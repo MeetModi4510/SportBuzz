@@ -103,6 +103,12 @@ export const login = asyncHandler(async (req, res) => {
         throw new Error('This email is not registered');
     }
 
+    // Check if the user has a password (they might have signed up via OAuth)
+    if (!user.password) {
+        res.status(401);
+        throw new Error(`This account was registered using ${user.provider || 'a third-party provider'}. Please sign in with that provider.`);
+    }
+
     // Check password
     const isMatch = await user.comparePassword(password);
 

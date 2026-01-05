@@ -257,7 +257,7 @@ export const players: Player[] = [
   { id: "tatum", name: "Jayson Tatum", teamId: "bos", sport: "basketball", position: "Forward", rating: 91, stats: { matches: 495, points: 11892, rebounds: 3421, assists: 2198 } },
 
   // Tennis Players
-  { id: "tn1", name: "Novak Djokovic", teamId: "srb", sport: "tennis", position: "Singles", rating: 97, stats: { matches: 1234, wins: 1068, title: "24 Grand Slams" }, image: "/images/players/djokovic_trending.png" },
+  { id: "tn1", name: "Novak Djokovic", teamId: "srb", sport: "tennis", position: "Singles", rating: 97, stats: { matches: 1234, wins: 1068, grandSlams: 24 }, image: "/images/players/djokovic_trending.png" },
   { id: "alcaraz", name: "Carlos Alcaraz", teamId: "esp", sport: "tennis", position: "Singles", rating: 94, stats: { matches: 187, wins: 152, grandSlams: 4, aces: 1234 } },
   { id: "sinner", name: "Jannik Sinner", teamId: "ita", sport: "tennis", position: "Singles", rating: 93, stats: { matches: 245, wins: 189, grandSlams: 2, aces: 1567 } },
 ];

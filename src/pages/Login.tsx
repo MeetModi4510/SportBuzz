@@ -10,6 +10,10 @@ import { SportIcon } from "@/components/SportIcon";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { authApi } from "@/services/api";
 
+const API_BASE = import.meta.env.PROD 
+  ? 'https://sportbuzz-backend.onrender.com' 
+  : 'http://localhost:5000';
+
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -52,9 +56,20 @@ const Login = () => {
           setIsLoading(false);
           return;
       }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error.response?.data?.message || "Login failed. Please try again.");
+    } catch (err: any) {
+      console.error("Login error:", err);
+      if (err.response) {
+        const data = err.response.data;
+        if (typeof data === 'string' && data.includes('<html')) {
+           setError("Backend server is not reachable. Is it running on port 5000?");
+        } else {
+           setError(data?.message || `Login failed with status ${err.response.status}`);
+        }
+      } else if (err.request) {
+        setError("Network error: Could not reach the server.");
+      } else {
+        setError(err.message || "Login failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -222,7 +237,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => {
-                  window.location.href = 'https://sportbuzz-backend.onrender.com/api/auth/google';
+                  window.location.href = `${API_BASE}/api/auth/google`;
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-800 hover:border-slate-700 hover:bg-slate-900/80 transition-all duration-300 group"
               >
@@ -236,7 +251,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => {
-                  window.location.href = 'https://sportbuzz-backend.onrender.com/api/auth/discord';
+                  window.location.href = `${API_BASE}/api/auth/discord`;
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[#5865F2]/20 border border-[#5865F2]/30 hover:bg-[#5865F2]/30 hover:border-[#5865F2]/50 transition-all duration-300 group"
               >

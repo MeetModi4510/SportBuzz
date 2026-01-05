@@ -55,12 +55,21 @@ export const MatchCard = ({ match, onClick, className }: MatchCardProps) => {
     return match.displayTime || formatToIST(new Date(match.startTime), 'full');
   };
 
-  // Get result styling based on summaryText
-  const getResultBar = () => {
-    const summary = (match.summaryText || '').toLowerCase();
+  // Determine if scores are genuinely unavailable (API limitation)
+  const scoresUnavailable = (match as any)._scoresUnavailable === true || 
+    (isLive && !match.homeScore && !match.awayScore);
 
+  // Get result styling based on summaryText / chaseLine
+  const getResultBar = () => {
     if (isLive) {
-      // Live matches - show chase status or current state
+      // PROMPT 3: Show chase line if available, otherwise generic live indicator
+      if (match.chaseLine) {
+        return (
+          <div className="mt-3 p-2 bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 rounded-lg text-xs text-red-400 font-medium text-center">
+            🎯 {match.chaseLine}
+          </div>
+        );
+      }
       return (
         <div className="mt-3 p-2 bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 rounded-lg text-xs text-red-400 font-medium text-center animate-pulse">
           🔴 {match.sport === 'cricket' ? (match.summaryText || 'Live') : 'Live'}
@@ -94,9 +103,9 @@ export const MatchCard = ({ match, onClick, className }: MatchCardProps) => {
     <div
       onClick={() => onClick?.(match)}
       className={cn(
-        "group relative overflow-hidden rounded-xl border bg-card p-4 transition-all duration-300",
+        "group relative overflow-hidden rounded-xl border bg-card p-3 transition-all duration-300",
         "hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/5 cursor-pointer",
-        match.matchType === 'Test' ? "h-[380px] flex flex-col" : "h-[280px] flex flex-col", // Taller for Test matches
+        "h-[280px] w-full flex flex-col",
         `bg-gradient-to-br ${getSportGradient(match.sport)}`,
         getSportBorderColor(match.sport),
         isLive && "ring-2 ring-live/50 animate-pulse-live",
@@ -202,7 +211,7 @@ export const MatchCard = ({ match, onClick, className }: MatchCardProps) => {
                 "text-lg font-bold font-mono whitespace-nowrap",
                 isLive && "text-live"
               )}>
-                {match.homeScore || (isUpcoming ? '-' : '0/0')}
+                {match.homeScore || (isUpcoming ? '-' : (scoresUnavailable ? '—' : '0/0'))}
               </span>
             </div>
 
@@ -228,7 +237,7 @@ export const MatchCard = ({ match, onClick, className }: MatchCardProps) => {
                 "text-lg font-bold font-mono whitespace-nowrap",
                 isLive && "text-live"
               )}>
-                {match.awayScore || (isUpcoming ? '-' : '0/0')}
+                {match.awayScore || (isUpcoming ? '-' : (scoresUnavailable ? '—' : '0/0'))}
               </span>
             </div>
           </>

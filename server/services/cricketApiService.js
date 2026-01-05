@@ -22,7 +22,8 @@ if (!API_KEY) {
 
 // Cache configuration
 // stdTTL: standard time to live in seconds
-const cache = new NodeCache({ stdTTL: 600 }); // Default 10 minutes
+// PROMPT 2: Aligned to 12-minute (720s) refresh cycle
+const cache = new NodeCache({ stdTTL: 720 }); // Default 12 minutes
 
 // API Endpoints
 const ENDPOINTS = {
@@ -133,18 +134,18 @@ export const cricketService = {
         return await fetchWithCache(ENDPOINTS.SERIES, searchParams, 3600);
     },
 
-    // Cache for 10 minutes (600 seconds)
+    // PROMPT 2: Cache for 12 minutes (720 seconds) aligned to frontend refresh
     getCurrentMatches: async () => {
-        const data = await fetchWithCache(ENDPOINTS.CURRENT_MATCHES, {}, 600);
+        const data = await fetchWithCache(ENDPOINTS.CURRENT_MATCHES, {}, 720);
         if (data && data.data) {
             data.data = enrichMatches(data.data);
         }
         return data;
     },
 
-    // Cache for 10 minutes (600 seconds)
+    // PROMPT 2: Cache for 12 minutes (720 seconds)
     getAllMatches: async () => {
-        const data = await fetchWithCache(ENDPOINTS.MATCHES, {}, 600);
+        const data = await fetchWithCache(ENDPOINTS.MATCHES, {}, 720);
         if (data && data.data) {
             data.data = enrichMatches(data.data);
         }
@@ -193,18 +194,46 @@ export const cricketService = {
             }
         }
 
-        const data = await fetchWithCache(ENDPOINTS.MATCH_INFO, { id }, 600);
+        // PROMPT 2: Completed match info cached for 1 hour, others for 12 min
+        const data = await fetchWithCache(ENDPOINTS.MATCH_INFO, { id }, 720);
 
-        // If match is completed, update cache TTL to 1 hour (hacky way to extend TTL for completed matches)
-        if (data?.data?.status === 'Match Ended') {
+        if (data?.data?.matchEnded === true || (data?.data?.status || '').toLowerCase().includes('won by')) {
             const cacheKey = `${ENDPOINTS.MATCH_INFO}_${JSON.stringify({ id })}`;
-            cache.ttl(cacheKey, 3600);
+            cache.ttl(cacheKey, 3600); // Extend completed match cache to 1 hour
         }
 
         if (data && data.data) {
             data.data = enrichMatch(data.data);
         }
         return data;
+    },
+
+    // PROMPT 3: Dedicated live /match_info fetch with 5-minute (300s) TTL
+    // Used exclusively by featuredController for live score + chase sync
+    getMatchInfoLive: async (id) => {
+        // Use a separate cache key prefix to avoid colliding with the 12-min cache
+        const cacheKey = `live_match_info_${id}`;
+        const cached = cache.get(cacheKey);
+        if (cached) {
+            console.log(`[CACHE HIT] live_match_info ${id}`);
+            return cached;
+        }
+        console.log(`[API CALL] getMatchInfoLive ${id}`);
+        try {
+            const response = await axios.get(`${BASE_URL}${ENDPOINTS.MATCH_INFO}`, {
+                params: { apikey: API_KEY, id, offset: 0 },
+            });
+            const data = response.data;
+            if (data && (data.status === 'success' || data.data)) {
+                if (data.data) data.data = enrichMatch(data.data);
+                // 12-minute TTL for live match info polling
+                cache.set(cacheKey, data, 720);
+            }
+            return data;
+        } catch (err) {
+            console.error(`[API ERROR] getMatchInfoLive ${id}:`, err.message);
+            throw err;
+        }
     },
 
     // Cache for 24 hours

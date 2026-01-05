@@ -122,9 +122,13 @@ export function mapApiMatchToModel(apiMatch: any): Match {
         displayTime: formatToIST(apiMatch.dateTimeGMT || apiMatch.date, 'full'),
         summaryText: apiMatch.status,
         stumpsStatus: apiMatch.status,
+        // PROMPT 3: Chase line precomputed on backend from same live payload
+        chaseLine: apiMatch.chaseLine ?? null,
         inningsScores,
         homeLineup: apiMatch.homeLineup,
-        awayLineup: apiMatch.awayLineup
+        awayLineup: apiMatch.awayLineup,
+        // FIX: Pass API limitation flag to frontend for proper display
+        _scoresUnavailable: apiMatch._scoresUnavailable || false
     };
 }
 

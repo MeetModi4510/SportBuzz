@@ -142,6 +142,29 @@ const TEAM_COLORS: Record<string, { primary: string; gradient: string }> = {
 
 const getTeamColor = (country: string) => TEAM_COLORS[country] || { primary: "#6b7280", gradient: "from-gray-500/20 to-gray-300/10" };
 
+// ─── Flag Helper ─────────────────────────────────────────────────
+const COUNTRY_CODES: Record<string, string> = {
+    "India": "in", "Australia": "au", "England": "gb-eng", "New Zealand": "nz",
+    "Pakistan": "pk", "South Africa": "za", "Sri Lanka": "lk", "Bangladesh": "bd",
+    "Afghanistan": "af", "France": "fr", "Norway": "no", "Argentina": "ar",
+    "Brazil": "br", "Portugal": "pt", "Belgium": "be", "Netherlands": "nl",
+    "Spain": "es", "Nigeria": "ng", "Morocco": "ma", "Germany": "de",
+    "Croatia": "hr", "Uruguay": "uy", "USA": "us", "Serbia": "rs",
+    "Greece": "gr", "Slovenia": "si", "Cameroon": "cm", "Canada": "ca",
+    "Italy": "it", "Russia": "ru", "Poland": "pl", "Belarus": "by"
+};
+
+const getCountryFlagImg = (country: string, className = "w-5 h-auto rounded-[2px] shadow-sm") => {
+    if (country === "West Indies") {
+        return <img src="/flags/westindies.png" alt="West Indies" className={className} />;
+    }
+    const code = COUNTRY_CODES[country];
+    if (code) {
+        return <img src={`https://flagcdn.com/w40/${code}.png`} alt={country} className={className} />;
+    }
+    return null; // fallback if needed
+};
+
 // ─── Section Card ────────────────────────────────────────────────
 const Section = ({ icon, title, subtitle, children, className }: {
     icon: React.ReactNode; title: string; subtitle?: string; children: React.ReactNode; className?: string;
@@ -535,8 +558,8 @@ export const PlayerAnalysisPanel = () => {
     // Get unique countries for the current sport
     const countries = useMemo(() => {
         const unique = new Map<string, string>(); // country -> flag
-        allPlayers.forEach(p => unique.set(p.country, p.countryFlag));
-        return Array.from(unique.entries()).map(([name, flag]) => ({ name, flag }));
+        allPlayers.forEach(p => unique.set(p.country, p.country));
+        return Array.from(unique.entries()).map(([name]) => ({ name }));
     }, [allPlayers]);
 
     // Filter players
@@ -612,14 +635,15 @@ export const PlayerAnalysisPanel = () => {
                         <button
                             onClick={() => setSelectedCountry("All")}
                             className={cn(
-                                "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap border transition-all",
+                                "shrink-0 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition-all flex items-center gap-2",
                                 selectedCountry === "All"
                                     ? "text-white border-transparent shadow-md"
                                     : "bg-secondary/30 text-muted-foreground border-border hover:bg-secondary/60"
                             )}
                             style={selectedCountry === "All" ? { background: sportConfig.color } : undefined}
                         >
-                            🌍 All
+                            <span className="text-base leading-none">🌍</span>
+                            <span className="leading-none mt-[1px]">All</span>
                         </button>
                         {countries.map(c => {
                             const tc = getTeamColor(c.name);
@@ -628,15 +652,15 @@ export const PlayerAnalysisPanel = () => {
                                     key={c.name}
                                     onClick={() => setSelectedCountry(c.name)}
                                     className={cn(
-                                        "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap border transition-all flex items-center gap-1.5",
+                                        "shrink-0 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition-all flex items-center gap-2",
                                         selectedCountry === c.name
                                             ? "text-white border-transparent shadow-md"
                                             : "bg-secondary/30 text-muted-foreground border-border hover:bg-secondary/60"
                                     )}
                                     style={selectedCountry === c.name ? { background: tc.primary } : undefined}
                                 >
-                                    <span>{c.flag}</span>
-                                    {c.name}
+                                    {getCountryFlagImg(c.name, "w-[22px] h-[15px] object-cover rounded-[2px] shadow-sm")}
+                                    <span className="leading-none mt-[1px]">{c.name}</span>
                                 </button>
                             );
                         })}
@@ -666,9 +690,11 @@ export const PlayerAnalysisPanel = () => {
                                         <span style={PLAYER_PHOTOS[player.id] ? { display: 'none' } : undefined}>{player.image}</span>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-1.5">
+                                        <div className="flex items-center gap-2">
                                             <span className="font-semibold text-sm truncate">{player.name}</span>
-                                            <span className="text-sm">{player.countryFlag}</span>
+                                            <div className="flex-shrink-0 flex items-center justify-center">
+                                                {getCountryFlagImg(player.country, "w-6 h-4 object-cover rounded-[2px] shadow-sm")}
+                                            </div>
                                         </div>
                                         <div className="flex items-center gap-2 mt-0.5">
                                             <span className="text-[11px] text-muted-foreground">{player.role}</span>
@@ -699,9 +725,11 @@ export const PlayerAnalysisPanel = () => {
                                     <span style={PLAYER_PHOTOS[selectedPlayer.id] ? { display: 'none' } : undefined}>{selectedPlayer.image}</span>
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-bold flex items-center gap-2">
+                                    <h2 className="text-2xl font-bold flex items-center gap-3">
                                         {selectedPlayer.name}
-                                        <span className="text-lg">{selectedPlayer.countryFlag}</span>
+                                        <div className="flex-shrink-0 flex items-center justify-center mt-1">
+                                            {getCountryFlagImg(selectedPlayer.country, "w-8 h-[22px] object-cover rounded-[3px] shadow-sm")}
+                                        </div>
                                     </h2>
                                     <p className="text-sm text-muted-foreground mt-0.5">{selectedPlayer.role} • {selectedPlayer.country}</p>
                                 </div>

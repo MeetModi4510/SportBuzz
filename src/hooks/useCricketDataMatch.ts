@@ -49,8 +49,8 @@ export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean
         // Initial fetch
         fetchData();
 
-        // Poll every 5 minutes (300,000 ms)
-        const interval = setInterval(fetchData, 300000);
+        // Poll every 12 minutes (720,000 ms) — aligned with backend cache TTL
+        const interval = setInterval(fetchData, 720000);
 
         return () => clearInterval(interval);
     }, [isOpen, matchId, fetchData]);

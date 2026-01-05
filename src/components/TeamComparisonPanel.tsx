@@ -38,6 +38,81 @@ import {
     Activity,
 } from "lucide-react";
 
+// ─── Country ISO code map for Flagpedia API ─────────────────────
+const COUNTRY_ISO: Record<string, string> = {
+    "India": "in",
+    "Australia": "au",
+    "England": "gb-eng",
+    "New Zealand": "nz",
+    "Pakistan": "pk",
+    "South Africa": "za",
+    "Sri Lanka": "lk",
+    "Bangladesh": "bd",
+    "Afghanistan": "af",
+    "France": "fr",
+    "Norway": "no",
+    "Argentina": "ar",
+    "Brazil": "br",
+    "Portugal": "pt",
+    "Belgium": "be",
+    "Netherlands": "nl",
+    "Spain": "es",
+    "Germany": "de",
+    "Croatia": "hr",
+    "Uruguay": "uy",
+    "Nigeria": "ng",
+    "Morocco": "ma",
+    "USA": "us",
+    "Serbia": "rs",
+    "Greece": "gr",
+    "Slovenia": "si",
+    "Canada": "ca",
+    "Cameroon": "cm",
+    "Italy": "it",
+};
+
+/**
+ * TeamFlag — renders a real flag image.
+ * For West Indies: uses the local /flags/westindies.png asset.
+ * For all others: fetches from Flagpedia CDN via ISO country code.
+ * Falls back silently to nothing if neither is available.
+ */
+function TeamFlag({ country, size = 48 }: { country: string; size?: number }) {
+    // West Indies has no ISO country code — use stored image
+    if (country === "West Indies") {
+        return (
+            <img
+                src="/flags/westindies.png"
+                alt="West Indies"
+                width={size}
+                height={size}
+                className="object-contain rounded-md"
+                style={{ width: size, height: size }}
+            />
+        );
+    }
+
+    const iso = COUNTRY_ISO[country];
+    if (!iso) {
+        // Unknown country — render nothing (keeps layout intact)
+        return <span className="text-2xl">🏏</span>;
+    }
+
+    // Flagpedia CDN: /w40/{iso}.png  (40px wide, auto height)
+    return (
+        <img
+            src={`https://flagcdn.com/w40/${iso}.png`}
+            srcSet={`https://flagcdn.com/w80/${iso}.png 2x`}
+            alt={country}
+            width={size}
+            height={Math.round(size * 0.66)}
+            className="object-contain rounded-md"
+            style={{ width: size, height: Math.round(size * 0.66) }}
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+        />
+    );
+}
+
 // ─── Tooltip style ───────────────────────────────────────────────
 const TOOLTIP_STYLE = {
     backgroundColor: "hsl(var(--card))",
@@ -223,8 +298,8 @@ function CountrySelectHUD({
                 )}>
                     {/* Flag Unit */}
                     <div className="relative shrink-0">
-                        <div className="w-24 h-24 rounded-[2rem] bg-slate-900 border border-white/10 flex items-center justify-center text-5xl shadow-2xl relative overflow-hidden group-hover/hud:scale-105 transition-transform">
-                            {current?.flag}
+                        <div className="w-24 h-24 rounded-[2rem] bg-slate-900 border border-white/10 flex items-center justify-center shadow-2xl relative overflow-hidden group-hover/hud:scale-105 transition-transform">
+                            <TeamFlag country={current?.country || ""} size={52} />
                             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent animate-pulse" />
                         </div>
                         <div className="absolute -inset-2 rounded-[2.5rem] border border-white/5 animate-[spin_10s_linear_infinite]" />
@@ -262,7 +337,9 @@ function CountrySelectHUD({
                                 t.country === selected ? "bg-primary/20 border border-primary/30" : "hover:bg-white/5 border border-transparent"
                             )}
                         >
-                            <span className="text-3xl shrink-0 group-hover/item:scale-110 transition-transform">{t.flag}</span>
+                            <span className="shrink-0 group-hover/item:scale-110 transition-transform flex items-center justify-center w-10 h-8">
+                                <TeamFlag country={t.country} size={36} />
+                            </span>
                             <div className="flex-1 min-w-0 text-left">
                                 <span className="font-black text-white text-sm block uppercase tracking-tight">{t.country}</span>
                                 <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Rating: {t.avgRating}</span>
@@ -681,8 +758,8 @@ export function TeamComparisonPanel() {
                     <div className="grid grid-cols-2 gap-4">
                         {/* Team A pie */}
                         <div className="text-center">
-                            <p className="text-sm font-medium text-indigo-400 mb-2">
-                                {teamA.flag} {teamA.country}
+                            <p className="text-sm font-medium text-indigo-400 mb-2 flex items-center justify-center gap-2">
+                                <TeamFlag country={teamA.country} size={24} /> {teamA.country}
                             </p>
                             <div className="h-44">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -719,8 +796,8 @@ export function TeamComparisonPanel() {
                         </div>
                         {/* Team B pie */}
                         <div className="text-center">
-                            <p className="text-sm font-medium text-rose-400 mb-2">
-                                {teamB.flag} {teamB.country}
+                            <p className="text-sm font-medium text-rose-400 mb-2 flex items-center justify-center gap-2">
+                                <TeamFlag country={teamB.country} size={24} /> {teamB.country}
                             </p>
                             <div className="h-44">
                                 <ResponsiveContainer width="100%" height="100%">

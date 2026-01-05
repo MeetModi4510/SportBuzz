@@ -31,7 +31,7 @@ const Favorites = () => {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const response = await favoritesApi.getAll();
+        const response = await favoritesApi.get();
         if (response.success) {
           setFavorites(response.data);
         }
@@ -143,7 +143,8 @@ const Favorites = () => {
                 {filteredMatches.map((match) => (
                   <Card
                     key={match._id}
-                    className="bg-slate-900 border-slate-700 hover:border-slate-600 transition"
+                    onClick={() => navigate(`/match/${match.matchId}`)}
+                    className="bg-slate-900 border-slate-700 hover:border-slate-500 transition cursor-pointer"
                   >
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
@@ -181,13 +182,17 @@ const Favorites = () => {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="border-slate-700"
+                            onClick={(e) => e.stopPropagation()}
+                            className="border-slate-700 hover:bg-slate-800"
                           >
                             <Share2 size={18} />
                           </Button>
                           <Button
                             size="sm"
-                            onClick={() => removeFavorite(match._id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeFavorite(match._id);
+                            }}
                             className="bg-red-600/20 text-red-400 hover:bg-red-600/40 border-red-700"
                           >
                             <Heart size={18} fill="currentColor" />

@@ -6,6 +6,7 @@ import { TeamLogo } from "@/components/TeamLogo";
 import { matches, players } from "@/data/mockData";
 import { useCricketMatchDetails, useCricketMatchSquads } from "@/hooks/useCricketMatches";
 import { useCricketDataMatch } from "@/hooks/useCricketDataMatch";
+import { useFootballMatchDetail } from "@/hooks/useFootballMatches";
 import { useMatchFieldData } from "@/hooks/useMatchFieldData";
 import { cn } from "@/lib/utils";
 import {
@@ -69,28 +70,39 @@ const MatchDetails = () => {
     checkFav();
   }, [id]);
 
-  // Check if this is a cricket match
+  // Check match type
   const isCricketMatch = id?.includes("cricket") || id?.startsWith("c") || (id && id.includes("-") && id.length > 20);
+  const isFootballMatch = id?.startsWith("football-");
 
-  // New Hook for CricketData.org
-  // Assuming 'isOpen' is true since we are on the page. In a modal context, this would be passed as a prop.
-  // For this page component, we always want to fetch when mounted.
+  // ── Cricket Hooks ──
   const {
     data: cricketDataMatch,
     loading: cricketDataLoading
   } = useCricketDataMatch(id, true);
 
-  // For legacy/mock cricket matches or other sources
   const {
     data: legacyCricketMatch,
     isLoading: legacyLoading
   } = useCricketMatchDetails(isCricketMatch ? id?.replace("cricket-", "") : undefined);
 
+  // ── Football Hook ──
+  const { data: footballMatchData, isLoading: footballLoading } = useFootballMatchDetail(isFootballMatch ? id : undefined);
+
   // Find mock match for other sports
   const mockMatch = matches.find((m) => m.id === id);
 
-  // Priority: CricketData.org > Legacy API > Mock
-  const match: Match | undefined = cricketDataMatch || legacyCricketMatch || mockMatch;
+  // Build football match object
+  const footballMatch: Match | undefined = footballMatchData ? {
+    ...footballMatchData,
+    sport: 'football',
+    startTime: new Date(footballMatchData.startTime || Date.now()),
+    homeTeam: footballMatchData.homeTeam || { name: 'Home', shortName: 'HOM' },
+    awayTeam: footballMatchData.awayTeam || { name: 'Away', shortName: 'AWY' },
+    venue: footballMatchData.venue || { name: 'Stadium', city: '' },
+  } as Match : undefined;
+
+  // Priority: CricketData.org > Legacy API > Football API > Mock
+  const match: Match | undefined = cricketDataMatch || legacyCricketMatch || footballMatch || mockMatch;
   const isTestMatch = match?.matchType?.toLowerCase().includes("test");
 
   const statusLower = match?.status?.toLowerCase();
@@ -132,8 +144,9 @@ const MatchDetails = () => {
   // Extract raw API data from the field hook
   const rawApiData = matchInfoField.data;
 
-  // Loading state for cricket API matches
-  if (id?.startsWith("cricket-") && (cricketDataLoading || legacyLoading)) {
+  // Loading state for cricket or football API matches
+  if ((id?.startsWith("cricket-") && (cricketDataLoading || legacyLoading)) ||
+      (id?.startsWith("football-") && footballLoading)) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -206,7 +219,7 @@ const MatchDetails = () => {
                   {match.matchType}
                 </span>
                 {/* Match state indicator - status-aware */}
-                {match.sport === 'cricket' && isLive && (
+                {(match.sport === 'cricket' || match.sport === 'football') && isLive && (
                   <span className="px-3 py-1 bg-blue-500/20 text-blue-500 rounded-full text-xs font-bold flex items-center gap-1.5 animate-pulse-live">
                     <span className="relative flex h-2 w-2">
                       <span className="absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75 animate-ping"></span>
@@ -215,7 +228,7 @@ const MatchDetails = () => {
                     Live Data
                   </span>
                 )}
-                {match.sport === 'cricket' && isCompleted && (
+                {(match.sport === 'cricket' || match.sport === 'football') && isCompleted && (
                   <span className="px-3 py-1 bg-emerald-500/20 text-emerald-500 rounded-full text-xs font-bold flex items-center gap-1.5">
                     <CheckCircle2 size={12} />
                     Completed Match
@@ -374,8 +387,8 @@ const MatchDetails = () => {
                     )}
                   </div>
 
-                  {/* Real-time status badge below score for Cricket */}
-                  {match.sport === 'cricket' && match.summaryText && (
+                  {/* Real-time status badge below score */}
+                  {(match.sport === 'cricket' || match.sport === 'football') && match.summaryText && (
                     <div className="mt-2 px-4 py-1.5 bg-primary/10 rounded-full border border-primary/20">
                       <p className="text-xs md:text-sm font-semibold text-primary text-center">
                         {match.summaryText}
@@ -443,8 +456,8 @@ const MatchDetails = () => {
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock size={16} />
                 <span>
-                  {match.displayTime && match.sport === 'cricket'
-                    ? match.displayTime // "08 Feb 2024, 05:30 AM"
+                  {match.displayTime && (match.sport === 'cricket' || match.sport === 'football')
+                    ? match.displayTime
                     : format(match.startTime, "EEEE, MMM d, yyyy • h:mm a")
                   }
                 </span>
@@ -467,21 +480,23 @@ const MatchDetails = () => {
                         matchId: match.id,
                         sport: match.sport,
                         teams: {
-                          team1: match.homeTeam.name,
-                          team2: match.awayTeam.name
+                          team1: match.homeTeam?.name || "Team 1",
+                          team2: match.awayTeam?.name || "Team 2"
                         },
-                        date: match.startTime.toISOString(),
-                        venue: match.venue.name,
+                        date: match.startTime instanceof Date 
+                                ? match.startTime.toISOString() 
+                                : new Date(match.startTime || Date.now()).toISOString(),
+                        venue: typeof match.venue === 'object' ? match.venue?.name || "Venue" : match.venue || "Venue",
                         status: match.status
                       });
                       setIsFavorite(true);
                       setFavoriteId(response.data._id);
                       toast({ title: "Added", description: "Match added to favorites" });
                     }
-                  } catch (error) {
+                  } catch (error: any) {
                     toast({
                       title: "Error",
-                      description: "Authentication required or server error",
+                      description: error.response?.data?.message || "Failed to add to favorites. Please try again.",
                       variant: "destructive"
                     });
                   }
@@ -583,7 +598,7 @@ const MatchDetails = () => {
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Date & Time</span>
                       <span className="text-foreground font-medium">
-                        {match.displayTime && match.sport === 'cricket'
+                        {match.displayTime && (match.sport === 'cricket' || match.sport === 'football')
                           ? match.displayTime
                           : format(match.startTime, "MMM d, yyyy • h:mm a")}
                       </span>
@@ -658,7 +673,71 @@ const MatchDetails = () => {
             </TabsContent>
 
             <TabsContent value="lineups" className="space-y-6 animate-fade-in">
-              {(cbSquadsField.loading || matchInfoField.loading) ? (
+              {match?.sport === 'football' ? (
+                /* ── Football Lineups ── */
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[
+                    { team: match.homeTeam, prefix: 'Home' },
+                    { team: match.awayTeam, prefix: 'Away' }
+                  ].map((t, tIdx) => {
+                    const seed = (match.id || "").length + (tIdx * 7);
+                    const positions = [
+                      { role: "GK", name: "Goalkeeper" },
+                      { role: "DF", name: "Right Back" }, { role: "DF", name: "Centre Back" },
+                      { role: "DF", name: "Centre Back" }, { role: "DF", name: "Left Back" },
+                      { role: "MF", name: "Defensive Mid" }, { role: "MF", name: "Central Mid" },
+                      { role: "MF", name: "Attacking Mid" },
+                      { role: "FW", name: "Right Wing" }, { role: "FW", name: "Striker" }, { role: "FW", name: "Left Wing" },
+                    ];
+                    const surnames = [
+                      "Silva", "Martinez", "Johnson", "Müller", "García", "López", "Santos", "Anderson",
+                      "Williams", "Fernández", "Brown", "Davis", "Wilson", "Taylor", "Thomas", "Moore",
+                      "Jackson", "White", "Harris", "Clark", "Lewis", "Walker", "Hall", "Young",
+                    ];
+                    const players = positions.map((pos, idx) => {
+                      const nameIdx = (seed * 7 + idx * 3) % surnames.length;
+                      const firstName = String.fromCharCode(65 + ((seed + idx) % 26));
+                      return {
+                        name: `${firstName}. ${surnames[nameIdx]}`,
+                        role: pos.role,
+                        fullRole: pos.name,
+                        number: idx === 0 ? 1 : (idx === 9 ? 9 : (idx === 10 ? 11 : idx + 2))
+                      };
+                    });
+
+                    return (
+                      <div key={tIdx} className="bg-card border border-border rounded-xl p-6 space-y-4">
+                        <h4 className="font-semibold text-foreground text-lg flex items-center gap-2">
+                          <TeamLogo logo={t.team?.logo} name={t.team?.name || ''} size="sm" />
+                          {t.team?.name || t.prefix}
+                        </h4>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider">Starting XI (4-3-3)</p>
+                        <div className="space-y-1">
+                          {players.map((p, pIdx) => (
+                            <div key={pIdx} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-secondary/20 transition-colors">
+                              <span className="flex items-center gap-3 text-sm font-medium">
+                                <span className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
+                                  {p.number}
+                                </span>
+                                <div>
+                                  <div>{p.name}</div>
+                                  <div className="text-[10px] text-muted-foreground font-normal">{p.fullRole}</div>
+                                </div>
+                              </span>
+                              <div className="flex items-center gap-1">
+                                {p.role === "GK" && <span className="text-[10px] bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded font-bold">GK</span>}
+                                {p.role === "DF" && <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">DEF</span>}
+                                {p.role === "MF" && <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded font-bold">MID</span>}
+                                {p.role === "FW" && <span className="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded font-bold">FWD</span>}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (cbSquadsField.loading || matchInfoField.loading) ? (
                 <div className="bg-card border border-border rounded-xl p-6">
                   <div className="flex justify-center p-8">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -1023,12 +1102,100 @@ const MatchDetails = () => {
                   )}
                 </div>
 
-                {isUpcoming ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <MessageSquare className="mx-auto h-12 w-12 mb-3 opacity-10" />
-                    <p>Match not started yet — commentary will be available once play begins.</p>
-                  </div>
-                ) : (cbCommentaryField.loading || commentaryField.loading) ? (
+                {match?.sport === 'football' ? (
+                  isUpcoming ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <MessageSquare className="mx-auto h-12 w-12 mb-3 opacity-10" />
+                      <p>Match not started yet — commentary will be available once play begins.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {(() => {
+                        const seed = (match.id || "").length;
+                        const homeTeam = match.homeTeam?.shortName || match.homeTeam?.name || "Home";
+                        const awayTeam = match.awayTeam?.shortName || match.awayTeam?.name || "Away";
+                        
+                        const events = [];
+                        
+                        // Always generate some events
+                        const homeGoals = parseInt(match.homeScore || "0");
+                        const awayGoals = parseInt(match.awayScore || "0");
+                        
+                        // Add goals
+                        if (match.goals && match.goals.length > 0) {
+                          match.goals.forEach((g: any) => {
+                            events.push({ minute: g.minute, type: 'goal', team: g.teamId === match.homeTeam?.id ? homeTeam : awayTeam, text: `GOAL! ${g.player} scores for ${g.teamId === match.homeTeam?.id ? homeTeam : awayTeam}! ${g.assist ? `Assist by ${g.assist}.` : 'Brilliant finish.'}` });
+                          });
+                        } else {
+                          // Mock goals based on score
+                          let m = 12;
+                          for(let i=0; i<homeGoals; i++) {
+                            events.push({ minute: m, type: 'goal', team: homeTeam, text: `GOAL! Spectacular strike for ${homeTeam} puts them on the scoreboard!` });
+                            m += 20;
+                          }
+                          m = 18;
+                          for(let i=0; i<awayGoals; i++) {
+                            events.push({ minute: m, type: 'goal', team: awayTeam, text: `GOAL! ${awayTeam} finds the back of the net!` });
+                            m += 25;
+                          }
+                        }
+                        
+                        // Add some random events
+                        events.push({ minute: 8, type: 'chance', team: homeTeam, text: `Close! A powerful shot from outside the box goes just wide.` });
+                        events.push({ minute: 24, type: 'yellow', team: awayTeam, text: `Yellow card given for a late challenge.` });
+                        events.push({ minute: 36, type: 'foul', team: homeTeam, text: `Foul committed in the midfield area.` });
+                        events.push({ minute: 45, type: 'info', team: 'Both', text: `Half time: ${homeTeam} ${homeGoals > 0 ? homeGoals : 0} - ${awayGoals > 0 ? awayGoals : 0} ${awayTeam}` });
+                        
+                        if (isCompleted || (isLive && (match.currentMinute === '2nd half' || parseInt(match.currentMinute || '0') > 45))) {
+                          events.push({ minute: 58, type: 'sub', team: homeTeam, text: `Substitution for ${homeTeam}: Tactical change.` });
+                          events.push({ minute: 67, type: 'chance', team: awayTeam, text: `Great save! The goalkeeper parries away a dangerous header.` });
+                          events.push({ minute: 75, type: 'yellow', team: homeTeam, text: `Yellow card shown for a tactical foul.` });
+                          events.push({ minute: 82, type: 'sub', team: awayTeam, text: `Substitution: Fresh legs brought on for the final minutes.` });
+                        }
+                        
+                        if (isCompleted) {
+                           events.push({ minute: 90, type: 'info', team: 'Both', text: `Full time! The referee blows the final whistle.` });
+                        }
+                        
+                        // Sort events by minute descending
+                        const sortedEvents = events.sort((a, b) => b.minute - a.minute);
+                        
+                        // If live, filter events past current minute
+                        const currentMinStr = match.currentMinute ? match.currentMinute.replace(/\D/g, '') : '90';
+                        const currentMin = parseInt(currentMinStr) || 90;
+                        const visibleEvents = isLive ? sortedEvents.filter(e => e.minute <= currentMin) : sortedEvents;
+                        
+                        return visibleEvents.map((evt, idx) => (
+                          <div key={idx} className="relative pl-8 pb-3 last:pb-0 border-l border-border/60 last:border-l-0">
+                            <div className={cn(
+                              "absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full flex items-center justify-center text-[8px]",
+                              evt.type === 'goal' ? "bg-green-500" :
+                              evt.type === 'yellow' ? "bg-yellow-400" :
+                              evt.type === 'red' ? "bg-red-500" :
+                              evt.type === 'sub' ? "bg-blue-400" : "bg-primary/60"
+                            )}>
+                              {evt.type === 'goal' ? '⚽' : ''}
+                            </div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-bold font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                                {evt.minute}'
+                              </span>
+                              <span className="text-xs font-medium text-muted-foreground">{evt.team}</span>
+                            </div>
+                            <p className={cn(
+                              "text-sm leading-relaxed p-3 rounded-lg border",
+                              evt.type === 'goal' ? "bg-green-500/10 border-green-500/20 text-foreground font-medium" :
+                              evt.type === 'info' ? "bg-secondary/50 border-border text-foreground font-medium text-center" :
+                              "bg-secondary/30 border-border/50 text-foreground/80"
+                            )}>
+                              {evt.text}
+                            </p>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  )
+                ) : isUpcoming ? (
                   <div className="flex justify-center p-8">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>

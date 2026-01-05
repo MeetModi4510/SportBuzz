@@ -92,9 +92,23 @@ const Signup = () => {
           setIsLoading(false);
           return;
       }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error.response?.data?.message || "Signup failed. Please try again.");
+    } catch (err: any) {
+      console.error("Signup error:", err);
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        const data = err.response.data;
+        if (typeof data === 'string' && data.includes('<html')) {
+           setError("Backend server is not reachable. Is it running on port 5000?");
+        } else {
+           setError(data?.message || `Signup failed with status ${err.response.status}`);
+        }
+      } else if (err.request) {
+        // The request was made but no response was received
+        setError("Network error: Could not reach the server.");
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setError(err.message || "Signup failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

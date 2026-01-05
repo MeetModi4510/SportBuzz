@@ -132,7 +132,12 @@ export const footballApi = {
     
     // External/Existing
     getMatchSquads: (matchId: string) => api.get(`football/match/${matchId}/squads`),
-    getLiveMatches: () => api.get('football/matches/live')
+    getLiveMatches: () => api.get('football/matches/live'),
+
+    // Real Football Data (Hybrid: AllSportsApi2 + Football-Data.org)
+    getDashboard: () => api.get('football/dashboard'),
+    getMatchDetail: (id: string) => api.get(`football/detail/${id}`),
+    getRealMatch: (id: string) => api.get(`football/real/${id}`)
 };
 
 export const tournamentApi = {
@@ -200,10 +205,10 @@ export const userApi = {
 };
 
 export const favoritesApi = {
-  get: () => api.get('user/favorites'),
-  add: (data: any) => api.post('user/favorites', data),
-  remove: (id: string) => api.delete(`user/favorites/${id}`),
-  check: (id: string) => api.get(`user/favorites/check/${id}`)
+  get: () => api.get('favorites'),
+  add: (data: any) => api.post('favorites', data),
+  remove: (id: string) => api.delete(`favorites/${id}`),
+  check: (id: string) => api.get(`favorites/check/${id}`)
 };
 
 export const leaderboardApi = {

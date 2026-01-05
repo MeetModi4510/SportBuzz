@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getTeamAcronym } from "@/lib/utils";
@@ -60,7 +60,20 @@ type DetailTab = "traits" | "stats" | "awards" | "wagonwheel" | "matches";
 const PlayerProfilePage = () => {
     const { name } = useParams<{ name: string }>();
     const navigate = useNavigate();
-    
+    const location = useLocation();
+
+    // Determine where to go back to
+    const locationState = location.state as { from?: string; section?: string } | null;
+    const handleBack = () => {
+        if (locationState?.from === 'dashboard' && locationState?.section) {
+            // Navigate back to dashboard with a hash so it scrolls to the right section
+            const sectionId = locationState.section === 'trending' ? 'trending-players' : 'match-sections';
+            navigate({ pathname: '/', hash: `#${sectionId}` });
+        } else {
+            navigate(-1);
+        }
+    };
+
     const [isLoadingStats, setIsLoadingStats] = useState(false);
     const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
     const [playerStats, setPlayerStats] = useState<any>(null);
@@ -89,7 +102,7 @@ const PlayerProfilePage = () => {
         setPlayerDetailTab(tab);
         const next = new URLSearchParams(searchParams);
         next.set("ptab", tab);
-        setSearchParams(next);
+        setSearchParams(next, { replace: true });
     };
 
     const fetchPlayerStats = useCallback(async (playerName: string) => {
@@ -183,10 +196,10 @@ const PlayerProfilePage = () => {
         batting: statsRaw.batting || { innings: 0, runs: 0, average: '0.0', strikeRate: '0.0', highestScore: '0', hundreds: 0, fifties: 0, fours: 0, sixes: 0 },
         bowling: statsRaw.bowling || { wickets: 0, economy: '0.00', average: '0.0', bestFigures: '0/0' },
         fielding: statsRaw.fielding || { catches: 0, stumpings: 0, runouts: 0, total: 0 },
-        recentPerformances: statsRaw.recentPerformances || [],
+        recentPerformances: statsRaw.recentPerformances || playerStats?.recentPerformances || [],
         awardsList: statsRaw.awardsList?.length > 0 ? statsRaw.awardsList : (playerStats?.milestones || []),
         awardsCount: statsRaw.awardsCount || (playerStats?.milestones?.length || 0),
-        wagonWheel: statsRaw.wagonWheel || [],
+        wagonWheel: statsRaw.wagonWheel || playerStats?.wagonWheel || [],
         teamsPlayedFor: playerStats?.teamsPlayedFor || []
     };
 
@@ -195,7 +208,7 @@ const PlayerProfilePage = () => {
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
                 <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800 h-10 w-10">
+                    <Button variant="ghost" size="icon" onClick={handleBack} className="text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800 h-10 w-10">
                         <ArrowLeft size={18} />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800 h-10 w-10">
@@ -292,14 +305,16 @@ const PlayerProfilePage = () => {
                                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">
                                                     {playerSport === 'football' ? 'Position' : playerSport === 'basketball' ? 'Position' : playerSport === 'tennis' ? 'Handedness' : 'Batting Profile'}
                                                 </p>
-                                                <p className="text-sm font-black text-white">{selectedPlayer.role || (playerSport === 'cricket' ? (selectedPlayer.battingStyle || 'Right-hand Bat') : 'Professional')}</p>
+                                                <p className="text-sm font-black text-white">
+                                                    {playerSport === 'cricket' ? (selectedPlayer.battingStyle || 'Right-hand Bat') : (selectedPlayer.role || 'Professional')}
+                                                </p>
                                             </div>
                                             <div className="px-4 py-2 rounded-xl bg-slate-800/80 border border-slate-700">
                                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">
                                                     {playerSport === 'football' ? 'Pref. Foot' : playerSport === 'basketball' ? 'Age' : playerSport === 'tennis' ? 'Backhand' : 'Bowling Action'}
                                                 </p>
                                                 <p className="text-sm font-black text-white">
-                                                    {playerSport === 'cricket' ? (selectedPlayer.bowlingStyle || 'None') : 
+                                                    {playerSport === 'cricket' ? (selectedPlayer.bowlingStyle || 'Right-arm Fast') : 
                                                      playerSport === 'basketball' ? (selectedPlayer.age || 'N/A') :
                                                      playerSport === 'tennis' ? 'Two-handed' : 'Right'}
                                                 </p>
@@ -358,7 +373,7 @@ const PlayerProfilePage = () => {
                             {playerStats && playerSport === 'cricket' && (
                                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between p-4 bg-slate-900 border border-slate-800 rounded-3xl relative z-20 shadow-2xl">
                                     <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
-                                        {['All', 'T20', 'ODI', 'Test', 'T10'].map(fmt => (
+                                        {['All', 'T20', 'ODI', 'Test'].map(fmt => (
                                             <button
                                                 key={fmt}
                                                 onClick={() => setPlayerStatsFormat(fmt)}
@@ -517,13 +532,14 @@ const PlayerProfilePage = () => {
                                                             <div className="space-y-6">
                                                                 <div className="flex items-end justify-between gap-1 h-32">
                                                                     {playerStats.formTrend.map((val: number, i: number) => (
-                                                                        <div key={i} className="flex-1 group relative">
+                                                                        <div key={i} className="flex-1 group relative h-full flex flex-col justify-end">
                                                                             <div 
-                                                                                className="w-full bg-blue-500/40 group-hover:bg-blue-500 transition-all rounded-t-sm" 
+                                                                                className="w-full bg-blue-500/40 group-hover:bg-blue-500 transition-all rounded-t-sm relative" 
                                                                                 style={{ height: `${val}%` }} 
-                                                                            />
-                                                                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-900 text-[8px] text-white px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                                                                {val}
+                                                                            >
+                                                                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-900 text-[8px] text-white px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                                                                    {val}
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     ))}

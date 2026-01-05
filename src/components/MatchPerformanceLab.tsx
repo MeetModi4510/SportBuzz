@@ -110,12 +110,60 @@ const generateMockData = (match: Match) => {
         };
     });
 
-    // ─── Use REAL lineups from the match data ────────────────────
+    // ─── Use REAL lineups from the match data, or generate synthetic ones ────────────────────
     const rawHomePlayers = getPlayersByTeam(match.homeTeam?.id || "");
     const rawAwayPlayers = getPlayersByTeam(match.awayTeam?.id || "");
 
-    const homePlayers: MockPlayer[] = rawHomePlayers.map((p, i) => toMockPlayer(p, i, "hp"));
-    const awayPlayers: MockPlayer[] = rawAwayPlayers.map((p, i) => toMockPlayer(p, i, "ap"));
+    // Generate synthetic football squad when real data isn't available
+    const generateSyntheticSquad = (teamName: string, seed: number): MockPlayer[] => {
+        const positions = [
+            { role: "GK", name: "Goalkeeper" },
+            { role: "DF", name: "Right Back" }, { role: "DF", name: "Centre Back" },
+            { role: "DF", name: "Centre Back" }, { role: "DF", name: "Left Back" },
+            { role: "MF", name: "Defensive Mid" }, { role: "MF", name: "Central Mid" },
+            { role: "MF", name: "Attacking Mid" },
+            { role: "FW", name: "Right Wing" }, { role: "FW", name: "Striker" }, { role: "FW", name: "Left Wing" },
+        ];
+        // Common football surnames for realistic feel
+        const surnames = [
+            "Silva", "Martinez", "Johnson", "Müller", "García", "López", "Santos", "Anderson",
+            "Williams", "Fernández", "Brown", "Davis", "Wilson", "Taylor", "Thomas", "Moore",
+            "Jackson", "White", "Harris", "Clark", "Lewis", "Walker", "Hall", "Young",
+        ];
+        return positions.map((pos, idx) => {
+            const nameIdx = (seed * 7 + idx * 3) % surnames.length;
+            const firstName = String.fromCharCode(65 + ((seed + idx) % 26));
+            const playerName = `${firstName}. ${surnames[nameIdx]}`;
+            const s = seed * 13 + idx * 17;
+            const baseRating = pos.role === "GK" ? 70 + (s % 15) : pos.role === "FW" ? 72 + (s % 18) : 68 + (s % 16);
+            return {
+                id: `syn${seed}p${idx}`,
+                name: playerName,
+                number: idx + 1,
+                role: pos.name,
+                normalizedRole: pos.role,
+                rating: baseRating,
+                goals: pos.role === "FW" ? (s % 3) : pos.role === "MF" ? (s % 2) : 0,
+                assists: pos.role === "MF" ? (s % 3) : pos.role === "FW" ? (s % 2) : 0,
+                passes: pos.role === "GK" ? 20 + (s % 15) : pos.role === "DF" ? 45 + (s % 25) : pos.role === "MF" ? 55 + (s % 30) : 20 + (s % 20),
+                tackles: pos.role === "DF" ? 3 + (s % 5) : pos.role === "MF" ? 1 + (s % 4) : s % 2,
+                dribbles: pos.role === "FW" ? 3 + (s % 6) : pos.role === "MF" ? 2 + (s % 4) : s % 2,
+                shots: pos.role === "FW" ? 2 + (s % 5) : pos.role === "MF" ? 1 + (s % 3) : 0,
+                saves: pos.role === "GK" ? 2 + (s % 4) : 0,
+                interceptions: pos.role === "DF" ? 2 + (s % 4) : pos.role === "MF" ? 1 + (s % 3) : 0,
+                consistency: Math.max(60, Math.min(98, baseRating - 5 + (s % 15))),
+                impactScore: Math.max(50, Math.min(98, baseRating - 3 + (s % 10))),
+                heatmapZones: HEATMAP_BY_ROLE[pos.role] || HEATMAP_BY_ROLE.MF,
+            };
+        });
+    };
+
+    const homePlayers: MockPlayer[] = rawHomePlayers.length > 0
+        ? rawHomePlayers.map((p, i) => toMockPlayer(p, i, "hp"))
+        : generateSyntheticSquad(homeTeam, (match.id || "").length);
+    const awayPlayers: MockPlayer[] = rawAwayPlayers.length > 0
+        ? rawAwayPlayers.map((p, i) => toMockPlayer(p, i, "ap"))
+        : generateSyntheticSquad(awayTeam, (match.id || "").length + 7);
 
     // ─── Build events from actual match goals + generated extras ─
     const events: MatchEvent[] = [];

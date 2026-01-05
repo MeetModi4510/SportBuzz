@@ -28,6 +28,9 @@ export interface AnalysisPlayer {
     // Unique sport-specific data
     specialData: any;
     recentPerformances?: any[];
+    formats?: any;
+    battingStyle?: string;
+    bowlingStyle?: string;
 }
 
 // ─── CRICKET PLAYERS ─────────────────────────────────────────────
@@ -63,17 +66,101 @@ const cricketPlayers: AnalysisPlayer[] = [
         ],
     },
     {
-        id: "cr11", name: "Jasprit Bumrah", country: "India", countryFlag: "🇮🇳", sport: "cricket",
+        id: "bumrah", name: "Jasprit Bumrah", country: "India", countryFlag: "🇮🇳", sport: "cricket",
         role: "Bowler", age: 31, image: "JB", photo: "/players/bumrah_new.png", overallRating: 95,
         attributes: { Pace: 94, Accuracy: 96, Swing: 88, Yorker: 97, Bouncer: 85, Death: 95 },
         detailedStats: { Matches: 180, Wickets: 350, Average: 21.0, Economy: 4.5, "Best Bowling": "6/19", "5W Hauls": 12 },
+        formats: {
+            All: {
+                matchesPlayed: 195,
+                batting: { innings: 52, runs: 284, average: '7.8', strikeRate: '85.2', highestScore: '34*', hundreds: 0, fifties: 0, fours: 30, sixes: 10 },
+                bowling: { innings: 215, wickets: 397, economy: '4.15', average: '22.8', bestFigures: '6/19' },
+                fielding: { catches: 42, stumpings: 0, runouts: 5, total: 47 },
+                recentPerformances: [
+                    { date: "Mar 15, 2024", opponent: "Australia", result: "Win", matchType: "ODI", batting: { runs: 2, balls: 5 }, bowling: { wickets: 3, economy: 4.2 }, impactScore: "A++" },
+                    { date: "Mar 10, 2024", opponent: "England", result: "Loss", matchType: "Test", batting: { runs: 0, balls: 2 }, bowling: { wickets: 1, economy: 5.8 }, impactScore: "B+" },
+                    { date: "Mar 05, 2024", opponent: "South Africa", result: "Win", matchType: "T20I", batting: { runs: 5, balls: 10 }, bowling: { wickets: 4, economy: 3.5 }, impactScore: "A++" }
+                ],
+                awardsList: [
+                    { year: 2024, event: "T20 World Cup MVP", title: "World Cup MVP", icon: "🏆" },
+                    { year: 2022, event: "Test Bowler of the Year", title: "ICC Award", icon: "🥇" },
+                    { year: 2020, event: "IPL Champion", title: "Trophy Winner", icon: "⭐" }
+                ],
+                wagonWheel: [
+                    { runs: 4, direction: "cover" }, { runs: 6, direction: "midwicket" }, { runs: 1, direction: "third-man" }, { runs: 2, direction: "square-leg" }, { runs: 4, direction: "fine-leg" }, { runs: 1, direction: "mid-off" }
+                ]
+            },
+            Test: {
+                matchesPlayed: 36,
+                batting: { innings: 50, runs: 254, average: '7.4', strikeRate: '54.5', highestScore: '34*', hundreds: 0, fifties: 0, fours: 25, sixes: 6 },
+                bowling: { innings: 69, wickets: 159, economy: '2.74', average: '20.5', bestFigures: '6/27' },
+                fielding: { catches: 15, stumpings: 0, runouts: 2, total: 17 },
+                recentPerformances: [
+                    { date: "Feb 20, 2024", opponent: "England", result: "Win", matchType: "Test", batting: { runs: 10, balls: 25 }, bowling: { wickets: 5, economy: 2.5 }, impactScore: "A++" },
+                    { date: "Jan 15, 2024", opponent: "South Africa", result: "Loss", matchType: "Test", batting: { runs: 0, balls: 5 }, bowling: { wickets: 2, economy: 3.1 }, impactScore: "B" },
+                    { date: "Dec 26, 2023", opponent: "South Africa", result: "Win", matchType: "Test", batting: { runs: 15, balls: 18 }, bowling: { wickets: 6, economy: 2.1 }, impactScore: "S+" }
+                ],
+                awardsList: [
+                    { year: 2022, event: "Test Bowler of the Year", title: "ICC Award", icon: "🥇" },
+                    { year: 2021, event: "50 Test Wickets in England", title: "Milestone", icon: "🔥" }
+                ],
+                wagonWheel: [
+                    { runs: 4, direction: "cover" }, { runs: 4, direction: "straight" }, { runs: 1, direction: "point" }, { runs: 2, direction: "midwicket" }
+                ]
+            },
+            ODI: {
+                matchesPlayed: 89,
+                batting: { innings: 30, runs: 65, average: '4.3', strikeRate: '62.0', highestScore: '16', hundreds: 0, fifties: 0, fours: 3, sixes: 1 },
+                bowling: { innings: 89, wickets: 149, economy: '4.67', average: '23.5', bestFigures: '6/19' },
+                fielding: { catches: 18, stumpings: 0, runouts: 2, total: 20 },
+                recentPerformances: [
+                    { date: "Nov 19, 2023", opponent: "Australia", result: "Loss", matchType: "ODI", batting: { runs: 1, balls: 3 }, bowling: { wickets: 2, economy: 4.8 }, impactScore: "B+" },
+                    { date: "Nov 15, 2023", opponent: "New Zealand", result: "Win", matchType: "ODI", batting: { runs: 0, balls: 0 }, bowling: { wickets: 1, economy: 6.4 }, impactScore: "B" },
+                    { date: "Nov 05, 2023", opponent: "South Africa", result: "Win", matchType: "ODI", batting: { runs: 0, balls: 0 }, bowling: { wickets: 2, economy: 3.5 }, impactScore: "A" }
+                ],
+                awardsList: [
+                    { year: 2023, event: "World Cup Finalist", title: "WC Run", icon: "🥈" },
+                    { year: 2019, event: "CWC Team of the Tournament", title: "CWC Team", icon: "🏆" }
+                ],
+                wagonWheel: [
+                    { runs: 1, direction: "third-man" }, { runs: 2, direction: "square-leg" }, { runs: 1, direction: "mid-on" }
+                ]
+            },
+            T20: {
+                matchesPlayed: 70,
+                batting: { innings: 15, runs: 8, average: '2.0', strikeRate: '50.0', highestScore: '7', hundreds: 0, fifties: 0, fours: 0, sixes: 0 },
+                bowling: { innings: 69, wickets: 89, economy: '6.27', average: '17.7', bestFigures: '3/11' },
+                fielding: { catches: 15, stumpings: 0, runouts: 2, total: 17 },
+                recentPerformances: [
+                    { date: "Jun 29, 2024", opponent: "South Africa", result: "Win", matchType: "T20I", batting: { runs: 0, balls: 0 }, bowling: { wickets: 2, economy: 4.5 }, impactScore: "S+" },
+                    { date: "Jun 27, 2024", opponent: "England", result: "Win", matchType: "T20I", batting: { runs: 0, balls: 0 }, bowling: { wickets: 2, economy: 3.0 }, impactScore: "A++" },
+                    { date: "Jun 24, 2024", opponent: "Australia", result: "Win", matchType: "T20I", batting: { runs: 0, balls: 0 }, bowling: { wickets: 1, economy: 7.2 }, impactScore: "B+" }
+                ],
+                awardsList: [
+                    { year: 2024, event: "T20 World Cup MVP", title: "World Cup MVP", icon: "🏆" },
+                    { year: 2024, event: "T20 World Cup Champion", title: "Champion", icon: "🥇" }
+                ],
+                wagonWheel: [
+                    { runs: 1, direction: "mid-off" }, { runs: 1, direction: "straight" }
+                ]
+            },
+            T10: {
+                matchesPlayed: 0,
+                batting: { innings: 0, runs: 0, average: '0.0', strikeRate: '0.0', highestScore: '0', hundreds: 0, fifties: 0, fours: 0, sixes: 0 },
+                bowling: { innings: 0, wickets: 0, economy: '0.00', average: '0.0', bestFigures: '0/0' },
+                fielding: { catches: 0, stumpings: 0, runouts: 0, total: 0 },
+                recentPerformances: [],
+                awardsList: [],
+                wagonWheel: []
+            }
+        },
         formTrend: [90, 88, 95, 92, 85, 97, 93, 91, 96, 94],
         milestones: [{ year: 2024, event: "T20 World Cup MVP" }],
         specialData: { scoringZones: { Yorker: 92, "Good Length": 115, Short: 60 }, formatBreakdown: { Test: { matches: 36, avg: 20.5 }, T20I: { matches: 70, avg: 17.0 } }, vsOpposition: [{ team: "Australia", avg: 22.4 }, { team: "England", avg: 19.8 }, { team: "South Africa", avg: 23.5 }, { team: "Pakistan", avg: 18.2 }, { team: "New Zealand", avg: 20.1 }] },
         recentPerformances: [
             { date: "Mar 15, 2024", opponent: "Australia", result: "Win", batting: { runs: 2, balls: 5 }, bowling: { wickets: 3, economy: 4.2 }, impactScore: "A++" },
             { date: "Mar 10, 2024", opponent: "England", result: "Loss", batting: { runs: 0, balls: 2 }, bowling: { wickets: 1, economy: 5.8 }, impactScore: "B+" },
-            { date: "Mar 05, 2024", opponent: "South Africa", result: "Win", batting: { runs: 5, balls: 10 }, bowling: { wickets: 4, economy: 3.5 }, impactScore: "A++" },
+            { date: "Mar 05, 2024", opponent: "South Africa", result: "Win", batting: { runs: 5, balls: 10 }, bowling: { wickets: 4, economy: 3.5 }, impactScore: "A++" }
         ],
     },
     {
@@ -631,6 +718,11 @@ const basketballPlayers: AnalysisPlayer[] = [
             clutchStats: { "4th Qtr PPG": 6.8, "Game Winners": 18, "Buzzer Beaters": 8 },
             seasonSplits: [{ season: "21/22", ppg: 30.3 }, { season: "22/23", ppg: 28.9 }, { season: "23/24", ppg: 25.7 }, { season: "24/25", ppg: 23.5 }],
         },
+        recentPerformances: [
+            { date: "May 02, 2024", opponent: "Nuggets", result: "Loss", stats: { points: 30, rebounds: 9, assists: 11 }, impactScore: "A-" },
+            { date: "Apr 29, 2024", opponent: "Nuggets", result: "Win", stats: { points: 26, rebounds: 7, assists: 9 }, impactScore: "A" },
+            { date: "Apr 27, 2024", opponent: "Nuggets", result: "Loss", stats: { points: 27, rebounds: 6, assists: 8 }, impactScore: "B+" },
+        ],
     },
     {
         id: "bb2", name: "Stephen Curry", country: "USA", countryFlag: "🇺🇸", sport: "basketball",
@@ -778,6 +870,11 @@ const tennisPlayers: AnalysisPlayer[] = [
             serveAnalysis: { "1st Serve Win%": 78, "2nd Serve Win%": 58, "Avg Speed (mph)": 119, "Max Speed (mph)": 136 },
             grandSlamBreakdown: { AO: 10, RG: 3, Wimbledon: 7, USO: 4 },
         },
+        recentPerformances: [
+            { date: "Jul 14, 2024", opponent: "C. Alcaraz", matchType: "Wimbledon Final", result: "Loss", stats: { sets: "0-3", aces: 4, "winners": 15 }, impactScore: "B" },
+            { date: "Jul 12, 2024", opponent: "L. Musetti", matchType: "Wimbledon SF", result: "Win", stats: { sets: "3-0", aces: 6, "winners": 34 }, impactScore: "A+" },
+            { date: "Jul 08, 2024", opponent: "H. Rune", matchType: "Wimbledon R4", result: "Win", stats: { sets: "3-0", aces: 5, "winners": 28 }, impactScore: "A" },
+        ],
     },
     {
         id: "tn2", name: "Carlos Alcaraz", country: "Spain", countryFlag: "🇪🇸", sport: "tennis",

@@ -69,8 +69,8 @@ export function useLiveCricketMatches() {
             const response = await cricketApi.getLiveMatches();
             return response.data?.data || response.data || [];
         },
-        refetchInterval: 600000,
-        staleTime: 300000,
+        refetchInterval: 720000,
+        staleTime: 720000,
     });
 }
 
