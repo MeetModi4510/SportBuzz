@@ -222,8 +222,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => {
-                  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-                  window.location.href = `${apiBase.replace('/api', '')}/api/auth/google`;
+                  window.location.href = 'https://sportbuzz-backend.onrender.com/api/auth/google';
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-800 hover:border-slate-700 hover:bg-slate-900/80 transition-all duration-300 group"
               >
@@ -237,8 +236,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => {
-                  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-                  window.location.href = `${apiBase.replace('/api', '')}/api/auth/discord`;
+                  window.location.href = 'https://sportbuzz-backend.onrender.com/api/auth/discord';
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[#5865F2]/20 border border-[#5865F2]/30 hover:bg-[#5865F2]/30 hover:border-[#5865F2]/50 transition-all duration-300 group"
               >
