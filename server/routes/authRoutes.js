@@ -69,7 +69,7 @@ router.post('/reset-password/:token', resetPassword);
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login?error=oauth_failed', session: false }),
+    passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL || ''}/login?error=oauth_failed`, session: false }),
     (req, res) => {
         const token = generateToken(req.user);
         const userData = {
@@ -78,7 +78,8 @@ router.get('/google/callback',
             fullName: req.user.fullName,
             photoUrl: req.user.photoUrl,
         };
-        res.redirect(`/oauth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
+        const frontendUrl = process.env.FRONTEND_URL || '';
+        res.redirect(`${frontendUrl}/oauth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
     }
 );
 
@@ -86,7 +87,7 @@ router.get('/google/callback',
 router.get('/discord', passport.authenticate('discord', { scope: ['identify', 'email'] }));
 
 router.get('/discord/callback',
-    passport.authenticate('discord', { failureRedirect: '/login?error=oauth_failed', session: false }),
+    passport.authenticate('discord', { failureRedirect: `${process.env.FRONTEND_URL || ''}/login?error=oauth_failed`, session: false }),
     (req, res) => {
         const token = generateToken(req.user);
         const userData = {
@@ -95,7 +96,8 @@ router.get('/discord/callback',
             fullName: req.user.fullName,
             photoUrl: req.user.photoUrl,
         };
-        res.redirect(`/oauth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
+        const frontendUrl = process.env.FRONTEND_URL || '';
+        res.redirect(`${frontendUrl}/oauth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
     }
 );
 
