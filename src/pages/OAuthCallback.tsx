@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
@@ -6,6 +6,8 @@ import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 const OAuthCallback = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const [status, setStatus] = useState<'loading' | 'error'>('loading');
+    const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
         const token = searchParams.get("token");
@@ -13,7 +15,8 @@ const OAuthCallback = () => {
         const error = searchParams.get("error");
 
         if (error) {
-            // OAuth failed
+            setStatus('error');
+            setErrorMsg('OAuth authentication failed');
             setTimeout(() => {
                 navigate("/login?error=" + error);
             }, 2000);
@@ -21,29 +24,48 @@ const OAuthCallback = () => {
         }
 
         if (token && userData) {
-            // OAuth successful
-            try {
-                const user = JSON.parse(decodeURIComponent(userData));
+            // Store token first
+            localStorage.setItem("token", token);
 
-                // Store authentication data
-                localStorage.setItem("token", token);
-                localStorage.setItem("user", JSON.stringify(user));
-
-                // Redirect to dashboard with full page reload
-                setTimeout(() => {
-                    window.location.href = "/";
-                }, 1500);
-            } catch (err) {
-                console.error("Failed to parse user data:", err);
-                navigate("/login?error=invalid_data");
-            }
+            // Try to get full user data from API to match email login format
+            fetch('/api/auth/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.data?.user) {
+                    // Store full user data (with role, etc.) - matches email login
+                    localStorage.setItem("user", JSON.stringify(data.data.user));
+                } else {
+                    // Fallback: use the user data from URL params
+                    try {
+                        const user = JSON.parse(decodeURIComponent(userData));
+                        localStorage.setItem("user", JSON.stringify(user));
+                    } catch {
+                        localStorage.setItem("user", userData);
+                    }
+                }
+                // Redirect to dashboard
+                window.location.href = "/";
+            })
+            .catch(() => {
+                // API call failed - still try with URL data
+                try {
+                    const user = JSON.parse(decodeURIComponent(userData));
+                    localStorage.setItem("user", JSON.stringify(user));
+                } catch {
+                    localStorage.setItem("user", userData);
+                }
+                window.location.href = "/";
+            });
         } else {
-            // Missing required data
-            navigate("/login?error=missing_data");
+            setStatus('error');
+            setErrorMsg('Missing authentication data');
+            setTimeout(() => {
+                navigate("/login?error=missing_data");
+            }, 2000);
         }
     }, [searchParams, navigate]);
-
-    const error = searchParams.get("error");
 
     return (
         <>
@@ -53,11 +75,11 @@ const OAuthCallback = () => {
 
             <div className="min-h-screen flex items-center justify-center bg-slate-950">
                 <div className="text-center space-y-4">
-                    {error ? (
+                    {status === 'error' ? (
                         <>
                             <XCircle className="w-16 h-16 text-red-500 mx-auto animate-pulse" />
                             <h2 className="text-2xl font-bold text-white">Authentication Failed</h2>
-                            <p className="text-slate-400">Redirecting to login...</p>
+                            <p className="text-slate-400">{errorMsg || 'Redirecting to login...'}</p>
                         </>
                     ) : (
                         <>
