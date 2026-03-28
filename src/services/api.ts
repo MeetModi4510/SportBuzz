@@ -30,12 +30,15 @@ api.interceptors.response.use(
     (response) => response.data,
     (error) => {
         if (error.response?.status === 401) {
-            const path = window.location.pathname;
-            // Don't clear auth during OAuth callback or on login/signup pages
-            if (path !== '/login' && path !== '/signup' && path !== '/oauth/callback') {
+            console.error("API 401 Error on:", error.config?.url);
+            // We used to redirect to login here, but it caused aggressive redirect loops
+            // if a single component like notifications threw a 401.
+            // Now we just let the error propagate. The ProtectedRoute handles missing tokens.
+            if (error.config?.url === '/auth/me') {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
-                window.location.href = '/login';
+                // Only redirect if auth/me explicitly fails
+                window.location.href = '/login?error=session_expired';
             }
         }
         return Promise.reject(error);
