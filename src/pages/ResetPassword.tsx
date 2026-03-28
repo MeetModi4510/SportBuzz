@@ -44,7 +44,9 @@ const ResetPassword = () => {
             return;
         }
 
-        const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        const API_BASE = import.meta.env.VITE_API_URL 
+            ? import.meta.env.VITE_API_URL 
+            : (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
         try {
             const response = await axios.post(`${API_BASE}/auth/reset-password/${token}`, { password });
             setSuccess(response.data.message);

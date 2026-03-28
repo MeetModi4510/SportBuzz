@@ -70,7 +70,9 @@ const PlayerProfilePage = () => {
     const [playerDetailTab, setPlayerDetailTab] = useState<DetailTab>(urlTab || "traits");
     const [playerStatsFormat, setPlayerStatsFormat] = useState<string>("All");
 
-    const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
+    const BASE_URL = import.meta.env.VITE_API_URL 
+        ? import.meta.env.VITE_API_URL.replace('/api', '') 
+        : (import.meta.env.PROD ? '' : 'http://localhost:5000');
 
     const getImageUrl = (path: string | null) => {
         if (!path) return null;

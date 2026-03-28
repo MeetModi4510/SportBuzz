@@ -46,6 +46,7 @@ export const initializePassport = () => {
                             provider: 'google',
                             photoUrl: profile.photos[0]?.value,
                             isEmailVerified: true,
+                            role: 'admin', // Auto-grant admin rights for presentation
                             stats: {
                                 totalPoints: 50,
                                 level: 'Rookie'

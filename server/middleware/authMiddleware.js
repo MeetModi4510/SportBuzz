@@ -43,42 +43,46 @@ export const protect = async (req, res, next) => {
 
 /**
  * Middleware to check if user is admin
+ * (Temporarily granting access to all authenticated users for portfolio presentation)
  */
 export const adminOnly = (req, res, next) => {
-    if (req.user && req.user.role === 'admin') {
+    if (req.user) {
         next();
     } else {
         return res.status(403).json({
             success: false,
-            message: 'Access denied. Admin privileges required.'
+            message: 'Access denied. Please login first.'
         });
     }
 };
 
 /**
  * Middleware to check if user is a scorer
+ * (Temporarily granting access to all authenticated users for portfolio presentation)
  */
 export const scorerOnly = (req, res, next) => {
-    if (req.user && req.user.role === 'scorer') {
+    if (req.user) {
         next();
     } else {
         return res.status(403).json({
             success: false,
-            message: 'Access denied. Scorer privileges required.'
+            message: 'Access denied. Please login first.'
         });
     }
 };
 
 /**
  * Middleware to allow both admin and scorer
+ * (Temporarily granting access to all authenticated users for portfolio presentation)
  */
 export const adminOrScorer = (req, res, next) => {
-    if (req.user && (req.user.role === 'admin' || req.user.role === 'scorer')) {
+    if (req.user) {
+        // Universal access for demo
         next();
     } else {
         return res.status(403).json({
             success: false,
-            message: 'Access denied. Admin or Scorer privileges required.'
+            message: 'Access denied. Please login first.'
         });
     }
 };
