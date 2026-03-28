@@ -1,0 +1,265 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SportBuzz Design System - Dark Theme with Sport Accent Colors */
+
+@layer base {
+  :root {
+    /* Light Mode Colors (Default) */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 91%;
+    --muted-foreground: 215 14% 34%;
+
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 33% 88%;
+    --input: 217 33% 96%;
+    --ring: 142 76% 36%;
+
+    --radius: 0.75rem;
+
+    /* Sport-specific accent colors */
+    --cricket: 142 76% 36%;
+    --football: 217 91% 60%;
+    --basketball: 25 95% 53%;
+    --tennis: 84 85% 50%;
+
+    /* Status colors */
+    --live: 0 84% 60%;
+    --upcoming: 45 93% 47%;
+    --completed: 142 76% 36%;
+
+    /* Glassmorphism */
+    --glass: 0 0% 100% / 0.8;
+    --glass-border: 217 33% 88% / 0.5;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 32%));
+    --gradient-live: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 84% 50%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 99%));
+
+    /* Shadows */
+    --shadow-glow: 0 0 30px hsl(142 76% 45% / 0.2);
+    --shadow-live: 0 0 20px hsl(0 84% 60% / 0.2);
+    --shadow-card: 0 8px 32px hsl(222 47% 4% / 0.1);
+
+    --sidebar-background: 217 33% 97%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 142 76% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 91% 60%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217 33% 88%;
+    --sidebar-ring: 142 76% 36%;
+  }
+
+  .dark {
+    /* Dark Mode Colors */
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 142 76% 45%;
+    --primary-foreground: 222 47% 6%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 14%;
+    --muted-foreground: 215 20% 55%;
+
+    --accent: 217 33% 20%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 142 76% 45%;
+
+    --glass: 222 47% 12% / 0.8;
+    --glass-border: 217 33% 25% / 0.5;
+
+    --gradient-primary: linear-gradient(135deg, hsl(142 76% 45%), hsl(142 76% 35%));
+    --gradient-live: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 84% 50%));
+    --gradient-card: linear-gradient(180deg, hsl(222 47% 10%), hsl(222 47% 8%));
+
+    --shadow-glow: 0 0 30px hsl(142 76% 45% / 0.3);
+    --shadow-live: 0 0 20px hsl(0 84% 60% / 0.4);
+    --shadow-card: 0 8px 32px hsl(222 47% 4% / 0.5);
+
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 142 76% 45%;
+    --sidebar-primary-foreground: 222 47% 6%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 18%;
+    --sidebar-ring: 142 76% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom Scrollbar - SportBuzz Theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-800 rounded-full border-2 border-slate-950;
+    transition: background 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-700;
+  }
+
+  /* Support for Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(222 47% 12%) transparent;
+  }
+}
+
+@layer utilities {
+
+  /* Live pulse animation */
+  .animate-pulse-live {
+    animation: pulse-live 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-live {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Glow effect for live matches */
+  .glow-live {
+    box-shadow: 0 0 20px hsl(0 84% 60% / 0.4), 0 0 40px hsl(0 84% 60% / 0.2);
+  }
+
+  .glow-cricket {
+    box-shadow: 0 0 20px hsl(142 76% 45% / 0.3);
+  }
+
+  .glow-football {
+    box-shadow: 0 0 20px hsl(217 91% 60% / 0.3);
+  }
+
+  .glow-basketball {
+    box-shadow: 0 0 20px hsl(25 95% 53% / 0.3);
+  }
+
+  .glow-tennis {
+    box-shadow: 0 0 20px hsl(84 85% 50% / 0.3);
+  }
+
+  /* Glassmorphism */
+  .glass {
+    background: hsl(var(--glass));
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--glass-border));
+  }
+
+  /* Score text styling */
+  .score-text {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px hsl(222 47% 4% / 0.6);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(142 76% 45%), hsl(217 91% 60%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Sport-specific borders */
+  .border-sport-cricket {
+    border-color: hsl(142 76% 45%);
+  }
+
+  .border-sport-football {
+    border-color: hsl(217 91% 60%);
+  }
+
+  .border-sport-basketball {
+    border-color: hsl(25 95% 53%);
+  }
+
+  .border-sport-tennis {
+    border-color: hsl(84 85% 50%);
+  }
+
+  @keyframes scan {
+    from {
+      transform: translateY(-100%);
+    }
+
+    to {
+      transform: translateY(200%);
+    }
+  }
+}
