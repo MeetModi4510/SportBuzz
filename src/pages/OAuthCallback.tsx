@@ -29,9 +29,9 @@ const OAuthCallback = () => {
                 localStorage.setItem("token", token);
                 localStorage.setItem("user", JSON.stringify(user));
 
-                // Redirect to dashboard
+                // Redirect to dashboard with full page reload
                 setTimeout(() => {
-                    navigate("/");
+                    window.location.href = "/";
                 }, 1500);
             } catch (err) {
                 console.error("Failed to parse user data:", err);

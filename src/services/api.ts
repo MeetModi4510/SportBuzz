@@ -30,9 +30,11 @@ api.interceptors.response.use(
     (response) => response.data,
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            if (window.location.pathname !== '/login') {
+            const path = window.location.pathname;
+            // Don't clear auth during OAuth callback or on login/signup pages
+            if (path !== '/login' && path !== '/signup' && path !== '/oauth/callback') {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
                 window.location.href = '/login';
             }
         }
