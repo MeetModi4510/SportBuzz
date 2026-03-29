@@ -62,7 +62,10 @@ const NotificationPopover = () => {
 
         // Socket setup
         const socket = io(API_BASE, {
-            auth: { token }
+            auth: { token },
+            transports: ["websocket", "polling"],
+            reconnection: true,
+            reconnectionAttempts: Infinity
         });
 
         socket.on("connect", () => {

@@ -442,8 +442,9 @@ const ScoringPanel = () => {
                     }
                 }
             }
-        } catch {
-            toast.error("Failed to record ball");
+        } catch (err: any) {
+            const msg = err?.response?.data?.message || err?.message || "Failed to record ball";
+            toast.error(msg);
         } finally {
             setIsRecording(false);
         }

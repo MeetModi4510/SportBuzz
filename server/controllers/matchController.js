@@ -393,8 +393,10 @@ export const recordBall = asyncHandler(async (req, res) => {
 
     // Ownership check
     if (match.tournament && req.user) {
-        const tournamentDoc = await Tournament.findById(match.tournament);
+        const tournamentId = typeof match.tournament === 'object' ? (match.tournament._id || match.tournament) : match.tournament;
+        const tournamentDoc = await Tournament.findById(tournamentId);
         if (tournamentDoc && tournamentDoc.createdBy && String(tournamentDoc.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
+            console.log(`[RECORD_BALL] Auth denied: tournament creator=${tournamentDoc.createdBy}, req.user=${req.user._id}, role=${req.user.role}`);
             res.status(403);
             throw new Error('Not authorized. You can only score matches in tournaments you created.');
         }

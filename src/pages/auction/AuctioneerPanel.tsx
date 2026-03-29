@@ -101,12 +101,16 @@ export default function AuctioneerPanel() {
       
       const socket = getSocket();
       
-      const handleConnect = () => {
+      const joinRoom = () => {
         socket.emit("join_auction", id);
-        fetchAuction(); // fresh payload to catch missed packets
+      };
+      
+      const handleConnect = () => {
+        joinRoom();
+        fetchAuction();
       };
 
-      socket.emit("join_auction", id);
+      joinRoom();
       socket.on("connect", handleConnect);
       
       socket.on("bid_update", (data: any) => {
@@ -157,7 +161,13 @@ export default function AuctioneerPanel() {
         setTimeout(() => setSoldData(null), 5000);
       });
 
+      // Polling fallback: fetch auction state every 5s as safety net
+      const pollInterval = setInterval(() => {
+        fetchAuction();
+      }, 5000);
+
       return () => {
+        clearInterval(pollInterval);
         socket.off("connect", handleConnect);
         socket.off("bid_update");
         socket.off("auction_update");

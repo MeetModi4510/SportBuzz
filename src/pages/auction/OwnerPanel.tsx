@@ -151,19 +151,31 @@ export default function OwnerPanel() {
         // Join socket room
         const socket = getSocket();
         
-        const handleConnect = () => {
-          socket.emit("join_auction", id);
-          handleLogin(email, accessCode); // refresh state safely
-        };
-        
+        // Clean up old listeners first
         socket.off("connect");
         socket.off("bid_update");
         socket.off("auction_update");
         socket.off("trade_update");
         socket.off("player_sold");
 
-        socket.emit("join_auction", id);
-        socket.on("connect", handleConnect);
+        const joinRoom = () => {
+          socket.emit("join_auction", id);
+        };
+
+        joinRoom();
+
+        socket.on("connect", () => {
+          joinRoom();
+          // Re-fetch auction state on reconnect (without re-running full login)
+          auctionApi.ownerLogin(id!, email, accessCode).then((r: any) => {
+            if (r.success) {
+              setAuction(r.auction);
+              const team = r.auction.teams.find((t: any) => t.captainEmail === email);
+              if (team) setMyTeam(team);
+            }
+          }).catch(() => {});
+        });
+
         socket.on("bid_update", (data: any) => {
           setAuction((prev: any) => {
             if (!prev) return prev;
@@ -199,6 +211,27 @@ export default function OwnerPanel() {
       setLoading(false);
     }
   };
+
+  // Polling fallback for OwnerPanel - syncs auction state every 5 seconds
+  useEffect(() => {
+    if (!isLoggedIn || !id) return;
+    const saved = localStorage.getItem(`auction_auth_${id}`);
+    if (!saved) return;
+    const { email, accessCode } = JSON.parse(saved);
+    
+    const pollInterval = setInterval(async () => {
+      try {
+        const res: any = await auctionApi.ownerLogin(id!, email, accessCode);
+        if (res.success) {
+          setAuction(res.auction);
+          const team = res.auction.teams.find((t: any) => t.captainEmail === email);
+          if (team) setMyTeam(team);
+        }
+      } catch {}
+    }, 5000);
+    
+    return () => clearInterval(pollInterval);
+  }, [isLoggedIn, id]);
 
   useEffect(() => {
     if (auction?.currentPlayer?.name) {

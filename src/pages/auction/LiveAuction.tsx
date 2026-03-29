@@ -237,17 +237,24 @@ export default function LiveAuction() {
     fetchAuction();
     const socket = getSocket();
     
-    const handleConnect = () => {
+    const joinRoom = () => {
+      console.log("[LiveAuction] Joining auction room:", id);
       socket.emit("join_auction", id);
-      fetchAuction(); // fetch any state changes missed while disconnected
     };
     
-    // Explicitly join on mount
-    socket.emit("join_auction", id);
-    // Bind auto-rejoin if socket drops and recovers
+    const handleConnect = () => {
+      joinRoom();
+      fetchAuction();
+    };
+    
+    // Join on mount
+    joinRoom();
+    
+    // Re-join on reconnect
     socket.on("connect", handleConnect);
     
     socket.on("bid_update", (data: any) => {
+      console.log("[LiveAuction] bid_update received:", data);
       setAuction((prev: any) => {
         if (!prev) return prev;
         const newBidHistory = prev.bidHistory ? [...prev.bidHistory, data] : [data];
@@ -294,7 +301,14 @@ export default function LiveAuction() {
       setAuction(data);
     });
 
+    // Polling fallback: every 5 seconds, fetch the latest state
+    // This guarantees bids sync even if the socket connection drops silently
+    const pollInterval = setInterval(() => {
+      fetchAuction();
+    }, 5000);
+
     return () => {
+      clearInterval(pollInterval);
       socket.off("connect", handleConnect);
       socket.off("bid_update");
       socket.off("player_sold");
