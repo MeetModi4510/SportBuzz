@@ -49,15 +49,6 @@ async function triggerFollowerNotifications(match, { title, message, type }) {
 export const createMatch = asyncHandler(async (req, res) => {
     const { tournament, homeTeam, awayTeam, venue, date, status, matchType } = req.body;
 
-    // Ownership check: verify user owns the tournament
-    if (tournament && req.user) {
-        const tournamentDoc = await Tournament.findById(tournament);
-        if (tournamentDoc && tournamentDoc.createdBy && String(tournamentDoc.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
-            res.status(403);
-            throw new Error('Not authorized. You can only schedule matches in tournaments you created.');
-        }
-    }
-
     const match = await Match.create({
         tournament,
         homeTeam,
@@ -140,15 +131,6 @@ export const updateMatch = asyncHandler(async (req, res) => {
     if (!match) {
         res.status(404);
         throw new Error('Match not found');
-    }
-
-    // Ownership check
-    if (match.tournament && req.user) {
-        const tournamentDoc = await Tournament.findById(match.tournament);
-        if (tournamentDoc && tournamentDoc.createdBy && String(tournamentDoc.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
-            res.status(403);
-            throw new Error('Not authorized. You can only edit matches in tournaments you created.');
-        }
     }
 
     if (match) {
@@ -389,17 +371,6 @@ export const recordBall = asyncHandler(async (req, res) => {
     if (!match) {
         res.status(404);
         throw new Error('Match not found');
-    }
-
-    // Ownership check
-    if (match.tournament && req.user) {
-        const tournamentId = typeof match.tournament === 'object' ? (match.tournament._id || match.tournament) : match.tournament;
-        const tournamentDoc = await Tournament.findById(tournamentId);
-        if (tournamentDoc && tournamentDoc.createdBy && String(tournamentDoc.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
-            console.log(`[RECORD_BALL] Auth denied: tournament creator=${tournamentDoc.createdBy}, req.user=${req.user._id}, role=${req.user.role}`);
-            res.status(403);
-            throw new Error('Not authorized. You can only score matches in tournaments you created.');
-        }
     }
 
     const totalBallRuns = isCommentaryOnly ? 0 : (runs + (extraRuns || 0));
@@ -758,15 +729,6 @@ export const undoLastBall = asyncHandler(async (req, res) => {
         throw new Error('Match not found');
     }
 
-    // Ownership check
-    if (match.tournament && req.user) {
-        const tournamentDoc = await Tournament.findById(match.tournament);
-        if (tournamentDoc && tournamentDoc.createdBy && String(tournamentDoc.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
-            res.status(403);
-            throw new Error('Not authorized. You can only undo balls in tournaments you created.');
-        }
-    }
-
     // Find and delete the last ball for the current innings
     const lastBall = await Ball.findOne({ match: match._id, inning: match.currentInnings })
         .sort({ over: -1, ball: -1, _id: -1 });
@@ -837,15 +799,6 @@ export const deleteMatch = asyncHandler(async (req, res) => {
     if (!match) {
         res.status(404);
         throw new Error('Match not found');
-    }
-
-    // Ownership check
-    if (match.tournament && req.user) {
-        const tournamentDoc = await Tournament.findById(match.tournament);
-        if (tournamentDoc && tournamentDoc.createdBy && String(tournamentDoc.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
-            res.status(403);
-            throw new Error('Not authorized. You can only delete matches in tournaments you created.');
-        }
     }
 
     // Delete all balls associated with this match

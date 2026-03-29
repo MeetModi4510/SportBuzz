@@ -115,12 +115,6 @@ export const updateTournament = asyncHandler(async (req, res) => {
         throw new Error('Tournament not found');
     }
 
-    // Ownership check
-    if (tournament.createdBy && req.user && tournament.createdBy.toString() !== req.user._id.toString()) {
-        res.status(403);
-        throw new Error('Not authorized. You can only edit tournaments you created.');
-    }
-
     if (tournament) {
         tournament.name = req.body.name || tournament.name;
         tournament.format = req.body.format || tournament.format;
@@ -170,12 +164,6 @@ export const deleteTournament = asyncHandler(async (req, res) => {
         throw new Error('Tournament not found');
     }
 
-    // Ownership check
-    if (tournament.createdBy && req.user && tournament.createdBy.toString() !== req.user._id.toString()) {
-        res.status(403);
-        throw new Error('Not authorized. You can only delete tournaments you created.');
-    }
-
     // Cascade delete: balls → matches → points table → tournament
     const matches = await Match.find({ tournament: req.params.id });
     const matchIds = matches.map(m => m._id);
@@ -199,12 +187,6 @@ export const addTeamToTournament = asyncHandler(async (req, res) => {
     if (!tournament) {
         res.status(404);
         throw new Error('Tournament not found');
-    }
-
-    // Ownership check
-    if (tournament.createdBy && req.user && tournament.createdBy.toString() !== req.user._id.toString()) {
-        res.status(403);
-        throw new Error('Not authorized. You can only modify tournaments you created.');
     }
 
     if (tournament) {
@@ -525,12 +507,6 @@ export const shuffleTournamentGroups = asyncHandler(async (req, res) => {
         throw new Error('Tournament not found');
     }
 
-    // Ownership check
-    if (tournament.createdBy && req.user && tournament.createdBy.toString() !== req.user._id.toString()) {
-        res.status(403);
-        throw new Error('Not authorized. You can only modify tournaments you created.');
-    }
-
     if (tournament.groupStructure === 'None' || tournament.groupsCount <= 1) {
         res.status(400);
         throw new Error('Tournament does not support multiple groups');
@@ -577,12 +553,6 @@ export const recalculatePointsTable = asyncHandler(async (req, res) => {
     if (!tournament) {
         res.status(404);
         throw new Error('Tournament not found');
-    }
-
-    // Ownership check
-    if (tournament.createdBy && req.user && tournament.createdBy.toString() !== req.user._id.toString()) {
-        res.status(403);
-        throw new Error('Not authorized. You can only modify tournaments you created.');
     }
 
     const maxOvers = tournament.overs || 20;
