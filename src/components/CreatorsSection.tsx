@@ -1,14 +1,8 @@
-import { Github, Linkedin, ExternalLink, Code2, Layout, Database } from "lucide-react";
-
-interface SocialLinks {
-  linkedin?: string;
-  github?: string;
-}
-
 interface Creator {
   name: string;
   role: string;
   icon: JSX.Element;
+  image?: string;
   description: string;
   links: SocialLinks;
   gradient: string;
@@ -19,6 +13,7 @@ const creators: Creator[] = [
     name: "Meet Modi",
     role: "Lead Full Stack Developer",
     icon: <Code2 className="w-6 h-6 text-blue-400" />,
+    image: "/creators/meet_modi.jpg",
     description: "Architecting the core engine and real-time synchronization of SportBuzz.",
     links: {
       linkedin: "https://www.linkedin.com/in/meet-modi-a227a1295?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
@@ -75,8 +70,18 @@ export const CreatorsSection = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
               
               <div className="relative space-y-6">
-                <div className="inline-flex p-3 rounded-xl bg-background/50 border border-border/50 shadow-inner">
-                  {creator.icon}
+                <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-background/50 border border-border/50 shadow-inner group-hover:border-blue-500/50 transition-colors">
+                  {creator.image ? (
+                    <img 
+                      src={creator.image} 
+                      alt={creator.name} 
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-110 group-hover:scale-100"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      {creator.icon}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
