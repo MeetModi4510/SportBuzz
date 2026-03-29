@@ -3,6 +3,7 @@ import FootballMatch from '../models/FootballMatch.js';
 import FootballTournament from '../models/FootballTournament.js';
 import FootballTeam from '../models/FootballTeam.js';
 import { getIO } from '../config/socket.js';
+import { syncTournamentStatus } from './footballTournamentController.js';
 
 const calculatePerformance = (match) => {
     if (!match.performance) {
@@ -320,6 +321,11 @@ export const updateTimer = asyncHandler(async (req, res) => {
         match.status = 'Paused';
     }
 
+    // Sync tournament status if match is part of one
+    if (match.tournamentId) {
+        await syncTournamentStatus(match.tournamentId);
+    }
+
     calculatePerformance(match);
 
     await match.save();
@@ -352,7 +358,9 @@ export const finalizeMatch = asyncHandler(async (req, res) => {
         .populate('awayTeam');
 
     // If part of a tournament, update points table logic here
-    // ...
+    if (match.tournamentId) {
+        await syncTournamentStatus(match.tournamentId);
+    }
 
     const io = getIO();
     io.to(`football_match_${match._id}`).emit('football_update', populatedMatch);

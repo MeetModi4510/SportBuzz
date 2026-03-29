@@ -151,6 +151,21 @@ export default function FootballScoringPanel() {
                 if (res.success) {
                     setMatch(res.data);
                     updateTimerDisplay(res.data);
+
+                    /* Authorization Check */
+                    const user = JSON.parse(localStorage.getItem('user') || '{}');
+                    const currentUserId = user._id || user.id || '';
+                    const isAdmin = user.role === 'admin';
+
+                    const tournamentData = res.data.tournamentId;
+                    const creatorId = typeof tournamentData === 'object' ? tournamentData.createdBy : null;
+                    const actualCreatorId = typeof creatorId === 'object' ? creatorId?._id : creatorId;
+
+                    if (actualCreatorId && String(actualCreatorId) !== String(currentUserId) && !isAdmin) {
+                        toast.error("Access Denied: You are not authorized to score matches in this tournament.");
+                        navigate("/admin");
+                        return;
+                    }
                 }
             } catch (error) {
                 toast.error("Failed to load match");

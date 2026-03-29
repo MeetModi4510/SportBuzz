@@ -30,32 +30,73 @@ export const createTournament = asyncHandler(async (req, res) => {
     }
 });
 
+// Helper to update tournament status based on dates and matches
+export const syncTournamentStatus = async (tournamentOrId) => {
+    let tournament = tournamentOrId;
+    if (typeof tournamentOrId === 'string' || (tournamentOrId && !tournamentOrId.startDate)) {
+        tournament = await FootballTournament.findById(tournamentOrId);
+    }
+
+    if (!tournament) return null;
+    const now = new Date();
+    let newStatus = tournament.status;
+
+    // 1. Check Dates
+    if (now >= tournament.startDate && now <= tournament.endDate) {
+        if (tournament.status === 'Upcoming') newStatus = 'Live';
+    } else if (now > tournament.endDate) {
+        // If matches are still live, keep it Live. Otherwise Complete.
+        const liveMatch = await FootballMatch.findOne({ tournamentId: tournament._id, status: 'Live' });
+        if (!liveMatch && tournament.status !== 'Completed') {
+            newStatus = 'Completed';
+        }
+    }
+
+    // 2. Check if any match is currently Live
+    const liveMatch = await FootballMatch.findOne({ tournamentId: tournament._id, status: 'Live' });
+    if (liveMatch) {
+        newStatus = 'Live';
+    }
+
+    if (newStatus !== tournament.status) {
+        tournament.status = newStatus;
+        await tournament.save();
+    }
+    return tournament;
+};
+
 // @desc    Get all football tournaments
 // @route   GET /api/football/tournaments
 // @access  Public
 export const getTournaments = asyncHandler(async (req, res) => {
     const tournaments = await FootballTournament.find({}).populate('teams');
-    res.json({ success: true, data: tournaments });
+    
+    // Sync statuses before returning
+    const syncedTournaments = await Promise.all(
+        tournaments.map(t => syncTournamentStatus(t))
+    );
+    
+    res.json({ success: true, data: syncedTournaments });
 });
 
 // @desc    Get tournament by ID (with Table)
 // @route   GET /api/football/tournaments/:id
 // @access  Public
 export const getTournamentById = asyncHandler(async (req, res) => {
-    const tournament = await FootballTournament.findById(req.params.id).populate('teams');
+    let tournament = await FootballTournament.findById(req.params.id).populate('teams');
     if (!tournament) {
         res.status(404);
         throw new Error('Tournament not found');
     }
+
+    // Sync status
+    tournament = await syncTournamentStatus(tournament);
 
     // Fetch all matches for this tournament
     const matches = await FootballMatch.find({ tournamentId: req.params.id })
         .populate('homeTeam')
         .populate('awayTeam');
     
-    // Logic for calculating table could be here or on frontend. 
-    // Usually backend for consistency.
-
     res.json({ success: true, data: { tournament, matches } });
 });
 

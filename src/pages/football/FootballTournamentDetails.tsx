@@ -29,6 +29,11 @@ export default function FootballTournamentDetails() {
     const [matchData, setMatchData] = useState({ homeTeam: "", awayTeam: "", venue: "", date: "" });
     const [settingsData, setSettingsData] = useState({ name: "", format: "", startDate: "", endDate: "" });
 
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const currentUserId = user._id || user.id || '';
+    const isAdmin = user.role === 'admin' || user.email === 'admin@sportbuzz.com';
+    const isTournamentOwner = isAdmin || (tournament && (tournament.createdBy === currentUserId || tournament.createdBy?._id === currentUserId));
+
     const fetchDetails = async () => {
         try {
             const res: any = await footballApi.getTournamentById(id!);
@@ -267,84 +272,88 @@ export default function FootballTournamentDetails() {
                     </div>
 
                     <div className="flex gap-3">
-                        <Dialog open={isAddTeamOpen} onOpenChange={setIsAddTeamOpen}>
-                            <DialogTrigger asChild>
-                                <Button className="bg-white text-black hover:bg-slate-200 rounded-[1.25rem] font-black uppercase italic tracking-tight px-8 h-12">
-                                    <Plus size={18} className="mr-2" /> Add Team
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="bg-slate-900 border-slate-800 text-white rounded-[2rem] max-w-md">
-                                <DialogHeader>
-                                    <DialogTitle className="text-2xl font-black italic uppercase tracking-tight">Add Team to {tournament.name}</DialogTitle>
-                                </DialogHeader>
-                                <Tabs defaultValue="existing" className="mt-4">
-                                    <TabsList className="bg-slate-950 border-slate-800 w-full rounded-xl">
-                                        <TabsTrigger value="existing" className="flex-1 rounded-lg italic font-bold">Existing Team</TabsTrigger>
-                                        <TabsTrigger value="new" className="flex-1 rounded-lg italic font-bold">Create New</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="existing" className="space-y-4 pt-4">
-                                        <div className="space-y-2">
-                                            <Label>Select Team</Label>
-                                            <Select value={selectedExistingTeam} onValueChange={setSelectedExistingTeam}>
-                                                <SelectTrigger className="bg-slate-950 border-slate-800 rounded-xl h-12">
-                                                    <SelectValue placeholder="Choose a team" />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-slate-950 border-slate-800 text-white">
-                                                    {allTeams.filter((t: any) => !tournament.teams?.some((tt: any) => tt._id === t._id)).map((team: any) => (
-                                                        <SelectItem key={team._id} value={team._id}>{team.name}</SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <Button className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl h-12 font-bold italic" onClick={handleAddExistingTeam}>Add to Tournament</Button>
-                                    </TabsContent>
-                                    <TabsContent value="new" className="space-y-4 pt-4">
-                                        <div className="space-y-2">
-                                            <Label>Team Name</Label>
-                                            <Input className="bg-slate-950 border-slate-800 rounded-xl h-12" placeholder="e.g. Manchester United" value={newTeam.name} onChange={e => setNewTeam({...newTeam, name: e.target.value})} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label>Logo URL (Optional)</Label>
-                                            <Input className="bg-slate-950 border-slate-800 rounded-xl h-12" placeholder="https://..." value={newTeam.logo} onChange={e => setNewTeam({...newTeam, logo: e.target.value})} />
-                                        </div>
-                                        <Button className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl h-12 font-bold italic" onClick={handleCreateAddTeam}>Create & Add</Button>
-                                    </TabsContent>
-                                </Tabs>
-                            </DialogContent>
-                        </Dialog>
-
-                        <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-                            <DialogTrigger asChild>
-                                <Button variant="outline" className="border-slate-800 bg-slate-900/50 text-white hover:bg-slate-800 rounded-[1.25rem] font-black uppercase italic tracking-tight px-8 h-12">
-                                    <Settings size={18} className="mr-2" /> Settings
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="bg-slate-900 border-slate-800 text-white rounded-[2rem] max-w-md">
-                                <DialogHeader>
-                                    <DialogTitle className="text-2xl font-black italic uppercase tracking-tight">Tournament Settings</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4 mt-4">
-                                    <div className="space-y-2">
-                                        <Label>Tournament Name</Label>
-                                        <Input className="bg-slate-950 border-slate-800 rounded-xl h-12" value={settingsData.name} onChange={e => setSettingsData({...settingsData, name: e.target.value})} />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label>Start Date</Label>
-                                            <Input type="date" className="bg-slate-950 border-slate-800 rounded-xl h-12" value={settingsData.startDate} onChange={e => setSettingsData({...settingsData, startDate: e.target.value})} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label>End Date</Label>
-                                            <Input type="date" className="bg-slate-950 border-slate-800 rounded-xl h-12" value={settingsData.endDate} onChange={e => setSettingsData({...settingsData, endDate: e.target.value})} />
-                                        </div>
-                                    </div>
-                                    <Button className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl h-12 font-bold italic" onClick={handleUpdateTournament}>Save Changes</Button>
-                                    <Button variant="destructive" className="w-full rounded-xl h-12 font-bold italic" onClick={handleDeleteTournament}>
-                                        <Trash2 size={16} className="mr-2" /> Delete Tournament
+                        {isTournamentOwner && (
+                            <Dialog open={isAddTeamOpen} onOpenChange={setIsAddTeamOpen}>
+                                <DialogTrigger asChild>
+                                    <Button className="bg-white text-black hover:bg-slate-200 rounded-[1.25rem] font-black uppercase italic tracking-tight px-8 h-12">
+                                        <Plus size={18} className="mr-2" /> Add Team
                                     </Button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
+                                </DialogTrigger>
+                                <DialogContent className="bg-slate-900 border-slate-800 text-white rounded-[2rem] max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle className="text-2xl font-black italic uppercase tracking-tight">Add Team to {tournament.name}</DialogTitle>
+                                    </DialogHeader>
+                                    <Tabs defaultValue="existing" className="mt-4">
+                                        <TabsList className="bg-slate-950 border-slate-800 w-full rounded-xl">
+                                            <TabsTrigger value="existing" className="flex-1 rounded-lg italic font-bold">Existing Team</TabsTrigger>
+                                            <TabsTrigger value="new" className="flex-1 rounded-lg italic font-bold">Create New</TabsTrigger>
+                                        </TabsList>
+                                        <TabsContent value="existing" className="space-y-4 pt-4">
+                                            <div className="space-y-2">
+                                                <Label>Select Team</Label>
+                                                <Select value={selectedExistingTeam} onValueChange={setSelectedExistingTeam}>
+                                                    <SelectTrigger className="bg-slate-950 border-slate-800 rounded-xl h-12">
+                                                        <SelectValue placeholder="Choose a team" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="bg-slate-950 border-slate-800 text-white">
+                                                        {allTeams.filter((t: any) => !tournament.teams?.some((tt: any) => tt._id === t._id)).map((team: any) => (
+                                                            <SelectItem key={team._id} value={team._id}>{team.name}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <Button className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl h-12 font-bold italic" onClick={handleAddExistingTeam}>Add to Tournament</Button>
+                                        </TabsContent>
+                                        <TabsContent value="new" className="space-y-4 pt-4">
+                                            <div className="space-y-2">
+                                                <Label>Team Name</Label>
+                                                <Input className="bg-slate-950 border-slate-800 rounded-xl h-12" placeholder="e.g. Manchester United" value={newTeam.name} onChange={e => setNewTeam({...newTeam, name: e.target.value})} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>Logo URL (Optional)</Label>
+                                                <Input className="bg-slate-950 border-slate-800 rounded-xl h-12" placeholder="https://..." value={newTeam.logo} onChange={e => setNewTeam({...newTeam, logo: e.target.value})} />
+                                            </div>
+                                            <Button className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl h-12 font-bold italic" onClick={handleCreateAddTeam}>Create & Add</Button>
+                                        </TabsContent>
+                                    </Tabs>
+                                </DialogContent>
+                            </Dialog>
+                        )}
+
+                        {isTournamentOwner && (
+                            <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" className="border-slate-800 bg-slate-900/50 text-white hover:bg-slate-800 rounded-[1.25rem] font-black uppercase italic tracking-tight px-8 h-12">
+                                        <Settings size={18} className="mr-2" /> Settings
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="bg-slate-900 border-slate-800 text-white rounded-[2rem] max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle className="text-2xl font-black italic uppercase tracking-tight">Tournament Settings</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="space-y-4 mt-4">
+                                        <div className="space-y-2">
+                                            <Label>Tournament Name</Label>
+                                            <Input className="bg-slate-950 border-slate-800 rounded-xl h-12" value={settingsData.name} onChange={e => setSettingsData({...settingsData, name: e.target.value})} />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label>Start Date</Label>
+                                                <Input type="date" className="bg-slate-950 border-slate-800 rounded-xl h-12" value={settingsData.startDate} onChange={e => setSettingsData({...settingsData, startDate: e.target.value})} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>End Date</Label>
+                                                <Input type="date" className="bg-slate-950 border-slate-800 rounded-xl h-12" value={settingsData.endDate} onChange={e => setSettingsData({...settingsData, endDate: e.target.value})} />
+                                            </div>
+                                        </div>
+                                        <Button className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl h-12 font-bold italic" onClick={handleUpdateTournament}>Save Changes</Button>
+                                        <Button variant="destructive" className="w-full rounded-xl h-12 font-bold italic" onClick={handleDeleteTournament}>
+                                            <Trash2 size={16} className="mr-2" /> Delete Tournament
+                                        </Button>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        )}
                     </div>
                 </div>
 
@@ -411,53 +420,55 @@ export default function FootballTournamentDetails() {
                     <TabsContent value="matches" className="space-y-6">
                         <div className="flex justify-between items-center bg-slate-900/40 border border-white/5 p-6 rounded-3xl">
                             <h3 className="text-2xl font-black italic uppercase tracking-tight">Match Schedule</h3>
-                            <Dialog open={isScheduleOpen} onOpenChange={setIsScheduleOpen}>
-                                <DialogTrigger asChild>
-                                    <Button className="bg-blue-600 hover:bg-blue-500 rounded-xl h-11 px-8 font-bold italic uppercase tracking-tight">
-                                        <Plus size={18} className="mr-2" /> Schedule Match
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="bg-slate-900 border-slate-800 text-white rounded-[2rem] max-w-lg">
-                                    <DialogHeader>
-                                        <DialogTitle className="text-2xl font-black italic uppercase tracking-tight">Schedule New Match</DialogTitle>
-                                    </DialogHeader>
-                                    <div className="space-y-4 mt-6">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label className="uppercase text-[10px] font-black tracking-widest text-slate-500">Home Team</Label>
-                                                <Select value={matchData.homeTeam} onValueChange={v => setMatchData({...matchData, homeTeam: v})}>
-                                                    <SelectTrigger className="bg-slate-950 border-slate-800 rounded-xl h-12"><SelectValue placeholder="Team 1" /></SelectTrigger>
-                                                    <SelectContent className="bg-slate-950 border-slate-800 text-white">
-                                                        {tournament.teams?.map((t: any) => (
-                                                            <SelectItem key={t._id} value={t._id}>{t.name}</SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                            {isTournamentOwner && (
+                                <Dialog open={isScheduleOpen} onOpenChange={setIsScheduleOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button className="bg-blue-600 hover:bg-blue-500 rounded-xl h-11 px-8 font-bold italic uppercase tracking-tight">
+                                            <Plus size={18} className="mr-2" /> Schedule Match
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-slate-900 border-slate-800 text-white rounded-[2rem] max-w-lg">
+                                        <DialogHeader>
+                                            <DialogTitle className="text-2xl font-black italic uppercase tracking-tight">Schedule New Match</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="space-y-4 mt-6">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="uppercase text-[10px] font-black tracking-widest text-slate-500">Home Team</Label>
+                                                    <Select value={matchData.homeTeam} onValueChange={v => setMatchData({...matchData, homeTeam: v})}>
+                                                        <SelectTrigger className="bg-slate-950 border-slate-800 rounded-xl h-12"><SelectValue placeholder="Team 1" /></SelectTrigger>
+                                                        <SelectContent className="bg-slate-950 border-slate-800 text-white">
+                                                            {tournament.teams?.map((t: any) => (
+                                                                <SelectItem key={t._id} value={t._id}>{t.name}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="uppercase text-[10px] font-black tracking-widest text-slate-500">Away Team</Label>
+                                                    <Select value={matchData.awayTeam} onValueChange={v => setMatchData({...matchData, awayTeam: v})}>
+                                                        <SelectTrigger className="bg-slate-950 border-slate-800 rounded-xl h-12"><SelectValue placeholder="Team 2" /></SelectTrigger>
+                                                        <SelectContent className="bg-slate-950 border-slate-800 text-white">
+                                                            {tournament.teams?.map((t: any) => (
+                                                                <SelectItem key={t._id} value={t._id}>{t.name}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="uppercase text-[10px] font-black tracking-widest text-slate-500">Away Team</Label>
-                                                <Select value={matchData.awayTeam} onValueChange={v => setMatchData({...matchData, awayTeam: v})}>
-                                                    <SelectTrigger className="bg-slate-950 border-slate-800 rounded-xl h-12"><SelectValue placeholder="Team 2" /></SelectTrigger>
-                                                    <SelectContent className="bg-slate-950 border-slate-800 text-white">
-                                                        {tournament.teams?.map((t: any) => (
-                                                            <SelectItem key={t._id} value={t._id}>{t.name}</SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                                <Label className="uppercase text-[10px] font-black tracking-widest text-slate-500">Date & Time</Label>
+                                                <Input type="datetime-local" className="bg-slate-950 border-slate-800 rounded-xl h-12" value={matchData.date} onChange={e => setMatchData({...matchData, date: e.target.value})} />
                                             </div>
+                                            <div className="space-y-2">
+                                                <Label className="uppercase text-[10px] font-black tracking-widest text-slate-500">Venue</Label>
+                                                <Input className="bg-slate-950 border-slate-800 rounded-xl h-12" placeholder="Stadium Name" value={matchData.venue} onChange={e => setMatchData({...matchData, venue: e.target.value})} />
+                                            </div>
+                                            <Button className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl h-14 font-black italic uppercase text-lg mt-4 shadow-lg shadow-blue-500/20" onClick={handleScheduleMatch}>Confirm Schedule</Button>
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label className="uppercase text-[10px] font-black tracking-widest text-slate-500">Date & Time</Label>
-                                            <Input type="datetime-local" className="bg-slate-950 border-slate-800 rounded-xl h-12" value={matchData.date} onChange={e => setMatchData({...matchData, date: e.target.value})} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="uppercase text-[10px] font-black tracking-widest text-slate-500">Venue</Label>
-                                            <Input className="bg-slate-950 border-slate-800 rounded-xl h-12" placeholder="Stadium Name" value={matchData.venue} onChange={e => setMatchData({...matchData, venue: e.target.value})} />
-                                        </div>
-                                        <Button className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl h-14 font-black italic uppercase text-lg mt-4 shadow-lg shadow-blue-500/20" onClick={handleScheduleMatch}>Confirm Schedule</Button>
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
+                                    </DialogContent>
+                                </Dialog>
+                            )}
                         </div>
                         <div className="grid gap-4">
                              {matches.map((match: any) => (
@@ -493,7 +504,7 @@ export default function FootballTournamentDetails() {
                                             <p className="text-[10px] font-medium text-slate-600">{match.venue || "No venue"}</p>
                                         </div>
                                         <div className="flex gap-2">
-                                            {match.status !== 'Completed' ? (
+                                            {isTournamentOwner && match.status !== 'Completed' && (
                                                 <Button 
                                                     onClick={(e) => {
                                                         e.stopPropagation();
@@ -503,7 +514,8 @@ export default function FootballTournamentDetails() {
                                                 >
                                                     <Play size={24} className="fill-current" />
                                                 </Button>
-                                            ) : (
+                                            )}
+                                            {match.status === 'Completed' && (
                                                 <Button 
                                                     onClick={(e) => {
                                                         e.stopPropagation();
@@ -515,16 +527,18 @@ export default function FootballTournamentDetails() {
                                                     <BarChart3 size={24} />
                                                 </Button>
                                             )}
-                                            <Button 
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteMatch(match._id);
-                                                }} 
-                                                variant="ghost" 
-                                                className="text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-2xl h-14 w-14 p-0"
-                                            >
-                                                <Trash2 size={24} />
-                                            </Button>
+                                            {isTournamentOwner && (
+                                                <Button 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteMatch(match._id);
+                                                    }} 
+                                                    variant="ghost" 
+                                                    className="text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-2xl h-14 w-14 p-0"
+                                                >
+                                                    <Trash2 size={24} />
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
                                 </Card>

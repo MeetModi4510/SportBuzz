@@ -784,9 +784,13 @@ const ScoringPanel = () => {
         );
     }
 
-    const currentUserId = localStorage.getItem('userId') || '';
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const currentUserId = user._id || user.id || '';
+    const isAdmin = user.role === 'admin';
+
     const creatorId = match.tournament?.createdBy ? (typeof match.tournament.createdBy === 'object' ? (match.tournament.createdBy as any)._id : match.tournament.createdBy) : null;
-    if (match.tournament && creatorId && creatorId !== currentUserId) {
+    
+    if (match.tournament && creatorId && String(creatorId) !== String(currentUserId) && !isAdmin) {
         return (
             <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
                 <XCircle className="w-16 h-16 text-red-500 mb-4" />

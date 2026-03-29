@@ -19,7 +19,7 @@ import { ANALYSIS_PLAYERS } from "@/data/playerAnalysisData";
 
 const API_BASE = import.meta.env.VITE_API_URL 
     ? import.meta.env.VITE_API_URL.replace('/api', '') 
-    : (import.meta.env.PROD ? '' : 'http://localhost:5000');
+    : (import.meta.env.PROD ? 'https://sportbuzz-backend.onrender.com' : 'http://localhost:5000');
 
 const cricketPlayers = ANALYSIS_PLAYERS.cricket;
 
