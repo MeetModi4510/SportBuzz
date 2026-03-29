@@ -787,11 +787,17 @@ const ScoringPanel = () => {
 
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const currentUserId = user._id || user.id || '';
+    const userEmail = user.email || '';
     const isAdmin = user.role === 'admin';
 
     const creatorId = match.tournament?.createdBy ? (typeof match.tournament.createdBy === 'object' ? (match.tournament.createdBy as any)._id : match.tournament.createdBy) : null;
     
-    if (match.tournament && creatorId && String(creatorId) !== String(currentUserId) && !isAdmin) {
+    // --- AUTH LOGIC ---
+    const isCreator = creatorId && String(creatorId) === String(currentUserId);
+    const isLegacyTournament = match.tournament ? (!creatorId || new Date(match.tournament.createdAt) < new Date('2026-03-30T00:00:00Z')) : false;
+    const isSpecialUserForLegacy = userEmail === 'meetmodi451013@gmail.com' && isLegacyTournament;
+    
+    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
         return (
             <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
                 <XCircle className="w-16 h-16 text-red-500 mb-4" />
@@ -803,6 +809,7 @@ const ScoringPanel = () => {
             </div>
         );
     }
+    // ------------------
 
     /* ═══════════════════════════════════════════════════════════
        PHASE 1: LINEUP SELECTION
