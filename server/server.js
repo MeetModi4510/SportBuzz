@@ -158,7 +158,7 @@ app.use('/api/auctions', auctionRoutes);
 app.get('/api/health', (req, res) => {
     res.json({
         success: true,
-        message: 'SportBuzz API is running',
+        message: 'SportBuzz API is running v2.0',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV
     });
