@@ -52,7 +52,7 @@ export const createMatch = asyncHandler(async (req, res) => {
     // Ownership check: verify user owns the tournament
     if (tournament && req.user) {
         const tournamentDoc = await Tournament.findById(tournament);
-        if (tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() !== req.user._id.toString()) {
+        if (tournamentDoc && tournamentDoc.createdBy && String(tournamentDoc.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
             res.status(403);
             throw new Error('Not authorized. You can only schedule matches in tournaments you created.');
         }
@@ -145,7 +145,7 @@ export const updateMatch = asyncHandler(async (req, res) => {
     // Ownership check
     if (match.tournament && req.user) {
         const tournamentDoc = await Tournament.findById(match.tournament);
-        if (tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() !== req.user._id.toString()) {
+        if (tournamentDoc && tournamentDoc.createdBy && String(tournamentDoc.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
             res.status(403);
             throw new Error('Not authorized. You can only edit matches in tournaments you created.');
         }
@@ -394,7 +394,7 @@ export const recordBall = asyncHandler(async (req, res) => {
     // Ownership check
     if (match.tournament && req.user) {
         const tournamentDoc = await Tournament.findById(match.tournament);
-        if (tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() !== req.user._id.toString()) {
+        if (tournamentDoc && tournamentDoc.createdBy && String(tournamentDoc.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
             res.status(403);
             throw new Error('Not authorized. You can only score matches in tournaments you created.');
         }
@@ -759,7 +759,7 @@ export const undoLastBall = asyncHandler(async (req, res) => {
     // Ownership check
     if (match.tournament && req.user) {
         const tournamentDoc = await Tournament.findById(match.tournament);
-        if (tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() !== req.user._id.toString()) {
+        if (tournamentDoc && tournamentDoc.createdBy && String(tournamentDoc.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
             res.status(403);
             throw new Error('Not authorized. You can only undo balls in tournaments you created.');
         }
@@ -840,7 +840,7 @@ export const deleteMatch = asyncHandler(async (req, res) => {
     // Ownership check
     if (match.tournament && req.user) {
         const tournamentDoc = await Tournament.findById(match.tournament);
-        if (tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() !== req.user._id.toString()) {
+        if (tournamentDoc && tournamentDoc.createdBy && String(tournamentDoc.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
             res.status(403);
             throw new Error('Not authorized. You can only delete matches in tournaments you created.');
         }

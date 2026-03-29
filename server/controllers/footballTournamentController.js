@@ -163,7 +163,7 @@ export const updateTournament = asyncHandler(async (req, res) => {
     }
 
     // Only creator can update
-    if (tournament.createdBy.toString() !== req.user._id.toString()) {
+    if (String(tournament.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
         res.status(403);
         throw new Error('Not authorized to update this tournament');
     }
@@ -190,7 +190,7 @@ export const deleteTournament = asyncHandler(async (req, res) => {
         throw new Error('Tournament not found');
     }
 
-    if (tournament.createdBy.toString() !== req.user._id.toString()) {
+    if (String(tournament.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
         res.status(403);
         throw new Error('Not authorized to delete this tournament');
     }
@@ -210,7 +210,7 @@ export const updateTeam = asyncHandler(async (req, res) => {
     }
 
     // Only creator can update
-    if (team.createdBy.toString() !== req.user._id.toString()) {
+    if (String(team.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
         res.status(403);
         throw new Error('Not authorized to update this team');
     }
