@@ -1,3 +1,10 @@
+import { Github, Linkedin, ExternalLink, Code2, Layout, Database } from "lucide-react";
+
+interface SocialLinks {
+  linkedin?: string;
+  github?: string;
+}
+
 interface Creator {
   name: string;
   role: string;
