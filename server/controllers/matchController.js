@@ -47,7 +47,23 @@ async function triggerFollowerNotifications(match, { title, message, type }) {
 // @route   POST /api/matches
 // @access  Private
 export const createMatch = asyncHandler(async (req, res) => {
-    const { tournament, homeTeam, awayTeam, venue, date, status, matchType } = req.body;
+    // --- AUTH CHECK ---
+    const tournamentDoc = await Tournament.findById(tournament);
+    if (!tournamentDoc) {
+        res.status(404);
+        throw new Error('Tournament not found');
+    }
+
+    const isCreator = tournamentDoc.createdBy && tournamentDoc.createdBy.toString() === req.user._id.toString();
+    const isLegacyTournament = !tournamentDoc.createdBy || new Date(tournamentDoc.createdAt) < new Date('2026-03-30T00:00:00Z');
+    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized. Only the tournament creator can create matches.');
+    }
+    // -------------------
 
     const match = await Match.create({
         tournament,
@@ -126,12 +142,25 @@ export const getMatchById = asyncHandler(async (req, res) => {
 // @route   PUT /api/matches/:id
 // @access  Private
 export const updateMatch = asyncHandler(async (req, res) => {
-    const match = await Match.findById(req.params.id);
+    const match = await Match.findById(req.params.id).populate('tournament');
 
     if (!match) {
         res.status(404);
         throw new Error('Match not found');
     }
+
+    // --- AUTH CHECK ---
+    const tournamentDoc = match.tournament;
+    const isCreator = tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() === req.user._id.toString();
+    const isLegacyTournament = tournamentDoc && (!tournamentDoc.createdBy || new Date(tournamentDoc.createdAt) < new Date('2026-03-30T00:00:00Z'));
+    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized. Only the tournament creator can update this match.');
+    }
+    // -------------------
 
     if (match) {
         const oldStatus = match.status;
@@ -366,12 +395,25 @@ export const recordBall = asyncHandler(async (req, res) => {
         isDroppedCatch, droppedFielder, shotDirection
     } = req.body;
 
-    const match = await Match.findById(req.params.id);
+    const match = await Match.findById(req.params.id).populate('tournament');
 
     if (!match) {
         res.status(404);
         throw new Error('Match not found');
     }
+
+    // --- AUTH CHECK ---
+    const tournamentDoc = match.tournament;
+    const isCreator = tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() === req.user._id.toString();
+    const isLegacyTournament = tournamentDoc && (!tournamentDoc.createdBy || new Date(tournamentDoc.createdAt) < new Date('2026-03-30T00:00:00Z'));
+    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized. Only the tournament creator can score this match.');
+    }
+    // -------------------
 
     const totalBallRuns = isCommentaryOnly ? 0 : (runs + (extraRuns || 0));
 
@@ -723,11 +765,24 @@ export const getMatchBalls = asyncHandler(async (req, res) => {
 // @route   DELETE /api/matches/:id/balls/last
 // @access  Private
 export const undoLastBall = asyncHandler(async (req, res) => {
-    const match = await Match.findById(req.params.id);
+    const match = await Match.findById(req.params.id).populate('tournament');
     if (!match) {
         res.status(404);
         throw new Error('Match not found');
     }
+
+    // --- AUTH CHECK ---
+    const tournamentDoc = match.tournament;
+    const isCreator = tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() === req.user._id.toString();
+    const isLegacyTournament = tournamentDoc && (!tournamentDoc.createdBy || new Date(tournamentDoc.createdAt) < new Date('2026-03-30T00:00:00Z'));
+    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized. Only the tournament creator can undo balls.');
+    }
+    // -------------------
 
     // Find and delete the last ball for the current innings
     const lastBall = await Ball.findOne({ match: match._id, inning: match.currentInnings })
@@ -794,12 +849,25 @@ export const undoLastBall = asyncHandler(async (req, res) => {
 // @route   DELETE /api/matches/:id
 // @access  Private
 export const deleteMatch = asyncHandler(async (req, res) => {
-    const match = await Match.findById(req.params.id);
+    const match = await Match.findById(req.params.id).populate('tournament');
 
     if (!match) {
         res.status(404);
         throw new Error('Match not found');
     }
+
+    // --- AUTH CHECK ---
+    const tournamentDoc = match.tournament;
+    const isCreator = tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() === req.user._id.toString();
+    const isLegacyTournament = tournamentDoc && (!tournamentDoc.createdBy || new Date(tournamentDoc.createdAt) < new Date('2026-03-30T00:00:00Z'));
+    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized. Only the tournament creator can delete this match.');
+    }
+    // -------------------
 
     // Delete all balls associated with this match
     await Ball.deleteMany({ match: match._id });

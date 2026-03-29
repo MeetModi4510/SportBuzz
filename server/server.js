@@ -158,7 +158,7 @@ app.use('/api/auctions', auctionRoutes);
 app.get('/api/health', (req, res) => {
     res.json({
         success: true,
-        message: 'SportBuzz API is running v2.0',
+        message: 'SportBuzz API is running v2.2 (Restrictive Auth)',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV
     });

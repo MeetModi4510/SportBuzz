@@ -115,6 +115,18 @@ export const updateTournament = asyncHandler(async (req, res) => {
         throw new Error('Tournament not found');
     }
 
+    // --- AUTH CHECK ---
+    const isCreator = tournament.createdBy && tournament.createdBy.toString() === req.user._id.toString();
+    const isLegacyTournament = !tournament.createdBy || new Date(tournament.createdAt) < new Date('2026-03-30T00:00:00Z');
+    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized. Only the tournament creator can update this tournament.');
+    }
+    // -------------------
+
     if (tournament) {
         tournament.name = req.body.name || tournament.name;
         tournament.format = req.body.format || tournament.format;
@@ -164,6 +176,18 @@ export const deleteTournament = asyncHandler(async (req, res) => {
         throw new Error('Tournament not found');
     }
 
+    // --- AUTH CHECK ---
+    const isCreator = tournament.createdBy && tournament.createdBy.toString() === req.user._id.toString();
+    const isLegacyTournament = !tournament.createdBy || new Date(tournament.createdAt) < new Date('2026-03-30T00:00:00Z');
+    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized. Only the tournament creator can delete this tournament.');
+    }
+    // -------------------
+
     // Cascade delete: balls → matches → points table → tournament
     const matches = await Match.find({ tournament: req.params.id });
     const matchIds = matches.map(m => m._id);
@@ -188,6 +212,18 @@ export const addTeamToTournament = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error('Tournament not found');
     }
+
+    // --- AUTH CHECK ---
+    const isCreator = tournament.createdBy && tournament.createdBy.toString() === req.user._id.toString();
+    const isLegacyTournament = !tournament.createdBy || new Date(tournament.createdAt) < new Date('2026-03-30T00:00:00Z');
+    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized. Only the tournament creator can add teams.');
+    }
+    // -------------------
 
     if (tournament) {
         if (tournament.teams.includes(teamId)) {
@@ -507,6 +543,18 @@ export const shuffleTournamentGroups = asyncHandler(async (req, res) => {
         throw new Error('Tournament not found');
     }
 
+    // --- AUTH CHECK ---
+    const isCreator = tournament.createdBy && tournament.createdBy.toString() === req.user._id.toString();
+    const isLegacyTournament = !tournament.createdBy || new Date(tournament.createdAt) < new Date('2026-03-30T00:00:00Z');
+    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized. Only the tournament creator can shuffle groups.');
+    }
+    // -------------------
+
     if (tournament.groupStructure === 'None' || tournament.groupsCount <= 1) {
         res.status(400);
         throw new Error('Tournament does not support multiple groups');
@@ -554,6 +602,18 @@ export const recalculatePointsTable = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error('Tournament not found');
     }
+
+    // --- AUTH CHECK ---
+    const isCreator = tournament.createdBy && tournament.createdBy.toString() === req.user._id.toString();
+    const isLegacyTournament = !tournament.createdBy || new Date(tournament.createdAt) < new Date('2026-03-30T00:00:00Z');
+    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized. Only the tournament creator can recalculate the points table.');
+    }
+    // -------------------
 
     const maxOvers = tournament.overs || 20;
 
