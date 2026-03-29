@@ -9,6 +9,7 @@ import { LiveTicker } from "@/components/LiveTicker";
 import { TrendingPlayers } from "@/components/TrendingPlayers";
 import { SportIcon } from "@/components/SportIcon";
 import { MatchCard } from "@/components/MatchCard";
+import { CreatorsSection } from "@/components/CreatorsSection";
 import {
   matches as mockMatches,
   players,
@@ -307,8 +308,10 @@ const Index = () => {
           {/* Feature Coming Soon Placeholder for Live Tab */}
 
 
-          {/* Trending Players */}
           <TrendingPlayers players={players} onPlayerClick={handlePlayerClick} />
+
+          {/* Creators Section */}
+          <CreatorsSection />
         </main>
 
         {/* Footer */}
