@@ -150,7 +150,20 @@ export default function OwnerPanel() {
         
         // Join socket room
         const socket = getSocket();
+        
+        const handleConnect = () => {
+          socket.emit("join_auction", id);
+          handleLogin(email, accessCode); // refresh state safely
+        };
+        
+        socket.off("connect");
+        socket.off("bid_update");
+        socket.off("auction_update");
+        socket.off("trade_update");
+        socket.off("player_sold");
+
         socket.emit("join_auction", id);
+        socket.on("connect", handleConnect);
         socket.on("bid_update", (data: any) => {
           setAuction((prev: any) => {
             if (!prev) return prev;

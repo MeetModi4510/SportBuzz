@@ -236,7 +236,16 @@ export default function LiveAuction() {
   useEffect(() => {
     fetchAuction();
     const socket = getSocket();
+    
+    const handleConnect = () => {
+      socket.emit("join_auction", id);
+      fetchAuction(); // fetch any state changes missed while disconnected
+    };
+    
+    // Explicitly join on mount
     socket.emit("join_auction", id);
+    // Bind auto-rejoin if socket drops and recovers
+    socket.on("connect", handleConnect);
     
     socket.on("bid_update", (data: any) => {
       setAuction((prev: any) => {
@@ -286,6 +295,7 @@ export default function LiveAuction() {
     });
 
     return () => {
+      socket.off("connect", handleConnect);
       socket.off("bid_update");
       socket.off("player_sold");
       socket.off("auction_update");

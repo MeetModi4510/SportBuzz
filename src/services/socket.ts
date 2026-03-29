@@ -11,8 +11,9 @@ export const getSocket = () => {
     const token = localStorage.getItem("token");
     socket = io(API_BASE, {
       reconnection: true,
-      reconnectionAttempts: 5,
+      reconnectionAttempts: 10,
       reconnectionDelay: 1000,
+      transports: ["websocket"],
       auth: {
         token: token
       }

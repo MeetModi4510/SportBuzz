@@ -100,7 +100,14 @@ export default function AuctioneerPanel() {
       fetchAuction();
       
       const socket = getSocket();
+      
+      const handleConnect = () => {
+        socket.emit("join_auction", id);
+        fetchAuction(); // fresh payload to catch missed packets
+      };
+
       socket.emit("join_auction", id);
+      socket.on("connect", handleConnect);
       
       socket.on("bid_update", (data: any) => {
         setAuction((prev: any) => {
@@ -151,6 +158,7 @@ export default function AuctioneerPanel() {
       });
 
       return () => {
+        socket.off("connect", handleConnect);
         socket.off("bid_update");
         socket.off("auction_update");
         socket.off("trade_update");
