@@ -1,8 +1,8 @@
 import { io, Socket } from "socket.io-client";
 
-const API_BASE = import.meta.env.VITE_API_URL 
-  ? import.meta.env.VITE_API_URL.replace('/api', '') 
-  : (import.meta.env.PROD ? 'https://sportbuzz-backend.onrender.com' : 'http://localhost:5000');
+const API_BASE = import.meta.env.PROD 
+  ? 'https://sportbuzz-backend.onrender.com' 
+  : 'http://localhost:5000';
 
 let socket: Socket | null = null;
 
