@@ -86,6 +86,7 @@ export default function FootballScoringPanel() {
     const [secondsElapsed, setSecondsElapsed] = useState(0);
     const [displayTime, setDisplayTime] = useState("00:00");
     const timerInterval = useRef<any>(null);
+    const isUpdatingTimer = useRef(false);
     
     // Event Dialog State
     const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
@@ -105,6 +106,7 @@ export default function FootballScoringPanel() {
     const [showInjuryPrompt, setShowInjuryPrompt] = useState(false);
     const [injuryMatchMinute, setInjuryMatchMinute] = useState(0); 
     const [tempInjuryTime, setTempInjuryTime] = useState(0);
+    const [lastPromptedHalf, setLastPromptedHalf] = useState(0); 
 
     // Lineup Selection State
     const [homeXI, setHomeXI] = useState<string[]>([]);
@@ -202,19 +204,24 @@ export default function FootballScoringPanel() {
                 setDisplayTime(formatTime(totalSecs, match.timer.half));
 
                 // Injury Time Prompt Logic
-                if (match.timer.half === 1 && currentMin === 43 && !showInjuryPrompt && match.timer.injuryTime === 0) {
+                if (match.timer.half === 1 && currentMin === 43 && !showInjuryPrompt && match.timer.injuryTime === 0 && lastPromptedHalf !== 1) {
                     setInjuryMatchMinute(43);
                     setShowInjuryPrompt(true);
-                } else if (match.timer.half === 2 && currentMin === 88 && !showInjuryPrompt && match.timer.injuryTime === 0) {
+                    setLastPromptedHalf(1);
+                } else if (match.timer.half === 2 && currentMin === 88 && !showInjuryPrompt && match.timer.injuryTime === 0 && lastPromptedHalf !== 2) {
                     setInjuryMatchMinute(88);
                     setShowInjuryPrompt(true);
+                    setLastPromptedHalf(2);
                 }
 
                 // Auto-Stop Logic
                 const limit = match.timer.half === 1 ? 45 : 90;
-                if (currentMin >= limit + (match.timer.injuryTime || 0)) {
-                    handleTimerControl(false, currentMin, match.timer.half === 1 ? 'HalfTime' : 'FullTime');
-                    toast.info(match.timer.half === 1 ? "End of First Half" : "End of Second Half");
+                if (currentMin >= limit + (match.timer.injuryTime || 0) && !isUpdatingTimer.current) {
+                    const nextStatus = match.timer.half === 1 ? 'HalfTime' : 'FullTime';
+                    if (match.timer.halfStatus !== nextStatus) {
+                        handleTimerControl(false, currentMin, nextStatus);
+                        toast.info(match.timer.half === 1 ? "End of First Half" : "End of Second Half");
+                    }
                 }
             }, 1000); 
         } else {
@@ -223,7 +230,10 @@ export default function FootballScoringPanel() {
     }, [match?.timer?.isRunning, match?.timer?.startTime, match?.timer?.currentMinute, match?.timer?.half, match?.timer?.injuryTime, showInjuryPrompt]);
 
     const handleTimerControl = async (isRunning: boolean, minuteOverride?: number, statusOverride?: string) => {
+        if (isUpdatingTimer.current) return;
+        
         try {
+            isUpdatingTimer.current = true;
             const minute = minuteOverride !== undefined ? minuteOverride : Math.floor(secondsElapsed / 60);
             const res: any = await footballApi.updateTimer(id!, { 
                 isRunning, 
@@ -236,7 +246,10 @@ export default function FootballScoringPanel() {
                 updateTimerDisplay(res.data);
             }
         } catch (error) {
+            console.error("Timer update failed:", error);
             toast.error("Failed to update timer");
+        } finally {
+            isUpdatingTimer.current = false;
         }
     };
 
@@ -1579,8 +1592,10 @@ export default function FootballScoringPanel() {
                                      const events = match.events || [];
                                      const isSubbedOut = events.some((e: any) => e.type === 'Substitution' && e.playerOut === p.name);
                                      const isSubbedIn = events.some((e: any) => e.type === 'Substitution' && e.player === p.name);
+                                     const pEvents = summarizePlayerEvents(p.name, events);
+                                     const hasRedCard = pEvents.redCards > 0 || pEvents.yellowCards >= 2;
                                      const isOnField = (startingXI.includes(p.name) || isSubbedIn) && !isSubbedOut;
-                                     return isOnField;
+                                     return isOnField && !hasRedCard;
                                  })?.map((player: any) => (
                                      <Button 
                                         key={player.number}
@@ -1667,8 +1682,10 @@ export default function FootballScoringPanel() {
                                      const events = match.events || [];
                                      const isSubbedOut = events.some((e: any) => e.type === 'Substitution' && e.playerOut === p.name);
                                      const isSubbedIn = events.some((e: any) => e.type === 'Substitution' && e.player === p.name);
+                                     const pEvents = summarizePlayerEvents(p.name, events);
+                                     const hasRedCard = pEvents.redCards > 0 || pEvents.yellowCards >= 2;
                                      const isOnField = (startingXI.includes(p.name) || isSubbedIn) && !isSubbedOut;
-                                     return isOnField && p.name !== selectedScorer;
+                                     return isOnField && p.name !== selectedScorer && !hasRedCard;
                                  }).map((player: any) => (
                                      <Button 
                                         key={player.number}
@@ -1721,7 +1738,9 @@ export default function FootballScoringPanel() {
                                       const substitutes = match.lineups?.[side]?.substitutes || [];
                                       const events = match.events || [];
                                       const isSubbedIn = events.some((e: any) => e.type === 'Substitution' && e.player === p.name);
-                                      return substitutes.includes(p.name) && !isSubbedIn;
+                                      const pEvents = summarizePlayerEvents(p.name, events);
+                                     const hasRedCard = pEvents.redCards > 0 || pEvents.yellowCards >= 2;
+                                      return substitutes.includes(p.name) && !isSubbedIn && !hasRedCard;
                                   }).map((player: any) => (
                                       <Button 
                                          key={player.number}

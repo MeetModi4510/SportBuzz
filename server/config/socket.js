@@ -50,6 +50,17 @@ export const initSocket = (server) => {
             console.log(`[SOCKET] User ${socket.id} left match: ${matchId}`);
         });
 
+        // Football Match Handlers
+        socket.on('join_football_match', (matchId) => {
+            socket.join(`football_match_${matchId}`);
+            console.log(`[SOCKET] User ${socket.id} joined football match: ${matchId}`);
+        });
+
+        socket.on('leave_football_match', (matchId) => {
+            socket.leave(`football_match_${matchId}`);
+            console.log(`[SOCKET] User ${socket.id} left football match: ${matchId}`);
+        });
+
         // Auction Handlers
         socket.on('join_auction', (auctionId) => {
             socket.join(`auction_${auctionId}`);
