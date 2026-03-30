@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +19,7 @@ import { toast } from "sonner";
 
 export default function LiveFootballMatch() {
     const { id } = useParams();
+    const [match, setMatch] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const receivedSocketUpdate = useRef(false);
     const lastUpdateTimestamp = useRef<Date>(new Date());
@@ -146,11 +147,11 @@ export default function LiveFootballMatch() {
     if (!match) return <div className="min-h-screen bg-[#0a0a0c] flex flex-col items-center justify-center gap-4 text-center p-8"><h1 className="text-2xl font-bold text-white">Match Not Found</h1><p className="text-slate-500 max-w-md">The match you're looking for was not found or has been removed.</p></div>;
 
     // Safety check for unpopulated or missing teams
-    if (!match.homeTeam || !match.awayTeam) {
+    if (!match.homeTeam || !match.awayTeam || typeof match.homeTeam === 'string' || typeof match.awayTeam === 'string') {
         return (
             <div className="min-h-screen bg-[#0a0a0c] flex flex-col items-center justify-center gap-6 text-center p-8">
                 <div className="p-10 bg-slate-900/40 border border-white/5 rounded-[3rem] backdrop-blur-3xl">
-                    <Users className="mx-auto text-slate-800 mb-8" size={80} />
+                    <Loader2 className="mx-auto text-blue-500 mb-8 animate-spin" size={48} />
                     <h1 className="text-2xl font-black italic uppercase tracking-tighter text-white">Match Setup Pending</h1>
                     <p className="text-slate-500 mt-2 max-w-sm mx-auto">This match is in our system, but teams haven't been fully assigned or loaded yet. Check back soon!</p>
                 </div>
@@ -353,11 +354,11 @@ export default function LiveFootballMatch() {
                                                 <div className="flex justify-between items-end">
                                                     <div className="flex flex-col">
                                                         <span className="text-2xl font-black italic text-blue-500">{stat.home}</span>
-                                                        <span className="text-[8px] font-bold text-slate-700 uppercase">{match.homeTeam.name.slice(0, 3)}</span>
+                                                        <span className="text-[8px] font-bold text-slate-700 uppercase">{match.homeTeam?.name?.slice(0, 3) || 'HOM'}</span>
                                                     </div>
                                                     <div className="flex flex-col items-end">
                                                         <span className="text-2xl font-black italic text-orange-500">{stat.away}</span>
-                                                        <span className="text-[8px] font-bold text-slate-700 uppercase">{match.awayTeam.name.slice(0, 3)}</span>
+                                                        <span className="text-[8px] font-bold text-slate-700 uppercase">{match.awayTeam?.name?.slice(0, 3) || 'AWA'}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -404,7 +405,7 @@ export default function LiveFootballMatch() {
                                                     <div className={`w-1.5 h-1.5 rounded-full ${isHome ? 'bg-blue-500' : 'bg-orange-500'} ring-4 ring-slate-950`} />
                                                     <div className={`mt-3 opacity-0 group-hover/event:opacity-100 transition-opacity absolute top-full flex flex-col items-center pointer-events-none`}>
                                                         <span className="text-[8px] font-black text-white whitespace-nowrap bg-slate-900/90 px-2 py-1 rounded-md border border-white/10 uppercase italic">
-                                                            {event.minute}' {event.player.split(' ').pop()}
+                                                            {event.minute}' {event.player?.split(' ').pop() || 'Unknown'}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -477,7 +478,7 @@ export default function LiveFootballMatch() {
                                     <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-500 mb-8 px-2">Recent Performance</h3>
                                     <div className="space-y-8">
                                         <div className="flex justify-between items-center group">
-                                            <span className="text-xs font-black uppercase tracking-widest text-blue-500">{match.homeTeam.name.slice(0, 12)}</span>
+                                            <span className="text-xs font-black uppercase tracking-widest text-blue-500">{match.homeTeam?.name?.slice(0, 12) || 'Home Team'}</span>
                                             <div className="flex gap-2">
                                                 {['W', 'D', 'W', 'W', 'L'].map((r, i) => (
                                                     <div key={i} className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black border ${r === 'W' ? 'bg-green-500/20 text-green-500 border-green-500/30' : r === 'L' ? 'bg-red-500/20 text-red-500 border-red-500/30' : 'bg-slate-800 text-slate-400 border-slate-700'}`}>
@@ -487,7 +488,7 @@ export default function LiveFootballMatch() {
                                             </div>
                                         </div>
                                         <div className="flex justify-between items-center group">
-                                            <span className="text-xs font-black uppercase tracking-widest text-orange-500">{match.awayTeam.name.slice(0, 12)}</span>
+                                            <span className="text-xs font-black uppercase tracking-widest text-orange-500">{match.awayTeam?.name?.slice(0, 12) || 'Away Team'}</span>
                                             <div className="flex gap-2">
                                                 {['L', 'L', 'D', 'W', 'L'].map((r, i) => (
                                                     <div key={i} className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black border ${r === 'W' ? 'bg-green-500/20 text-green-500 border-green-500/30' : r === 'L' ? 'bg-red-500/20 text-red-500 border-red-500/30' : 'bg-slate-800 text-slate-400 border-slate-700'}`}>
