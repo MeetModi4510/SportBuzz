@@ -93,12 +93,25 @@ export default function LiveFootballMatch() {
         if (id) fetchMatch();
 
         const socket = getSocket();
-        socket.emit("join_football_match", id);
+        
+        const joinRoom = () => {
+            console.log(`[SOCKET] Joining football match room: ${id}`);
+            socket.emit("join_football_match", id);
+        };
+
+        if (socket.connected) {
+            joinRoom();
+        }
+
+        socket.on("connect", joinRoom);
+        
         socket.on("football_update", (updatedMatch) => {
+            console.log("[SOCKET] Received football update:", updatedMatch._id);
             setMatch(updatedMatch);
         });
 
         return () => {
+            socket.off("connect", joinRoom);
             socket.emit("leave_football_match", id);
             socket.off("football_update");
         };

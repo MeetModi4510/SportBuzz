@@ -179,13 +179,26 @@ export default function FootballScoringPanel() {
         if (id) fetchMatch();
 
         const socket = getSocket();
-        socket.emit("join_football_match", id);
+        
+        const joinRoom = () => {
+            console.log(`[SOCKET] Scorer joining football match room: ${id}`);
+            socket.emit("join_football_match", id);
+        };
+
+        if (socket.connected) {
+            joinRoom();
+        }
+
+        socket.on("connect", joinRoom);
+
         socket.on("football_update", (updatedMatch) => {
+            console.log("[SOCKET] Scorer received update for match:", updatedMatch._id);
             setMatch(updatedMatch);
             updateTimerDisplay(updatedMatch);
         });
 
         return () => {
+            socket.off("connect", joinRoom);
             socket.emit("leave_football_match", id);
             socket.off("football_update");
             if (timerInterval.current) clearInterval(timerInterval.current);
