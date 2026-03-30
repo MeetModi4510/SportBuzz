@@ -98,8 +98,11 @@ function getRowYPositions(rowCount: number, isHome: boolean): number[] {
 
 function getPlayerXPositions(count: number): number[] {
     if (count === 1) return [50];
-    const margin = 14;
+    
+    // For 2 players, use a larger margin to keep them more central
+    const margin = count === 2 ? 35 : 14;
     const spread = 100 - margin * 2;
+    
     return Array.from({ length: count }, (_, i) => {
         return margin + (i * spread) / (count - 1);
     });
