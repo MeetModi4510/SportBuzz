@@ -17,6 +17,11 @@ interface SquadPlayer {
         assists: number;
         yellowCards: number;
         redCards: number;
+        saves?: number;
+        fouls?: number;
+        shotsOnTarget?: number;
+        corners?: number;
+        teamGoalsConceded?: number;
         substitution?: { inMinute?: number; outMinute?: number; isInjured?: boolean };
     };
 }
@@ -111,7 +116,17 @@ const getRatingColor = (rating: number) => {
 const derivePlayerPerformance = (p: SquadPlayer, currentMinute: number = 90) => {
     if (p.matchStats && Object.keys(p.matchStats).length > 0) return p.matchStats;
 
-    const events = p.events || { goals: 0, assists: 0, yellowCards: 0, redCards: 0, substitution: undefined };
+    const events = p.events || { 
+        goals: 0, 
+        assists: 0, 
+        yellowCards: 0, 
+        redCards: 0, 
+        saves: 0, 
+        fouls: 0, 
+        shotsOnTarget: 0, 
+        teamGoalsConceded: 0,
+        substitution: undefined 
+    };
     
     let minutes = 0;
     if (!p.isSubstitute) {
@@ -132,18 +147,50 @@ const derivePlayerPerformance = (p: SquadPlayer, currentMinute: number = 90) => 
     const assists = events.assists || 0;
     const yellowCards = events.yellowCards || 0;
     const redCards = events.redCards || 0;
+    const saves = events.saves || 0;
+    const fouls = events.fouls || 0;
+    const shotsOnTarget = events.shotsOnTarget || 0;
+    const teamGoalsConceded = events.teamGoalsConceded || 0;
 
-    rating += (goals * 1.5);
-    rating += (assists * 1.0);
+    // Role detection
+    const isGK = p.role?.toLowerCase().includes('keeper');
+    const isDEF = p.role?.toLowerCase().includes('defender');
+
+    // Offensive Impact
+    if (isGK) rating += (goals * 2.0); // Rare and amazing
+    else if (isDEF) rating += (goals * 1.5);
+    else rating += (goals * 1.0);
+
+    rating += (assists * 0.8);
+    rating += (shotsOnTarget * 0.3);
+
+    // Defensive Impact
+    if (isGK) {
+        rating += (saves * 0.5);
+    }
+    
+    // Disciplinary
+    rating -= (fouls * 0.2);
     rating -= (yellowCards * 0.5);
-    rating -= (redCards * 2.0);
+    rating -= (redCards * 2.5);
+
+    // Contextual: Defense & Clean Sheet
+    if (isGK || isDEF) {
+        // Penalty for goals conceded
+        rating -= (teamGoalsConceded * 0.4);
+
+        // Clean Sheet Bonus (Min 60 mins played and 0 conceded)
+        if (teamGoalsConceded === 0 && minutes >= 60) {
+            rating += 1.0;
+        }
+    }
     
     const validMinutes = isNaN(minutes) ? 0 : minutes;
-    if (validMinutes > 45) rating += 0.5;
+    if (validMinutes > 45) rating += 0.4;
     if (validMinutes > 80) rating += 0.3;
     
     // Safety check for NaN
-    const finalRating = isNaN(rating) ? 6.0 : Math.min(10.0, Number(rating.toFixed(1)));
+    const finalRating = isNaN(rating) ? 6.0 : Math.min(10.0, Math.max(1.0, Number(rating.toFixed(1))));
     
     return {
         rating: finalRating,
@@ -152,6 +199,9 @@ const derivePlayerPerformance = (p: SquadPlayer, currentMinute: number = 90) => 
         assists,
         yellowCards,
         redCards,
+        saves,
+        fouls,
+        shotsOnTarget,
         substitutedIn: events.substitution?.inMinute,
         substitutedOut: events.substitution?.outMinute,
         isInjured: events.substitution?.isInjured || false,

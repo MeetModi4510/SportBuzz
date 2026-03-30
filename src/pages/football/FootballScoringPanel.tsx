@@ -639,20 +639,31 @@ export default function FootballScoringPanel() {
         );
     };
 
-    const summarizePlayerEvents = (playerName: string, events: any[]) => {
+    const summarizePlayerEvents = (playerName: string, events: any[], teamGoalsConceded: number = 0) => {
         const playerEvents = {
             goals: 0,
             assists: 0,
             yellowCards: 0,
             redCards: 0,
+            saves: 0,
+            fouls: 0,
+            shotsOnTarget: 0,
+            corners: 0,
+            teamGoalsConceded,
             substitution: undefined as any
         };
 
         events?.forEach(event => {
-            if (event.type === 'Goal' && event.player === playerName) playerEvents.goals++;
+            if (event.player === playerName) {
+                if (event.type === 'Goal') playerEvents.goals++;
+                if (event.type === 'YellowCard') playerEvents.yellowCards++;
+                if (event.type === 'RedCard') playerEvents.redCards++;
+                if (event.type === 'Save') playerEvents.saves++;
+                if (event.type === 'Foul') playerEvents.fouls++;
+                if (event.type === 'ShotOnTarget') playerEvents.shotsOnTarget++;
+                if (event.type === 'Corner') playerEvents.corners++;
+            }
             if (event.type === 'Goal' && event.assister === playerName) playerEvents.assists++;
-            if (event.type === 'YellowCard' && event.player === playerName) playerEvents.yellowCards++;
-            if (event.type === 'RedCard' && event.player === playerName) playerEvents.redCards++;
             if (event.type === 'Substitution') {
                 if (event.player === playerName) {
                     playerEvents.substitution = { 
@@ -1174,7 +1185,7 @@ export default function FootballScoringPanel() {
                                             number: p?.number, 
                                             isSubstitute: false, 
                                             isCaptain: p?.isCaptain,
-                                            events: summarizePlayerEvents(name, match.events)
+                                            events: summarizePlayerEvents(name, match.events, match.score?.away || 0)
                                         };
                                     }) || []),
                                     ...(match.lineups?.home?.substitutes?.map((name: string) => {
@@ -1185,7 +1196,7 @@ export default function FootballScoringPanel() {
                                             role: p?.role || 'Midfielder', 
                                             number: p?.number, 
                                             isSubstitute: true,
-                                            events: summarizePlayerEvents(name, match.events)
+                                            events: summarizePlayerEvents(name, match.events, match.score?.away || 0)
                                         };
                                     }) || [])
                                 ].filter((p, i, self) => i === self.findIndex((t) => t.id === p.id))}
@@ -1199,7 +1210,7 @@ export default function FootballScoringPanel() {
                                             number: p?.number, 
                                             isSubstitute: false, 
                                             isCaptain: p?.isCaptain,
-                                            events: summarizePlayerEvents(name, match.events)
+                                            events: summarizePlayerEvents(name, match.events, match.score?.home || 0)
                                         };
                                     }) || []),
                                     ...(match.lineups?.away?.substitutes?.map((name: string) => {
@@ -1210,7 +1221,7 @@ export default function FootballScoringPanel() {
                                             role: p?.role || 'Midfielder', 
                                             number: p?.number, 
                                             isSubstitute: true,
-                                            events: summarizePlayerEvents(name, match.events)
+                                            events: summarizePlayerEvents(name, match.events, match.score?.home || 0)
                                         };
                                     }) || [])
                                 ].filter((p, i, self) => i === self.findIndex((t) => t.id === p.id))}
