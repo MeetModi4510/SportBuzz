@@ -292,6 +292,7 @@ export const addMatchEvent = asyncHandler(async (req, res) => {
 
     // Broadcast update
     const io = getIO();
+    console.log(`[BROADCAST] Sending football_update for match ${match._id} with ${populatedMatch.events?.length} events`);
     io.to(`football_match_${match._id}`).emit('football_update', populatedMatch);
 
     res.json({ success: true, data: populatedMatch });

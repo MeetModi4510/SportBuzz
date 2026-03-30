@@ -19,8 +19,9 @@ import { toast } from "sonner";
 
 export default function LiveFootballMatch() {
     const { id } = useParams();
-    const [match, setMatch] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const receivedSocketUpdate = useRef(false);
+    const lastUpdateTimestamp = useRef<Date>(new Date());
     const [displayTime, setDisplayTime] = useState("00:00");
 
     const summarizePlayerEvents = (playerName: string, events: any[], teamGoalsConceded: number = 0) => {
@@ -80,8 +81,11 @@ export default function LiveFootballMatch() {
         const fetchMatch = async () => {
             try {
                 const res: any = await footballApi.getMatchById(id!);
-                if (res.success) {
+                if (res.success && !receivedSocketUpdate.current) {
+                    console.log("[DEBUG] Applying initial fetch data");
                     setMatch(res.data);
+                } else if (res.success) {
+                    console.log("[DEBUG] Initial fetch completed but ignored because socket update already arrived");
                 }
             } catch (error) {
                 console.error("Match fetch failed");
@@ -107,6 +111,8 @@ export default function LiveFootballMatch() {
         
         socket.on("football_update", (updatedMatch) => {
             console.log("[SOCKET] Received football update:", updatedMatch._id);
+            receivedSocketUpdate.current = true;
+            lastUpdateTimestamp.current = new Date();
             setMatch(updatedMatch);
         });
 
@@ -524,7 +530,7 @@ export default function LiveFootballMatch() {
                                         };
 
                                         return (
-                                            <Card key={i} className={`relative bg-slate-950/40 border-white/5 rounded-2xl p-5 hover:bg-slate-900/60 transition-all duration-500 group overflow-hidden ${getEventGlow(event.type)} after:absolute after:inset-0 after:pointer-events-none after:opacity-50`}>
+                                            <Card key={event._id || i} className={`relative bg-slate-950/40 border-white/5 rounded-2xl p-5 hover:bg-slate-900/60 transition-all duration-500 group overflow-hidden ${getEventGlow(event.type)} after:absolute after:inset-0 after:pointer-events-none after:opacity-50`}>
                                                 {/* Team Accent Bar */}
                                                 <div className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor} opacity-40 group-hover:opacity-100 transition-opacity duration-500`} />
                                                 
