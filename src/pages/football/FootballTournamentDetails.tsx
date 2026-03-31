@@ -389,6 +389,7 @@ export default function FootballTournamentDetails() {
                         <TabsTrigger value="matches" className="rounded-xl px-8 h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white font-bold uppercase tracking-widest text-[10px] transition-all">Matches</TabsTrigger>
                         <TabsTrigger value="table" className="rounded-xl px-8 h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white font-bold uppercase tracking-widest text-[10px] transition-all">Points Table</TabsTrigger>
                         <TabsTrigger value="stats" className="rounded-xl px-8 h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white font-bold uppercase tracking-widest text-[10px] transition-all">Stats</TabsTrigger>
+                        <TabsTrigger value="newsroom" className="rounded-xl px-8 h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white font-bold uppercase tracking-widest text-[10px] transition-all">Newsroom</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="overview">
@@ -441,7 +442,6 @@ export default function FootballTournamentDetails() {
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="matches" className="space-y-6">
                     <TabsContent value="matches" className="space-y-6">
                         <div className="flex justify-between items-center bg-slate-900/40 border border-white/5 p-6 rounded-3xl">
                             <h3 className="text-2xl font-black italic uppercase tracking-tight">Match Schedule</h3>
@@ -670,7 +670,6 @@ export default function FootballTournamentDetails() {
                                 </div>
                             )}
                         </div>
-                    </TabsContent>
                     </TabsContent>
 
                     <TabsContent value="table">
