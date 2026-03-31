@@ -7,6 +7,12 @@ const footballTeamSchema = new mongoose.Schema({
         trim: true
     },
     logo: String,
+    acronym: {
+        type: String,
+        maxLength: 4,
+        uppercase: true,
+        trim: true
+    },
     players: [{
         name: { type: String, required: true },
         number: { type: Number },

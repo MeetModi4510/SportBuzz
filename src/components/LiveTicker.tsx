@@ -46,12 +46,12 @@ export const LiveTicker = () => {
         isFollowedTournament: true,
         homeTeam: {
           name: m.homeTeamName,
-          shortName: getTeamAcronym(m.homeTeamName),
+          shortName: m.homeTeamAcronym || getTeamAcronym(m.homeTeamName),
           logo: m.homeTeamLogo || "",
         },
         awayTeam: {
           name: m.awayTeamName,
-          shortName: getTeamAcronym(m.awayTeamName),
+          shortName: m.awayTeamAcronym || getTeamAcronym(m.awayTeamName),
           logo: m.awayTeamLogo || "",
         },
         homeScore: m.homeScore,

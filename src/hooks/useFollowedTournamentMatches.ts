@@ -13,6 +13,8 @@ export interface TournamentTickerMatch {
     awayScore: string;
     status: "Live" | "Completed";
     tournamentId: string;
+    homeTeamAcronym?: string;
+    awayTeamAcronym?: string;
     testBreakStatus?: string | null;
 }
 
@@ -43,6 +45,8 @@ export const useFollowedTournamentMatches = (tournamentList: { _id: string; name
                                    homeTeamLogo: m.homeTeam?.logo,
                                    awayTeamName: m.awayTeam?.name || "Team B",
                                    awayTeamLogo: m.awayTeam?.logo,
+                                   homeTeamAcronym: m.homeTeam?.acronym,
+                                   awayTeamAcronym: m.awayTeam?.acronym,
                                    homeScore: `${m.score?.home ?? 0}`,
                                    awayScore: `${m.score?.away ?? 0}`,
                                    status: m.status,

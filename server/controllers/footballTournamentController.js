@@ -105,11 +105,12 @@ export const getTournamentById = asyncHandler(async (req, res) => {
 // @route   POST /api/football/teams
 // @access  Private
 export const createTeam = asyncHandler(async (req, res) => {
-    const { name, logo, players, substitutes } = req.body;
-
+    const { name, logo, acronym, players, substitutes } = req.body;
+    
     const team = await FootballTeam.create({
         name,
         logo,
+        acronym,
         players,
         substitutes,
         createdBy: req.user._id
@@ -275,9 +276,10 @@ export const updateTeam = asyncHandler(async (req, res) => {
         throw new Error('Not authorized to update this team');
     }
 
-    const { name, logo, players, substitutes } = req.body;
+    const { name, logo, acronym, players, substitutes } = req.body;
     team.name = name || team.name;
-    team.logo = logo || team.logo;
+    team.logo = logo || (logo === "" ? "" : team.logo); // Allow clearing logo
+    team.acronym = acronym !== undefined ? acronym : team.acronym;
     if (players) team.players = players;
     if (substitutes) team.substitutes = substitutes;
 

@@ -22,10 +22,10 @@ export default function FootballTournamentDetails() {
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isAddTeamOpen, setIsAddTeamOpen] = useState(false);
+    const [selectedExistingTeam, setSelectedExistingTeam] = useState("");
+    const [newTeam, setNewTeam] = useState({ name: "", logo: "", acronym: "" });
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isScheduleOpen, setIsScheduleOpen] = useState(false);
-    const [newTeam, setNewTeam] = useState({ name: "", logo: "" });
-    const [selectedExistingTeam, setSelectedExistingTeam] = useState("");
     const [matchData, setMatchData] = useState({ homeTeam: "", awayTeam: "", venue: "", date: "" });
     const [settingsData, setSettingsData] = useState({ name: "", format: "", startDate: "", endDate: "" });
 
@@ -305,9 +305,15 @@ export default function FootballTournamentDetails() {
                                             <Button className="w-full bg-blue-600 hover:bg-blue-500 rounded-xl h-12 font-bold italic" onClick={handleAddExistingTeam}>Add to Tournament</Button>
                                         </TabsContent>
                                         <TabsContent value="new" className="space-y-4 pt-4">
-                                            <div className="space-y-2">
-                                                <Label>Team Name</Label>
-                                                <Input className="bg-slate-950 border-slate-800 rounded-xl h-12" placeholder="e.g. Manchester United" value={newTeam.name} onChange={e => setNewTeam({...newTeam, name: e.target.value})} />
+                                            <div className="grid grid-cols-3 gap-4">
+                                                <div className="col-span-2 space-y-2">
+                                                    <Label>Team Name</Label>
+                                                    <Input className="bg-slate-950 border-slate-800 rounded-xl h-12" placeholder="e.g. Manchester United" value={newTeam.name} onChange={e => setNewTeam({...newTeam, name: e.target.value})} />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>Acronym</Label>
+                                                    <Input className="bg-slate-950 border-slate-800 rounded-xl h-12 uppercase" maxLength={4} placeholder="e.g. MU" value={newTeam.acronym} onChange={e => setNewTeam({...newTeam, acronym: e.target.value.toUpperCase()})} />
+                                                </div>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label>Logo URL (Optional)</Label>

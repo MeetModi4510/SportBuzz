@@ -24,7 +24,7 @@ export default function FootballTeamProfile() {
     const [teamData, setTeamData] = useState<any>(null);
     const [isAddPlayerOpen, setIsAddPlayerOpen] = useState(false);
     const [isEditTeamOpen, setIsEditTeamOpen] = useState(false);
-    const [editTeamData, setEditTeamData] = useState({ name: "", logo: "" });
+    const [editTeamData, setEditTeamData] = useState({ name: "", logo: "", acronym: "" });
     const [newPlayer, setNewPlayer] = useState({ name: "", number: "", role: "Forward", isCaptain: false });
     const [isUpdating, setIsUpdating] = useState(false);
 
@@ -33,7 +33,11 @@ export default function FootballTeamProfile() {
             const res: any = await footballApi.getTeamById(id!);
             if (res.success) {
                 setTeamData(res.data);
-                setEditTeamData({ name: res.data.team.name, logo: res.data.team.logo || "" });
+                setEditTeamData({ 
+                    name: res.data.team.name, 
+                    logo: res.data.team.logo || "",
+                    acronym: res.data.team.acronym || ""
+                });
             }
         } catch (error) {
             toast.error("Failed to load team data");
@@ -199,13 +203,25 @@ export default function FootballTeamProfile() {
                                             <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter">Edit Team Profile</DialogTitle>
                                         </DialogHeader>
                                         <div className="space-y-6 mt-6">
-                                            <div className="space-y-2">
-                                                <Label className="uppercase text-[10px] font-black tracking-widest text-slate-500">Team Name</Label>
-                                                <Input 
-                                                    className="bg-slate-950 border-slate-800 h-12 rounded-xl" 
-                                                    value={editTeamData.name}
-                                                    onChange={e => setEditTeamData({...editTeamData, name: e.target.value})}
-                                                />
+                                            <div className="grid grid-cols-3 gap-4">
+                                                <div className="col-span-2 space-y-2">
+                                                    <Label className="uppercase text-[10px] font-black tracking-widest text-slate-500">Team Name</Label>
+                                                    <Input 
+                                                        className="bg-slate-950 border-slate-800 h-12 rounded-xl" 
+                                                        value={editTeamData.name}
+                                                        onChange={e => setEditTeamData({...editTeamData, name: e.target.value})}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="uppercase text-[10px] font-black tracking-widest text-slate-500">Acronym</Label>
+                                                    <Input 
+                                                        className="bg-slate-950 border-slate-800 h-12 rounded-xl uppercase" 
+                                                        maxLength={4}
+                                                        placeholder="e.g. FCB"
+                                                        value={editTeamData.acronym}
+                                                        onChange={e => setEditTeamData({...editTeamData, acronym: e.target.value.toUpperCase()})}
+                                                    />
+                                                </div>
                                             </div>
                                             <div className="space-y-4">
                                                 <div className="space-y-2">
