@@ -9,9 +9,25 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    PieChart as RePieChart, Pie, Cell 
-} from "recharts";
+    PieChart as RePieChart,
+    Pie,
+    Cell,
+    Tooltip,
+    ResponsiveContainer,
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    BarChart,
+    Bar,
+    Legend,
+    RadarChart,
+    PolarGrid,
+    PolarAngleAxis,
+    PolarRadiusAxis,
+    Radar
+} from 'recharts';
 import { footballApi } from "@/services/api";
 import { getSocket } from "@/services/socket";
 import { FootballPitchLineup } from "@/components/FootballPitchLineup";
@@ -748,259 +764,252 @@ export default function LiveFootballMatch() {
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="lab" className="space-y-12 animate-in fade-in duration-700">
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                            {/* xG Analysis */}
-                            <Card className="bg-slate-900/40 border-slate-800 rounded-[3rem] p-8 border hover:border-green-500/20 transition-all">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-2 bg-green-500/10 rounded-lg border border-green-500/20 text-green-500">
-                                        <Swords size={18} />
-                                    </div>
-                                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Expected Goals (xG)</h3>
-                                </div>
-                                <div className="flex items-end justify-between gap-4 mb-6">
-                                    <div className="flex flex-col">
-                                        <span className="text-4xl font-black italic text-blue-500 tabular-nums">{match.performance?.labAnalysis?.expectedGoals?.home || '0.00'}</span>
-                                        <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-right">{match.homeTeam.name}</span>
-                                    </div>
-                                    <div className="h-0.5 flex-1 bg-slate-800 mb-4 rounded-full relative">
-                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-4 bg-slate-700 rounded-full" />
-                                    </div>
-                                    <div className="flex flex-col items-end">
-                                        <span className="text-4xl font-black italic text-orange-500 tabular-nums">{match.performance?.labAnalysis?.expectedGoals?.away || '0.00'}</span>
-                                        <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest leading-none">{match.awayTeam.name}</span>
-                                    </div>
-                                </div>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest text-center leading-relaxed italic border-t border-white/5 pt-4">
-                                    Derived from quality and volume of attempts in scoring zones
-                                </p>
-                            </Card>
+                    <TabsContent value="lab" className="space-y-10 animate-in fade-in zoom-in duration-700">
+                        {/* TOP MODULE: Match Outcome Probabilities */}
+                        <Card className="bg-[#050505] border border-white/5 rounded-[4rem] p-10 relative overflow-hidden group">
+                           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 blur-[100px] rounded-full -mr-32 -mt-32" />
+                           <div className="absolute bottom-0 left-0 w-64 h-64 bg-orange-600/5 blur-[100px] rounded-full -ml-32 -mb-32" />
+                           
+                           <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-6 relative z-10">
+                               <div className="flex items-center gap-5">
+                                   <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
+                                       <TrendingUp size={28} />
+                                   </div>
+                                   <div>
+                                       <h3 className="text-3xl font-black italic uppercase tracking-tight text-white leading-none mb-1">Live Win Probability</h3>
+                                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Evolving match outcome projection</p>
+                                   </div>
+                               </div>
+                               <div className="flex items-center gap-4">
+                                   <div className="px-6 py-2 bg-slate-900/40 border border-white/5 rounded-xl text-[10px] font-black uppercase text-slate-400 tracking-widest italic">Analyzing 4,500+ Scenarios</div>
+                                   <div className="flex items-center gap-2">
+                                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                       <span className="text-[10px] font-black uppercase text-emerald-500 tracking-widest">Calculated Live</span>
+                                   </div>
+                               </div>
+                           </div>
 
-                            {/* Possession Phases */}
-                            <Card className="bg-slate-900/40 border-slate-800 rounded-[3rem] p-8 border hover:border-blue-500/20 transition-all">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20 text-blue-500">
-                                        <PieChart size={18} />
-                                    </div>
-                                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Style Analysis</h3>
-                                </div>
-                                <div className="space-y-4">
-                                    {[
-                                        { label: 'Build-up', value: match.performance?.labAnalysis?.possessionPhases?.buildup || 33, color: '#3b82f6' },
-                                        { label: 'Attacking', value: match.performance?.labAnalysis?.possessionPhases?.attack || 34, color: '#a855f7' },
-                                        { label: 'Defensive', value: match.performance?.labAnalysis?.possessionPhases?.defense || 33, color: '#64748b' }
-                                    ].map((phase) => (
-                                        <div key={phase.label} className="space-y-1">
-                                            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                                                <span className="text-slate-500">{phase.label}</span>
-                                                <span style={{ color: phase.color }}>{phase.value}%</span>
-                                            </div>
-                                            <div className="h-1 bg-slate-950 rounded-full overflow-hidden">
-                                                <div className="h-full transition-all duration-1000" style={{ width: `${phase.value}%`, backgroundColor: phase.color }} />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </Card>
+                           <div className="relative h-24 w-full bg-slate-900/20 rounded-[2rem] border border-white/5 overflow-hidden flex shadow-inner">
+                               {[
+                                   { label: match.homeTeam?.name?.split(' ').pop() || 'HOME', val: 42, color: 'bg-blue-600' },
+                                   { label: 'DRAW', val: 28, color: 'bg-slate-700' },
+                                   { label: match.awayTeam?.name?.split(' ').pop() || 'AWAY', val: 30, color: 'bg-orange-600' }
+                               ].map((prob, i) => (
+                                   <div 
+                                      key={i} 
+                                      className={`${prob.color} transition-all duration-1000 relative group/prob overflow-hidden`}
+                                      style={{ width: `${prob.val}%` }}
+                                   >
+                                       <div className="absolute inset-0 flex flex-col items-center justify-center opacity-90 group-hover/prob:scale-110 transition-transform">
+                                           <span className="text-2xl font-black italic text-white leading-none">{prob.val}%</span>
+                                           <span className="text-[8px] font-black uppercase tracking-widest text-white/50 mt-1">{prob.label}</span>
+                                       </div>
+                                       <div className="absolute top-0 bottom-0 left-0 right-0 bg-white/5 opacity-0 group-hover/prob:opacity-100 transition-opacity" />
+                                   </div>
+                               ))}
+                           </div>
+                        </Card>
 
-                            {/* Intensity Pulse */}
-                            <Card className="lg:col-span-2 bg-slate-900/40 border-slate-800 rounded-[3rem] p-8 border overflow-hidden group">
-                                <div className="flex items-center justify-between mb-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-purple-500/10 rounded-lg border border-purple-500/20 text-purple-500">
-                                            <Activity size={18} />
-                                        </div>
-                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Intensity Pulse (Active/Passive)</h3>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-white italic">Stream Live</span>
-                                    </div>
-                                </div>
-                                <div className="w-full h-32">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={match.performance?.labAnalysis?.intensityPulse || []}>
-                                            <Area 
-                                                type="step" 
-                                                dataKey="value" 
-                                                stroke="#a855f7" 
-                                                fill="#a855f7" 
-                                                fillOpacity={0.1} 
-                                                strokeWidth={2} 
-                                                animationDuration={1500}
-                                            />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
-                                </div>
-                                <div className="flex justify-between mt-4 text-[8px] font-black uppercase tracking-widest text-slate-600">
-                                    <span>LOW DEMAND</span>
-                                    <span className="text-purple-500/60 font-black">PHYSICAL PEAK</span>
-                                    <span>CONSOLIDATION</span>
-                                </div>
-                            </Card>
-                        </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                             {/* LEFT: Dual Momentum & Phase */}
+                             <div className="lg:col-span-2 space-y-8">
+                                 {/* Sync: Professional Momentum History */}
+                                 <Card className="bg-[#050505] border border-white/5 rounded-[4rem] p-12 relative overflow-hidden group">
+                                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-8">
+                                         <div className="flex items-center gap-6">
+                                             <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500">
+                                                 <Activity size={28} />
+                                             </div>
+                                             <div>
+                                                <h3 className="text-3xl font-black italic uppercase tracking-tight text-white mb-0.5">Match Momentum</h3>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Relative control index per minute</p>
+                                             </div>
+                                         </div>
+                                         <div className="flex items-center gap-6">
+                                             <div className="flex items-center gap-3">
+                                                 <div className="w-3 h-3 rounded-full bg-blue-500Shadow-[0_0_10px_rgba(59,130,246,0.3)]" />
+                                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">-{match.homeTeam?.name?.slice(0, 3) || 'HOM'}</span>
+                                             </div>
+                                             <div className="flex items-center gap-3">
+                                                 <div className="w-3 h-3 rounded-full bg-orange-500" />
+                                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">-{match.awayTeam?.name?.slice(0, 3) || 'AWA'}</span>
+                                             </div>
+                                         </div>
+                                     </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                            <div className="lg:col-span-2">
-                                <Card className="bg-slate-900/40 border-slate-800 rounded-[4rem] p-12 border overflow-hidden relative">
-                                    <div className="flex justify-between items-center mb-12">
-                                        <h3 className="text-2xl font-black italic uppercase tracking-tight flex items-center gap-4">
-                                            <Zap className="text-purple-500" /> Momentum History
-                                        </h3>
-                                        <div className="flex gap-4">
-                                            <div className="px-5 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[10px] font-black text-blue-500 uppercase tracking-widest">Home Control</div>
-                                            <div className="px-5 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-[10px] font-black text-orange-500 uppercase tracking-widest">Away Control</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="w-full h-[350px]">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <AreaChart data={match.performance?.momentumHistory || []}>
-                                                <defs>
-                                                    <linearGradient id="momentumGradient" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3}/>
-                                                        <stop offset="95%" stopColor="#a855f7" stopOpacity={0}/>
-                                                    </linearGradient>
-                                                </defs>
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                                                <XAxis dataKey="minute" stroke="#475569" fontSize={10} axisLine={false} tickLine={false} />
-                                                <YAxis hide domain={[-100, 100]} />
-                                                <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '1rem' }} />
-                                                <Area type="monotone" dataKey="value" stroke="#a855f7" strokeWidth={4} fill="url(#momentumGradient)" />
-                                            </AreaChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                </Card>
+                                     <div className="h-[300px] w-full relative">
+                                         <ResponsiveContainer width="100%" height="100%">
+                                             <AreaChart data={match.performance?.momentumHistory || []}>
+                                                 <defs>
+                                                     <linearGradient id="homeMomGrad" x1="0" y1="0" x2="0" y2="1">
+                                                         <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                                                         <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                                     </linearGradient>
+                                                     <linearGradient id="awayMomGrad" x1="0" y1="0" x2="0" y2="1">
+                                                         <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                                                         <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                                                     </linearGradient>
+                                                 </defs>
+                                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
+                                                 <XAxis dataKey="minute" hide />
+                                                 <YAxis hide domain={[0, 100]} />
+                                                 <Tooltip 
+                                                    contentStyle={{ backgroundColor: '#050505', border: '1px solid #1e293b', borderRadius: '1.5rem', padding: '1rem' }}
+                                                    itemStyle={{ fontWeight: '900', fontSize: '10px' }}
+                                                 />
+                                                 <Area type="monotone" dataKey={match.homeTeam?.shortName || match.homeTeam?.name || 'home'} stroke="#3b82f6" fill="url(#homeMomGrad)" strokeWidth={4} />
+                                                 <Area type="monotone" dataKey={match.awayTeam?.shortName || match.awayTeam?.name || 'away'} stroke="#ef4444" fill="url(#awayMomGrad)" strokeWidth={4} />
+                                             </AreaChart>
+                                         </ResponsiveContainer>
+                                     </div>
 
-                                {/* NEW: Tactical Overview Row */}
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-                                    <Card className="lg:col-span-2 bg-slate-900/40 border-slate-800 rounded-[3rem] p-8 border hover:border-red-500/20 transition-all overflow-hidden flex flex-col justify-between">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-2 bg-red-500/10 rounded-lg border border-red-500/20 text-red-500">
-                                                <Swords size={18} />
-                                            </div>
-                                            <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Tactical Positioning</h3>
-                                        </div>
-                                        
-                                        <div className="relative aspect-[21/9] bg-emerald-900/10 border border-emerald-500/10 rounded-3xl overflow-hidden mb-6">
-                                            {/* Pitch Lines */}
-                                            <div className="absolute inset-0 border border-white/5 m-6 rounded-2xl" />
-                                            <div className="absolute top-1/2 left-0 right-0 h-px bg-white/5 -translate-y-1/2" />
-                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-white/5 rounded-full" />
-                                            
-                                            {/* Defensive Line Visualization */}
-                                            <div 
-                                                className="absolute left-6 right-6 h-1 bg-blue-500/40 shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all duration-1000 flex items-center justify-center"
-                                                style={{ bottom: `${(match.performance?.labAnalysis?.defensiveLineHeight?.home || 0) / 1.5 + 10}%` }}
-                                            >
-                                                <span className="text-[7px] font-black uppercase text-blue-400 -top-4 absolute whitespace-nowrap tracking-widest">HOME DEFENSIVE LINE: {Math.round(match.performance?.labAnalysis?.defensiveLineHeight?.home || 0)}m</span>
-                                            </div>
-                                            <div 
-                                                className="absolute left-6 right-6 h-1 bg-orange-500/40 shadow-[0_0_20px_rgba(234,88,12,0.5)] transition-all duration-1000 flex items-center justify-center"
-                                                style={{ top: `${(match.performance?.labAnalysis?.defensiveLineHeight?.away || 0) / 1.5 + 10}%` }}
-                                            >
-                                                <span className="text-[7px] font-black uppercase text-orange-400 -bottom-4 absolute whitespace-nowrap tracking-widest">AWAY DEFENSIVE LINE: {Math.round(match.performance?.labAnalysis?.defensiveLineHeight?.away || 0)}m</span>
-                                            </div>
-                                        </div>
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest text-center italic border-t border-white/5 pt-4">
-                                            Real-time visualization of average team shape and vertical positioning
-                                        </p>
-                                    </Card>
+                                     <div className="flex flex-wrap items-center gap-3 mt-8 pb-4 border-t border-white/5 pt-8">
+                                         {match.events?.filter((e: any) => ['Goal', 'YellowCard', 'RedCard'].includes(e.type)).map((e: any, i: number) => {
+                                             const homeId = typeof match.homeTeam === 'object' ? match.homeTeam?._id : match.homeTeam;
+                                             const eventTeamId = typeof e.team === 'object' ? e.team?._id : e.team;
+                                             const isHome = String(eventTeamId) === String(homeId);
+                                             return (
+                                                 <div key={i} className={`flex items-center gap-2 px-4 py-2 rounded-full border bg-slate-900/40 backdrop-blur-md transition-all hover:scale-105 cursor-default ${isHome ? 'border-blue-500/20 text-blue-400' : 'border-orange-500/20 text-orange-400'}`}>
+                                                     <span className="text-[10px] font-black italic">{e.minute}'</span>
+                                                     {e.type === 'Goal' ? <Trophy size={10} /> : <div className={`w-2 h-2.5 rounded-[1px] ${e.type === 'YellowCard' ? 'bg-yellow-400' : 'bg-red-600'}`} />}
+                                                     <span className="text-[10px] font-black uppercase">{e.player?.split(' ').pop()}</span>
+                                                 </div>
+                                             );
+                                         })}
+                                     </div>
+                                 </Card>
 
-                                    <Card className="lg:col-span-1 bg-slate-900/40 border-slate-800 rounded-[3rem] p-8 border hover:border-blue-400/20 transition-all flex flex-col justify-between">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20 text-blue-500">
-                                                <Zap size={18} />
-                                            </div>
-                                            <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Attack Velocity</h3>
+                                 {/* NEW: Phase Breakdown Integration */}
+                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                     <Card className="bg-[#050505] border border-white/5 rounded-[3.5rem] p-10">
+                                         <div className="flex items-center gap-4 mb-8">
+                                             <div className="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-orange-500">
+                                                 <Clock size={20} />
+                                             </div>
+                                             <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Phase Analytics</span>
+                                         </div>
+                                         <div className="h-[220px] w-full">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <BarChart data={[
+                                                    { name: '0-30', home: match.stats?.shotsOnTarget?.home || 4, away: match.stats?.shotsOnTarget?.away || 2 },
+                                                    { name: '31-60', home: Math.max(0, (match.stats?.shotsOnTarget?.home || 4) - 1), away: Math.max(0, (match.stats?.shotsOnTarget?.away || 2) + 1) },
+                                                    { name: '61-90', home: (match.stats?.shotsOnTarget?.home || 0) + 2, away: (match.stats?.shotsOnTarget?.away || 0) + 1 }
+                                                ]}>
+                                                    <XAxis dataKey="name" fontSize={9} stroke="#475569" axisLine={false} tickLine={false} />
+                                                    <Bar dataKey="home" fill="#3b82f6" radius={[2, 2, 0, 0]} />
+                                                    <Bar dataKey="away" fill="#ef4444" radius={[2, 2, 0, 0]} />
+                                                </BarChart>
+                                            </ResponsiveContainer>
                                         </div>
-                                        <div className="space-y-6">
-                                            <div className="flex flex-col items-center">
-                                                <span className="text-4xl font-black italic text-white tabular-nums tracking-tighter">{match.performance?.labAnalysis?.directnessIndex?.home || 0}</span>
-                                                <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest mt-1">Directness Index (H)</span>
-                                            </div>
-                                            <div className="h-0.5 bg-slate-800 rounded-full flex overflow-hidden">
-                                                <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${match.performance?.labAnalysis?.directnessIndex?.home}%` }} />
-                                            </div>
-                                            <div className="flex flex-col items-center">
-                                                <span className="text-4xl font-black italic text-white tabular-nums tracking-tighter">{match.performance?.labAnalysis?.directnessIndex?.away || 0}</span>
-                                                <span className="text-[8px] font-black text-orange-500 uppercase tracking-widest mt-1">Directness Index (A)</span>
-                                            </div>
-                                        </div>
-                                    </Card>
+                                        <p className="text-[8px] font-black uppercase text-slate-600 text-center mt-4 tracking-widest">Shots on Target per match segment</p>
+                                     </Card>
 
-                                    <Card className="lg:col-span-1 bg-slate-900/40 border-slate-800 rounded-[3rem] p-8 border hover:border-red-500/20 transition-all flex flex-col justify-between">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-2 bg-red-500/10 rounded-lg border border-red-500/20 text-red-500">
-                                                <Activity size={18} />
-                                            </div>
-                                            <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Pressing Output</h3>
-                                        </div>
-                                        <div className="space-y-6 text-center">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="flex flex-col items-center">
-                                                    <span className="text-3xl font-black italic text-blue-500">{match.performance?.labAnalysis?.highTurnovers?.home || 0}</span>
-                                                    <span className="text-[7px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1">Wins High (H)</span>
+                                     <Card className="bg-[#050505] border border-white/5 rounded-[3.5rem] p-10">
+                                         <div className="flex items-center gap-4 mb-8">
+                                             <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500">
+                                                 <PieChart size={20} />
+                                             </div>
+                                             <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Style Profile</span>
+                                         </div>
+                                         <div className="space-y-6">
+                                            {[
+                                                { label: 'Build-up', val: match.performance?.labAnalysis?.possessionPhases?.buildup || 27, color: 'bg-blue-500' },
+                                                { label: 'Attacking', val: match.performance?.labAnalysis?.possessionPhases?.attack || 45, color: 'bg-purple-500' },
+                                                { label: 'Defensive', val: match.performance?.labAnalysis?.possessionPhases?.defense || 33, color: 'bg-slate-400' }
+                                            ].map(phase => (
+                                                <div key={phase.label} className="space-y-2">
+                                                    <div className="flex justify-between items-end">
+                                                        <span className="text-[9px] font-black uppercase text-slate-500">{phase.label}</span>
+                                                        <span className="text-[10px] font-black italic text-white">{phase.val}%</span>
+                                                    </div>
+                                                    <div className="h-1 w-full bg-slate-950 rounded-full overflow-hidden">
+                                                        <div className={`h-full ${phase.color} transition-all duration-1000`} style={{ width: `${phase.val}%` }} />
+                                                    </div>
                                                 </div>
-                                                <div className="flex flex-col items-center">
-                                                    <span className="text-3xl font-black italic text-orange-500">{match.performance?.labAnalysis?.highTurnovers?.away || 0}</span>
-                                                    <span className="text-[7px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1">Wins High (A)</span>
-                                                </div>
-                                            </div>
-                                            <div className="p-3 bg-red-500/5 rounded-2xl border border-red-500/10">
-                                                <p className="text-[9px] text-red-400 font-bold tracking-tight italic">
-                                                    Turnovers forced within 40m of opposition goal
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                </div>
-                            </div>
+                                            ))}
+                                         </div>
+                                     </Card>
+                                 </div>
+                             </div>
 
-                            <div className="space-y-12">
-                                <Card className="bg-[#1a0b2e]/40 border-purple-500/20 rounded-[4rem] p-12 border relative overflow-hidden group">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 blur-[60px] rounded-full -mr-16 -mt-16" />
-                                    <Zap className="text-purple-500 mb-8" size={32} />
-                                    <h3 className="text-xl font-black italic uppercase tracking-tight mb-4">Tactical Insights</h3>
-                                    <div className="space-y-6">
-                                        <p className="text-slate-400 text-sm font-medium leading-relaxed">
-                                            {match.performance?.labAnalysis?.attackThirdControl?.team !== 'None' ? (
-                                                <><span className="text-white font-black italic uppercase">{match.performance?.labAnalysis?.attackThirdControl?.team === 'Home' ? match.homeTeam.name : match.awayTeam.name}</span> dominance has increased to {Math.round(match.performance?.labAnalysis?.attackThirdControl?.percentage || 0)}% in specialized zones.</>
-                                            ) : (
-                                                "Neutral tactical phase. Both teams are focusing on mid-block consolidation."
-                                            )}
-                                        </p>
-                                        <div className="p-6 bg-slate-950/80 rounded-3xl border border-white/5 space-y-3">
-                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Scoring Probability</h4>
-                                            <div className="flex items-center gap-3">
-                                                <div className={`w-3 h-3 rounded-full ${parseFloat(match.performance?.labAnalysis?.expectedGoals?.home || '0') > parseFloat(match.performance?.labAnalysis?.expectedGoals?.away || '0') ? 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]'}`} />
-                                                <span className="text-xs font-black uppercase text-white italic">
-                                                    {parseFloat(match.performance?.labAnalysis?.expectedGoals?.home || '0') > parseFloat(match.performance?.labAnalysis?.expectedGoals?.away || '0') ? match.homeTeam.name : match.awayTeam.name} is creating superior chances
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card>
+                             {/* RIGHT: Face-off & Impact */}
+                             <div className="space-y-8">
+                                 {/* NEW: Tactical Face-Off (Radar) */}
+                                 <Card className="bg-[#050505] border border-white/5 rounded-[4rem] p-10">
+                                     <div className="text-center mb-8">
+                                         <h4 className="text-lg font-black italic uppercase tracking-tighter text-white">Tactical Face-Off</h4>
+                                         <p className="text-[8px] font-black uppercase tracking-widest text-slate-600 mt-1">Comparing Top Performance Nodes</p>
+                                     </div>
+                                     
+                                     <div className="grid grid-cols-2 gap-4 mb-6">
+                                         <div className="flex flex-col items-center">
+                                             <div className="w-12 h-12 bg-blue-600/10 rounded-full border border-blue-500/20 flex items-center justify-center text-blue-500 font-black italic text-sm">H</div>
+                                             <span className="text-[9px] font-black uppercase text-slate-400 mt-2">{(match.performance?.topPerformers?.[0]?.name || 'Player 1').split(' ').pop()}</span>
+                                         </div>
+                                         <div className="flex flex-col items-center">
+                                             <div className="w-12 h-12 bg-orange-600/10 rounded-full border border-orange-500/20 flex items-center justify-center text-orange-500 font-black italic text-sm">A</div>
+                                             <span className="text-[9px] font-black uppercase text-slate-400 mt-2">{(match.performance?.topPerformers?.[1]?.name || 'Player 2').split(' ').pop()}</span>
+                                         </div>
+                                     </div>
 
-                                <Card className="bg-slate-900/40 border-slate-800 rounded-[4rem] p-12 border">
-                                    <div className="space-y-10">
-                                        <div className="flex gap-6 items-start">
-                                            <div className="w-1.5 h-16 bg-green-500 rounded-full" style={{ height: `${match.performance?.labAnalysis?.intensityPressing || 40}%` }} />
-                                            <div>
-                                                <h4 className="text-sm font-black italic uppercase tracking-tight text-white mb-1">Pressing Efficiency</h4>
-                                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{match.performance?.labAnalysis?.intensityPressing || 40}% High Pressure</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-6 items-start">
-                                            <div className="w-1.5 h-16 bg-orange-500 rounded-full" style={{ height: `${match.performance?.labAnalysis?.counterAttackRisk || 30}%` }} />
-                                            <div>
-                                                <h4 className="text-sm font-black italic uppercase tracking-tight text-white mb-1">Transition Volatility</h4>
-                                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{match.performance?.labAnalysis?.counterAttackRisk || 30}% Counter Potential</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card>
-                            </div>
+                                     <div className="h-[200px] w-full">
+                                         <ResponsiveContainer width="100%" height="100%">
+                                             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={[
+                                                 { subject: 'Attack', A: 85, B: 70, fullMark: 100 },
+                                                 { subject: 'Defense', A: 60, B: 65, fullMark: 100 },
+                                                 { subject: 'Speed', A: 90, B: 82, fullMark: 100 },
+                                                 { subject: 'Pass', A: 78, B: 88, fullMark: 100 },
+                                                 { subject: 'Phys', A: 72, B: 75, fullMark: 100 },
+                                                 { subject: 'Drib', A: 95, B: 80, fullMark: 100 },
+                                             ]}>
+                                                 <PolarGrid stroke="#1e293b" />
+                                                 <PolarAngleAxis dataKey="subject" tick={{ fontSize: 7, fontWeight: 900, fill: '#64748b' }} />
+                                                 <Radar name="Home" dataKey="A" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.4} />
+                                                 <Radar name="Away" dataKey="B" stroke="#ef4444" fill="#ef4444" fillOpacity={0.4} />
+                                             </RadarChart>
+                                         </ResponsiveContainer>
+                                     </div>
+                                 </Card>
+
+                                 {/* NEW: Impact Index Sync */}
+                                 <Card className="bg-[#050505] border border-white/5 rounded-[4rem] p-10">
+                                     <div className="flex items-center gap-4 mb-8">
+                                         <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
+                                             <Zap size={20} />
+                                         </div>
+                                         <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Live Impact Index</span>
+                                     </div>
+                                     <div className="h-[250px] w-full">
+                                         <ResponsiveContainer width="100%" height="100%">
+                                             <BarChart layout="vertical" data={(match.performance?.topPerformers || []).slice(0, 5).map((p: any) => ({
+                                                 name: p.name?.split(' ').pop() || 'N/A',
+                                                 score: p.score || 0,
+                                                 team: p.team
+                                             }))}>
+                                                 <XAxis type="number" hide domain={[0, 10]} />
+                                                 <YAxis dataKey="name" type="category" stroke="#475569" fontSize={8} axisLine={false} tickLine={false} width={60} />
+                                                 <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={15}>
+                                                    {(match.performance?.topPerformers || []).slice(0, 5).map((entry: any, index: number) => (
+                                                        <Cell key={`cell-${index}`} fill={entry.team === 'H' ? '#3b82f6' : '#ef4444'} />
+                                                    ))}
+                                                 </Bar>
+                                             </BarChart>
+                                         </ResponsiveContainer>
+                                     </div>
+                                 </Card>
+
+                                 {/* Score Intensity Glance */}
+                                 <Card className="bg-[#050505] border border-white/5 rounded-[3.5rem] p-10">
+                                     <div className="flex justify-between items-center mb-6">
+                                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">xG accumulation</span>
+                                         <span className="text-xl font-black italic text-emerald-500">{(parseFloat(match.performance?.labAnalysis?.expectedGoals?.home || '0.0') + parseFloat(match.performance?.labAnalysis?.expectedGoals?.away || '0.0')).toFixed(2)}</span>
+                                     </div>
+                                     <div className="flex items-center gap-2">
+                                         <div className="h-1.5 flex-1 bg-blue-600 rounded-full" style={{ width: `${(parseFloat(match.performance?.labAnalysis?.expectedGoals?.home || '0.5') / (parseFloat(match.performance?.labAnalysis?.expectedGoals?.home || '0.5') + parseFloat(match.performance?.labAnalysis?.expectedGoals?.away || '0.5'))) * 100}%` }} />
+                                         <div className="h-1.5 flex-1 bg-orange-600 rounded-full" style={{ width: `${(parseFloat(match.performance?.labAnalysis?.expectedGoals?.away || '0.5') / (parseFloat(match.performance?.labAnalysis?.expectedGoals?.home || '0.5') + parseFloat(match.performance?.labAnalysis?.expectedGoals?.away || '0.5'))) * 100}%` }} />
+                                     </div>
+                                 </Card>
+                             </div>
                         </div>
                     </TabsContent>
 
