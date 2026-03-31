@@ -361,7 +361,7 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
 
     const matches = await FootballMatch.find({ 
         tournamentId: req.params.id, 
-        status: { $in: ['Completed', 'Live'] }
+        status: { $in: ['Completed', 'Live', 'Paused'] }
     });
     
     const pointsTable = tournament.teams.map(team => {
@@ -382,21 +382,24 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
             const isAway = match.awayTeam.toString() === team._id.toString();
 
             if (isHome || isAway) {
-                teamStats.played++;
-                const tf = isHome ? match.score.home : match.score.away;
-                const ta = isHome ? match.score.away : match.score.home;
-                teamStats.goalsFor += tf;
-                teamStats.goalsAgainst += ta;
+                // Only count played/won/lost/points for Live, Paused or Completed matches
+                if (match.status !== 'Scheduled') {
+                    teamStats.played++;
+                    const tf = isHome ? match.score.home : match.score.away;
+                    const ta = isHome ? match.score.away : match.score.home;
+                    teamStats.goalsFor += tf;
+                    teamStats.goalsAgainst += ta;
 
-                if (tf > ta) {
-                    teamStats.won++;
-                    teamStats.points += (tournament.pointsRule?.win || 3);
-                } else if (tf === ta) {
-                    teamStats.draw++;
-                    teamStats.points += (tournament.pointsRule?.draw || 1);
-                } else {
-                    teamStats.lost++;
-                    teamStats.points += (tournament.pointsRule?.loss || 0);
+                    if (tf > ta) {
+                        teamStats.won++;
+                        teamStats.points += (tournament.pointsRule?.win || 3);
+                    } else if (tf === ta) {
+                        teamStats.draw++;
+                        teamStats.points += (tournament.pointsRule?.draw || 1);
+                    } else {
+                        teamStats.lost++;
+                        teamStats.points += (tournament.pointsRule?.loss || 0);
+                    }
                 }
             }
         });
@@ -410,10 +413,16 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
 
     const playerStats = {};
     const getPlayer = (name, teamId) => {
-        if (!playerStats[name]) {
-            playerStats[name] = {
+        if (!name || name === 'Unknown Player' || name === 'Unknown') return null;
+        
+        const tid = teamId?.toString();
+        const key = `${name}_${tid || 'unknown'}`;
+        
+        if (!playerStats[key]) {
+            playerStats[key] = {
                 name,
-                teamName: teamMap[teamId?.toString()] || 'Unknown',
+                teamId: tid,
+                teamName: teamMap[tid] || 'Unknown',
                 goals: 0,
                 assists: 0,
                 yellowCards: 0,
@@ -421,31 +430,41 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
                 saves: 0
             };
         }
-        return playerStats[name];
+        return playerStats[key];
     };
 
     matches.forEach(match => {
         match.events.forEach(event => {
+            const typeLower = event.type?.toLowerCase();
+            
             if (event.player) {
                 const p = getPlayer(event.player, event.team);
-                if (event.type === 'Goal') p.goals++;
-                if (event.type === 'YellowCard') p.yellowCards++;
-                if (event.type === 'RedCard') p.redCards++;
-                if (event.type === 'Save') p.saves++;
+                if (p) {
+                    if (typeLower === 'goal') p.goals++;
+                    if (typeLower === 'yellowcard') p.yellowCards++;
+                    if (typeLower === 'redcard') p.redCards++;
+                    if (typeLower === 'save') p.saves++;
+                }
             }
-            if (event.assister && event.assister !== 'No Assist' && event.assister !== 'Unknown Player') {
+            
+            if (event.assister && event.assister !== 'No Assist' && event.assister !== 'Unknown Player' && event.assister !== 'Unknown') {
                 const a = getPlayer(event.assister, event.team);
-                a.assists++;
+                if (a) a.assists++;
             }
         });
     });
 
+    const statsList = Object.values(playerStats);
+
     const stats = {
-        topScorers: Object.values(playerStats).filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals).slice(0, 10),
-        topAssisters: Object.values(playerStats).filter(p => p.assists > 0).sort((a, b) => b.assists - a.assists).slice(0, 10),
-        mostCards: Object.values(playerStats).filter(p => p.yellowCards > 0 || p.redCards > 0).sort((a, b) => (b.yellowCards + b.redCards * 2) - (a.yellowCards + a.redCards * 2)).slice(0, 10),
-        topKeepers: Object.values(playerStats).filter(p => p.saves > 0).sort((a, b) => b.saves - a.saves).slice(0, 10)
+        topScorers: statsList.filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals).slice(0, 10),
+        topAssisters: statsList.filter(p => p.assists > 0).sort((a, b) => b.assists - a.assists).slice(0, 10),
+        mostCards: statsList.filter(p => p.yellowCards > 0 || p.redCards > 0)
+            .sort((a, b) => (b.yellowCards + b.redCards * 2) - (a.yellowCards + a.redCards * 2))
+            .slice(0, 10),
+        topKeepers: statsList.filter(p => p.saves > 0).sort((a, b) => b.saves - a.saves).slice(0, 10)
     };
 
     res.json({ success: true, data: { pointsTable, stats } });
 });
+
