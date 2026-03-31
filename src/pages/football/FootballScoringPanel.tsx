@@ -69,6 +69,9 @@ import {
     Cell,
     LineChart,
     Line,
+    BarChart,
+    Bar,
+    Legend,
 } from 'recharts';
 import { VENUE_ANALYSIS_DATA } from "@/data/venueAnalysisData";
 import { footballApi } from "@/services/api";
@@ -1362,12 +1365,12 @@ export default function FootballScoringPanel() {
                                 <div className="flex items-center gap-12 mt-12 mb-8">
                                     <div className="flex flex-col items-center">
                                         <span className="text-7xl font-black italic tracking-tighter text-blue-500 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)] tabular-nums">{match.performance?.labAnalysis?.expectedGoals?.home || '0.0'}</span>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">{match.homeTeam.name}</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">{match.homeTeam?.name || 'Home'}</span>
                                     </div>
                                     <div className="text-4xl font-light text-slate-700">+</div>
                                     <div className="flex flex-col items-center">
                                         <span className="text-7xl font-black italic tracking-tighter text-orange-500 drop-shadow-[0_0_15px_rgba(249,115,22,0.3)] tabular-nums">{match.performance?.labAnalysis?.expectedGoals?.away || '0.0'}</span>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">{match.awayTeam.name}</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-2">{match.awayTeam?.name || 'Away'}</span>
                                     </div>
                                 </div>
                                 <div className="text-center px-10">
@@ -1496,7 +1499,7 @@ export default function FootballScoringPanel() {
                                          />
                                          <Area 
                                             type="monotone" 
-                                            dataKey="home" 
+                                            dataKey={match.homeTeam?.shortName || match.homeTeam?.name || 'home'} 
                                             stroke="#3b82f6" 
                                             fill="url(#homeMomGrad)" 
                                             strokeWidth={4}
@@ -1504,7 +1507,7 @@ export default function FootballScoringPanel() {
                                          />
                                          <Area 
                                             type="monotone" 
-                                            dataKey="away" 
+                                            dataKey={match.awayTeam?.shortName || match.awayTeam?.name || 'away'} 
                                             stroke="#ef4444" 
                                             fill="url(#awayMomGrad)" 
                                             strokeWidth={4}
@@ -1516,13 +1519,19 @@ export default function FootballScoringPanel() {
 
                              {/* EVENT PINS ROW */}
                              <div className="flex flex-wrap items-center gap-3 mt-8 pb-4 border-t border-white/5 pt-8">
-                                 {match.events?.filter((e: any) => ['Goal', 'YellowCard', 'RedCard'].includes(e.type)).map((e: any, i: number) => (
-                                     <div key={i} className={`flex items-center gap-2 px-4 py-2 rounded-full border bg-slate-900/40 backdrop-blur-md transition-all hover:scale-105 cursor-default ${String(e.team?._id || e.team) === String(match.homeTeam._id) ? 'border-blue-500/20 text-blue-400' : 'border-orange-500/20 text-orange-400'}`}>
-                                         <span className="text-[10px] font-black italic">{e.minute}'</span>
-                                         {e.type === 'Goal' ? <Trophy size={10} /> : <div className={`w-2 h-2.5 rounded-[1px] ${e.type === 'YellowCard' ? 'bg-yellow-400' : 'bg-red-600'}`} />}
-                                         <span className="text-[10px] font-black uppercase tracking-widest">{e.player?.split(' ').pop()}</span>
-                                     </div>
-                                 ))}
+                                 {match.events?.filter((e: any) => ['Goal', 'YellowCard', 'RedCard'].includes(e.type)).map((e: any, i: number) => {
+                                     const homeId = typeof match.homeTeam === 'object' ? match.homeTeam?._id : match.homeTeam;
+                                     const eventTeamId = typeof e.team === 'object' ? e.team?._id : e.team;
+                                     const isHome = String(eventTeamId) === String(homeId);
+                                     
+                                     return (
+                                         <div key={i} className={`flex items-center gap-2 px-4 py-2 rounded-full border bg-slate-900/40 backdrop-blur-md transition-all hover:scale-105 cursor-default ${isHome ? 'border-blue-500/20 text-blue-400' : 'border-orange-500/20 text-orange-400'}`}>
+                                             <span className="text-[10px] font-black italic">{e.minute}'</span>
+                                             {e.type === 'Goal' ? <Trophy size={10} /> : <div className={`w-2 h-2.5 rounded-[1px] ${e.type === 'YellowCard' ? 'bg-yellow-400' : 'bg-red-600'}`} />}
+                                             <span className="text-[10px] font-black uppercase tracking-widest">{e.player?.split(' ').pop()}</span>
+                                         </div>
+                                     );
+                                 })}
                                  {match.events?.filter((e: any) => ['Goal', 'YellowCard', 'RedCard'].includes(e.type)).length === 0 && (
                                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-700 italic">No major tactical breakthroughs recorded yet...</p>
                                  )}
