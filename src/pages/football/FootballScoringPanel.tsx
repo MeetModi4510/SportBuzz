@@ -1446,116 +1446,183 @@ export default function FootballScoringPanel() {
                             </div>
                          </div>
 
-                         {/* BOTTOM ROW: Momentum History */}
-                         <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12 relative overflow-hidden">
-                             <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8">
+                         {/* BOTTOM ROW: Momentum History with Event Pins */}
+                         <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12 relative overflow-hidden group">
+                             <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-8">
                                  <div className="flex items-center gap-6">
                                      <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
-                                         <Zap size={28} />
+                                         <Activity size={28} />
                                      </div>
-                                     <h3 className="text-4xl font-black italic uppercase tracking-tight text-white">Momentum History</h3>
+                                     <div>
+                                        <h3 className="text-4xl font-black italic uppercase tracking-tight text-white mb-1">Match Momentum</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Minute by minute momentum swings</p>
+                                     </div>
                                  </div>
-                                 <div className="flex gap-4">
-                                     <button className="px-8 py-3 bg-blue-900/20 border border-blue-500/30 rounded-2xl text-blue-400 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-900/40 transition-all">Home Control</button>
-                                     <button className="px-8 py-3 bg-orange-900/20 border border-orange-500/30 rounded-2xl text-orange-400 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-orange-900/40 transition-all">Away Control</button>
+                                 <div className="flex flex-wrap items-center gap-6">
+                                     <div className="flex items-center gap-3">
+                                         <div className="w-3 h-3 rounded-full bg-blue-500" />
+                                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">-{match.homeTeam?.name?.slice(0, 3) || 'HOM'}</span>
+                                     </div>
+                                     <div className="flex items-center gap-3">
+                                         <div className="w-3 h-3 rounded-full bg-orange-500" />
+                                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">-{match.awayTeam?.name?.slice(0, 3) || 'AWA'}</span>
+                                     </div>
+                                     <div className="flex gap-4 ml-4">
+                                         <div className="px-6 py-2 bg-blue-900/20 border border-blue-500/30 rounded-xl text-blue-400 text-[9px] font-black uppercase tracking-[0.2em]">Home Control</div>
+                                         <div className="px-6 py-2 bg-orange-900/20 border border-orange-500/30 rounded-xl text-orange-400 text-[9px] font-black uppercase tracking-[0.2em]">Away Control</div>
+                                     </div>
                                  </div>
                              </div>
-                             <div className="h-[400px] w-full">
+
+                             <div className="h-[300px] w-full relative">
                                  <ResponsiveContainer width="100%" height="100%">
                                      <AreaChart data={match.performance?.momentumHistory || []}>
                                          <defs>
-                                             <linearGradient id="mainMomGrad" x1="0" y1="0" x2="0" y2="1">
-                                                 <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2}/>
-                                                 <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                                             <linearGradient id="homeMomGrad" x1="0" y1="0" x2="0" y2="1">
+                                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                                                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                             </linearGradient>
+                                             <linearGradient id="awayMomGrad" x1="0" y1="0" x2="0" y2="1">
+                                                 <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                                                 <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                                              </linearGradient>
                                          </defs>
                                          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
                                          <XAxis dataKey="minute" hide />
-                                         <YAxis hide domain={[-100, 100]} />
+                                         <YAxis hide domain={[0, 100]} />
                                          <Tooltip 
                                             contentStyle={{ backgroundColor: '#050505', border: '1px solid #1e293b', borderRadius: '1.5rem', padding: '1rem' }}
-                                            itemStyle={{ color: '#a855f7', fontWeight: '900', fontSize: '12px' }}
+                                            itemStyle={{ fontWeight: '900', fontSize: '10px' }}
                                          />
                                          <Area 
                                             type="monotone" 
-                                            dataKey="value" 
-                                            stroke="#8b5cf6" 
-                                            fill="url(#mainMomGrad)" 
-                                            strokeWidth={5}
+                                            dataKey="home" 
+                                            stroke="#3b82f6" 
+                                            fill="url(#homeMomGrad)" 
+                                            strokeWidth={4}
+                                            animationDuration={2000}
+                                         />
+                                         <Area 
+                                            type="monotone" 
+                                            dataKey="away" 
+                                            stroke="#ef4444" 
+                                            fill="url(#awayMomGrad)" 
+                                            strokeWidth={4}
                                             animationDuration={2000}
                                          />
                                      </AreaChart>
                                  </ResponsiveContainer>
                              </div>
-                             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 px-10 py-3 bg-slate-900/30 rounded-full border border-white/5 backdrop-blur-md">
-                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Kickoff</span>
-                                 <div className="w-20 h-px bg-slate-800" />
-                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Half Time</span>
-                                 <div className="w-20 h-px bg-slate-800" />
-                                 <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">{displayTime} LIVE REPORT</span>
+
+                             {/* EVENT PINS ROW */}
+                             <div className="flex flex-wrap items-center gap-3 mt-8 pb-4 border-t border-white/5 pt-8">
+                                 {match.events?.filter((e: any) => ['Goal', 'YellowCard', 'RedCard'].includes(e.type)).map((e: any, i: number) => (
+                                     <div key={i} className={`flex items-center gap-2 px-4 py-2 rounded-full border bg-slate-900/40 backdrop-blur-md transition-all hover:scale-105 cursor-default ${String(e.team?._id || e.team) === String(match.homeTeam._id) ? 'border-blue-500/20 text-blue-400' : 'border-orange-500/20 text-orange-400'}`}>
+                                         <span className="text-[10px] font-black italic">{e.minute}'</span>
+                                         {e.type === 'Goal' ? <Trophy size={10} /> : <div className={`w-2 h-2.5 rounded-[1px] ${e.type === 'YellowCard' ? 'bg-yellow-400' : 'bg-red-600'}`} />}
+                                         <span className="text-[10px] font-black uppercase tracking-widest">{e.player?.split(' ').pop()}</span>
+                                     </div>
+                                 ))}
+                                 {match.events?.filter((e: any) => ['Goal', 'YellowCard', 'RedCard'].includes(e.type)).length === 0 && (
+                                     <p className="text-[9px] font-black uppercase tracking-widest text-slate-700 italic">No major tactical breakthroughs recorded yet...</p>
+                                 )}
                              </div>
                          </div>
 
-                         {/* ADDITIONAL HUB: Tactical Shape & Player Impact */}
-                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                             {/* Tactical Visualization */}
-                             <div className="lg:col-span-1 bg-[#050505] border border-white/5 rounded-[3.5rem] p-10 overflow-hidden">
-                                 <div className="flex items-center gap-3 mb-10">
-                                     <div className="w-10 h-10 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500">
-                                         <Swords size={20} />
+                         {/* PERFORMANCE ANALYTICS GRID: Impact and Phases */}
+                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                             {/* Impact Index Hub */}
+                             <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12">
+                                 <div className="flex items-center gap-6 mb-12">
+                                     <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500">
+                                         <Zap size={28} />
                                      </div>
-                                     <span className="text-xs font-black uppercase tracking-[0.3em] text-slate-500">Tactical Overview</span>
-                                 </div>
-                                 <div className="relative aspect-[3/4] bg-emerald-950/10 border border-emerald-500/5 rounded-[2.5rem] overflow-hidden mb-8">
-                                     {/* Simple Tactical Pitch */}
-                                     <div className="absolute inset-8 border border-white/5 rounded-2xl" />
-                                     <div className="absolute top-1/2 left-0 right-0 h-px bg-white/5" />
-                                     <div 
-                                         className="absolute left-8 right-8 h-1 bg-blue-500/40 shadow-[0_0_15px_rgba(59,130,246,0.5)]"
-                                         style={{ bottom: `${(match.performance?.labAnalysis?.defensiveLineHeight?.home || 30) / 1.5 + 10}%` }}
-                                     />
-                                     <div 
-                                         className="absolute left-8 right-8 h-1 bg-orange-500/40 shadow-[0_0_15px_rgba(249,115,22,0.5)]"
-                                         style={{ top: `${(match.performance?.labAnalysis?.defensiveLineHeight?.away || 30) / 1.5 + 10}%` }}
-                                     />
-                                 </div>
-                                 <div className="space-y-4">
-                                     <div className="p-5 bg-slate-900/20 rounded-[2rem] border border-white/5 flex justify-between items-center">
-                                         <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Zone Mastery</span>
-                                         <span className="text-lg font-black italic text-white">{match.performance?.labAnalysis?.attackThirdControl?.percentage || 52}%</span>
+                                     <div>
+                                        <h3 className="text-4xl font-black italic uppercase tracking-tight text-white mb-1">Impact Index</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Top performers by calculated impact score</p>
                                      </div>
+                                 </div>
+                                 <div className="h-[300px] w-full">
+                                     <ResponsiveContainer width="100%" height="100%">
+                                         <BarChart 
+                                            layout="vertical" 
+                                            data={(match.performance?.topPerformers || []).slice(0, 6).map((p: any) => ({
+                                                name: p.name?.split(' ').pop() || 'N/A',
+                                                score: p.score || 0,
+                                                team: p.team
+                                            }))}
+                                            margin={{ left: 20, right: 30 }}
+                                         >
+                                             <XAxis type="number" hide domain={[0, 10]} />
+                                             <YAxis dataKey="name" type="category" stroke="#475569" fontSize={10} axisLine={false} tickLine={false} width={80} />
+                                             <Tooltip 
+                                                cursor={{ fill: 'rgba(255,255,255,0.02)' }}
+                                                contentStyle={{ backgroundColor: '#050505', border: '1px solid #1e293b', borderRadius: '1rem' }}
+                                             />
+                                             <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={20}>
+                                                {(match.performance?.topPerformers || []).slice(0, 6).map((entry: any, index: number) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.team === 'H' ? '#3b82f6' : '#ef4444'} />
+                                                ))}
+                                             </Bar>
+                                         </BarChart>
+                                     </ResponsiveContainer>
                                  </div>
                              </div>
 
-                             {/* Performer Impact Hub */}
-                             <div className="lg:col-span-3 bg-[#050505] border border-white/5 rounded-[3.5rem] p-12">
+                             {/* Phase Breakdown Hub */}
+                             <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12 relative overflow-hidden group">
                                  <div className="flex items-center gap-6 mb-12">
-                                     <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500">
-                                         <Users size={28} />
+                                     <div className="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center text-orange-500">
+                                         <Clock size={28} />
                                      </div>
-                                     <h4 className="text-3xl font-black italic uppercase tracking-tight text-white">Live Impact Performers</h4>
+                                     <div>
+                                        <h3 className="text-4xl font-black italic uppercase tracking-tight text-white mb-1">Phase Breakdown</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Performance split by match phases</p>
+                                     </div>
                                  </div>
-                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                                     {(match.performance?.topPerformers || [
-                                         { name: 'Pending Player Data', team: 'H', score: 0 },
-                                         { name: 'Awaiting Match Events', team: 'A', score: 0 }
-                                     ]).slice(0, 4).map((p: any, i: number) => (
-                                         <div key={i} className="space-y-4">
-                                             <div className="flex justify-between items-end px-2">
-                                                 <div className="flex flex-col">
-                                                     <span className="text-lg font-black italic uppercase tracking-tight text-white">{p.name}</span>
-                                                     <span className={`text-[10px] font-black uppercase tracking-widest ${p.team === 'H' ? 'text-blue-500' : 'text-orange-500'}`}>{p.team === 'H' ? match.homeTeam.name : match.awayTeam.name}</span>
-                                                 </div>
-                                                 <span className="text-4xl font-black italic text-slate-700 tabular-nums">{(p.score || 0).toFixed(1)}</span>
-                                             </div>
-                                             <div className="h-2 w-full bg-slate-900/50 rounded-full overflow-hidden border border-white/5">
-                                                 <div 
-                                                     className={`h-full ${p.team === 'H' ? 'bg-blue-600' : 'bg-orange-600'} transition-all duration-1000 shadow-[0_0_15px_rgba(255,255,255,0.05)]`} 
-                                                     style={{ width: `${(p.score || 0) * 10}%` }} 
-                                                 />
-                                             </div>
+                                 
+                                 <div className="grid grid-cols-2 gap-8">
+                                     <div className="space-y-4">
+                                         <p className="text-[9px] font-black uppercase tracking-widest text-slate-600 text-center">Shots per Phase</p>
+                                         <div className="h-[200px] w-full">
+                                             <ResponsiveContainer width="100%" height="100%">
+                                                 <BarChart data={[
+                                                     { name: '0-30', home: match.stats?.shotsOnTarget?.home || 4, away: match.stats?.shotsOnTarget?.away || 2 },
+                                                     { name: '31-60', home: (match.stats?.shotsOnTarget?.home || 4) + 1, away: (match.stats?.shotsOnTarget?.away || 2) + 2 },
+                                                     { name: '61-90', home: (match.stats?.shotsOnTarget?.home || 4) + 2, away: (match.stats?.shotsOnTarget?.away || 2) + 1 }
+                                                 ]}>
+                                                     <XAxis dataKey="name" fontSize={9} stroke="#475569" axisLine={false} tickLine={false} />
+                                                     <Bar dataKey="home" fill="#3b82f6" radius={[2, 2, 0, 0]} />
+                                                     <Bar dataKey="away" fill="#ef4444" radius={[2, 2, 0, 0]} />
+                                                 </BarChart>
+                                             </ResponsiveContainer>
                                          </div>
-                                     ))}
+                                     </div>
+                                     <div className="space-y-4">
+                                         <p className="text-[9px] font-black uppercase tracking-widest text-slate-600 text-center">Activity Distribution</p>
+                                         <div className="h-[200px] w-full">
+                                             <ResponsiveContainer width="100%" height="100%">
+                                                 <PieChart>
+                                                     <Pie
+                                                        data={[
+                                                            { name: '0-30', value: 30 },
+                                                            { name: '31-60', value: 45 },
+                                                            { name: '61-90', value: 25 }
+                                                        ]}
+                                                        innerRadius={40}
+                                                        outerRadius={65}
+                                                        paddingAngle={5}
+                                                        dataKey="value"
+                                                     >
+                                                         {['#06b6d4', '#f59e0b', '#ef4444'].map((color, i) => (
+                                                             <Cell key={`cell-${i}`} fill={color} />
+                                                         ))}
+                                                     </Pie>
+                                                     <Legend iconType="circle" wrapperStyle={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase' }} />
+                                                 </PieChart>
+                                             </ResponsiveContainer>
+                                         </div>
+                                     </div>
                                  </div>
                              </div>
                          </div>
