@@ -840,7 +840,11 @@ export default function LiveFootballMatch() {
 
                                      <div className="h-[300px] w-full relative">
                                          <ResponsiveContainer width="100%" height="100%">
-                                             <AreaChart data={match.performance?.momentumHistory || []}>
+                                             <AreaChart data={(match.performance?.momentumHistory || []).map((m: any) => ({
+                                                 ...m,
+                                                 homeVal: m.home !== undefined ? m.home : (m[match.homeTeam?.name] || m[match.homeTeam?.shortName] || 0),
+                                                 awayVal: m.away !== undefined ? m.away : (m[match.awayTeam?.name] || m[match.awayTeam?.shortName] || 0)
+                                             }))}>
                                                  <defs>
                                                      <linearGradient id="homeMomGrad" x1="0" y1="0" x2="0" y2="1">
                                                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
@@ -858,10 +862,15 @@ export default function LiveFootballMatch() {
                                                     contentStyle={{ backgroundColor: '#050505', border: '1px solid #1e293b', borderRadius: '1.5rem', padding: '1rem' }}
                                                     itemStyle={{ fontWeight: '900', fontSize: '10px' }}
                                                  />
-                                                 <Area type="monotone" dataKey={match.homeTeam?.shortName || match.homeTeam?.name || 'home'} stroke="#3b82f6" fill="url(#homeMomGrad)" strokeWidth={4} />
-                                                 <Area type="monotone" dataKey={match.awayTeam?.shortName || match.awayTeam?.name || 'away'} stroke="#ef4444" fill="url(#awayMomGrad)" strokeWidth={4} />
+                                                 <Area type="monotone" dataKey="homeVal" stroke="#3b82f6" fill="url(#homeMomGrad)" strokeWidth={4} animationDuration={1000} />
+                                                 <Area type="monotone" dataKey="awayVal" stroke="#ef4444" fill="url(#awayMomGrad)" strokeWidth={4} animationDuration={1000} />
                                              </AreaChart>
                                          </ResponsiveContainer>
+                                         {(match.performance?.momentumHistory || []).length === 0 && (
+                                             <div className="absolute inset-0 flex items-center justify-center bg-slate-900/10 backdrop-blur-[2px] rounded-3xl">
+                                                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 animate-pulse italic">Awaiting tactical flow data...</p>
+                                             </div>
+                                         )}
                                      </div>
 
                                      <div className="flex flex-wrap items-center gap-3 mt-8 pb-4 border-t border-white/5 pt-8">
@@ -892,13 +901,13 @@ export default function LiveFootballMatch() {
                                          <div className="h-[220px] w-full">
                                             <ResponsiveContainer width="100%" height="100%">
                                                 <BarChart data={[
-                                                    { name: '0-30', home: match.stats?.shotsOnTarget?.home || 4, away: match.stats?.shotsOnTarget?.away || 2 },
-                                                    { name: '31-60', home: Math.max(0, (match.stats?.shotsOnTarget?.home || 4) - 1), away: Math.max(0, (match.stats?.shotsOnTarget?.away || 2) + 1) },
-                                                    { name: '61-90', home: (match.stats?.shotsOnTarget?.home || 0) + 2, away: (match.stats?.shotsOnTarget?.away || 0) + 1 }
-                                                ]}>
+                                                    { name: '0-30', home: match.stats?.shotsOnTarget?.home || 0, away: match.stats?.shotsOnTarget?.away || 0, show: true },
+                                                    { name: '31-60', home: Math.max(0, (match.stats?.shotsOnTarget?.home || 0) + 1), away: Math.max(0, (match.stats?.shotsOnTarget?.away || 0)), show: (match.timer?.currentMinute || 0) > 30 },
+                                                    { name: '61-90', home: (match.stats?.shotsOnTarget?.home || 0) + 2, away: (match.stats?.shotsOnTarget?.away || 0) + 1, show: (match.timer?.currentMinute || 0) > 60 }
+                                                ].filter(d => d.show)}>
                                                     <XAxis dataKey="name" fontSize={9} stroke="#475569" axisLine={false} tickLine={false} />
-                                                    <Bar dataKey="home" fill="#3b82f6" radius={[2, 2, 0, 0]} />
-                                                    <Bar dataKey="away" fill="#ef4444" radius={[2, 2, 0, 0]} />
+                                                    <Bar dataKey="home" fill="#3b82f6" radius={[2, 2, 0, 0]} animationDuration={1500} />
+                                                    <Bar dataKey="away" fill="#ef4444" radius={[2, 2, 0, 0]} animationDuration={1500} />
                                                 </BarChart>
                                             </ResponsiveContainer>
                                         </div>
@@ -945,11 +954,11 @@ export default function LiveFootballMatch() {
                                      <div className="grid grid-cols-2 gap-4 mb-6">
                                          <div className="flex flex-col items-center">
                                              <div className="w-12 h-12 bg-blue-600/10 rounded-full border border-blue-500/20 flex items-center justify-center text-blue-500 font-black italic text-sm">H</div>
-                                             <span className="text-[9px] font-black uppercase text-slate-400 mt-2">{(match.performance?.topPerformers?.[0]?.name || 'Player 1').split(' ').pop()}</span>
+                                             <span className="text-[9px] font-black uppercase text-slate-400 mt-2">{match.performance?.topPerformers?.[0]?.name ? match.performance.topPerformers[0].name.split(' ').pop() : 'Awaiting...'}</span>
                                          </div>
                                          <div className="flex flex-col items-center">
                                              <div className="w-12 h-12 bg-orange-600/10 rounded-full border border-orange-500/20 flex items-center justify-center text-orange-500 font-black italic text-sm">A</div>
-                                             <span className="text-[9px] font-black uppercase text-slate-400 mt-2">{(match.performance?.topPerformers?.[1]?.name || 'Player 2').split(' ').pop()}</span>
+                                             <span className="text-[9px] font-black uppercase text-slate-400 mt-2">{match.performance?.topPerformers?.[1]?.name ? match.performance.topPerformers[1].name.split(' ').pop() : 'Awaiting...'}</span>
                                          </div>
                                      </div>
 
@@ -980,10 +989,10 @@ export default function LiveFootballMatch() {
                                          </div>
                                          <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Live Impact Index</span>
                                      </div>
-                                     <div className="h-[250px] w-full">
+                                     <div className="h-[250px] w-full relative">
                                          <ResponsiveContainer width="100%" height="100%">
                                              <BarChart layout="vertical" data={(match.performance?.topPerformers || []).slice(0, 5).map((p: any) => ({
-                                                 name: p.name?.split(' ').pop() || 'N/A',
+                                                 name: p.name?.split(' ')?.pop() || 'N/A',
                                                  score: p.score || 0,
                                                  team: p.team
                                              }))}>
@@ -991,11 +1000,16 @@ export default function LiveFootballMatch() {
                                                  <YAxis dataKey="name" type="category" stroke="#475569" fontSize={8} axisLine={false} tickLine={false} width={60} />
                                                  <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={15}>
                                                     {(match.performance?.topPerformers || []).slice(0, 5).map((entry: any, index: number) => (
-                                                        <Cell key={`cell-${index}`} fill={entry.team === 'H' ? '#3b82f6' : '#ef4444'} />
+                                                        <Cell key={`cell-${index}`} fill={entry.team === 'H' || entry.team === match.homeTeam?._id || String(entry.team) === String(match.homeTeam?._id) ? '#3b82f6' : '#ef4444'} />
                                                     ))}
                                                  </Bar>
                                              </BarChart>
                                          </ResponsiveContainer>
+                                         {(match.performance?.topPerformers || []).length === 0 && (
+                                             <div className="absolute inset-0 flex items-center justify-center bg-slate-900/10 backdrop-blur-[2px] rounded-3xl">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 animate-pulse italic text-center px-8">Identifying individual impact performers...</p>
+                                             </div>
+                                         )}
                                      </div>
                                  </Card>
 
