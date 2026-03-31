@@ -30,6 +30,7 @@ export default function FootballTournamentDetails() {
     const [settingsData, setSettingsData] = useState({ name: "", format: "", startDate: "", endDate: "" });
     const [news, setNews] = useState<any[]>([]);
     const [newsLoading, setNewsLoading] = useState(false);
+    const [selectedArticle, setSelectedArticle] = useState<any>(null);
 
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const currentUserId = user._id || user.id || '';
@@ -91,7 +92,7 @@ export default function FootballTournamentDetails() {
 
             const socket = getSocket();
             socket.on('football_update', (updatedMatch) => {
-                if (updatedMatch.tournamentId === id || matches.some(m => m._id === updatedMatch._id)) {
+                if (updatedMatch.tournamentId === id) {
                     fetchDetails();
                     fetchNews();
                 }
@@ -101,7 +102,7 @@ export default function FootballTournamentDetails() {
                 socket.off('football_update');
             };
         }
-    }, [id, matches]);
+    }, [id]);
 
     const handleAddExistingTeam = async () => {
         if (!selectedExistingTeam) return;
@@ -626,7 +627,11 @@ export default function FootballTournamentDetails() {
                                 </div>
                             ) : news.length > 0 ? (
                                 news.map((article: any) => (
-                                    <Card key={article._id} className="group relative overflow-hidden bg-slate-900/40 border-white/5 hover:border-blue-500/30 transition-all duration-500 rounded-[2.5rem] flex flex-col">
+                                    <Card 
+                                        key={article._id} 
+                                        onClick={() => setSelectedArticle(article)}
+                                        className="group relative overflow-hidden bg-slate-900/40 border-white/5 hover:border-blue-500/30 transition-all duration-500 rounded-[2.5rem] flex flex-col cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                                    >
                                         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                         
                                         <div className="p-8 relative z-10 flex flex-col h-full">
@@ -647,7 +652,7 @@ export default function FootballTournamentDetails() {
                                                 {article.title}
                                             </h3>
                                             
-                                            <p className="text-slate-400 text-sm leading-relaxed mb-8 flex-grow">
+                                            <p className="text-slate-400 text-sm leading-relaxed mb-8 flex-grow line-clamp-4">
                                                 {article.content}
                                             </p>
 
@@ -670,6 +675,65 @@ export default function FootballTournamentDetails() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Article Detail Dialog */}
+                        <Dialog open={!!selectedArticle} onOpenChange={(open) => !open && setSelectedArticle(null)}>
+                            {selectedArticle && (
+                                <DialogContent className="bg-slate-950 border-white/5 text-white max-w-4xl max-h-[85vh] overflow-y-auto rounded-[3rem] p-0 gap-0 border shadow-2xl">
+                                    <div className="relative h-64 bg-slate-900 overflow-hidden">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent z-10" />
+                                        <div className="absolute inset-0 bg-blue-600/20 mix-blend-overlay" />
+                                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+                                        
+                                        <div className="absolute bottom-0 left-0 p-12 z-20 w-full">
+                                            <div className="flex items-center gap-4 mb-4">
+                                                <div className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] ${
+                                                    selectedArticle.type === 'MatchReport' ? 'bg-blue-600 text-white' :
+                                                    selectedArticle.type === 'Milestone' ? 'bg-purple-600 text-white' :
+                                                    'bg-slate-700 text-slate-300'
+                                                }`}>
+                                                    {selectedArticle.type?.replace(/([A-Z])/g, ' $1').trim() || 'General News'}
+                                                </div>
+                                                <div className="h-1 w-1 rounded-full bg-slate-700" />
+                                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                                    {new Date(selectedArticle.createdAt).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                                                </span>
+                                            </div>
+                                            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-[0.9] text-white">
+                                                {selectedArticle.title}
+                                            </h2>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-12 md:p-16">
+                                        <div className="prose prose-invert max-w-none">
+                                            {selectedArticle.content.split('\n').filter((p: string) => p.trim()).map((paragraph: string, idx: number) => (
+                                                <p key={idx} className="text-slate-300 text-lg md:text-xl leading-relaxed mb-8 font-medium">
+                                                    {paragraph.trim()}
+                                                </p>
+                                            ))}
+                                        </div>
+                                        
+                                        <div className="mt-16 pt-12 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.3)]">
+                                                    <Newspaper size={20} className="text-white" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 leading-none mb-1">Generated by</p>
+                                                    <p className="text-sm font-black italic uppercase text-white tracking-widest">SportBuzz AI Newsroom</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                                                <span>#FOOTBALL</span>
+                                                <span>#LIVEUPDATE</span>
+                                                <span>#SPORTBUZZ</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </DialogContent>
+                            )}
+                        </Dialog>
                     </TabsContent>
 
                     <TabsContent value="table">

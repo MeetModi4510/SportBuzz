@@ -38,6 +38,7 @@ import {
     Layout,
     Swords,
     LineChart as LineChartIcon,
+    PieChart as PieChartIcon,
     ArrowDownLeft,
     ArrowUpRight
 } from "lucide-react";
@@ -227,13 +228,22 @@ export default function FootballScoringPanel() {
                     setLastPromptedHalf(2);
                 }
 
-                // Auto-Stop Logic
+                // Auto-Stop / Transition Logic
                 const limit = match.timer.half === 1 ? 45 : 90;
-                if (currentMin >= limit + (match.timer.injuryTime || 0) && !isUpdatingTimer.current) {
-                    const nextStatus = match.timer.half === 1 ? 'HalfTime' : 'FullTime';
-                    if (match.timer.halfStatus !== nextStatus) {
-                        handleTimerControl(false, currentMin, nextStatus);
-                        toast.info(match.timer.half === 1 ? "End of First Half" : "End of Second Half");
+                const isEndTime = currentMin >= limit + (match.timer.injuryTime || 0);
+
+                if (isEndTime && !isUpdatingTimer.current) {
+                    if (match.timer.half === 1) {
+                        if (match.timer.halfStatus !== 'HalfTime') {
+                            handleTimerControl(false, limit, 'HalfTime', true); // Use limit to keep it clean (45:00)
+                            toast.info("End of First Half", { id: "half-time-toast" }); // Unique ID to prevent loop
+                        }
+                    } else if (match.timer.half === 2) {
+                        if (match.timer.halfStatus !== 'FullTime' && match.status !== 'Completed') {
+                            console.log("[TIMER] Auto-finalizing second half...");
+                            autoFinalizeMatch();
+                            toast.info("Match Time Ended - Finalizing Results...", { id: "full-time-toast" });
+                        }
                     }
                 }
             }, 1000); 
@@ -242,7 +252,7 @@ export default function FootballScoringPanel() {
         }
     }, [match?.timer?.isRunning, match?.timer?.startTime, match?.timer?.currentMinute, match?.timer?.half, match?.timer?.injuryTime, showInjuryPrompt]);
 
-    const handleTimerControl = async (isRunning: boolean, minuteOverride?: number, statusOverride?: string) => {
+    const handleTimerControl = async (isRunning: boolean, minuteOverride?: number, statusOverride?: string, silent: boolean = false) => {
         if (isUpdatingTimer.current) return;
         
         try {
@@ -254,13 +264,15 @@ export default function FootballScoringPanel() {
                 halfStatus: statusOverride || (isRunning ? (match.timer.half === 1 ? 'FirstHalf' : 'SecondHalf') : match.timer.halfStatus)
             });
             if (res.success) {
-                toast.success(isRunning ? "Timer Started" : "Timer Paused");
+                if (!silent) {
+                    toast.success(isRunning ? "Timer Started" : "Timer Paused");
+                }
                 setMatch(res.data);
                 updateTimerDisplay(res.data);
             }
         } catch (error) {
             console.error("Timer update failed:", error);
-            toast.error("Failed to update timer");
+            if (!silent) toast.error("Failed to update timer");
         } finally {
             isUpdatingTimer.current = false;
         }
@@ -453,14 +465,23 @@ export default function FootballScoringPanel() {
 
     const handleFinalize = async () => {
         if (!window.confirm("Are you sure you want to end the match? This will finalize the scores.")) return;
+        await autoFinalizeMatch();
+    };
+
+    const autoFinalizeMatch = async () => {
+        if (isUpdatingTimer.current) return;
         try {
+            isUpdatingTimer.current = true;
             const res: any = await footballApi.finalizeMatch(id!);
             if (res.success) {
                 toast.success("Match Finalized!");
                 navigate(`/football/match/result/${id}`);
             }
         } catch (error) {
+            console.error("Finalize error:", error);
             toast.error("Failed to finalize match");
+        } finally {
+            isUpdatingTimer.current = false;
         }
     };
 
@@ -1327,137 +1348,274 @@ export default function FootballScoringPanel() {
                          </div>
                     </TabsContent>
 
-                    <TabsContent value="performance">
+                    <TabsContent value="performance" className="space-y-8 animate-in fade-in duration-700">
+                         {/* Header Insights Row */}
+                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <Card className="bg-slate-900/40 border-slate-800 p-6 rounded-[2rem] flex flex-col items-center justify-center text-center group hover:bg-slate-900/60 transition-colors">
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Win Probability (H)</p>
+                                <p className="text-4xl font-black italic text-blue-500 tracking-tighter tabular-nums">{match.performance?.winProbability?.home || 45}%</p>
+                                <div className="w-full h-1 bg-slate-800 rounded-full mt-4 overflow-hidden">
+                                    <div className="h-full bg-blue-500" style={{ width: `${match.performance?.winProbability?.home || 45}%` }} />
+                                </div>
+                            </Card>
+                            <Card className="bg-slate-900/40 border-slate-800 p-6 rounded-[2rem] flex flex-col items-center justify-center text-center group hover:bg-slate-900/60 transition-colors">
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Draw Probability</p>
+                                <p className="text-4xl font-black italic text-slate-400 tracking-tighter tabular-nums">{match.performance?.winProbability?.draw || 25}%</p>
+                                <div className="w-full h-1 bg-slate-800 rounded-full mt-4 overflow-hidden">
+                                    <div className="h-full bg-slate-500" style={{ width: `${match.performance?.winProbability?.draw || 25}%` }} />
+                                </div>
+                            </Card>
+                            <Card className="bg-slate-900/40 border-slate-800 p-6 rounded-[2rem] flex flex-col items-center justify-center text-center group hover:bg-slate-900/60 transition-colors">
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Win Probability (A)</p>
+                                <p className="text-4xl font-black italic text-orange-500 tracking-tighter tabular-nums">{match.performance?.winProbability?.away || 30}%</p>
+                                <div className="w-full h-1 bg-slate-800 rounded-full mt-4 overflow-hidden">
+                                    <div className="h-full bg-orange-500" style={{ width: `${match.performance?.winProbability?.away || 30}%` }} />
+                                </div>
+                            </Card>
+                            <Card className="bg-purple-900/20 border-purple-500/20 p-6 rounded-[2rem] flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-2 opacity-10"><Zap size={48} /></div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-400 mb-2">Pressure Index</p>
+                                <p className="text-4xl font-black italic text-white tracking-tighter tabular-nums">{match.performance?.pressureIndex || '5.0'}</p>
+                                <span className="text-[8px] font-black uppercase text-purple-500/60 mt-2 tracking-widest">LIVE VOLATILITY</span>
+                            </Card>
+                         </div>
+
                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                             <Card className="lg:col-span-2 bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-8">
-                                 <div className="flex items-center justify-between mb-8">
-                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter">Win Probability & Momentum</h3>
-                                    <div className="flex gap-4">
-                                        <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400 font-black text-[10px] uppercase">Home {match.performance?.winProbability?.home || 45}%</div>
-                                        <div className="p-2 bg-slate-800 rounded-lg text-slate-400 font-black text-[10px] uppercase">Draw {match.performance?.winProbability?.draw || 25}%</div>
-                                        <div className="p-2 bg-orange-500/10 rounded-lg text-orange-400 font-black text-[10px] uppercase">Away {match.performance?.winProbability?.away || 30}%</div>
-                                    </div>
-                                 </div>
-                                 <div className="h-[300px] w-full">
-                                     <ResponsiveContainer width="100%" height="100%">
-                                         <AreaChart data={match.performance?.momentumHistory || []}>
-                                             <defs>
-                                                 <linearGradient id="colorMom" x1="0" y1="0" x2="0" y2="1">
-                                                     <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                                                     <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
-                                                 </linearGradient>
-                                             </defs>
-                                             <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
-                                             <XAxis dataKey="minute" hide />
-                                             <YAxis hide domain={[-100, 100]} />
-                                             <Tooltip 
-                                                contentStyle={{ backgroundColor: '#1e1b4b', border: '1px solid #4338ca', borderRadius: '12px' }}
-                                                itemStyle={{ color: '#c084fc', fontWeight: 'bold' }}
-                                             />
-                                             <Area 
-                                                type="monotone" 
-                                                dataKey="value" 
-                                                stroke="#8b5cf6" 
-                                                fillOpacity={1} 
-                                                fill="url(#colorMom)" 
-                                                strokeWidth={3}
-                                             />
-                                         </AreaChart>
-                                     </ResponsiveContainer>
-                                 </div>
-                                 <div className="flex justify-between text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] mt-4">
-                                     <span>Kickoff</span>
-                                     <span>Half Time</span>
-                                     <span>{Math.floor(secondsElapsed / 60)}' LIVE</span>
-                                 </div>
-                             </Card>
- 
-                             <div className="space-y-8">
-                                 <Card className="bg-purple-900/20 border-purple-500/20 rounded-[2.5rem] p-4 sm:p-8 overflow-hidden relative">
-                                     <Zap size={32} className="text-purple-400 mb-6" />
-                                     <h4 className="text-lg font-black italic uppercase mb-2">Momentum Tracker</h4>
-                                     <p className="text-slate-400 text-sm leading-relaxed mb-6 font-medium">
-                                         {match.performance?.labAnalysis?.attackThirdControl?.team !== 'None' ? (
-                                             <><span className="text-white font-black italic uppercase">{match.performance?.labAnalysis?.attackThirdControl?.team === 'Home' ? match.homeTeam.name : match.awayTeam.name}</span> is currently controlling {match.performance?.labAnalysis?.attackThirdControl?.percentage}% of the attacking third.</>
-                                         ) : (
-                                            "The match is currently balanced with no team dominating the final third."
-                                         )}
-                                     </p>
-                                     <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-between">
-                                         <span className="text-xs font-black uppercase tracking-widest text-purple-300">Pressure Index</span>
-                                         <span className="text-xl font-black italic text-purple-400">{match.performance?.pressureIndex || '5.0'}</span>
+                             {/* Momentum & xG Trends */}
+                             <div className="lg:col-span-2 space-y-8">
+                                 <Card className="bg-slate-900/40 border-slate-800 rounded-[3rem] p-10 relative overflow-hidden">
+                                     <div className="flex items-center justify-between mb-10">
+                                         <h3 className="text-2xl font-black italic uppercase tracking-tight flex items-center gap-3">
+                                             <Activity className="text-purple-500" /> Match Momentum
+                                         </h3>
+                                         <div className="flex gap-4">
+                                             <div className="flex items-center gap-2">
+                                                 <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                                                 <span className="text-[9px] font-black uppercase text-slate-500">Home Control</span>
+                                             </div>
+                                             <div className="flex items-center gap-2">
+                                                 <div className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]" />
+                                                 <span className="text-[9px] font-black uppercase text-slate-500">Away Control</span>
+                                             </div>
+                                         </div>
                                      </div>
-                                 </Card>
- 
-                                 <Card className="bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-8">
-                                     <h4 className="text-lg font-black italic uppercase mb-6 flex items-center gap-2">
-                                        <TrendingUp size={20} className="text-blue-500" />
-                                        Lab Analysis
-                                     </h4>
-                                     <div className="space-y-6">
-                                         <div className="flex items-start gap-4">
-                                             <div className="w-2 rounded-full mt-1 bg-green-500" style={{ height: `${match.performance?.labAnalysis?.intensityPressing || 40}px` }} />
-                                             <div>
-                                                 <p className="font-bold text-sm">High Intensity Pressing</p>
-                                                 <p className="text-xs text-slate-500">Teams winning balls high up the pitch with {match.performance?.labAnalysis?.intensityPressing || 40}% efficiency.</p>
-                                             </div>
-                                         </div>
-                                          <div className="flex items-start gap-4">
-                                             <div className="w-2 rounded-full mt-1 bg-orange-500" style={{ height: `${match.performance?.labAnalysis?.counterAttackRisk || 30}px` }} />
-                                             <div>
-                                                 <p className="font-bold text-sm">Counter Attack Risk</p>
-                                                 <p className="text-xs text-slate-500">Transition potential calculated at {match.performance?.labAnalysis?.counterAttackRisk || 30}% based on spacing.</p>
-                                             </div>
-                                         </div>
+                                     <div className="h-[350px] w-full">
+                                         <ResponsiveContainer width="100%" height="100%">
+                                             <AreaChart data={match.performance?.momentumHistory || []}>
+                                                 <defs>
+                                                     <linearGradient id="momGrad" x1="0" y1="0" x2="0" y2="1">
+                                                         <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                                                         <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                                                     </linearGradient>
+                                                 </defs>
+                                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                                                 <XAxis dataKey="minute" hide />
+                                                 <YAxis hide domain={[-100, 100]} />
+                                                 <Tooltip 
+                                                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '1rem' }}
+                                                    itemStyle={{ color: '#a855f7', fontWeight: 'bold' }}
+                                                 />
+                                                 <Area 
+                                                    type="monotone" 
+                                                    dataKey="value" 
+                                                    stroke="#8b5cf6" 
+                                                    fill="url(#momGrad)" 
+                                                    strokeWidth={4}
+                                                    animationDuration={1000}
+                                                 />
+                                             </AreaChart>
+                                         </ResponsiveContainer>
+                                     </div>
+                                     <div className="flex justify-between text-[9px] font-black uppercase text-slate-600 tracking-[0.4em] mt-6 px-4">
+                                         <span>KICKOFF</span>
+                                         <span>HALF TIME</span>
+                                         <span className="text-blue-500">{displayTime} LIVE</span>
                                      </div>
                                  </Card>
 
-                                 {/* Tactical Pitch & Advanced Metrics */}
-                                 <Card className="bg-slate-900/60 border-slate-800 rounded-[2.5rem] p-6 overflow-hidden">
-                                     <h4 className="text-xs font-black uppercase tracking-[0.3em] text-slate-500 mb-6 flex items-center gap-2">
-                                         <Swords size={14} className="text-red-500" /> Tactical Overview
-                                     </h4>
-                                     
-                                     {/* Simplified Tactical Pitch */}
-                                     <div className="relative aspect-[4/3] bg-emerald-900/20 border border-emerald-500/10 rounded-2xl overflow-hidden mb-6">
-                                         {/* Pitch Markings */}
+                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                     {/* Intensity Pulse */}
+                                     <Card className="bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-8 overflow-hidden">
+                                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
+                                             <TrendingUp size={14} className="text-emerald-500" /> Intensity Pulse
+                                         </h3>
+                                         <div className="h-[150px] w-full">
+                                             <ResponsiveContainer width="100%" height="100%">
+                                                 <AreaChart data={match.performance?.labAnalysis?.intensityPulse || []}>
+                                                     <Area type="step" dataKey="value" stroke="#10b981" fill="#10b981" fillOpacity={0.1} strokeWidth={2} />
+                                                 </AreaChart>
+                                             </ResponsiveContainer>
+                                         </div>
+                                         <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-center mt-4 italic">
+                                             Physical demand vs Tactical consolidation phases
+                                         </p>
+                                     </Card>
+
+                                     {/* xG Trend */}
+                                     <Card className="bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-8 overflow-hidden">
+                                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
+                                             <Target size={14} className="text-blue-500" /> Expected Goals (xG) Trend
+                                         </h3>
+                                         <div className="h-[150px] w-full">
+                                             <ResponsiveContainer width="100%" height="100%">
+                                                 <LineChart data={match.performance?.labAnalysis?.xgTrend || []}>
+                                                     <Line type="monotone" dataKey="home" stroke="#3b82f6" strokeWidth={3} dot={false} />
+                                                     <Line type="monotone" dataKey="away" stroke="#f97316" strokeWidth={3} dot={false} />
+                                                 </LineChart>
+                                             </ResponsiveContainer>
+                                         </div>
+                                         <div className="flex justify-center gap-6 mt-4">
+                                            <div className="flex items-center gap-1.5 text-[8px] font-black uppercase text-blue-500">
+                                                <span>Home: {match.performance?.labAnalysis?.expectedGoals?.home || '0.00'}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 text-[8px] font-black uppercase text-orange-500">
+                                                <span>Away: {match.performance?.labAnalysis?.expectedGoals?.away || '0.00'}</span>
+                                            </div>
+                                         </div>
+                                     </Card>
+                                 </div>
+                             </div>
+
+                             {/* Vertical Analytics Column */}
+                             <div className="space-y-8">
+                                 {/* Tactical Pitch module */}
+                                 <Card className="bg-slate-900/40 border-slate-800 rounded-[3rem] p-8 overflow-hidden h-fit">
+                                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-8 flex items-center gap-2">
+                                         <Swords size={14} className="text-red-500" /> Tactical Shape Visualization
+                                     </h3>
+                                     <div className="relative aspect-[4/5] bg-emerald-950/20 border border-emerald-500/10 rounded-2xl overflow-hidden mb-6">
+                                         {/* Pitch Lines */}
                                          <div className="absolute inset-0 border-2 border-white/5 m-4 rounded-lg" />
                                          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-white/5 -translate-y-1/2" />
-                                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-2 border-white/5 rounded-full" />
+                                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-2 border-white/5 rounded-full" />
                                          
-                                         {/* Defensive Lines */}
+                                         {/* Defensive Lines Height */}
                                          <div 
-                                             className="absolute left-4 right-4 h-1 bg-blue-500/40 shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all duration-1000"
-                                             style={{ bottom: `${match.performance?.labAnalysis?.defensiveLineHeight?.home / 1.5 + 10}%` }}
+                                             className="absolute left-4 right-4 h-1.5 bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.6)] transition-all duration-1000 z-10"
+                                             style={{ bottom: `${(match.performance?.labAnalysis?.defensiveLineHeight?.home || 30) / 1.5 + 10}%` }}
                                          >
-                                             <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[8px] font-black uppercase text-blue-400">Home Line: {Math.round(match.performance?.labAnalysis?.defensiveLineHeight?.home)}m</div>
+                                             <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[8px] font-black text-blue-400 uppercase whitespace-nowrap tracking-widest">HOME DEF LINE: {Math.round(match.performance?.labAnalysis?.defensiveLineHeight?.home || 30)}m</span>
                                          </div>
                                          <div 
-                                             className="absolute left-4 right-4 h-1 bg-orange-500/40 shadow-[0_0_15px_rgba(234,88,12,0.5)] transition-all duration-1000"
-                                             style={{ top: `${match.performance?.labAnalysis?.defensiveLineHeight?.away / 1.5 + 10}%` }}
+                                             className="absolute left-4 right-4 h-1.5 bg-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.6)] transition-all duration-1000 z-10"
+                                             style={{ top: `${(match.performance?.labAnalysis?.defensiveLineHeight?.away || 30) / 1.5 + 10}%` }}
                                          >
-                                             <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[8px] font-black uppercase text-orange-400">Away Line: {Math.round(match.performance?.labAnalysis?.defensiveLineHeight?.away)}m</div>
+                                             <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] font-black text-orange-400 uppercase whitespace-nowrap tracking-widest">AWAY DEF LINE: {Math.round(match.performance?.labAnalysis?.defensiveLineHeight?.away || 30)}m</span>
                                          </div>
                                      </div>
-
                                      <div className="grid grid-cols-2 gap-4">
                                          <div className="p-4 bg-slate-950/50 rounded-2xl border border-white/5">
-                                             <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 block mb-2">Directness Index</span>
-                                             <div className="flex items-end gap-2">
-                                                 <span className="text-xl font-black italic text-white leading-none">{match.performance?.labAnalysis?.directnessIndex?.home || 40}</span>
-                                                 <span className="text-[8px] font-bold text-blue-500 mb-0.5">SPEED</span>
-                                             </div>
+                                             <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1 text-center">Attack Zone (H)</p>
+                                             <p className="text-xl font-black italic text-white text-center">{(match.performance?.labAnalysis?.attackThirdControl?.percentage || 50)}%</p>
                                          </div>
                                          <div className="p-4 bg-slate-950/50 rounded-2xl border border-white/5">
-                                             <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 block mb-2">High Turnovers</span>
-                                             <div className="flex items-end gap-2">
-                                                 <span className="text-xl font-black italic text-white leading-none">{match.performance?.labAnalysis?.highTurnovers?.home || 0}</span>
-                                                 <span className="text-[8px] font-bold text-red-500 mb-0.5">RECOV</span>
-                                             </div>
+                                             <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1 text-center">Attack Zone (A)</p>
+                                             <p className="text-xl font-black italic text-white text-center">{100 - (match.performance?.labAnalysis?.attackThirdControl?.percentage || 50)}%</p>
                                          </div>
+                                     </div>
+                                 </Card>
+
+                                 {/* Style Analysis */}
+                                 <Card className="bg-slate-900/40 border-slate-800 rounded-[3rem] p-8">
+                                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
+                                         <PieChartIcon size={14} className="text-blue-400" /> Phase Breakdown
+                                     </h3>
+                                     <div className="h-[200px] w-full flex items-center justify-center relative">
+                                         <ResponsiveContainer width="100%" height="100%">
+                                             <PieChart>
+                                                 <Pie
+                                                     data={[
+                                                         { name: 'Build-up', value: match.performance?.labAnalysis?.possessionPhases?.buildup || 33 },
+                                                         { name: 'Attacking', value: match.performance?.labAnalysis?.possessionPhases?.attack || 34 },
+                                                         { name: 'Defensive', value: match.performance?.labAnalysis?.possessionPhases?.defense || 33 }
+                                                     ]}
+                                                     innerRadius={60}
+                                                     outerRadius={80}
+                                                     paddingAngle={5}
+                                                     dataKey="value"
+                                                 >
+                                                     <Cell fill="#3b82f6" />
+                                                     <Cell fill="#a855f7" />
+                                                     <Cell fill="#64748b" />
+                                                 </Pie>
+                                             </PieChart>
+                                         </ResponsiveContainer>
+                                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                            <span className="text-[10px] font-black text-slate-600 uppercase">Focus</span>
+                                            <span className="text-sm font-black text-white uppercase italic">Possession</span>
+                                         </div>
+                                     </div>
+                                     <div className="space-y-3 mt-4">
+                                            {[
+                                                { label: 'Build-up Phase', val: match.performance?.labAnalysis?.possessionPhases?.buildup || 33, col: 'bg-blue-500' },
+                                                { label: 'High Attack', val: match.performance?.labAnalysis?.possessionPhases?.attack || 34, col: 'bg-purple-500' },
+                                                { label: 'Defensive Block', val: match.performance?.labAnalysis?.possessionPhases?.defense || 33, col: 'bg-slate-500' }
+                                            ].map(p => (
+                                                <div key={p.label} className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className={`w-2 h-2 rounded-full ${p.col}`} />
+                                                        <span className="text-slate-400">{p.label}</span>
+                                                    </div>
+                                                    <span className="text-white">{p.val}%</span>
+                                                </div>
+                                            ))}
                                      </div>
                                  </Card>
                              </div>
+                         </div>
+
+                         {/* Bottom Impact Hub */}
+                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                            <Card className="bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-8 lg:col-span-1">
+                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-6">Velocity Insight</h3>
+                                <div className="space-y-6">
+                                    <div className="flex flex-col items-center p-6 bg-slate-950/50 rounded-[2rem] border border-white/5">
+                                        <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest mb-2">Directness (H)</span>
+                                        <div className="text-4xl font-black italic text-white tabular-nums">{match.performance?.labAnalysis?.directnessIndex?.home || 40}</div>
+                                        <div className="w-full h-1 bg-slate-800 rounded-full mt-4 overflow-hidden">
+                                            <div className="h-full bg-blue-500/50" style={{ width: `${match.performance?.labAnalysis?.directnessIndex?.home || 40}%` }} />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-center p-6 bg-slate-950/50 rounded-[2rem] border border-white/5">
+                                        <span className="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-2">Directness (A)</span>
+                                        <div className="text-4xl font-black italic text-white tabular-nums">{match.performance?.labAnalysis?.directnessIndex?.away || 40}</div>
+                                        <div className="w-full h-1 bg-slate-800 rounded-full mt-4 overflow-hidden">
+                                            <div className="h-full bg-orange-500/50" style={{ width: `${match.performance?.labAnalysis?.directnessIndex?.away || 40}%` }} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Card>
+
+                            <Card className="bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-8 lg:col-span-3">
+                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-8 flex items-center gap-3">
+                                    <Users size={16} className="text-blue-500" /> Live Match Performers (Impact Hub)
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                                    {(match.performance?.topPerformers || [
+                                        { name: 'Player Rating Pending', team: 'H', score: 0 },
+                                        { name: 'Active Performance Data', team: 'A', score: 0 }
+                                    ]).slice(0, 4).map((p: any, i: number) => (
+                                        <div key={i} className="flex flex-col gap-2">
+                                            <div className="flex justify-between items-end">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-black italic uppercase tracking-tight text-white mb-0.5">{p.name}</span>
+                                                    <span className={`text-[8px] font-black uppercase tracking-[0.2em] ${p.team === 'H' ? 'text-blue-500' : 'text-orange-500'}`}>{p.team === 'H' ? match.homeTeam.name : match.awayTeam.name}</span>
+                                                </div>
+                                                <span className="text-xl font-black italic text-slate-400 tabular-nums">{(p.score || 0).toFixed(1)}</span>
+                                            </div>
+                                            <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-white/5">
+                                                <div className={`h-full ${p.team === 'H' ? 'bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]' : 'bg-orange-600 shadow-[0_0_10px_rgba(249,115,22,0.4)]'} transition-all duration-1000`} style={{ width: `${(p.score || 0) * 10}%` }} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {(!match.performance?.topPerformers || match.performance.topPerformers.length === 0) && (
+                                        <div className="col-span-full py-10 flex flex-col items-center justify-center gap-4 text-center">
+                                            <Activity className="text-slate-800" size={32} />
+                                            <p className="text-[10px] font-black uppercase text-slate-700 tracking-widest">Impact scoring will activate as more match data streams in</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </Card>
                          </div>
                     </TabsContent>
                 </Tabs>
