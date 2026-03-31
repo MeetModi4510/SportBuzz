@@ -842,8 +842,8 @@ export default function LiveFootballMatch() {
                                          <ResponsiveContainer width="100%" height="100%">
                                              <AreaChart data={(match.performance?.momentumHistory || []).map((m: any) => ({
                                                  ...m,
-                                                 homeVal: m.home !== undefined ? m.home : (m[match.homeTeam?.name] || m[match.homeTeam?.shortName] || 0),
-                                                 awayVal: m.away !== undefined ? m.away : (m[match.awayTeam?.name] || m[match.awayTeam?.shortName] || 0)
+                                                 homeVal: m.value > 0 ? m.value : 0,
+                                                 awayVal: m.value < 0 ? Math.abs(m.value) : 0
                                              }))}>
                                                  <defs>
                                                      <linearGradient id="homeMomGrad" x1="0" y1="0" x2="0" y2="1">

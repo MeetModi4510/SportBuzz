@@ -15,8 +15,16 @@ const calculatePerformance = (match) => {
             labAnalysis: { 
                 intensityPressing: 40, 
                 counterAttackRisk: 30,
-                attackThirdControl: { team: 'None', percentage: 50 }
-            }
+                attackThirdControl: { team: 'None', percentage: 50 },
+                intensityPulse: [],
+                possessionPhases: { buildup: 33, attack: 33, defense: 34 },
+                expectedGoals: { home: 0, away: 0 },
+                directnessIndex: { home: 40, away: 35 },
+                defensiveLineHeight: { home: 45, away: 45 },
+                finalThirdEntries: { home: 0, away: 0 },
+                highTurnovers: { home: 0, away: 0 }
+            },
+            topPerformers: []
         };
     }
 
@@ -99,6 +107,39 @@ const calculatePerformance = (match) => {
         attack: Math.round(40 + Math.abs(factor) * 10),
         defense: Math.round(30 - factor * 5)
     };
+
+    // TOP PERFORMERS Calculation
+    const playerScores = {};
+    match.events.forEach(event => {
+        const pName = event.player;
+        if (!pName) return;
+
+        if (!playerScores[pName]) {
+            const side = String(event.team) === String(match.homeTeam._id || match.homeTeam) ? 'H' : 'A';
+            playerScores[pName] = { name: pName, score: 0, team: side };
+        }
+
+        // Scoring rules
+        if (event.type === 'Goal') playerScores[pName].score += 5.0;
+        if (event.assister) {
+            if (!playerScores[event.assister]) {
+                const side = String(event.team) === String(match.homeTeam._id || match.homeTeam) ? 'H' : 'A';
+                playerScores[event.assister] = { name: event.assister, score: 0, team: side };
+            }
+            playerScores[event.assister].score += 3.0;
+        }
+        if (event.type === 'ShotOnTarget') playerScores[pName].score += 1.5;
+        if (event.type === 'YellowCard') playerScores[pName].score -= 1.5;
+        if (event.type === 'RedCard') playerScores[pName].score -= 5.0;
+        if (event.type === 'Save') playerScores[pName].score += 2.0;
+    });
+
+    const sortedPlayers = Object.values(playerScores)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
+
+    match.performance.topPerformers = sortedPlayers;
+    match.markModified('performance.topPerformers');
 
     // NEW ADVANCED METRICS
     const homePossession = match.stats.possession.home;

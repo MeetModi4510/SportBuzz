@@ -149,7 +149,12 @@ const footballMatchSchema = new mongoose.Schema({
                 home: { type: Number, default: 0 },
                 away: { type: Number, default: 0 }
             }
-        }
+        },
+        topPerformers: [{
+            name: { type: String },
+            score: { type: Number, default: 0 },
+            team: { type: String } // 'H' or 'A'
+        }]
     }
 }, {
     timestamps: true
