@@ -164,8 +164,9 @@ export const updateTournament = asyncHandler(async (req, res) => {
         throw new Error('Tournament not found');
     }
 
-    // Only creator can update
-    if (String(tournament.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
+    // Only creator or admin can update
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
+    if (String(tournament.createdBy) !== String(req.user._id) && !isAdmin) {
         res.status(403);
         throw new Error('Not authorized to update this tournament');
     }
@@ -192,7 +193,8 @@ export const deleteTournament = asyncHandler(async (req, res) => {
         throw new Error('Tournament not found');
     }
 
-    if (String(tournament.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
+    if (String(tournament.createdBy) !== String(req.user._id) && !isAdmin) {
         res.status(403);
         throw new Error('Not authorized to delete this tournament');
     }
@@ -270,8 +272,9 @@ export const updateTeam = asyncHandler(async (req, res) => {
         throw new Error('Team not found');
     }
 
-    // Only creator can update
-    if (String(team.createdBy) !== String(req.user._id) && req.user.role !== 'admin') {
+    // Only creator or admin can update
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
+    if (String(team.createdBy) !== String(req.user._id) && !isAdmin) {
         res.status(403);
         throw new Error('Not authorized to update this team');
     }

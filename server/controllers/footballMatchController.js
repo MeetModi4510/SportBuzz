@@ -176,6 +176,18 @@ export const getMatchById = asyncHandler(async (req, res) => {
 // @route   POST /api/football/matches
 export const createMatch = asyncHandler(async (req, res) => {
     const { tournamentId, homeTeam, awayTeam, matchDate, venue } = req.body;
+    const tournament = await FootballTournament.findById(tournamentId);
+
+    if (!tournament) {
+        res.status(404);
+        throw new Error('Tournament not found');
+    }
+
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
+    if (String(tournament.createdBy) !== String(req.user._id) && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized to create matches for this tournament');
+    }
 
     try {
         const match = await FootballMatch.create({
@@ -206,6 +218,15 @@ export const addMatchEvent = asyncHandler(async (req, res) => {
     if (!match) {
         res.status(404);
         throw new Error('Match not found');
+    }
+
+    const tournament = await FootballTournament.findById(match.tournamentId);
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
+    const isTournamentCreator = tournament && String(tournament.createdBy) === String(req.user._id);
+
+    if (!isTournamentCreator && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized to add events to this match');
     }
 
     const event = { 
@@ -309,6 +330,15 @@ export const updateTimer = asyncHandler(async (req, res) => {
         throw new Error('Match not found');
     }
 
+    const tournament = await FootballTournament.findById(match.tournamentId);
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
+    const isTournamentCreator = tournament && String(tournament.createdBy) === String(req.user._id);
+
+    if (!isTournamentCreator && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized to update match timer');
+    }
+
     if (isRunning !== undefined) match.timer.isRunning = isRunning;
     if (currentMinute !== undefined) match.timer.currentMinute = currentMinute;
     if (injuryTime !== undefined) match.timer.injuryTime = injuryTime;
@@ -350,6 +380,15 @@ export const finalizeMatch = asyncHandler(async (req, res) => {
         throw new Error('Match not found');
     }
 
+    const tournament = await FootballTournament.findById(match.tournamentId);
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
+    const isTournamentCreator = tournament && String(tournament.createdBy) === String(req.user._id);
+
+    if (!isTournamentCreator && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized to finalize this match');
+    }
+
     match.status = 'Completed';
     match.timer.isRunning = false;
     await match.save();
@@ -378,6 +417,15 @@ export const updateMatchLineups = asyncHandler(async (req, res) => {
     if (!match) {
         res.status(404);
         throw new Error('Match not found');
+    }
+
+    const tournament = await FootballTournament.findById(match.tournamentId);
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
+    const isTournamentCreator = tournament && String(tournament.createdBy) === String(req.user._id);
+
+    if (!isTournamentCreator && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized to update lineups');
     }
 
     match.lineups = {
@@ -415,6 +463,15 @@ export const deleteMatch = asyncHandler(async (req, res) => {
     if (!match) {
         res.status(404);
         throw new Error('Match not found');
+    }
+
+    const tournament = await FootballTournament.findById(match.tournamentId);
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
+    const isTournamentCreator = tournament && String(tournament.createdBy) === String(req.user._id);
+
+    if (!isTournamentCreator && !isAdmin) {
+        res.status(403);
+        throw new Error('Not authorized to delete this match');
     }
 
     await FootballMatch.findByIdAndDelete(req.params.id);

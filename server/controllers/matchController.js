@@ -55,11 +55,9 @@ export const createMatch = asyncHandler(async (req, res) => {
     }
 
     const isCreator = tournamentDoc.createdBy && tournamentDoc.createdBy.toString() === req.user._id.toString();
-    const isLegacyTournament = !tournamentDoc.createdBy || new Date(tournamentDoc.createdAt) < new Date('2026-03-30T00:00:00Z');
-    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
-    const isAdmin = req.user.role === 'admin';
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
 
-    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+    if (!isCreator && !isAdmin) {
         res.status(403);
         throw new Error('Not authorized. Only the tournament creator can create matches.');
     }
@@ -152,11 +150,9 @@ export const updateMatch = asyncHandler(async (req, res) => {
     // --- AUTH CHECK ---
     const tournamentDoc = match.tournament;
     const isCreator = tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() === req.user._id.toString();
-    const isLegacyTournament = tournamentDoc && (!tournamentDoc.createdBy || new Date(tournamentDoc.createdAt) < new Date('2026-03-30T00:00:00Z'));
-    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
-    const isAdmin = req.user.role === 'admin';
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
 
-    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+    if (!isCreator && !isAdmin) {
         res.status(403);
         throw new Error('Not authorized. Only the tournament creator can update this match.');
     }
@@ -405,11 +401,9 @@ export const recordBall = asyncHandler(async (req, res) => {
     // --- AUTH CHECK ---
     const tournamentDoc = match.tournament;
     const isCreator = tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() === req.user._id.toString();
-    const isLegacyTournament = tournamentDoc && (!tournamentDoc.createdBy || new Date(tournamentDoc.createdAt) < new Date('2026-03-30T00:00:00Z'));
-    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
-    const isAdmin = req.user.role === 'admin';
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
 
-    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+    if (!isCreator && !isAdmin) {
         res.status(403);
         throw new Error('Not authorized. Only the tournament creator can score this match.');
     }
@@ -774,11 +768,9 @@ export const undoLastBall = asyncHandler(async (req, res) => {
     // --- AUTH CHECK ---
     const tournamentDoc = match.tournament;
     const isCreator = tournamentDoc && tournamentDoc.createdBy && tournamentDoc.createdBy.toString() === req.user._id.toString();
-    const isLegacyTournament = tournamentDoc && (!tournamentDoc.createdBy || new Date(tournamentDoc.createdAt) < new Date('2026-03-30T00:00:00Z'));
-    const isSpecialUserForLegacy = req.user.email === 'meetmodi451013@gmail.com' && isLegacyTournament;
-    const isAdmin = req.user.role === 'admin';
+    const isAdmin = req.user.role === 'admin' || req.user.email === 'meetmodi451013@gmail.com' || req.user.email === 'admin@sportbuzz.com';
 
-    if (!isCreator && !isSpecialUserForLegacy && !isAdmin) {
+    if (!isCreator && !isAdmin) {
         res.status(403);
         throw new Error('Not authorized. Only the tournament creator can undo balls.');
     }
