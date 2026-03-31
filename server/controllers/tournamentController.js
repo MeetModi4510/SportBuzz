@@ -196,6 +196,13 @@ export const deleteTournament = asyncHandler(async (req, res) => {
         await Match.deleteMany({ _id: { $in: matchIds } });
     }
     await PointsTable.deleteMany({ tournament: req.params.id });
+    
+    // Remove tournament from users' following lists
+    await User.updateMany(
+        { followedTournaments: req.params.id },
+        { $pull: { followedTournaments: req.params.id } }
+    );
+
     await Tournament.findByIdAndDelete(req.params.id);
 
     res.json({ success: true, message: 'Tournament deleted' });
@@ -706,15 +713,21 @@ export const followTournament = asyncHandler(async (req, res) => {
         throw new Error('Tournament not found');
     }
 
-    const user = await User.findById(req.user.id);
-    const tournamentIdStr = req.params.id;
+    const userId = req.user._id;
+    const tournamentId = req.params.id;
     
-    // Check if already followed - use toString() for robust comparison
-    const isAlreadyFollowed = user.followedTournaments.some(id => id.toString() === tournamentIdStr);
-    
-    if (!isAlreadyFollowed) {
-        user.followedTournaments.push(tournamentIdStr);
+    // Add to User's followed list
+    const user = await User.findById(userId);
+    if (!user.followedTournaments.some(id => id.toString() === tournamentId)) {
+        user.followedTournaments.push(tournamentId);
         await user.save();
+    }
+
+    // Add to Tournament's followers list
+    if (!tournament.followers) tournament.followers = [];
+    if (!tournament.followers.some(id => id.toString() === userId.toString())) {
+        tournament.followers.push(userId);
+        await tournament.save();
     }
 
     res.json({
@@ -727,11 +740,24 @@ export const followTournament = asyncHandler(async (req, res) => {
 // @route   POST /api/tournaments/:id/unfollow
 // @access  Private
 export const unfollowTournament = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user.id);
+    const userId = req.user._id;
+    const tournamentId = req.params.id;
+
+    // Remove from User's list
+    const user = await User.findById(userId);
     user.followedTournaments = user.followedTournaments.filter(
-        id => id.toString() !== req.params.id
+        id => id.toString() !== tournamentId
     );
     await user.save();
+
+    // Remove from Tournament's list
+    const tournament = await Tournament.findById(tournamentId);
+    if (tournament && tournament.followers) {
+        tournament.followers = tournament.followers.filter(
+            id => id.toString() !== userId.toString()
+        );
+        await tournament.save();
+    }
 
     res.json({
         success: true,

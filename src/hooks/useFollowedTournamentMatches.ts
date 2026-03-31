@@ -17,7 +17,7 @@ export interface TournamentTickerMatch {
 }
 
 /** Fetches live + recent matches for all followed tournaments and refreshes every 15s */
-export const useFollowedTournamentMatches = (tournamentList: { _id: string; name: string }[]) => {
+export const useFollowedTournamentMatches = (tournamentList: { _id: string; name: string; isFootball?: boolean }[]) => {
     const { followed } = useTournamentFollow();
     const [matches, setMatches] = useState<TournamentTickerMatch[]>([]);
 
@@ -31,48 +31,68 @@ export const useFollowedTournamentMatches = (tournamentList: { _id: string; name
             await Promise.all(
                 followedTournaments.map(async (t) => {
                     try {
-                        const res = await customMatchApi.getAll({ tournamentId: t._id });
-                        const liveMatches = (res.data || []).filter(
-                            (m: any) => m.status === "Live"
-                        );
-                        for (const m of liveMatches) {
-                            const fmtOv = (o: number) => {
-                                const b = Math.round(o * 6);
-                                return `${Math.floor(b / 6)}.${b % 6}`;
-                            };
-                            const s1 = m.score?.team1;
-                            const s2 = m.score?.team2;
-                            let testBreakStatus: string | null = null;
-                            if (m.status === "Live" && m.tournament?.matchType === "Test") {
-                                const sessionOvers = m.tournament.oversPerSession || 30;
-                                const currentInningsScore = m.currentInnings === 1 ? s1 : s2;
-                                if (currentInningsScore) {
-                                    const overs = currentInningsScore.overs || 0;
-                                    if (overs > 0 && Number.isInteger(overs) && overs % sessionOvers === 0) {
-                                        if (m.testSession === 2) testBreakStatus = "Lunch";
-                                        else if (m.testSession === 3) testBreakStatus = "Tea";
-                                        else if (m.testSession === 1) testBreakStatus = `Stumps`;
-                                        else testBreakStatus = "Break";
+                        if (t.isFootball) {
+                           const res = await (import("@/services/api").then(m => m.footballApi.getTournamentById(t._id)));
+                           const { matches: footballMatches } = res.data || {};
+                           const liveMatches = (footballMatches || []).filter((m: any) => m.status === "Live");
+                           for (const m of liveMatches) {
+                               results.push({
+                                   _id: m._id,
+                                   tournamentName: t.name,
+                                   homeTeamName: m.homeTeam?.name || "Team A",
+                                   homeTeamLogo: m.homeTeam?.logo,
+                                   awayTeamName: m.awayTeam?.name || "Team B",
+                                   awayTeamLogo: m.awayTeam?.logo,
+                                   homeScore: `${m.score?.home ?? 0}`,
+                                   awayScore: `${m.score?.away ?? 0}`,
+                                   status: m.status,
+                                   tournamentId: t._id
+                               });
+                           }
+                        } else {
+                            const res = await customMatchApi.getAll({ tournamentId: t._id });
+                            const liveMatches = (res.data || []).filter(
+                                (m: any) => m.status === "Live"
+                            );
+                            for (const m of liveMatches) {
+                                const fmtOv = (o: number) => {
+                                    const b = Math.round(o * 6);
+                                    return `${Math.floor(b / 6)}.${b % 6}`;
+                                };
+                                const s1 = m.score?.team1;
+                                const s2 = m.score?.team2;
+                                let testBreakStatus: string | null = null;
+                                if (m.status === "Live" && m.tournament?.matchType === "Test") {
+                                    const sessionOvers = m.tournament.oversPerSession || 30;
+                                    const currentInningsScore = m.currentInnings === 1 ? s1 : s2;
+                                    if (currentInningsScore) {
+                                        const overs = currentInningsScore.overs || 0;
+                                        if (overs > 0 && Number.isInteger(overs) && overs % sessionOvers === 0) {
+                                            if (m.testSession === 2) testBreakStatus = "Lunch";
+                                            else if (m.testSession === 3) testBreakStatus = "Tea";
+                                            else if (m.testSession === 1) testBreakStatus = `Stumps`;
+                                            else testBreakStatus = "Break";
+                                        }
                                     }
                                 }
-                            }
 
-                            results.push({
-                                _id: m._id,
-                                tournamentName: t.name,
-                                homeTeamName: m.homeTeam?.name || "Team A",
-                                homeTeamLogo: m.homeTeam?.logo,
-                                awayTeamName: m.awayTeam?.name || "Team B",
-                                awayTeamLogo: m.awayTeam?.logo,
-                                homeScore: s1 ? `${s1.runs}/${s1.wickets} (${fmtOv(s1.overs)})` : "-",
-                                awayScore: s2 ? `${s2.runs}/${s2.wickets} (${fmtOv(s2.overs)})` : "-",
-                                status: m.status,
-                                tournamentId: t._id,
-                                testBreakStatus
-                            });
+                                results.push({
+                                    _id: m._id,
+                                    tournamentName: t.name,
+                                    homeTeamName: m.homeTeam?.name || "Team A",
+                                    homeTeamLogo: m.homeTeam?.logo,
+                                    awayTeamName: m.awayTeam?.name || "Team B",
+                                    awayTeamLogo: m.awayTeam?.logo,
+                                    homeScore: s1 ? `${s1.runs}/${s1.wickets} (${fmtOv(s1.overs)})` : "-",
+                                    awayScore: s2 ? `${s2.runs}/${s2.wickets} (${fmtOv(s2.overs)})` : "-",
+                                    status: m.status,
+                                    tournamentId: t._id,
+                                    testBreakStatus
+                                });
+                            }
                         }
-                    } catch {
-                        // ignore individual failures
+                    } catch (e) {
+                        console.error("Failed to fetch matches for tournament", t._id, e);
                     }
                 })
             );

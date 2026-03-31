@@ -123,6 +123,8 @@ export const footballApi = {
     deleteTournament: (id: string) => api.delete(`football/tournaments/${id}`),
     updateTeam: (id: string, data: any) => api.put(`football/teams/${id}`, data),
     getTeamById: (id: string) => api.get(`football/teams/${id}`),
+    follow: (id: string) => api.post(`football/tournaments/${id}/follow`),
+    unfollow: (id: string) => api.post(`football/tournaments/${id}/unfollow`),
     
     // Stats
     getTournamentStats: (id: string) => api.get(`football/tournaments/${id}/stats`),

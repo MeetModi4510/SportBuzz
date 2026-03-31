@@ -42,7 +42,11 @@ const footballTournamentSchema = new mongoose.Schema({
     winner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'FootballTeam'
-    }
+    },
+    followers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 }, {
     timestamps: true
 });

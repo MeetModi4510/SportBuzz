@@ -30,6 +30,6 @@ router.post('/:id/unfollow', protect, unfollowTournament);
 router.route('/:id')
     .get(getTournamentById)
     .put(protect, adminOrScorer, updateTournament)
-    .delete(protect, adminOnly, deleteTournament);
+    .delete(protect, deleteTournament);
 
 export default router;

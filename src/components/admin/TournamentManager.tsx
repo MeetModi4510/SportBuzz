@@ -1411,8 +1411,12 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                 {(listMode === 'mine' ? tournaments : searchResults).map((tournament: any) => {
                                     const ownerId = typeof tournament.createdBy === 'object' ? tournament.createdBy?._id : tournament.createdBy;
                                     const user = JSON.parse(localStorage.getItem("user") || "{}");
-                                    const currentUserEmail = user.email;
-                                    const isTournamentOwner = (ownerId && currentUserId && ownerId.toString() === currentUserId.toString()) || currentUserEmail === 'admin@sportbuzz.com';
+                                    const currentUserEmail = user.email?.toLowerCase();
+                                    const currentUserRole = user.role?.toLowerCase();
+                                    const isTournamentOwner = 
+                                        (ownerId && currentUserId && ownerId.toString() === currentUserId.toString()) || 
+                                        currentUserEmail === 'admin@sportbuzz.com' ||
+                                        currentUserRole === 'admin';
 
                                     return (
                                         <Card key={tournament._id} onClick={() => openTournamentDetail(tournament)}

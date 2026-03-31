@@ -10,7 +10,9 @@ import {
     deleteTournament,
     updateTeam,
     getTeamById,
-    getTournamentStats
+    getTournamentStats,
+    followTournament,
+    unfollowTournament
 } from '../controllers/footballTournamentController.js';
 import { 
     getMatchById,
@@ -33,6 +35,8 @@ router.put('/tournaments/:id', protect, updateTournament);
 router.delete('/tournaments/:id', protect, deleteTournament);
 router.post('/tournaments/:id/teams', protect, addTeamToTournament);
 router.get('/tournaments/:id/stats', getTournamentStats);
+router.post('/tournaments/:id/follow', protect, followTournament);
+router.post('/tournaments/:id/unfollow', protect, unfollowTournament);
 
 // Team Routes
 router.get('/teams', getTeams);

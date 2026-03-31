@@ -99,6 +99,10 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tournament'
     }],
+    followedFootballTournaments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'FootballTournament'
+    }],
     role: {
         type: String,
         enum: ['user', 'admin', 'scorer'],

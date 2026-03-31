@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Trophy, Calendar, Users, Plus, ArrowRight, Loader2, Search, Trophy as TrophyIcon } from "lucide-react";
+import { Trophy, Calendar, Users, Plus, ArrowRight, Loader2, Search, Trophy as TrophyIcon, Bell, BellOff, Trash2 } from "lucide-react";
 import { footballApi } from "@/services/api";
+import { useTournamentFollow } from "@/hooks/useTournamentFollow";
 import { toast } from "sonner";
 
 export const FootballTournamentManager = () => {
@@ -12,6 +13,19 @@ export const FootballTournamentManager = () => {
     const [tournaments, setTournaments] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
+    const { toggle: toggleFollow, isFollowed } = useTournamentFollow();
+
+    const getCurrentUserId = () => {
+        try {
+            const userStr = localStorage.getItem("user");
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                return user._id || user.id || null;
+            }
+        } catch { }
+        return null;
+    };
+    const currentUserId = getCurrentUserId();
 
     useEffect(() => {
         fetchTournaments();
@@ -28,6 +42,23 @@ export const FootballTournamentManager = () => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleDeleteTournament = async (e: React.MouseEvent, id: string, name: string) => {
+        e.stopPropagation();
+        if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
+        try {
+            await footballApi.deleteTournament(id);
+            toast.success(`"${name}" deleted`);
+            fetchTournaments();
+        } catch (err) {
+            toast.error("Failed to delete tournament");
+        }
+    };
+
+    const handleToggleFollow = (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        toggleFollow(id, true); // true for football
     };
 
     const filteredTournaments = tournaments.filter(t => 
@@ -58,6 +89,35 @@ export const FootballTournamentManager = () => {
                                     'bg-slate-500/10 border-slate-500/20 text-slate-400'
                                 }`}>
                                     {tournament.status}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={(e) => handleToggleFollow(e, tournament._id)}
+                                        className={`p-1.5 rounded-lg transition-all ${isFollowed(tournament._id)
+                                            ? 'text-yellow-400 bg-yellow-500/10 hover:bg-yellow-500/20'
+                                            : 'text-slate-500 hover:text-yellow-400 hover:bg-yellow-500/10'
+                                            }`}
+                                        title={isFollowed(tournament._id) ? "Unfollow tournament" : "Follow tournament"}
+                                    >
+                                        {isFollowed(tournament._id) ? <BellOff size={14} /> : <Bell size={14} />}
+                                    </button>
+                                    {(() => {
+                                        const ownerId = typeof tournament.createdBy === 'object' ? tournament.createdBy?._id : tournament.createdBy;
+                                        const user = JSON.parse(localStorage.getItem("user") || "{}");
+                                        const isOwner = (ownerId && currentUserId && ownerId.toString() === currentUserId.toString()) || 
+                                                       user.role?.toLowerCase() === 'admin' || 
+                                                       user.email?.toLowerCase() === 'admin@sportbuzz.com';
+                                        
+                                        return isOwner && (
+                                            <button
+                                                onClick={(e) => handleDeleteTournament(e, tournament._id, tournament.name)}
+                                                className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                                                title="Delete tournament"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                             

@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import FootballTournament from '../models/FootballTournament.js';
 import FootballTeam from '../models/FootballTeam.js';
 import FootballMatch from '../models/FootballMatch.js';
+import User from '../models/User.js';
 
 // @desc    Create new football tournament
 // @route   POST /api/football/tournaments
@@ -195,8 +196,67 @@ export const deleteTournament = asyncHandler(async (req, res) => {
         throw new Error('Not authorized to delete this tournament');
     }
 
+    // Remove from users' followed lists
+    await User.updateMany(
+        { followedFootballTournaments: req.params.id },
+        { $pull: { followedFootballTournaments: req.params.id } }
+    );
+
     await tournament.deleteOne();
     res.json({ success: true, message: "Tournament deleted successfully" });
+});
+
+// @desc    Follow a football tournament
+// @route   POST /api/football/tournaments/:id/follow
+// @access  Private
+export const followTournament = asyncHandler(async (req, res) => {
+    const tournament = await FootballTournament.findById(req.params.id);
+    if (!tournament) {
+        res.status(404);
+        throw new Error('Tournament not found');
+    }
+
+    const userId = req.user._id;
+    const tournamentId = req.params.id;
+
+    const user = await User.findById(userId);
+    
+    if (!user.followedFootballTournaments.some(id => id.toString() === tournamentId)) {
+        user.followedFootballTournaments.push(tournamentId);
+        await user.save();
+    }
+
+    if (!tournament.followers) tournament.followers = [];
+    if (!tournament.followers.some(id => id.toString() === userId.toString())) {
+        tournament.followers.push(userId);
+        await tournament.save();
+    }
+
+    res.json({ success: true, message: 'Successfully followed tournament' });
+});
+
+// @desc    Unfollow a football tournament
+// @route   POST /api/football/tournaments/:id/unfollow
+// @access  Private
+export const unfollowTournament = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+    const tournamentId = req.params.id;
+
+    const user = await User.findById(userId);
+    user.followedFootballTournaments = user.followedFootballTournaments.filter(
+        id => id.toString() !== tournamentId
+    );
+    await user.save();
+
+    const tournament = await FootballTournament.findById(tournamentId);
+    if (tournament && tournament.followers) {
+        tournament.followers = tournament.followers.filter(
+            id => id.toString() !== userId.toString()
+        );
+        await tournament.save();
+    }
+
+    res.json({ success: true, message: 'Successfully unfollowed tournament' });
 });
 // @desc    Update football team
 // @route   PUT /api/football/teams/:id

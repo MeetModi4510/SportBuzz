@@ -71,6 +71,10 @@ const tournamentSchema = new mongoose.Schema({
     knockedOutTeams: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team'
+    }],
+    followers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }]
 }, {
     timestamps: true

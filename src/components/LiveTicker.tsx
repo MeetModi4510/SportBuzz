@@ -15,36 +15,50 @@ export const LiveTicker = () => {
   const { data: cricketFeatured, isLoading } = useFeaturedCricketMatches();
 
   // Followed tournament live matches
-  const [tournamentList, setTournamentList] = useState<{ _id: string; name: string }[]>([]);
+  const [tournamentList, setTournamentList] = useState<{ _id: string; name: string; isFootball?: boolean }[]>([]);
   useEffect(() => {
-    tournamentApi.getAll()
-      .then((data: any) => setTournamentList(data?.data || []))
-      .catch(() => { });
+    const fetchAll = async () => {
+      try {
+        const [cricket, football] = await Promise.all([
+          tournamentApi.getAll(),
+          import("@/services/api").then(m => m.footballApi.getTournaments())
+        ]);
+        const cList = (cricket as any)?.data || [];
+        const fList = ((football as any)?.data || []).map((t: any) => ({ ...t, isFootball: true }));
+        setTournamentList([...cList, ...fList]);
+      } catch (err) {
+        console.error("Failed to fetch tournament lists", err);
+      }
+    };
+    fetchAll();
   }, []);
   const followedMatches = useFollowedTournamentMatches(tournamentList);
 
   // Convert followed tournament matches to a ticker-compatible shape
   const followedAsTicker = useMemo(() =>
-    followedMatches.map(m => ({
-      _id: m._id,
-      sport: "cricket" as const,
-      matchType: m.tournamentName,
-      status: "live" as const,
-      isFollowedTournament: true,
-      homeTeam: {
-        name: m.homeTeamName,
-        shortName: getTeamAcronym(m.homeTeamName),
-        logo: m.homeTeamLogo || "",
-      },
-      awayTeam: {
-        name: m.awayTeamName,
-        shortName: getTeamAcronym(m.awayTeamName),
-        logo: m.awayTeamLogo || "",
-      },
-      homeScore: m.homeScore,
-      awayScore: m.awayScore,
-    })),
-    [followedMatches]
+    followedMatches.map(m => {
+      const isFootball = tournamentList.find(t => t._id === m.tournamentId)?.isFootball;
+      return {
+        _id: m._id,
+        sport: (isFootball ? "football" : "cricket") as any,
+        matchType: m.tournamentName,
+        status: "live" as const,
+        isFollowedTournament: true,
+        homeTeam: {
+          name: m.homeTeamName,
+          shortName: getTeamAcronym(m.homeTeamName),
+          logo: m.homeTeamLogo || "",
+        },
+        awayTeam: {
+          name: m.awayTeamName,
+          shortName: getTeamAcronym(m.awayTeamName),
+          logo: m.awayTeamLogo || "",
+        },
+        homeScore: m.homeScore,
+        awayScore: m.awayScore,
+      };
+    }),
+    [followedMatches, tournamentList]
   );
 
   const tickerMatches = useMemo(() => {

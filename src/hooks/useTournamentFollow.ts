@@ -41,33 +41,41 @@ export const useTournamentFollow = () => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(followed));
     }, [followed]);
 
-    const follow = useCallback(async (id: string) => {
+    const follow = useCallback(async (id: string, isFootball: boolean = false) => {
         setFollowed(prev => prev.includes(id) ? prev : [...prev, id]);
         if (isLoggedIn) {
             try {
-                await tournamentApi.follow(id);
+                if (isFootball) {
+                    await (import("@/services/api").then(m => m.footballApi.follow(id)));
+                } else {
+                    await tournamentApi.follow(id);
+                }
             } catch (err) {
                 console.error("Failed to follow tournament on backend", err);
             }
         }
     }, [isLoggedIn]);
 
-    const unfollow = useCallback(async (id: string) => {
+    const unfollow = useCallback(async (id: string, isFootball: boolean = false) => {
         setFollowed(prev => prev.filter(f => f !== id));
         if (isLoggedIn) {
             try {
-                await tournamentApi.unfollow(id);
+                if (isFootball) {
+                    await (import("@/services/api").then(m => m.footballApi.unfollow(id)));
+                } else {
+                    await tournamentApi.unfollow(id);
+                }
             } catch (err) {
                 console.error("Failed to unfollow tournament on backend", err);
             }
         }
     }, [isLoggedIn]);
 
-    const toggle = useCallback((id: string) => {
+    const toggle = useCallback((id: string, isFootball: boolean = false) => {
         if (followed.includes(id)) {
-            unfollow(id);
+            unfollow(id, isFootball);
         } else {
-            follow(id);
+            follow(id, isFootball);
         }
     }, [followed, follow, unfollow]);
 
