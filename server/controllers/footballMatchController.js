@@ -4,6 +4,7 @@ import FootballTournament from '../models/FootballTournament.js';
 import FootballTeam from '../models/FootballTeam.js';
 import { getIO } from '../config/socket.js';
 import { syncTournamentStatus } from './footballTournamentController.js';
+import { createMatchReportNews, createEventNews } from './footballNewsController.js';
 
 const calculatePerformance = (match) => {
     if (!match.performance) {
@@ -255,6 +256,12 @@ export const addMatchEvent = asyncHandler(async (req, res) => {
         } else {
             match.score.away += 1;
         }
+
+        // Check for Hat-trick (3 goals)
+        const playerGoals = match.events.filter(e => e.type === 'Goal' && e.player === player).length;
+        if (playerGoals === 3) {
+            createEventNews(match._id, player, 'HatTrick');
+        }
     }
 
     // NEW: Lineup Substitution Logic
@@ -400,6 +407,8 @@ export const finalizeMatch = asyncHandler(async (req, res) => {
     // If part of a tournament, update points table logic here
     if (match.tournamentId) {
         await syncTournamentStatus(match.tournamentId);
+        // Generate match report news
+        createMatchReportNews(match._id);
     }
 
     const io = getIO();

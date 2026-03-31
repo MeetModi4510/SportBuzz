@@ -128,6 +128,7 @@ export const footballApi = {
     
     // Stats
     getTournamentStats: (id: string) => api.get(`football/tournaments/${id}/stats`),
+    getTournamentNews: (id: string) => api.get(`football/tournaments/${id}/news`),
     
     // External/Existing
     getMatchSquads: (matchId: string) => api.get(`football/match/${matchId}/squads`),

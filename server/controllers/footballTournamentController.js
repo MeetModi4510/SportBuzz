@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import FootballTournament from '../models/FootballTournament.js';
 import FootballTeam from '../models/FootballTeam.js';
 import FootballMatch from '../models/FootballMatch.js';
+import FootballNews from '../models/FootballNews.js';
 import User from '../models/User.js';
 
 // @desc    Create new football tournament
@@ -456,15 +457,28 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
 
     const statsList = Object.values(playerStats);
 
-    const stats = {
-        topScorers: statsList.filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals).slice(0, 10),
-        topAssisters: statsList.filter(p => p.assists > 0).sort((a, b) => b.assists - a.assists).slice(0, 10),
-        mostCards: statsList.filter(p => p.yellowCards > 0 || p.redCards > 0)
-            .sort((a, b) => (b.yellowCards + b.redCards * 2) - (a.yellowCards + a.redCards * 2))
-            .slice(0, 10),
-        topKeepers: statsList.filter(p => p.saves > 0).sort((a, b) => b.saves - a.saves).slice(0, 10)
+    const statsResult = {
+        topScorers: statsList.filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals).slice(0, 5),
+        topAssisters: statsList.filter(p => p.assists > 0).sort((a, b) => b.assists - a.assists).slice(0, 5),
+        mostCards: statsList.filter(p => (p.yellowCards + p.redCards) > 0).sort((a, b) => (b.yellowCards + b.redCards) - (a.yellowCards + a.redCards)).slice(0, 5),
+        topKeepers: statsList.filter(p => p.saves > 0).sort((a, b) => b.saves - a.saves).slice(0, 5)
     };
 
-    res.json({ success: true, data: { pointsTable, stats } });
+    res.json({ 
+        success: true, 
+        data: { 
+            pointsTable: pointsTable.sort((a, b) => b.points - a.points || b.goalDifference - a.goalDifference), 
+            stats: statsResult 
+        } 
+    });
 });
 
+// @desc    Get news for a specific tournament
+// @route   GET /api/football/tournaments/:id/news
+export const getTournamentNews = asyncHandler(async (req, res) => {
+    const news = await FootballNews.find({ tournamentId: req.params.id })
+        .sort({ createdAt: -1 })
+        .limit(20);
+    
+    res.json({ success: true, data: news });
+});

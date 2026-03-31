@@ -12,7 +12,8 @@ import {
     getTeamById,
     getTournamentStats,
     followTournament,
-    unfollowTournament
+    unfollowTournament,
+    getTournamentNews
 } from '../controllers/footballTournamentController.js';
 import { 
     getMatchById,
@@ -37,6 +38,7 @@ router.post('/tournaments/:id/teams', protect, addTeamToTournament);
 router.get('/tournaments/:id/stats', getTournamentStats);
 router.post('/tournaments/:id/follow', protect, followTournament);
 router.post('/tournaments/:id/unfollow', protect, unfollowTournament);
+router.get('/tournaments/:id/news', getTournamentNews);
 
 // Team Routes
 router.get('/teams', getTeams);

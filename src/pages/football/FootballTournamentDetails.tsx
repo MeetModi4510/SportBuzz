@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Users, Swords, BarChart3, Settings, Play, ArrowLeft, Plus, Loader2, Calendar, Trash2, UserPlus, Shield, Circle } from "lucide-react";
+import { Trophy, Users, Swords, BarChart3, Settings, Play, ArrowLeft, Plus, Loader2, Calendar, Trash2, UserPlus, Shield, Circle, Newspaper } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +28,8 @@ export default function FootballTournamentDetails() {
     const [isScheduleOpen, setIsScheduleOpen] = useState(false);
     const [matchData, setMatchData] = useState({ homeTeam: "", awayTeam: "", venue: "", date: "" });
     const [settingsData, setSettingsData] = useState({ name: "", format: "", startDate: "", endDate: "" });
+    const [news, setNews] = useState<any[]>([]);
+    const [newsLoading, setNewsLoading] = useState(false);
 
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const currentUserId = user._id || user.id || '';
@@ -60,6 +62,20 @@ export default function FootballTournamentDetails() {
         }
     };
 
+    const fetchNews = async () => {
+        setNewsLoading(true);
+        try {
+            const res: any = await footballApi.getTournamentNews(id!);
+            if (res.success) {
+                setNews(res.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch news:", error);
+        } finally {
+            setNewsLoading(false);
+        }
+    };
+
     const fetchAllTeams = async () => {
         try {
             const res: any = await footballApi.getTeams();
@@ -71,11 +87,13 @@ export default function FootballTournamentDetails() {
         if (id) {
             fetchDetails();
             fetchAllTeams();
+            fetchNews();
 
             const socket = getSocket();
             socket.on('football_update', (updatedMatch) => {
                 if (updatedMatch.tournamentId === id || matches.some(m => m._id === updatedMatch._id)) {
                     fetchDetails();
+                    fetchNews();
                 }
             });
 
@@ -596,6 +614,62 @@ export default function FootballTournamentDetails() {
                                 </TabsContent>
                             ))}
                         </Tabs>
+                    </TabsContent>
+
+                    {/* Newsroom Tab */}
+                    <TabsContent value="newsroom" className="mt-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {newsLoading ? (
+                                <div className="col-span-full py-20 text-center">
+                                    <Loader2 className="animate-spin mx-auto text-blue-500 mb-4" size={40} />
+                                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Generating latest reports...</p>
+                                </div>
+                            ) : news.length > 0 ? (
+                                news.map((article: any) => (
+                                    <Card key={article._id} className="group relative overflow-hidden bg-slate-900/40 border-white/5 hover:border-blue-500/30 transition-all duration-500 rounded-[2.5rem] flex flex-col">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        
+                                        <div className="p-8 relative z-10 flex flex-col h-full">
+                                            <div className="flex items-center gap-3 mb-6">
+                                                <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                                                    article.type === 'MatchReport' ? 'bg-blue-500/10 text-blue-400' :
+                                                    article.type === 'Milestone' ? 'bg-purple-500/10 text-purple-400' :
+                                                    'bg-slate-500/10 text-slate-400'
+                                                }`}>
+                                                    {article.type?.replace(/([A-Z])/g, ' $1').trim() || 'General'}
+                                                </div>
+                                                <span className="text-[10px] font-bold text-slate-500 uppercase">
+                                                    {new Date(article.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            </div>
+
+                                            <h3 className="text-xl font-black italic uppercase tracking-tighter text-white group-hover:text-blue-400 transition-colors mb-4 leading-tight">
+                                                {article.title}
+                                            </h3>
+                                            
+                                            <p className="text-slate-400 text-sm leading-relaxed mb-8 flex-grow">
+                                                {article.content}
+                                            </p>
+
+                                            <div className="pt-6 border-t border-white/5 mt-auto">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">SportBuzz News Room</span>
+                                                    <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                                                        <Newspaper size={14} className="text-slate-400 group-hover:text-white" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                ))
+                            ) : (
+                                <div className="col-span-full py-32 text-center bg-slate-900/20 border border-dashed border-white/5 rounded-[3rem]">
+                                    <Newspaper className="mx-auto text-slate-800/30 mb-6" size={64} strokeWidth={1} />
+                                    <h3 className="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">No news reports yet</h3>
+                                    <p className="text-slate-600 text-xs mt-2 uppercase tracking-widest font-bold">Finish matches to see auto-generated reports</p>
+                                </div>
+                            )}
+                        </div>
                     </TabsContent>
                     </TabsContent>
 
