@@ -34,7 +34,7 @@ export const useFollowedTournamentMatches = (tournamentList: { _id: string; name
                         if (t.isFootball) {
                            const res = await (import("@/services/api").then(m => m.footballApi.getTournamentById(t._id)));
                            const { matches: footballMatches } = res.data || {};
-                           const liveMatches = (footballMatches || []).filter((m: any) => m.status === "Live");
+                           const liveMatches = (footballMatches || []).filter((m: any) => m.status === "Live" || m.status === "Paused");
                            for (const m of liveMatches) {
                                results.push({
                                    _id: m._id,

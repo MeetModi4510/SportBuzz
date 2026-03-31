@@ -418,6 +418,7 @@ export default function FootballTournamentDetails() {
                     </TabsContent>
 
                     <TabsContent value="matches" className="space-y-6">
+                    <TabsContent value="matches" className="space-y-6">
                         <div className="flex justify-between items-center bg-slate-900/40 border border-white/5 p-6 rounded-3xl">
                             <h3 className="text-2xl font-black italic uppercase tracking-tight">Match Schedule</h3>
                             {isTournamentOwner && (
@@ -470,86 +471,126 @@ export default function FootballTournamentDetails() {
                                 </Dialog>
                             )}
                         </div>
-                        <div className="grid gap-4">
-                             {matches.map((match: any) => (
-                                <Card 
-                                    key={match._id} 
-                                    className="bg-slate-900/40 border-slate-800 p-8 rounded-[2.5rem] hover:border-blue-500/30 transition-all flex items-center justify-between group cursor-pointer relative overflow-hidden"
-                                    onClick={() => navigate(`/football/live/${match._id}`)}
-                                >
-                                    <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                                    
-                                    <div className="flex items-center gap-12 flex-1 relative z-10">
-                                        <div className="flex-1 text-right flex flex-col items-end">
-                                            <span className="text-2xl font-black italic uppercase tracking-tight group-hover:text-blue-400 transition-colors">{match.homeTeam?.name}</span>
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Home</span>
-                                        </div>
-                                        <div className="flex flex-col items-center gap-2">
-                                            <div className="px-8 py-3 bg-slate-950 rounded-2xl border border-slate-800 shadow-inner">
-                                                <span className="text-3xl font-black italic text-white leading-none tracking-tighter">{match.score?.home || 0}<span className="text-slate-700 mx-2">-</span>{match.score?.away || 0}</span>
-                                            </div>
-                                            <div className="px-3 py-1 bg-blue-500/10 rounded-full border border-blue-500/20">
-                                                <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">{match.status}</span>
-                                            </div>
-                                        </div>
-                                        <div className="flex-1 text-left flex flex-col items-start">
-                                            <span className="text-2xl font-black italic uppercase tracking-tight group-hover:text-blue-400 transition-colors">{match.awayTeam?.name}</span>
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Away</span>
-                                        </div>
-                                    </div>
 
-                                    <div className="flex items-center gap-4 ml-12 relative z-10">
-                                        <div className="text-right hidden md:block">
-                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{new Date(match.matchDate).toLocaleDateString()}</p>
-                                            <p className="text-[10px] font-medium text-slate-600">{match.venue || "No venue"}</p>
+                        <Tabs defaultValue="live" className="w-full">
+                            <TabsList className="bg-slate-950/50 border border-white/5 p-1 h-12 rounded-xl mb-6">
+                                <TabsTrigger value="live" className="rounded-lg px-6 h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white font-bold uppercase tracking-widest text-[9px]">Live</TabsTrigger>
+                                <TabsTrigger value="upcoming" className="rounded-lg px-6 h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white font-bold uppercase tracking-widest text-[9px]">Upcoming</TabsTrigger>
+                                <TabsTrigger value="recent" className="rounded-lg px-6 h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white font-bold uppercase tracking-widest text-[9px]">Recent</TabsTrigger>
+                            </TabsList>
+
+                            {[
+                                { id: "live", data: matches.filter(m => m.status === 'Live' || m.status === 'Paused'), emptyMsg: "No matches currently live" },
+                                { id: "upcoming", data: matches.filter(m => m.status === 'Scheduled'), emptyMsg: "No upcoming matches scheduled" },
+                                { id: "recent", data: matches.filter(m => m.status === 'Completed'), emptyMsg: "No recently completed matches" }
+                            ].map(tab => (
+                                <TabsContent key={tab.id} value={tab.id} className="space-y-4">
+                                    {tab.data.map((match: any) => (
+                                        <Card 
+                                            key={match._id} 
+                                            className="bg-slate-900/40 border border-slate-800 p-8 rounded-[3rem] hover:border-blue-500/30 transition-all group cursor-pointer relative overflow-hidden"
+                                            onClick={() => navigate(`/football/live/${match._id}`)}
+                                        >
+                                            <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                                            
+                                            <div className="flex items-center justify-between relative z-10 w-full">
+                                                {/* Home Team */}
+                                                <div className="flex-1 text-right pr-6">
+                                                    <h4 className="text-3xl font-black italic uppercase tracking-tighter group-hover:text-blue-400 transition-colors leading-none">{match.homeTeam?.name}</h4>
+                                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mt-1">Home</p>
+                                                </div>
+
+                                                {/* Score & Status */}
+                                                <div className="flex flex-col items-center gap-3 shrink-0">
+                                                    <div className="px-10 py-4 bg-slate-950/80 rounded-[2rem] border border-slate-800 shadow-2xl shadow-black/50">
+                                                        <span className="text-4xl font-black italic text-white leading-none tracking-tighter tabular-nums">
+                                                            {match.score?.home || 0}
+                                                            <span className="text-slate-800 mx-4">-</span>
+                                                            {match.score?.away || 0}
+                                                        </span>
+                                                    </div>
+                                                    <div className={`px-4 py-1.5 rounded-full border flex items-center gap-2 ${
+                                                        match.status === 'Live' ? 'bg-red-500/10 border-red-500/20' : 
+                                                        match.status === 'Paused' ? 'bg-orange-500/10 border-orange-500/20' : 
+                                                        'bg-slate-500/10 border-slate-500/20'
+                                                    }`}>
+                                                        {match.status === 'Live' && <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />}
+                                                        <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${
+                                                            match.status === 'Live' ? 'text-red-400' : 
+                                                            match.status === 'Paused' ? 'text-orange-400' : 
+                                                            'text-slate-400'
+                                                        }`}>
+                                                            {match.status}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Away Team */}
+                                                <div className="flex-1 text-left pl-6">
+                                                    <h4 className="text-3xl font-black italic uppercase tracking-tighter group-hover:text-blue-400 transition-colors leading-none">{match.awayTeam?.name}</h4>
+                                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mt-1">Away</p>
+                                                </div>
+
+                                                {/* Info & Actions */}
+                                                <div className="flex items-center gap-6 pl-12 border-l border-white/5">
+                                                    <div className="text-right hidden xl:block min-w-[120px]">
+                                                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{new Date(match.matchDate).toLocaleDateString()}</p>
+                                                        <p className="text-[10px] font-bold text-slate-600 mt-0.5 truncate max-w-[120px]">{match.venue || "Stadium"}</p>
+                                                    </div>
+                                                    
+                                                    <div className="flex gap-3">
+                                                        {isTournamentOwner && match.status !== 'Completed' && (
+                                                            <Button 
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    window.open(`/football/score/football/${match._id}`, '_blank');
+                                                                }} 
+                                                                className="bg-blue-600 hover:bg-blue-500 rounded-3xl h-16 w-16 p-0 shadow-xl shadow-blue-600/20 group/btn transition-transform hover:scale-105 active:scale-95"
+                                                            >
+                                                                <Play size={28} className="fill-white text-white translate-x-0.5 group-hover/btn:scale-110 transition-transform" />
+                                                            </Button>
+                                                        )}
+                                                        {match.status === 'Completed' && (
+                                                            <Button 
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    navigate(`/football/match/result/${match._id}`);
+                                                                }} 
+                                                                variant="outline" 
+                                                                className="border-slate-800 rounded-3xl h-16 w-16 p-0 hover:bg-slate-800 transition-all"
+                                                            >
+                                                                <BarChart3 size={28} className="text-slate-400" />
+                                                            </Button>
+                                                        )}
+                                                        {isTournamentOwner && (
+                                                            <div className="flex items-center">
+                                                                <Button 
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleDeleteMatch(match._id);
+                                                                    }} 
+                                                                    variant="ghost" 
+                                                                    className="text-slate-700 hover:text-red-500 hover:bg-red-500/10 rounded-2xl h-12 w-12 p-0 transition-colors"
+                                                                >
+                                                                    <Trash2 size={20} />
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Card>
+                                    ))}
+                                    {tab.data.length === 0 && (
+                                        <div className="text-center py-24 bg-slate-900/20 border border-dashed border-white/5 rounded-[3rem]">
+                                            <Calendar className="mx-auto text-slate-800/50 mb-6" size={64} strokeWidth={1.5} />
+                                            <p className="text-slate-600 font-black uppercase tracking-[0.3em] text-[10px]">{tab.emptyMsg}</p>
                                         </div>
-                                        <div className="flex gap-2">
-                                            {isTournamentOwner && match.status !== 'Completed' && (
-                                                <Button 
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        window.open(`/football/score/football/${match._id}`, '_blank');
-                                                    }} 
-                                                    className="bg-blue-600 hover:bg-blue-500 rounded-2xl h-14 w-14 p-0 shadow-lg shadow-blue-500/20"
-                                                >
-                                                    <Play size={24} className="fill-current" />
-                                                </Button>
-                                            )}
-                                            {match.status === 'Completed' && (
-                                                <Button 
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        navigate(`/football/match/result/${match._id}`);
-                                                    }} 
-                                                    variant="outline" 
-                                                    className="border-slate-800 rounded-2xl h-14 w-14 p-0 hover:bg-slate-800"
-                                                >
-                                                    <BarChart3 size={24} />
-                                                </Button>
-                                            )}
-                                            {isTournamentOwner && (
-                                                <Button 
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleDeleteMatch(match._id);
-                                                    }} 
-                                                    variant="ghost" 
-                                                    className="text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-2xl h-14 w-14 p-0"
-                                                >
-                                                    <Trash2 size={24} />
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </div>
-                                </Card>
-                             ))}
-                            {matches.length === 0 && (
-                                <div className="text-center py-20 bg-slate-900/20 border border-white/5 rounded-[3rem]">
-                                    <Calendar className="mx-auto text-slate-800 mb-6" size={64} />
-                                    <p className="text-slate-500 font-black uppercase tracking-[0.2em] text-xs">No matches scheduled yet</p>
-                                </div>
-                            )}
-                        </div>
+                                    )}
+                                </TabsContent>
+                            ))}
+                        </Tabs>
+                    </TabsContent>
                     </TabsContent>
 
                     <TabsContent value="table">
