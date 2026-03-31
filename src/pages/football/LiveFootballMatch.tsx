@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { 
     Trophy, Timer, Users, History, Activity, Zap, BarChart3, Shield, Swords, 
     PieChart, Info, Circle, Square, Flag, AlertCircle, CheckCircle2, Loader2, 
-    ArrowLeft, LayoutDashboard, MapPin, User, ArrowRightLeft, ArrowUpRight, ArrowDownLeft
+    ArrowLeft, LayoutDashboard, MapPin, User, ArrowRightLeft, ArrowUpRight, ArrowDownLeft,
+    TrendingUp, Clock
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -727,8 +728,8 @@ export default function LiveFootballMatch() {
                                             <RePieChart>
                                                 <Pie
                                                     data={[
-                                                        { name: match.homeTeam.name, value: match.stats.possession.home },
-                                                        { name: match.awayTeam.name, value: match.stats.possession.away }
+                                                        { name: match.homeTeam?.name || 'Home', value: match.stats?.possession?.home || 50 },
+                                                        { name: match.awayTeam?.name || 'Away', value: match.stats?.possession?.away || 50 }
                                                     ]}
                                                     cx="50%"
                                                     cy="50%"
@@ -791,9 +792,9 @@ export default function LiveFootballMatch() {
 
                            <div className="relative h-24 w-full bg-slate-900/20 rounded-[2rem] border border-white/5 overflow-hidden flex shadow-inner">
                                {[
-                                   { label: match.homeTeam?.name?.split(' ').pop() || 'HOME', val: 42, color: 'bg-blue-600' },
+                                   { label: match.homeTeam?.name?.split(' ')?.pop() || 'HOME', val: 42, color: 'bg-blue-600' },
                                    { label: 'DRAW', val: 28, color: 'bg-slate-700' },
-                                   { label: match.awayTeam?.name?.split(' ').pop() || 'AWAY', val: 30, color: 'bg-orange-600' }
+                                   { label: match.awayTeam?.name?.split(' ')?.pop() || 'AWAY', val: 30, color: 'bg-orange-600' }
                                ].map((prob, i) => (
                                    <div 
                                       key={i} 
@@ -827,7 +828,7 @@ export default function LiveFootballMatch() {
                                          </div>
                                          <div className="flex items-center gap-6">
                                              <div className="flex items-center gap-3">
-                                                 <div className="w-3 h-3 rounded-full bg-blue-500Shadow-[0_0_10px_rgba(59,130,246,0.3)]" />
+                                                 <div className="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)]" />
                                                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">-{match.homeTeam?.name?.slice(0, 3) || 'HOM'}</span>
                                              </div>
                                              <div className="flex items-center gap-3">
