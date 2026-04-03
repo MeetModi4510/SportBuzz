@@ -1523,33 +1523,44 @@ export default function FootballScoringPanel() {
                               <div className="h-[350px] w-full relative">
                                   <ResponsiveContainer width="100%" height="100%">
                                       <AreaChart data={match.performance?.momentumHistory || []} margin={{ bottom: 20 }}>
-                                          <defs>
-                                              <linearGradient id="momGradScorerFull" x1="0" y1="0" x2="0" y2="1">
-                                                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                                                  <stop offset="50%" stopColor="#3b82f6" stopOpacity={0}/>
-                                                  <stop offset="50%" stopColor="#ef4444" stopOpacity={0}/>
-                                                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0.4}/>
-                                              </linearGradient>
-                                          </defs>
                                           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
                                           <XAxis dataKey="minute" hide />
-                                          <YAxis hide domain={[-100, 100]} />
-                                          <Area 
-                                             type="monotone" 
-                                             dataKey="value" 
-                                             stroke="#ffffff10" 
-                                             fill="url(#momGradScorerFull)" 
-                                             strokeWidth={1} 
-                                             baseValue={0}
-                                             animationDuration={1500} 
+                                          <YAxis hide domain={[0, 100]} />
+                                          <Tooltip 
+                                             content={({ active, payload }: any) => {
+                                                 if (active && payload && payload.length > 0) {
+                                                     const val = payload[0].payload.value;
+                                                     return (
+                                                         <div className="bg-slate-950/90 border border-white/10 p-4 rounded-2xl shadow-2xl backdrop-blur-md">
+                                                             <p className="text-[10px] font-black uppercase text-slate-500 mb-2 tracking-[0.2em]">Minute {payload[0].payload.minute}'</p>
+                                                             <div className="flex items-center gap-3">
+                                                                 <div className={`w-2 h-2 rounded-full ${val >= 0 ? 'bg-blue-500' : 'bg-red-500'}`} />
+                                                                 <span className="text-xl font-black italic text-white">{Math.abs(val)}%</span>
+                                                                 <span className="text-[10px] font-black uppercase text-slate-400">{val >= 0 ? 'Home Dominance' : 'Away Dominance'}</span>
+                                                             </div>
+                                                         </div>
+                                                     );
+                                                 }
+                                                 return null;
+                                             }}
                                           />
                                           <Area 
                                              type="monotone" 
-                                             dataKey="value" 
-                                             stroke={(match.performance?.momentumHistory?.slice(-1)[0]?.value as number >= 0) ? '#3b82f6' : '#ef4444'} 
-                                             fill="transparent" 
-                                             strokeWidth={4} 
-                                             baseValue={0}
+                                             dataKey="home" 
+                                             stroke="#3b82f6" 
+                                             fill="#3b82f6" 
+                                             fillOpacity={0.05} 
+                                             strokeWidth={3} 
+                                             animationDuration={1500}
+                                          />
+                                          <Area 
+                                             type="monotone" 
+                                             dataKey="away" 
+                                             stroke="#ef4444" 
+                                             fill="#ef4444" 
+                                             fillOpacity={0.05} 
+                                             strokeWidth={3} 
+                                             animationDuration={1500}
                                           />
                                       </AreaChart>
                                   </ResponsiveContainer>
@@ -1631,13 +1642,16 @@ export default function FootballScoringPanel() {
                                      <div className="space-y-6">
                                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 text-center mb-4">Phase Shots (SOT)</p>
                                          <div className="h-[180px] w-full">
-                                             <ResponsiveContainer width="100%" height="100%">
-                                                 <BarChart data={match.performance?.labAnalysis?.phaseStats || []}>
-                                                     <XAxis dataKey="phase" fontSize={9} stroke="#475569" axisLine={false} tickLine={false} />
-                                                     <Bar dataKey="homeShots" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                                                     <Bar dataKey="awayShots" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                                                 </BarChart>
-                                             </ResponsiveContainer>
+                                              <ResponsiveContainer width="100%" height="100%">
+                                                  <BarChart data={match.performance?.labAnalysis?.phaseStats || []} margin={{ top: 10 }}>
+                                                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                                                      <XAxis dataKey="phase" fontSize={9} stroke="#475569" axisLine={false} tickLine={false} />
+                                                      <YAxis hide domain={[0, 'auto']} />
+                                                      <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px' }} />
+                                                      <Bar dataKey="homeShots" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                                                      <Bar dataKey="awayShots" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                                                  </BarChart>
+                                              </ResponsiveContainer>
                                          </div>
                                      </div>
                                  </div>

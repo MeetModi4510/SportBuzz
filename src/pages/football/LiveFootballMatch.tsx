@@ -843,29 +843,32 @@ export default function LiveFootballMatch() {
 
                                      <div className="h-[320px] w-full relative">
                                          <ResponsiveContainer width="100%" height="100%">
-                                             <AreaChart data={match.performance?.momentumHistory || []} margin={{ top: 20, right: 0, left: 0, bottom: 20 }}>
-                                                 <defs>
-                                                     <linearGradient id="momGrad" x1="0" y1="0" x2="0" y2="1">
-                                                         <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                                                         <stop offset="50%" stopColor="#3b82f6" stopOpacity={0}/>
-                                                         <stop offset="50%" stopColor="#ef4444" stopOpacity={0}/>
-                                                         <stop offset="95%" stopColor="#ef4444" stopOpacity={0.4}/>
-                                                     </linearGradient>
-                                                 </defs>
-                                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                                             <AreaChart data={match.performance?.momentumHistory || []} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+                                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
                                                  <XAxis dataKey="minute" hide />
-                                                 <YAxis hide domain={[-100, 100]} />
+                                                 <YAxis hide domain={[0, 100]} />
                                                  <Tooltip 
-                                                    content={({ active, payload }) => {
-                                                        if (active && payload && payload.length) {
-                                                            const val = payload[0].value;
+                                                    content={({ active, payload }: any) => {
+                                                        if (active && payload && payload.length > 0) {
+                                                            const p = payload[0].payload;
                                                             return (
-                                                                <div className="bg-[#0a0a0c] border border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-xl">
-                                                                    <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Minute {payload[0].payload.minute}'</p>
-                                                                    <div className="flex items-center gap-3">
-                                                                        <div className={`w-2 h-2 rounded-full ${(val as number) >= 0 ? 'bg-blue-500' : 'bg-red-500'}`} />
-                                                                        <span className="text-xl font-black italic text-white">{Math.abs(val as number)}%</span>
-                                                                        <span className="text-[10px] font-black uppercase text-slate-400">{(val as number) >= 0 ? 'Home Dominance' : 'Away Dominance'}</span>
+                                                                <div className="bg-slate-950/90 border border-white/10 p-4 rounded-2xl shadow-2xl backdrop-blur-md">
+                                                                    <p className="text-[10px] font-black uppercase text-slate-500 mb-2 tracking-[0.2em]">Minute {p.minute}'</p>
+                                                                    <div className="space-y-2">
+                                                                        <div className="flex items-center justify-between gap-6">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                                                                                <span className="text-[10px] font-black uppercase text-slate-400">Home</span>
+                                                                            </div>
+                                                                            <span className="font-black italic text-white">{p.home}%</span>
+                                                                        </div>
+                                                                        <div className="flex items-center justify-between gap-6">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <div className="w-2 h-2 rounded-full bg-red-500" />
+                                                                                <span className="text-[10px] font-black uppercase text-slate-400">Away</span>
+                                                                            </div>
+                                                                            <span className="font-black italic text-white">{p.away}%</span>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             );
@@ -875,21 +878,21 @@ export default function LiveFootballMatch() {
                                                  />
                                                  <Area 
                                                     type="monotone" 
-                                                    dataKey="value" 
-                                                    stroke="#ffffff10" 
-                                                    fill="url(#momGrad)" 
-                                                    strokeWidth={1} 
-                                                    baseValue={0}
-                                                    animationDuration={1500} 
+                                                    dataKey="home" 
+                                                    stroke="#3b82f6" 
+                                                    fill="#3b82f6" 
+                                                    fillOpacity={0.15} 
+                                                    strokeWidth={3} 
+                                                    animationDuration={1500}
                                                  />
-                                                 {/* Custom stroke implementation for better visuals */}
                                                  <Area 
                                                     type="monotone" 
-                                                    dataKey="value" 
-                                                    stroke={(match.performance?.momentumHistory?.slice(-1)[0]?.value >= 0) ? '#3b82f6' : '#ef4444'} 
-                                                    fill="transparent" 
-                                                    strokeWidth={4} 
-                                                    baseValue={0}
+                                                    dataKey="away" 
+                                                    stroke="#ef4444" 
+                                                    fill="#ef4444" 
+                                                    fillOpacity={0.15} 
+                                                    strokeWidth={3} 
+                                                    animationDuration={1500}
                                                  />
                                              </AreaChart>
                                          </ResponsiveContainer>
@@ -933,13 +936,16 @@ export default function LiveFootballMatch() {
                                              <span className="text-[10px] font-black text-slate-600">S.O.T</span>
                                          </div>
                                          <div className="h-[220px] w-full">
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <BarChart data={match.performance?.labAnalysis?.phaseStats || []}>
-                                                    <XAxis dataKey="phase" fontSize={9} stroke="#475569" axisLine={false} tickLine={false} />
-                                                    <Bar dataKey="homeShots" fill="#3b82f6" radius={[4, 4, 0, 0]} animationDuration={1500} />
-                                                    <Bar dataKey="awayShots" fill="#ef4444" radius={[4, 4, 0, 0]} animationDuration={1500} />
-                                                </BarChart>
-                                            </ResponsiveContainer>
+                                             <ResponsiveContainer width="100%" height="100%">
+                                                 <BarChart data={match.performance?.labAnalysis?.phaseStats || []} margin={{ top: 10 }}>
+                                                     <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                                                     <XAxis dataKey="phase" fontSize={9} stroke="#475569" axisLine={false} tickLine={false} />
+                                                     <YAxis hide domain={[0, 'auto']} />
+                                                     <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px' }} />
+                                                     <Bar dataKey="homeShots" fill="#3b82f6" radius={[4, 4, 0, 0]} animationDuration={1500} />
+                                                     <Bar dataKey="awayShots" fill="#ef4444" radius={[4, 4, 0, 0]} animationDuration={1500} />
+                                                 </BarChart>
+                                             </ResponsiveContainer>
                                         </div>
                                         <div className="flex justify-between items-center mt-4 pt-4 border-t border-white/5">
                                             <p className="text-[7px] font-black uppercase text-slate-600 tracking-widest">Efficiency segmenting</p>
@@ -1051,23 +1057,23 @@ export default function LiveFootballMatch() {
                                      <div className="h-[200px] w-full">
                                          <ResponsiveContainer width="100%" height="100%">
                                              <AreaChart data={match.performance?.xGHistory || []}>
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
-                                                <XAxis dataKey="minute" hide />
-                                                <YAxis hide />
-                                                <Tooltip 
-                                                    content={({ active, payload }) => {
-                                                        if (active && payload && payload.length) {
+                                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
+                                                 <XAxis dataKey="minute" hide />
+                                                 <YAxis hide domain={[0, 'auto']} />
+                                                 <Tooltip 
+                                                    content={({ active, payload }: any) => {
+                                                        if (active && payload && payload.length > 0) {
                                                             return (
-                                                                <div className="bg-[#0a0a0c] border border-white/10 rounded-2xl p-4 shadow-2xl">
-                                                                    <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Minute {payload[0].payload.minute}'</p>
-                                                                    <div className="space-y-1">
-                                                                        <div className="flex items-center justify-between gap-8">
-                                                                            <span className="text-[10px] font-black uppercase text-blue-500">HOME xG</span>
-                                                                            <span className="font-black italic">{payload[0].value}</span>
+                                                                <div className="bg-slate-950/90 border border-white/10 p-4 rounded-2xl shadow-2xl backdrop-blur-md">
+                                                                    <p className="text-[10px] font-black uppercase text-slate-500 mb-2 tracking-[0.2em]">Minute {payload[0].payload.minute}'</p>
+                                                                    <div className="space-y-2">
+                                                                        <div className="flex items-center justify-between gap-6">
+                                                                            <span className="text-[10px] font-black uppercase text-blue-500">Home xG</span>
+                                                                            <span className="font-black italic text-white">{payload[0].value}</span>
                                                                         </div>
-                                                                        <div className="flex items-center justify-between gap-8">
-                                                                            <span className="text-[10px] font-black uppercase text-orange-500">AWAY xG</span>
-                                                                            <span className="font-black italic">{payload[1].value}</span>
+                                                                        <div className="flex items-center justify-between gap-6">
+                                                                            <span className="text-[10px] font-black uppercase text-orange-500">Away xG</span>
+                                                                            <span className="font-black italic text-white">{payload[1].value}</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1075,9 +1081,9 @@ export default function LiveFootballMatch() {
                                                         }
                                                         return null;
                                                     }}
-                                                />
-                                                <Area type="stepAfter" dataKey="home" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.1} strokeWidth={3} />
-                                                <Area type="stepAfter" dataKey="away" stroke="#ef4444" fill="#ef4444" fillOpacity={0.1} strokeWidth={3} />
+                                                 />
+                                                 <Area type="stepAfter" dataKey="home" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.1} strokeWidth={3} animationDuration={1000} />
+                                                 <Area type="stepAfter" dataKey="away" stroke="#ef4444" fill="#ef4444" fillOpacity={0.1} strokeWidth={3} animationDuration={1000} />
                                              </AreaChart>
                                          </ResponsiveContainer>
                                      </div>

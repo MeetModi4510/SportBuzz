@@ -152,6 +152,12 @@ const footballMatchSchema = new mongoose.Schema({
                 homeShots: { type: Number, default: 0 },
                 awayShots: { type: Number, default: 0 }
             }],
+            radarData: [{
+                subject: { type: String },
+                A: { type: Number, default: 0 },
+                B: { type: Number, default: 0 },
+                fullMark: { type: Number, default: 100 }
+            }],
             directnessIndex: {
                 home: { type: Number, default: 0 },
                 away: { type: Number, default: 0 }

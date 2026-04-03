@@ -85,12 +85,12 @@ const calculatePerformance = (match) => {
     momentumValue = Math.max(-100, Math.min(100, momentumValue));
 
     // Only push if minute changed or event happened
-    if (match.performance.momentumHistory.slice(-1)[0]?.minute !== currentMinute || currentEventMomentum !== 0) {
+    if (match.performance.momentumHistory.length === 0 || match.performance.momentumHistory.slice(-1)[0]?.minute !== currentMinute || currentEventMomentum !== 0) {
         match.performance.momentumHistory.push({
             minute: currentMinute,
             value: Number(momentumValue.toFixed(1)),
-            home: 50 + (momentumValue / 2),
-            away: 50 - (momentumValue / 2)
+            home: Number((50 + (momentumValue / 2) + Math.random() * 2).toFixed(1)), // Subtle jitter for visibility
+            away: Number((50 - (momentumValue / 2) + Math.random() * 2).toFixed(1))
         });
     }
     if (match.performance.momentumHistory.length > 90) match.performance.momentumHistory.shift();
