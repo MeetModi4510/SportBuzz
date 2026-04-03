@@ -179,6 +179,11 @@ const calculatePerformance = (match) => {
             hVal = lastPulse;
             aVal = lastPulse * 0.8 + (Math.random() * 10);
         } else if (metric === 'Press') {
+            hVal = match.performance?.labAnalysis?.intensityPressing || 50;
+            aVal = Math.max(20, (match.performance?.labAnalysis?.intensityPressing || 50) - 10 + (Math.random() * 20));
+        }
+        return { subject: metric, A: Math.round(hVal), B: Math.round(aVal), fullMark: 100 };
+    });
 
     match.markModified('performance');
 

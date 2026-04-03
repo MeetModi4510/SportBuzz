@@ -215,6 +215,13 @@ export default function FootballScoringPanel() {
 
     useEffect(() => {
         if (match?.timer?.isRunning) {
+            // Safety: If somehow the status is HalfTime or FullTime but isRunning is true, stop it
+            if (match.timer.halfStatus === 'HalfTime' || match.timer.halfStatus === 'FullTime') {
+                console.log("[TIMER] Safety pause triggered - inconsistent state");
+                handleTimerControl(false, undefined, match.timer.halfStatus, true);
+                return;
+            }
+
             timerInterval.current = setInterval(() => {
                 const start = new Date(match.timer.startTime).getTime();
                 const now = Date.now();
@@ -242,8 +249,8 @@ export default function FootballScoringPanel() {
                 if (isEndTime && !isUpdatingTimer.current) {
                     if (match.timer.half === 1) {
                         if (match.timer.halfStatus !== 'HalfTime') {
-                            handleTimerControl(false, limit, 'HalfTime', true); // Use limit to keep it clean (45:00)
-                            toast.info("End of First Half", { id: "half-time-toast" }); // Unique ID to prevent loop
+                            handleTimerControl(false, limit, 'HalfTime', true); 
+                            toast.info("End of First Half", { id: "half-time-toast" }); 
                         }
                     } else if (match.timer.half === 2) {
                         if (match.timer.halfStatus !== 'FullTime' && match.status !== 'Completed') {
@@ -257,7 +264,7 @@ export default function FootballScoringPanel() {
         } else {
             if (timerInterval.current) clearInterval(timerInterval.current);
         }
-    }, [match?.timer?.isRunning, match?.timer?.startTime, match?.timer?.currentMinute, match?.timer?.half, match?.timer?.injuryTime, showInjuryPrompt]);
+    }, [match?.timer?.isRunning, match?.timer?.startTime, match?.timer?.currentMinute, match?.timer?.half, match?.timer?.injuryTime, match?.timer?.halfStatus, showInjuryPrompt]);
 
     const handleTimerControl = async (isRunning: boolean, minuteOverride?: number, statusOverride?: string, silent: boolean = false) => {
         if (isUpdatingTimer.current) return;
@@ -289,9 +296,22 @@ export default function FootballScoringPanel() {
         try {
             const res: any = await footballApi.updateTimer(id!, { injuryTime: tempInjuryTime });
             if (res.success) {
-                toast.success(`Injury Time set to ${tempInjuryTime} mins`);
+                toast.success(`Stoppage Time set to ${tempInjuryTime} mins`);
                 setMatch(res.data);
                 setShowInjuryPrompt(false);
+
+                // If already past the limit, immediately offer to end half or auto-end
+                const totalSecs = (res.data.timer.currentMinute * 60);
+                const limit = res.data.timer.half === 1 ? 45 : 90;
+                const isEndTime = Math.floor(totalSecs / 60) >= limit + tempInjuryTime;
+                
+                if (isEndTime && res.data.timer.isRunning) {
+                    if (res.data.timer.half === 1) {
+                        toast.info("Time is up! You can now end the half.");
+                    } else {
+                        toast.info("Match time is over.");
+                    }
+                }
             }
         } catch (error) {
             toast.error("Failed to set injury time");
@@ -1133,10 +1153,29 @@ export default function FootballScoringPanel() {
                                     <Button 
                                         onClick={handleFinalize}
                                         variant="outline"
-                                        className="h-16 border-slate-800 bg-slate-950 text-white hover:bg-slate-800 rounded-2xl font-black uppercase italic tracking-widest"
+                                        className="h-14 border-slate-800 bg-slate-950 text-white hover:bg-slate-800 rounded-2xl font-black uppercase italic tracking-widest"
                                     >
                                         <CheckCircle2 size={20} className="mr-2 text-green-500" /> End Match
                                     </Button>
+
+                                    {/* Manual End Half Button */}
+                                    {match.timer.halfStatus !== 'HalfTime' && match.timer.halfStatus !== 'FullTime' && (
+                                        <Button 
+                                            onClick={() => {
+                                                const limit = match.timer.half === 1 ? 45 : 90;
+                                                if (match.timer.half === 1) {
+                                                    handleTimerControl(false, limit, 'HalfTime');
+                                                } else {
+                                                    autoFinalizeMatch();
+                                                }
+                                            }}
+                                            variant="secondary"
+                                            className="h-14 bg-orange-600/10 hover:bg-orange-600/20 text-orange-500 border border-orange-500/20 rounded-2xl font-black uppercase italic tracking-widest"
+                                        >
+                                            <Clock size={20} className="mr-2" /> 
+                                            End {match.timer.half === 1 ? '1st' : '2nd'} Half
+                                        </Button>
+                                    )}
                                 </div>
                             </Card>
 
