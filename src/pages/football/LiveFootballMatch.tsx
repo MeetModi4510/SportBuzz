@@ -792,9 +792,9 @@ export default function LiveFootballMatch() {
 
                            <div className="relative h-24 w-full bg-slate-900/20 rounded-[2rem] border border-white/5 overflow-hidden flex shadow-inner">
                                {[
-                                   { label: match.homeTeam?.name?.split(' ')?.pop() || 'HOME', val: 42, color: 'bg-blue-600' },
-                                   { label: 'DRAW', val: 28, color: 'bg-slate-700' },
-                                   { label: match.awayTeam?.name?.split(' ')?.pop() || 'AWAY', val: 30, color: 'bg-orange-600' }
+                                   { label: match.homeTeam?.name?.split(' ')?.pop() || 'HOME', val: match.performance?.winProbability?.home || 45, color: 'bg-blue-600' },
+                                   { label: 'DRAW', val: match.performance?.winProbability?.draw || 25, color: 'bg-slate-700' },
+                                   { label: match.awayTeam?.name?.split(' ')?.pop() || 'AWAY', val: match.performance?.winProbability?.away || 30, color: 'bg-orange-600' }
                                ].map((prob, i) => (
                                    <div 
                                       key={i} 
