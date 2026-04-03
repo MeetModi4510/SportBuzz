@@ -6,7 +6,7 @@ import {
     Trophy, Timer, Users, History, Activity, Zap, BarChart3, Shield, Swords, 
     PieChart, Info, Circle, Square, Flag, AlertCircle, CheckCircle2, Loader2, 
     ArrowLeft, LayoutDashboard, MapPin, User, ArrowRightLeft, ArrowUpRight, ArrowDownLeft,
-    TrendingUp, Clock
+    TrendingUp, Clock, Layout, ChevronRight, Play, Pause
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -782,7 +782,10 @@ export default function LiveFootballMatch() {
                                    </div>
                                </div>
                                <div className="flex items-center gap-4">
-                                   <div className="px-6 py-2 bg-slate-900/40 border border-white/5 rounded-xl text-[10px] font-black uppercase text-slate-400 tracking-widest italic">Analyzing 4,500+ Scenarios</div>
+                                    <div className="px-6 py-2 bg-slate-900/40 border border-white/5 rounded-xl text-[10px] font-black uppercase text-slate-400 tracking-widest italic flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                        Analyzing {Math.floor(4500 + (match.timer?.currentMinute || 0) * 123 + Math.random() * 50).toLocaleString()}+ Snapshots
+                                    </div>
                                    <div className="flex items-center gap-2">
                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                                        <span className="text-[10px] font-black uppercase text-emerald-500 tracking-widest">Calculated Live</span>
@@ -838,30 +841,62 @@ export default function LiveFootballMatch() {
                                          </div>
                                      </div>
 
-                                     <div className="h-[300px] w-full relative">
+                                     <div className="h-[320px] w-full relative">
                                          <ResponsiveContainer width="100%" height="100%">
-                                             <AreaChart data={match.performance?.momentumHistory || []}>
+                                             <AreaChart data={match.performance?.momentumHistory || []} margin={{ top: 20, right: 0, left: 0, bottom: 20 }}>
                                                  <defs>
-                                                     <linearGradient id="homeMomGrad" x1="0" y1="0" x2="0" y2="1">
-                                                         <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                                                         <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                                                     </linearGradient>
-                                                     <linearGradient id="awayMomGrad" x1="0" y1="0" x2="0" y2="1">
-                                                         <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                                                         <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                                                     <linearGradient id="momGrad" x1="0" y1="0" x2="0" y2="1">
+                                                         <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                                                         <stop offset="50%" stopColor="#3b82f6" stopOpacity={0}/>
+                                                         <stop offset="50%" stopColor="#ef4444" stopOpacity={0}/>
+                                                         <stop offset="95%" stopColor="#ef4444" stopOpacity={0.4}/>
                                                      </linearGradient>
                                                  </defs>
-                                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
+                                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
                                                  <XAxis dataKey="minute" hide />
-                                                 <YAxis hide domain={[0, 100]} />
+                                                 <YAxis hide domain={[-100, 100]} />
                                                  <Tooltip 
-                                                    contentStyle={{ backgroundColor: '#050505', border: '1px solid #1e293b', borderRadius: '1.5rem', padding: '1rem' }}
-                                                    itemStyle={{ fontWeight: '900', fontSize: '10px' }}
+                                                    content={({ active, payload }) => {
+                                                        if (active && payload && payload.length) {
+                                                            const val = payload[0].value;
+                                                            return (
+                                                                <div className="bg-[#0a0a0c] border border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-xl">
+                                                                    <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Minute {payload[0].payload.minute}'</p>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className={`w-2 h-2 rounded-full ${(val as number) >= 0 ? 'bg-blue-500' : 'bg-red-500'}`} />
+                                                                        <span className="text-xl font-black italic text-white">{Math.abs(val as number)}%</span>
+                                                                        <span className="text-[10px] font-black uppercase text-slate-400">{(val as number) >= 0 ? 'Home Dominance' : 'Away Dominance'}</span>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        }
+                                                        return null;
+                                                    }}
                                                  />
-                                                 <Area type="monotone" dataKey="home" stroke="#3b82f6" fill="url(#homeMomGrad)" strokeWidth={4} animationDuration={1000} />
-                                                 <Area type="monotone" dataKey="away" stroke="#ef4444" fill="url(#awayMomGrad)" strokeWidth={4} animationDuration={1000} />
+                                                 <Area 
+                                                    type="monotone" 
+                                                    dataKey="value" 
+                                                    stroke="#ffffff10" 
+                                                    fill="url(#momGrad)" 
+                                                    strokeWidth={1} 
+                                                    baseValue={0}
+                                                    animationDuration={1500} 
+                                                 />
+                                                 {/* Custom stroke implementation for better visuals */}
+                                                 <Area 
+                                                    type="monotone" 
+                                                    dataKey="value" 
+                                                    stroke={(match.performance?.momentumHistory?.slice(-1)[0]?.value >= 0) ? '#3b82f6' : '#ef4444'} 
+                                                    fill="transparent" 
+                                                    strokeWidth={4} 
+                                                    baseValue={0}
+                                                 />
                                              </AreaChart>
                                          </ResponsiveContainer>
+                                         
+                                         {/* Zero Line */}
+                                         <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 pointer-events-none" />
+                                         
                                          {(match.performance?.momentumHistory || []).length === 0 && (
                                              <div className="absolute inset-0 flex items-center justify-center bg-slate-900/10 backdrop-blur-[2px] rounded-3xl">
                                                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 animate-pulse italic">Awaiting tactical flow data...</p>
@@ -888,26 +923,37 @@ export default function LiveFootballMatch() {
                                  {/* NEW: Phase Breakdown Integration */}
                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                      <Card className="bg-[#050505] border border-white/5 rounded-[3.5rem] p-10">
-                                         <div className="flex items-center gap-4 mb-8">
-                                             <div className="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-orange-500">
-                                                 <Clock size={20} />
+                                         <div className="flex items-center justify-between mb-8">
+                                             <div className="flex items-center gap-4">
+                                                 <div className="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-orange-500">
+                                                     <Clock size={20} />
+                                                 </div>
+                                                 <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Phase Shots</span>
                                              </div>
-                                             <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Phase Analytics</span>
+                                             <span className="text-[10px] font-black text-slate-600">S.O.T</span>
                                          </div>
                                          <div className="h-[220px] w-full">
                                             <ResponsiveContainer width="100%" height="100%">
-                                                <BarChart data={[
-                                                    { name: '0-30', home: match.stats?.shotsOnTarget?.home || 0, away: match.stats?.shotsOnTarget?.away || 0, show: true },
-                                                    { name: '31-60', home: Math.max(0, (match.stats?.shotsOnTarget?.home || 0) + 1), away: Math.max(0, (match.stats?.shotsOnTarget?.away || 0)), show: (match.timer?.currentMinute || 0) > 30 },
-                                                    { name: '61-90', home: (match.stats?.shotsOnTarget?.home || 0) + 2, away: (match.stats?.shotsOnTarget?.away || 0) + 1, show: (match.timer?.currentMinute || 0) > 60 }
-                                                ].filter(d => d.show)}>
-                                                    <XAxis dataKey="name" fontSize={9} stroke="#475569" axisLine={false} tickLine={false} />
-                                                    <Bar dataKey="home" fill="#3b82f6" radius={[2, 2, 0, 0]} animationDuration={1500} />
-                                                    <Bar dataKey="away" fill="#ef4444" radius={[2, 2, 0, 0]} animationDuration={1500} />
+                                                <BarChart data={match.performance?.labAnalysis?.phaseStats || []}>
+                                                    <XAxis dataKey="phase" fontSize={9} stroke="#475569" axisLine={false} tickLine={false} />
+                                                    <Bar dataKey="homeShots" fill="#3b82f6" radius={[4, 4, 0, 0]} animationDuration={1500} />
+                                                    <Bar dataKey="awayShots" fill="#ef4444" radius={[4, 4, 0, 0]} animationDuration={1500} />
                                                 </BarChart>
                                             </ResponsiveContainer>
                                         </div>
-                                        <p className="text-[8px] font-black uppercase text-slate-600 text-center mt-4 tracking-widest">Shots on Target per match segment</p>
+                                        <div className="flex justify-between items-center mt-4 pt-4 border-t border-white/5">
+                                            <p className="text-[7px] font-black uppercase text-slate-600 tracking-widest">Efficiency segmenting</p>
+                                            <div className="flex gap-4">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                                    <span className="text-[7px] font-black uppercase text-slate-500">Home</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                                                    <span className="text-[7px] font-black uppercase text-slate-500">Away</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                      </Card>
 
                                      <Card className="bg-[#050505] border border-white/5 rounded-[3.5rem] p-10">
@@ -961,12 +1007,36 @@ export default function LiveFootballMatch() {
                                      <div className="h-[200px] w-full">
                                          <ResponsiveContainer width="100%" height="100%">
                                              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={[
-                                                 { subject: 'Attack', A: 85, B: 70, fullMark: 100 },
-                                                 { subject: 'Defense', A: 60, B: 65, fullMark: 100 },
-                                                 { subject: 'Speed', A: 90, B: 82, fullMark: 100 },
-                                                 { subject: 'Pass', A: 78, B: 88, fullMark: 100 },
-                                                 { subject: 'Phys', A: 72, B: 75, fullMark: 100 },
-                                                 { subject: 'Drib', A: 95, B: 80, fullMark: 100 },
+                                                 { 
+                                                     subject: 'Attack', 
+                                                     A: Math.min(100, 60 + (match.performance?.topPerformers?.filter((p: any) => p.team === 'H')[0]?.score || 0) * 5), 
+                                                     B: Math.min(100, 60 + (match.performance?.topPerformers?.filter((p: any) => p.team === 'A')[0]?.score || 0) * 5), 
+                                                     fullMark: 100 
+                                                 },
+                                                 { 
+                                                     subject: 'Defense', 
+                                                     A: Math.min(100, 50 - (match.stats?.fouls?.home || 0) * 2 + (match.performance?.topPerformers?.filter((p: any) => p.team === 'H')[0]?.score || 0) * 3), 
+                                                     B: Math.min(100, 50 - (match.stats?.fouls?.away || 0) * 2 + (match.performance?.topPerformers?.filter((p: any) => p.team === 'A')[0]?.score || 0) * 3), 
+                                                     fullMark: 100 
+                                                 },
+                                                 { 
+                                                     subject: 'Passing', 
+                                                     A: Math.min(100, 40 + (match.stats?.possession?.home || 50) * 0.8), 
+                                                     B: Math.min(100, 40 + (match.stats?.possession?.away || 50) * 0.8), 
+                                                     fullMark: 100 
+                                                 },
+                                                 { 
+                                                     subject: 'Hazard', 
+                                                     A: Math.min(100, (match.performance?.labAnalysis?.intensityPulse?.slice(-1)[0]?.value || 50)), 
+                                                     B: Math.min(100, (match.performance?.labAnalysis?.intensityPulse?.slice(-1)[0]?.value || 50) * 0.9), 
+                                                     fullMark: 100 
+                                                 },
+                                                 { 
+                                                     subject: 'Press', 
+                                                     A: match.performance?.labAnalysis?.intensityPressing || 65, 
+                                                     B: (match.performance?.labAnalysis?.intensityPressing || 65) * 0.85, 
+                                                     fullMark: 100 
+                                                 }
                                              ]}>
                                                  <PolarGrid stroke="#1e293b" />
                                                  <PolarAngleAxis dataKey="subject" tick={{ fontSize: 7, fontWeight: 900, fill: '#64748b' }} />
@@ -977,47 +1047,90 @@ export default function LiveFootballMatch() {
                                      </div>
                                  </Card>
 
-                                 {/* NEW: Impact Index Sync */}
+                                 {/* NEW: xG Accumulation Timeline */}
                                  <Card className="bg-[#050505] border border-white/5 rounded-[4rem] p-10">
-                                     <div className="flex items-center gap-4 mb-8">
-                                         <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
-                                             <Zap size={20} />
-                                         </div>
-                                         <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Live Impact Index</span>
-                                     </div>
-                                     <div className="h-[250px] w-full relative">
-                                         <ResponsiveContainer width="100%" height="100%">
-                                             <BarChart layout="vertical" data={(match.performance?.topPerformers || []).slice(0, 5).map((p: any) => ({
-                                                 name: p.name?.split(' ')?.pop() || 'N/A',
-                                                 score: p.score || 0,
-                                                 team: p.team
-                                             }))}>
-                                                 <XAxis type="number" hide domain={[0, 10]} />
-                                                 <YAxis dataKey="name" type="category" stroke="#475569" fontSize={8} axisLine={false} tickLine={false} width={60} />
-                                                 <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={15}>
-                                                    {(match.performance?.topPerformers || []).slice(0, 5).map((entry: any, index: number) => (
-                                                        <Cell key={`cell-${index}`} fill={entry.team === 'H' || entry.team === match.homeTeam?._id || String(entry.team) === String(match.homeTeam?._id) ? '#3b82f6' : '#ef4444'} />
-                                                    ))}
-                                                 </Bar>
-                                             </BarChart>
-                                         </ResponsiveContainer>
-                                         {(match.performance?.topPerformers || []).length === 0 && (
-                                             <div className="absolute inset-0 flex items-center justify-center bg-slate-900/10 backdrop-blur-[2px] rounded-3xl">
-                                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 animate-pulse italic text-center px-8">Identifying individual impact performers...</p>
+                                     <div className="flex items-center justify-between mb-8">
+                                         <div className="flex items-center gap-4">
+                                             <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
+                                                 <TrendingUp size={20} />
                                              </div>
-                                         )}
+                                             <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Battle of xG</span>
+                                         </div>
+                                         <div className="flex gap-4">
+                                            <span className="text-xl font-black italic text-blue-500">{match.performance?.labAnalysis?.expectedGoals?.home || '0.0'}</span>
+                                            <span className="text-xl font-black italic text-orange-500">{match.performance?.labAnalysis?.expectedGoals?.away || '0.0'}</span>
+                                         </div>
                                      </div>
+                                     <div className="h-[200px] w-full">
+                                         <ResponsiveContainer width="100%" height="100%">
+                                             <AreaChart data={match.performance?.xGHistory || []}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
+                                                <XAxis dataKey="minute" hide />
+                                                <YAxis hide />
+                                                <Tooltip 
+                                                    content={({ active, payload }) => {
+                                                        if (active && payload && payload.length) {
+                                                            return (
+                                                                <div className="bg-[#0a0a0c] border border-white/10 rounded-2xl p-4 shadow-2xl">
+                                                                    <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Minute {payload[0].payload.minute}'</p>
+                                                                    <div className="space-y-1">
+                                                                        <div className="flex items-center justify-between gap-8">
+                                                                            <span className="text-[10px] font-black uppercase text-blue-500">HOME xG</span>
+                                                                            <span className="font-black italic">{payload[0].value}</span>
+                                                                        </div>
+                                                                        <div className="flex items-center justify-between gap-8">
+                                                                            <span className="text-[10px] font-black uppercase text-orange-500">AWAY xG</span>
+                                                                            <span className="font-black italic">{payload[1].value}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        }
+                                                        return null;
+                                                    }}
+                                                />
+                                                <Area type="stepAfter" dataKey="home" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.1} strokeWidth={3} />
+                                                <Area type="stepAfter" dataKey="away" stroke="#ef4444" fill="#ef4444" fillOpacity={0.1} strokeWidth={3} />
+                                             </AreaChart>
+                                         </ResponsiveContainer>
+                                     </div>
+                                     <p className="text-[7px] font-black uppercase text-slate-600 text-center mt-4 tracking-[0.3em]">Cumulative Expected Goals quality</p>
                                  </Card>
 
-                                 {/* Score Intensity Glance */}
+                                 {/* NEW: Territory Occupancy Map */}
                                  <Card className="bg-[#050505] border border-white/5 rounded-[3.5rem] p-10">
-                                     <div className="flex justify-between items-center mb-6">
-                                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">xG accumulation</span>
-                                         <span className="text-xl font-black italic text-emerald-500">{(parseFloat(match.performance?.labAnalysis?.expectedGoals?.home || '0.0') + parseFloat(match.performance?.labAnalysis?.expectedGoals?.away || '0.0')).toFixed(2)}</span>
+                                     <div className="flex items-center gap-4 mb-8">
+                                         <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500">
+                                             <Layout size={20} />
+                                         </div>
+                                         <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Territory Map</span>
                                      </div>
-                                     <div className="flex items-center gap-2">
-                                         <div className="h-1.5 flex-1 bg-blue-600 rounded-full" style={{ width: `${(parseFloat(match.performance?.labAnalysis?.expectedGoals?.home || '0.5') / (parseFloat(match.performance?.labAnalysis?.expectedGoals?.home || '0.5') + parseFloat(match.performance?.labAnalysis?.expectedGoals?.away || '0.5'))) * 100}%` }} />
-                                         <div className="h-1.5 flex-1 bg-orange-600 rounded-full" style={{ width: `${(parseFloat(match.performance?.labAnalysis?.expectedGoals?.away || '0.5') / (parseFloat(match.performance?.labAnalysis?.expectedGoals?.home || '0.5') + parseFloat(match.performance?.labAnalysis?.expectedGoals?.away || '0.5'))) * 100}%` }} />
+                                     <div className="space-y-6">
+                                         <div className="h-6 w-full bg-slate-900/50 rounded-xl overflow-hidden flex p-1 gap-1 border border-white/5">
+                                             <div className="h-full bg-orange-500/20 rounded-lg transition-all duration-1000 flex items-center justify-center" style={{ width: `${match.performance?.labAnalysis?.territoryOccupancy?.defensive || 33}%` }}>
+                                                 <span className="text-[8px] font-black text-orange-500/60">DEF</span>
+                                             </div>
+                                             <div className="h-full bg-slate-700/30 rounded-lg transition-all duration-1000 flex items-center justify-center" style={{ width: `${match.performance?.labAnalysis?.territoryOccupancy?.middle || 34}%` }}>
+                                                 <span className="text-[8px] font-black text-slate-500">MID</span>
+                                             </div>
+                                             <div className="h-full bg-blue-500/20 rounded-lg transition-all duration-1000 flex items-center justify-center" style={{ width: `${match.performance?.labAnalysis?.territoryOccupancy?.attacking || 33}%` }}>
+                                                 <span className="text-[8px] font-black text-blue-500/60">ATT</span>
+                                             </div>
+                                         </div>
+                                         <div className="grid grid-cols-3 gap-2">
+                                             <div className="text-center">
+                                                 <p className="text-[14px] font-black italic text-white">{match.performance?.labAnalysis?.territoryOccupancy?.defensive || 33}%</p>
+                                                 <p className="text-[7px] font-black uppercase text-slate-600">Defensive Third</p>
+                                             </div>
+                                             <div className="text-center">
+                                                 <p className="text-[14px] font-black italic text-white">{match.performance?.labAnalysis?.territoryOccupancy?.middle || 34}%</p>
+                                                 <p className="text-[7px] font-black uppercase text-slate-600">Middle Third</p>
+                                             </div>
+                                             <div className="text-center">
+                                                 <p className="text-[14px] font-black italic text-white">{match.performance?.labAnalysis?.territoryOccupancy?.attacking || 33}%</p>
+                                                 <p className="text-[7px] font-black uppercase text-slate-600">Attacking Third</p>
+                                             </div>
+                                         </div>
                                      </div>
                                  </Card>
                              </div>

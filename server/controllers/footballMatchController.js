@@ -11,6 +11,7 @@ const calculatePerformance = (match) => {
         match.performance = {
             winProbability: { home: 45, away: 30, draw: 25 },
             momentumHistory: [],
+            xGHistory: [],
             pressureIndex: 5.0,
             labAnalysis: { 
                 intensityPressing: 40, 
@@ -18,6 +19,12 @@ const calculatePerformance = (match) => {
                 attackThirdControl: { team: 'None', percentage: 50 },
                 intensityPulse: [],
                 possessionPhases: { buildup: 33, attack: 33, defense: 34 },
+                territoryOccupancy: { defensive: 33, middle: 34, attacking: 33 },
+                phaseStats: [
+                    { phase: '0-30', homeShots: 0, awayShots: 0 },
+                    { phase: '31-60', homeShots: 0, awayShots: 0 },
+                    { phase: '61-90', homeShots: 0, awayShots: 0 }
+                ],
                 expectedGoals: { home: 0, away: 0 },
                 directnessIndex: { home: 40, away: 35 },
                 defensiveLineHeight: { home: 45, away: 45 },
@@ -34,86 +41,118 @@ const calculatePerformance = (match) => {
     const awayShots = (match.stats.shotsOnTarget.away + match.stats.shotsOffTarget.away);
     const homeFouls = match.stats.fouls.home;
     const awayFouls = match.stats.fouls.away;
+    const currentMinute = match.timer.currentMinute;
 
-    // Win Probability (Simple heuristic)
-    let homeBase = 40;
-    let awayBase = 35;
+    // 1. Win Probability (Improved heuristic)
+    let homeBase = 45;
+    let awayBase = 40;
     
-    const scoreDiff = homeScore - awayScore;
-    homeBase += scoreDiff * 20;
-    awayBase -= scoreDiff * 20;
+    homeBase += (homeScore - awayScore) * 25;
+    awayBase -= (homeScore - awayScore) * 25;
     
-    const shotsDiff = (match.stats.shotsOnTarget.home - match.stats.shotsOnTarget.away);
-    homeBase += shotsDiff * 5;
-    awayBase -= shotsDiff * 5;
+    const shotsOnTargetDiff = (match.stats.shotsOnTarget.home - match.stats.shotsOnTarget.away);
+    homeBase += shotsOnTargetDiff * 6;
+    awayBase -= shotsOnTargetDiff * 6;
     
-    const total = Math.max(homeBase + awayBase + 25, 100);
+    const total = Math.max(homeBase + awayBase + 30, 100);
     match.performance.winProbability.home = Math.min(Math.max(Math.round((homeBase / total) * 100), 5), 90);
     match.performance.winProbability.away = Math.min(Math.max(Math.round((awayBase / total) * 100), 5), 90);
     match.performance.winProbability.draw = 100 - match.performance.winProbability.home - match.performance.winProbability.away;
 
-    // Momentum
-    const currentMinute = match.timer.currentMinute;
-    let momentumValue = (shotsDiff * 8) + (scoreDiff * 15) - ((homeFouls - awayFouls) * 5);
+    // Calculate dynamic momentum (with temporal decay)
+    const lastMomentum = match.performance.momentumHistory.length > 0 ? match.performance.momentumHistory[match.performance.momentumHistory.length - 1].value : 0;
+    let currentEventMomentum = 0;
     
-    // Add time-based fluctuation
-    momentumValue += Math.sin(currentMinute * 0.3) * 10;
+    // Focus on VERY recent events for immediate impact
+    const superRecent = match.events.filter(e => e.minute >= currentMinute);
+    superRecent.forEach(e => {
+        const side = String(e.team) === String(match.homeTeam) ? 1 : -1;
+        if (e.type === 'Goal') currentEventMomentum += 50 * side;
+        if (e.type === 'ShotOnTarget') currentEventMomentum += 20 * side;
+        if (e.type === 'Corner') currentEventMomentum += 12 * side;
+        if (e.type === 'Foul') currentEventMomentum -= 8 * side;
+    });
+
+    // Momentum = 90% of last momentum (decay) + NEW impact
+    let momentumValue = (lastMomentum * 0.9) + currentEventMomentum;
     
-    const homeVal = 50 + (momentumValue / 2);
-    const awayVal = 100 - homeVal;
-    
+    // Safety cap
+    momentumValue = Math.max(-100, Math.min(100, momentumValue));
+
     match.performance.momentumHistory.push({
         minute: currentMinute,
-        value: Math.min(Math.max(Math.round(momentumValue), -100), 100),
-        home: Math.round(homeVal),
-        away: Math.round(awayVal)
+        value: Number(momentumValue.toFixed(1)),
+        home: 50 + (momentumValue / 2),
+        away: 50 - (momentumValue / 2)
     });
+    if (match.performance.momentumHistory.length > 90) match.performance.momentumHistory.shift();
 
-    if (match.performance.momentumHistory.length > 60) {
-        match.performance.momentumHistory.shift();
-    }
-
-    // Pressure Index
-    const recentEvents = match.events.filter(e => e.minute > currentMinute - 10).length;
-    match.performance.pressureIndex = (recentEvents * 0.8 + 4 + Math.random()).toFixed(1);
-
-    // Lab Analysis
-    match.performance.labAnalysis.intensityPressing = Math.min(Math.max(35 + (homeFouls + awayFouls) * 1.5, 20), 85);
-    match.performance.labAnalysis.counterAttackRisk = Math.min(Math.max(25 + (homeShots + awayShots) * 2, 10), 95);
+    // 3. xG Accumulation History
+    const currentXG = {
+        home: parseFloat((match.stats.shotsOnTarget.home * 0.35 + match.stats.shotsOffTarget.home * 0.12).toFixed(2)),
+        away: parseFloat((match.stats.shotsOnTarget.away * 0.35 + match.stats.shotsOffTarget.away * 0.12).toFixed(2))
+    };
+    match.performance.labAnalysis.expectedGoals = currentXG;
     
-    if (momentumValue > 15) {
-        match.performance.labAnalysis.attackThirdControl.team = 'Home';
-        match.performance.labAnalysis.attackThirdControl.percentage = Math.min(60 + Math.abs(momentumValue) / 2, 98);
-    } else if (momentumValue < -15) {
-        match.performance.labAnalysis.attackThirdControl.team = 'Away';
-        match.performance.labAnalysis.attackThirdControl.percentage = Math.min(60 + Math.abs(momentumValue) / 2, 98);
-    } else {
-        match.performance.labAnalysis.attackThirdControl.team = 'None';
-        match.performance.labAnalysis.attackThirdControl.percentage = 50;
-    }
-
-    // NEW Metrics
-    match.performance.labAnalysis.expectedGoals = {
-        home: (match.stats.shotsOnTarget.home * 0.3 + match.stats.shotsOffTarget.home * 0.1).toFixed(2),
-        away: (match.stats.shotsOnTarget.away * 0.3 + match.stats.shotsOffTarget.away * 0.1).toFixed(2)
-    };
-
-    const intensity = Math.min(Math.round(40 + Math.random() * 40 + (homeShots + awayShots) * 2), 100);
-    match.performance.labAnalysis.intensityPulse.push({
+    match.performance.xGHistory.push({
         minute: currentMinute,
-        value: intensity
+        home: currentXG.home,
+        away: currentXG.away
     });
-    if (match.performance.labAnalysis.intensityPulse.length > 30) match.performance.labAnalysis.intensityPulse.shift();
+    if (match.performance.xGHistory.length > 90) match.performance.xGHistory.shift();
 
-    // NEW: Possession Phases (Dynamic shift)
-    const factor = Math.sin(currentMinute * 0.5);
-    match.performance.labAnalysis.possessionPhases = {
-        buildup: Math.round(30 + factor * 5),
-        attack: Math.round(40 + Math.abs(factor) * 10),
-        defense: Math.round(30 - factor * 5)
+    // 4. Pressure Index
+    const recentEvents = match.events.filter(e => e.minute > currentMinute - 10).length;
+    match.performance.pressureIndex = parseFloat((recentEvents * 0.9 + 3.5 + (Math.random() * 2)).toFixed(1));
+
+    // 5. Territory Occupancy
+    const momentumInfluence = (momentumValue / 100) * 20;
+    match.performance.labAnalysis.territoryOccupancy = {
+        defensive: Math.round(Math.max(10, 33 - momentumInfluence)),
+        middle: Math.round(34 + Math.abs(momentumInfluence / 2)),
+        attacking: Math.round(Math.max(10, 33 + momentumInfluence))
     };
+    // Normalize to 100
+    const territoryTotal = match.performance.labAnalysis.territoryOccupancy.defensive + 
+                           match.performance.labAnalysis.territoryOccupancy.middle + 
+                           match.performance.labAnalysis.territoryOccupancy.attacking;
+    if (territoryTotal !== 100) match.performance.labAnalysis.territoryOccupancy.middle += (100 - territoryTotal);
 
-    // TOP PERFORMERS Calculation
+    // 6. Phase Stats (Real shot distribution)
+    const phases = [
+        { name: '0-30', start: 0, end: 30 },
+        { name: '31-60', start: 31, end: 60 },
+        { name: '61-90', start: 61, end: 120 }
+    ];
+    
+    match.performance.labAnalysis.phaseStats = phases.map(p => {
+        const hShots = match.events.filter(e => e.type === 'ShotOnTarget' && e.minute >= p.start && e.minute <= p.end && String(e.team) === String(match.homeTeam)).length;
+        const aShots = match.events.filter(e => e.type === 'ShotOnTarget' && e.minute >= p.start && e.minute <= p.end && String(e.team) === String(match.awayTeam)).length;
+        return { phase: p.name, homeShots: hShots, awayShots: aShots };
+    });
+
+    // 7. Advanced Style Profiles
+    match.performance.labAnalysis.intensityPressing = Math.min(Math.max(30 + (homeFouls + awayFouls) * 1.8, 20), 90);
+    match.performance.labAnalysis.counterAttackRisk = Math.min(Math.max(20 + (homeShots + awayShots) * 2.2, 10), 95);
+    
+    const factor = Math.sin(currentMinute * 0.6);
+    match.performance.labAnalysis.possessionPhases = {
+        buildup: Math.round(25 + factor * 8 + (momentumValue > 0 ? 5 : -5)),
+        attack: Math.round(41 + factor * 12 + (momentumValue > 0 ? 10 : -10)),
+        defense: 0
+    };
+    // Normalize possession phases to 100
+    match.performance.labAnalysis.possessionPhases.defense = Math.max(5, 100 - match.performance.labAnalysis.possessionPhases.buildup - match.performance.labAnalysis.possessionPhases.attack);
+    
+    // Recalculate if defense clamped
+    const currentTotal = match.performance.labAnalysis.possessionPhases.buildup + match.performance.labAnalysis.possessionPhases.attack + match.performance.labAnalysis.possessionPhases.defense;
+    if (currentTotal !== 100) {
+        match.performance.labAnalysis.possessionPhases.attack += (100 - currentTotal);
+    }
+    
+    match.markModified('performance');
+
+    // 8. Top Performers
     const playerScores = {};
     match.events.forEach(event => {
         const pName = event.player;
@@ -124,51 +163,25 @@ const calculatePerformance = (match) => {
             playerScores[pName] = { name: pName, score: 0, team: side };
         }
 
-        // Scoring rules
-        if (event.type === 'Goal') playerScores[pName].score += 5.0;
+        if (event.type === 'Goal') playerScores[pName].score += 4.5;
         if (event.assister) {
             if (!playerScores[event.assister]) {
                 const side = String(event.team) === String(match.homeTeam._id || match.homeTeam) ? 'H' : 'A';
                 playerScores[event.assister] = { name: event.assister, score: 0, team: side };
             }
-            playerScores[event.assister].score += 3.0;
+            playerScores[event.assister].score += 2.5;
         }
-        if (event.type === 'ShotOnTarget') playerScores[pName].score += 1.5;
-        if (event.type === 'YellowCard') playerScores[pName].score -= 1.5;
-        if (event.type === 'RedCard') playerScores[pName].score -= 5.0;
-        if (event.type === 'Save') playerScores[pName].score += 2.0;
+        if (event.type === 'ShotOnTarget') playerScores[pName].score += 1.2;
+        if (event.type === 'Save') playerScores[pName].score += 2.2;
+        if (event.type === 'YellowCard') playerScores[pName].score -= 1.0;
+        if (event.type === 'RedCard') playerScores[pName].score -= 4.0;
     });
 
-    const sortedPlayers = Object.values(playerScores)
+    match.performance.topPerformers = Object.values(playerScores)
         .sort((a, b) => b.score - a.score)
         .slice(0, 10);
 
-    match.performance.topPerformers = sortedPlayers;
-    match.markModified('performance.topPerformers');
-
-    // NEW ADVANCED METRICS
-    const homePossession = match.stats.possession.home;
-    const awayPossession = match.stats.possession.away;
-
-    match.performance.labAnalysis.directnessIndex = {
-        home: Math.round((match.stats.shotsOnTarget.home + match.stats.shotsOffTarget.home) / (homePossession / 10) * 10) || 40,
-        away: Math.round((match.stats.shotsOnTarget.away + match.stats.shotsOffTarget.away) / (awayPossession / 10) * 10) || 35
-    };
-
-    match.performance.labAnalysis.defensiveLineHeight = {
-        home: Math.min(Math.max(45 + (momentumValue / 5) + (recentEvents * 2), 30), 75),
-        away: Math.min(Math.max(45 - (momentumValue / 5) + (recentEvents * 2), 30), 75)
-    };
-
-    match.performance.labAnalysis.finalThirdEntries = {
-        home: Math.round(match.stats.shotsOnTarget.home * 2 + match.stats.corners.home * 1.5 + (momentumValue > 10 ? 5 : 0)),
-        away: Math.round(match.stats.shotsOnTarget.away * 2 + match.stats.corners.away * 1.5 + (momentumValue < -10 ? 5 : 0))
-    };
-
-    match.performance.labAnalysis.highTurnovers = {
-        home: Math.round(match.stats.fouls.away * 0.4 + (match.performance.labAnalysis.intensityPressing / 10)),
-        away: Math.round(match.stats.fouls.home * 0.4 + (match.performance.labAnalysis.intensityPressing / 10))
-    };
+    match.markModified('performance');
 };
 
 const generateCommentary = (event) => {

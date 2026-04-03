@@ -110,7 +110,12 @@ const footballMatchSchema = new mongoose.Schema({
         },
         momentumHistory: [{
             minute: Number,
-            value: Number,
+            value: Number, // -100 to 100 for mirroring
+            home: Number,
+            away: Number
+        }],
+        xGHistory: [{
+            minute: Number,
             home: Number,
             away: Number
         }],
@@ -135,6 +140,16 @@ const footballMatchSchema = new mongoose.Schema({
                 attack: { type: Number, default: 33 },
                 defense: { type: Number, default: 34 }
             },
+            territoryOccupancy: {
+                defensive: { type: Number, default: 33 },
+                middle: { type: Number, default: 34 },
+                attacking: { type: Number, default: 33 }
+            },
+            phaseStats: [{
+                phase: { type: String }, // e.g., '0-30', '31-60', '61-90'
+                homeShots: { type: Number, default: 0 },
+                awayShots: { type: Number, default: 0 }
+            }],
             directnessIndex: {
                 home: { type: Number, default: 0 },
                 away: { type: Number, default: 0 }
