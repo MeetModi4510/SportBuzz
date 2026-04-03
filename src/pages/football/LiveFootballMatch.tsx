@@ -829,22 +829,18 @@ export default function LiveFootballMatch() {
                                          <div className="flex items-center gap-6">
                                              <div className="flex items-center gap-3">
                                                  <div className="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)]" />
-                                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">-{match.homeTeam?.name?.slice(0, 3) || 'HOM'}</span>
+                                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{match.homeTeam?.name?.slice(0, 3) || 'HOM'}</span>
                                              </div>
                                              <div className="flex items-center gap-3">
                                                  <div className="w-3 h-3 rounded-full bg-orange-500" />
-                                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">-{match.awayTeam?.name?.slice(0, 3) || 'AWA'}</span>
+                                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{match.awayTeam?.name?.slice(0, 3) || 'AWA'}</span>
                                              </div>
                                          </div>
                                      </div>
 
                                      <div className="h-[300px] w-full relative">
                                          <ResponsiveContainer width="100%" height="100%">
-                                             <AreaChart data={(match.performance?.momentumHistory || []).map((m: any) => ({
-                                                 ...m,
-                                                 homeVal: m.value > 0 ? m.value : 0,
-                                                 awayVal: m.value < 0 ? Math.abs(m.value) : 0
-                                             }))}>
+                                             <AreaChart data={match.performance?.momentumHistory || []}>
                                                  <defs>
                                                      <linearGradient id="homeMomGrad" x1="0" y1="0" x2="0" y2="1">
                                                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
@@ -862,8 +858,8 @@ export default function LiveFootballMatch() {
                                                     contentStyle={{ backgroundColor: '#050505', border: '1px solid #1e293b', borderRadius: '1.5rem', padding: '1rem' }}
                                                     itemStyle={{ fontWeight: '900', fontSize: '10px' }}
                                                  />
-                                                 <Area type="monotone" dataKey="homeVal" stroke="#3b82f6" fill="url(#homeMomGrad)" strokeWidth={4} animationDuration={1000} />
-                                                 <Area type="monotone" dataKey="awayVal" stroke="#ef4444" fill="url(#awayMomGrad)" strokeWidth={4} animationDuration={1000} />
+                                                 <Area type="monotone" dataKey="home" stroke="#3b82f6" fill="url(#homeMomGrad)" strokeWidth={4} animationDuration={1000} />
+                                                 <Area type="monotone" dataKey="away" stroke="#ef4444" fill="url(#awayMomGrad)" strokeWidth={4} animationDuration={1000} />
                                              </AreaChart>
                                          </ResponsiveContainer>
                                          {(match.performance?.momentumHistory || []).length === 0 && (

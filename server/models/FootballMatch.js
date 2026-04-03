@@ -110,7 +110,9 @@ const footballMatchSchema = new mongoose.Schema({
         },
         momentumHistory: [{
             minute: Number,
-            value: Number
+            value: Number,
+            home: Number,
+            away: Number
         }],
         pressureIndex: { type: Number, default: 5.0 },
         labAnalysis: {

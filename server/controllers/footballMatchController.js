@@ -59,9 +59,14 @@ const calculatePerformance = (match) => {
     // Add time-based fluctuation
     momentumValue += Math.sin(currentMinute * 0.3) * 10;
     
+    const homeVal = 50 + (momentumValue / 2);
+    const awayVal = 100 - homeVal;
+    
     match.performance.momentumHistory.push({
         minute: currentMinute,
-        value: Math.min(Math.max(Math.round(momentumValue), -100), 100)
+        value: Math.min(Math.max(Math.round(momentumValue), -100), 100),
+        home: Math.round(homeVal),
+        away: Math.round(awayVal)
     });
 
     if (match.performance.momentumHistory.length > 60) {

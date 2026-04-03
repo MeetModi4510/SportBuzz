@@ -1464,11 +1464,11 @@ export default function FootballScoringPanel() {
                                  <div className="flex flex-wrap items-center gap-6">
                                      <div className="flex items-center gap-3">
                                          <div className="w-3 h-3 rounded-full bg-blue-500" />
-                                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">-{match.homeTeam?.name?.slice(0, 3) || 'HOM'}</span>
+                                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{match.homeTeam?.name?.slice(0, 3) || 'HOM'}</span>
                                      </div>
                                      <div className="flex items-center gap-3">
                                          <div className="w-3 h-3 rounded-full bg-orange-500" />
-                                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">-{match.awayTeam?.name?.slice(0, 3) || 'AWA'}</span>
+                                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{match.awayTeam?.name?.slice(0, 3) || 'AWA'}</span>
                                      </div>
                                      <div className="flex gap-4 ml-4">
                                          <div className="px-6 py-2 bg-blue-900/20 border border-blue-500/30 rounded-xl text-blue-400 text-[9px] font-black uppercase tracking-[0.2em]">Home Control</div>
@@ -1499,7 +1499,7 @@ export default function FootballScoringPanel() {
                                          />
                                          <Area 
                                             type="monotone" 
-                                            dataKey={match.homeTeam?.shortName || match.homeTeam?.name || 'home'} 
+                                            dataKey="home" 
                                             stroke="#3b82f6" 
                                             fill="url(#homeMomGrad)" 
                                             strokeWidth={4}
@@ -1507,7 +1507,7 @@ export default function FootballScoringPanel() {
                                          />
                                          <Area 
                                             type="monotone" 
-                                            dataKey={match.awayTeam?.shortName || match.awayTeam?.name || 'away'} 
+                                            dataKey="away" 
                                             stroke="#ef4444" 
                                             fill="url(#awayMomGrad)" 
                                             strokeWidth={4}

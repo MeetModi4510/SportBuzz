@@ -456,7 +456,7 @@ export const TournamentNewsTab = ({
                             <Sparkles className="absolute top-4 right-4 text-yellow-400/30" size={40} />
                             <div className="p-8 space-y-4 relative z-10 w-full">
                                 <span className="bg-blue-600/80 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-blue-500/20">
-                                    {item.type === 'match' ? 'Match Highlight' : item.type === 'upcoming' ? 'Live Alert' : 'Editorial'}
+                                    {item.type === 'match' ? 'MATCH REPORT' : item.type === 'upcoming' ? 'Live Alert' : 'Editorial'}
                                 </span>
                                 <h2 className="text-3xl md:text-4xl font-black text-white leading-tight group-hover:text-blue-400 transition-colors">
                                     {item.headline}
@@ -522,7 +522,7 @@ export const TournamentNewsTab = ({
 
                                 <div className="flex flex-wrap gap-2 mb-6">
                                     <span className="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded uppercase tracking-widest">
-                                        {selectedNewsItem.type === 'match' ? 'Match Highlight' : selectedNewsItem.type === 'upcoming' ? 'Live Alert' : 'Editorial'}
+                                        {selectedNewsItem.type === 'match' ? 'MATCH REPORT' : selectedNewsItem.type === 'upcoming' ? 'Live Alert' : 'Editorial'}
                                     </span>
                                     <span className="bg-slate-800 text-slate-300 text-[10px] font-bold px-3 py-1 rounded uppercase tracking-widest flex items-center gap-1.5">
                                         <Clock size={12} /> 4 min read
