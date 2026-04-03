@@ -1327,19 +1327,15 @@ export default function FootballScoringPanel() {
                                 homePlayers={[
                                     ...(match.lineups?.home?.startingXI?.map((name: string) => {
                                         const p = match.homeTeam?.players?.find((tp: any) => tp.name === name);
-const pEvents = summarizePlayerEvents(name, match.events, match.score?.away || 0);
-return { 
-    id: name, 
-    name, 
-    role: p?.role || 'Midfielder', 
-    number: p?.number, 
-    isSubstitute: false, 
-    isCaptain: p?.isCaptain,
-    events: {
-        ...pEvents,
-        redCardMinute: pEvents.redCardMinute
-    }
-};
+                                        return { 
+                                            id: name, 
+                                            name, 
+                                            role: p?.role || 'Midfielder', 
+                                            number: p?.number, 
+                                            isSubstitute: false, 
+                                            isCaptain: p?.isCaptain,
+                                            events: summarizePlayerEvents(name, match.events, match.score?.away || 0)
+                                        };
                                     }) || []),
                                     ...(match.lineups?.home?.substitutes?.map((name: string) => {
                                         const p = match.homeTeam?.players?.find((tp: any) => tp.name === name);
@@ -1349,6 +1345,17 @@ return {
                                             role: p?.role || 'Midfielder', 
                                             number: p?.number, 
                                             isSubstitute: true,
+                                            events: summarizePlayerEvents(name, match.events, match.score?.away || 0)
+                                        };
+                                    }) || []),
+                                    ...(match.lineups?.home?.sentOff?.map((name: string) => {
+                                        const p = match.homeTeam?.players?.find((tp: any) => tp.name === name);
+                                        return { 
+                                            id: name, 
+                                            name, 
+                                            role: p?.role || 'Midfielder', 
+                                            number: p?.number, 
+                                            isSubstitute: false, 
                                             events: summarizePlayerEvents(name, match.events, match.score?.away || 0)
                                         };
                                     }) || [])
@@ -1368,18 +1375,25 @@ return {
                                     }) || []),
                                     ...(match.lineups?.away?.substitutes?.map((name: string) => {
                                         const p = match.awayTeam?.players?.find((tp: any) => tp.name === name);
-const pEvents = summarizePlayerEvents(name, match.events, match.score?.home || 0);
-return { 
-    id: name, 
-    name, 
-    role: p?.role || 'Midfielder', 
-    number: p?.number, 
-    isSubstitute: true,
-    events: {
-        ...pEvents,
-        redCardMinute: pEvents.redCardMinute
-    }
-};
+                                        return { 
+                                            id: name, 
+                                            name, 
+                                            role: p?.role || 'Midfielder', 
+                                            number: p?.number, 
+                                            isSubstitute: true,
+                                            events: summarizePlayerEvents(name, match.events, match.score?.home || 0)
+                                        };
+                                    }) || []),
+                                    ...(match.lineups?.away?.sentOff?.map((name: string) => {
+                                        const p = match.awayTeam?.players?.find((tp: any) => tp.name === name);
+                                        return { 
+                                            id: name, 
+                                            name, 
+                                            role: p?.role || 'Midfielder', 
+                                            number: p?.number, 
+                                            isSubstitute: false, 
+                                            events: summarizePlayerEvents(name, match.events, match.score?.home || 0)
+                                        };
                                     }) || [])
                                 ].filter((p, i, self) => i === self.findIndex((t) => t.id === p.id))}
                                 homeFormation={match.lineups?.home?.formation || '4-4-2'}

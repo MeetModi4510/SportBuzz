@@ -268,8 +268,68 @@ const FootballSquads = ({ match }: { match: Match }) => {
         return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
     }
 
-    const homePlayers = squads?.homeTeam || players.filter((p) => p.sport === match.sport);
-    const awayPlayers = squads?.awayTeam || players.filter((p) => p.sport === match.sport);
+    const m = match as any;
+    const hasRealLineups = m.lineups?.home || m.lineups?.away;
+
+    // Helper to build players list from real match data or fallback to squads API
+    const buildPlayersList = (side: 'home' | 'away', team: any) => {
+        const lineup = m.lineups?.[side];
+        if (!lineup) {
+            return squads?.[`${side}Team`] || players.filter((p) => p.sport === match.sport);
+        }
+
+        // Helper to find player details from team roster
+        const findDetails = (name: string) => team?.players?.find((p: any) => (typeof p === 'string' ? p === name : p.name === name));
+
+        // Basic event summarizer for SquadsList (doesn't need transition logic etc)
+        const getBasicEvents = (name: string) => {
+            const evs = (match.events || []) as any[];
+            const redCardEvent = evs.find(e => e.type === 'RedCard' && e.player === name);
+            const yellowCards = evs.filter(e => e.type === 'YellowCard' && e.player === name).length;
+            const subIn = evs.find(e => e.type === 'Substitution' && e.player === name);
+            const subOut = evs.find(e => e.type === 'Substitution' && e.playerOut === name);
+            
+            return {
+                redCards: redCardEvent ? 1 : 0,
+                redCardMinute: redCardEvent?.minute,
+                yellowCards,
+                substitution: (subIn || subOut) ? {
+                    inMinute: subIn?.minute,
+                    outMinute: subOut?.minute
+                } : undefined
+            };
+        };
+
+        const list = [
+            ...(lineup.startingXI || []).map((name: string) => ({
+                id: name,
+                name,
+                isSubstitute: false,
+                ...findDetails(name),
+                events: getBasicEvents(name)
+            })),
+            ...(lineup.substitutes || []).map((name: string) => ({
+                id: name,
+                name,
+                isSubstitute: true,
+                ...findDetails(name),
+                events: getBasicEvents(name)
+            })),
+            ...(lineup.sentOff || []).map((name: string) => ({
+                id: name,
+                name,
+                isSubstitute: false,
+                ...findDetails(name),
+                events: getBasicEvents(name)
+            }))
+        ];
+
+        // Deduplicate
+        return list.filter((p, i, self) => i === self.findIndex((t) => t.id === p.id));
+    };
+
+    const homePlayers = buildPlayersList('home', match.homeTeam);
+    const awayPlayers = buildPlayersList('away', match.awayTeam);
 
     return (
         <FootballPitchLineup
@@ -283,8 +343,8 @@ const FootballSquads = ({ match }: { match: Match }) => {
             }}
             homePlayers={homePlayers}
             awayPlayers={awayPlayers}
-            homeFormation={squads?.homeFormation || '4-4-2'}
-            awayFormation={squads?.awayFormation || '4-4-2'}
+            homeFormation={m.lineups?.home?.formation || squads?.homeFormation || '4-4-2'}
+            awayFormation={m.lineups?.away?.formation || squads?.awayFormation || '4-4-2'}
         />
     );
 };

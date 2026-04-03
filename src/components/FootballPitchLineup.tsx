@@ -503,7 +503,7 @@ function PlayerNode({
 
     return (
         <div
-            className={`pitch-player ${isRedCarded ? 'opacity-40 grayscale-[0.5]' : ''}`}
+            className={`pitch-player transition-all duration-500 ${isRedCarded ? 'opacity-70 grayscale-[0.3] ring-2 ring-red-500/50' : ''}`}
             style={{ left: `${x}%`, top: `${y}%`, cursor: 'pointer' }}
             title={`${player.number ? '#' + player.number + ' ' : ''}${player.name}${player.isCaptain ? ' (C)' : ''}`}
             onClick={onClick}
