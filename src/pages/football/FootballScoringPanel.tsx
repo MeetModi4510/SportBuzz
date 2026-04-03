@@ -1414,7 +1414,7 @@ export default function FootballScoringPanel() {
                              <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12 relative overflow-hidden group">
                                  <div className="flex items-center justify-between mb-12">
                                      <div className="flex items-center gap-6">
-                                         <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 shadow-[0_0_20px_rgba(168,185,129,0.1)]">
+                                         <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
                                              <TrendingUp size={28} />
                                          </div>
                                          <div>
@@ -1425,11 +1425,11 @@ export default function FootballScoringPanel() {
                                      <div className="flex gap-8">
                                          <div className="text-right">
                                              <p className="text-[10px] font-black uppercase text-blue-500 mb-1">HOME xG</p>
-                                             <p className="text-4xl font-black italic text-white leading-none tabular-nums">{match.performance?.labAnalysis?.expectedGoals?.home || '0.0'}</p>
+                                             <p className="text-4xl font-black italic text-white leading-none tabular-nums">{match?.performance?.labAnalysis?.expectedGoals?.home || '0.0'}</p>
                                          </div>
                                          <div className="text-right">
                                              <p className="text-[10px] font-black uppercase text-orange-500 mb-1">AWAY xG</p>
-                                             <p className="text-4xl font-black italic text-white leading-none tabular-nums">{match.performance?.labAnalysis?.expectedGoals?.away || '0.0'}</p>
+                                             <p className="text-4xl font-black italic text-white leading-none tabular-nums">{match?.performance?.labAnalysis?.expectedGoals?.away || '0.0'}</p>
                                          </div>
                                      </div>
                                  </div>
@@ -1461,8 +1461,8 @@ export default function FootballScoringPanel() {
                                      </div>
                                      <div className="flex gap-4">
                                          {(() => {
-                                             const homeTop = (match.performance?.topPerformers || []).find((p: any) => p.team === 'H');
-                                             const awayTop = (match.performance?.topPerformers || []).find((p: any) => p.team === 'A');
+                                             const homeTop = (match?.performance?.topPerformers || []).find((p: any) => p.team === 'H');
+                                             const awayTop = (match?.performance?.topPerformers || []).find((p: any) => p.team === 'A');
                                              return (
                                                  <>
                                                      <div className="flex flex-col items-center">
@@ -1480,7 +1480,7 @@ export default function FootballScoringPanel() {
                                  </div>
                                  <div className="h-[300px] w-full">
                                      <ResponsiveContainer width="100%" height="100%">
-                                         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={match.performance?.labAnalysis?.radarData?.length > 0 ? match.performance.labAnalysis.radarData : [
+                                         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={match?.performance?.labAnalysis?.radarData?.length > 0 ? match.performance.labAnalysis.radarData : [
                                              { subject: 'Attack', A: 50, B: 50, fullMark: 100 },
                                              { subject: 'Defense', A: 50, B: 50, fullMark: 100 },
                                              { subject: 'Passing', A: 50, B: 50, fullMark: 100 },
@@ -1497,41 +1497,73 @@ export default function FootballScoringPanel() {
                              </div>
                          </div>
 
-                         {/* MIDDLE ROW: Mirror Momentum (The Core Analytics) */}
-                                                             <p className="text-[10px] font-black uppercase text-slate-500 mb-2 tracking-[0.2em]">Minute {payload[0].payload.minute}'</p>
+                         {/* MIDDLE ROW: Momentum Mirror */}
+                         <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12 relative overflow-hidden group">
+                             <div className="flex items-center justify-between mb-12">
+                                 <div className="flex items-center gap-6">
+                                     <div className="w-14 h-14 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
+                                         <Zap size={28} />
+                                     </div>
+                                     <div>
+                                        <h3 className="text-4xl font-black italic uppercase tracking-tight text-white mb-1">Momentum Mirror</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Live tactical pressure shift</p>
+                                     </div>
+                                 </div>
+                                 <div className="flex gap-12">
+                                     <div className="flex items-center gap-3">
+                                         <div className="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+                                         <span className="text-xs font-black uppercase tracking-widest text-slate-400">{match?.homeTeam?.name || 'HOME'}</span>
+                                     </div>
+                                     <div className="flex items-center gap-3">
+                                         <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]" />
+                                         <span className="text-xs font-black uppercase tracking-widest text-slate-400">{match?.awayTeam?.name || 'AWAY'}</span>
+                                     </div>
+                                 </div>
+                             </div>
+                             <div className="h-[300px] w-full relative">
+                                 <ResponsiveContainer width="100%" height="100%">
+                                     <AreaChart data={match?.performance?.momentumHistory?.length > 0 ? match.performance.momentumHistory : [{ minute: 0, home: 50, away: 50 }]}>
+                                         <defs>
+                                             <linearGradient id="colorHomeMo" x1="0" y1="0" x2="0" y2="1">
+                                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                                                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                             </linearGradient>
+                                             <linearGradient id="colorAwayMo" x1="0" y1="0" x2="0" y2="1">
+                                                 <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                                                 <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                                             </linearGradient>
+                                         </defs>
+                                         <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
+                                         <XAxis dataKey="minute" hide />
+                                         <YAxis hide domain={[0, 100]} />
+                                         <Tooltip 
+                                             content={({ active, payload }: any) => {
+                                                 if (active && payload && payload.length > 0) {
+                                                     const data = payload[0].payload;
+                                                     return (
+                                                         <div className="bg-slate-950/90 border border-white/10 p-4 rounded-2xl shadow-2xl backdrop-blur-md">
+                                                             <p className="text-[10px] font-black uppercase text-slate-500 mb-2 tracking-[0.2em]">Minute {data.minute}'</p>
                                                              <div className="flex items-center gap-3">
-                                                                 <div className={`w-2 h-2 rounded-full ${val >= 0 ? 'bg-blue-500' : 'bg-red-500'}`} />
-                                                                 <span className="text-xl font-black italic text-white">{Math.abs(val)}%</span>
-                                                                 <span className="text-[10px] font-black uppercase text-slate-400">{val >= 0 ? 'Home Dominance' : 'Away Dominance'}</span>
+                                                                 <div className="w-2 h-2 rounded-full bg-blue-500" />
+                                                                 <span className="text-lg font-black italic text-white">{data.home}%</span>
+                                                                 <span className="text-[10px] font-black uppercase text-slate-400">Home Press</span>
+                                                             </div>
+                                                             <div className="flex items-center gap-3 mt-1">
+                                                                 <div className="w-2 h-2 rounded-full bg-red-500" />
+                                                                 <span className="text-lg font-black italic text-white">{data.away}%</span>
+                                                                 <span className="text-[10px] font-black uppercase text-slate-400">Away Press</span>
                                                              </div>
                                                          </div>
                                                      );
                                                  }
                                                  return null;
                                              }}
-                                          />
-                                          <Area 
-                                             type="monotone" 
-                                             dataKey="home" 
-                                             stroke="#3b82f6" 
-                                             fill="#3b82f6" 
-                                             fillOpacity={0.05} 
-                                             strokeWidth={3} 
-                                             animationDuration={1500}
-                                          />
-                                          <Area 
-                                             type="monotone" 
-                                             dataKey="away" 
-                                             stroke="#ef4444" 
-                                             fill="#ef4444" 
-                                             fillOpacity={0.05} 
-                                             strokeWidth={3} 
-                                             animationDuration={1500}
-                                          />
-                                      </AreaChart>
-                                  </ResponsiveContainer>
-                                  <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 pointer-events-none" />
-                              </div>
+                                         />
+                                         <Area type="monotone" dataKey="home" stroke="#3b82f6" fill="url(#colorHomeMo)" strokeWidth={4} />
+                                         <Area type="monotone" dataKey="away" stroke="#ef4444" fill="url(#colorAwayMo)" strokeWidth={4} />
+                                     </AreaChart>
+                                 </ResponsiveContainer>
+                             </div>
                          </div>
 
                          {/* BOTTOM ROW: Territory & Style */}
@@ -1549,27 +1581,27 @@ export default function FootballScoringPanel() {
                                  </div>
                                  <div className="space-y-12">
                                     <div className="h-10 w-full bg-slate-900/50 rounded-2xl overflow-hidden flex p-1.5 gap-1.5 border border-white/5">
-                                        <div className="h-full bg-orange-500/20 rounded-xl transition-all duration-1000 flex items-center justify-center" style={{ width: `${match.performance?.labAnalysis?.territoryOccupancy?.defensive || 33}%` }}>
+                                        <div className="h-full bg-orange-500/20 rounded-xl transition-all duration-1000 flex items-center justify-center" style={{ width: `${match?.performance?.labAnalysis?.territoryOccupancy?.defensive || 33}%` }}>
                                             <span className="text-[10px] font-black text-orange-500/60 uppercase">Def</span>
                                         </div>
-                                        <div className="h-full bg-slate-700/30 rounded-xl transition-all duration-1000 flex items-center justify-center" style={{ width: `${match.performance?.labAnalysis?.territoryOccupancy?.middle || 34}%` }}>
+                                        <div className="h-full bg-slate-700/30 rounded-xl transition-all duration-1000 flex items-center justify-center" style={{ width: `${match?.performance?.labAnalysis?.territoryOccupancy?.middle || 34}%` }}>
                                             <span className="text-[10px] font-black text-slate-500 uppercase">Mid</span>
                                         </div>
-                                        <div className="h-full bg-blue-500/20 rounded-xl transition-all duration-1000 flex items-center justify-center" style={{ width: `${match.performance?.labAnalysis?.territoryOccupancy?.attacking || 33}%` }}>
+                                        <div className="h-full bg-blue-500/20 rounded-xl transition-all duration-1000 flex items-center justify-center" style={{ width: `${match?.performance?.labAnalysis?.territoryOccupancy?.attacking || 33}%` }}>
                                             <span className="text-[10px] font-black text-blue-500/60 uppercase">Att</span>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-3 gap-4">
                                         <div className="text-center">
-                                            <p className="text-4xl font-black italic text-white">{match.performance?.labAnalysis?.territoryOccupancy?.defensive || 33}%</p>
+                                            <p className="text-4xl font-black italic text-white">{match?.performance?.labAnalysis?.territoryOccupancy?.defensive || 33}%</p>
                                             <p className="text-[10px] font-black uppercase text-slate-600 mt-2">Defensive Third</p>
                                         </div>
                                         <div className="text-center border-x border-white/5">
-                                            <p className="text-4xl font-black italic text-white">{match.performance?.labAnalysis?.territoryOccupancy?.middle || 34}%</p>
+                                            <p className="text-4xl font-black italic text-white">{match?.performance?.labAnalysis?.territoryOccupancy?.middle || 34}%</p>
                                             <p className="text-[10px] font-black uppercase text-slate-600 mt-2">Middle Third</p>
                                         </div>
                                         <div className="text-center">
-                                            <p className="text-4xl font-black italic text-white">{match.performance?.labAnalysis?.territoryOccupancy?.attacking || 33}%</p>
+                                            <p className="text-4xl font-black italic text-white">{match?.performance?.labAnalysis?.territoryOccupancy?.attacking || 33}%</p>
                                             <p className="text-[10px] font-black uppercase text-slate-600 mt-2">Attacking Third</p>
                                         </div>
                                     </div>
@@ -1590,9 +1622,9 @@ export default function FootballScoringPanel() {
                                  <div className="grid grid-cols-2 gap-12">
                                      <div className="space-y-6">
                                          {[
-                                             { label: 'Build-up', val: match.performance?.labAnalysis?.possessionPhases?.buildup || 33, color: 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)]' },
-                                             { label: 'Attacking', val: match.performance?.labAnalysis?.possessionPhases?.attack || 34, color: 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.3)]' },
-                                             { label: 'Defensive', val: match.performance?.labAnalysis?.possessionPhases?.defense || 33, color: 'bg-slate-400' }
+                                             { label: 'Build-up', val: match?.performance?.labAnalysis?.possessionPhases?.buildup || 33, color: 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)]' },
+                                             { label: 'Attacking', val: match?.performance?.labAnalysis?.possessionPhases?.attack || 34, color: 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.3)]' },
+                                             { label: 'Defensive', val: match?.performance?.labAnalysis?.possessionPhases?.defense || 33, color: 'bg-slate-400' }
                                          ].map(phase => (
                                              <div key={phase.label} className="space-y-3">
                                                  <div className="flex justify-between items-end">
@@ -1609,11 +1641,11 @@ export default function FootballScoringPanel() {
                                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 text-center mb-4">Phase Shots (SOT)</p>
                                          <div className="h-[180px] w-full">
                                               <ResponsiveContainer width="100%" height="100%">
-                                                  <BarChart data={match.performance?.labAnalysis?.phaseStats || []} margin={{ top: 10 }}>
+                                                  <BarChart data={match?.performance?.labAnalysis?.phaseStats || []} margin={{ top: 10 }}>
                                                       <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
-                                                      <XAxis dataKey="phase" fontSize={9} stroke="#475569" axisLine={false} tickLine={false} />
+                                                      <XAxis dataKey="phase" fontSize={9} stroke="#475569" axisLine={false} tickLine={false} tick={{fill: '#475569'}} />
                                                       <YAxis hide domain={[0, 'auto']} />
-                                                      <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px' }} />
+                                                      <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px', color: '#fff' }} />
                                                       <Bar dataKey="homeShots" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                                                       <Bar dataKey="awayShots" fill="#ef4444" radius={[4, 4, 0, 0]} />
                                                   </BarChart>
