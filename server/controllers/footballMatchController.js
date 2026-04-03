@@ -222,7 +222,8 @@ const generateCommentary = (event) => {
 export const getMatchById = asyncHandler(async (req, res) => {
     const match = await FootballMatch.findById(req.params.id)
         .populate('homeTeam')
-        .populate('awayTeam');
+        .populate('awayTeam')
+        .populate('tournamentId');
 
     if (!match) {
         res.status(404);
@@ -289,8 +290,17 @@ export const addMatchEvent = asyncHandler(async (req, res) => {
         throw new Error('Not authorized to add events to this match');
     }
 
+    // Detect Second Yellow -> Red
+    let finalType = type;
+    if (type === 'YellowCard') {
+        const previousYellows = match.events.filter(e => e.player === player && e.type === 'YellowCard').length;
+        if (previousYellows >= 1) {
+            finalType = 'RedCard';
+        }
+    }
+
     const event = { 
-        type, 
+        type: finalType, 
         minute: minute !== undefined ? minute : match.timer.currentMinute, 
         half: match.timer.half,
         team, 
@@ -298,7 +308,7 @@ export const addMatchEvent = asyncHandler(async (req, res) => {
         playerOut, 
         assister, 
         goalType, 
-        details,
+        details: finalType === 'RedCard' && type === 'YellowCard' ? 'Second Yellow Card' : details,
         commentary: req.body.commentary 
     };
 
@@ -309,8 +319,8 @@ export const addMatchEvent = asyncHandler(async (req, res) => {
     match.events.push(event);
 
     // Update score if Goal
-    if (type === 'Goal') {
-        if (String(team) === String(match.homeTeam)) {
+    if (finalType === 'Goal') {
+        if (String(team) === String(match.homeTeam._id || match.homeTeam)) {
             match.score.home += 1;
         } else {
             match.score.away += 1;
@@ -324,50 +334,71 @@ export const addMatchEvent = asyncHandler(async (req, res) => {
     }
 
     // NEW: Lineup Substitution Logic
-    if (type === 'Substitution') {
+    if (finalType === 'Substitution') {
         const side = String(team) === String(match.homeTeam._id || match.homeTeam) ? 'home' : 'away';
         
-        // Ensure lineup arrays exist
         if (!match.lineups[side]) {
-            match.lineups[side] = { startingXI: [], substitutes: [], substitutionCount: 0 };
+            match.lineups[side] = { startingXI: [], substitutes: [], sentOff: [], substitutionCount: 0 };
         }
 
-        // Check substitution limit
         if (match.lineups[side].substitutionCount >= 5) {
             res.status(400);
             throw new Error(`Maximum 5 substitutions allowed for ${side === 'home' ? 'Home' : 'Away'} team`);
         }
 
-        // Update Starting XI
-        // Filter out the player leaving the pitch
         match.lineups[side].startingXI = (match.lineups[side].startingXI || []).filter(p => p !== playerOut);
-        // Add the player entering the pitch
         match.lineups[side].startingXI.push(player);
-        
-        // Remove the new player from substitutes bench
         match.lineups[side].substitutes = (match.lineups[side].substitutes || []).filter(p => p !== player);
         
-        // Add the subbed out player back to the substitutes bench (to show as "Out")
         if (playerOut && !match.lineups[side].substitutes.includes(playerOut)) {
             match.lineups[side].substitutes.push(playerOut);
         }
         
-        // Increment substitution count
         match.lineups[side].substitutionCount += 1;
-        
-        // Ensure modification is tracked
         match.markModified('lineups');
     }
 
+    // NEW: Handle Red Card (Team Reduction & Suspension)
+    if (finalType === 'RedCard') {
+        const side = String(team) === String(match.homeTeam._id || match.homeTeam) ? 'home' : 'away';
+        
+        if (!match.lineups[side]) {
+            match.lineups[side] = { startingXI: [], substitutes: [], sentOff: [], substitutionCount: 0 };
+        }
+
+        // Remove from current play
+        match.lineups[side].startingXI = (match.lineups[side].startingXI || []).filter(p => p !== player);
+        // Add to sentOff
+        if (!match.lineups[side].sentOff) match.lineups[side].sentOff = [];
+        if (!match.lineups[side].sentOff.includes(player)) {
+            match.lineups[side].sentOff.push(player);
+        }
+        match.markModified('lineups');
+
+        // Add to Tournament Suspensions
+        if (tournament) {
+            if (!tournament.suspensions) tournament.suspensions = [];
+            const alreadySuspended = tournament.suspensions.some(s => s.player === player && String(s.matchId) === String(match._id));
+            if (!alreadySuspended) {
+                tournament.suspensions.push({
+                    player,
+                    teamId: team,
+                    matchId: match._id
+                });
+                await tournament.save();
+            }
+        }
+    }
+
     // Update statistics
-    const teamSide = String(team) === String(match.homeTeam) ? 'home' : 'away';
-    if (type === 'ShotOnTarget' || type === 'Goal') match.stats.shotsOnTarget[teamSide] += 1;
-    if (type === 'ShotOffTarget') match.stats.shotsOffTarget[teamSide] += 1;
-    if (type === 'Foul') match.stats.fouls[teamSide] += 1;
-    if (type === 'Corner') match.stats.corners[teamSide] += 1;
-    if (type === 'Offside') match.stats.offsides[teamSide] += 1;
-    if (type === 'YellowCard') match.stats.yellowCards[teamSide] += 1;
-    if (type === 'RedCard') match.stats.redCards[teamSide] += 1;
+    const teamSide = String(team) === String(match.homeTeam._id || match.homeTeam) ? 'home' : 'away';
+    if (finalType === 'ShotOnTarget' || finalType === 'Goal') match.stats.shotsOnTarget[teamSide] += 1;
+    if (finalType === 'ShotOffTarget') match.stats.shotsOffTarget[teamSide] += 1;
+    if (finalType === 'Foul') match.stats.fouls[teamSide] += 1;
+    if (finalType === 'Corner') match.stats.corners[teamSide] += 1;
+    if (finalType === 'Offside') match.stats.offsides[teamSide] += 1;
+    if (finalType === 'YellowCard') match.stats.yellowCards[teamSide] += 1;
+    if (finalType === 'RedCard') match.stats.redCards[teamSide] += 1;
 
     calculatePerformance(match);
 
@@ -375,7 +406,8 @@ export const addMatchEvent = asyncHandler(async (req, res) => {
 
     const populatedMatch = await FootballMatch.findById(match._id)
         .populate('homeTeam')
-        .populate('awayTeam');
+        .populate('awayTeam')
+        .populate('tournamentId');
 
     // Broadcast update
     const io = getIO();
@@ -429,7 +461,8 @@ export const updateTimer = asyncHandler(async (req, res) => {
 
     const populatedMatch = await FootballMatch.findById(match._id)
         .populate('homeTeam')
-        .populate('awayTeam');
+        .populate('awayTeam')
+        .populate('tournamentId');
 
     const io = getIO();
     io.to(`football_match_${match._id}`).emit('football_update', populatedMatch);
@@ -461,7 +494,8 @@ export const finalizeMatch = asyncHandler(async (req, res) => {
 
     const populatedMatch = await FootballMatch.findById(match._id)
         .populate('homeTeam')
-        .populate('awayTeam');
+        .populate('awayTeam')
+        .populate('tournamentId');
 
     // If part of a tournament, update points table logic here
     if (match.tournamentId) {
@@ -515,7 +549,8 @@ export const updateMatchLineups = asyncHandler(async (req, res) => {
 
     const populatedMatch = await FootballMatch.findById(match._id)
         .populate('homeTeam')
-        .populate('awayTeam');
+        .populate('awayTeam')
+        .populate('tournamentId');
 
     const io = getIO();
     io.to(`football_match_${match._id}`).emit('football_update', populatedMatch);

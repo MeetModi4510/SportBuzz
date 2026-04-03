@@ -596,29 +596,48 @@ export default function FootballScoringPanel() {
                             </div>
                         </div>
                         <div className="grid gap-2 max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
-                            {match.homeTeam.players?.map((player: any) => (
-                                <div key={player.name} className="flex items-center justify-between p-4 bg-slate-950/50 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-colors">
-                                    <span className="font-bold text-slate-300">{player.name} <span className="text-[9px] text-slate-600 ml-2">({player.role})</span></span>
-                                    <div className="flex gap-2">
-                                        <Button 
-                                            size="sm"
-                                            onClick={() => togglePlayerLineup('home', player.name, 'XI')}
-                                            variant={homeXI.includes(player.name) ? "default" : "outline"}
-                                            className={`h-8 rounded-lg text-[10px] font-black uppercase tracking-widest ${homeXI.includes(player.name) ? 'bg-blue-600' : 'border-white/5 text-slate-500'}`}
-                                        >
-                                            Starters
-                                        </Button>
-                                        <Button 
-                                            size="sm"
-                                            onClick={() => togglePlayerLineup('home', player.name, 'Sub')}
-                                            variant={homeSubs.includes(player.name) ? "default" : "outline"}
-                                            className={`h-8 rounded-lg text-[10px] font-black uppercase tracking-widest ${homeSubs.includes(player.name) ? 'bg-slate-700' : 'border-white/5 text-slate-500'}`}
-                                        >
-                                            Bench
-                                        </Button>
+                            {match.homeTeam.players?.map((player: any) => {
+                                const isSuspended = match.tournamentId?.suspensions?.some((s: any) => 
+                                    s.player === player.name && 
+                                    String(s.teamId) === String(match.homeTeam?._id || match.homeTeam)
+                                );
+                                
+                                return (
+                                    <div key={player.name} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${isSuspended ? 'bg-red-500/5 border-red-500/20 opacity-60' : 'bg-slate-950/50 border-white/5 hover:border-blue-500/30'}`}>
+                                        <div className="flex flex-col text-left">
+                                            <span className="font-bold text-slate-300">
+                                                {player.name} 
+                                                <span className="text-[9px] text-slate-600 ml-2">({player.role})</span>
+                                            </span>
+                                            {isSuspended && (
+                                                <span className="text-[8px] font-black uppercase text-red-500 flex items-center gap-1 mt-0.5">
+                                                    <ShieldAlert size={10} /> Suspended
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button 
+                                                size="sm"
+                                                onClick={() => togglePlayerLineup('home', player.name, 'XI')}
+                                                disabled={isSuspended}
+                                                variant={homeXI.includes(player.name) ? "default" : "outline"}
+                                                className={`h-8 rounded-lg text-[10px] font-black uppercase tracking-widest ${homeXI.includes(player.name) ? 'bg-blue-600' : 'border-white/5 text-slate-500'}`}
+                                            >
+                                                Starters
+                                            </Button>
+                                            <Button 
+                                                size="sm"
+                                                onClick={() => togglePlayerLineup('home', player.name, 'Sub')}
+                                                disabled={isSuspended}
+                                                variant={homeSubs.includes(player.name) ? "default" : "outline"}
+                                                className={`h-8 rounded-lg text-[10px] font-black uppercase tracking-widest ${homeSubs.includes(player.name) ? 'bg-slate-700' : 'border-white/5 text-slate-500'}`}
+                                            >
+                                                Bench
+                                            </Button>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </Card>
 
@@ -647,29 +666,48 @@ export default function FootballScoringPanel() {
                             </div>
                         </div>
                         <div className="grid gap-2 max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
-                            {match.awayTeam.players?.map((player: any) => (
-                                <div key={player.name} className="flex items-center justify-between p-4 bg-slate-950/50 rounded-2xl border border-white/5 hover:border-orange-500/30 transition-colors">
-                                    <span className="font-bold text-slate-300">{player.name} <span className="text-[9px] text-slate-600 ml-2">({player.role})</span></span>
-                                    <div className="flex gap-2">
-                                        <Button 
-                                            size="sm"
-                                            onClick={() => togglePlayerLineup('away', player.name, 'XI')}
-                                            variant={awayXI.includes(player.name) ? "default" : "outline"}
-                                            className={`h-8 rounded-lg text-[10px] font-black uppercase tracking-widest ${awayXI.includes(player.name) ? 'bg-orange-600' : 'border-white/5 text-slate-500'}`}
-                                        >
-                                            Starters
-                                        </Button>
-                                        <Button 
-                                            size="sm"
-                                            onClick={() => togglePlayerLineup('away', player.name, 'Sub')}
-                                            variant={awaySubs.includes(player.name) ? "default" : "outline"}
-                                            className={`h-8 rounded-lg text-[10px] font-black uppercase tracking-widest ${awaySubs.includes(player.name) ? 'bg-slate-700' : 'border-white/5 text-slate-500'}`}
-                                        >
-                                            Bench
-                                        </Button>
+                            {match.awayTeam.players?.map((player: any) => {
+                                const isSuspended = match.tournamentId?.suspensions?.some((s: any) => 
+                                    s.player === player.name && 
+                                    String(s.teamId) === String(match.awayTeam?._id || match.awayTeam)
+                                );
+
+                                return (
+                                    <div key={player.name} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${isSuspended ? 'bg-red-500/5 border-red-500/20 opacity-60' : 'bg-slate-950/50 border-white/5 hover:border-orange-500/30'}`}>
+                                        <div className="flex flex-col text-left">
+                                            <span className="font-bold text-slate-300">
+                                                {player.name} 
+                                                <span className="text-[9px] text-slate-600 ml-2">({player.role})</span>
+                                            </span>
+                                            {isSuspended && (
+                                                <span className="text-[8px] font-black uppercase text-red-500 flex items-center gap-1 mt-0.5">
+                                                    <ShieldAlert size={10} /> Suspended
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button 
+                                                size="sm"
+                                                onClick={() => togglePlayerLineup('away', player.name, 'XI')}
+                                                disabled={isSuspended}
+                                                variant={awayXI.includes(player.name) ? "default" : "outline"}
+                                                className={`h-8 rounded-lg text-[10px] font-black uppercase tracking-widest ${awayXI.includes(player.name) ? 'bg-orange-600' : 'border-white/5 text-slate-500'}`}
+                                            >
+                                                Starters
+                                            </Button>
+                                            <Button 
+                                                size="sm"
+                                                onClick={() => togglePlayerLineup('away', player.name, 'Sub')}
+                                                disabled={isSuspended}
+                                                variant={awaySubs.includes(player.name) ? "default" : "outline"}
+                                                className={`h-8 rounded-lg text-[10px] font-black uppercase tracking-widest ${awaySubs.includes(player.name) ? 'bg-slate-700' : 'border-white/5 text-slate-500'}`}
+                                            >
+                                                Bench
+                                            </Button>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </Card>
                 </div>
@@ -1732,7 +1770,8 @@ export default function FootballScoringPanel() {
                                      const isSubbedOut = events.some((e: any) => e.type === 'Substitution' && e.playerOut === p.name);
                                      const isSubbedIn = events.some((e: any) => e.type === 'Substitution' && e.player === p.name);
                                      const pEvents = summarizePlayerEvents(p.name, events);
-                                     const hasRedCard = pEvents.redCards > 0 || pEvents.yellowCards >= 2;
+                                     const isSentOff = match.lineups?.[side]?.sentOff?.includes(p.name);
+                                     const hasRedCard = pEvents.redCards > 0 || pEvents.yellowCards >= 2 || isSentOff;
                                      const isOnField = (startingXI.includes(p.name) || isSubbedIn) && !isSubbedOut;
                                      return isOnField && !hasRedCard;
                                  })?.map((player: any) => (

@@ -90,12 +90,14 @@ const footballMatchSchema = new mongoose.Schema({
         home: {
             startingXI: [{ type: String }],
             substitutes: [{ type: String }],
+            sentOff: [{ type: String }],
             substitutionCount: { type: Number, default: 0 },
             formation: { type: String, default: '4-4-2' }
         },
         away: {
             startingXI: [{ type: String }],
             substitutes: [{ type: String }],
+            sentOff: [{ type: String }],
             substitutionCount: { type: Number, default: 0 },
             formation: { type: String, default: '4-4-2' }
         }
