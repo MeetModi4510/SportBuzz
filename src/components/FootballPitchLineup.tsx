@@ -17,6 +17,7 @@ interface SquadPlayer {
         assists: number;
         yellowCards: number;
         redCards: number;
+        redCardMinute?: number;
         saves?: number;
         fouls?: number;
         shotsOnTarget?: number;
@@ -132,14 +133,17 @@ const derivePlayerPerformance = (p: SquadPlayer, currentMinute: number = 90) => 
     };
     
     let minutes = 0;
+    const redCardMin = events.redCardMinute;
+
     if (!p.isSubstitute) {
-        // Starters: minute they went off or total current time
-        minutes = events.substitution?.outMinute ? events.substitution.outMinute : currentMinute;
+        // Starters: minute they went off (sub or red) or total current time
+        const exitMin = events.substitution?.outMinute || redCardMin;
+        minutes = exitMin ? exitMin : currentMinute;
     } else {
         // Substitutes: if they came on, calculate time played
         if (events.substitution?.inMinute !== undefined) {
             const inMin = events.substitution.inMinute;
-            const outMin = events.substitution.outMinute || currentMinute;
+            const outMin = events.substitution.outMinute || redCardMin || currentMinute;
             minutes = Math.max(0, outMin - inMin);
         }
     }

@@ -757,6 +757,7 @@ export default function FootballScoringPanel() {
             assists: 0,
             yellowCards: 0,
             redCards: 0,
+            redCardMinute: undefined as number | undefined,
             saves: 0,
             fouls: 0,
             shotsOnTarget: 0,
@@ -769,7 +770,10 @@ export default function FootballScoringPanel() {
             if (event.player === playerName) {
                 if (event.type === 'Goal') playerEvents.goals++;
                 if (event.type === 'YellowCard') playerEvents.yellowCards++;
-                if (event.type === 'RedCard') playerEvents.redCards++;
+                if (event.type === 'RedCard') {
+                    playerEvents.redCards++;
+                    if (playerEvents.redCardMinute === undefined) playerEvents.redCardMinute = event.minute;
+                }
                 if (event.type === 'Save') playerEvents.saves++;
                 if (event.type === 'Foul') playerEvents.fouls++;
                 if (event.type === 'ShotOnTarget') playerEvents.shotsOnTarget++;
@@ -1323,15 +1327,19 @@ export default function FootballScoringPanel() {
                                 homePlayers={[
                                     ...(match.lineups?.home?.startingXI?.map((name: string) => {
                                         const p = match.homeTeam?.players?.find((tp: any) => tp.name === name);
-                                        return { 
-                                            id: name, 
-                                            name, 
-                                            role: p?.role || 'Midfielder', 
-                                            number: p?.number, 
-                                            isSubstitute: false, 
-                                            isCaptain: p?.isCaptain,
-                                            events: summarizePlayerEvents(name, match.events, match.score?.away || 0)
-                                        };
+const pEvents = summarizePlayerEvents(name, match.events, match.score?.away || 0);
+return { 
+    id: name, 
+    name, 
+    role: p?.role || 'Midfielder', 
+    number: p?.number, 
+    isSubstitute: false, 
+    isCaptain: p?.isCaptain,
+    events: {
+        ...pEvents,
+        redCardMinute: pEvents.redCardMinute
+    }
+};
                                     }) || []),
                                     ...(match.lineups?.home?.substitutes?.map((name: string) => {
                                         const p = match.homeTeam?.players?.find((tp: any) => tp.name === name);
@@ -1360,14 +1368,18 @@ export default function FootballScoringPanel() {
                                     }) || []),
                                     ...(match.lineups?.away?.substitutes?.map((name: string) => {
                                         const p = match.awayTeam?.players?.find((tp: any) => tp.name === name);
-                                        return { 
-                                            id: name, 
-                                            name, 
-                                            role: p?.role || 'Midfielder', 
-                                            number: p?.number, 
-                                            isSubstitute: true,
-                                            events: summarizePlayerEvents(name, match.events, match.score?.home || 0)
-                                        };
+const pEvents = summarizePlayerEvents(name, match.events, match.score?.home || 0);
+return { 
+    id: name, 
+    name, 
+    role: p?.role || 'Midfielder', 
+    number: p?.number, 
+    isSubstitute: true,
+    events: {
+        ...pEvents,
+        redCardMinute: pEvents.redCardMinute
+    }
+};
                                     }) || [])
                                 ].filter((p, i, self) => i === self.findIndex((t) => t.id === p.id))}
                                 homeFormation={match.lineups?.home?.formation || '4-4-2'}

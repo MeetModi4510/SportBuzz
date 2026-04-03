@@ -399,8 +399,9 @@ export const addMatchEvent = asyncHandler(async (req, res) => {
             match.lineups[side] = { startingXI: [], substitutes: [], sentOff: [], substitutionCount: 0 };
         }
 
-        // Remove from current play
-        match.lineups[side].startingXI = (match.lineups[side].startingXI || []).filter(p => p !== player);
+        // Remove from current play (REMOVED: User wants them to stay in lineup visually)
+        // match.lineups[side].startingXI = (match.lineups[side].startingXI || []).filter(p => p !== player);
+        
         // Add to sentOff
         if (!match.lineups[side].sentOff) match.lineups[side].sentOff = [];
         if (!match.lineups[side].sentOff.includes(player)) {
