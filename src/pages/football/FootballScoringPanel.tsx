@@ -72,6 +72,10 @@ import {
     BarChart,
     Bar,
     Legend,
+    RadarChart,
+    PolarGrid,
+    PolarAngleAxis,
+    Radar
 } from 'recharts';
 import { VENUE_ANALYSIS_DATA } from "@/data/venueAnalysisData";
 import { footballApi } from "@/services/api";
@@ -1404,7 +1408,7 @@ export default function FootballScoringPanel() {
                     </TabsContent>
 
                     <TabsContent value="performance" className="space-y-10 animate-in fade-in zoom-in duration-700">
-                         {/* TOP ROW: xG Battle & Impact Index */}
+                         {/* TOP ROW: xG Battle & Tactical Face-Off */}
                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                              {/* Battle of xG Timeline */}
                              <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12 relative overflow-hidden group">
@@ -1429,7 +1433,7 @@ export default function FootballScoringPanel() {
                                          </div>
                                      </div>
                                  </div>
-                                 <div className="h-[250px] w-full">
+                                 <div className="h-[300px] w-full">
                                      <ResponsiveContainer width="100%" height="100%">
                                          <AreaChart data={match.performance?.xGHistory || []}>
                                              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
@@ -1442,36 +1446,51 @@ export default function FootballScoringPanel() {
                                  </div>
                              </div>
 
-                             {/* High Impact Index */}
-                             <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12">
-                                 <div className="flex items-center gap-6 mb-12">
-                                     <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
-                                         <Zap size={28} />
+                             {/* Tactical Face-Off (Radar) */}
+                             <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12 relative overflow-hidden group">
+                                 <div className="flex items-center justify-between mb-8">
+                                     <div className="flex items-center gap-6">
+                                         <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
+                                             <Swords size={28} />
+                                         </div>
+                                         <div>
+                                            <h3 className="text-4xl font-black italic uppercase tracking-tight text-white mb-1">Tactical Face-Off</h3>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Comparing top performance nodes</p>
+                                         </div>
                                      </div>
-                                     <div>
-                                        <h3 className="text-4xl font-black italic uppercase tracking-tight text-white mb-1">Impact Index</h3>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Live performance weightings</p>
+                                     <div className="flex gap-4">
+                                         {(() => {
+                                             const homeTop = (match.performance?.topPerformers || []).find((p: any) => p.team === 'H');
+                                             const awayTop = (match.performance?.topPerformers || []).find((p: any) => p.team === 'A');
+                                             return (
+                                                 <>
+                                                     <div className="flex flex-col items-center">
+                                                         <div className="w-10 h-10 bg-blue-600/10 rounded-full border border-blue-500/20 flex items-center justify-center text-blue-500 font-black italic text-xs">H</div>
+                                                         <span className="text-[8px] font-black uppercase text-slate-400 mt-1">{homeTop?.name?.split(' ').pop() || 'HOM'}</span>
+                                                     </div>
+                                                     <div className="flex flex-col items-center">
+                                                         <div className="w-10 h-10 bg-orange-600/10 rounded-full border border-orange-500/20 flex items-center justify-center text-orange-500 font-black italic text-xs">A</div>
+                                                         <span className="text-[8px] font-black uppercase text-slate-400 mt-1">{awayTop?.name?.split(' ').pop() || 'AWA'}</span>
+                                                     </div>
+                                                 </>
+                                             );
+                                         })()}
                                      </div>
                                  </div>
-                                 <div className="h-[250px] w-full">
+                                 <div className="h-[300px] w-full">
                                      <ResponsiveContainer width="100%" height="100%">
-                                         <BarChart 
-                                            layout="vertical" 
-                                            data={(match.performance?.topPerformers || []).slice(0, 5).map((p: any) => ({
-                                                name: p.name?.split(' ').pop() || 'N/A',
-                                                score: p.score || 0,
-                                                team: p.team
-                                            }))}
-                                            margin={{ left: 20, right: 30 }}
-                                         >
-                                             <XAxis type="number" hide domain={[0, 10]} />
-                                             <YAxis dataKey="name" type="category" stroke="#475569" fontSize={10} axisLine={false} tickLine={false} width={80} />
-                                             <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={20}>
-                                                {(match.performance?.topPerformers || []).slice(0, 5).map((entry: any, index: number) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.team === 'H' ? '#3b82f6' : '#ef4444'} />
-                                                ))}
-                                             </Bar>
-                                         </BarChart>
+                                         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={match.performance?.labAnalysis?.radarData?.length > 0 ? match.performance.labAnalysis.radarData : [
+                                             { subject: 'Attack', A: 50, B: 50, fullMark: 100 },
+                                             { subject: 'Defense', A: 50, B: 50, fullMark: 100 },
+                                             { subject: 'Passing', A: 50, B: 50, fullMark: 100 },
+                                             { subject: 'Hazard', A: 30, B: 30, fullMark: 100 },
+                                             { subject: 'Press', A: 40, B: 40, fullMark: 100 }
+                                         ]}>
+                                             <PolarGrid stroke="#1e293b" />
+                                             <PolarAngleAxis dataKey="subject" tick={{ fontSize: 8, fontWeight: 900, fill: '#64748b' }} />
+                                             <Radar name="Home" dataKey="A" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.4} animationDuration={1500} />
+                                             <Radar name="Away" dataKey="B" stroke="#ef4444" fill="#ef4444" fillOpacity={0.4} animationDuration={1500} />
+                                         </RadarChart>
                                      </ResponsiveContainer>
                                  </div>
                              </div>
@@ -1584,7 +1603,7 @@ export default function FootballScoringPanel() {
                              <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12">
                                  <div className="flex items-center gap-6 mb-12">
                                      <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500">
-                                         <Activity size={28} />
+                                         <Zap size={28} />
                                      </div>
                                      <div>
                                          <h3 className="text-4xl font-black italic uppercase tracking-tight text-white mb-1">Style Profile</h3>
@@ -1594,8 +1613,8 @@ export default function FootballScoringPanel() {
                                  <div className="grid grid-cols-2 gap-12">
                                      <div className="space-y-6">
                                          {[
-                                             { label: 'Build-up', val: match.performance?.labAnalysis?.possessionPhases?.buildup || 27, color: 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)]' },
-                                             { label: 'Attacking', val: match.performance?.labAnalysis?.possessionPhases?.attack || 45, color: 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.3)]' },
+                                             { label: 'Build-up', val: match.performance?.labAnalysis?.possessionPhases?.buildup || 33, color: 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)]' },
+                                             { label: 'Attacking', val: match.performance?.labAnalysis?.possessionPhases?.attack || 34, color: 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.3)]' },
                                              { label: 'Defensive', val: match.performance?.labAnalysis?.possessionPhases?.defense || 33, color: 'bg-slate-400' }
                                          ].map(phase => (
                                              <div key={phase.label} className="space-y-3">

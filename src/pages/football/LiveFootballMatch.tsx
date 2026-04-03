@@ -965,8 +965,8 @@ export default function LiveFootballMatch() {
                                          </div>
                                          <div className="space-y-6">
                                             {[
-                                                { label: 'Build-up', val: match.performance?.labAnalysis?.possessionPhases?.buildup || 27, color: 'bg-blue-500' },
-                                                { label: 'Attacking', val: match.performance?.labAnalysis?.possessionPhases?.attack || 45, color: 'bg-purple-500' },
+                                                { label: 'Build-up', val: match.performance?.labAnalysis?.possessionPhases?.buildup || 33, color: 'bg-blue-500' },
+                                                { label: 'Attacking', val: match.performance?.labAnalysis?.possessionPhases?.attack || 34, color: 'bg-purple-500' },
                                                 { label: 'Defensive', val: match.performance?.labAnalysis?.possessionPhases?.defense || 33, color: 'bg-slate-400' }
                                             ].map(phase => (
                                                 <div key={phase.label} className="space-y-2">
@@ -994,54 +994,41 @@ export default function LiveFootballMatch() {
                                      </div>
                                      
                                      <div className="grid grid-cols-2 gap-4 mb-6">
-                                         <div className="flex flex-col items-center">
-                                             <div className="w-12 h-12 bg-blue-600/10 rounded-full border border-blue-500/20 flex items-center justify-center text-blue-500 font-black italic text-sm">H</div>
-                                             <span className="text-[9px] font-black uppercase text-slate-400 mt-2">{match.performance?.topPerformers?.[0]?.name ? match.performance.topPerformers[0].name.split(' ').pop() : 'Awaiting...'}</span>
-                                         </div>
-                                         <div className="flex flex-col items-center">
-                                             <div className="w-12 h-12 bg-orange-600/10 rounded-full border border-orange-500/20 flex items-center justify-center text-orange-500 font-black italic text-sm">A</div>
-                                             <span className="text-[9px] font-black uppercase text-slate-400 mt-2">{match.performance?.topPerformers?.[1]?.name ? match.performance.topPerformers[1].name.split(' ').pop() : 'Awaiting...'}</span>
-                                         </div>
+                                         {(() => {
+                                             const homeTop = (match.performance?.topPerformers || []).find((p: any) => p.team === 'H');
+                                             const awayTop = (match.performance?.topPerformers || []).find((p: any) => p.team === 'A');
+                                             return (
+                                                 <>
+                                                     <div className="flex flex-col items-center">
+                                                         <div className="w-12 h-12 bg-blue-600/10 rounded-full border border-blue-500/20 flex items-center justify-center text-blue-500 font-black italic text-sm">H</div>
+                                                         <span className="text-[9px] font-black uppercase text-slate-400 mt-2 truncate w-full text-center">
+                                                             {homeTop?.name ? homeTop.name.split(' ').pop() : (match.homeTeam?.name?.slice(0, 3) || 'HOM')}
+                                                         </span>
+                                                     </div>
+                                                     <div className="flex flex-col items-center">
+                                                         <div className="w-12 h-12 bg-orange-600/10 rounded-full border border-orange-500/20 flex items-center justify-center text-orange-500 font-black italic text-sm">A</div>
+                                                         <span className="text-[9px] font-black uppercase text-slate-400 mt-2 truncate w-full text-center">
+                                                             {awayTop?.name ? awayTop.name.split(' ').pop() : (match.awayTeam?.name?.slice(0, 3) || 'AWA')}
+                                                         </span>
+                                                     </div>
+                                                 </>
+                                             );
+                                         })()}
                                      </div>
 
                                      <div className="h-[200px] w-full">
                                          <ResponsiveContainer width="100%" height="100%">
-                                             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={[
-                                                 { 
-                                                     subject: 'Attack', 
-                                                     A: Math.min(100, 60 + (match.performance?.topPerformers?.filter((p: any) => p.team === 'H')[0]?.score || 0) * 5), 
-                                                     B: Math.min(100, 60 + (match.performance?.topPerformers?.filter((p: any) => p.team === 'A')[0]?.score || 0) * 5), 
-                                                     fullMark: 100 
-                                                 },
-                                                 { 
-                                                     subject: 'Defense', 
-                                                     A: Math.min(100, 50 - (match.stats?.fouls?.home || 0) * 2 + (match.performance?.topPerformers?.filter((p: any) => p.team === 'H')[0]?.score || 0) * 3), 
-                                                     B: Math.min(100, 50 - (match.stats?.fouls?.away || 0) * 2 + (match.performance?.topPerformers?.filter((p: any) => p.team === 'A')[0]?.score || 0) * 3), 
-                                                     fullMark: 100 
-                                                 },
-                                                 { 
-                                                     subject: 'Passing', 
-                                                     A: Math.min(100, 40 + (match.stats?.possession?.home || 50) * 0.8), 
-                                                     B: Math.min(100, 40 + (match.stats?.possession?.away || 50) * 0.8), 
-                                                     fullMark: 100 
-                                                 },
-                                                 { 
-                                                     subject: 'Hazard', 
-                                                     A: Math.min(100, (match.performance?.labAnalysis?.intensityPulse?.slice(-1)[0]?.value || 50)), 
-                                                     B: Math.min(100, (match.performance?.labAnalysis?.intensityPulse?.slice(-1)[0]?.value || 50) * 0.9), 
-                                                     fullMark: 100 
-                                                 },
-                                                 { 
-                                                     subject: 'Press', 
-                                                     A: match.performance?.labAnalysis?.intensityPressing || 65, 
-                                                     B: (match.performance?.labAnalysis?.intensityPressing || 65) * 0.85, 
-                                                     fullMark: 100 
-                                                 }
+                                             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={match.performance?.labAnalysis?.radarData?.length > 0 ? match.performance.labAnalysis.radarData : [
+                                                 { subject: 'Attack', A: 50, B: 50, fullMark: 100 },
+                                                 { subject: 'Defense', A: 50, B: 50, fullMark: 100 },
+                                                 { subject: 'Passing', A: 50, B: 50, fullMark: 100 },
+                                                 { subject: 'Hazard', A: 30, B: 30, fullMark: 100 },
+                                                 { subject: 'Press', A: 40, B: 40, fullMark: 100 }
                                              ]}>
                                                  <PolarGrid stroke="#1e293b" />
                                                  <PolarAngleAxis dataKey="subject" tick={{ fontSize: 7, fontWeight: 900, fill: '#64748b' }} />
-                                                 <Radar name="Home" dataKey="A" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.4} />
-                                                 <Radar name="Away" dataKey="B" stroke="#ef4444" fill="#ef4444" fillOpacity={0.4} />
+                                                 <Radar name="Home" dataKey="A" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.4} animationDuration={1500} />
+                                                 <Radar name="Away" dataKey="B" stroke="#ef4444" fill="#ef4444" fillOpacity={0.4} animationDuration={1500} />
                                              </RadarChart>
                                          </ResponsiveContainer>
                                      </div>

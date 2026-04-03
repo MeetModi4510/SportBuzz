@@ -10,14 +10,14 @@ const calculatePerformance = (match) => {
     if (!match.performance) {
         match.performance = {
             winProbability: { home: 45, away: 30, draw: 25 },
-            momentumHistory: [],
-            xGHistory: [],
+            momentumHistory: [{ minute: 0, value: 0, home: 50, away: 50 }],
+            xGHistory: [{ minute: 0, home: 0, away: 0 }],
             pressureIndex: 5.0,
             labAnalysis: { 
                 intensityPressing: 40, 
                 counterAttackRisk: 30,
                 attackThirdControl: { team: 'None', percentage: 50 },
-                intensityPulse: [],
+                intensityPulse: [{ minute: 0, value: 30 }],
                 possessionPhases: { buildup: 33, attack: 33, defense: 34 },
                 territoryOccupancy: { defensive: 33, middle: 34, attacking: 33 },
                 phaseStats: [
@@ -29,7 +29,8 @@ const calculatePerformance = (match) => {
                 directnessIndex: { home: 40, away: 35 },
                 defensiveLineHeight: { home: 45, away: 45 },
                 finalThirdEntries: { home: 0, away: 0 },
-                highTurnovers: { home: 0, away: 0 }
+                highTurnovers: { home: 0, away: 0 },
+                radarData: [] 
             },
             topPerformers: []
         };
@@ -42,6 +43,14 @@ const calculatePerformance = (match) => {
     const homeFouls = match.stats.fouls.home;
     const awayFouls = match.stats.fouls.away;
     const currentMinute = match.timer.currentMinute;
+
+    // 0. Ensure history starts at 0
+    if (match.performance.momentumHistory.length === 0) {
+        match.performance.momentumHistory.push({ minute: 0, value: 0, home: 50, away: 50 });
+    }
+    if (match.performance.xGHistory.length === 0) {
+        match.performance.xGHistory.push({ minute: 0, home: 0, away: 0 });
+    }
 
     // 1. Win Probability (Improved heuristic)
     let homeBase = 45;
@@ -59,114 +68,139 @@ const calculatePerformance = (match) => {
     match.performance.winProbability.away = Math.min(Math.max(Math.round((awayBase / total) * 100), 5), 90);
     match.performance.winProbability.draw = 100 - match.performance.winProbability.home - match.performance.winProbability.away;
 
-    // Calculate dynamic momentum (with temporal decay)
+    // 2. Momentum History
     const lastMomentum = match.performance.momentumHistory.length > 0 ? match.performance.momentumHistory[match.performance.momentumHistory.length - 1].value : 0;
     let currentEventMomentum = 0;
     
-    // Focus on VERY recent events for immediate impact
-    const superRecent = match.events.filter(e => e.minute >= currentMinute);
+    const superRecent = match.events.filter(e => e.minute === currentMinute);
     superRecent.forEach(e => {
-        const side = String(e.team) === String(match.homeTeam) ? 1 : -1;
+        const side = String(e.team?._id || e.team) === String(match.homeTeam?._id || match.homeTeam) ? 1 : -1;
         if (e.type === 'Goal') currentEventMomentum += 50 * side;
         if (e.type === 'ShotOnTarget') currentEventMomentum += 20 * side;
         if (e.type === 'Corner') currentEventMomentum += 12 * side;
         if (e.type === 'Foul') currentEventMomentum -= 8 * side;
     });
 
-    // Momentum = 90% of last momentum (decay) + NEW impact
     let momentumValue = (lastMomentum * 0.9) + currentEventMomentum;
-    
-    // Safety cap
     momentumValue = Math.max(-100, Math.min(100, momentumValue));
 
-    match.performance.momentumHistory.push({
-        minute: currentMinute,
-        value: Number(momentumValue.toFixed(1)),
-        home: 50 + (momentumValue / 2),
-        away: 50 - (momentumValue / 2)
-    });
+    // Only push if minute changed or event happened
+    if (match.performance.momentumHistory.slice(-1)[0]?.minute !== currentMinute || currentEventMomentum !== 0) {
+        match.performance.momentumHistory.push({
+            minute: currentMinute,
+            value: Number(momentumValue.toFixed(1)),
+            home: 50 + (momentumValue / 2),
+            away: 50 - (momentumValue / 2)
+        });
+    }
     if (match.performance.momentumHistory.length > 90) match.performance.momentumHistory.shift();
 
-    // 3. xG Accumulation History
+    // 3. xG History
     const currentXG = {
         home: parseFloat((match.stats.shotsOnTarget.home * 0.35 + match.stats.shotsOffTarget.home * 0.12).toFixed(2)),
         away: parseFloat((match.stats.shotsOnTarget.away * 0.35 + match.stats.shotsOffTarget.away * 0.12).toFixed(2))
     };
     match.performance.labAnalysis.expectedGoals = currentXG;
     
-    match.performance.xGHistory.push({
-        minute: currentMinute,
-        home: currentXG.home,
-        away: currentXG.away
-    });
+    if (match.performance.xGHistory.slice(-1)[0]?.minute !== currentMinute || 
+        match.performance.xGHistory.slice(-1)[0]?.home !== currentXG.home ||
+        match.performance.xGHistory.slice(-1)[0]?.away !== currentXG.away) {
+        match.performance.xGHistory.push({
+            minute: currentMinute,
+            home: currentXG.home,
+            away: currentXG.away
+        });
+    }
     if (match.performance.xGHistory.length > 90) match.performance.xGHistory.shift();
 
-    // 4. Pressure Index
+    // 4. Pressure & Intensity Pulse
     const recentEvents = match.events.filter(e => e.minute > currentMinute - 10).length;
     match.performance.pressureIndex = parseFloat((recentEvents * 0.9 + 3.5 + (Math.random() * 2)).toFixed(1));
+    
+    const pulseVal = Math.min(95, 30 + (recentEvents * 5) + (Math.random() * 10));
+    match.performance.labAnalysis.intensityPulse.push({ minute: currentMinute, value: Math.round(pulseVal) });
+    if (match.performance.labAnalysis.intensityPulse.length > 20) match.performance.labAnalysis.intensityPulse.shift();
 
-    // 5. Territory Occupancy
+    // 5. Territory
     const momentumInfluence = (momentumValue / 100) * 20;
     match.performance.labAnalysis.territoryOccupancy = {
         defensive: Math.round(Math.max(10, 33 - momentumInfluence)),
         middle: Math.round(34 + Math.abs(momentumInfluence / 2)),
         attacking: Math.round(Math.max(10, 33 + momentumInfluence))
     };
-    // Normalize to 100
     const territoryTotal = match.performance.labAnalysis.territoryOccupancy.defensive + 
                            match.performance.labAnalysis.territoryOccupancy.middle + 
                            match.performance.labAnalysis.territoryOccupancy.attacking;
     if (territoryTotal !== 100) match.performance.labAnalysis.territoryOccupancy.middle += (100 - territoryTotal);
 
-    // 6. Phase Stats (Real shot distribution)
+    // 6. Phase Stats
     const phases = [
         { name: '0-30', start: 0, end: 30 },
         { name: '31-60', start: 31, end: 60 },
         { name: '61-90', start: 61, end: 120 }
     ];
-    
     match.performance.labAnalysis.phaseStats = phases.map(p => {
-        const hShots = match.events.filter(e => e.type === 'ShotOnTarget' && e.minute >= p.start && e.minute <= p.end && String(e.team) === String(match.homeTeam)).length;
-        const aShots = match.events.filter(e => e.type === 'ShotOnTarget' && e.minute >= p.start && e.minute <= p.end && String(e.team) === String(match.awayTeam)).length;
+        const hShots = match.events.filter(e => e.type === 'ShotOnTarget' && e.minute >= p.start && e.minute <= p.end && String(e.team?._id || e.team) === String(match.homeTeam?._id || match.homeTeam)).length;
+        const aShots = match.events.filter(e => e.type === 'ShotOnTarget' && e.minute >= p.start && e.minute <= p.end && String(e.team?._id || e.team) === String(match.awayTeam?._id || match.awayTeam)).length;
         return { phase: p.name, homeShots: hShots, awayShots: aShots };
     });
 
-    // 7. Advanced Style Profiles
-    match.performance.labAnalysis.intensityPressing = Math.min(Math.max(30 + (homeFouls + awayFouls) * 1.8, 20), 90);
-    match.performance.labAnalysis.counterAttackRisk = Math.min(Math.max(20 + (homeShots + awayShots) * 2.2, 10), 95);
+    // 7. Possession Phases (Style Profile) - FIXED NORMALIZATION
+    const factor = Math.sin(currentMinute * 0.4);
+    let buildup = Math.round(25 + factor * 8 + (momentumValue > 0 ? 5 : -5));
+    let attack = Math.round(41 + factor * 12 + (momentumValue > 0 ? 10 : -10));
     
-    const factor = Math.sin(currentMinute * 0.6);
-    match.performance.labAnalysis.possessionPhases = {
-        buildup: Math.round(25 + factor * 8 + (momentumValue > 0 ? 5 : -5)),
-        attack: Math.round(41 + factor * 12 + (momentumValue > 0 ? 10 : -10)),
-        defense: 0
-    };
-    // Normalize possession phases to 100
-    match.performance.labAnalysis.possessionPhases.defense = Math.max(5, 100 - match.performance.labAnalysis.possessionPhases.buildup - match.performance.labAnalysis.possessionPhases.attack);
-    
-    // Recalculate if defense clamped
-    const currentTotal = match.performance.labAnalysis.possessionPhases.buildup + match.performance.labAnalysis.possessionPhases.attack + match.performance.labAnalysis.possessionPhases.defense;
-    if (currentTotal !== 100) {
-        match.performance.labAnalysis.possessionPhases.attack += (100 - currentTotal);
+    if (buildup + attack > 90) {
+        const over = (buildup + attack) - 90;
+        attack -= over;
     }
     
+    let defense = 100 - buildup - attack;
+    match.performance.labAnalysis.possessionPhases = { buildup, attack, defense };
+
+    // 8. Dynamic Radar Data
+    const radarMetrics = ['Attack', 'Defense', 'Passing', 'Hazard', 'Press'];
+    match.performance.labAnalysis.radarData = radarMetrics.map(metric => {
+        let hVal = 50, aVal = 50;
+        if (metric === 'Attack') {
+            hVal = 40 + (match.stats.shotsOnTarget.home * 5);
+            aVal = 40 + (match.stats.shotsOnTarget.away * 5);
+        } else if (metric === 'Defense') {
+            hVal = 80 - (match.stats.fouls.home * 3) + (match.stats.saves.home * 5);
+            aVal = 80 - (match.stats.fouls.away * 3) + (match.stats.saves.away * 5);
+        } else if (metric === 'Passing') {
+            hVal = 30 + (match.stats.possession.home * 0.8);
+            aVal = 30 + (match.stats.possession.away * 0.8);
+        } else if (metric === 'Hazard') {
+            hVal = match.performance.labAnalysis.intensityPulse.slice(-1)[0]?.value || 50;
+            aVal = (match.performance.labAnalysis.intensityPulse.slice(-1)[0]?.value || 50) * 0.8 + (Math.random() * 10);
+        } else if (metric === 'Press') {
+            hVal = match.performance.labAnalysis.intensityPressing;
+            aVal = match.performance.labAnalysis.intensityPressing * 0.9;
+        }
+        return {
+            subject: metric,
+            A: Math.min(95, Math.max(20, Math.round(hVal))),
+            B: Math.min(95, Math.max(20, Math.round(aVal))),
+            fullMark: 100
+        };
+    });
+
     match.markModified('performance');
 
-    // 8. Top Performers
+    // 9. Top Performers
     const playerScores = {};
     match.events.forEach(event => {
         const pName = event.player;
         if (!pName) return;
-
         if (!playerScores[pName]) {
-            const side = String(event.team) === String(match.homeTeam._id || match.homeTeam) ? 'H' : 'A';
+            const side = String(event.team?._id || event.team) === String(match.homeTeam?._id || match.homeTeam) ? 'H' : 'A';
             playerScores[pName] = { name: pName, score: 0, team: side };
         }
-
         if (event.type === 'Goal') playerScores[pName].score += 4.5;
         if (event.assister) {
             if (!playerScores[event.assister]) {
-                const side = String(event.team) === String(match.homeTeam._id || match.homeTeam) ? 'H' : 'A';
+                const side = String(event.team?._id || event.team) === String(match.homeTeam?._id || match.homeTeam) ? 'H' : 'A';
                 playerScores[event.assister] = { name: event.assister, score: 0, team: side };
             }
             playerScores[event.assister].score += 2.5;
