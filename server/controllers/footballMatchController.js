@@ -140,8 +140,8 @@ const calculatePerformance = (match) => {
         { name: '61-90', start: 61, end: 120 }
     ];
     match.performance.labAnalysis.phaseStats = phases.map(p => {
-        const hShots = match.events.filter(e => e.type === 'ShotOnTarget' && e.minute >= p.start && e.minute <= p.end && String(e.team?._id || e.team) === String(match.homeTeam?._id || match.homeTeam)).length;
-        const aShots = match.events.filter(e => e.type === 'ShotOnTarget' && e.minute >= p.start && e.minute <= p.end && String(e.team?._id || e.team) === String(match.awayTeam?._id || match.awayTeam)).length;
+        const hShots = (match.events || []).filter(e => e.type === 'ShotOnTarget' && e.minute >= p.start && e.minute <= p.end && String(e.team?._id || e.team) === String(match.homeTeam?._id || match.homeTeam)).length;
+        const aShots = (match.events || []).filter(e => e.type === 'ShotOnTarget' && e.minute >= p.start && e.minute <= p.end && String(e.team?._id || e.team) === String(match.awayTeam?._id || match.awayTeam)).length;
         return { phase: p.name, homeShots: hShots, awayShots: aShots };
     });
 
@@ -157,34 +157,28 @@ const calculatePerformance = (match) => {
     
     let defense = 100 - buildup - attack;
     match.performance.labAnalysis.possessionPhases = { buildup, attack, defense };
+    
+    // NEW: Intensity Pressing
+    match.performance.labAnalysis.intensityPressing = Math.round(50 + factor * 10 + (momentumValue > 0 ? 15 : -15));
 
     // 8. Dynamic Radar Data
     const radarMetrics = ['Attack', 'Defense', 'Passing', 'Hazard', 'Press'];
     match.performance.labAnalysis.radarData = radarMetrics.map(metric => {
         let hVal = 50, aVal = 50;
         if (metric === 'Attack') {
-            hVal = 40 + (match.stats.shotsOnTarget.home * 5);
-            aVal = 40 + (match.stats.shotsOnTarget.away * 5);
+            hVal = 40 + ((match.stats?.shotsOnTarget?.home || 0) * 5);
+            aVal = 40 + ((match.stats?.shotsOnTarget?.away || 0) * 5);
         } else if (metric === 'Defense') {
-            hVal = 80 - (match.stats.fouls.home * 3) + (match.stats.saves.home * 5);
-            aVal = 80 - (match.stats.fouls.away * 3) + (match.stats.saves.away * 5);
+            hVal = Math.max(30, 80 - ((match.stats?.fouls?.home || 0) * 3) + ((match.stats?.saves?.home || 0) * 5));
+            aVal = Math.max(30, 80 - ((match.stats?.fouls?.away || 0) * 3) + ((match.stats?.saves?.away || 0) * 5));
         } else if (metric === 'Passing') {
-            hVal = 30 + (match.stats.possession.home * 0.8);
-            aVal = 30 + (match.stats.possession.away * 0.8);
+            hVal = 30 + ((match.stats?.possession?.home || 50) * 0.8);
+            aVal = 30 + ((match.stats?.possession?.away || 50) * 0.8);
         } else if (metric === 'Hazard') {
-            hVal = match.performance.labAnalysis.intensityPulse.slice(-1)[0]?.value || 50;
-            aVal = (match.performance.labAnalysis.intensityPulse.slice(-1)[0]?.value || 50) * 0.8 + (Math.random() * 10);
+            const lastPulse = (match.performance?.labAnalysis?.intensityPulse || []).slice(-1)[0]?.value || 50;
+            hVal = lastPulse;
+            aVal = lastPulse * 0.8 + (Math.random() * 10);
         } else if (metric === 'Press') {
-            hVal = match.performance.labAnalysis.intensityPressing;
-            aVal = match.performance.labAnalysis.intensityPressing * 0.9;
-        }
-        return {
-            subject: metric,
-            A: Math.min(95, Math.max(20, Math.round(hVal))),
-            B: Math.min(95, Math.max(20, Math.round(aVal))),
-            fullMark: 100
-        };
-    });
 
     match.markModified('performance');
 
@@ -477,11 +471,13 @@ export const updateTimer = asyncHandler(async (req, res) => {
     if (half !== undefined) match.timer.half = half;
     if (halfStatus !== undefined) match.timer.halfStatus = halfStatus;
 
-    if (isRunning) {
-        match.timer.startTime = new Date();
-        match.status = 'Live';
-    } else {
-        match.status = 'Paused';
+    if (isRunning !== undefined) {
+        if (isRunning) {
+            match.timer.startTime = new Date();
+            match.status = 'Live';
+        } else {
+            match.status = 'Paused';
+        }
     }
 
     // Sync tournament status if match is part of one

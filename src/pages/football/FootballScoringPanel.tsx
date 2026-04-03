@@ -374,19 +374,19 @@ export default function FootballScoringPanel() {
             if (originalRes.success) {
                 // 2. If it's a save, record a SAVE for the opposing team's goalkeeper
                 if (isSave) {
-                    const opposingTeam = String(pendingEvent.teamId) === String(match.homeTeam._id) ? match.awayTeam : match.homeTeam;
-                    const side = String(opposingTeam._id) === String(match.homeTeam._id) ? 'home' : 'away';
-                    const playingXI = match.lineups?.[side]?.startingXI || [];
-                    
-                    // Prefer active keeper from starting XI
-                    const goalkeeper = opposingTeam.players?.find((p: any) => 
-                        playingXI.includes(p.name) && p.role?.toLowerCase().includes('goalkeeper')
-                    ) || opposingTeam.players?.find((p: any) => p.role?.toLowerCase().includes('goalkeeper')) || { name: `GK (${opposingTeam.name})` };
+                const opposingTeam = String(pendingEvent.teamId) === String(match?.homeTeam?._id || match?.homeTeam) ? match?.awayTeam : match?.homeTeam;
+                const side = String(opposingTeam?._id || opposingTeam) === String(match?.homeTeam?._id || match?.homeTeam) ? 'home' : 'away';
+                const playingXI = match?.lineups?.[side]?.startingXI || [];
+                
+                // Prefer active keeper from starting XI
+                const goalkeeper = opposingTeam?.players?.find((p: any) => 
+                    playingXI.includes(p.name) && p.role?.toLowerCase().includes('goalkeeper')
+                ) || opposingTeam?.players?.find((p: any) => p.role?.toLowerCase().includes('goalkeeper')) || { name: `GK (${opposingTeam?.name || 'Opponent'})` };
                     
                     await footballApi.addEvent(id!, {
                         type: 'Save',
                         minute: Math.floor(secondsElapsed / 60),
-                        team: opposingTeam._id,
+                        team: opposingTeam?._id,
                         player: goalkeeper.name
                     });
                     toast.success(`${pendingEvent.type} and Save recorded!`);
@@ -579,7 +579,7 @@ export default function FootballScoringPanel() {
                     <Card className="bg-slate-900/40 border-slate-800 rounded-[3rem] p-10">
                         <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
                             <div>
-                                <h3 className="text-2xl font-black italic uppercase text-blue-500">{match.homeTeam?.name || 'Home Team'}</h3>
+                                <h3 className="text-2xl font-black italic uppercase text-blue-500">{match?.homeTeam?.name || 'Home Team'}</h3>
                                 <div className="flex flex-wrap gap-2 mt-2">
                                     <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Starting XI: {homeXI.length}/11</p>
                                     <div className="w-1 h-1 rounded-full bg-slate-700 mt-1.5" />
@@ -600,10 +600,10 @@ export default function FootballScoringPanel() {
                             </div>
                         </div>
                         <div className="grid gap-2 max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
-                            {match.homeTeam.players?.map((player: any) => {
-                                const isSuspended = match.tournamentId?.suspensions?.some((s: any) => 
+                            {match?.homeTeam?.players?.map((player: any) => {
+                                const isSuspended = match?.tournamentId?.suspensions?.some((s: any) => 
                                     s.player === player.name && 
-                                    String(s.teamId) === String(match.homeTeam?._id || match.homeTeam)
+                                    String(s.teamId) === String(match?.homeTeam?._id || match?.homeTeam)
                                 );
                                 
                                 return (
@@ -649,7 +649,7 @@ export default function FootballScoringPanel() {
                     <Card className="bg-slate-900/40 border-slate-800 rounded-[3rem] p-10">
                         <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
                             <div>
-                                <h3 className="text-2xl font-black italic uppercase text-orange-500">{match.awayTeam?.name || 'Away Team'}</h3>
+                                <h3 className="text-2xl font-black italic uppercase text-orange-500">{match?.awayTeam?.name || 'Away Team'}</h3>
                                 <div className="flex flex-wrap gap-2 mt-2">
                                     <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Starting XI: {awayXI.length}/11</p>
                                     <div className="w-1 h-1 rounded-full bg-slate-700 mt-1.5" />
@@ -670,10 +670,10 @@ export default function FootballScoringPanel() {
                             </div>
                         </div>
                         <div className="grid gap-2 max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
-                            {match.awayTeam.players?.map((player: any) => {
-                                const isSuspended = match.tournamentId?.suspensions?.some((s: any) => 
+                            {match?.awayTeam?.players?.map((player: any) => {
+                                const isSuspended = match?.tournamentId?.suspensions?.some((s: any) => 
                                     s.player === player.name && 
-                                    String(s.teamId) === String(match.awayTeam?._id || match.awayTeam)
+                                    String(s.teamId) === String(match?.awayTeam?._id || match?.awayTeam)
                                 );
 
                                 return (
@@ -1222,7 +1222,7 @@ export default function FootballScoringPanel() {
                                  <div className="space-y-6">
                                      <div>
                                          <div className="flex justify-between items-center mb-3">
-                                            <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">{match.homeTeam.name}</p>
+                                            <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">{match?.homeTeam?.name || 'Home Team'}</p>
                                             <span className="text-[8px] font-bold text-slate-500">LAST 5</span>
                                          </div>
                                          <div className="flex gap-2">
@@ -1235,7 +1235,7 @@ export default function FootballScoringPanel() {
                                      </div>
                                      <div>
                                          <div className="flex justify-between items-center mb-3">
-                                            <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">{match.awayTeam.name}</p>
+                                            <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">{match?.awayTeam?.name || 'Away Team'}</p>
                                             <span className="text-[8px] font-bold text-slate-500">LAST 5</span>
                                          </div>
                                          <div className="flex gap-2">
@@ -1343,12 +1343,12 @@ export default function FootballScoringPanel() {
                              <Card className="lg:col-span-2 bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-12">
                                  <div className="max-w-3xl mx-auto space-y-12">
                                      {[
-                                         { label: "Possession", home: match.stats.possession.home, away: match.stats.possession.away, suffix: "%" },
-                                         { label: "Shots on Target", home: match.stats.shotsOnTarget.home, away: match.stats.shotsOnTarget.away },
-                                         { label: "Fouls", home: match.stats.fouls.home, away: match.stats.fouls.away },
-                                         { label: "Corners", home: match.stats.corners.home, away: match.stats.corners.away },
-                                         { label: "Yellow Cards", home: match.stats.yellowCards?.home || 0, away: match.stats.yellowCards?.away || 0 },
-                                         { label: "Red Cards", home: match.stats.redCards?.home || 0, away: match.stats.redCards?.away || 0 }
+                                         { label: "Possession", home: match.stats?.possession?.home || 50, away: match.stats?.possession?.away || 50, suffix: "%" },
+                                         { label: "Shots on Target", home: match.stats?.shotsOnTarget?.home || 0, away: match.stats?.shotsOnTarget?.away || 0 },
+                                         { label: "Fouls", home: match.stats?.fouls?.home || 0, away: match.stats?.fouls?.away || 0 },
+                                         { label: "Corners", home: match.stats?.corners?.home || 0, away: match.stats?.corners?.away || 0 },
+                                         { label: "Yellow Cards", home: match.stats?.yellowCards?.home || 0, away: match.stats?.yellowCards?.away || 0 },
+                                         { label: "Red Cards", home: match.stats?.redCards?.home || 0, away: match.stats?.redCards?.away || 0 }
                                      ].map((stat, i) => (
                                          <div key={i} className="space-y-4">
                                              <div className="flex justify-between items-end">
@@ -1414,7 +1414,7 @@ export default function FootballScoringPanel() {
                              <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12 relative overflow-hidden group">
                                  <div className="flex items-center justify-between mb-12">
                                      <div className="flex items-center gap-6">
-                                         <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                                         <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 shadow-[0_0_20px_rgba(168,185,129,0.1)]">
                                              <TrendingUp size={28} />
                                          </div>
                                          <div>
@@ -1435,10 +1435,11 @@ export default function FootballScoringPanel() {
                                  </div>
                                  <div className="h-[300px] w-full">
                                      <ResponsiveContainer width="100%" height="100%">
-                                         <AreaChart data={match.performance?.xGHistory || []}>
+                                         <AreaChart data={match?.performance?.xGHistory?.length > 0 ? match.performance.xGHistory : [{ minute: 0, home: 0, away: 0 }]}>
                                              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
                                              <XAxis dataKey="minute" hide />
-                                             <YAxis hide />
+                                             <YAxis hide domain={[0, 'auto']} />
+                                             <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px', color: '#fff' }} />
                                              <Area type="stepAfter" dataKey="home" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.1} strokeWidth={4} />
                                              <Area type="stepAfter" dataKey="away" stroke="#ef4444" fill="#ef4444" fillOpacity={0.1} strokeWidth={4} />
                                          </AreaChart>
@@ -1497,41 +1498,6 @@ export default function FootballScoringPanel() {
                          </div>
 
                          {/* MIDDLE ROW: Mirror Momentum (The Core Analytics) */}
-                         <div className="bg-[#050505] border border-white/5 rounded-[4rem] p-12 relative overflow-hidden group">
-                              <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-8">
-                                  <div className="flex items-center gap-6">
-                                      <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
-                                          <Activity size={28} />
-                                      </div>
-                                      <div>
-                                         <h3 className="text-4xl font-black italic uppercase tracking-tight text-white mb-1">Momentum Mirror</h3>
-                                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Dual-axis control intensity mapping</p>
-                                      </div>
-                                  </div>
-                                  <div className="flex gap-12">
-                                      <div className="flex items-center gap-3">
-                                          <div className="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
-                                          <span className="text-xs font-black uppercase tracking-widest text-slate-400">{match.homeTeam?.name || 'HOME'}</span>
-                                      </div>
-                                      <div className="flex items-center gap-3">
-                                          <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]" />
-                                          <span className="text-xs font-black uppercase tracking-widest text-slate-400">{match.awayTeam?.name || 'AWAY'}</span>
-                                      </div>
-                                  </div>
-                              </div>
-
-                              <div className="h-[350px] w-full relative">
-                                  <ResponsiveContainer width="100%" height="100%">
-                                      <AreaChart data={match.performance?.momentumHistory || []} margin={{ bottom: 20 }}>
-                                          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
-                                          <XAxis dataKey="minute" hide />
-                                          <YAxis hide domain={[0, 100]} />
-                                          <Tooltip 
-                                             content={({ active, payload }: any) => {
-                                                 if (active && payload && payload.length > 0) {
-                                                     const val = payload[0].payload.value;
-                                                     return (
-                                                         <div className="bg-slate-950/90 border border-white/10 p-4 rounded-2xl shadow-2xl backdrop-blur-md">
                                                              <p className="text-[10px] font-black uppercase text-slate-500 mb-2 tracking-[0.2em]">Minute {payload[0].payload.minute}'</p>
                                                              <div className="flex items-center gap-3">
                                                                  <div className={`w-2 h-2 rounded-full ${val >= 0 ? 'bg-blue-500' : 'bg-red-500'}`} />
@@ -1797,8 +1763,8 @@ export default function FootballScoringPanel() {
                                  </h4>
 
                                  {eventTeam?.players?.filter((p: any) => {
-                                     const side = String(eventTeam?._id) === String(match.homeTeam?._id || match.homeTeam) ? 'home' : 'away';
-                                     const startingXI = match.lineups?.[side]?.startingXI || [];
+                                     const side = String(eventTeam?._id) === String(match?.homeTeam?._id || match?.homeTeam) ? 'home' : 'away';
+                                     const startingXI = match?.lineups?.[side]?.startingXI || [];
                                      const events = match.events || [];
                                      const isSubbedOut = events.some((e: any) => e.type === 'Substitution' && e.playerOut === p.name);
                                      const isSubbedIn = events.some((e: any) => e.type === 'Substitution' && e.player === p.name);
