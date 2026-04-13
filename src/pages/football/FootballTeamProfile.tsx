@@ -548,123 +548,210 @@ export default function FootballTeamProfile() {
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="matches" className="space-y-8">
-                        <div className="grid gap-4">
+                    <TabsContent value="matches" className="space-y-6 mt-8">
+                        <div className="grid gap-6">
                             {matches.map((match: any) => (
-                                <Card key={match._id} className="bg-slate-900/40 border-white/5 p-8 rounded-[3rem] hover:border-white/10 transition-all flex items-center justify-between group">
-                                    <div className="flex items-center gap-12 flex-1">
-                                        <div className="flex-1 text-right flex flex-col items-end">
-                                            <span className="text-3xl font-black italic uppercase tracking-tighter group-hover:text-blue-400 transition-colors line-clamp-1">{match.homeTeam.name}</span>
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Home</span>
+                                <Card key={match._id} className="relative overflow-hidden bg-[#0a0a0c] border border-white/5 p-0 rounded-[2.5rem] group hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_20px_40px_-20px_rgba(59,130,246,0.15)]">
+                                    {/* Background glow effects */}
+                                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/5 blur-[100px] rounded-full group-hover:bg-blue-600/10 transition-colors duration-700" />
+                                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/5 blur-[80px] rounded-full" />
+                                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]" />
+
+                                    <div className="relative z-10 flex flex-col md:flex-row items-stretch md:items-center">
+                                        {/* Main Match Area */}
+                                        <div className="flex-1 flex items-center justify-between p-8 md:p-10 gap-4">
+                                            {/* Home Team */}
+                                            <div className="flex-1 text-right flex flex-col items-end group/team">
+                                                <span className="text-2xl md:text-3xl lg:text-4xl font-black italic uppercase tracking-tighter group-hover/team:text-blue-400 transition-colors drop-shadow-md line-clamp-1">{match.homeTeam.name}</span>
+                                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mt-2 group-hover/team:text-slate-500 transition-colors">Home</span>
+                                            </div>
+                                            
+                                            {/* Score Center */}
+                                            <div className="flex flex-col items-center gap-5 mx-2 md:mx-8">
+                                                <div className="relative">
+                                                    <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                                    <div className="relative px-8 md:px-12 py-6 bg-slate-950/80 rounded-[2rem] border border-white/10 shadow-2xl backdrop-blur-md group-hover:border-blue-500/30 transition-all">
+                                                        <span className="text-3xl md:text-5xl font-black italic tracking-tighter tabular-nums drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                                                            <span className="text-white">{match.score.home}</span>
+                                                            <span className="text-blue-500/50 mx-3 md:mx-4">-</span>
+                                                            <span className="text-white">{match.score.away}</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className={`px-5 py-2 rounded-full border text-[10px] font-black uppercase tracking-[0.25em] shadow-lg ${
+                                                    match.status === 'Live' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-emerald-500/20 animate-pulse' :
+                                                    match.status === 'Completed' ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-blue-500/10' :
+                                                    'bg-slate-800/50 border-slate-700 text-slate-400'
+                                                }`}>
+                                                    {match.status}
+                                                </div>
+                                            </div>
+
+                                            {/* Away Team */}
+                                            <div className="flex-1 text-left flex flex-col items-start group/team">
+                                                <span className="text-2xl md:text-3xl lg:text-4xl font-black italic uppercase tracking-tighter group-hover/team:text-blue-400 transition-colors drop-shadow-md line-clamp-1">{match.awayTeam.name}</span>
+                                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mt-2 group-hover/team:text-slate-500 transition-colors">Away</span>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col items-center gap-4">
-                                            <div className="px-10 py-5 bg-slate-950 rounded-[2rem] border border-white/10 shadow-inner group-hover:border-blue-500/20 transition-all">
-                                                <span className="text-4xl font-black italic leading-none tracking-tighter tabular-nums">
-                                                    {match.score.home}<span className="text-slate-700 mx-3">-</span>{match.score.away}
+
+                                        {/* Metadata Sidebar */}
+                                        <div className="w-full md:w-64 bg-slate-900/50 md:border-l border-t md:border-t-0 border-white/5 p-8 flex flex-col md:justify-center justify-between gap-6 backdrop-blur-md">
+                                            <div className="space-y-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-xl bg-slate-800/50 border border-slate-700 flex items-center justify-center shrink-0">
+                                                        <Calendar size={14} className="text-slate-400" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[8px] font-black text-slate-600 uppercase tracking-[0.2em] mb-0.5">Date</p>
+                                                        <p className="text-xs font-bold text-slate-300">{new Date(match.matchDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+                                                        <Trophy size={14} className="text-blue-400" />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <p className="text-[8px] font-black text-slate-600 uppercase tracking-[0.2em] mb-0.5">Tournament</p>
+                                                        <p className="text-xs font-bold text-slate-300 truncate">{match.tournamentId?.name || "League Match"}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <Button 
+                                                onClick={() => navigate(`/football/match/result/${match._id}`)}
+                                                className="w-full h-12 rounded-[1rem] bg-white/5 hover:bg-blue-600 text-white border border-white/10 hover:border-transparent transition-all overflow-hidden group/btn relative"
+                                            >
+                                                <span className="relative z-10 text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center">
+                                                    Report <ChevronRight size={14} className="ml-1 group-hover/btn:translate-x-1 transition-transform" />
                                                 </span>
-                                            </div>
-                                            <div className={`px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest ${
-                                                match.status === 'Live' ? 'bg-green-500/10 border-green-500/20 text-green-400 animate-pulse' :
-                                                match.status === 'Completed' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
-                                                'bg-slate-500/10 border-slate-500/20 text-slate-500'
-                                            }`}>
-                                                {match.status}
-                                            </div>
+                                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                                            </Button>
                                         </div>
-                                        <div className="flex-1 text-left flex flex-col items-start">
-                                            <span className="text-3xl font-black italic uppercase tracking-tighter group-hover:text-blue-400 transition-colors line-clamp-1">{match.awayTeam.name}</span>
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Away</span>
-                                        </div>
-                                    </div>
-                                    <div className="ml-12 pl-12 border-l border-white/5 hidden lg:block space-y-2">
-                                        <div className="flex items-center gap-2 text-slate-500">
-                                            <Calendar size={14} />
-                                            <span className="text-[10px] font-black uppercase tracking-widest">{new Date(match.matchDate).toLocaleDateString()}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-slate-500">
-                                            <Trophy size={14} />
-                                            <span className="text-[10px] font-black uppercase tracking-widest truncate max-w-[120px]">{match.tournamentId?.name || "League"}</span>
-                                        </div>
-                                        <Button 
-                                            onClick={() => navigate(`/football/match/result/${match._id}`)}
-                                            size="sm" 
-                                            variant="outline" 
-                                            className="w-full rounded-xl border-white/5 hover:bg-blue-600 hover:text-white transition-all text-[10px] font-black uppercase"
-                                        >
-                                            View Report <ChevronRight size={12} className="ml-1" />
-                                        </Button>
                                     </div>
                                 </Card>
                             ))}
                             {matches.length === 0 && (
-                                <div className="py-40 text-center bg-slate-900/10 border border-white/5 rounded-[4rem]">
-                                    <Swords className="mx-auto text-slate-800 mb-6 opacity-20" size={80} />
-                                    <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-sm">No matches scheduled</p>
+                                <div className="py-32 text-center relative overflow-hidden bg-slate-900/30 border border-white/5 rounded-[3rem]">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-80" />
+                                    <Swords className="mx-auto text-slate-700 mb-6 drop-shadow-lg relative z-10" size={64} />
+                                    <p className="text-slate-400 font-black uppercase tracking-[0.4em] text-xs relative z-10">No Matches Scheduled</p>
                                 </div>
                             )}
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="stats" className="space-y-12">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            <Card className="col-span-1 lg:col-span-2 bg-slate-900/30 border-white/5 p-10 rounded-[3rem]">
-                                <h4 className="text-2xl font-black italic uppercase tracking-tight mb-8">Scoring Distribution</h4>
-                                <div className="h-[400px]">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={chartData}>
-                                            <XAxis 
-                                                dataKey="name" 
-                                                stroke="#475569" 
-                                                fontSize={12} 
-                                                tickLine={false} 
-                                                axisLine={false}
-                                                tick={{ fill: '#475569', fontWeight: 'bold' }}
-                                            />
-                                            <YAxis hide />
-                                            <Tooltip 
-                                                contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '16px' }}
-                                                itemStyle={{ color: '#3b82f6', fontWeight: 'bold' }}
-                                            />
-                                            <Bar dataKey="goals" radius={[12, 12, 0, 0]}>
-                                                {chartData.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={`rgba(59, 130, 246, ${1 - (index * 0.15)})`} />
-                                                ))}
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                    <TabsContent value="stats" className="space-y-8 mt-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Main Chart */}
+                            <Card className="col-span-1 lg:col-span-2 relative overflow-hidden bg-[#0c0c10] border border-slate-800/60 p-8 md:p-12 rounded-[3rem] shadow-2xl group/chart">
+                                <div className="absolute top-0 right-0 w-full h-96 bg-gradient-to-b from-blue-600/10 to-transparent opacity-50 transition-opacity duration-700 group-hover/chart:opacity-100" />
+                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02]" />
+                                
+                                <div className="relative z-10 flex flex-col h-full">
+                                    <div className="flex items-center gap-4 mb-10">
+                                        <div className="w-1.5 h-8 bg-blue-500 rounded-full" />
+                                        <div>
+                                            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white">Scoring Distribution</h4>
+                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] mt-1">Goal Contributions By Player</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="h-[350px] w-full mt-auto">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={chartData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
+                                                <XAxis 
+                                                    dataKey="name" 
+                                                    stroke="#334155" 
+                                                    fontSize={10} 
+                                                    tickLine={false} 
+                                                    axisLine={false}
+                                                    tick={{ fill: '#64748b', fontWeight: 900, textTransform: 'uppercase' }}
+                                                    dy={10}
+                                                />
+                                                <YAxis hide />
+                                                <Tooltip 
+                                                    cursor={{ fill: 'rgba(59, 130, 246, 0.05)' }}
+                                                    contentStyle={{ 
+                                                        backgroundColor: 'rgba(15, 23, 42, 0.9)', 
+                                                        border: '1px solid rgba(59, 130, 246, 0.2)', 
+                                                        borderRadius: '16px',
+                                                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(59, 130, 246, 0.1)',
+                                                        backdropFilter: 'blur(12px)'
+                                                    }}
+                                                    itemStyle={{ color: '#fff', fontWeight: 900, fontSize: '14px', fontStyle: 'italic' }}
+                                                    labelStyle={{ color: '#94a3b8', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 'bold', marginBottom: '4px' }}
+                                                />
+                                                <Bar 
+                                                    dataKey="goals" 
+                                                    radius={[12, 12, 0, 0]}
+                                                    maxBarSize={60}
+                                                >
+                                                    {chartData.map((entry, index) => (
+                                                        <Cell 
+                                                            key={`cell-${index}`} 
+                                                            fill={`url(#colorGradient-${index})`} 
+                                                            className="hover:opacity-80 transition-opacity cursor-pointer drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]"
+                                                        />
+                                                    ))}
+                                                </Bar>
+                                                {/* Define Gradients */}
+                                                <defs>
+                                                    {chartData.map((_, index) => (
+                                                        <linearGradient key={`colorGradient-${index}`} id={`colorGradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                                                            <stop offset="0%" stopColor="#3b82f6" stopOpacity={1 - (index * 0.1)} />
+                                                            <stop offset="100%" stopColor="#1d4ed8" stopOpacity={0.4} />
+                                                        </linearGradient>
+                                                    ))}
+                                                </defs>
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
                                 </div>
                             </Card>
 
-                            <div className="space-y-6">
-                                <Card className="bg-slate-900/30 border-white/5 p-10 rounded-[3rem]">
-                                    <h5 className="text-xs font-black uppercase tracking-[0.3em] text-slate-500 mb-8 text-center">Efficiency Rating</h5>
-                                    <div className="relative w-48 h-48 mx-auto flex items-center justify-center">
-                                        <div className="absolute inset-0 border-[16px] border-white/5 rounded-full" />
-                                        <div className="absolute inset-0 border-[16px] border-blue-500 rounded-full border-t-transparent border-r-transparent animate-spin-slow rotate-45" />
-                                        <div className="text-center">
-                                            <p className="text-5xl font-black italic text-blue-500 tracking-tighter">
+                            {/* Supplemental Cards */}
+                            <div className="col-span-1 lg:col-span-1 space-y-6 flex flex-col">
+                                <Card className="flex-1 relative overflow-hidden bg-[#0c0c10] border border-slate-800/60 p-8 rounded-[3rem] shadow-2xl flex flex-col justify-center items-center group/eff">
+                                    <div className="absolute inset-0 bg-blue-600/5 group-hover/eff:bg-blue-600/10 transition-colors duration-500" />
+                                    
+                                    <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-8 relative z-10 text-center">Efficiency Rating</h5>
+                                    
+                                    <div className="relative w-52 h-52 flex items-center justify-center">
+                                        {/* Ring background */}
+                                        <div className="absolute inset-0 border-[12px] border-slate-900 rounded-full shadow-inner" />
+                                        {/* Animated primary ring */}
+                                        <div className="absolute inset-0 border-[12px] border-blue-500/80 rounded-full border-t-transparent border-l-transparent animate-[spin_4s_linear_infinite] shadow-[0_0_30px_rgba(59,130,246,0.2)]" />
+                                        {/* Static dash ring */}
+                                        <div className="absolute inset-2 border-2 border-dashed border-slate-700/50 rounded-full" />
+                                        
+                                        <div className="text-center relative z-10 mt-2">
+                                            <p className="text-6xl font-black italic text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 tracking-tighter drop-shadow-lg">
                                                 {matches.filter((m: any) => m.status === 'Completed').length > 0 ? (
                                                     Math.round(((Object.values(playerStats) as any[]).reduce((acc: number, s: any) => acc + (s.goals || 0), 0) / matches.filter((m: any) => m.status === 'Completed').length) * 10) / 10
                                                 ) : 0}
                                             </p>
-                                            <p className="text-[8px] font-black uppercase tracking-widest text-slate-500 mt-1">Goals / Match</p>
+                                            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-blue-500 mt-2">Goals/Match</p>
                                         </div>
                                     </div>
                                 </Card>
 
-                                <Card className="bg-slate-900/30 border-white/5 p-8 rounded-[3rem] space-y-6">
-                                    <div className="flex justify-between items-center">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Disciplinary Record</p>
-                                        <CreditCard size={14} className="text-red-500" />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="p-4 bg-yellow-500/5 border border-yellow-500/20 rounded-2xl text-center">
-                                            <p className="text-3xl font-black italic text-yellow-500">{(Object.values(playerStats) as any[]).reduce((acc: number, s: any) => acc + (s.yellowCards || 0), 0)}</p>
-                                            <p className="text-[8px] font-black uppercase tracking-widest text-yellow-600">Yellows</p>
+                                <Card className="relative overflow-hidden bg-[#0c0c10] border border-slate-800/60 p-8 rounded-[3rem] shadow-2xl space-y-6">
+                                    <div className="flex justify-between items-center relative z-10">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Discipline</p>
+                                        <div className="w-8 h-8 rounded-full bg-slate-900 border border-white/5 flex items-center justify-center">
+                                            <CreditCard size={12} className="text-slate-500/50" />
                                         </div>
-                                        <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-2xl text-center">
-                                            <p className="text-3xl font-black italic text-red-500">{(Object.values(playerStats) as any[]).reduce((acc: number, s: any) => acc + (s.redCards || 0), 0)}</p>
-                                            <p className="text-[8px] font-black uppercase tracking-widest text-red-600">Reds</p>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 gap-4 relative z-10">
+                                        <div className="group/card p-5 bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border border-yellow-500/20 rounded-[2rem] text-center hover:bg-yellow-500/20 transition-colors shadow-[0_0_30px_-10px_rgba(234,179,8,0.15)] relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-yellow-400 opacity-0 group-hover/card:opacity-10 blur-[20px] transition-opacity" />
+                                            <p className="text-4xl font-black italic text-yellow-400 drop-shadow-md">{(Object.values(playerStats) as any[]).reduce((acc: number, s: any) => acc + (s.yellowCards || 0), 0)}</p>
+                                            <p className="text-[8px] font-black uppercase tracking-[0.3em] text-yellow-500/80 mt-2">Yellows</p>
+                                        </div>
+                                        <div className="group/card p-5 bg-gradient-to-br from-red-500/10 to-red-600/5 border border-red-500/20 rounded-[2rem] text-center hover:bg-red-500/20 transition-colors shadow-[0_0_30px_-10px_rgba(239,68,68,0.15)] relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-red-400 opacity-0 group-hover/card:opacity-10 blur-[20px] transition-opacity" />
+                                            <p className="text-4xl font-black italic text-red-500 drop-shadow-md">{(Object.values(playerStats) as any[]).reduce((acc: number, s: any) => acc + (s.redCards || 0), 0)}</p>
+                                            <p className="text-[8px] font-black uppercase tracking-[0.3em] text-red-500/80 mt-2">Reds</p>
                                         </div>
                                     </div>
                                 </Card>
