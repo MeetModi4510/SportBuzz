@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, AreaChart, Area, CartesianGrid, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "recharts";
 
 export default function FootballTeamProfile() {
     const { id } = useParams();
@@ -176,6 +176,26 @@ export default function FootballTeamProfile() {
     });
     
     const winRate = completedMatches.length > 0 ? Math.round((wins / completedMatches.length) * 100) : 0;
+
+    const totalYellows = (Object.values(playerStats) as any[]).reduce((acc: number, s: any) => acc + (s.yellowCards || 0), 0);
+    const totalReds = (Object.values(playerStats) as any[]).reduce((acc: number, s: any) => acc + (s.redCards || 0), 0);
+
+    const formTimeline = completedMatches.slice().reverse().map((m: any, i: number) => {
+        const isHome = m.homeTeam?._id === team._id || m.homeTeam?.name === team.name;
+        return {
+            match: `M${i+1}`,
+            scored: isHome ? (m.score?.home || 0) : (m.score?.away || 0),
+            conceded: isHome ? (m.score?.away || 0) : (m.score?.home || 0),
+        };
+    });
+
+    const radarData = [
+        { subject: 'Attack', value: Math.round(Math.min(100, (totalGoalsScored / Math.max(1, completedMatches.length)) * 30 + 40)) },
+        { subject: 'Defense', value: Math.round(Math.min(100, (cleanSheets * 15) + (totalGoalsConceded < completedMatches.length ? 30 : 0) + 40)) },
+        { subject: 'Tactics', value: Math.round(Math.min(100, winRate + 20)) },
+        { subject: 'Discipline', value: Math.round(Math.max(20, 100 - (totalYellows * 5 + totalReds * 15))) },
+        { subject: 'Form', value: Math.round(Math.min(100, (recentForm.filter((f: string) => f === 'W').length * 20) + 40)) },
+    ];
 
     return (
         <div className="min-h-screen bg-[#0a0a0c] text-white selection:bg-blue-500/30">
@@ -732,6 +752,81 @@ export default function FootballTeamProfile() {
                                             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-500 mt-1">Goals Conceded</p>
                                         </div>
                                     </div>
+                                </div>
+                            </Card>
+                        </div>
+
+                        {/* NEW ROW: Form Match History & Team DNA Radar */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 mt-2">
+                            {/* Match Form Timeline */}
+                            <Card className="col-span-1 lg:col-span-2 relative overflow-hidden bg-gradient-to-br from-[#0c0c10] to-[#050508] border border-slate-800/60 p-8 rounded-[3rem] shadow-2xl group/timeline">
+                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.05]" />
+                                <div className="absolute right-0 top-0 w-64 h-64 bg-emerald-500/10 blur-[100px] pointer-events-none" />
+                                <div className="relative z-10 flex flex-col h-full">
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className="w-1.5 h-8 bg-emerald-500 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+                                        <div>
+                                            <h4 className="text-xl font-black italic uppercase tracking-tighter text-white">Season Progression</h4>
+                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] mt-1">Goals Scored vs Conceded Over Time</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 min-h-[220px] w-full mt-4">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={formTimeline} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                                                <defs>
+                                                    <linearGradient id="scoreArea" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
+                                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                                    </linearGradient>
+                                                    <linearGradient id="concedeArea" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
+                                                        <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                                <XAxis dataKey="match" stroke="#334155" fontSize={10} tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontWeight: 900 }} dy={10} />
+                                                <YAxis hide />
+                                                <Tooltip 
+                                                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '16px', backdropFilter: 'blur(16px)', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }}
+                                                    itemStyle={{ color: '#fff', fontWeight: 900, fontSize: '14px', fontStyle: 'italic' }}
+                                                    labelStyle={{ color: '#cbd5e1', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 'bold', marginBottom: '8px' }}
+                                                />
+                                                <Area type="monotone" dataKey="scored" name="Scored" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#scoreArea)" activeDot={{ r: 6, fill: "#3b82f6", stroke: "#fff", strokeWidth: 2 }} />
+                                                <Area type="monotone" dataKey="conceded" name="Conceded" stroke="#f43f5e" strokeWidth={3} fillOpacity={1} fill="url(#concedeArea)" activeDot={{ r: 6, fill: "#f43f5e", stroke: "#fff", strokeWidth: 2 }} />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </Card>
+
+                            {/* Team DNA Radar */}
+                            <Card className="col-span-1 relative overflow-hidden bg-gradient-to-b from-[#0c0c10] to-[#050508] border border-slate-800/60 p-8 rounded-[3rem] shadow-2xl flex flex-col justify-between">
+                                <div className="absolute right-0 bottom-0 w-64 h-64 bg-indigo-600/10 blur-[100px] pointer-events-none" />
+                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02]" />
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-4 mb-2">
+                                        <div className="w-1.5 h-8 bg-indigo-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
+                                        <div>
+                                            <h4 className="text-xl font-black italic uppercase tracking-tighter text-white">Team DNA</h4>
+                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] mt-1">Attribute Matrix</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="relative z-10 w-full h-[220px] -mt-2">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
+                                            <PolarGrid stroke="rgba(255,255,255,0.1)" strokeWidth={1.5} />
+                                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 900 }} />
+                                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                                            <Radar name="Team Rating" dataKey="value" stroke="#6366f1" fill="#6366f1" fillOpacity={0.4} strokeWidth={2.5} />
+                                            <Tooltip 
+                                                cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                                                contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(99, 102, 241, 0.3)', borderRadius: '12px' }}
+                                                itemStyle={{ color: '#fff', fontWeight: 900, fontStyle: 'italic' }}
+                                                labelStyle={{ display: 'none' }}
+                                            />
+                                        </RadarChart>
+                                    </ResponsiveContainer>
                                 </div>
                             </Card>
                         </div>
