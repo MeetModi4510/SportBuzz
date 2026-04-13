@@ -297,6 +297,7 @@ export default function FootballTeamProfile() {
                                     </DialogContent>
                                 </Dialog>
                             </div>
+                            </div>
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                                 <span className="px-3 py-1 bg-blue-500/20 rounded-full text-blue-400 text-[10px] font-black uppercase tracking-widest border border-blue-500/30">
                                     Established {new Date(team.createdAt).getFullYear()}
