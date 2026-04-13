@@ -151,6 +151,30 @@ export default function FootballTeamProfile() {
         .sort((a, b) => b.goals - a.goals)
         .slice(0, 5);
 
+    const completedMatches = matches.filter((m: any) => m.status === 'Completed');
+    let totalGoalsScored = 0;
+    let totalGoalsConceded = 0;
+    let cleanSheets = 0;
+    let wins = 0;
+    let draws = 0;
+    let losses = 0;
+
+    completedMatches.forEach((m: any) => {
+        const isHome = m.homeTeam?._id === team._id || m.homeTeam?.name === team.name;
+        const scored = isHome ? (m.score?.home || 0) : (m.score?.away || 0);
+        const conceded = isHome ? (m.score?.away || 0) : (m.score?.home || 0);
+        
+        totalGoalsScored += scored;
+        totalGoalsConceded += conceded;
+        
+        if (conceded === 0) cleanSheets++;
+        if (scored > conceded) wins++;
+        else if (scored === conceded) draws++;
+        else losses++;
+    });
+    
+    const winRate = completedMatches.length > 0 ? Math.round((wins / completedMatches.length) * 100) : 0;
+
     return (
         <div className="min-h-screen bg-[#0a0a0c] text-white selection:bg-blue-500/30">
             <Navbar />
@@ -640,6 +664,64 @@ export default function FootballTeamProfile() {
                     </TabsContent>
 
                     <TabsContent value="stats" className="space-y-8 mt-8">
+                        {/* Team Performance Overview Cards */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                                        <Trophy size={18} className="text-blue-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-4xl font-black italic tracking-tighter text-white">{winRate}%</p>
+                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mt-1">Win Rate</p>
+                                    </div>
+                                </div>
+                            </Card>
+                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                                        <Shield size={18} className="text-emerald-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-4xl font-black italic tracking-tighter text-white">{cleanSheets}</p>
+                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mt-1">Clean Sheets</p>
+                                    </div>
+                                </div>
+                            </Card>
+                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center">
+                                        <Goal size={18} className="text-indigo-500" />
+                                    </div>
+                                    <div className="flex items-end gap-2">
+                                        <div>
+                                            <p className="text-4xl font-black italic tracking-tighter text-white">{totalGoalsScored}</p>
+                                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mt-1">Goals Scored</p>
+                                        </div>
+                                        <div className="mb-1 text-xs font-bold text-slate-600 italic">/{completedMatches.length} M</div>
+                                    </div>
+                                </div>
+                            </Card>
+                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-gradient-to-br from-rose-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center">
+                                        <Swords size={18} className="text-rose-500" />
+                                    </div>
+                                    <div className="flex items-end gap-2">
+                                        <div>
+                                            <p className="text-4xl font-black italic tracking-tighter text-white">{totalGoalsConceded}</p>
+                                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mt-1">Goals Conceded</p>
+                                        </div>
+                                        <div className="mb-1 text-xs font-bold text-slate-600 italic">/{completedMatches.length} M</div>
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             {/* Main Chart */}
                             <Card className="col-span-1 lg:col-span-2 relative overflow-hidden bg-[#0c0c10] border border-slate-800/60 p-8 md:p-12 rounded-[3rem] shadow-2xl group/chart">
@@ -664,7 +746,7 @@ export default function FootballTeamProfile() {
                                                     fontSize={10} 
                                                     tickLine={false} 
                                                     axisLine={false}
-                                                    tick={{ fill: '#64748b', fontWeight: 900, textTransform: 'uppercase' }}
+                                                    tick={{ fill: '#64748b', fontWeight: 900 }}
                                                     dy={10}
                                                 />
                                                 <YAxis hide />
