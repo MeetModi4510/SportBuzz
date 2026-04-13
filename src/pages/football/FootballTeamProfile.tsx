@@ -7,8 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
     Trophy, Users, Swords, BarChart3, ArrowLeft, Plus, 
     Loader2, Calendar, Shield, Goal, CreditCard, 
-    TrendingUp, UserPlus, Trash2, ChevronRight, Settings, Camera, Upload,
-    X, Star, Shirt, CircleDot, Footprints, UserCircle2
+    TrendingUp, UserPlus, Trash2, ChevronRight, Settings, Camera, Upload
 } from "lucide-react";
 import { footballApi } from "@/services/api";
 import { toast } from "sonner";
@@ -28,7 +27,6 @@ export default function FootballTeamProfile() {
     const [editTeamData, setEditTeamData] = useState({ name: "", logo: "", acronym: "" });
     const [newPlayer, setNewPlayer] = useState({ name: "", number: "", role: "Forward", isCaptain: false });
     const [isUpdating, setIsUpdating] = useState(false);
-    const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
 
     const fetchData = async () => {
         try {
@@ -502,7 +500,7 @@ export default function FootballTeamProfile() {
                                             <div 
                                                 key={i} 
                                                 className="group relative bg-slate-900/30 border border-white/5 p-6 rounded-[2.5rem] hover:border-blue-500/30 transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/5 active:scale-[0.98]"
-                                                onClick={() => setSelectedPlayer({ ...p, stats: pStats, pos })}
+                                                onClick={() => navigate(`/football/player/${id}/${encodeURIComponent(p.name)}`)}
                                             >
                                                 <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity" />
                                                 <div className="flex items-center gap-6 relative z-10">
@@ -674,157 +672,6 @@ export default function FootballTeamProfile() {
                     </TabsContent>
                 </Tabs>
             </main>
-
-            {/* ===== PLAYER PROFILE MODAL ===== */}
-            {selectedPlayer && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => setSelectedPlayer(null)}>
-                    <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
-                    <div 
-                        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0c0c10] border border-white/10 rounded-[3rem] shadow-2xl shadow-blue-500/10"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        {/* Close Button */}
-                        <button 
-                            onClick={() => setSelectedPlayer(null)}
-                            className="absolute top-6 right-6 z-20 w-10 h-10 bg-slate-800/80 hover:bg-red-500/20 rounded-full flex items-center justify-center text-slate-400 hover:text-red-400 transition-all backdrop-blur-sm border border-white/5"
-                        >
-                            <X size={18} />
-                        </button>
-
-                        {/* Hero Header */}
-                        <div className="relative overflow-hidden rounded-t-[3rem]">
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-[#0c0c10] to-purple-600/10" />
-                            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5" />
-                            <div className="relative z-10 px-10 pt-12 pb-10">
-                                <div className="flex items-start gap-8">
-                                    {/* Jersey Number */}
-                                    <div className="relative">
-                                        <div className="w-28 h-28 rounded-[2rem] bg-gradient-to-br from-blue-600/30 to-blue-900/60 flex items-center justify-center border-[3px] border-blue-500/30 shadow-2xl shadow-blue-500/20">
-                                            <span className="text-5xl font-black italic text-blue-400 drop-shadow-lg">#{selectedPlayer.number}</span>
-                                        </div>
-                                        {selectedPlayer.isCaptain && (
-                                            <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center shadow-lg shadow-yellow-500/30 border-2 border-yellow-400">
-                                                <Star size={14} className="text-yellow-900 fill-yellow-900" />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Player Info */}
-                                    <div className="flex-1 space-y-3">
-                                        <div>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-400 mb-1">{selectedPlayer.pos || selectedPlayer.role}</p>
-                                            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-[0.85] bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent">
-                                                {selectedPlayer.name}
-                                            </h2>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] font-black text-blue-400 uppercase tracking-[0.15em]">
-                                                <Shirt size={12} /> {team.name}
-                                            </span>
-                                            {selectedPlayer.isCaptain && (
-                                                <span className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-yellow-500/10 border border-yellow-500/20 rounded-full text-[10px] font-black text-yellow-400 uppercase tracking-[0.15em]">
-                                                    <Shield size={12} /> Captain
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Stats Grid */}
-                        <div className="px-10 py-8 space-y-8">
-                            {/* Key Stats */}
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                {[
-                                    { label: 'Goals', value: selectedPlayer.stats?.goals || 0, icon: Goal, color: 'text-emerald-400', bg: 'bg-emerald-500/10', borderColor: 'border-emerald-500/20' },
-                                    { label: 'Assists', value: selectedPlayer.stats?.assists || 0, icon: Footprints, color: 'text-blue-400', bg: 'bg-blue-500/10', borderColor: 'border-blue-500/20' },
-                                    { label: 'Yellow Cards', value: selectedPlayer.stats?.yellowCards || 0, icon: CreditCard, color: 'text-yellow-400', bg: 'bg-yellow-500/10', borderColor: 'border-yellow-500/20' },
-                                    { label: 'Red Cards', value: selectedPlayer.stats?.redCards || 0, icon: CreditCard, color: 'text-red-400', bg: 'bg-red-500/10', borderColor: 'border-red-500/20' },
-                                ].map((stat, i) => (
-                                    <div key={i} className={`p-5 rounded-[1.5rem] ${stat.bg} border ${stat.borderColor} text-center space-y-2 group hover:scale-105 transition-transform duration-300`}>
-                                        <stat.icon className={`${stat.color} mx-auto group-hover:rotate-12 transition-transform`} size={22} />
-                                        <p className={`text-3xl font-black italic ${stat.color}`}>{stat.value}</p>
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">{stat.label}</p>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Match Appearances & Performance */}
-                            <div className="space-y-4">
-                                <h4 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-                                    <CircleDot size={14} className="text-blue-500" /> Match Involvement
-                                </h4>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-5 rounded-2xl bg-slate-900/50 border border-white/5 space-y-1">
-                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Matches Appeared</p>
-                                        <p className="text-2xl font-black text-white">
-                                            {selectedPlayer.stats?.matchesPlayed || selectedPlayer.stats?.appearances || 0}
-                                        </p>
-                                    </div>
-                                    <div className="p-5 rounded-2xl bg-slate-900/50 border border-white/5 space-y-1">
-                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Goals Per Match</p>
-                                        <p className="text-2xl font-black text-white">
-                                            {(selectedPlayer.stats?.matchesPlayed || selectedPlayer.stats?.appearances) 
-                                                ? (((selectedPlayer.stats?.goals || 0) / (selectedPlayer.stats?.matchesPlayed || selectedPlayer.stats?.appearances || 1))).toFixed(2)
-                                                : '0.00'}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Visual Stat Bars */}
-                            <div className="space-y-4">
-                                <h4 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-                                    <BarChart3 size={14} className="text-blue-500" /> Performance Breakdown
-                                </h4>
-                                <div className="space-y-4">
-                                    {[
-                                        { label: 'Attacking', value: Math.min(((selectedPlayer.stats?.goals || 0) * 10 + (selectedPlayer.stats?.assists || 0) * 5), 100), color: 'bg-emerald-500' },
-                                        { label: 'Discipline', value: Math.max(100 - ((selectedPlayer.stats?.yellowCards || 0) * 15 + (selectedPlayer.stats?.redCards || 0) * 35), 0), color: 'bg-blue-500' },
-                                        { label: 'Consistency', value: (selectedPlayer.stats?.matchesPlayed || selectedPlayer.stats?.appearances) ? Math.min(((selectedPlayer.stats?.matchesPlayed || selectedPlayer.stats?.appearances || 0) * 12), 100) : 0, color: 'bg-purple-500' },
-                                    ].map((bar, i) => (
-                                        <div key={i} className="space-y-2">
-                                            <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.15em]">
-                                                <span className="text-slate-400">{bar.label}</span>
-                                                <span className="text-white">{Math.round(bar.value)}%</span>
-                                            </div>
-                                            <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                                                <div 
-                                                    className={`h-full ${bar.color} rounded-full transition-all duration-1000`}
-                                                    style={{ width: `${bar.value}%` }}
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Player Details */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="p-4 rounded-2xl bg-slate-900/30 border border-white/5">
-                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Position</p>
-                                    <p className="text-sm font-bold text-white">{selectedPlayer.role || selectedPlayer.pos}</p>
-                                </div>
-                                <div className="p-4 rounded-2xl bg-slate-900/30 border border-white/5">
-                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Jersey Number</p>
-                                    <p className="text-sm font-bold text-white">#{selectedPlayer.number}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="px-10 pb-10">
-                            <Button 
-                                className="w-full bg-blue-600 hover:bg-blue-500 rounded-2xl h-14 font-black uppercase italic tracking-tight shadow-xl shadow-blue-500/20 text-base"
-                                onClick={() => setSelectedPlayer(null)}
-                            >
-                                Close Profile
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
