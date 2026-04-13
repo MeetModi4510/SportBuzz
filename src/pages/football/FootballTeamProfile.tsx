@@ -147,9 +147,11 @@ export default function FootballTeamProfile() {
     };
 
     const chartData = Object.entries(playerStats)
-        .map(([name, stats]: [string, any]) => ({ name, goals: stats.goals }))
-        .sort((a, b) => b.goals - a.goals)
+        .map(([name, stats]: [string, any]) => ({ name, goals: stats.goals || 0, assists: stats.assists || 0 }))
+        .sort((a, b) => (b.goals + b.assists) - (a.goals + a.assists))
         .slice(0, 5);
+
+    const totalAssists = (Object.values(playerStats) as any[]).reduce((acc: number, s: any) => acc + (s.assists || 0), 0);
 
     const completedMatches = matches.filter((m: any) => m.status === 'Completed');
     let totalGoalsScored = 0;
@@ -665,58 +667,70 @@ export default function FootballTeamProfile() {
 
                     <TabsContent value="stats" className="space-y-8 mt-8">
                         {/* Team Performance Overview Cards */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group">
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 shadow-[0_10px_30px_-15px_rgba(59,130,246,0.1)]">
                                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 <div className="relative z-10 flex flex-col justify-between h-full gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
                                         <Trophy size={18} className="text-blue-500" />
                                     </div>
                                     <div>
                                         <p className="text-4xl font-black italic tracking-tighter text-white">{winRate}%</p>
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mt-1">Win Rate</p>
+                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500 mt-1">Win Rate</p>
                                     </div>
                                 </div>
                             </Card>
-                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group">
+                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 shadow-[0_10px_30px_-15px_rgba(16,185,129,0.1)]">
                                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 <div className="relative z-10 flex flex-col justify-between h-full gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
                                         <Shield size={18} className="text-emerald-500" />
                                     </div>
                                     <div>
                                         <p className="text-4xl font-black italic tracking-tighter text-white">{cleanSheets}</p>
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mt-1">Clean Sheets</p>
+                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-500 mt-1">Clean Sheets</p>
                                     </div>
                                 </div>
                             </Card>
-                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group">
+                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 shadow-[0_10px_30px_-15px_rgba(99,102,241,0.1)]">
                                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 <div className="relative z-10 flex flex-col justify-between h-full gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
                                         <Goal size={18} className="text-indigo-500" />
                                     </div>
                                     <div className="flex items-end gap-2">
                                         <div>
                                             <p className="text-4xl font-black italic tracking-tighter text-white">{totalGoalsScored}</p>
-                                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mt-1">Goals Scored</p>
+                                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400 mt-1">Goals Scored</p>
                                         </div>
-                                        <div className="mb-1 text-xs font-bold text-slate-600 italic">/{completedMatches.length} M</div>
                                     </div>
                                 </div>
                             </Card>
-                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group">
+                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 shadow-[0_10px_30px_-15px_rgba(245,158,11,0.1)]">
+                                <div className="absolute inset-0 bg-gradient-to-br from-amber-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+                                        <Users size={18} className="text-amber-500" />
+                                    </div>
+                                    <div className="flex items-end gap-2">
+                                        <div>
+                                            <p className="text-4xl font-black italic tracking-tighter text-white">{totalAssists}</p>
+                                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-500 mt-1">Total Assists</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Card>
+                            <Card className="bg-[#0a0a0c] border border-white/5 p-6 rounded-[2rem] relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 shadow-[0_10px_30px_-15px_rgba(244,63,94,0.1)]">
                                 <div className="absolute inset-0 bg-gradient-to-br from-rose-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 <div className="relative z-10 flex flex-col justify-between h-full gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
                                         <Swords size={18} className="text-rose-500" />
                                     </div>
                                     <div className="flex items-end gap-2">
                                         <div>
                                             <p className="text-4xl font-black italic tracking-tighter text-white">{totalGoalsConceded}</p>
-                                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mt-1">Goals Conceded</p>
+                                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-500 mt-1">Goals Conceded</p>
                                         </div>
-                                        <div className="mb-1 text-xs font-bold text-slate-600 italic">/{completedMatches.length} M</div>
                                     </div>
                                 </div>
                             </Card>
@@ -724,66 +738,70 @@ export default function FootballTeamProfile() {
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             {/* Main Chart */}
-                            <Card className="col-span-1 lg:col-span-2 relative overflow-hidden bg-[#0c0c10] border border-slate-800/60 p-8 md:p-12 rounded-[3rem] shadow-2xl group/chart">
+                            <Card className="col-span-1 lg:col-span-2 relative overflow-hidden bg-gradient-to-b from-[#0c0c10] to-[#050508] border border-slate-800/60 p-8 md:p-12 rounded-[3rem] shadow-2xl group/chart">
                                 <div className="absolute top-0 right-0 w-full h-96 bg-gradient-to-b from-blue-600/10 to-transparent opacity-50 transition-opacity duration-700 group-hover/chart:opacity-100" />
                                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02]" />
                                 
                                 <div className="relative z-10 flex flex-col h-full">
                                     <div className="flex items-center gap-4 mb-10">
-                                        <div className="w-1.5 h-8 bg-blue-500 rounded-full" />
+                                        <div className="w-1.5 h-8 bg-blue-500 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
                                         <div>
-                                            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white">Scoring Distribution</h4>
-                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] mt-1">Goal Contributions By Player</p>
+                                            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white">Offensive Matrix</h4>
+                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] mt-1">Goals vs Assists By Player</p>
                                         </div>
                                     </div>
                                     
                                     <div className="h-[350px] w-full mt-auto">
                                         <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart data={chartData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
+                                            <BarChart data={chartData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }} barGap={6}>
+                                                <defs>
+                                                    <linearGradient id="goalGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
+                                                        <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.2} />
+                                                    </linearGradient>
+                                                    <linearGradient id="assistGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="#f59e0b" stopOpacity={1} />
+                                                        <stop offset="100%" stopColor="#78350f" stopOpacity={0.2} />
+                                                    </linearGradient>
+                                                </defs>
                                                 <XAxis 
                                                     dataKey="name" 
                                                     stroke="#334155" 
                                                     fontSize={10} 
                                                     tickLine={false} 
                                                     axisLine={false}
-                                                    tick={{ fill: '#64748b', fontWeight: 900 }}
-                                                    dy={10}
+                                                    tick={{ fill: '#94a3b8', fontWeight: 900 }}
+                                                    dy={15}
                                                 />
                                                 <YAxis hide />
                                                 <Tooltip 
                                                     cursor={{ fill: 'rgba(59, 130, 246, 0.05)' }}
                                                     contentStyle={{ 
-                                                        backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                                                        border: '1px solid rgba(59, 130, 246, 0.2)', 
+                                                        backgroundColor: 'rgba(15, 23, 42, 0.95)', 
+                                                        border: '1px solid rgba(59, 130, 246, 0.3)', 
                                                         borderRadius: '16px',
-                                                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(59, 130, 246, 0.1)',
-                                                        backdropFilter: 'blur(12px)'
+                                                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 0 20px rgba(59, 130, 246, 0.15)',
+                                                        backdropFilter: 'blur(16px)'
                                                     }}
                                                     itemStyle={{ color: '#fff', fontWeight: 900, fontSize: '14px', fontStyle: 'italic' }}
-                                                    labelStyle={{ color: '#94a3b8', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 'bold', marginBottom: '4px' }}
+                                                    labelStyle={{ color: '#cbd5e1', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 'bold', marginBottom: '8px' }}
                                                 />
                                                 <Bar 
                                                     dataKey="goals" 
-                                                    radius={[12, 12, 0, 0]}
-                                                    maxBarSize={60}
-                                                >
-                                                    {chartData.map((entry, index) => (
-                                                        <Cell 
-                                                            key={`cell-${index}`} 
-                                                            fill={`url(#colorGradient-${index})`} 
-                                                            className="hover:opacity-80 transition-opacity cursor-pointer drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]"
-                                                        />
-                                                    ))}
-                                                </Bar>
-                                                {/* Define Gradients */}
-                                                <defs>
-                                                    {chartData.map((_, index) => (
-                                                        <linearGradient key={`colorGradient-${index}`} id={`colorGradient-${index}`} x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="0%" stopColor="#3b82f6" stopOpacity={1 - (index * 0.1)} />
-                                                            <stop offset="100%" stopColor="#1d4ed8" stopOpacity={0.4} />
-                                                        </linearGradient>
-                                                    ))}
-                                                </defs>
+                                                    name="Goals"
+                                                    fill="url(#goalGradient)"
+                                                    radius={[8, 8, 0, 0]}
+                                                    maxBarSize={45}
+                                                    className="drop-shadow-[0_0_12px_rgba(59,130,246,0.4)] hover:brightness-125 transition-all"
+                                                />
+                                                <Bar 
+                                                    dataKey="assists" 
+                                                    name="Assists"
+                                                    fill="url(#assistGradient)"
+                                                    radius={[8, 8, 0, 0]}
+                                                    maxBarSize={45}
+                                                    className="drop-shadow-[0_0_12px_rgba(245,158,11,0.4)] hover:brightness-125 transition-all"
+                                                />
                                             </BarChart>
                                         </ResponsiveContainer>
                                     </div>
