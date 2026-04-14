@@ -725,336 +725,304 @@ export default function FootballTeamProfile() {
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="stats" className="space-y-10 mt-12 relative z-10 pb-20">
-                        {/* Elite Top Holographic Cards */}
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-                            <Card className="bg-black/40 backdrop-blur-2xl border-t border-t-blue-500/30 border-l border-l-white/10 border-r border-r-white/5 border-b border-b-transparent p-6 rounded-[2.5rem] relative overflow-hidden group shadow-[0_20px_40px_-20px_rgba(59,130,246,0.3)] hover:-translate-y-2 transition-transform duration-500">
-                                <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl" />
-                                <div className="absolute top-0 right-0 p-4 opacity-10 blur-[1px]">
-                                    <Trophy size={64} />
+                    <TabsContent value="stats" className="space-y-6 mt-8 relative z-10 pb-20">
+                        {/* Elite Top Cards - Clean & Restrained */}
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <Card className="bg-[#0f1115] border border-white/5 p-6 rounded-2xl relative overflow-hidden group hover:border-blue-500/30 transition-colors duration-300">
+                                <div className="absolute top-0 right-0 p-4 opacity-5">
+                                    <Trophy size={48} />
                                 </div>
-                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[140px]">
-                                    <div className="w-12 h-12 rounded-[1.5rem] bg-gradient-to-br from-blue-500/20 to-blue-600/5 flex items-center justify-center border border-blue-400/20 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
-                                        <Trophy size={20} className="text-blue-400" />
+                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[120px]">
+                                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                                        <Trophy size={18} className="text-blue-400" />
                                     </div>
                                     <div className="mt-4">
-                                        <p className="text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-blue-200 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">{winRate}<span className="text-2xl">%</span></p>
-                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mt-2">Win Rate</p>
+                                        <p className="text-4xl font-bold tracking-tight text-white">{winRate}<span className="text-xl text-slate-400 font-medium tracking-normal">%</span></p>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Win Rate</p>
                                     </div>
                                 </div>
                             </Card>
 
-                            <Card className="bg-black/40 backdrop-blur-2xl border-t border-t-emerald-500/30 border-l border-l-white/10 border-r border-r-white/5 border-b border-b-transparent p-6 rounded-[2.5rem] relative overflow-hidden group shadow-[0_20px_40px_-20px_rgba(16,185,129,0.3)] hover:-translate-y-2 transition-transform duration-500">
-                                <div className="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl" />
-                                <div className="absolute top-0 right-0 p-4 opacity-10 blur-[1px]">
-                                    <Shield size={64} />
+                            <Card className="bg-[#0f1115] border border-white/5 p-6 rounded-2xl relative overflow-hidden group hover:border-blue-500/30 transition-colors duration-300">
+                                <div className="absolute top-0 right-0 p-4 opacity-5">
+                                    <Shield size={48} />
                                 </div>
-                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[140px]">
-                                    <div className="w-12 h-12 rounded-[1.5rem] bg-gradient-to-br from-emerald-500/20 to-emerald-600/5 flex items-center justify-center border border-emerald-400/20 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                                        <Shield size={20} className="text-emerald-400" />
+                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[120px]">
+                                    <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center border border-white/5">
+                                        <Shield size={18} className="text-slate-300" />
                                     </div>
                                     <div className="mt-4">
-                                        <p className="text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-emerald-200 drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">{cleanSheets}</p>
-                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mt-2">Clean Sheets</p>
+                                        <p className="text-4xl font-bold tracking-tight text-white">{cleanSheets}</p>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Clean Sheets</p>
                                     </div>
                                 </div>
                             </Card>
 
-                            <Card className="bg-black/40 backdrop-blur-2xl border-t border-t-indigo-500/30 border-l border-l-white/10 border-r border-r-white/5 border-b border-b-transparent p-6 rounded-[2.5rem] relative overflow-hidden group shadow-[0_20px_40px_-20px_rgba(99,102,241,0.3)] hover:-translate-y-2 transition-transform duration-500">
-                                <div className="absolute inset-0 bg-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl" />
-                                <div className="absolute top-0 right-0 p-4 opacity-10 blur-[1px]">
-                                    <Goal size={64} />
+                            <Card className="bg-[#0f1115] border border-white/5 p-6 rounded-2xl relative overflow-hidden group hover:border-blue-500/30 transition-colors duration-300">
+                                <div className="absolute top-0 right-0 p-4 opacity-5">
+                                    <Goal size={48} />
                                 </div>
-                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[140px]">
-                                    <div className="w-12 h-12 rounded-[1.5rem] bg-gradient-to-br from-indigo-500/20 to-indigo-600/5 flex items-center justify-center border border-indigo-400/20 shadow-[0_0_20px_rgba(99,102,241,0.2)]">
-                                        <Goal size={20} className="text-indigo-400" />
+                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[120px]">
+                                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                                        <Goal size={18} className="text-blue-400" />
                                     </div>
                                     <div className="mt-4">
-                                        <p className="text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-indigo-200 drop-shadow-[0_0_10px_rgba(99,102,241,0.5)]">{totalGoalsScored}</p>
-                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400 mt-2">Goals Scored</p>
+                                        <p className="text-4xl font-bold tracking-tight text-white">{totalGoalsScored}</p>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Goals Scored</p>
                                     </div>
                                 </div>
                             </Card>
 
-                            <Card className="bg-black/40 backdrop-blur-2xl border-t border-t-amber-500/30 border-l border-l-white/10 border-r border-r-white/5 border-b border-b-transparent p-6 rounded-[2.5rem] relative overflow-hidden group shadow-[0_20px_40px_-20px_rgba(245,158,11,0.3)] hover:-translate-y-2 transition-transform duration-500">
-                                <div className="absolute inset-0 bg-amber-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl" />
-                                <div className="absolute top-0 right-0 p-4 opacity-10 blur-[1px]">
-                                    <Users size={64} />
+                            <Card className="bg-[#0f1115] border border-white/5 p-6 rounded-2xl relative overflow-hidden group hover:border-emerald-500/30 transition-colors duration-300">
+                                <div className="absolute top-0 right-0 p-4 opacity-5">
+                                    <Users size={48} />
                                 </div>
-                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[140px]">
-                                    <div className="w-12 h-12 rounded-[1.5rem] bg-gradient-to-br from-amber-500/20 to-amber-600/5 flex items-center justify-center border border-amber-400/20 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
-                                        <Users size={20} className="text-amber-400" />
+                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[120px]">
+                                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                                        <Users size={18} className="text-emerald-400" />
                                     </div>
                                     <div className="mt-4 flex items-end gap-2">
                                         <div>
-                                            <p className="text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-amber-200 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">{totalAssists}</p>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-500 mt-2">Total Assists</p>
+                                            <p className="text-4xl font-bold tracking-tight text-white">{totalAssists}</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Total Assists</p>
                                         </div>
                                     </div>
                                 </div>
                             </Card>
 
-                            <Card className="bg-black/40 backdrop-blur-2xl border-t border-t-rose-500/30 border-l border-l-white/10 border-r border-r-white/5 border-b border-b-transparent p-6 rounded-[2.5rem] relative overflow-hidden group shadow-[0_20px_40px_-20px_rgba(225,29,72,0.3)] hover:-translate-y-2 transition-transform duration-500">
-                                <div className="absolute inset-0 bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl" />
-                                <div className="absolute top-0 right-0 p-4 opacity-10 blur-[1px]">
-                                    <Swords size={64} />
+                            <Card className="bg-[#0f1115] border border-white/5 p-6 rounded-2xl relative overflow-hidden group hover:border-rose-500/30 transition-colors duration-300">
+                                <div className="absolute top-0 right-0 p-4 opacity-5">
+                                    <Swords size={48} />
                                 </div>
-                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[140px]">
-                                    <div className="w-12 h-12 rounded-[1.5rem] bg-gradient-to-br from-rose-500/20 to-rose-600/5 flex items-center justify-center border border-rose-400/20 shadow-[0_0_20px_rgba(225,29,72,0.2)]">
-                                        <Swords size={20} className="text-rose-400" />
+                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[120px]">
+                                    <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
+                                        <Swords size={18} className="text-rose-400" />
                                     </div>
                                     <div className="mt-4 flex items-end gap-2">
                                         <div>
-                                            <p className="text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-rose-200 drop-shadow-[0_0_10px_rgba(225,29,72,0.5)]">{totalGoalsConceded}</p>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500 mt-2">Goals Conceded</p>
+                                            <p className="text-4xl font-bold tracking-tight text-white">{totalGoalsConceded}</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Goals Conceded</p>
                                         </div>
                                     </div>
                                 </div>
                             </Card>
                         </div>
 
-                        {/* ROW 2: Hyper-Timeline & Radar */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
-                            {/* Match Form Timeline - Next Gen Segment */}
-                            <Card className="col-span-1 lg:col-span-2 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-                                <div className="bg-gradient-to-br from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative overflow-hidden">
-                                    <div className="absolute rotate-45 -right-64 -top-64 w-[500px] h-[500px] bg-gradient-to-br from-emerald-500/10 to-transparent blur-3xl opacity-50" />
-                                    <div className="relative z-10 flex flex-col h-full">
-                                        <div className="flex items-center justify-between mb-8">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-1.5 h-10 bg-gradient-to-b from-blue-400 to-emerald-400 rounded-full shadow-[0_0_20px_rgba(59,130,246,0.6)]" />
-                                                <div>
-                                                    <h4 className="text-3xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Season Progression</h4>
-                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.4em] mt-1">Timeline Telemetry</p>
-                                                </div>
-                                            </div>
-                                            <div className="hidden sm:flex gap-3 text-[10px] font-bold uppercase tracking-[0.2em] border border-white/10 p-2 rounded-2xl bg-black/50">
-                                                <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/10 rounded-xl text-blue-400"><div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-pulse"/> Scored</div>
-                                                <div className="flex items-center gap-2 px-3 py-1 bg-rose-500/10 rounded-xl text-rose-400"><div className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)] animate-pulse"/> Conceded</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex-1 min-h-[300px] w-full">
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <AreaChart data={formTimeline} margin={{ top: 20, right: 0, left: -25, bottom: 0 }}>
-                                                    <defs>
-                                                        <linearGradient id="scoreGlow" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.6} />
-                                                            <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
-                                                        </linearGradient>
-                                                        <linearGradient id="concedeGlow" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.4} />
-                                                            <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
-                                                        </linearGradient>
-                                                        {/* Adding a grid pattern pattern manually for webgl feel */}
-                                                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                                                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="1"/>
-                                                        </pattern>
-                                                    </defs>
-                                                    <rect width="100%" height="100%" fill="url(#grid)" />
-                                                    <XAxis dataKey="match" stroke="#1e293b" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontWeight: 900, fontFamily: 'monospace' }} dy={15} />
-                                                    <YAxis hide />
-                                                    <Tooltip 
-                                                        contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(59,130,246, 0.2)', borderRadius: '20px', backdropFilter: 'blur(20px)', boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(59,130,246,0.1)' }}
-                                                        itemStyle={{ color: '#fff', fontWeight: 900, fontSize: '16px', fontStyle: 'italic' }}
-                                                        labelStyle={{ color: '#94a3b8', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: 'bold', marginBottom: '10px' }}
-                                                    />
-                                                    <Area type="monotone" dataKey="scored" name="Goals Scored" stroke="#3b82f6" strokeWidth={4} fillOpacity={1} fill="url(#scoreGlow)" activeDot={{ r: 8, fill: "#0ea5e9", stroke: "#fff", strokeWidth: 3 }} />
-                                                    <Area type="monotone" dataKey="conceded" name="Goals Conceded" stroke="#f43f5e" strokeWidth={4} fillOpacity={1} fill="url(#concedeGlow)" activeDot={{ r: 8, fill: "#f43f5e", stroke: "#fff", strokeWidth: 3 }} />
-                                                </AreaChart>
-                                            </ResponsiveContainer>
+                        {/* ROW 2: Form Trajectory & Radar */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Match Form Timeline */}
+                            <Card className="col-span-1 lg:col-span-2 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col h-[400px]">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-2 h-6 bg-blue-500 rounded-full" />
+                                        <div>
+                                            <h4 className="text-lg font-bold text-white tracking-tight">Season Progression</h4>
+                                            <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Goals Scored vs Conceded</p>
                                         </div>
                                     </div>
+                                    <div className="hidden sm:flex gap-4 text-xs font-medium bg-slate-900 px-4 py-2 rounded-xl border border-white/5">
+                                        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded bg-blue-500" /> <span className="text-slate-300">Scored</span></div>
+                                        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded bg-slate-600" /> <span className="text-slate-300">Conceded</span></div>
+                                    </div>
+                                </div>
+                                <div className="flex-1 w-full relative">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={formTimeline} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
+                                            <defs>
+                                                <linearGradient id="scoreGlow" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.2} />
+                                                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                            <XAxis dataKey="match" stroke="#334155" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#64748b' }} dy={10} />
+                                            <YAxis hide />
+                                            <Tooltip 
+                                                contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)' }}
+                                                itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}
+                                                labelStyle={{ color: '#94a3b8', fontSize: '12px', marginBottom: '8px' }}
+                                            />
+                                            <Area type="monotone" dataKey="scored" name="Scored" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#scoreGlow)" activeDot={{ r: 6, fill: "#3b82f6", stroke: "#0f1115", strokeWidth: 2 }} />
+                                            <Area type="monotone" dataKey="conceded" name="Conceded" stroke="#475569" strokeWidth={3} fillOpacity={0} activeDot={{ r: 6, fill: "#475569", stroke: "#0f1115", strokeWidth: 2 }} />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
                                 </div>
                             </Card>
 
                             {/* Team DNA Hex Radar */}
-                            <Card className="col-span-1 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-                                <div className="bg-gradient-to-b from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative flex flex-col items-center justify-between">
-                                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent opacity-80" />
-                                    
-                                    <div className="relative z-10 w-full">
-                                        <h4 className="text-2xl font-black italic uppercase tracking-tighter text-center text-white drop-shadow-md">Team DNA</h4>
-                                        <p className="text-[9px] text-indigo-400 font-bold uppercase tracking-[0.4em] mt-1 text-center">Calculated Attribute Matrix</p>
+                            <Card className="col-span-1 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col h-[400px]">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-2 h-6 bg-indigo-500 rounded-full" />
+                                    <div>
+                                        <h4 className="text-lg font-bold text-white tracking-tight">Team DNA</h4>
+                                        <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Attribute Mapping</p>
                                     </div>
-                                    
-                                    <div className="relative z-10 w-full flex-1 -mt-4 min-h-[300px]">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                                                <PolarGrid stroke="rgba(99,102,241,0.2)" strokeWidth={2} />
-                                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#cbd5e1', fontSize: 11, fontWeight: 900, letterSpacing: '0.1em' }} />
-                                                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                                                <Radar name="Rating" dataKey="value" stroke="#818cf8" fill="#4f46e5" fillOpacity={0.3} strokeWidth={3} />
-                                                <Tooltip 
-                                                    cursor={false}
-                                                    contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(129, 140, 248, 0.4)', borderRadius: '16px' }}
-                                                    itemStyle={{ color: '#fff', fontWeight: 900, fontSize: '18px', fontStyle: 'italic' }}
-                                                    labelStyle={{ display: 'none' }}
-                                                />
-                                            </RadarChart>
-                                        </ResponsiveContainer>
-                                    </div>
+                                </div>
+                                <div className="w-full flex-1 min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <RadarChart cx="50%" cy="50%" outerRadius="65%" data={radarData}>
+                                            <PolarGrid stroke="rgba(255,255,255,0.05)" strokeWidth={1} />
+                                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} />
+                                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                                            <Radar name="Rating" dataKey="value" stroke="#818cf8" fill="#6366f1" fillOpacity={0.2} strokeWidth={2} />
+                                            <Tooltip 
+                                                contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                                                itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}
+                                                labelStyle={{ display: 'none' }}
+                                            />
+                                        </RadarChart>
+                                    </ResponsiveContainer>
                                 </div>
                             </Card>
                         </div>
 
-                        {/* ROW 3: Form Trajectory & Home/Away Split */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
-                            {/* Cumulative Points (Line Chart) */}
-                            <Card className="col-span-1 lg:col-span-2 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-                                <div className="bg-gradient-to-br from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative flex flex-col justify-between">
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-[100px]" />
-                                    
-                                    <div className="flex items-center gap-4 mb-6 relative z-10">
-                                        <div className="w-1.5 h-8 bg-cyan-500 rounded-full shadow-[0_0_15px_rgba(6,182,212,0.5)]" />
-                                        <div>
-                                            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Points Trajectory</h4>
-                                            <p className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.4em] mt-1">Cumulative Season Points</p>
-                                        </div>
+                        {/* ROW 3: Points Trajectory & Home/Away Split */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Cumulative Points */}
+                            <Card className="col-span-1 lg:col-span-2 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col h-[360px]">
+                                <div className="flex items-center gap-3 mb-8">
+                                    <div className="w-2 h-6 bg-cyan-500 rounded-full" />
+                                    <div>
+                                        <h4 className="text-lg font-bold text-white tracking-tight">Points Trajectory</h4>
+                                        <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Cumulative Points Accumulation</p>
                                     </div>
-
-                                    <div className="relative z-10 w-full h-[260px]">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <LineChart data={pointsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.02)" />
-                                                <XAxis dataKey="match" stroke="#334155" fontSize={10} tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontWeight: 900 }} dy={10} />
-                                                <YAxis hide />
-                                                <Tooltip 
-                                                    contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(6, 182, 212, 0.3)', borderRadius: '16px' }}
-                                                    itemStyle={{ color: '#fff', fontWeight: 900, fontSize: '15px' }}
-                                                    labelStyle={{ color: '#cbd5e1', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 'bold' }}
-                                                />
-                                                <Line type="monotone" dataKey="points" name="Total Points" stroke="#06b6d4" strokeWidth={4} activeDot={{ r: 8, fill: '#06b6d4' }} className="drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]" />
-                                            </LineChart>
-                                        </ResponsiveContainer>
-                                    </div>
+                                </div>
+                                <div className="relative z-10 w-full flex-1 min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={pointsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                            <XAxis dataKey="match" stroke="#334155" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#64748b' }} dy={10} />
+                                            <YAxis hide />
+                                            <Tooltip 
+                                                contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                                                itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}
+                                                labelStyle={{ color: '#94a3b8', fontSize: '12px', marginBottom: '8px' }}
+                                            />
+                                            <Line type="stepAfter" dataKey="points" name="Points" stroke="#06b6d4" strokeWidth={3} dot={false} activeDot={{ r: 6, fill: '#06b6d4', stroke: '#0f1115' }} />
+                                        </LineChart>
+                                    </ResponsiveContainer>
                                 </div>
                             </Card>
 
                             {/* Home vs Away Analysis */}
-                            <Card className="col-span-1 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-                                <div className="bg-gradient-to-br from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative flex flex-col justify-between">
-                                    <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/10 blur-[60px]" />
-                                    
-                                    <div className="mb-4 relative z-10">
-                                        <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Fortress</h4>
-                                        <p className="text-[9px] text-purple-400 font-bold uppercase tracking-[0.4em] mt-1">Home vs Away Analysis</p>
+                            <Card className="col-span-1 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col h-[360px]">
+                                <div className="mb-8">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-2 h-6 bg-slate-400 rounded-full" />
+                                        <div>
+                                            <h4 className="text-lg font-bold text-white tracking-tight">Fortress</h4>
+                                            <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Home vs Away Context</p>
+                                        </div>
                                     </div>
-                                    
-                                    <div className="relative z-10 w-full h-[260px]">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart data={homeAwayData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }} barGap={8}>
-                                                <CartesianGrid strokeDasharray="1 5" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                                                <XAxis dataKey="category" stroke="#1e293b" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#94a3b8', fontWeight: 900 }} dy={10} />
-                                                <YAxis hide />
-                                                <Tooltip 
-                                                    cursor={{ fill: 'rgba(255, 255, 255, 0.02)' }}
-                                                    contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.9)', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '16px' }}
-                                                />
-                                                <Bar dataKey="Scored" fill="#a855f7" radius={[8, 8, 0, 0]} maxBarSize={40} className="drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]" />
-                                                <Bar dataKey="Conceded" fill="#475569" radius={[8, 8, 0, 0]} maxBarSize={40} />
-                                            </BarChart>
-                                        </ResponsiveContainer>
-                                    </div>
+                                </div>
+                                <div className="w-full flex-1 min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={homeAwayData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={6}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                            <XAxis dataKey="category" stroke="#1e293b" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#94a3b8' }} dy={10} />
+                                            <YAxis hide />
+                                            <Tooltip 
+                                                cursor={{ fill: 'rgba(255, 255, 255, 0.02)' }}
+                                                contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                                                itemStyle={{ fontSize: '13px', fontWeight: 600 }}
+                                            />
+                                            <Bar dataKey="Scored" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                                            <Bar dataKey="Conceded" fill="#475569" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
                                 </div>
                             </Card>
                         </div>
 
                         {/* ROW 4: Radial Top 5, Sector Output, Offensive Matrix */}
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                             {/* Sector Output (Donut) */}
-                            <Card className="col-span-1 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-                                <div className="bg-gradient-to-b from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative flex flex-col justify-between">
-                                    <div className="absolute top-0 right-0 w-40 h-40 bg-pink-500/10 blur-[60px]" />
-                                    <div className="relative z-10 mb-2">
-                                        <h4 className="text-xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Sector Output</h4>
-                                        <p className="text-[8px] text-pink-400 font-bold uppercase tracking-[0.4em] mt-1">Goal Contributions</p>
-                                    </div>
-                                    {goalsByPosition.length > 0 ? (
-                                        <div className="relative z-10 w-full h-[200px]">
-                                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                                <p className="text-3xl font-black italic text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mt-3">{totalGoalsScored}</p>
-                                                <p className="text-[7px] font-black uppercase tracking-[0.3em] text-slate-500 mt-1">Total</p>
-                                            </div>
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <PieChart>
-                                                    <Pie data={goalsByPosition} cx="50%" cy="50%" innerRadius={60} outerRadius={85} paddingAngle={8} dataKey="value" stroke="none">
-                                                        {goalsByPosition.map((entry, index) => (
-                                                            <Cell key={`cell-${index}`} fill={positionColors[index % positionColors.length]} className="drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] hover:opacity-80 transition-opacity outline-none" />
-                                                        ))}
-                                                    </Pie>
-                                                    <Tooltip contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '16px' }} itemStyle={{ color: '#fff', fontWeight: 900, fontSize: '14px' }} />
-                                                    <Legend verticalAlign="bottom" height={20} iconType="circle" wrapperStyle={{ fontSize: '9px', fontWeight: 'bold' }} />
-                                                </PieChart>
-                                            </ResponsiveContainer>
-                                        </div>
-                                    ) : (
-                                        <div className="w-full h-[200px] flex items-center justify-center flex-col"><p className="text-xs text-slate-600">No Goals</p></div>
-                                    )}
+                            <Card className="col-span-1 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col justify-between h-[340px]">
+                                <div className="mb-2">
+                                    <h4 className="text-lg font-bold text-white tracking-tight">Sector Mapping</h4>
+                                    <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Goal Origins</p>
                                 </div>
+                                {goalsByPosition.length > 0 ? (
+                                    <div className="w-full flex-1 relative mt-2">
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                            <p className="text-3xl font-bold text-white">{totalGoalsScored}</p>
+                                            <p className="text-[10px] uppercase font-semibold text-slate-500">Goals</p>
+                                        </div>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie data={goalsByPosition} cx="50%" cy="50%" innerRadius="70%" outerRadius="90%" paddingAngle={4} dataKey="value" stroke="none">
+                                                    {goalsByPosition.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={positionColors[index % positionColors.length]} className="hover:opacity-80 outline-none" />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                        <div className="flex justify-center gap-3 mt-4">
+                                            {goalsByPosition.map((entry, i) => (
+                                                <div key={i} className="flex items-center gap-1.5 opacity-80 mt-2">
+                                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: positionColors[i % positionColors.length] }} />
+                                                    <span className="text-[9px] uppercase font-bold text-slate-300">{entry.name.slice(0, 3)}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="w-full flex-1 flex items-center justify-center"><p className="text-xs font-medium text-slate-600">No Goal Data</p></div>
+                                )}
                             </Card>
 
                             {/* Top 5 Contributors Radial */}
-                            <Card className="col-span-1 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-                                <div className="bg-gradient-to-b from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative flex flex-col justify-between">
-                                    <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/10 blur-[60px]" />
-                                    <div className="relative z-10 mb-2">
-                                        <h4 className="text-xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Top 5 MVP</h4>
-                                        <p className="text-[8px] text-orange-400 font-bold uppercase tracking-[0.4em] mt-1">G/A Combined</p>
-                                    </div>
-                                    {topContributors.length > 0 ? (
-                                        <div className="relative z-10 w-full h-[200px] mt-2">
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <RadialBarChart cx="50%" cy="50%" innerRadius="30%" outerRadius="100%" barSize={10} data={topContributors}>
-                                                    <RadialBar
-                                                        background={{ fill: 'rgba(255,255,255,0.05)' }}
-                                                        dataKey="total"
-                                                        cornerRadius={10}
-                                                    />
-                                                    <Legend iconSize={8} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', color: '#cbd5e1' }} />
-                                                    <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px' }} itemStyle={{ color: '#fff' }} />
-                                                </RadialBarChart>
-                                            </ResponsiveContainer>
-                                        </div>
-                                    ) : (
-                                        <div className="w-full h-[200px] flex items-center justify-center flex-col"><p className="text-xs text-slate-600">No Stats Data</p></div>
-                                    )}
+                            <Card className="col-span-1 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col justify-between h-[340px]">
+                                <div className="mb-2">
+                                    <h4 className="text-lg font-bold text-white tracking-tight">Top MVP</h4>
+                                    <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Goal Contributions</p>
                                 </div>
+                                {topContributors.length > 0 ? (
+                                    <div className="w-full flex-1 mt-2">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <RadialBarChart cx="50%" cy="50%" innerRadius="30%" outerRadius="100%" barSize={8} data={topContributors}>
+                                                <RadialBar
+                                                    background={{ fill: 'rgba(255,255,255,0.03)' }}
+                                                    dataKey="total"
+                                                    cornerRadius={10}
+                                                />
+                                                <Legend iconSize={6} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8' }} />
+                                                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }} />
+                                            </RadialBarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                ) : (
+                                    <div className="w-full flex-1 flex items-center justify-center"><p className="text-xs font-medium text-slate-600">No Stats Data</p></div>
+                                )}
                             </Card>
 
                             {/* Offensive Matrix */}
-                            <Card className="col-span-1 lg:col-span-2 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-                                <div className="bg-gradient-to-br from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative flex flex-col h-full">
-                                    <div className="absolute right-0 bottom-0 w-96 h-96 bg-blue-500/5 blur-[100px]" />
-                                    
-                                    <div className="flex items-center gap-4 mb-4 relative z-10">
-                                        <div className="w-1.5 h-8 bg-gradient-to-b from-blue-500 to-amber-500 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
+                            <Card className="col-span-1 lg:col-span-2 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col h-[340px]">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-2 h-6 bg-slate-700 rounded-full" />
                                         <div>
-                                            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Offensive Matrix</h4>
-                                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.4em] mt-1">Player Efficacy Profiling</p>
+                                            <h4 className="text-lg font-bold text-white tracking-tight">Output Matrix</h4>
+                                            <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Player Production Profiling</p>
                                         </div>
                                     </div>
-                                    
-                                    <div className="flex-1 min-h-[220px] w-full relative z-10">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart data={chartData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }} barGap={4}>
-                                                <defs>
-                                                    <linearGradient id="goalGradientMatrix" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="0%" stopColor="#60a5fa" stopOpacity={1} />
-                                                        <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.5} />
-                                                    </linearGradient>
-                                                    <linearGradient id="assistGradientMatrix" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
-                                                        <stop offset="100%" stopColor="#78350f" stopOpacity={0.5} />
-                                                    </linearGradient>
-                                                </defs>
-                                                <XAxis dataKey="name" stroke="#1e293b" fontSize={10} tickLine={false} axisLine={false} tick={{ fill: '#94a3b8', fontWeight: 900 }} dy={5} />
-                                                <YAxis hide />
-                                                <Tooltip cursor={{ fill: 'rgba(255, 255, 255, 0.02)' }} contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(96, 165, 250, 0.3)', borderRadius: '16px' }} />
-                                                <Bar dataKey="goals" name="Goals" fill="url(#goalGradientMatrix)" radius={[6, 6, 0, 0]} maxBarSize={30} className="drop-shadow-[0_0_10px_rgba(96,165,250,0.3)]" />
-                                                <Bar dataKey="assists" name="Assists" fill="url(#assistGradientMatrix)" radius={[6, 6, 0, 0]} maxBarSize={30} className="drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]" />
-                                            </BarChart>
-                                        </ResponsiveContainer>
+                                    <div className="hidden sm:flex gap-4 text-xs font-medium px-4 py-1.5 rounded-lg border border-white/5">
+                                        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded bg-blue-500" /> <span className="text-slate-300">Goals</span></div>
+                                        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded bg-indigo-500" /> <span className="text-slate-300">Assists</span></div>
                                     </div>
+                                </div>
+                                <div className="w-full flex-1 min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={4}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                            <XAxis dataKey="name" stroke="#334155" fontSize={10} tickLine={false} axisLine={false} tick={{ fill: '#64748b' }} dy={10} />
+                                            <YAxis hide />
+                                            <Tooltip cursor={{ fill: 'rgba(255, 255, 255, 0.02)' }} contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ fontSize: '13px', fontWeight: 600 }} />
+                                            <Bar dataKey="goals" name="Goals" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={20} />
+                                            <Bar dataKey="assists" name="Assists" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={20} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
                                 </div>
                             </Card>
                         </div>
