@@ -237,6 +237,41 @@ export default function FootballTeamProfile() {
         .sort((a,b) => b.total - a.total)
         .slice(0, 5);
 
+    const completeSquadAnalytics = Object.entries(playerStats).map(([name, stats]: [string, any]) => {
+        const playerObj = team.players?.find((p:any) => p.name === name);
+        const role = playerObj?.role || 'Unknown';
+        const goals = stats.goals || 0;
+        const assists = stats.assists || 0;
+        const yellowCards = stats.yellowCards || 0;
+        const redCards = stats.redCards || 0;
+        
+        const rawScore = (goals * 3) + (assists * 2) - (yellowCards * 1) - (redCards * 3);
+        const matchCount = Math.max(1, completedMatches.length);
+        const efficacy = Math.min(10, Math.max(0, 5 + (rawScore / matchCount))).toFixed(1);
+
+        return {
+            name,
+            role,
+            goals,
+            assists,
+            contributions: goals + assists,
+            yellowCards,
+            redCards,
+            efficacy: parseFloat(efficacy)
+        };
+    }).sort((a,b) => b.contributions - a.contributions);
+
+    const resultDistribution = [
+        { name: 'Wins', value: wins, fill: '#3b82f6' },
+        { name: 'Draws', value: draws, fill: '#64748b' },
+        { name: 'Losses', value: losses, fill: '#f43f5e' }
+    ].filter(d => d.value > 0);
+
+    const differentialData = formTimeline.map((m: any) => ({
+        match: m.match,
+        differential: m.scored - m.conceded
+    }));
+
     return (
         <div className="min-h-screen bg-[#0a0a0c] text-white selection:bg-blue-500/30">
             <Navbar />
@@ -726,86 +761,28 @@ export default function FootballTeamProfile() {
                     </TabsContent>
 
                     <TabsContent value="stats" className="space-y-6 mt-8 relative z-10 pb-20">
-                        {/* Elite Top Cards - Clean & Restrained */}
+                        {/* Elite Top Cards */}
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                            <Card className="bg-[#0f1115] border border-white/5 p-6 rounded-2xl relative overflow-hidden group hover:border-blue-500/30 transition-colors duration-300">
-                                <div className="absolute top-0 right-0 p-4 opacity-5">
-                                    <Trophy size={48} />
-                                </div>
-                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[120px]">
-                                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                                        <Trophy size={18} className="text-blue-400" />
-                                    </div>
-                                    <div className="mt-4">
-                                        <p className="text-4xl font-bold tracking-tight text-white">{winRate}<span className="text-xl text-slate-400 font-medium tracking-normal">%</span></p>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Win Rate</p>
-                                    </div>
-                                </div>
-                            </Card>
-
-                            <Card className="bg-[#0f1115] border border-white/5 p-6 rounded-2xl relative overflow-hidden group hover:border-blue-500/30 transition-colors duration-300">
-                                <div className="absolute top-0 right-0 p-4 opacity-5">
-                                    <Shield size={48} />
-                                </div>
-                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[120px]">
-                                    <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center border border-white/5">
-                                        <Shield size={18} className="text-slate-300" />
-                                    </div>
-                                    <div className="mt-4">
-                                        <p className="text-4xl font-bold tracking-tight text-white">{cleanSheets}</p>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Clean Sheets</p>
-                                    </div>
-                                </div>
-                            </Card>
-
-                            <Card className="bg-[#0f1115] border border-white/5 p-6 rounded-2xl relative overflow-hidden group hover:border-blue-500/30 transition-colors duration-300">
-                                <div className="absolute top-0 right-0 p-4 opacity-5">
-                                    <Goal size={48} />
-                                </div>
-                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[120px]">
-                                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                                        <Goal size={18} className="text-blue-400" />
-                                    </div>
-                                    <div className="mt-4">
-                                        <p className="text-4xl font-bold tracking-tight text-white">{totalGoalsScored}</p>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Goals Scored</p>
-                                    </div>
-                                </div>
-                            </Card>
-
-                            <Card className="bg-[#0f1115] border border-white/5 p-6 rounded-2xl relative overflow-hidden group hover:border-emerald-500/30 transition-colors duration-300">
-                                <div className="absolute top-0 right-0 p-4 opacity-5">
-                                    <Users size={48} />
-                                </div>
-                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[120px]">
-                                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                                        <Users size={18} className="text-emerald-400" />
-                                    </div>
-                                    <div className="mt-4 flex items-end gap-2">
-                                        <div>
-                                            <p className="text-4xl font-bold tracking-tight text-white">{totalAssists}</p>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Total Assists</p>
+                            {[
+                                { title: "Win Rate", value: `${winRate}%`, icon: Trophy, bg: "bg-blue-500/10", border: "border-blue-500/20", color: "text-blue-400" },
+                                { title: "Clean Sheets", value: cleanSheets, icon: Shield, bg: "bg-slate-800", border: "border-white/5", color: "text-slate-300" },
+                                { title: "Goals Scored", value: totalGoalsScored, icon: Goal, bg: "bg-blue-500/10", border: "border-blue-500/20", color: "text-blue-400" },
+                                { title: "Total Assists", value: totalAssists, icon: Users, bg: "bg-emerald-500/10", border: "border-emerald-500/20", color: "text-emerald-400" },
+                                { title: "Goals Conceded", value: totalGoalsConceded, icon: Swords, bg: "bg-rose-500/10", border: "border-rose-500/20", color: "text-rose-400" },
+                            ].map((stat, i) => (
+                                <Card key={i} className="bg-[#0f1115] border border-white/5 p-6 rounded-2xl relative overflow-hidden group hover:border-slate-500/30 transition-colors">
+                                    <div className="absolute top-0 right-0 p-4 opacity-5"><stat.icon size={48} /></div>
+                                    <div className="relative z-10 flex flex-col justify-between h-full min-h-[120px]">
+                                        <div className={`w-10 h-10 rounded-xl ${stat.bg} border ${stat.border} flex items-center justify-center`}>
+                                            <stat.icon size={18} className={stat.color} />
+                                        </div>
+                                        <div className="mt-4">
+                                            <p className="text-4xl font-bold tracking-tight text-white">{stat.value}</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">{stat.title}</p>
                                         </div>
                                     </div>
-                                </div>
-                            </Card>
-
-                            <Card className="bg-[#0f1115] border border-white/5 p-6 rounded-2xl relative overflow-hidden group hover:border-rose-500/30 transition-colors duration-300">
-                                <div className="absolute top-0 right-0 p-4 opacity-5">
-                                    <Swords size={48} />
-                                </div>
-                                <div className="relative z-10 flex flex-col justify-between h-full min-h-[120px]">
-                                    <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
-                                        <Swords size={18} className="text-rose-400" />
-                                    </div>
-                                    <div className="mt-4 flex items-end gap-2">
-                                        <div>
-                                            <p className="text-4xl font-bold tracking-tight text-white">{totalGoalsConceded}</p>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Goals Conceded</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Card>
+                                </Card>
+                            ))}
                         </div>
 
                         {/* ROW 2: Form Trajectory & Radar */}
@@ -837,11 +814,7 @@ export default function FootballTeamProfile() {
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                                             <XAxis dataKey="match" stroke="#334155" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#64748b' }} dy={10} />
                                             <YAxis hide />
-                                            <Tooltip 
-                                                contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)' }}
-                                                itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}
-                                                labelStyle={{ color: '#94a3b8', fontSize: '12px', marginBottom: '8px' }}
-                                            />
+                                            <Tooltip contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }} />
                                             <Area type="monotone" dataKey="scored" name="Scored" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#scoreGlow)" activeDot={{ r: 6, fill: "#3b82f6", stroke: "#0f1115", strokeWidth: 2 }} />
                                             <Area type="monotone" dataKey="conceded" name="Conceded" stroke="#475569" strokeWidth={3} fillOpacity={0} activeDot={{ r: 6, fill: "#475569", stroke: "#0f1115", strokeWidth: 2 }} />
                                         </AreaChart>
@@ -865,21 +838,17 @@ export default function FootballTeamProfile() {
                                             <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} />
                                             <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                                             <Radar name="Rating" dataKey="value" stroke="#818cf8" fill="#6366f1" fillOpacity={0.2} strokeWidth={2} />
-                                            <Tooltip 
-                                                contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                                                itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}
-                                                labelStyle={{ display: 'none' }}
-                                            />
+                                            <Tooltip contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }} labelStyle={{ display: 'none' }} />
                                         </RadarChart>
                                     </ResponsiveContainer>
                                 </div>
                             </Card>
                         </div>
 
-                        {/* ROW 3: Points Trajectory & Home/Away Split */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* ROW 3: Points Trajectory & Differential Diverging Bar */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Cumulative Points */}
-                            <Card className="col-span-1 lg:col-span-2 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col h-[360px]">
+                            <Card className="col-span-1 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col h-[340px]">
                                 <div className="flex items-center gap-3 mb-8">
                                     <div className="w-2 h-6 bg-cyan-500 rounded-full" />
                                     <div>
@@ -893,19 +862,44 @@ export default function FootballTeamProfile() {
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                                             <XAxis dataKey="match" stroke="#334155" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#64748b' }} dy={10} />
                                             <YAxis hide />
-                                            <Tooltip 
-                                                contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                                                itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}
-                                                labelStyle={{ color: '#94a3b8', fontSize: '12px', marginBottom: '8px' }}
-                                            />
+                                            <Tooltip contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }} />
                                             <Line type="stepAfter" dataKey="points" name="Points" stroke="#06b6d4" strokeWidth={3} dot={false} activeDot={{ r: 6, fill: '#06b6d4', stroke: '#0f1115' }} />
                                         </LineChart>
                                     </ResponsiveContainer>
                                 </div>
                             </Card>
 
+                            {/* Goal Difference per match (Diverging) */}
+                            <Card className="col-span-1 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col h-[340px]">
+                                <div className="flex items-center gap-3 mb-8">
+                                    <div className="w-2 h-6 bg-purple-500 rounded-full" />
+                                    <div>
+                                        <h4 className="text-lg font-bold text-white tracking-tight">Match Differential</h4>
+                                        <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Goal Difference per Match</p>
+                                    </div>
+                                </div>
+                                <div className="w-full flex-1 min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={differentialData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                            <XAxis dataKey="match" stroke="#334155" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#64748b' }} dy={10} />
+                                            <YAxis hide />
+                                            <Tooltip contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ fontSize: '13px', fontWeight: 600 }} />
+                                            <Bar dataKey="differential" name="Difference" radius={[4, 4, 4, 4]}>
+                                                {differentialData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.differential >= 0 ? '#3b82f6' : '#f43f5e'} />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </Card>
+                        </div>
+
+                        {/* ROW 4: Home/Away, Sector Donut, Output Matrix */}
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                             {/* Home vs Away Analysis */}
-                            <Card className="col-span-1 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col h-[360px]">
+                            <Card className="col-span-1 lg:col-span-2 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col h-[340px]">
                                 <div className="mb-8">
                                     <div className="flex items-center gap-3">
                                         <div className="w-2 h-6 bg-slate-400 rounded-full" />
@@ -921,21 +915,14 @@ export default function FootballTeamProfile() {
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                                             <XAxis dataKey="category" stroke="#1e293b" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#94a3b8' }} dy={10} />
                                             <YAxis hide />
-                                            <Tooltip 
-                                                cursor={{ fill: 'rgba(255, 255, 255, 0.02)' }}
-                                                contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                                                itemStyle={{ fontSize: '13px', fontWeight: 600 }}
-                                            />
+                                            <Tooltip cursor={{ fill: 'rgba(255, 255, 255, 0.02)' }} contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ fontSize: '13px', fontWeight: 600 }} />
                                             <Bar dataKey="Scored" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={30} />
                                             <Bar dataKey="Conceded" fill="#475569" radius={[4, 4, 0, 0]} maxBarSize={30} />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>
                             </Card>
-                        </div>
 
-                        {/* ROW 4: Radial Top 5, Sector Output, Offensive Matrix */}
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                             {/* Sector Output (Donut) */}
                             <Card className="col-span-1 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col justify-between h-[340px]">
                                 <div className="mb-2">
@@ -946,7 +933,6 @@ export default function FootballTeamProfile() {
                                     <div className="w-full flex-1 relative mt-2">
                                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                                             <p className="text-3xl font-bold text-white">{totalGoalsScored}</p>
-                                            <p className="text-[10px] uppercase font-semibold text-slate-500">Goals</p>
                                         </div>
                                         <ResponsiveContainer width="100%" height="100%">
                                             <PieChart>
@@ -958,45 +944,42 @@ export default function FootballTeamProfile() {
                                                 <Tooltip contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }} />
                                             </PieChart>
                                         </ResponsiveContainer>
-                                        <div className="flex justify-center gap-3 mt-4">
-                                            {goalsByPosition.map((entry, i) => (
-                                                <div key={i} className="flex items-center gap-1.5 opacity-80 mt-2">
-                                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: positionColors[i % positionColors.length] }} />
-                                                    <span className="text-[9px] uppercase font-bold text-slate-300">{entry.name.slice(0, 3)}</span>
-                                                </div>
-                                            ))}
-                                        </div>
                                     </div>
                                 ) : (
                                     <div className="w-full flex-1 flex items-center justify-center"><p className="text-xs font-medium text-slate-600">No Goal Data</p></div>
                                 )}
                             </Card>
 
-                            {/* Top 5 Contributors Radial */}
+                            {/* Match Outcomes (Pie) */}
                             <Card className="col-span-1 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col justify-between h-[340px]">
                                 <div className="mb-2">
-                                    <h4 className="text-lg font-bold text-white tracking-tight">Top MVP</h4>
-                                    <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Goal Contributions</p>
+                                    <h4 className="text-lg font-bold text-white tracking-tight">Results</h4>
+                                    <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Outcome Distribution</p>
                                 </div>
-                                {topContributors.length > 0 ? (
-                                    <div className="w-full flex-1 mt-2">
+                                {resultDistribution.length > 0 ? (
+                                    <div className="w-full flex-1 relative mt-2">
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                            <p className="text-3xl font-bold text-white">{completedMatches.length}</p>
+                                        </div>
                                         <ResponsiveContainer width="100%" height="100%">
-                                            <RadialBarChart cx="50%" cy="50%" innerRadius="30%" outerRadius="100%" barSize={8} data={topContributors}>
-                                                <RadialBar
-                                                    background={{ fill: 'rgba(255,255,255,0.03)' }}
-                                                    dataKey="total"
-                                                    cornerRadius={10}
-                                                />
-                                                <Legend iconSize={6} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8' }} />
-                                                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }} />
-                                            </RadialBarChart>
+                                            <PieChart>
+                                                <Pie data={resultDistribution} cx="50%" cy="50%" labelLine={false} outerRadius="90%" dataKey="value" stroke="none">
+                                                    {resultDistribution.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={entry.fill} className="hover:opacity-80 outline-none" />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }} />
+                                            </PieChart>
                                         </ResponsiveContainer>
                                     </div>
                                 ) : (
-                                    <div className="w-full flex-1 flex items-center justify-center"><p className="text-xs font-medium text-slate-600">No Stats Data</p></div>
+                                    <div className="w-full flex-1 flex items-center justify-center"><p className="text-xs font-medium text-slate-600">No Matches</p></div>
                                 )}
                             </Card>
+                        </div>
 
+                        {/* ROW 5: Offensive Matrix, Radial MVP */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             {/* Offensive Matrix */}
                             <Card className="col-span-1 lg:col-span-2 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col h-[340px]">
                                 <div className="flex items-center justify-between mb-8">
@@ -1025,7 +1008,106 @@ export default function FootballTeamProfile() {
                                     </ResponsiveContainer>
                                 </div>
                             </Card>
+
+                            {/* Top 5 Contributors Radial */}
+                            <Card className="col-span-1 bg-[#0f1115] border border-white/5 rounded-[2rem] p-8 flex flex-col justify-between h-[340px]">
+                                <div className="mb-2">
+                                    <h4 className="text-lg font-bold text-white tracking-tight">Top MVP</h4>
+                                    <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Goal Contributions</p>
+                                </div>
+                                {topContributors.length > 0 ? (
+                                    <div className="w-full flex-1 mt-2">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <RadialBarChart cx="50%" cy="50%" innerRadius="30%" outerRadius="100%" barSize={8} data={topContributors}>
+                                                <RadialBar
+                                                    background={{ fill: 'rgba(255,255,255,0.03)' }}
+                                                    dataKey="total"
+                                                    cornerRadius={10}
+                                                />
+                                                <Legend iconSize={6} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8' }} />
+                                                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ backgroundColor: '#0f1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 600 }} />
+                                            </RadialBarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                ) : (
+                                    <div className="w-full flex-1 flex items-center justify-center"><p className="text-xs font-medium text-slate-600">No Stats Data</p></div>
+                                )}
+                            </Card>
                         </div>
+
+                        {/* ROW 6: Advanced Squad Analytics Deep Engine */}
+                        <Card className="bg-[#0f1115] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col">
+                            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-slate-900/20">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2 h-6 bg-slate-500 rounded-full" />
+                                    <div>
+                                        <h4 className="text-lg font-bold text-white tracking-tight">Squad Analytics Engine</h4>
+                                        <p className="text-[11px] text-slate-500 font-medium tracking-wide mt-1">Comprehensive Player Efficacy Matrix</p>
+                                    </div>
+                                </div>
+                                <div className="hidden md:flex gap-2 text-xs font-medium px-4 py-2 bg-black/40 rounded-xl border border-white/5 text-slate-400">
+                                    <span className="text-white mx-1">{completeSquadAnalytics.length}</span> Active Players
+                                </div>
+                            </div>
+                            
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse min-w-[700px]">
+                                    <thead>
+                                        <tr className="bg-white/[0.02] border-b border-white/5">
+                                            <th className="py-4 px-6 text-[10px] uppercase tracking-widest text-slate-400 font-bold">Player</th>
+                                            <th className="py-4 px-6 text-[10px] uppercase tracking-widest text-slate-400 font-bold">Role</th>
+                                            <th className="py-4 px-6 text-[10px] uppercase tracking-widest text-slate-400 font-bold text-center">Goals</th>
+                                            <th className="py-4 px-6 text-[10px] uppercase tracking-widest text-slate-400 font-bold text-center">Assists</th>
+                                            <th className="py-4 px-6 text-[10px] uppercase tracking-widest text-slate-400 font-bold text-center">Yel</th>
+                                            <th className="py-4 px-6 text-[10px] uppercase tracking-widest text-slate-400 font-bold text-center">Red</th>
+                                            <th className="py-4 px-6 text-[10px] uppercase tracking-widest text-slate-400 font-bold text-right">Efficacy Rating</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {completeSquadAnalytics.length > 0 ? (
+                                            completeSquadAnalytics.map((player, idx) => (
+                                                <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.01] transition-colors group">
+                                                    <td className="py-4 px-6 whitespace-nowrap">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-300 border border-white/5 group-hover:border-blue-500/30 transition-colors">
+                                                                {player.name.charAt(0)}
+                                                            </div>
+                                                            <span className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors">{player.name}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-6 whitespace-nowrap">
+                                                        <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 bg-slate-900 px-3 py-1 rounded-lg border border-white/5">
+                                                            {player.role}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-4 px-6 text-center text-sm font-bold text-white">{player.goals}</td>
+                                                    <td className="py-4 px-6 text-center text-sm font-bold text-slate-300">{player.assists}</td>
+                                                    <td className="py-4 px-6 text-center text-sm font-bold text-amber-500">{player.yellowCards}</td>
+                                                    <td className="py-4 px-6 text-center text-sm font-bold text-rose-500">{player.redCards}</td>
+                                                    <td className="py-4 px-6 text-right">
+                                                        <div className="inline-flex items-center gap-2">
+                                                            <div className="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                                                <div 
+                                                                    className={`h-full rounded-full ${player.efficacy >= 8 ? 'bg-blue-500' : player.efficacy >= 6 ? 'bg-emerald-500' : 'bg-slate-500'}`}
+                                                                    style={{ width: `${(player.efficacy / 10) * 100}%` }}
+                                                                />
+                                                            </div>
+                                                            <span className="text-sm font-bold text-white w-8">{player.efficacy}</span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={7} className="py-12 text-center text-slate-500 text-sm font-medium">
+                                                    No player analytics data available.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </Card>
                     </TabsContent>
                 </Tabs>
             </main>
