@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, AreaChart, Area, CartesianGrid, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, PieChart, Pie, Sector, Legend } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, AreaChart, Area, CartesianGrid, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, PieChart, Pie, Sector, Legend, RadialBarChart, RadialBar, LineChart, Line } from "recharts";
 
 export default function FootballTeamProfile() {
     const { id } = useParams();
@@ -203,6 +203,39 @@ export default function FootballTeamProfile() {
         { name: 'Defenders', value: squadByPosition.Defender.reduce((acc: number, p: any) => acc + (playerStats[p.name]?.goals || 0), 0) },
     ].filter(d => d.value > 0);
     const positionColors = ['#3b82f6', '#10b981', '#6366f1'];
+
+    let currentPoints = 0;
+    const pointsData = formTimeline.map((m: any) => {
+        if (m.scored > m.conceded) currentPoints += 3;
+        else if (m.scored === m.conceded) currentPoints += 1;
+        return { match: m.match, points: currentPoints, scored: m.scored, conceded: m.conceded };
+    });
+
+    let homeGoals = 0, homeConceded = 0, awayGoals = 0, awayConceded = 0;
+    completedMatches.forEach((m: any) => {
+        const isHome = m.homeTeam?._id === team._id || m.homeTeam?.name === team.name;
+        if (isHome) {
+            homeGoals += (m.score?.home || 0);
+            homeConceded += (m.score?.away || 0);
+        } else {
+            awayGoals += (m.score?.away || 0);
+            awayConceded += (m.score?.home || 0);
+        }
+    });
+
+    const homeAwayData = [
+        { category: 'Home', Scored: homeGoals, Conceded: homeConceded },
+        { category: 'Away', Scored: awayGoals, Conceded: awayConceded }
+    ];
+
+    const topContributors = [...chartData]
+        .map((d: any, index: number) => ({
+            name: d.name,
+            total: d.goals + d.assists,
+            fill: positionColors[index % positionColors.length]
+        }))
+        .sort((a,b) => b.total - a.total)
+        .slice(0, 5);
 
     return (
         <div className="min-h-screen bg-[#0a0a0c] text-white selection:bg-blue-500/30">
@@ -848,7 +881,7 @@ export default function FootballTeamProfile() {
                                         <ResponsiveContainer width="100%" height="100%">
                                             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
                                                 <PolarGrid stroke="rgba(99,102,241,0.2)" strokeWidth={2} />
-                                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#cbd5e1', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }} />
+                                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#cbd5e1', fontSize: 11, fontWeight: 900, letterSpacing: '0.1em' }} />
                                                 <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                                                 <Radar name="Rating" dataKey="value" stroke="#818cf8" fill="#4f46e5" fillOpacity={0.3} strokeWidth={3} />
                                                 <Tooltip 
@@ -864,99 +897,163 @@ export default function FootballTeamProfile() {
                             </Card>
                         </div>
 
-                        {/* ROW 3: Sector Analysis & Offensive Matrix */}
+                        {/* ROW 3: Form Trajectory & Home/Away Split */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
-                            {/* Distribution Donut (New) */}
+                            {/* Cumulative Points (Line Chart) */}
+                            <Card className="col-span-1 lg:col-span-2 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
+                                <div className="bg-gradient-to-br from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative flex flex-col justify-between">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-[100px]" />
+                                    
+                                    <div className="flex items-center gap-4 mb-6 relative z-10">
+                                        <div className="w-1.5 h-8 bg-cyan-500 rounded-full shadow-[0_0_15px_rgba(6,182,212,0.5)]" />
+                                        <div>
+                                            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Points Trajectory</h4>
+                                            <p className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.4em] mt-1">Cumulative Season Points</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="relative z-10 w-full h-[260px]">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={pointsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.02)" />
+                                                <XAxis dataKey="match" stroke="#334155" fontSize={10} tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontWeight: 900 }} dy={10} />
+                                                <YAxis hide />
+                                                <Tooltip 
+                                                    contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(6, 182, 212, 0.3)', borderRadius: '16px' }}
+                                                    itemStyle={{ color: '#fff', fontWeight: 900, fontSize: '15px' }}
+                                                    labelStyle={{ color: '#cbd5e1', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 'bold' }}
+                                                />
+                                                <Line type="monotone" dataKey="points" name="Total Points" stroke="#06b6d4" strokeWidth={4} activeDot={{ r: 8, fill: '#06b6d4' }} className="drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]" />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </Card>
+
+                            {/* Home vs Away Analysis */}
+                            <Card className="col-span-1 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
+                                <div className="bg-gradient-to-br from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative flex flex-col justify-between">
+                                    <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/10 blur-[60px]" />
+                                    
+                                    <div className="mb-4 relative z-10">
+                                        <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Fortress</h4>
+                                        <p className="text-[9px] text-purple-400 font-bold uppercase tracking-[0.4em] mt-1">Home vs Away Analysis</p>
+                                    </div>
+                                    
+                                    <div className="relative z-10 w-full h-[260px]">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={homeAwayData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }} barGap={8}>
+                                                <CartesianGrid strokeDasharray="1 5" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                                <XAxis dataKey="category" stroke="#1e293b" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#94a3b8', fontWeight: 900 }} dy={10} />
+                                                <YAxis hide />
+                                                <Tooltip 
+                                                    cursor={{ fill: 'rgba(255, 255, 255, 0.02)' }}
+                                                    contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.9)', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '16px' }}
+                                                />
+                                                <Bar dataKey="Scored" fill="#a855f7" radius={[8, 8, 0, 0]} maxBarSize={40} className="drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]" />
+                                                <Bar dataKey="Conceded" fill="#475569" radius={[8, 8, 0, 0]} maxBarSize={40} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+
+                        {/* ROW 4: Radial Top 5, Sector Output, Offensive Matrix */}
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-4">
+                            {/* Sector Output (Donut) */}
                             <Card className="col-span-1 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
                                 <div className="bg-gradient-to-b from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative flex flex-col justify-between">
                                     <div className="absolute top-0 right-0 w-40 h-40 bg-pink-500/10 blur-[60px]" />
                                     <div className="relative z-10 mb-2">
-                                        <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Sector Output</h4>
-                                        <p className="text-[9px] text-pink-400 font-bold uppercase tracking-[0.4em] mt-1">Goal Contributions by Role</p>
+                                        <h4 className="text-xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Sector Output</h4>
+                                        <p className="text-[8px] text-pink-400 font-bold uppercase tracking-[0.4em] mt-1">Goal Contributions</p>
                                     </div>
-                                    
                                     {goalsByPosition.length > 0 ? (
-                                        <div className="relative z-10 w-full h-[260px]">
+                                        <div className="relative z-10 w-full h-[200px]">
                                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                                <p className="text-4xl font-black italic text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] text-center mt-3">{totalGoalsScored}</p>
-                                                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-500 mt-1">Total</p>
+                                                <p className="text-3xl font-black italic text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mt-3">{totalGoalsScored}</p>
+                                                <p className="text-[7px] font-black uppercase tracking-[0.3em] text-slate-500 mt-1">Total</p>
                                             </div>
                                             <ResponsiveContainer width="100%" height="100%">
                                                 <PieChart>
-                                                    <Pie
-                                                        data={goalsByPosition}
-                                                        cx="50%"
-                                                        cy="50%"
-                                                        innerRadius={70}
-                                                        outerRadius={95}
-                                                        paddingAngle={8}
-                                                        dataKey="value"
-                                                        stroke="none"
-                                                    >
+                                                    <Pie data={goalsByPosition} cx="50%" cy="50%" innerRadius={60} outerRadius={85} paddingAngle={8} dataKey="value" stroke="none">
                                                         {goalsByPosition.map((entry, index) => (
                                                             <Cell key={`cell-${index}`} fill={positionColors[index % positionColors.length]} className="drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] hover:opacity-80 transition-opacity outline-none" />
                                                         ))}
                                                     </Pie>
-                                                    <Tooltip 
-                                                        contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '16px' }}
-                                                        itemStyle={{ color: '#fff', fontWeight: 900, fontSize: '16px', fontStyle: 'italic' }}
-                                                    />
-                                                    <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#94a3b8' }} />
+                                                    <Tooltip contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '16px' }} itemStyle={{ color: '#fff', fontWeight: 900, fontSize: '14px' }} />
+                                                    <Legend verticalAlign="bottom" height={20} iconType="circle" wrapperStyle={{ fontSize: '9px', fontWeight: 'bold' }} />
                                                 </PieChart>
                                             </ResponsiveContainer>
                                         </div>
                                     ) : (
-                                        <div className="w-full h-[260px] flex items-center justify-center flex-col relative z-10">
-                                            <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center mb-4 opacity-50">
-                                                <Goal size={24} className="text-slate-500" />
-                                            </div>
-                                            <p className="text-xs font-black uppercase tracking-[0.3em] text-slate-600">No Goals Evaluated</p>
-                                        </div>
+                                        <div className="w-full h-[200px] flex items-center justify-center flex-col"><p className="text-xs text-slate-600">No Goals</p></div>
                                     )}
                                 </div>
                             </Card>
 
-                            {/* Main Offensive Matrix Matrix */}
-                            <Card className="col-span-1 lg:col-span-2 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-                                <div className="bg-gradient-to-br from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative overflow-hidden">
-                                    <div className="absolute right-0 bottom-0 w-96 h-96 bg-blue-500/5 blur-[100px] pointer-events-none transition-opacity duration-700" />
-                                    
-                                    <div className="relative z-10 flex flex-col h-full">
-                                        <div className="flex items-center gap-4 mb-10">
-                                            <div className="w-1.5 h-10 bg-gradient-to-b from-blue-500 to-amber-500 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
-                                            <div>
-                                                <h4 className="text-3xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Offensive Matrix</h4>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.4em] mt-1">Player Efficacy Profiling</p>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="h-[280px] w-full mt-auto">
+                            {/* Top 5 Contributors Radial */}
+                            <Card className="col-span-1 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
+                                <div className="bg-gradient-to-b from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative flex flex-col justify-between">
+                                    <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/10 blur-[60px]" />
+                                    <div className="relative z-10 mb-2">
+                                        <h4 className="text-xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Top 5 MVP</h4>
+                                        <p className="text-[8px] text-orange-400 font-bold uppercase tracking-[0.4em] mt-1">G/A Combined</p>
+                                    </div>
+                                    {topContributors.length > 0 ? (
+                                        <div className="relative z-10 w-full h-[200px] mt-2">
                                             <ResponsiveContainer width="100%" height="100%">
-                                                <BarChart data={chartData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }} barGap={8}>
-                                                    <defs>
-                                                        <linearGradient id="goalGradientMatrix" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="0%" stopColor="#60a5fa" stopOpacity={1} />
-                                                            <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.5} />
-                                                        </linearGradient>
-                                                        <linearGradient id="assistGradientMatrix" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
-                                                            <stop offset="100%" stopColor="#78350f" stopOpacity={0.5} />
-                                                        </linearGradient>
-                                                    </defs>
-                                                    <CartesianGrid strokeDasharray="1 5" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                                                    <XAxis dataKey="name" stroke="#1e293b" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#94a3b8', fontWeight: 900, fontFamily: 'monospace' }} dy={10} />
-                                                    <YAxis hide />
-                                                    <Tooltip 
-                                                        cursor={{ fill: 'rgba(255, 255, 255, 0.02)' }}
-                                                        contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(96, 165, 250, 0.3)', borderRadius: '20px', backdropFilter: 'blur(20px)', boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.8)' }}
-                                                        itemStyle={{ color: '#fff', fontWeight: 900, fontSize: '15px', fontStyle: 'italic' }}
-                                                        labelStyle={{ color: '#cbd5e1', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: 'bold', marginBottom: '10px' }}
+                                                <RadialBarChart cx="50%" cy="50%" innerRadius="30%" outerRadius="100%" barSize={10} data={topContributors}>
+                                                    <RadialBar
+                                                        background={{ fill: 'rgba(255,255,255,0.05)' }}
+                                                        dataKey="total"
+                                                        cornerRadius={10}
                                                     />
-                                                    <Bar dataKey="goals" name="Goals" fill="url(#goalGradientMatrix)" radius={[10, 10, 0, 0]} maxBarSize={45} className="drop-shadow-[0_0_15px_rgba(96,165,250,0.4)]" />
-                                                    <Bar dataKey="assists" name="Assists" fill="url(#assistGradientMatrix)" radius={[10, 10, 0, 0]} maxBarSize={45} className="drop-shadow-[0_0_15px_rgba(251,191,36,0.4)]" />
-                                                </BarChart>
+                                                    <Legend iconSize={8} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', color: '#cbd5e1' }} />
+                                                    <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px' }} itemStyle={{ color: '#fff' }} />
+                                                </RadialBarChart>
                                             </ResponsiveContainer>
                                         </div>
+                                    ) : (
+                                        <div className="w-full h-[200px] flex items-center justify-center flex-col"><p className="text-xs text-slate-600">No Stats Data</p></div>
+                                    )}
+                                </div>
+                            </Card>
+
+                            {/* Offensive Matrix */}
+                            <Card className="col-span-1 lg:col-span-2 relative overflow-hidden bg-black/40 backdrop-blur-xl border border-white/5 p-1 rounded-[3rem] shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
+                                <div className="bg-gradient-to-br from-[#0c0c10]/95 to-[#050508]/95 w-full h-full rounded-[2.8rem] p-8 relative flex flex-col h-full">
+                                    <div className="absolute right-0 bottom-0 w-96 h-96 bg-blue-500/5 blur-[100px]" />
+                                    
+                                    <div className="flex items-center gap-4 mb-4 relative z-10">
+                                        <div className="w-1.5 h-8 bg-gradient-to-b from-blue-500 to-amber-500 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
+                                        <div>
+                                            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Offensive Matrix</h4>
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.4em] mt-1">Player Efficacy Profiling</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex-1 min-h-[220px] w-full relative z-10">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={chartData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }} barGap={4}>
+                                                <defs>
+                                                    <linearGradient id="goalGradientMatrix" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="#60a5fa" stopOpacity={1} />
+                                                        <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.5} />
+                                                    </linearGradient>
+                                                    <linearGradient id="assistGradientMatrix" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
+                                                        <stop offset="100%" stopColor="#78350f" stopOpacity={0.5} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <XAxis dataKey="name" stroke="#1e293b" fontSize={10} tickLine={false} axisLine={false} tick={{ fill: '#94a3b8', fontWeight: 900 }} dy={5} />
+                                                <YAxis hide />
+                                                <Tooltip cursor={{ fill: 'rgba(255, 255, 255, 0.02)' }} contentStyle={{ backgroundColor: 'rgba(5, 5, 8, 0.95)', border: '1px solid rgba(96, 165, 250, 0.3)', borderRadius: '16px' }} />
+                                                <Bar dataKey="goals" name="Goals" fill="url(#goalGradientMatrix)" radius={[6, 6, 0, 0]} maxBarSize={30} className="drop-shadow-[0_0_10px_rgba(96,165,250,0.3)]" />
+                                                <Bar dataKey="assists" name="Assists" fill="url(#assistGradientMatrix)" radius={[6, 6, 0, 0]} maxBarSize={30} className="drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]" />
+                                            </BarChart>
+                                        </ResponsiveContainer>
                                     </div>
                                 </div>
                             </Card>
