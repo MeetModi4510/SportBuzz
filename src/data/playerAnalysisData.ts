@@ -31,6 +31,8 @@ export interface AnalysisPlayer {
     formats?: any;
     battingStyle?: string;
     bowlingStyle?: string;
+    /** Cricbuzz numeric player ID for dynamic API stats. Only for cricket players. */
+    cricbuzzId?: number;
 }
 
 // ─── CRICKET PLAYERS ─────────────────────────────────────────────

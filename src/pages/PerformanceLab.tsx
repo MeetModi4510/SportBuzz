@@ -78,49 +78,10 @@ const PerformanceLab = () => {
       ? players
       : players.filter((p) => p.sport === activeSport);
 
-  // Mock data for charts
-  const playerFormData = [
-    { match: "M1", performance: 78 },
-    { match: "M2", performance: 85 },
-    { match: "M3", performance: 72 },
-    { match: "M4", performance: 91 },
-    { match: "M5", performance: 88 },
-    { match: "M6", performance: 95 },
-    { match: "M7", performance: 82 },
-    { match: "M8", performance: 89 },
-    { match: "M9", performance: 94 },
-    { match: "M10", performance: 87 },
-  ];
-
-  const radarData = [
-    { attribute: "Speed", value: 85, fullMark: 100 },
-    { attribute: "Power", value: 90, fullMark: 100 },
-    { attribute: "Accuracy", value: 78, fullMark: 100 },
-    { attribute: "Stamina", value: 88, fullMark: 100 },
-    { attribute: "Technique", value: 92, fullMark: 100 },
-    { attribute: "Mental", value: 85, fullMark: 100 },
-  ];
-
-  const teamComparisonData = [
-    { name: "Offense", team1: 85, team2: 78 },
-    { name: "Defense", team1: 72, team2: 88 },
-    { name: "Midfield", team1: 80, team2: 82 },
-    { name: "Form", team1: 90, team2: 75 },
-    { name: "Experience", team1: 88, team2: 85 },
-  ];
-
-  const venueData = [
-    { name: "Avg Score", value: 285 },
-    { name: "High Score", value: 420 },
-    { name: "Low Score", value: 145 },
-  ];
-
-  const COLORS = [
-    "hsl(142, 76%, 45%)",
-    "hsl(217, 91%, 60%)",
-    "hsl(25, 95%, 53%)",
-    "hsl(84, 85%, 50%)",
-  ];
+  // Chart data and visualization logic is handled by sub-components:
+  // - PlayerAnalysisPanel (player stats + API data)
+  // - TeamComparisonPanel
+  // - VenueAnalysisPanel
 
   return (
     <>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,18 @@ import { getTeamAcronym } from "@/lib/utils";
 import { ANALYSIS_PLAYERS, AnalysisPlayer, AnalysisSport } from "@/data/playerAnalysisData";
 import {
     Trophy, ArrowLeft, Camera, Compass, Database, Target, User as UserIcon, Zap, CircleDot, ChevronRight, Activity, TrendingUp, Shield, Sparkles,
-    Sword, ShieldAlert, ZapIcon, BarChart3, Star, Globe, Clock, Briefcase, Medal, Home
+    Sword, ShieldAlert, ZapIcon, BarChart3, Star, Globe, Clock, Briefcase, Medal, Home, RefreshCw, Wifi, AlertTriangle, Loader2
 } from "lucide-react";
 import { WagonWheel } from '../components/WagonWheel';
+import { usePlayerBattingStatsByName } from '@/hooks/usePlayerBattingStats';
+import type { BattingFormatKey, PlayerBattingFormat } from '@/types/playerBattingTypes';
+import { FORMAT_LABELS, FORMAT_COLORS } from '@/utils/playerStatsTransformer';
+import {
+    BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
+    AreaChart, Area, PieChart, Pie, RadarChart, Radar, PolarGrid,
+    PolarAngleAxis, PolarRadiusAxis, CartesianGrid, Legend
+} from "recharts";
+import { generateChartData, generateFormatBoundaryData, generateFormatRadarData } from '@/utils/playerStatsTransformer';
 
 // Helper for flag CDN
 const COUNTRY_CODE_MAP: Record<string, string> = {
@@ -57,6 +66,66 @@ import { PlayerRole } from "@/data/scoringTypes";
 
 type DetailTab = "traits" | "stats" | "awards" | "wagonwheel" | "matches";
 
+// Format tabs for API-driven batting stats
+const API_FORMAT_TABS: { key: BattingFormatKey; label: string }[] = [
+    { key: 'test', label: 'Test' },
+    { key: 'odi', label: 'ODI' },
+    { key: 't20', label: 'T20I' },
+    { key: 'ipl', label: 'IPL' },
+];
+
+const CHART_TOOLTIP_STYLE = {
+    backgroundColor: "#0f172a",
+    border: "1px solid #1e293b",
+    borderRadius: "12px",
+    fontSize: "11px",
+    color: "#e2e8f0",
+    padding: "8px 12px",
+};
+
+// Skeleton loader component for stats cards
+const StatsSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3].map(i => (
+            <Card key={i} className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                <CardHeader className="bg-slate-950 border-b border-slate-800 p-6">
+                    <div className="h-4 w-32 bg-slate-800 rounded animate-pulse" />
+                </CardHeader>
+                <CardContent className="p-0">
+                    <div className="grid grid-cols-2 divide-x divide-y divide-slate-800/50">
+                        {[1, 2, 3, 4, 5, 6].map(j => (
+                            <div key={j} className="p-5 flex flex-col items-center justify-center text-center gap-2">
+                                <div className="h-2 w-16 bg-slate-800 rounded animate-pulse" />
+                                <div className="h-6 w-12 bg-slate-700 rounded animate-pulse" />
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+        ))}
+    </div>
+);
+
+// Error state component
+const StatsError = ({ message, onRetry }: { message: string; onRetry: () => void }) => (
+    <div className="bg-slate-900/50 border border-rose-500/20 rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4 text-center">
+        <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center">
+            <AlertTriangle size={28} className="text-rose-500" />
+        </div>
+        <div>
+            <p className="text-white font-black uppercase tracking-widest text-sm mb-1">Unable to load player statistics</p>
+            <p className="text-slate-500 text-xs">{message}</p>
+        </div>
+        <button
+            onClick={onRetry}
+            className="px-6 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-[10px] font-black uppercase tracking-widest rounded-xl border border-rose-500/20 transition-all flex items-center gap-2"
+        >
+            <RefreshCw size={12} />
+            Retry
+        </button>
+    </div>
+);
+
 const PlayerProfilePage = () => {
     const { name } = useParams<{ name: string }>();
     const navigate = useNavigate();
@@ -82,6 +151,38 @@ const PlayerProfilePage = () => {
     const urlTab = searchParams.get("ptab") as DetailTab | null;
     const [playerDetailTab, setPlayerDetailTab] = useState<DetailTab>(urlTab || "traits");
     const [playerStatsFormat, setPlayerStatsFormat] = useState<string>("All");
+    const [apiBattingFormat, setApiBattingFormat] = useState<BattingFormatKey>('odi');
+
+    // ── Dynamic Cricbuzz Batting Stats (lazy loaded, 15-min cache) ──
+    const {
+        battingStats: apiBattingStats,
+        chartData: apiChartData,
+        isLoading: isApiLoading,
+        isError: isApiError,
+        errorMessage: apiErrorMessage,
+        refetch: refetchApiStats,
+        cricbuzzId,
+    } = usePlayerBattingStatsByName(name || null);
+
+    // Determine if we have API data available
+    const hasApiData = !!(apiBattingStats && (apiBattingStats.test || apiBattingStats.odi || apiBattingStats.t20 || apiBattingStats.ipl));
+
+    // Get the currently selected API format data
+    const currentApiFormat: PlayerBattingFormat | null = useMemo(() => {
+        if (!apiBattingStats) return null;
+        return apiBattingStats[apiBattingFormat] || null;
+    }, [apiBattingStats, apiBattingFormat]);
+
+    // Auto-select first available format when API data arrives
+    useEffect(() => {
+        if (hasApiData && apiBattingStats) {
+            const order: BattingFormatKey[] = ['odi', 'test', 't20', 'ipl'];
+            const firstAvailable = order.find(k => apiBattingStats[k] !== null);
+            if (firstAvailable) {
+                setApiBattingFormat(firstAvailable);
+            }
+        }
+    }, [hasApiData, apiBattingStats]);
 
     const BASE_URL = import.meta.env.VITE_API_URL 
         ? import.meta.env.VITE_API_URL.replace('/api', '') 
@@ -373,15 +474,51 @@ const PlayerProfilePage = () => {
                             {playerStats && playerSport === 'cricket' && (
                                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between p-4 bg-slate-900 border border-slate-800 rounded-3xl relative z-20 shadow-2xl">
                                     <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
-                                        {['All', 'T20', 'ODI', 'Test'].map(fmt => (
-                                            <button
-                                                key={fmt}
-                                                onClick={() => setPlayerStatsFormat(fmt)}
-                                                className={`px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${playerStatsFormat === fmt ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40 scale-105' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'}`}
-                                            >
-                                                {fmt === 'All' ? 'Career Total' : fmt}
-                                            </button>
-                                        ))}
+                                        {/* API-driven format tabs when Cricbuzz data is available */}
+                                        {hasApiData ? (
+                                            <>
+                                                {API_FORMAT_TABS.map(fmt => {
+                                                    const isAvailable = apiBattingStats?.[fmt.key] !== null;
+                                                    return (
+                                                        <button
+                                                            key={fmt.key}
+                                                            onClick={() => isAvailable && setApiBattingFormat(fmt.key)}
+                                                            disabled={!isAvailable}
+                                                            className={`px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${
+                                                                apiBattingFormat === fmt.key && isAvailable
+                                                                    ? 'text-white shadow-lg scale-105'
+                                                                    : !isAvailable
+                                                                    ? 'bg-slate-800/50 text-slate-600 cursor-not-allowed'
+                                                                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
+                                                            }`}
+                                                            style={apiBattingFormat === fmt.key && isAvailable ? { backgroundColor: FORMAT_COLORS[fmt.key], boxShadow: `0 8px 25px ${FORMAT_COLORS[fmt.key]}30` } : undefined}
+                                                        >
+                                                            {fmt.label}
+                                                        </button>
+                                                    );
+                                                })}
+                                                {/* Data source badge */}
+                                                <span className="ml-2 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 text-[8px] font-black uppercase tracking-widest rounded-full border border-emerald-500/20 flex items-center gap-1.5">
+                                                    <Wifi size={8} /> Live API
+                                                </span>
+                                            </>
+                                        ) : (
+                                            /* Fallback: original mock data format tabs */
+                                            ['All', 'T20', 'ODI', 'Test'].map(fmt => (
+                                                <button
+                                                    key={fmt}
+                                                    onClick={() => setPlayerStatsFormat(fmt)}
+                                                    className={`px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${playerStatsFormat === fmt ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40 scale-105' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'}`}
+                                                >
+                                                    {fmt === 'All' ? 'Career Total' : fmt}
+                                                </button>
+                                            ))
+                                        )}
+                                        {isApiLoading && cricbuzzId && (
+                                            <div className="ml-2 flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 text-blue-400 text-[8px] font-black uppercase tracking-widest rounded-full border border-blue-500/20">
+                                                <Loader2 size={8} className="animate-spin" /> Loading Stats
+                                            </div>
+                                        )}
                                     </div>
 
                                     {currentStats.teamsPlayedFor?.length > 0 && (
@@ -619,82 +756,319 @@ const PlayerProfilePage = () => {
                                 )}
 
                                 {playerDetailTab === 'stats' && (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <div className="space-y-6">
                                         {playerSport === 'cricket' ? (
                                             <>
-                                                <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-                                                    <CardHeader className="bg-slate-950 border-b border-slate-800 p-6">
-                                                        <CardTitle className="text-sm font-black text-blue-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                                                            <Zap size={16} /> Batting Summary
-                                                        </CardTitle>
-                                                    </CardHeader>
-                                                    <CardContent className="p-0">
-                                                        <div className="grid grid-cols-2 divide-x divide-y divide-slate-800/50">
-                                                            {[
-                                                                { label: 'Innings', value: currentStats.batting.innings },
-                                                                { label: 'Runs', value: currentStats.batting.runs },
-                                                                { label: 'Highest', value: currentStats.batting.highestScore },
-                                                                { label: 'Average', value: currentStats.batting.average },
-                                                                { label: 'Strike Rate', value: currentStats.batting.strikeRate },
-                                                                { label: '100s/50s', value: `${currentStats.batting.hundreds}/${currentStats.batting.fifties}` },
-                                                                { label: 'Fours', value: currentStats.batting.fours },
-                                                                { label: 'Sixes', value: currentStats.batting.sixes }
-                                                            ].map((stat, i) => (
-                                                                <div key={i} className="p-5 flex flex-col items-center justify-center text-center group hover:bg-slate-800/20 transition-colors">
-                                                                    <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1.5">{stat.label}</span>
-                                                                    <span className="text-2xl font-black text-white">{stat.value}</span>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
+                                                {/* API loading state */}
+                                                {isApiLoading && cricbuzzId && <StatsSkeleton />}
 
-                                                <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-                                                    <CardHeader className="bg-slate-950 border-b border-slate-800 p-6">
-                                                        <CardTitle className="text-sm font-black text-rose-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                                                            <Target size={16} /> Bowling Summary
-                                                        </CardTitle>
-                                                    </CardHeader>
-                                                    <CardContent className="p-0">
-                                                        <div className="grid grid-cols-2 divide-x divide-y divide-slate-800/50">
-                                                            {[
-                                                                { label: 'Innings', value: currentStats.bowling.innings || 0 },
-                                                                { label: 'Wickets', value: currentStats.bowling.wickets },
-                                                                { label: 'Economy', value: currentStats.bowling.economy },
-                                                                { label: 'Average', value: currentStats.bowling.average },
-                                                                { label: 'Best', value: currentStats.bowling.bestFigures }
-                                                            ].map((stat, i) => (
-                                                                <div key={i} className="p-5 flex flex-col items-center justify-center text-center group hover:bg-slate-800/20 transition-colors">
-                                                                    <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1.5">{stat.label}</span>
-                                                                    <span className="text-2xl font-black text-white">{stat.value}</span>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
+                                                {/* API error state */}
+                                                {isApiError && cricbuzzId && !hasApiData && (
+                                                    <StatsError message={apiErrorMessage || 'Failed to fetch stats'} onRetry={refetchApiStats} />
+                                                )}
 
-                                                <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-                                                    <CardHeader className="bg-slate-950 border-b border-slate-800 p-6">
-                                                        <CardTitle className="text-sm font-black text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                                                            <Shield size={16} /> Fielding / Misc
-                                                        </CardTitle>
-                                                    </CardHeader>
-                                                    <CardContent className="p-0">
-                                                        <div className="grid grid-cols-2 divide-x divide-y divide-slate-800/50">
-                                                            {[
-                                                                { label: 'Catches', value: currentStats.fielding.catches },
-                                                                { label: 'Stumpings', value: currentStats.fielding.stumpings },
-                                                                { label: 'Run Outs', value: currentStats.fielding.runouts },
-                                                                { label: 'Total', value: currentStats.fielding.total }
-                                                            ].map((stat, i) => (
-                                                                <div key={i} className="p-5 flex flex-col items-center justify-center text-center group hover:bg-slate-800/20 transition-colors">
-                                                                    <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1.5">{stat.label}</span>
-                                                                    <span className="text-2xl font-black text-white">{stat.value}</span>
+                                                {/* API-driven batting stats */}
+                                                {hasApiData && currentApiFormat && !isApiLoading && (
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+                                                        <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                                                            <CardHeader className="bg-slate-950 border-b border-slate-800 p-6">
+                                                                <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3" style={{ color: FORMAT_COLORS[apiBattingFormat] }}>
+                                                                    <Zap size={16} /> {FORMAT_LABELS[apiBattingFormat]} Batting
+                                                                </CardTitle>
+                                                            </CardHeader>
+                                                            <CardContent className="p-0">
+                                                                <div className="grid grid-cols-2 divide-x divide-y divide-slate-800/50">
+                                                                    {[
+                                                                        { label: 'Matches', value: currentApiFormat.matches },
+                                                                        { label: 'Innings', value: currentApiFormat.innings },
+                                                                        { label: 'Runs', value: currentApiFormat.runs.toLocaleString() },
+                                                                        { label: 'Highest', value: currentApiFormat.highestScore },
+                                                                        { label: 'Average', value: currentApiFormat.average.toFixed(2) },
+                                                                        { label: 'Strike Rate', value: currentApiFormat.strikeRate.toFixed(2) },
+                                                                        { label: 'Not Outs', value: currentApiFormat.notOuts },
+                                                                        { label: 'Balls Faced', value: currentApiFormat.balls.toLocaleString() },
+                                                                    ].map((stat, i) => (
+                                                                        <div key={i} className="p-5 flex flex-col items-center justify-center text-center group hover:bg-slate-800/20 transition-colors">
+                                                                            <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1.5">{stat.label}</span>
+                                                                            <span className="text-2xl font-black text-white">{stat.value}</span>
+                                                                        </div>
+                                                                    ))}
                                                                 </div>
-                                                            ))}
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
+                                                            </CardContent>
+                                                        </Card>
+
+                                                        <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                                                            <CardHeader className="bg-slate-950 border-b border-slate-800 p-6">
+                                                                <CardTitle className="text-sm font-black text-amber-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                                                                    <Star size={16} /> Milestones & Boundaries
+                                                                </CardTitle>
+                                                            </CardHeader>
+                                                            <CardContent className="p-0">
+                                                                <div className="grid grid-cols-2 divide-x divide-y divide-slate-800/50">
+                                                                    {[
+                                                                        { label: 'Hundreds', value: currentApiFormat.hundreds },
+                                                                        { label: 'Double 100s', value: currentApiFormat.twoHundreds },
+                                                                        { label: 'Fifties', value: currentApiFormat.fifties },
+                                                                        { label: 'Ducks', value: currentApiFormat.ducks },
+                                                                        { label: 'Fours', value: currentApiFormat.fours },
+                                                                        { label: 'Sixes', value: currentApiFormat.sixes },
+                                                                    ].map((stat, i) => (
+                                                                        <div key={i} className="p-5 flex flex-col items-center justify-center text-center group hover:bg-slate-800/20 transition-colors">
+                                                                            <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1.5">{stat.label}</span>
+                                                                            <span className="text-2xl font-black text-white">{stat.value}</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </CardContent>
+                                                        </Card>
+
+                                                        {/* Boundary Analysis Pie Chart */}
+                                                        <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                                                            <CardHeader className="bg-slate-950 border-b border-slate-800 p-6">
+                                                                <CardTitle className="text-sm font-black text-violet-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                                                                    <BarChart3 size={16} /> Boundary Analysis
+                                                                </CardTitle>
+                                                            </CardHeader>
+                                                            <CardContent className="p-4">
+                                                                <ResponsiveContainer width="100%" height={200}>
+                                                                    <PieChart>
+                                                                        <Pie
+                                                                            data={generateFormatBoundaryData(currentApiFormat)}
+                                                                            cx="50%" cy="50%"
+                                                                            innerRadius={50} outerRadius={80}
+                                                                            paddingAngle={3}
+                                                                            dataKey="value"
+                                                                            stroke="none"
+                                                                        >
+                                                                            {generateFormatBoundaryData(currentApiFormat).map((entry, i) => (
+                                                                                <Cell key={i} fill={entry.fill} />
+                                                                            ))}
+                                                                        </Pie>
+                                                                        <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                                                                    </PieChart>
+                                                                </ResponsiveContainer>
+                                                                <div className="flex justify-center gap-6 mt-2">
+                                                                    {generateFormatBoundaryData(currentApiFormat).map((entry, i) => (
+                                                                        <div key={i} className="flex items-center gap-2">
+                                                                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.fill }} />
+                                                                            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">{entry.name}: {entry.value}</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </CardContent>
+                                                        </Card>
+                                                    </div>
+                                                )}
+
+                                                {/* Cross-format charts when API data is available */}
+                                                {hasApiData && apiChartData && !isApiLoading && (
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 animate-in fade-in duration-700">
+                                                        {/* Runs by Format */}
+                                                        {apiChartData.runsByFormat.length > 0 && (
+                                                            <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                                                                <CardHeader className="bg-slate-950 border-b border-slate-800 p-5">
+                                                                    <CardTitle className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                                                        <BarChart3 size={14} /> Runs by Format
+                                                                    </CardTitle>
+                                                                </CardHeader>
+                                                                <CardContent className="p-4">
+                                                                    <ResponsiveContainer width="100%" height={220}>
+                                                                        <BarChart data={apiChartData.runsByFormat} barSize={36}>
+                                                                            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" opacity={0.5} />
+                                                                            <XAxis dataKey="format" tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                                                            <YAxis tick={{ fontSize: 10, fill: '#64748b' }} />
+                                                                            <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                                                                            <Bar dataKey="value" name="Runs" radius={[8, 8, 0, 0]}>
+                                                                                {apiChartData.runsByFormat.map((entry, i) => (
+                                                                                    <Cell key={i} fill={entry.fill} />
+                                                                                ))}
+                                                                            </Bar>
+                                                                        </BarChart>
+                                                                    </ResponsiveContainer>
+                                                                </CardContent>
+                                                            </Card>
+                                                        )}
+
+                                                        {/* Average by Format */}
+                                                        {apiChartData.averageByFormat.length > 0 && (
+                                                            <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                                                                <CardHeader className="bg-slate-950 border-b border-slate-800 p-5">
+                                                                    <CardTitle className="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                                                        <TrendingUp size={14} /> Average by Format
+                                                                    </CardTitle>
+                                                                </CardHeader>
+                                                                <CardContent className="p-4">
+                                                                    <ResponsiveContainer width="100%" height={220}>
+                                                                        <BarChart data={apiChartData.averageByFormat} barSize={36}>
+                                                                            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" opacity={0.5} />
+                                                                            <XAxis dataKey="format" tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                                                            <YAxis tick={{ fontSize: 10, fill: '#64748b' }} />
+                                                                            <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                                                                            <Bar dataKey="value" name="Average" radius={[8, 8, 0, 0]}>
+                                                                                {apiChartData.averageByFormat.map((entry, i) => (
+                                                                                    <Cell key={i} fill={entry.fill} />
+                                                                                ))}
+                                                                            </Bar>
+                                                                        </BarChart>
+                                                                    </ResponsiveContainer>
+                                                                </CardContent>
+                                                            </Card>
+                                                        )}
+
+                                                        {/* Strike Rate Comparison (Area) */}
+                                                        {apiChartData.strikeRateByFormat.length > 0 && (
+                                                            <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                                                                <CardHeader className="bg-slate-950 border-b border-slate-800 p-5">
+                                                                    <CardTitle className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                                                        <Activity size={14} /> Strike Rate Comparison
+                                                                    </CardTitle>
+                                                                </CardHeader>
+                                                                <CardContent className="p-4">
+                                                                    <ResponsiveContainer width="100%" height={220}>
+                                                                        <AreaChart data={apiChartData.strikeRateByFormat}>
+                                                                            <defs>
+                                                                                <linearGradient id="srGrad" x1="0" y1="0" x2="0" y2="1">
+                                                                                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
+                                                                                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.02} />
+                                                                                </linearGradient>
+                                                                            </defs>
+                                                                            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" opacity={0.5} />
+                                                                            <XAxis dataKey="format" tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                                                            <YAxis tick={{ fontSize: 10, fill: '#64748b' }} />
+                                                                            <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                                                                            <Area type="monotone" dataKey="value" name="Strike Rate" stroke="#06b6d4" strokeWidth={2.5} fill="url(#srGrad)" dot={{ fill: '#06b6d4', r: 5 }} />
+                                                                        </AreaChart>
+                                                                    </ResponsiveContainer>
+                                                                </CardContent>
+                                                            </Card>
+                                                        )}
+
+                                                        {/* 50s vs 100s */}
+                                                        {apiChartData.fiftyVsHundred.length > 0 && (
+                                                            <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                                                                <CardHeader className="bg-slate-950 border-b border-slate-800 p-5">
+                                                                    <CardTitle className="text-xs font-black text-amber-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                                                        <Trophy size={14} /> Fifties vs Hundreds
+                                                                    </CardTitle>
+                                                                </CardHeader>
+                                                                <CardContent className="p-4">
+                                                                    <ResponsiveContainer width="100%" height={220}>
+                                                                        <BarChart data={apiChartData.fiftyVsHundred} barSize={20}>
+                                                                            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" opacity={0.5} />
+                                                                            <XAxis dataKey="format" tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                                                            <YAxis tick={{ fontSize: 10, fill: '#64748b' }} allowDecimals={false} />
+                                                                            <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                                                                            <Legend wrapperStyle={{ fontSize: 10, paddingTop: 8 }} />
+                                                                            <Bar dataKey="fifties" name="Fifties" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                                                                            <Bar dataKey="hundreds" name="Hundreds" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                                                                        </BarChart>
+                                                                    </ResponsiveContainer>
+                                                                </CardContent>
+                                                            </Card>
+                                                        )}
+
+                                                        {/* Performance Radar */}
+                                                        {currentApiFormat && (
+                                                            <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl md:col-span-2">
+                                                                <CardHeader className="bg-slate-950 border-b border-slate-800 p-5">
+                                                                    <CardTitle className="text-xs font-black text-violet-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                                                        <Compass size={14} /> Performance Radar — {FORMAT_LABELS[apiBattingFormat]}
+                                                                    </CardTitle>
+                                                                </CardHeader>
+                                                                <CardContent className="p-4 flex justify-center">
+                                                                    <ResponsiveContainer width="100%" height={300}>
+                                                                        <RadarChart data={generateFormatRadarData(currentApiFormat, apiBattingFormat)}>
+                                                                            <PolarGrid stroke="#1e293b" />
+                                                                            <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                                                            <PolarRadiusAxis tick={{ fontSize: 9, fill: '#475569' }} domain={[0, 100]} />
+                                                                            <Radar name="Performance" dataKey="value" stroke={FORMAT_COLORS[apiBattingFormat]} fill={FORMAT_COLORS[apiBattingFormat]} fillOpacity={0.25} strokeWidth={2} />
+                                                                            <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+                                                                        </RadarChart>
+                                                                    </ResponsiveContainer>
+                                                                </CardContent>
+                                                            </Card>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Fallback: Original mock data stats (when no API data) */}
+                                                {!hasApiData && !isApiLoading && (
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                        <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                                                            <CardHeader className="bg-slate-950 border-b border-slate-800 p-6">
+                                                                <CardTitle className="text-sm font-black text-blue-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                                                                    <Zap size={16} /> Batting Summary
+                                                                </CardTitle>
+                                                            </CardHeader>
+                                                            <CardContent className="p-0">
+                                                                <div className="grid grid-cols-2 divide-x divide-y divide-slate-800/50">
+                                                                    {[
+                                                                        { label: 'Innings', value: currentStats.batting.innings },
+                                                                        { label: 'Runs', value: currentStats.batting.runs },
+                                                                        { label: 'Highest', value: currentStats.batting.highestScore },
+                                                                        { label: 'Average', value: currentStats.batting.average },
+                                                                        { label: 'Strike Rate', value: currentStats.batting.strikeRate },
+                                                                        { label: '100s/50s', value: `${currentStats.batting.hundreds}/${currentStats.batting.fifties}` },
+                                                                        { label: 'Fours', value: currentStats.batting.fours },
+                                                                        { label: 'Sixes', value: currentStats.batting.sixes }
+                                                                    ].map((stat, i) => (
+                                                                        <div key={i} className="p-5 flex flex-col items-center justify-center text-center group hover:bg-slate-800/20 transition-colors">
+                                                                            <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1.5">{stat.label}</span>
+                                                                            <span className="text-2xl font-black text-white">{stat.value}</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </CardContent>
+                                                        </Card>
+
+                                                        <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                                                            <CardHeader className="bg-slate-950 border-b border-slate-800 p-6">
+                                                                <CardTitle className="text-sm font-black text-rose-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                                                                    <Target size={16} /> Bowling Summary
+                                                                </CardTitle>
+                                                            </CardHeader>
+                                                            <CardContent className="p-0">
+                                                                <div className="grid grid-cols-2 divide-x divide-y divide-slate-800/50">
+                                                                    {[
+                                                                        { label: 'Innings', value: currentStats.bowling.innings || 0 },
+                                                                        { label: 'Wickets', value: currentStats.bowling.wickets },
+                                                                        { label: 'Economy', value: currentStats.bowling.economy },
+                                                                        { label: 'Average', value: currentStats.bowling.average },
+                                                                        { label: 'Best', value: currentStats.bowling.bestFigures }
+                                                                    ].map((stat, i) => (
+                                                                        <div key={i} className="p-5 flex flex-col items-center justify-center text-center group hover:bg-slate-800/20 transition-colors">
+                                                                            <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1.5">{stat.label}</span>
+                                                                            <span className="text-2xl font-black text-white">{stat.value}</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </CardContent>
+                                                        </Card>
+
+                                                        <Card className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                                                            <CardHeader className="bg-slate-950 border-b border-slate-800 p-6">
+                                                                <CardTitle className="text-sm font-black text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                                                                    <Shield size={16} /> Fielding / Misc
+                                                                </CardTitle>
+                                                            </CardHeader>
+                                                            <CardContent className="p-0">
+                                                                <div className="grid grid-cols-2 divide-x divide-y divide-slate-800/50">
+                                                                    {[
+                                                                        { label: 'Catches', value: currentStats.fielding.catches },
+                                                                        { label: 'Stumpings', value: currentStats.fielding.stumpings },
+                                                                        { label: 'Run Outs', value: currentStats.fielding.runouts },
+                                                                        { label: 'Total', value: currentStats.fielding.total }
+                                                                    ].map((stat, i) => (
+                                                                        <div key={i} className="p-5 flex flex-col items-center justify-center text-center group hover:bg-slate-800/20 transition-colors">
+                                                                            <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-1.5">{stat.label}</span>
+                                                                            <span className="text-2xl font-black text-white">{stat.value}</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </CardContent>
+                                                        </Card>
+                                                    </div>
+                                                )}
                                             </>
                                         ) : playerSport === 'football' ? (
                                             <>

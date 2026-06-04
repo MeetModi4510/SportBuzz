@@ -3,16 +3,21 @@ import { cn } from "@/lib/utils";
 import {
     Star, TrendingUp, Target, Award, Zap, Flame,
     Calendar, BarChart3, Trophy, Shield, Swords, Activity,
+    RefreshCw, Wifi, AlertTriangle, Loader2, Compass,
 } from "lucide-react";
 import {
     ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
     Tooltip, LineChart, Line, CartesianGrid, XAxis, YAxis,
     BarChart, Bar, Cell, PieChart, Pie, Legend,
+    AreaChart, Area,
 } from "recharts";
 import {
     ANALYSIS_PLAYERS, SPORT_LABELS,
     type AnalysisSport, type AnalysisPlayer,
 } from "@/data/playerAnalysisData";
+import { usePlayerBattingStats } from '@/hooks/usePlayerBattingStats';
+import type { BattingFormatKey, PlayerBattingFormat } from '@/types/playerBattingTypes';
+import { FORMAT_LABELS, FORMAT_COLORS, generateChartData, generateFormatBoundaryData, generateFormatRadarData } from '@/utils/playerStatsTransformer';
 
 // ─── Styles ──────────────────────────────────────────────────────
 const CHART_TOOLTIP = {
@@ -228,6 +233,14 @@ const StatCard = ({ label, value, color }: { label: string; value: string | numb
     </div>
 );
 
+// ─── API Format Tabs for Cricket ─────────────────────────────────
+const API_FORMAT_TABS: { key: BattingFormatKey; label: string }[] = [
+    { key: 'test', label: 'Test' },
+    { key: 'odi', label: 'ODI' },
+    { key: 't20', label: 'T20I' },
+    { key: 'ipl', label: 'IPL' },
+];
+
 // ─── Cricket Specific Panels ─────────────────────────────────────
 const CricketPanels = ({ player, teamColor }: { player: AnalysisPlayer; teamColor: string }) => {
     const zones = player.specialData?.scoringZones || {};
@@ -241,8 +254,235 @@ const CricketPanels = ({ player, teamColor }: { player: AnalysisPlayer; teamColo
     const isBowler = player.role.toLowerCase().includes("bowler");
     const unit = isBowler ? "wickets" : "runs";
 
+    // ── Dynamic API batting stats ──
+    const [apiBattingFormat, setApiBattingFormat] = useState<BattingFormatKey>('odi');
+    const {
+        battingStats: apiBattingStats,
+        chartData: apiChartData,
+        isLoading: isApiLoading,
+        isError: isApiError,
+        errorMessage: apiErrorMessage,
+        refetch: refetchApiStats,
+        cricbuzzId,
+    } = usePlayerBattingStats(player.id);
+
+    const hasApiData = !!(apiBattingStats && (apiBattingStats.test || apiBattingStats.odi || apiBattingStats.t20 || apiBattingStats.ipl));
+    const currentApiFormat: PlayerBattingFormat | null = apiBattingStats?.[apiBattingFormat] || null;
+
     return (
         <>
+            {/* ── Dynamic API Batting Stats Section ── */}
+            {cricbuzzId && (
+                <Section icon={<Zap size={16} style={{ color: teamColor }} />} title="Live Batting Statistics"
+                    subtitle="Dynamic data from Cricbuzz API • Cached 15 minutes">
+
+                    {/* Format Tabs */}
+                    <div className="flex items-center gap-2 mb-5 flex-wrap">
+                        {API_FORMAT_TABS.map(fmt => {
+                            const isAvailable = apiBattingStats?.[fmt.key] !== null && apiBattingStats?.[fmt.key] !== undefined;
+                            return (
+                                <button
+                                    key={fmt.key}
+                                    onClick={() => isAvailable && setApiBattingFormat(fmt.key)}
+                                    disabled={!hasApiData || !isAvailable}
+                                    className={cn(
+                                        "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border",
+                                        apiBattingFormat === fmt.key && isAvailable
+                                            ? "text-white border-transparent shadow-md scale-105"
+                                            : !isAvailable
+                                            ? "bg-secondary/20 text-muted-foreground/40 border-border/30 cursor-not-allowed"
+                                            : "bg-secondary/30 text-muted-foreground border-border hover:bg-secondary/60"
+                                    )}
+                                    style={apiBattingFormat === fmt.key && isAvailable ? { background: FORMAT_COLORS[fmt.key], boxShadow: `0 4px 15px ${FORMAT_COLORS[fmt.key]}30` } : undefined}
+                                >
+                                    {fmt.label}
+                                </button>
+                            );
+                        })}
+                        {hasApiData && (
+                            <span className="ml-auto px-3 py-1.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider rounded-full border border-emerald-500/20 flex items-center gap-1.5">
+                                <Wifi size={9} /> Live
+                            </span>
+                        )}
+                        {isApiLoading && (
+                            <span className="ml-auto px-3 py-1.5 bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-full border border-blue-500/20 flex items-center gap-1.5">
+                                <Loader2 size={9} className="animate-spin" /> Loading
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Loading skeleton */}
+                    {isApiLoading && (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                                <div key={i} className="p-3.5 bg-secondary/20 rounded-xl border border-border/50">
+                                    <div className="h-2 w-16 bg-secondary/40 rounded animate-pulse mb-2" />
+                                    <div className="h-5 w-12 bg-secondary/30 rounded animate-pulse" />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Error state */}
+                    {isApiError && !hasApiData && (
+                        <div className="p-8 flex flex-col items-center justify-center gap-3 text-center bg-secondary/10 rounded-xl border border-red-500/10">
+                            <AlertTriangle size={24} className="text-red-400" />
+                            <p className="text-sm text-muted-foreground">{apiErrorMessage || 'Failed to fetch stats'}</p>
+                            <button onClick={() => refetchApiStats()} className="px-4 py-2 text-xs font-bold bg-red-500/10 text-red-400 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all flex items-center gap-1.5">
+                                <RefreshCw size={11} /> Retry
+                            </button>
+                        </div>
+                    )}
+
+                    {/* API stats display */}
+                    {hasApiData && currentApiFormat && !isApiLoading && (
+                        <div className="space-y-5">
+                            {/* Stat Cards Grid */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <StatCard label="Matches" value={currentApiFormat.matches} color={FORMAT_COLORS[apiBattingFormat]} />
+                                <StatCard label="Innings" value={currentApiFormat.innings} color={FORMAT_COLORS[apiBattingFormat]} />
+                                <StatCard label="Runs" value={currentApiFormat.runs.toLocaleString()} color={FORMAT_COLORS[apiBattingFormat]} />
+                                <StatCard label="Highest" value={currentApiFormat.highestScore} color={FORMAT_COLORS[apiBattingFormat]} />
+                                <StatCard label="Average" value={currentApiFormat.average.toFixed(2)} color={FORMAT_COLORS[apiBattingFormat]} />
+                                <StatCard label="Strike Rate" value={currentApiFormat.strikeRate.toFixed(2)} color={FORMAT_COLORS[apiBattingFormat]} />
+                                <StatCard label="100s / 50s" value={`${currentApiFormat.hundreds} / ${currentApiFormat.fifties}`} color={FORMAT_COLORS[apiBattingFormat]} />
+                                <StatCard label="4s / 6s" value={`${currentApiFormat.fours} / ${currentApiFormat.sixes}`} color={FORMAT_COLORS[apiBattingFormat]} />
+                            </div>
+
+                            {/* Cross-format Comparison Charts */}
+                            {apiChartData && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    {/* Runs by Format */}
+                                    {apiChartData.runsByFormat.length > 0 && (
+                                        <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <BarChart3 size={12} style={{ color: teamColor }} /> Runs by Format
+                                            </p>
+                                            <div className="h-[180px]">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <BarChart data={apiChartData.runsByFormat} barSize={32}>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />
+                                                        <XAxis dataKey="format" tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <YAxis tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <Tooltip contentStyle={CHART_TOOLTIP} />
+                                                        <Bar dataKey="value" name="Runs" radius={[6, 6, 0, 0]}>
+                                                            {apiChartData.runsByFormat.map((entry, i) => (
+                                                                <Cell key={i} fill={entry.fill} />
+                                                            ))}
+                                                        </Bar>
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Average by Format */}
+                                    {apiChartData.averageByFormat.length > 0 && (
+                                        <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <TrendingUp size={12} style={{ color: teamColor }} /> Average by Format
+                                            </p>
+                                            <div className="h-[180px]">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <BarChart data={apiChartData.averageByFormat} barSize={32}>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />
+                                                        <XAxis dataKey="format" tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <YAxis tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <Tooltip contentStyle={CHART_TOOLTIP} />
+                                                        <Bar dataKey="value" name="Average" radius={[6, 6, 0, 0]}>
+                                                            {apiChartData.averageByFormat.map((entry, i) => (
+                                                                <Cell key={i} fill={entry.fill} />
+                                                            ))}
+                                                        </Bar>
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Strike Rate Comparison */}
+                                    {apiChartData.strikeRateByFormat.length > 0 && (
+                                        <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <Activity size={12} style={{ color: teamColor }} /> Strike Rate
+                                            </p>
+                                            <div className="h-[180px]">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <AreaChart data={apiChartData.strikeRateByFormat}>
+                                                        <defs>
+                                                            <linearGradient id={`srGrad-${player.id}`} x1="0" y1="0" x2="0" y2="1">
+                                                                <stop offset="5%" stopColor={teamColor} stopOpacity={0.4} />
+                                                                <stop offset="95%" stopColor={teamColor} stopOpacity={0.02} />
+                                                            </linearGradient>
+                                                        </defs>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />
+                                                        <XAxis dataKey="format" tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <YAxis tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <Tooltip contentStyle={CHART_TOOLTIP} />
+                                                        <Area type="monotone" dataKey="value" name="SR" stroke={teamColor} strokeWidth={2.5} fill={`url(#srGrad-${player.id})`} dot={{ fill: teamColor, r: 4 }} />
+                                                    </AreaChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Boundary Analysis Pie */}
+                                    {currentApiFormat && (
+                                        <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <Trophy size={12} style={{ color: teamColor }} /> Boundary Analysis — {FORMAT_LABELS[apiBattingFormat]}
+                                            </p>
+                                            <div className="h-[180px]">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <PieChart>
+                                                        <Pie data={generateFormatBoundaryData(currentApiFormat)} cx="50%" cy="50%" innerRadius={45} outerRadius={75}
+                                                            paddingAngle={3} dataKey="value" stroke="none">
+                                                            {generateFormatBoundaryData(currentApiFormat).map((entry, i) => (
+                                                                <Cell key={i} fill={entry.fill} />
+                                                            ))}
+                                                        </Pie>
+                                                        <Tooltip contentStyle={CHART_TOOLTIP} />
+                                                    </PieChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                            <div className="flex justify-center gap-4 mt-1">
+                                                {generateFormatBoundaryData(currentApiFormat).map((entry, i) => (
+                                                    <div key={i} className="flex items-center gap-1.5">
+                                                        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: entry.fill }} />
+                                                        <span className="text-[10px] text-muted-foreground font-medium">{entry.name}: {entry.value}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Performance Radar for selected format */}
+                            {currentApiFormat && (
+                                <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                    <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                        <Compass size={12} style={{ color: teamColor }} /> Performance Radar — {FORMAT_LABELS[apiBattingFormat]}
+                                    </p>
+                                    <div className="h-[260px]">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <RadarChart data={generateFormatRadarData(currentApiFormat, apiBattingFormat)}>
+                                                <PolarGrid stroke="currentColor" strokeOpacity={0.15} />
+                                                <PolarAngleAxis dataKey="metric" tick={{ fill: 'currentColor', fontSize: 10 }} />
+                                                <PolarRadiusAxis tick={{ fontSize: 9, fill: 'currentColor' }} domain={[0, 100]} />
+                                                <Radar name="Performance" dataKey="value" stroke={FORMAT_COLORS[apiBattingFormat]} fill={FORMAT_COLORS[apiBattingFormat]} fillOpacity={0.25} strokeWidth={2} />
+                                                <Tooltip contentStyle={CHART_TOOLTIP} />
+                                            </RadarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </Section>
+            )}
+
+            {/* ── Existing Mock Data Panels (always shown, serve as fallback) ── */}
             {/* Scoring Zones + Format Breakdown side by side */}
             <Section icon={<Target size={16} style={{ color: teamColor }} />} title={isBowler ? "Bowling Length Analysis" : "Scoring Zones"}
                 subtitle={isBowler ? "Wicket distribution by length" : "Career run distribution by zone"}>
