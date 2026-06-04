@@ -348,10 +348,18 @@ export const sendPasswordOtp = asyncHandler(async (req, res) => {
     }
 
     // Rate limiting (1 OTP per minute)
+    // Instead of throwing an error, return a flag so the frontend can
+    // always open the OTP screen and show a helpful countdown message.
     const oneMinAgo = new Date(Date.now() - 60 * 1000);
     if (user.passwordOtpLastSent && user.passwordOtpLastSent > oneMinAgo) {
-        res.status(429);
-        throw new Error('Please try again after 1 minute.');
+        const msRemaining = 60 * 1000 - (Date.now() - new Date(user.passwordOtpLastSent).getTime());
+        const secondsRemaining = Math.ceil(msRemaining / 1000);
+        return res.status(200).json({
+            success: true,
+            rateLimitActive: true,
+            secondsRemaining,
+            message: `You requested an OTP recently. Please try again in ${secondsRemaining} seconds.`
+        });
     }
 
     // Generate 6-digit OTP
@@ -467,8 +475,14 @@ export const resendPasswordOtp = asyncHandler(async (req, res) => {
     // Rate limiting check
     const oneMinAgo = new Date(Date.now() - 60 * 1000);
     if (user.passwordOtpLastSent && user.passwordOtpLastSent > oneMinAgo) {
-        res.status(429);
-        throw new Error('Please try again after 1 minute.');
+        const msRemaining = 60 * 1000 - (Date.now() - new Date(user.passwordOtpLastSent).getTime());
+        const secondsRemaining = Math.ceil(msRemaining / 1000);
+        return res.status(200).json({
+            success: true,
+            rateLimitActive: true,
+            secondsRemaining,
+            message: `You requested an OTP recently. Please try again in ${secondsRemaining} seconds.`
+        });
     }
 
     // Generate new OTP
