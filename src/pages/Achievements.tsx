@@ -50,7 +50,7 @@ const Achievements = () => {
   return (
     <>
       <Helmet>
-        <title>Achievements - SportBuzz</title>
+        <title>Achievements - SportsBuzz</title>
       </Helmet>
 
       <div className="min-h-screen bg-background p-4">

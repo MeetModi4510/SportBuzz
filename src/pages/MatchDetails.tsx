@@ -181,7 +181,7 @@ const MatchDetails = () => {
   return (
     <>
       <Helmet>
-        <title>{`${match.homeTeam?.name || "Team 1"} vs ${match.awayTeam?.name || "Team 2"} - ${match.matchType} | SportBuzz`}</title>
+        <title>{`${match.homeTeam?.name || "Team 1"} vs ${match.awayTeam?.name || "Team 2"} - ${match.matchType} | SportsBuzz`}</title>
         <meta
           name="description"
           content={`Live score and updates for ${match.homeTeam?.name || "Team 1"} vs ${match.awayTeam?.name || "Team 2"} - ${match.matchType} at ${typeof match.venue === 'object' ? match.venue?.name : match.venue || "Venue"}`}

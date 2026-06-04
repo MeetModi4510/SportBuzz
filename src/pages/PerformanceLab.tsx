@@ -125,7 +125,7 @@ const PerformanceLab = () => {
   return (
     <>
       <Helmet>
-        <title>Performance Lab - SportBuzz Analytics</title>
+        <title>Performance Lab - SportsBuzz Analytics</title>
         <meta
           name="description"
           content="Deep dive into player statistics, team comparisons, and venue analysis across all sports."

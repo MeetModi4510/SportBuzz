@@ -643,7 +643,7 @@ const LiveMatchViewer = () => {
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900">
             <Helmet>
-                <title>Live: {match.homeTeam.name} vs {match.awayTeam.name} | SportBuzz</title>
+                <title>Live: {match.homeTeam.name} vs {match.awayTeam.name} | SportsBuzz</title>
             </Helmet>
 
             {/* Connection Bar */}

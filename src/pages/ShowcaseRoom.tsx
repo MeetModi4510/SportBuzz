@@ -43,7 +43,7 @@ const ShowcaseRoom = () => {
     { id: "1", title: "Identity Master", description: "Complete all profile metadata", icon: <Boxes className="text-blue-400" />, unlocked: user?.fullName && user?.bio, rarity: "Common" },
     { id: "2", title: "Elite Analyst", description: "100+ Successful Operations", icon: <Cpu className="text-purple-400" />, unlocked: false, rarity: "Epic" },
     { id: "3", title: "Clutch King", description: "Last minute win prediction", icon: <Zap className="text-yellow-400" />, unlocked: true, rarity: "Legendary" },
-    { id: "4", title: "Founding Member", description: "SportBuzz Pioneer Badge", icon: <Shield className="text-emerald-400" />, unlocked: true, rarity: "Rare" },
+    { id: "4", title: "Founding Member", description: "SportsBuzz Pioneer Badge", icon: <Shield className="text-emerald-400" />, unlocked: true, rarity: "Rare" },
   ];
 
   const displayAchievements = achievements.length > 0 ? achievements : defaultAchievements;
@@ -59,7 +59,7 @@ const ShowcaseRoom = () => {
   return (
     <>
       <Helmet>
-        <title>Holographic Showcase - SportBuzz</title>
+        <title>Holographic Showcase - SportsBuzz</title>
       </Helmet>
 
       <div className="min-h-screen bg-[#02010a] text-slate-200 overflow-x-hidden selection:bg-purple-500/30">

@@ -117,8 +117,8 @@ const Signup = () => {
   return (
     <>
       <Helmet>
-        <title>Sign Up - SportBuzz</title>
-        <meta name="description" content="Create a new SportBuzz account" />
+        <title>Sign Up - SportsBuzz</title>
+        <meta name="description" content="Create a new SportsBuzz account" />
       </Helmet>
 
       <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-slate-950">
@@ -188,7 +188,7 @@ const Signup = () => {
             </div>
             <div className="space-y-1">
               <CardTitle className="text-3xl font-bold tracking-tight text-white">
-                Join <span className="gradient-text">SportBuzz</span>
+                Join <span className="gradient-text">SportsBuzz</span>
               </CardTitle>
               <CardDescription className="text-slate-400 text-base">
                 Create an account to get started

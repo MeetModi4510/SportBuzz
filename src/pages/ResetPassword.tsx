@@ -64,8 +64,8 @@ const ResetPassword = () => {
     return (
         <>
             <Helmet>
-                <title>Reset Password - SportBuzz</title>
-                <meta name="description" content="Reset your SportBuzz password" />
+                <title>Reset Password - SportsBuzz</title>
+                <meta name="description" content="Reset your SportsBuzz password" />
             </Helmet>
 
             <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-slate-950">

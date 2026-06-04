@@ -68,7 +68,7 @@ const ActivityHistory = () => {
   return (
     <>
       <Helmet>
-        <title>Activity History - SportBuzz</title>
+        <title>Activity History - SportsBuzz</title>
       </Helmet>
 
       <div className="min-h-screen bg-background p-4">
@@ -88,7 +88,7 @@ const ActivityHistory = () => {
                 Activity History
               </CardTitle>
               <CardDescription>
-                Track your recent activities on SportBuzz
+                Track your recent activities on SportsBuzz
               </CardDescription>
             </CardHeader>
             <CardContent>

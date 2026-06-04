@@ -111,7 +111,7 @@ const Preferences = () => {
   return (
     <>
       <Helmet>
-        <title>Preferences - SportBuzz</title>
+        <title>Preferences - SportsBuzz</title>
       </Helmet>
 
       <div className="min-h-screen bg-background p-4">
@@ -132,7 +132,7 @@ const Preferences = () => {
                   <Sun size={20} className="text-yellow-500" />
                   Display
                 </CardTitle>
-                <CardDescription>Manage how SportBuzz looks</CardDescription>
+                <CardDescription>Manage how SportsBuzz looks</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">

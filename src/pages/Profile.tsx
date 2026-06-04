@@ -339,7 +339,7 @@ const Profile = () => {
   return (
     <>
       <Helmet>
-        <title>{user.fullName} | Global Profile • SportBuzz</title>
+        <title>{user.fullName} | Global Profile • SportsBuzz</title>
         <style>
           {`
             @keyframes scan {
@@ -548,7 +548,7 @@ const Profile = () => {
                       </Button>
                     )}
                     <span className="text-center text-[8px] font-black text-slate-500 uppercase tracking-[0.5em] py-2 border border-slate-800 rounded-xl">
-                      SportBuzz Studio Certified
+                      SportsBuzz Studio Certified
                     </span>
                   </div>
                 </div>
@@ -758,7 +758,7 @@ const Profile = () => {
                             <Sparkles className="text-blue-400" size={32} />
                          </div>
                          <h3 className="text-2xl font-black text-white tracking-tight">Profile Integrity</h3>
-                         <p className="text-slate-400 text-sm leading-relaxed font-medium">Your profile defines your identity across the SportBuzz ecosystem. This data powers advanced matchup simulations and leaderboard visibility.</p>
+                         <p className="text-slate-400 text-sm leading-relaxed font-medium">Your profile defines your identity across the SportsBuzz ecosystem. This data powers advanced matchup simulations and leaderboard visibility.</p>
                          <div className="pt-6 space-y-4">
                             {[
                                { label: "Global Sync Locked", color: "bg-blue-500" },

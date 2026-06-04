@@ -11,7 +11,7 @@ const TournamentDetailsPage = () => {
     return (
         <div className="min-h-screen bg-background">
             <Helmet>
-                <title>Tournament Details - SportBuzz</title>
+                <title>Tournament Details - SportsBuzz</title>
             </Helmet>
             <Navbar />
             <main className="container mx-auto px-4 py-8">

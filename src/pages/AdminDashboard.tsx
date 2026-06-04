@@ -109,7 +109,7 @@ const AdminDashboard = ({ initialTab: propsInitialTab, initialTournamentId }: Ad
   return (
     <>
       <Helmet>
-        <title>Admin Dashboard - SportBuzz</title>
+        <title>Admin Dashboard - SportsBuzz</title>
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
@@ -121,7 +121,7 @@ const AdminDashboard = ({ initialTab: propsInitialTab, initialTournamentId }: Ad
                 <Shield className="text-red-500 w-10 h-10" />
                 Admin Dashboard
               </h1>
-              <p className="text-slate-400 mt-2">Manage SportBuzz platform, Users & Tournaments</p>
+              <p className="text-slate-400 mt-2">Manage SportsBuzz platform, Users & Tournaments</p>
             </div>
             <div className="flex gap-3">
               <Button
