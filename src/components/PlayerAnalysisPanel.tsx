@@ -16,8 +16,13 @@ import {
     type AnalysisSport, type AnalysisPlayer,
 } from "@/data/playerAnalysisData";
 import { usePlayerBattingStats } from '@/hooks/usePlayerBattingStats';
+import { usePlayerBowlingStats, useBowlingDerivedStats } from '@/hooks/usePlayerBowlingStats';
 import type { BattingFormatKey, PlayerBattingFormat } from '@/types/playerBattingTypes';
+import type { BowlingFormatKey, PlayerBowlingFormat } from '@/types/playerBowlingTypes';
 import { FORMAT_LABELS, FORMAT_COLORS, generateChartData, generateFormatBoundaryData, generateFormatRadarData } from '@/utils/playerStatsTransformer';
+import { BOWLING_FORMAT_COLORS, BOWLING_FORMAT_LABELS, generateBowlingChartData, generateBowlingFormatRadarData, generateBowlingDerivedStats } from '@/utils/playerBowlingStatsTransformer';
+
+type StatsView = 'batting' | 'bowling';
 
 // ─── Styles ──────────────────────────────────────────────────────
 const CHART_TOOLTIP = {
@@ -242,11 +247,12 @@ const API_FORMAT_TABS: { key: BattingFormatKey; label: string }[] = [
 ];
 
 // ─── Cricket Specific Panels ─────────────────────────────────────
-const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingFormat }: { 
+const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingFormat, statsView }: { 
     player: AnalysisPlayer; 
     teamColor: string;
     apiBattingFormat: BattingFormatKey;
     setApiBattingFormat: (fmt: BattingFormatKey) => void;
+    statsView: StatsView;
 }) => {
     const zones = player.specialData?.scoringZones || {};
     const formats = player.specialData?.formatBreakdown || {};
@@ -270,35 +276,66 @@ const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingForma
         cricbuzzId,
     } = usePlayerBattingStats(player.id);
 
+    // ── Dynamic API bowling stats ──
+    const {
+        bowlingStats: apiBowlingStats,
+        chartData: bowlingChartData,
+        isLoading: isBowlingLoading,
+        isError: isBowlingError,
+        errorMessage: bowlingErrorMessage,
+        refetch: refetchBowlingStats,
+    } = usePlayerBowlingStats(player.id);
+
     const hasApiData = !!(apiBattingStats && (apiBattingStats.test || apiBattingStats.odi || apiBattingStats.t20 || apiBattingStats.ipl));
+    const hasBowlingData = !!(apiBowlingStats && (apiBowlingStats.test || apiBowlingStats.odi || apiBowlingStats.t20 || apiBowlingStats.ipl));
     const currentApiFormat: PlayerBattingFormat | null = apiBattingStats?.[apiBattingFormat] || null;
+    const currentBowlingFormat: PlayerBowlingFormat | null = apiBowlingStats?.[apiBattingFormat as BowlingFormatKey] || null;
+    const bowlingDerived = currentBowlingFormat ? generateBowlingDerivedStats(currentBowlingFormat) : null;
+
+    const showBowling = statsView === 'bowling';
+    const isCurrentLoading = showBowling ? isBowlingLoading : isApiLoading;
+    const isCurrentError = showBowling ? isBowlingError : isApiError;
+    const currentErrorMessage = showBowling ? bowlingErrorMessage : apiErrorMessage;
+    const currentRefetch = showBowling ? refetchBowlingStats : refetchApiStats;
+    const hasCurrentData = showBowling ? hasBowlingData : hasApiData;
 
     return (
         <>
-            {/* ── Dynamic API Batting Stats Section ── */}
+            {/* ── Dynamic API Stats Section ── */}
             {cricbuzzId && (
-                <Section icon={<Zap size={16} style={{ color: teamColor }} />} title="Cross-Format Analysis"
-                    subtitle="Performance metrics breakdown and visualizations">
+                <Section icon={<Zap size={16} style={{ color: teamColor }} />} title={showBowling ? "Bowling Cross-Format Analysis" : "Cross-Format Analysis"}
+                    subtitle={showBowling ? "Bowling performance metrics and visualizations" : "Performance metrics breakdown and visualizations"}>
 
                     {/* Error state */}
-                    {isApiError && !hasApiData && (
+                    {isCurrentError && !hasCurrentData && (
                         <div className="p-8 flex flex-col items-center justify-center gap-3 text-center bg-secondary/10 rounded-xl border border-red-500/10 mb-5">
                             <AlertTriangle size={24} className="text-red-400" />
-                            <p className="text-sm text-muted-foreground">{apiErrorMessage || 'Failed to fetch stats'}</p>
-                            <button onClick={() => refetchApiStats()} className="px-4 py-2 text-xs font-bold bg-red-500/10 text-red-400 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all flex items-center gap-1.5">
+                            <p className="text-sm text-muted-foreground">{currentErrorMessage || `Failed to fetch ${showBowling ? 'bowling' : 'batting'} stats`}</p>
+                            <button onClick={() => currentRefetch()} className="px-4 py-2 text-xs font-bold bg-red-500/10 text-red-400 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all flex items-center gap-1.5">
                                 <RefreshCw size={11} /> Retry
                             </button>
                         </div>
                     )}
 
-                    {/* API stats display */}
-                    {hasApiData && currentApiFormat && !isApiLoading && (
+                    {/* Skeleton loader */}
+                    {isCurrentLoading && (
                         <div className="space-y-5">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                {[1, 2, 3, 4].map(i => (
+                                    <div key={i} className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                        <div className="h-3 w-32 bg-secondary/30 rounded animate-pulse mb-4" />
+                                        <div className="h-[160px] bg-secondary/20 rounded-lg animate-pulse" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
-                            {/* Cross-format Comparison Charts */}
+                    {/* ── BATTING Charts ── */}
+                    {!showBowling && hasApiData && currentApiFormat && !isApiLoading && (
+                        <div className="space-y-5">
                             {apiChartData && (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                    {/* Runs by Format */}
                                     {apiChartData.runsByFormat.length > 0 && (
                                         <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
                                             <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -322,7 +359,6 @@ const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingForma
                                         </div>
                                     )}
 
-                                    {/* Average by Format */}
                                     {apiChartData.averageByFormat.length > 0 && (
                                         <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
                                             <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -346,7 +382,6 @@ const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingForma
                                         </div>
                                     )}
 
-                                    {/* Strike Rate Comparison */}
                                     {apiChartData.strikeRateByFormat.length > 0 && (
                                         <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
                                             <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -372,7 +407,6 @@ const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingForma
                                         </div>
                                     )}
 
-                                    {/* Boundary Analysis Pie */}
                                     {currentApiFormat && (
                                         <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
                                             <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -404,7 +438,6 @@ const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingForma
                                 </div>
                             )}
 
-                            {/* Performance Radar for selected format */}
                             {currentApiFormat && (
                                 <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
                                     <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -423,6 +456,224 @@ const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingForma
                                     </div>
                                 </div>
                             )}
+                        </div>
+                    )}
+
+                    {/* ── BOWLING Charts ── */}
+                    {showBowling && hasBowlingData && currentBowlingFormat && !isBowlingLoading && (
+                        <div className="space-y-5">
+                            {bowlingChartData && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    {/* Wickets by Format */}
+                                    {bowlingChartData.wicketsByFormat.length > 0 && (
+                                        <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <Target size={12} style={{ color: teamColor }} /> Wickets by Format
+                                            </p>
+                                            <div className="h-[180px]">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <BarChart data={bowlingChartData.wicketsByFormat} barSize={32}>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />
+                                                        <XAxis dataKey="format" tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <YAxis tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <Tooltip contentStyle={CHART_TOOLTIP} />
+                                                        <Bar dataKey="value" name="Wickets" radius={[6, 6, 0, 0]}>
+                                                            {bowlingChartData.wicketsByFormat.map((entry, i) => (
+                                                                <Cell key={i} fill={entry.fill} />
+                                                            ))}
+                                                        </Bar>
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Economy Rate */}
+                                    {bowlingChartData.economyByFormat.length > 0 && (
+                                        <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <TrendingUp size={12} style={{ color: teamColor }} /> Economy Rate
+                                            </p>
+                                            <div className="h-[180px]">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <BarChart data={bowlingChartData.economyByFormat} barSize={32}>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />
+                                                        <XAxis dataKey="format" tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <YAxis tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <Tooltip contentStyle={CHART_TOOLTIP} />
+                                                        <Bar dataKey="value" name="Economy" radius={[6, 6, 0, 0]}>
+                                                            {bowlingChartData.economyByFormat.map((entry, i) => (
+                                                                <Cell key={i} fill={entry.fill} />
+                                                            ))}
+                                                        </Bar>
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Bowling Average */}
+                                    {bowlingChartData.averageByFormat.length > 0 && (
+                                        <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <BarChart3 size={12} style={{ color: teamColor }} /> Bowling Average
+                                            </p>
+                                            <div className="h-[180px]">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <BarChart data={bowlingChartData.averageByFormat} barSize={32}>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />
+                                                        <XAxis dataKey="format" tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <YAxis tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <Tooltip contentStyle={CHART_TOOLTIP} />
+                                                        <Bar dataKey="value" name="Average" radius={[6, 6, 0, 0]}>
+                                                            {bowlingChartData.averageByFormat.map((entry, i) => (
+                                                                <Cell key={i} fill={entry.fill} />
+                                                            ))}
+                                                        </Bar>
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Bowling Strike Rate */}
+                                    {bowlingChartData.strikeRateByFormat.length > 0 && (
+                                        <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <Activity size={12} style={{ color: teamColor }} /> Bowling Strike Rate
+                                            </p>
+                                            <div className="h-[180px]">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <AreaChart data={bowlingChartData.strikeRateByFormat}>
+                                                        <defs>
+                                                            <linearGradient id={`bowlSrGrad-${player.id}`} x1="0" y1="0" x2="0" y2="1">
+                                                                <stop offset="5%" stopColor={teamColor} stopOpacity={0.4} />
+                                                                <stop offset="95%" stopColor={teamColor} stopOpacity={0.02} />
+                                                            </linearGradient>
+                                                        </defs>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />
+                                                        <XAxis dataKey="format" tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <YAxis tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <Tooltip contentStyle={CHART_TOOLTIP} />
+                                                        <Area type="monotone" dataKey="value" name="SR" stroke={teamColor} strokeWidth={2.5} fill={`url(#bowlSrGrad-${player.id})`} dot={{ fill: teamColor, r: 4 }} />
+                                                    </AreaChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Maidens by Format */}
+                                    {bowlingChartData.maidensByFormat.length > 0 && (
+                                        <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <Shield size={12} style={{ color: teamColor }} /> Maidens by Format
+                                            </p>
+                                            <div className="h-[180px]">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <BarChart data={bowlingChartData.maidensByFormat} barSize={32}>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />
+                                                        <XAxis dataKey="format" tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <YAxis tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <Tooltip contentStyle={CHART_TOOLTIP} />
+                                                        <Bar dataKey="value" name="Maidens" radius={[6, 6, 0, 0]}>
+                                                            {bowlingChartData.maidensByFormat.map((entry, i) => (
+                                                                <Cell key={i} fill={entry.fill} />
+                                                            ))}
+                                                        </Bar>
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* 4W vs 5W vs 10W Hauls */}
+                                    {bowlingChartData.wicketHauls.length > 0 && (
+                                        <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <Award size={12} style={{ color: teamColor }} /> Wicket Hauls (4W / 5W / 10W)
+                                            </p>
+                                            <div className="h-[180px]">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <BarChart data={bowlingChartData.wicketHauls} barSize={14}>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />
+                                                        <XAxis dataKey="format" tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: 'currentColor' }} />
+                                                        <Tooltip contentStyle={CHART_TOOLTIP} />
+                                                        <Legend wrapperStyle={{ fontSize: 10 }} />
+                                                        <Bar dataKey="fourWickets" name="4W" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                                                        <Bar dataKey="fiveWickets" name="5W" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                                                        <Bar dataKey="tenWickets" name="10W" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Bowling Performance Radar */}
+                            {currentBowlingFormat && (
+                                <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                    <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                        <Compass size={12} style={{ color: teamColor }} /> Bowling Radar — {BOWLING_FORMAT_LABELS[apiBattingFormat as BowlingFormatKey]}
+                                    </p>
+                                    <div className="h-[260px]">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <RadarChart data={generateBowlingFormatRadarData(currentBowlingFormat, apiBattingFormat as BowlingFormatKey)}>
+                                                <PolarGrid stroke="currentColor" strokeOpacity={0.15} />
+                                                <PolarAngleAxis dataKey="metric" tick={{ fill: 'currentColor', fontSize: 10 }} />
+                                                <PolarRadiusAxis tick={{ fontSize: 9, fill: 'currentColor' }} domain={[0, 100]} />
+                                                <Radar name="Bowling" dataKey="value" stroke={BOWLING_FORMAT_COLORS[apiBattingFormat as BowlingFormatKey]} fill={BOWLING_FORMAT_COLORS[apiBattingFormat as BowlingFormatKey]} fillOpacity={0.25} strokeWidth={2} />
+                                                <Tooltip contentStyle={CHART_TOOLTIP} />
+                                            </RadarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Derived Bowling Analytics */}
+                            {bowlingDerived && (
+                                <div className="bg-secondary/10 rounded-xl border border-border/50 p-4">
+                                    <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
+                                        <Flame size={12} style={{ color: teamColor }} /> Derived Analytics — {BOWLING_FORMAT_LABELS[apiBattingFormat as BowlingFormatKey]}
+                                    </p>
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                        <div className="relative overflow-hidden p-3.5 bg-secondary/20 rounded-xl border border-border/50">
+                                            <div className="absolute top-0 left-0 w-1 h-full rounded-r" style={{ backgroundColor: teamColor }} />
+                                            <p className="text-[11px] text-muted-foreground mb-1 pl-2">Wkts/Match</p>
+                                            <p className="text-lg font-bold font-mono pl-2" style={{ color: teamColor }}>{bowlingDerived.wicketsPerMatch}</p>
+                                        </div>
+                                        <div className="relative overflow-hidden p-3.5 bg-secondary/20 rounded-xl border border-border/50">
+                                            <div className="absolute top-0 left-0 w-1 h-full rounded-r" style={{ backgroundColor: teamColor }} />
+                                            <p className="text-[11px] text-muted-foreground mb-1 pl-2">Wkts/Inns</p>
+                                            <p className="text-lg font-bold font-mono pl-2" style={{ color: teamColor }}>{bowlingDerived.wicketsPerInnings}</p>
+                                        </div>
+                                        <div className="relative overflow-hidden p-3.5 bg-secondary/20 rounded-xl border border-border/50">
+                                            <div className="absolute top-0 left-0 w-1 h-full rounded-r" style={{ backgroundColor: teamColor }} />
+                                            <p className="text-[11px] text-muted-foreground mb-1 pl-2">Impact Score</p>
+                                            <p className="text-lg font-bold font-mono pl-2" style={{ color: teamColor }}>{bowlingDerived.bowlingImpactScore}</p>
+                                        </div>
+                                        <div className="relative overflow-hidden p-3.5 bg-secondary/20 rounded-xl border border-border/50">
+                                            <div className="absolute top-0 left-0 w-1 h-full rounded-r" style={{ backgroundColor: teamColor }} />
+                                            <p className="text-[11px] text-muted-foreground mb-1 pl-2">Haul Eff. %</p>
+                                            <p className="text-lg font-bold font-mono pl-2" style={{ color: teamColor }}>{bowlingDerived.wicketHaulEfficiency}%</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* ── Bowling Empty State ── */}
+                    {showBowling && !hasBowlingData && !isBowlingLoading && !isBowlingError && (
+                        <div className="p-10 flex flex-col items-center justify-center gap-3 text-center bg-secondary/5 rounded-xl border border-border/30">
+                            <div className="w-14 h-14 rounded-full bg-secondary/20 flex items-center justify-center">
+                                <Shield size={24} className="text-muted-foreground/40" />
+                            </div>
+                            <p className="text-sm font-medium text-muted-foreground">No bowling records available</p>
+                            <p className="text-xs text-muted-foreground/60 max-w-[280px]">
+                                This player has no bowling statistics across any format, or data is not yet available from Cricbuzz.
+                            </p>
                         </div>
                     )}
                 </Section>
@@ -739,6 +990,7 @@ export const PlayerAnalysisPanel = () => {
     const [selectedPlayerId, setSelectedPlayerId] = useState<string>("cr1");
     const [selectedCountry, setSelectedCountry] = useState<string>("All");
     const [apiBattingFormat, setApiBattingFormat] = useState<BattingFormatKey>('odi');
+    const [statsView, setStatsView] = useState<StatsView>('batting');
 
     const allPlayers = ANALYSIS_PLAYERS[activeSport];
 
@@ -795,7 +1047,19 @@ export const PlayerAnalysisPanel = () => {
         isError: isApiError,
     } = usePlayerBattingStats(selectedPlayer.id);
     const hasApiData = !!(apiBattingStats && (apiBattingStats.test || apiBattingStats.odi || apiBattingStats.t20 || apiBattingStats.ipl));
+
+    // Fetch bowling stats for the header too
+    const {
+        bowlingStats: apiBowlingStats,
+        isLoading: isBowlingLoading,
+        isError: isBowlingError,
+    } = usePlayerBowlingStats(selectedPlayer.id);
+    const hasBowlingData = !!(apiBowlingStats && (apiBowlingStats.test || apiBowlingStats.odi || apiBowlingStats.t20 || apiBowlingStats.ipl));
     const currentApiFormat = activeSport === 'cricket' && apiBattingStats ? apiBattingStats[apiBattingFormat] : null;
+    const currentBowlingFormatHeader: PlayerBowlingFormat | null = activeSport === 'cricket' && apiBowlingStats ? apiBowlingStats[apiBattingFormat as BowlingFormatKey] : null;
+
+    // Determine which data to show in the header based on statsView
+    const showBowlingInHeader = statsView === 'bowling';
 
     return (
         <div className="space-y-6">
@@ -938,12 +1202,42 @@ export const PlayerAnalysisPanel = () => {
 
                         {/* ── Dynamic API Stats (or fallback) ── */}
                         <div className="mt-6 pt-5 border-t border-border/30">
-                            {activeSport === "cricket" && hasApiData ? (
+                            {activeSport === "cricket" && (hasApiData || hasBowlingData) ? (
                                 <div className="space-y-4">
+                                    {/* Batting / Bowling Toggle */}
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <div className="flex gap-1 bg-secondary/30 rounded-xl p-1 mr-2">
+                                            <button
+                                                onClick={() => setStatsView('batting')}
+                                                className={cn(
+                                                    "px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5",
+                                                    statsView === 'batting'
+                                                        ? "bg-primary text-primary-foreground shadow-md"
+                                                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                                                )}
+                                            >
+                                                🏏 Batting
+                                            </button>
+                                            <button
+                                                onClick={() => setStatsView('bowling')}
+                                                className={cn(
+                                                    "px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5",
+                                                    statsView === 'bowling'
+                                                        ? "bg-primary text-primary-foreground shadow-md"
+                                                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                                                )}
+                                            >
+                                                🎳 Bowling
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     {/* Format Tabs & Status */}
                                     <div className="flex items-center gap-2 flex-wrap">
                                         {API_FORMAT_TABS.map(fmt => {
-                                            const isAvailable = apiBattingStats?.[fmt.key] !== null && apiBattingStats?.[fmt.key] !== undefined;
+                                            const battingAvailable = apiBattingStats?.[fmt.key] !== null && apiBattingStats?.[fmt.key] !== undefined;
+                                            const bowlingAvailable = apiBowlingStats?.[fmt.key as BowlingFormatKey] !== null && apiBowlingStats?.[fmt.key as BowlingFormatKey] !== undefined;
+                                            const isAvailable = showBowlingInHeader ? bowlingAvailable : battingAvailable;
                                             return (
                                                 <button
                                                     key={fmt.key}
@@ -966,11 +1260,11 @@ export const PlayerAnalysisPanel = () => {
                                         
                                         {/* Status Badges */}
                                         <div className="ml-auto flex items-center gap-2">
-                                            {isApiLoading ? (
+                                            {(showBowlingInHeader ? isBowlingLoading : isApiLoading) ? (
                                                 <span className="px-3 py-1.5 bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-full border border-blue-500/20 flex items-center gap-1.5">
                                                     <Loader2 size={9} className="animate-spin" /> Loading
                                                 </span>
-                                            ) : isApiError ? (
+                                            ) : (showBowlingInHeader ? isBowlingError : isApiError) ? (
                                                 <span className="px-3 py-1.5 bg-red-500/10 text-red-400 text-[10px] font-bold uppercase tracking-wider rounded-full border border-red-500/20 flex items-center gap-1.5">
                                                     <AlertTriangle size={9} /> Error
                                                 </span>
@@ -983,7 +1277,7 @@ export const PlayerAnalysisPanel = () => {
                                     </div>
 
                                     {/* Stat Cards Grid */}
-                                    {isApiLoading ? (
+                                    {(showBowlingInHeader ? isBowlingLoading : isApiLoading) ? (
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                             {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                                                 <div key={i} className="p-3.5 bg-secondary/20 rounded-xl border border-border/50">
@@ -991,6 +1285,22 @@ export const PlayerAnalysisPanel = () => {
                                                     <div className="h-5 w-12 bg-secondary/30 rounded animate-pulse" />
                                                 </div>
                                             ))}
+                                        </div>
+                                    ) : showBowlingInHeader && currentBowlingFormatHeader ? (
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                            <StatCard label="Matches" value={currentBowlingFormatHeader.matches} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="Innings" value={currentBowlingFormatHeader.innings} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="Wickets" value={currentBowlingFormatHeader.wickets} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="BBI" value={currentBowlingFormatHeader.bbi} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="Average" value={currentBowlingFormatHeader.average.toFixed(2)} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="Economy" value={currentBowlingFormatHeader.economy.toFixed(2)} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="Strike Rate" value={currentBowlingFormatHeader.strikeRate.toFixed(2)} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="5W Hauls" value={currentBowlingFormatHeader.fiveWickets} color={FORMAT_COLORS[apiBattingFormat]} />
+                                        </div>
+                                    ) : showBowlingInHeader && !currentBowlingFormatHeader ? (
+                                        <div className="p-6 flex flex-col items-center justify-center gap-2 text-center bg-secondary/5 rounded-xl border border-border/30">
+                                            <Shield size={20} className="text-muted-foreground/40" />
+                                            <p className="text-xs text-muted-foreground">No bowling data for this format</p>
                                         </div>
                                     ) : currentApiFormat ? (
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -1062,7 +1372,34 @@ export const PlayerAnalysisPanel = () => {
                         <Section icon={<BarChart3 size={16} style={{ color: getTeamColor(selectedPlayer.country).primary }} />} title="Detailed Statistics"
                             subtitle="Full career numbers">
                             <div className="space-y-1 max-h-[290px] overflow-y-auto pr-1">
-                                {activeSport === 'cricket' && currentApiFormat ? (
+                                {activeSport === 'cricket' && showBowlingInHeader && currentBowlingFormatHeader ? (
+                                    <>
+                                        {[
+                                            { label: 'Matches', value: currentBowlingFormatHeader.matches },
+                                            { label: 'Innings', value: currentBowlingFormatHeader.innings },
+                                            { label: 'Balls', value: currentBowlingFormatHeader.balls },
+                                            { label: 'Runs', value: currentBowlingFormatHeader.runs },
+                                            { label: 'Maidens', value: currentBowlingFormatHeader.maidens },
+                                            { label: 'Wickets', value: currentBowlingFormatHeader.wickets },
+                                            { label: 'Average', value: currentBowlingFormatHeader.average.toFixed(2) },
+                                            { label: 'Economy', value: currentBowlingFormatHeader.economy.toFixed(2) },
+                                            { label: 'Strike Rate', value: currentBowlingFormatHeader.strikeRate.toFixed(2) },
+                                            { label: 'BBI', value: currentBowlingFormatHeader.bbi },
+                                            { label: 'BBM', value: currentBowlingFormatHeader.bbm },
+                                            { label: '4W Hauls', value: currentBowlingFormatHeader.fourWickets },
+                                            { label: '5W Hauls', value: currentBowlingFormatHeader.fiveWickets },
+                                            { label: '10W Hauls', value: currentBowlingFormatHeader.tenWickets },
+                                        ].map((stat, i) => (
+                                            <div key={stat.label} className={cn(
+                                                "flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors",
+                                                i % 2 === 0 ? "bg-secondary/10 hover:bg-secondary/20" : "hover:bg-secondary/10"
+                                            )}>
+                                                <span className="text-xs text-muted-foreground font-medium">{stat.label}</span>
+                                                <span className="text-sm font-mono font-bold text-foreground">{stat.value}</span>
+                                            </div>
+                                        ))}
+                                    </>
+                                ) : activeSport === 'cricket' && currentApiFormat ? (
                                     <>
                                         <div className={cn("flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors bg-secondary/10 hover:bg-secondary/20")}>
                                             <span className="text-xs text-muted-foreground font-medium">Matches</span>
@@ -1122,7 +1459,7 @@ export const PlayerAnalysisPanel = () => {
 
                     {/* Sport-Specific Panels — 1 column, full width for clean display */}
                     <div className="space-y-5">
-                        {activeSport === "cricket" && <CricketPanels player={selectedPlayer} teamColor={getTeamColor(selectedPlayer.country).primary} apiBattingFormat={apiBattingFormat} setApiBattingFormat={setApiBattingFormat} />}
+                        {activeSport === "cricket" && <CricketPanels player={selectedPlayer} teamColor={getTeamColor(selectedPlayer.country).primary} apiBattingFormat={apiBattingFormat} setApiBattingFormat={setApiBattingFormat} statsView={statsView} />}
                         {activeSport === "football" && <FootballPanels player={selectedPlayer} teamColor={getTeamColor(selectedPlayer.country).primary} />}
                         {activeSport === "basketball" && <BasketballPanels player={selectedPlayer} teamColor={getTeamColor(selectedPlayer.country).primary} />}
                         {activeSport === "tennis" && <TennisPanels player={selectedPlayer} teamColor={getTeamColor(selectedPlayer.country).primary} />}
