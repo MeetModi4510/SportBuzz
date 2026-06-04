@@ -10,7 +10,7 @@
 
 import type { CricbuzzBattingStatsResponse } from '@/types/playerBattingTypes';
 
-const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
+const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY || '030c75b4d4mshfdaef69329cdd7ap1943adjsn3edfcf4a96b1';
 const RAPIDAPI_HOST = import.meta.env.VITE_RAPIDAPI_HOST || 'cricbuzz-cricket.p.rapidapi.com';
 
 const BASE_URL = `https://${RAPIDAPI_HOST}`;
