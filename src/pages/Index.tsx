@@ -48,7 +48,7 @@ const Index = () => {
   // Build real football matches from API response
   const realFootballMatches = useMemo(() => {
     if (!footballDashboard) return [];
-    const all = footballDashboard.all || [];
+    const all = (footballDashboard as any).all || [];
     // Ensure each match has Date objects for startTime
     return all.map((m: any) => ({
       ...m,
@@ -135,18 +135,18 @@ const Index = () => {
   
   // Categorized football for dashboard (from real API)
   const footballLeague = useMemo(() => 
-    footballDashboard?.league?.map((m: any) => ({ ...m, startTime: new Date(m.startTime) })) || [], 
+    (footballDashboard as any)?.league?.map((m: any) => ({ ...m, startTime: new Date(m.startTime) })) || [], 
     [footballDashboard]
   );
   const footballCup = useMemo(() => 
-    footballDashboard?.cup?.map((m: any) => ({ ...m, startTime: new Date(m.startTime) })) || [], 
+    (footballDashboard as any)?.cup?.map((m: any) => ({ ...m, startTime: new Date(m.startTime) })) || [], 
     [footballDashboard]
   );
   const footballInternational = useMemo(() => 
-    footballDashboard?.international?.map((m: any) => ({ ...m, startTime: new Date(m.startTime) })) || [], 
+    (footballDashboard as any)?.international?.map((m: any) => ({ ...m, startTime: new Date(m.startTime) })) || [], 
     [footballDashboard]
   );
-  const footballLiveCount = footballDashboard?.meta?.liveCount || 0;
+  const footballLiveCount = (footballDashboard as any)?.meta?.liveCount || 0;
   const basketballMatches = filteredMatches.filter((m) => m.sport === "basketball");
   const tennisMatches = filteredMatches.filter((m) => m.sport === "tennis");
   

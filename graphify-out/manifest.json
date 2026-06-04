@@ -220,8 +220,8 @@
     "semantic_hash": "7f25aca378fbcd78997f591895d84a3a"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\controllers\\authController.js": {
-    "mtime": 1780479839.975233,
-    "ast_hash": "a6d5c57a6ef22c4c3dd735c9897d1f5d",
+    "mtime": 1780566998.733844,
+    "ast_hash": "32159d265b4dd78810d52056a390ebf1",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\controllers\\cricketController.js": {
@@ -1370,19 +1370,19 @@
     "semantic_hash": "092c6937f28c1dff19a7d561f5f98360"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Achievements.tsx": {
-    "mtime": 1777566131.7415278,
-    "ast_hash": "40225fc4ef47ffbdd169100657389001",
-    "semantic_hash": "40225fc4ef47ffbdd169100657389001"
+    "mtime": 1780563420.3923583,
+    "ast_hash": "2919610122e6ee385bb710803bc5bccd",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\ActivityHistory.tsx": {
-    "mtime": 1777566131.747528,
-    "ast_hash": "e031cb22c9118efb158f812652831a42",
-    "semantic_hash": "e031cb22c9118efb158f812652831a42"
+    "mtime": 1780563420.4096892,
+    "ast_hash": "204bbe448973b51e4e01bca1a284c654",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\AdminDashboard.tsx": {
-    "mtime": 1777566131.8010452,
-    "ast_hash": "dbce564fe98f71136347cb7c468609f7",
-    "semantic_hash": "dbce564fe98f71136347cb7c468609f7"
+    "mtime": 1780563420.410206,
+    "ast_hash": "75349216a43ca1131a7b9d1464201e66",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Create.tsx": {
     "mtime": 1777566131.8290524,
@@ -1390,18 +1390,18 @@
     "semantic_hash": "5762062e4bb66c03fd2dc02d14e04302"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\FantasyCricket.tsx": {
-    "mtime": 1777566131.837047,
-    "ast_hash": "87ea805ea986fc6e8408a6e0a7942797",
-    "semantic_hash": "87ea805ea986fc6e8408a6e0a7942797"
+    "mtime": 1780563420.4158154,
+    "ast_hash": "fb4227da886de1cf78cfa6f38b5c4423",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Favorites.tsx": {
-    "mtime": 1777576180.8569045,
-    "ast_hash": "7d0497ee824976cd8f31216d9b68d619",
-    "semantic_hash": "7d0497ee824976cd8f31216d9b68d619"
+    "mtime": 1780563420.42086,
+    "ast_hash": "5b75de91287dc7ff0cbe20abda91cbce",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\ForgotPassword.tsx": {
-    "mtime": 1780479555.1231472,
-    "ast_hash": "f4249a9ec630c5f8c341f3491c0dbdc7",
+    "mtime": 1780566741.1556735,
+    "ast_hash": "783d0fc0265e9a4ac6980991c42caf21",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Index.tsx": {
@@ -1410,14 +1410,14 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Leaderboard.tsx": {
-    "mtime": 1777566131.8860438,
-    "ast_hash": "a4f7c5f649f5e7386dc43ccb59c1671f",
-    "semantic_hash": "a4f7c5f649f5e7386dc43ccb59c1671f"
+    "mtime": 1780563420.4294002,
+    "ast_hash": "bc2f7aa7a5cb4e6ccd62b8a13e5085e2",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\LiveMatchViewer.tsx": {
-    "mtime": 1777566131.9200385,
-    "ast_hash": "714ba2bb6841123729eaf6c2655e3f61",
-    "semantic_hash": "714ba2bb6841123729eaf6c2655e3f61"
+    "mtime": 1780563420.4342878,
+    "ast_hash": "8f3bc4b6cf51dfab0171c89485406999",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Login.tsx": {
     "mtime": 1780563313.1587698,
@@ -1425,9 +1425,9 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\MatchDetails.tsx": {
-    "mtime": 1777581917.638747,
-    "ast_hash": "c73c72083107876ee46e63c16751c84c",
-    "semantic_hash": "c73c72083107876ee46e63c16751c84c"
+    "mtime": 1780563420.4362943,
+    "ast_hash": "e2bd8beb7d3f48897f3f2b742902a0a4",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\NotFound.tsx": {
     "mtime": 1777566131.9813762,
@@ -1440,9 +1440,9 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\PerformanceLab.tsx": {
-    "mtime": 1777566132.0023654,
-    "ast_hash": "900baf4448e1acba750f00f6585bd5fb",
-    "semantic_hash": "900baf4448e1acba750f00f6585bd5fb"
+    "mtime": 1780563420.4383059,
+    "ast_hash": "e90c23a4271a79b63be476bd0f064f5c",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\PlayerProfilePage.tsx": {
     "mtime": 1777575637.8892388,
@@ -1450,19 +1450,19 @@
     "semantic_hash": "7cf8d63b7e5ecbaf248b06f8c8e53487"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Preferences.tsx": {
-    "mtime": 1777566132.0983634,
-    "ast_hash": "1cbb8a6d1b1eaf7e11c3a9671df4807e",
-    "semantic_hash": "1cbb8a6d1b1eaf7e11c3a9671df4807e"
+    "mtime": 1780563420.4435058,
+    "ast_hash": "0679cfc794283ca50ee217d4afed8d8c",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Profile.tsx": {
-    "mtime": 1777566132.1083665,
-    "ast_hash": "54cf2ae1ffe044427518a99ce917b5a1",
-    "semantic_hash": "54cf2ae1ffe044427518a99ce917b5a1"
+    "mtime": 1780563420.44495,
+    "ast_hash": "ebff76c4a0a249a20019bf1b46e2251a",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\ResetPassword.tsx": {
-    "mtime": 1777566132.1173654,
-    "ast_hash": "bdf5c39d7abfb7b66020cc8782b8f623",
-    "semantic_hash": "bdf5c39d7abfb7b66020cc8782b8f623"
+    "mtime": 1780563420.44495,
+    "ast_hash": "cedd18d2b82ac65b7cbd5713a668d513",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\ScoringPanel.tsx": {
     "mtime": 1777566132.130372,
@@ -1470,19 +1470,19 @@
     "semantic_hash": "3e8ecc3907053228313722260c6dba83"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\ShowcaseRoom.tsx": {
-    "mtime": 1777566132.1453662,
-    "ast_hash": "257df41196e0472690845a237490eef8",
-    "semantic_hash": "257df41196e0472690845a237490eef8"
+    "mtime": 1780563420.4464617,
+    "ast_hash": "5ee609b709f31c12038a4292abab1462",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Signup.tsx": {
-    "mtime": 1777569426.7257564,
-    "ast_hash": "962bd7a6d06450381ec770ccde4ebc91",
-    "semantic_hash": "962bd7a6d06450381ec770ccde4ebc91"
+    "mtime": 1780563420.4474683,
+    "ast_hash": "6720dfee3617c5f8bd63ef90fa7f9202",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\TournamentDetailsPage.tsx": {
-    "mtime": 1777566132.1683733,
-    "ast_hash": "a6ff354280e4007fb16be3bf0effe876",
-    "semantic_hash": "a6ff354280e4007fb16be3bf0effe876"
+    "mtime": 1780563420.4486823,
+    "ast_hash": "e1c776ee7763b817184b216cb2e5f85a",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\auction\\AuctionAnalytics.tsx": {
     "mtime": 1777566132.185362,
@@ -1545,9 +1545,9 @@
     "semantic_hash": "0eae42e5993a29266a3b9fe1d0e52cec"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\FootballTournamentDetails.tsx": {
-    "mtime": 1777566132.3923633,
-    "ast_hash": "aa99e534c8771d21a60dc6195c617c62",
-    "semantic_hash": "aa99e534c8771d21a60dc6195c617c62"
+    "mtime": 1780563420.425865,
+    "ast_hash": "a385dff237480b37c4a08508349fc130",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\LiveFootballMatch.tsx": {
     "mtime": 1777566132.3983762,
@@ -2944,9 +2944,79 @@
     "ast_hash": "02f0093be7b091cbf87454ac5e0e803e",
     "semantic_hash": ""
   },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\replace_names.js": {
-    "mtime": 1780563347.0129192,
-    "ast_hash": "10832870123d071854ded0ad0dd5c63d",
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026\\bhopal_leopards.png": {
+    "mtime": 1780568018.5657153,
+    "ast_hash": "8d8afe6f4c27cbfcde277fc41e81096b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026\\bundelkhand_bulls.png": {
+    "mtime": 1780568164.7767518,
+    "ast_hash": "219a6fe78b9cb80cdd111ff4d38ff198",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026\\chambal_ghariyals.png": {
+    "mtime": 1780568164.6824443,
+    "ast_hash": "155445cdfff330872d7f87de7ed03348",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026\\gwalior_cheetahs.png": {
+    "mtime": 1780568269.0927167,
+    "ast_hash": "02064910936aa98c8eae2e4c210ce77d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026\\indore_pink_panthers.png": {
+    "mtime": 1780568740.6541438,
+    "ast_hash": "c542fc0fcac115101d0dfd02ce046774",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026\\jabalpur_royal_lions.png": {
+    "mtime": 1780568356.7549798,
+    "ast_hash": "eb413c294707e51707aae060b1401c94",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026\\malwa_stallions.png": {
+    "mtime": 1780568419.3094065,
+    "ast_hash": "7b86fa897a4564977cd3ea5b44b85f8a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026\\rewa_jaguars.png": {
+    "mtime": 1780568394.937656,
+    "ast_hash": "2d1271edbba476210475dc9679b1516b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026\\royal_nimar_eagles.png": {
+    "mtime": 1780568491.3316247,
+    "ast_hash": "81df96c9a42623b30b468ec785ef0872",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026\\ujjain_falcons.png": {
+    "mtime": 1780568452.2949839,
+    "ast_hash": "e19244f680c3431cfbbcc2995228141b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026_women\\bhopal_wolves.png": {
+    "mtime": 1780568980.903558,
+    "ast_hash": "5029f9b263522f0fda6bc797fffd051d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026_women\\bundelkhand_queens.png": {
+    "mtime": 1780568164.7767518,
+    "ast_hash": "219a6fe78b9cb80cdd111ff4d38ff198",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026_women\\gwalior_tigresses.png": {
+    "mtime": 1780569118.5326846,
+    "ast_hash": "1f377483b8c8d1c5e420bd0579422abf",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026_women\\indore_panthers_women.png": {
+    "mtime": 1780568740.6541438,
+    "ast_hash": "c542fc0fcac115101d0dfd02ce046774",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026_women\\rewa_lionesses.png": {
+    "mtime": 1780568394.937656,
+    "ast_hash": "2d1271edbba476210475dc9679b1516b",
     "semantic_hash": ""
   }
 }

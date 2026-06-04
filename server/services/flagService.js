@@ -401,7 +401,7 @@ const teamToCountryCode = {
     // International Teams (Full names)
     'india': 'in',
     'australia': 'au',
-    'england': 'gb',
+    'england': 'gb-eng',
     'pakistan': 'pk',
     'new zealand': 'nz',
     'south africa': 'za',

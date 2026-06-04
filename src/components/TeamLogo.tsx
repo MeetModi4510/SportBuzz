@@ -1,5 +1,6 @@
 import { cn, getTeamAcronym } from "@/lib/utils";
 import { useState } from "react";
+import mplFlags from "@/data/mpl_t20_2026_flags.json";
 
 interface TeamLogoProps {
     logo: string;
@@ -86,10 +87,10 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
         'triumph knights mumbai north east': '/flags/t20_mumbai_2026/tkme.png',
         'triumphs knights mne': '/flags/t20_mumbai_2026/tkme.png',
         'tkme': '/flags/t20_mumbai_2026/tkme.png',
-        'north mumbai panthers': '/flags/t20_mumbai_2026/mp.png',
         'nmp': '/flags/t20_mumbai_2026/mp.png',
         'arcs andheri': '/flags/t20_mumbai_2026/aa.png',
         'aa': '/flags/t20_mumbai_2026/aa.png',
+        ...mplFlags
     };
 
     let resolvedLocalFlag = localFlagMap[safeNameLower] || localFlagMap[safeShortLower];
