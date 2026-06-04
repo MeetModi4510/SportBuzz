@@ -4,6 +4,7 @@ import Activity from '../models/Activity.js';
 import Achievement from '../models/Achievement.js';
 import { generateToken } from '../utils/tokenUtils.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
+import { sendOtpEmail } from '../services/emailService.js';
 
 /**
  * @desc    Register a new user
@@ -318,5 +319,179 @@ export const resetPassword = asyncHandler(async (req, res) => {
     res.json({
         success: true,
         message: 'Password has been reset successfully. You can now login with your new password.'
+    });
+});
+
+/**
+ * @desc    Send password reset OTP via email
+ * @route   POST /api/auth/send-otp
+ * @access  Public
+ */
+export const sendPasswordOtp = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        res.status(400);
+        throw new Error('Please provide an email address');
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        res.status(404);
+        throw new Error('This email is not registered');
+    }
+
+    if (user.provider !== 'local') {
+        res.status(400);
+        throw new Error(`This account uses ${user.provider} login. Please sign in with ${user.provider}.`);
+    }
+
+    // Rate limiting (1 OTP per minute)
+    const oneMinAgo = new Date(Date.now() - 60 * 1000);
+    if (user.passwordOtpLastSent && user.passwordOtpLastSent > oneMinAgo) {
+        res.status(429);
+        throw new Error('Please try again after 1 minute.');
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Hash the OTP before saving to DB
+    const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+
+    // Save to user
+    user.passwordOtp = hashedOtp;
+    user.passwordOtpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    user.passwordOtpUsed = false;
+    user.passwordOtpLastSent = Date.now();
+
+    await user.save();
+
+    // Send email
+    const emailSent = await sendOtpEmail(user.email, otp);
+
+    if (!emailSent) {
+        user.passwordOtp = undefined;
+        user.passwordOtpExpires = undefined;
+        await user.save();
+        res.status(500);
+        throw new Error('Email could not be sent. Please try again later.');
+    }
+
+    res.json({
+        success: true,
+        message: 'OTP sent successfully to your email.'
+    });
+});
+
+/**
+ * @desc    Verify OTP and generate reset token
+ * @route   POST /api/auth/verify-otp
+ * @access  Public
+ */
+export const verifyPasswordOtp = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        res.status(400);
+        throw new Error('Please provide email and OTP');
+    }
+
+    // Find user with unexpired OTP
+    const user = await User.findOne({
+        email,
+        passwordOtpExpires: { $gt: Date.now() }
+    }).select('+passwordOtp');
+
+    if (!user) {
+        res.status(400);
+        throw new Error('OTP has expired or email is invalid');
+    }
+
+    if (user.passwordOtpUsed) {
+        res.status(400);
+        throw new Error('OTP has already been used');
+    }
+
+    // Verify OTP hash
+    const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+    
+    if (user.passwordOtp !== hashedOtp) {
+        res.status(401);
+        throw new Error('Invalid OTP');
+    }
+
+    // Mark OTP as used
+    user.passwordOtpUsed = true;
+    
+    // Generate a reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    // Set token on user
+    user.resetPasswordToken = hashedResetToken;
+    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 mins to reset password
+    
+    await user.save();
+
+    res.json({
+        success: true,
+        message: 'OTP verified successfully',
+        data: {
+            resetToken // Send back to client to use in the actual reset-password endpoint
+        }
+    });
+});
+
+/**
+ * @desc    Resend password reset OTP
+ * @route   POST /api/auth/resend-otp
+ * @access  Public
+ */
+export const resendPasswordOtp = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        res.status(400);
+        throw new Error('Please provide an email address');
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        res.status(404);
+        throw new Error('This email is not registered');
+    }
+
+    // Rate limiting check
+    const oneMinAgo = new Date(Date.now() - 60 * 1000);
+    if (user.passwordOtpLastSent && user.passwordOtpLastSent > oneMinAgo) {
+        res.status(429);
+        throw new Error('Please try again after 1 minute.');
+    }
+
+    // Generate new OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+
+    // Update user
+    user.passwordOtp = hashedOtp;
+    user.passwordOtpExpires = Date.now() + 10 * 60 * 1000;
+    user.passwordOtpUsed = false;
+    user.passwordOtpLastSent = Date.now();
+
+    await user.save();
+
+    const emailSent = await sendOtpEmail(user.email, otp);
+
+    if (!emailSent) {
+        res.status(500);
+        throw new Error('Email could not be sent. Please try again later.');
+    }
+
+    res.json({
+        success: true,
+        message: 'OTP resent successfully to your email.'
     });
 });

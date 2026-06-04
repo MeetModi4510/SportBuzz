@@ -56,6 +56,24 @@ const userSchema = new mongoose.Schema({
         },
         select: false // Don't return answer in queries by default
     },
+    passwordOtp: {
+        type: String,
+        select: false
+    },
+    passwordOtpExpires: {
+        type: Date
+    },
+    passwordOtpUsed: {
+        type: Boolean,
+        default: false
+    },
+    passwordOtpAttempts: {
+        type: Number,
+        default: 0
+    },
+    passwordOtpLastSent: {
+        type: Date
+    },
     phone: {
         type: String,
         trim: true
@@ -123,7 +141,7 @@ userSchema.pre('save', async function (next) {
     // Hash security answer if modified
     if (this.isModified('securityAnswer') && this.securityAnswer) {
         const salt = await bcrypt.genSalt(10);
-        this.securityAnswer = await bcrypt.hash(this.securityAnswer.toLowerCase().trim(), salt);
+        this.securityAnswer = await bcrypt.hash(this.securityAnswer.trim(), salt);
     }
 
     next();
@@ -136,7 +154,7 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 
 // Compare security answer method
 userSchema.methods.compareSecurityAnswer = async function (candidateAnswer) {
-    return await bcrypt.compare(candidateAnswer.toLowerCase().trim(), this.securityAnswer);
+    return await bcrypt.compare(candidateAnswer.trim(), this.securityAnswer);
 };
 
 // Calculate user level based on points

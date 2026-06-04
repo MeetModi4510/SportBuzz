@@ -55,7 +55,11 @@ export const authApi = {
     logout: () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-    }
+    },
+    sendOtp: (email: string) => api.post('auth/send-otp', { email }),
+    verifyOtp: (data: { email: string, otp: string }) => api.post('auth/verify-otp', data),
+    resendOtp: (email: string) => api.post('auth/resend-otp', { email }),
+    resetPasswordWithToken: (data: { token: string, password: string }) => api.post(`auth/reset-password/${data.token}`, { password: data.password })
 };
 
 export const cricketApi = {

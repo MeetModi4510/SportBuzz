@@ -13,10 +13,10 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
     const [useTextFallback, setUseTextFallback] = useState(false);
 
     const sizeClasses = {
-        xs: { width: "w-8", height: "h-8", text: "text-lg" },
-        sm: { width: "w-12", height: "h-12", text: "text-xl" },
-        md: { width: "w-20", height: "h-20", text: "text-4xl" },
-        lg: { width: "w-32", height: "h-32", text: "text-6xl" },
+        xs: { width: "w-8", height: "h-8", text: "text-xs" },
+        sm: { width: "w-12", height: "h-12", text: "text-sm" },
+        md: { width: "w-20", height: "h-20", text: "text-lg" },
+        lg: { width: "w-32", height: "h-32", text: "text-2xl" },
     };
 
     // Generate a consistent vibrant gradient based on team name hash
@@ -43,14 +43,26 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
         // Use shortName if available, otherwise first 2 chars of name
         const displayText = shortName || getTeamAcronym(safeName);
 
+        // Dynamically scale font size so long abbreviations (ENGA, WARKS, etc.)
+        // always fit perfectly inside the circle without overflowing.
+        const getDynamicFontSize = (): string | undefined => {
+            const len = displayText.length;
+            if (len <= 2) return undefined;   // CSS class handles it fine
+            if (len === 3) return '0.78em';
+            if (len === 4) return '0.60em';
+            return '0.46em';                  // 5+ chars (e.g. ATMWS)
+        };
+        const dynamicFontSize = getDynamicFontSize();
+
         return (
             <div
+                style={dynamicFontSize ? { fontSize: dynamicFontSize } : undefined}
                 className={cn(
                     sizeClasses[size].width,
                     sizeClasses[size].height,
                     'flex items-center justify-center rounded-full font-bold text-white shadow-md border border-white/20',
                     getTeamColor(safeName),
-                    size === 'xs' ? 'text-[10px]' : size === 'sm' ? 'text-xs' : 'text-xl',
+                    sizeClasses[size].text,
                     className
                 )}
             >

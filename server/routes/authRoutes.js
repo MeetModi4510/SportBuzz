@@ -1,6 +1,10 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
-import { signup, login, getMe, logout, forgotPassword, resetPassword, verifySecurityAnswer } from '../controllers/authController.js';
+import { 
+    signup, login, getMe, logout, 
+    forgotPassword, resetPassword, verifySecurityAnswer,
+    sendPasswordOtp, verifyPasswordOtp, resendPasswordOtp
+} from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
@@ -64,6 +68,11 @@ router.post('/logout', protect, logout);
 router.post('/forgot-password', forgotPassword);
 router.post('/verify-security-answer', verifySecurityAnswer);
 router.post('/reset-password/:token', resetPassword);
+
+// OTP Routes
+router.post('/send-otp', sendPasswordOtp);
+router.post('/verify-otp', verifyPasswordOtp);
+router.post('/resend-otp', resendPasswordOtp);
 
 // OAuth Routes - Google
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));

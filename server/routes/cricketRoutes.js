@@ -133,10 +133,10 @@ router.get('/players/:id', async (req, res) => {
 
 // ====== CRICBUZZ PROXY ROUTES (Scorecard, Squads, Commentary) ======
 
-// Cricbuzz Scorecard — accepts CricketData.org match ID, maps internally
-router.get('/cb/scorecard/:cdMatchId', async (req, res) => {
+// Cricbuzz Scorecard — accepts Cricbuzz match ID directly
+router.get('/cb/scorecard/:matchId', async (req, res) => {
     try {
-        const result = await cricbuzzService.getScorecard(req.params.cdMatchId);
+        const result = await cricbuzzService.getScorecard(req.params.matchId);
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: error.message, data: null });
@@ -144,9 +144,9 @@ router.get('/cb/scorecard/:cdMatchId', async (req, res) => {
 });
 
 // Cricbuzz Squads — extracted from scorecard data
-router.get('/cb/squads/:cdMatchId', async (req, res) => {
+router.get('/cb/squads/:matchId', async (req, res) => {
     try {
-        const result = await cricbuzzService.getSquads(req.params.cdMatchId);
+        const result = await cricbuzzService.getSquads(req.params.matchId);
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: error.message, data: null });
@@ -154,9 +154,9 @@ router.get('/cb/squads/:cdMatchId', async (req, res) => {
 });
 
 // Cricbuzz Commentary — highlight commentary
-router.get('/cb/commentary/:cdMatchId', async (req, res) => {
+router.get('/cb/commentary/:matchId', async (req, res) => {
     try {
-        const result = await cricbuzzService.getCommentary(req.params.cdMatchId);
+        const result = await cricbuzzService.getCommentary(req.params.matchId);
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: error.message, data: null });

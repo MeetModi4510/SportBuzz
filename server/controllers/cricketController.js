@@ -1,4 +1,4 @@
-import cricketService from '../services/cricketApiService.js';
+import { cricketService } from '../services/cricketApiService.js';
 import Activity from '../models/Activity.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 
