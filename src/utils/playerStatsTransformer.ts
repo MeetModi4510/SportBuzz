@@ -126,16 +126,35 @@ export function transformBattingStats(
   }
 
   const headers = raw.headers;
+  
+  // Detect if the API response is transposed (formats are in the headers instead of first column)
+  const isTransposed = headers.some(h => FORMAT_MAP[h.toLowerCase().trim()] !== undefined);
 
-  for (const row of raw.values) {
-    if (!row.values || row.values.length === 0) continue;
+  if (isTransposed) {
+    // Extract the stat names from the first column of each row
+    const statNames = raw.values.map(row => (row.values[0] || '').trim());
 
-    // First value is typically the format name
-    const formatRaw = (row.values[0] || '').toLowerCase().trim();
-    const formatKey = FORMAT_MAP[formatRaw];
-
-    if (formatKey) {
-      result[formatKey] = parseFormatRow(row.values, headers);
+    for (let colIndex = 1; colIndex < headers.length; colIndex++) {
+      const formatRaw = (headers[colIndex] || '').toLowerCase().trim();
+      const formatKey = FORMAT_MAP[formatRaw];
+      
+      if (formatKey) {
+        // Build an array of values for this specific format column
+        const statValues = raw.values.map(row => row.values[colIndex] || '0');
+        result[formatKey] = parseFormatRow(statValues, statNames);
+      }
+    }
+  } else {
+    // Standard format processing
+    for (const row of raw.values) {
+      if (!row.values || row.values.length === 0) continue;
+  
+      const formatRaw = (row.values[0] || '').toLowerCase().trim();
+      const formatKey = FORMAT_MAP[formatRaw];
+  
+      if (formatKey) {
+        result[formatKey] = parseFormatRow(row.values, headers);
+      }
     }
   }
 
