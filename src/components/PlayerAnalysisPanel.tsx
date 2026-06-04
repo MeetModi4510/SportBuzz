@@ -277,59 +277,12 @@ const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingForma
         <>
             {/* ── Dynamic API Batting Stats Section ── */}
             {cricbuzzId && (
-                <Section icon={<Zap size={16} style={{ color: teamColor }} />} title="Live Batting Statistics"
-                    subtitle="Dynamic data from Cricbuzz API • Cached 15 minutes">
-
-                    {/* Format Tabs */}
-                    <div className="flex items-center gap-2 mb-5 flex-wrap">
-                        {API_FORMAT_TABS.map(fmt => {
-                            const isAvailable = apiBattingStats?.[fmt.key] !== null && apiBattingStats?.[fmt.key] !== undefined;
-                            return (
-                                <button
-                                    key={fmt.key}
-                                    onClick={() => isAvailable && setApiBattingFormat(fmt.key)}
-                                    disabled={!hasApiData || !isAvailable}
-                                    className={cn(
-                                        "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border",
-                                        apiBattingFormat === fmt.key && isAvailable
-                                            ? "text-white border-transparent shadow-md scale-105"
-                                            : !isAvailable
-                                            ? "bg-secondary/20 text-muted-foreground/40 border-border/30 cursor-not-allowed"
-                                            : "bg-secondary/30 text-muted-foreground border-border hover:bg-secondary/60"
-                                    )}
-                                    style={apiBattingFormat === fmt.key && isAvailable ? { background: FORMAT_COLORS[fmt.key], boxShadow: `0 4px 15px ${FORMAT_COLORS[fmt.key]}30` } : undefined}
-                                >
-                                    {fmt.label}
-                                </button>
-                            );
-                        })}
-                        {hasApiData && (
-                            <span className="ml-auto px-3 py-1.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider rounded-full border border-emerald-500/20 flex items-center gap-1.5">
-                                <Wifi size={9} /> Live
-                            </span>
-                        )}
-                        {isApiLoading && (
-                            <span className="ml-auto px-3 py-1.5 bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-full border border-blue-500/20 flex items-center gap-1.5">
-                                <Loader2 size={9} className="animate-spin" /> Loading
-                            </span>
-                        )}
-                    </div>
-
-                    {/* Loading skeleton */}
-                    {isApiLoading && (
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                                <div key={i} className="p-3.5 bg-secondary/20 rounded-xl border border-border/50">
-                                    <div className="h-2 w-16 bg-secondary/40 rounded animate-pulse mb-2" />
-                                    <div className="h-5 w-12 bg-secondary/30 rounded animate-pulse" />
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                <Section icon={<Zap size={16} style={{ color: teamColor }} />} title="Cross-Format Analysis"
+                    subtitle="Performance metrics breakdown and visualizations">
 
                     {/* Error state */}
                     {isApiError && !hasApiData && (
-                        <div className="p-8 flex flex-col items-center justify-center gap-3 text-center bg-secondary/10 rounded-xl border border-red-500/10">
+                        <div className="p-8 flex flex-col items-center justify-center gap-3 text-center bg-secondary/10 rounded-xl border border-red-500/10 mb-5">
                             <AlertTriangle size={24} className="text-red-400" />
                             <p className="text-sm text-muted-foreground">{apiErrorMessage || 'Failed to fetch stats'}</p>
                             <button onClick={() => refetchApiStats()} className="px-4 py-2 text-xs font-bold bg-red-500/10 text-red-400 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all flex items-center gap-1.5">
@@ -341,17 +294,6 @@ const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingForma
                     {/* API stats display */}
                     {hasApiData && currentApiFormat && !isApiLoading && (
                         <div className="space-y-5">
-                            {/* Stat Cards Grid */}
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                <StatCard label="Matches" value={currentApiFormat.matches} color={FORMAT_COLORS[apiBattingFormat]} />
-                                <StatCard label="Innings" value={currentApiFormat.innings} color={FORMAT_COLORS[apiBattingFormat]} />
-                                <StatCard label="Runs" value={currentApiFormat.runs.toLocaleString()} color={FORMAT_COLORS[apiBattingFormat]} />
-                                <StatCard label="Highest" value={currentApiFormat.highestScore} color={FORMAT_COLORS[apiBattingFormat]} />
-                                <StatCard label="Average" value={currentApiFormat.average.toFixed(2)} color={FORMAT_COLORS[apiBattingFormat]} />
-                                <StatCard label="Strike Rate" value={currentApiFormat.strikeRate.toFixed(2)} color={FORMAT_COLORS[apiBattingFormat]} />
-                                <StatCard label="100s / 50s" value={`${currentApiFormat.hundreds} / ${currentApiFormat.fifties}`} color={FORMAT_COLORS[apiBattingFormat]} />
-                                <StatCard label="4s / 6s" value={`${currentApiFormat.fours} / ${currentApiFormat.sixes}`} color={FORMAT_COLORS[apiBattingFormat]} />
-                            </div>
 
                             {/* Cross-format Comparison Charts */}
                             {apiChartData && (
@@ -847,7 +789,12 @@ export const PlayerAnalysisPanel = () => {
     );
 
     // Fetch API stats here as well to power the top header
-    const { battingStats: apiBattingStats } = usePlayerBattingStats(selectedPlayer.id);
+    const { 
+        battingStats: apiBattingStats,
+        isLoading: isApiLoading,
+        isError: isApiError,
+    } = usePlayerBattingStats(selectedPlayer.id);
+    const hasApiData = !!(apiBattingStats && (apiBattingStats.test || apiBattingStats.odi || apiBattingStats.t20 || apiBattingStats.ipl));
     const currentApiFormat = activeSport === 'cricket' && apiBattingStats ? apiBattingStats[apiBattingFormat] : null;
 
     return (
@@ -989,34 +936,84 @@ export const PlayerAnalysisPanel = () => {
                             </div>
                         </div>
 
-                        {/* Quick Stats Row */}
-                        <div className="grid grid-cols-4 gap-3 mt-5">
-                            {activeSport === "cricket" && currentApiFormat ? (
-                                <>
-                                    <div className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
-                                        <p className="text-xl font-bold font-mono">{currentApiFormat.matches}</p>
-                                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">Matches</p>
+                        {/* ── Dynamic API Stats (or fallback) ── */}
+                        <div className="mt-6 pt-5 border-t border-border/30">
+                            {activeSport === "cricket" && hasApiData ? (
+                                <div className="space-y-4">
+                                    {/* Format Tabs & Status */}
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        {API_FORMAT_TABS.map(fmt => {
+                                            const isAvailable = apiBattingStats?.[fmt.key] !== null && apiBattingStats?.[fmt.key] !== undefined;
+                                            return (
+                                                <button
+                                                    key={fmt.key}
+                                                    onClick={() => isAvailable && setApiBattingFormat(fmt.key)}
+                                                    disabled={!isAvailable}
+                                                    className={cn(
+                                                        "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border",
+                                                        apiBattingFormat === fmt.key && isAvailable
+                                                            ? "text-white border-transparent shadow-md scale-105"
+                                                            : !isAvailable
+                                                            ? "bg-secondary/20 text-muted-foreground/40 border-border/30 cursor-not-allowed"
+                                                            : "bg-secondary/30 text-muted-foreground border-border hover:bg-secondary/60"
+                                                    )}
+                                                    style={apiBattingFormat === fmt.key && isAvailable ? { background: FORMAT_COLORS[fmt.key], boxShadow: `0 4px 15px ${FORMAT_COLORS[fmt.key]}30` } : undefined}
+                                                >
+                                                    {fmt.label}
+                                                </button>
+                                            );
+                                        })}
+                                        
+                                        {/* Status Badges */}
+                                        <div className="ml-auto flex items-center gap-2">
+                                            {isApiLoading ? (
+                                                <span className="px-3 py-1.5 bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-full border border-blue-500/20 flex items-center gap-1.5">
+                                                    <Loader2 size={9} className="animate-spin" /> Loading
+                                                </span>
+                                            ) : isApiError ? (
+                                                <span className="px-3 py-1.5 bg-red-500/10 text-red-400 text-[10px] font-bold uppercase tracking-wider rounded-full border border-red-500/20 flex items-center gap-1.5">
+                                                    <AlertTriangle size={9} /> Error
+                                                </span>
+                                            ) : (
+                                                <span className="px-3 py-1.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider rounded-full border border-emerald-500/20 flex items-center gap-1.5">
+                                                    <Wifi size={9} /> Live
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
-                                        <p className="text-xl font-bold font-mono">{currentApiFormat.runs}</p>
-                                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">Runs</p>
-                                    </div>
-                                    <div className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
-                                        <p className="text-xl font-bold font-mono">{currentApiFormat.average.toFixed(2)}</p>
-                                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">Average</p>
-                                    </div>
-                                    <div className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
-                                        <p className="text-xl font-bold font-mono">{currentApiFormat.strikeRate.toFixed(2)}</p>
-                                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">Strike Rate</p>
-                                    </div>
-                                </>
+
+                                    {/* Stat Cards Grid */}
+                                    {isApiLoading ? (
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                                                <div key={i} className="p-3.5 bg-secondary/20 rounded-xl border border-border/50">
+                                                    <div className="h-2 w-16 bg-secondary/40 rounded animate-pulse mb-2" />
+                                                    <div className="h-5 w-12 bg-secondary/30 rounded animate-pulse" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : currentApiFormat ? (
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                            <StatCard label="Matches" value={currentApiFormat.matches} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="Innings" value={currentApiFormat.innings} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="Runs" value={currentApiFormat.runs.toLocaleString()} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="Highest" value={currentApiFormat.highestScore} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="Average" value={currentApiFormat.average.toFixed(2)} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="Strike Rate" value={currentApiFormat.strikeRate.toFixed(2)} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="100s / 50s" value={`${currentApiFormat.hundreds} / ${currentApiFormat.fifties}`} color={FORMAT_COLORS[apiBattingFormat]} />
+                                            <StatCard label="4s / 6s" value={`${currentApiFormat.fours} / ${currentApiFormat.sixes}`} color={FORMAT_COLORS[apiBattingFormat]} />
+                                        </div>
+                                    ) : null}
+                                </div>
                             ) : (
-                                Object.entries(selectedPlayer.detailedStats).slice(0, 4).map(([key, val]) => (
-                                    <div key={key} className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
-                                        <p className="text-xl font-bold font-mono">{val}</p>
-                                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">{key}</p>
-                                    </div>
-                                ))
+                                <div className="grid grid-cols-4 gap-3">
+                                    {Object.entries(selectedPlayer.detailedStats).slice(0, 4).map(([key, val]) => (
+                                        <div key={key} className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
+                                            <p className="text-xl font-bold font-mono">{val}</p>
+                                            <p className="text-[10px] text-muted-foreground truncate mt-0.5">{key}</p>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
                         </div>
                     </div>
