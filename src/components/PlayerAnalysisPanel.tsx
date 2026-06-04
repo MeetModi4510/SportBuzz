@@ -1062,15 +1062,60 @@ export const PlayerAnalysisPanel = () => {
                         <Section icon={<BarChart3 size={16} style={{ color: getTeamColor(selectedPlayer.country).primary }} />} title="Detailed Statistics"
                             subtitle="Full career numbers">
                             <div className="space-y-1 max-h-[290px] overflow-y-auto pr-1">
-                                {Object.entries(selectedPlayer.detailedStats).map(([key, val], i) => (
-                                    <div key={key} className={cn(
-                                        "flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors",
-                                        i % 2 === 0 ? "bg-secondary/10" : "hover:bg-secondary/10"
-                                    )}>
-                                        <span className="text-xs text-muted-foreground font-medium">{key}</span>
-                                        <span className="text-sm font-mono font-bold text-foreground">{val}</span>
-                                    </div>
-                                ))}
+                                {activeSport === 'cricket' && currentApiFormat ? (
+                                    <>
+                                        <div className={cn("flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors bg-secondary/10 hover:bg-secondary/20")}>
+                                            <span className="text-xs text-muted-foreground font-medium">Matches</span>
+                                            <span className="text-sm font-mono font-bold text-foreground">{currentApiFormat.matches}</span>
+                                        </div>
+                                        <div className={cn("flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-secondary/10")}>
+                                            <span className="text-xs text-muted-foreground font-medium">Innings</span>
+                                            <span className="text-sm font-mono font-bold text-foreground">{currentApiFormat.innings}</span>
+                                        </div>
+                                        <div className={cn("flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors bg-secondary/10 hover:bg-secondary/20")}>
+                                            <span className="text-xs text-muted-foreground font-medium">Runs</span>
+                                            <span className="text-sm font-mono font-bold text-foreground">{currentApiFormat.runs}</span>
+                                        </div>
+                                        <div className={cn("flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-secondary/10")}>
+                                            <span className="text-xs text-muted-foreground font-medium">Highest Score</span>
+                                            <span className="text-sm font-mono font-bold text-foreground">{currentApiFormat.highestScore}</span>
+                                        </div>
+                                        <div className={cn("flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors bg-secondary/10 hover:bg-secondary/20")}>
+                                            <span className="text-xs text-muted-foreground font-medium">Average</span>
+                                            <span className="text-sm font-mono font-bold text-foreground">{currentApiFormat.average.toFixed(2)}</span>
+                                        </div>
+                                        <div className={cn("flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-secondary/10")}>
+                                            <span className="text-xs text-muted-foreground font-medium">Strike Rate</span>
+                                            <span className="text-sm font-mono font-bold text-foreground">{currentApiFormat.strikeRate.toFixed(2)}</span>
+                                        </div>
+                                        <div className={cn("flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors bg-secondary/10 hover:bg-secondary/20")}>
+                                            <span className="text-xs text-muted-foreground font-medium">100s</span>
+                                            <span className="text-sm font-mono font-bold text-foreground">{currentApiFormat.hundreds}</span>
+                                        </div>
+                                        <div className={cn("flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-secondary/10")}>
+                                            <span className="text-xs text-muted-foreground font-medium">50s</span>
+                                            <span className="text-sm font-mono font-bold text-foreground">{currentApiFormat.fifties}</span>
+                                        </div>
+                                        <div className={cn("flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors bg-secondary/10 hover:bg-secondary/20")}>
+                                            <span className="text-xs text-muted-foreground font-medium">4s</span>
+                                            <span className="text-sm font-mono font-bold text-foreground">{currentApiFormat.fours}</span>
+                                        </div>
+                                        <div className={cn("flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors hover:bg-secondary/10")}>
+                                            <span className="text-xs text-muted-foreground font-medium">6s</span>
+                                            <span className="text-sm font-mono font-bold text-foreground">{currentApiFormat.sixes}</span>
+                                        </div>
+                                    </>
+                                ) : (
+                                    Object.entries(selectedPlayer.detailedStats).map(([key, val], i) => (
+                                        <div key={key} className={cn(
+                                            "flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors",
+                                            i % 2 === 0 ? "bg-secondary/10" : "hover:bg-secondary/10"
+                                        )}>
+                                            <span className="text-xs text-muted-foreground font-medium">{key}</span>
+                                            <span className="text-sm font-mono font-bold text-foreground">{val}</span>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </Section>
                     </div>

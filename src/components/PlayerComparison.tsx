@@ -36,8 +36,13 @@ import {
     Search,
     X,
     Swords,
-    BarChart3
+    BarChart3,
+    Loader2
 } from "lucide-react";
+
+import { usePlayerBattingStats } from '@/hooks/usePlayerBattingStats';
+import type { BattingFormatKey } from '@/types/playerBattingTypes';
+import { FORMAT_COLORS, FORMAT_LABELS } from '@/utils/playerStatsTransformer';
 
 // ─── Colors ──────────────────────────────────────────────────────
 const PLAYER_A_COLOR = "#6366f1"; // indigo
@@ -374,6 +379,14 @@ export const PlayerComparison = () => {
 
     if (!playerA || !playerB) return null;
 
+    const [apiFormat, setApiFormat] = useState<BattingFormatKey>('odi');
+
+    const { battingStats: statsA, isLoading: loadingA } = usePlayerBattingStats(playerA.id);
+    const { battingStats: statsB, isLoading: loadingB } = usePlayerBattingStats(playerB.id);
+
+    const formatA = selectedSport === 'cricket' && statsA ? statsA[apiFormat] : null;
+    const formatB = selectedSport === 'cricket' && statsB ? statsB[apiFormat] : null;
+
     // ─── Chart Data ──────────────────────────────────────────────
     const radarData = Object.keys(playerA.attributes).map(key => ({
         attribute: key,
@@ -388,11 +401,31 @@ export const PlayerComparison = () => {
         B: playerB.formTrend[i] || 0,
     }));
 
-    const statComparison = Object.keys(playerA.detailedStats).map(key => ({
-        label: key,
-        valA: playerA.detailedStats[key],
-        valB: playerB.detailedStats[key],
-    }));
+    const statComparison = useMemo(() => {
+        if (selectedSport === 'cricket' && (formatA || formatB)) {
+            const getA = (key: any) => formatA ? (formatA as any)[key] : 0;
+            const getB = (key: any) => formatB ? (formatB as any)[key] : 0;
+            return [
+                { label: 'Matches', valA: getA('matches'), valB: getB('matches') },
+                { label: 'Innings', valA: getA('innings'), valB: getB('innings') },
+                { label: 'Runs', valA: getA('runs'), valB: getB('runs') },
+                { label: 'Highest', valA: getA('highestScore'), valB: getB('highestScore') },
+                { label: 'Average', valA: getA('average'), valB: getB('average') },
+                { label: 'Strike Rate', valA: getA('strikeRate'), valB: getB('strikeRate') },
+                { label: '100s', valA: getA('hundreds'), valB: getB('hundreds') },
+                { label: '50s', valA: getA('fifties'), valB: getB('fifties') },
+                { label: '4s', valA: getA('fours'), valB: getB('fours') },
+                { label: '6s', valA: getA('sixes'), valB: getB('sixes') },
+            ];
+        }
+
+        // Fallback for non-cricket or missing data
+        return Object.keys(playerA.detailedStats).map(key => ({
+            label: key,
+            valA: playerA.detailedStats[key],
+            valB: playerB.detailedStats[key],
+        }));
+    }, [selectedSport, formatA, formatB, playerA, playerB]);
 
     return (
         <div className="space-y-8 animate-fade-in overflow-visible pb-20">
@@ -458,6 +491,34 @@ export const PlayerComparison = () => {
                         side="right"
                     />
                 </div>
+
+                {/* API Format Selector (Cricket Only) */}
+                {selectedSport === 'cricket' && (
+                    <div className="flex flex-col items-center justify-center mt-8">
+                        <div className="flex items-center justify-center gap-2">
+                            {(['test', 'odi', 't20', 'ipl'] as BattingFormatKey[]).map((fmt) => (
+                                <button
+                                    key={fmt}
+                                    onClick={() => setApiFormat(fmt)}
+                                    className={cn(
+                                        "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border",
+                                        apiFormat === fmt
+                                            ? "text-white border-transparent shadow-lg scale-105"
+                                            : "bg-[#0a0f1e]/80 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white"
+                                    )}
+                                    style={apiFormat === fmt ? { background: FORMAT_COLORS[fmt], boxShadow: `0 4px 20px ${FORMAT_COLORS[fmt]}40` } : undefined}
+                                >
+                                    {FORMAT_LABELS[fmt]}
+                                </button>
+                            ))}
+                        </div>
+                        {(loadingA || loadingB) && (
+                            <span className="mt-3 text-[10px] font-black uppercase tracking-widest text-blue-400 flex items-center gap-2">
+                                <Loader2 size={12} className="animate-spin" /> Syncing Live Stats...
+                            </span>
+                        )}
+                    </div>
+                )}
 
                 {/* Quick Insight Strip */}
                 <div className="relative mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">

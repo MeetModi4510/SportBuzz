@@ -36,7 +36,12 @@ import {
     Shield,
     Star,
     Activity,
+    Loader2
 } from "lucide-react";
+
+import { useTeamBattingStats } from '@/hooks/useTeamBattingStats';
+import type { BattingFormatKey } from '@/types/playerBattingTypes';
+import { FORMAT_COLORS, FORMAT_LABELS } from '@/utils/playerStatsTransformer';
 
 // ─── Country ISO code map for Flagpedia API ─────────────────────
 const COUNTRY_ISO: Record<string, string> = {
@@ -437,6 +442,14 @@ export function TeamComparisonPanel() {
     const teamB = countryTeams.find((t) => t.country === teamBCountry);
     const sportMeta = SPORT_LABELS[selectedSport];
 
+    const playerIdsA = useMemo(() => teamA ? teamA.players.map(p => p.id) : [], [teamA]);
+    const playerIdsB = useMemo(() => teamB ? teamB.players.map(p => p.id) : [], [teamB]);
+
+    const { results: statsA, isLoading: loadingA } = useTeamBattingStats(playerIdsA);
+    const { results: statsB, isLoading: loadingB } = useTeamBattingStats(playerIdsB);
+
+    const [apiFormat, setApiFormat] = useState<BattingFormatKey>('odi');
+
     // ─── Chart data ──────────────────────────────────────────────
     // Radar data: union of attribute keys
     const radarData = useMemo(() => {
@@ -458,18 +471,53 @@ export function TeamComparisonPanel() {
         if (!teamA || !teamB) return [];
         const keys = SPORT_STAT_KEYS[selectedSport];
         return keys.map((key) => {
-            const valsA = teamA.players
-                .map((p) => {
+            let avgA = 0;
+            let avgB = 0;
+
+            if (selectedSport === 'cricket') {
+                const apiMap: Record<string, string> = {
+                    "Matches": "matches",
+                    "Runs": "runs",
+                    "Average": "average",
+                    "Strike Rate": "strikeRate",
+                    "Centuries": "hundreds",
+                    "Half Centuries": "fifties"
+                };
+                const apiKey = apiMap[key];
+
+                const valsA = statsA
+                    .filter(res => res.battingStats && (res.battingStats as any)[apiFormat])
+                    .map(res => (res.battingStats as any)[apiFormat][apiKey] || 0);
+
+                const valsB = statsB
+                    .filter(res => res.battingStats && (res.battingStats as any)[apiFormat])
+                    .map(res => (res.battingStats as any)[apiFormat][apiKey] || 0);
+
+                avgA = valsA.length ? valsA.reduce((s, v) => s + v, 0) / valsA.length : 0;
+                avgB = valsB.length ? valsB.reduce((s, v) => s + v, 0) / valsB.length : 0;
+
+                // Fallback to detailedStats if no API data loaded yet
+                if (valsA.length === 0) {
+                     const fVals = teamA.players.map(p => { const v = p.detailedStats[key]; return typeof v === "number" ? v : parseFloat(String(v)) || 0; });
+                     avgA = fVals.length ? fVals.reduce((s, v) => s + v, 0) / fVals.length : 0;
+                }
+                if (valsB.length === 0) {
+                     const fVals = teamB.players.map(p => { const v = p.detailedStats[key]; return typeof v === "number" ? v : parseFloat(String(v)) || 0; });
+                     avgB = fVals.length ? fVals.reduce((s, v) => s + v, 0) / fVals.length : 0;
+                }
+            } else {
+                const valsA = teamA.players.map((p) => {
                     const v = p.detailedStats[key];
                     return typeof v === "number" ? v : parseFloat(String(v)) || 0;
                 });
-            const valsB = teamB.players
-                .map((p) => {
+                const valsB = teamB.players.map((p) => {
                     const v = p.detailedStats[key];
                     return typeof v === "number" ? v : parseFloat(String(v)) || 0;
                 });
-            const avgA = valsA.length ? valsA.reduce((s, v) => s + v, 0) / valsA.length : 0;
-            const avgB = valsB.length ? valsB.reduce((s, v) => s + v, 0) / valsB.length : 0;
+                avgA = valsA.length ? valsA.reduce((s, v) => s + v, 0) / valsA.length : 0;
+                avgB = valsB.length ? valsB.reduce((s, v) => s + v, 0) / valsB.length : 0;
+            }
+
             return {
                 stat: key.length > 12 ? key.slice(0, 10) + "…" : key,
                 fullKey: key,
@@ -477,7 +525,7 @@ export function TeamComparisonPanel() {
                 teamB: Math.round(avgB * 10) / 10,
             };
         });
-    }, [teamA, teamB, selectedSport]);
+    }, [teamA, teamB, selectedSport, statsA, statsB, apiFormat]);
 
     // Area chart: form trend
     const formData = useMemo(() => {
@@ -509,22 +557,12 @@ export function TeamComparisonPanel() {
 
     // Head-to-head stat bars
     const h2hStats = useMemo(() => {
-        if (!teamA || !teamB) return [];
-        const keys = SPORT_STAT_KEYS[selectedSport];
-        return keys.map((key) => {
-            const valsA = teamA.players.map((p) => {
-                const v = p.detailedStats[key];
-                return typeof v === "number" ? v : parseFloat(String(v)) || 0;
-            });
-            const valsB = teamB.players.map((p) => {
-                const v = p.detailedStats[key];
-                return typeof v === "number" ? v : parseFloat(String(v)) || 0;
-            });
-            const avgA = valsA.length ? valsA.reduce((s, v) => s + v, 0) / valsA.length : 0;
-            const avgB = valsB.length ? valsB.reduce((s, v) => s + v, 0) / valsB.length : 0;
-            return { label: key, valA: Math.round(avgA * 10) / 10, valB: Math.round(avgB * 10) / 10 };
-        });
-    }, [teamA, teamB, selectedSport]);
+        return barData.map((d) => ({
+            label: d.fullKey,
+            valA: d.teamA,
+            valB: d.teamB,
+        }));
+    }, [barData]);
 
     if (!teamA || !teamB) return null;
 
@@ -598,6 +636,34 @@ export function TeamComparisonPanel() {
                         side="right"
                     />
                 </div>
+
+                {/* API Format Selector (Cricket Only) */}
+                {selectedSport === 'cricket' && (
+                    <div className="flex flex-col items-center justify-center mt-8 z-20 relative">
+                        <div className="flex items-center justify-center gap-2">
+                            {(['test', 'odi', 't20', 'ipl'] as BattingFormatKey[]).map((fmt) => (
+                                <button
+                                    key={fmt}
+                                    onClick={() => setApiFormat(fmt)}
+                                    className={cn(
+                                        "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border",
+                                        apiFormat === fmt
+                                            ? "text-white border-transparent shadow-lg scale-105"
+                                            : "bg-[#0a0f1e]/80 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white"
+                                    )}
+                                    style={apiFormat === fmt ? { background: FORMAT_COLORS[fmt], boxShadow: `0 4px 20px ${FORMAT_COLORS[fmt]}40` } : undefined}
+                                >
+                                    {FORMAT_LABELS[fmt]}
+                                </button>
+                            ))}
+                        </div>
+                        {(loadingA || loadingB) && (
+                            <span className="mt-3 text-[10px] font-black uppercase tracking-widest text-blue-400 flex items-center gap-2">
+                                <Loader2 size={12} className="animate-spin" /> Syncing Live Team Stats...
+                            </span>
+                        )}
+                    </div>
+                )}
 
                 {/* Insight Comparison Strip */}
                 <div className="relative z-10 mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
