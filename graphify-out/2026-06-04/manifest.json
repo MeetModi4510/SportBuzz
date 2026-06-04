@@ -650,8 +650,8 @@
     "semantic_hash": "5f274083638d3f0e8fb40c9ab7a05fcb"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\flagService.js": {
-    "mtime": 1780561211.905875,
-    "ast_hash": "a18c97d4aa92d1440701138e9fd15766",
+    "mtime": 1780560762.720042,
+    "ast_hash": "7ece37bf8ca0f15344d86037b69fe956",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\footballApiService.js": {
@@ -825,9 +825,9 @@
     "semantic_hash": "889a81fd2eb948eb406c9ccabe175918"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\Navbar.tsx": {
-    "mtime": 1780562475.485869,
-    "ast_hash": "baa9041798f71ce35c58cbb1caf33009",
-    "semantic_hash": ""
+    "mtime": 1777566129.179539,
+    "ast_hash": "d282db7fb38bbb20e492ca6f50026fa3",
+    "semantic_hash": "d282db7fb38bbb20e492ca6f50026fa3"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\NotificationPopover.tsx": {
     "mtime": 1777566129.298164,
@@ -895,8 +895,8 @@
     "semantic_hash": "fc1b798d883b27907015ad08d79b348c"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\TeamLogo.tsx": {
-    "mtime": 1780561202.266594,
-    "ast_hash": "687c56044a097bc19c44bbff6271da9e",
+    "mtime": 1780561103.7791853,
+    "ast_hash": "13de38cb05fe8ee0e684fdcc1a8b9556",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\TrendingPlayers.tsx": {

@@ -291,9 +291,16 @@ const localFlagMap = {
     'mscmr':                        '/flags/t20_mumbai_2026/mscmr.png',
     'bandra blasters':              '/flags/t20_mumbai_2026/bb.png',
     'eagle thane strikers':         '/flags/t20_mumbai_2026/ets.png',
-    // Additional T20 Mumbai teams (may appear later in season)
-    'north mumbai panthers':        '/flags/t20_mumbai_2026/atmws.png',
-    'triumphs knights mne':         '/flags/t20_mumbai_2026/ets.png',
+    'sobo mumbai falcons':          '/flags/t20_mumbai_2026/sobo.png',
+    'smf':                          '/flags/t20_mumbai_2026/sobo.png',
+    'triumph knights mumbai north east': '/flags/t20_mumbai_2026/tkme.png',
+    'triumphs knights mne':         '/flags/t20_mumbai_2026/tkme.png',
+    'tkme':                         '/flags/t20_mumbai_2026/tkme.png',
+    'north mumbai panthers':        '/flags/t20_mumbai_2026/mp.png',
+    'nmp':                          '/flags/t20_mumbai_2026/mp.png',
+    'arcs andheri':                 '/flags/t20_mumbai_2026/aa.png',
+    'aa':                           '/flags/t20_mumbai_2026/aa.png',
+
 
     // ── IPL 2026 ─────────────────────────────────────────────────────────────
     'chennai super kings':          '/flags/ipl_2026/csk.png',

@@ -185,7 +185,7 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>SportBuzz - Live Sports Scores & Performance Analytics</title>
+        <title>SportsBuzz - Live Sports Scores & Performance Analytics</title>
         <meta
           name="description"
           content="Track live scores, match updates, and in-depth performance analytics for Cricket, Football, Basketball, and Tennis. Your ultimate sports companion."
@@ -440,7 +440,7 @@ const Index = () => {
           <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground">
-                © 2024 SportBuzz. All rights reserved.
+                © 2024 SportsBuzz. All rights reserved.
               </p>
               <div className="flex items-center gap-6">
                 <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">

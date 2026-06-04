@@ -194,7 +194,7 @@ export const Navbar = () => {
               <Zap className="h-8 w-8 text-primary transition-transform group-hover:scale-110" fill="currentColor" />
               <div className="absolute inset-0 bg-primary/30 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <span className="text-xl font-bold gradient-text font-display">SportBuzz</span>
+            <span className="text-xl font-bold gradient-text font-display">SportsBuzz</span>
           </Link>
 
           {/* Desktop Navigation */}

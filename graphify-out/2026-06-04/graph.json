@@ -5884,7 +5884,7 @@
       "label": "getInitialsBadge()",
       "file_type": "code",
       "source_file": "server/services/flagService.js",
-      "source_location": "L380",
+      "source_location": "L375",
       "id": "services_flagservice_getinitialsbadge",
       "community": 31,
       "norm_label": "getinitialsbadge()"
@@ -5893,7 +5893,7 @@
       "label": "teamToCountryCode",
       "file_type": "code",
       "source_file": "server/services/flagService.js",
-      "source_location": "L400",
+      "source_location": "L395",
       "id": "services_flagservice_teamtocountrycode",
       "community": 31,
       "norm_label": "teamtocountrycode"
@@ -5902,7 +5902,7 @@
       "label": "indianStateTeams",
       "file_type": "code",
       "source_file": "server/services/flagService.js",
-      "source_location": "L632",
+      "source_location": "L627",
       "id": "services_flagservice_indianstateteams",
       "community": 31,
       "norm_label": "indianstateteams"
@@ -5911,7 +5911,7 @@
       "label": "isStateTeam()",
       "file_type": "code",
       "source_file": "server/services/flagService.js",
-      "source_location": "L648",
+      "source_location": "L643",
       "id": "services_flagservice_isstateteam",
       "community": 31,
       "norm_label": "isstateteam()"
@@ -5920,7 +5920,7 @@
       "label": "getLocalFlagUrl()",
       "file_type": "code",
       "source_file": "server/services/flagService.js",
-      "source_location": "L659",
+      "source_location": "L654",
       "id": "services_flagservice_getlocalflagurl",
       "community": 31,
       "norm_label": "getlocalflagurl()"
@@ -5929,7 +5929,7 @@
       "label": "getLeagueLogoUrl()",
       "file_type": "code",
       "source_file": "server/services/flagService.js",
-      "source_location": "L680",
+      "source_location": "L675",
       "id": "services_flagservice_getleaguelogourl",
       "community": 31,
       "norm_label": "getleaguelogourl()"
@@ -5938,7 +5938,7 @@
       "label": "getFlagUrl()",
       "file_type": "code",
       "source_file": "server/services/flagService.js",
-      "source_location": "L702",
+      "source_location": "L697",
       "id": "services_flagservice_getflagurl",
       "community": 31,
       "norm_label": "getflagurl()"
@@ -5947,7 +5947,7 @@
       "label": "getCountryCode()",
       "file_type": "code",
       "source_file": "server/services/flagService.js",
-      "source_location": "L740",
+      "source_location": "L735",
       "id": "services_flagservice_getcountrycode",
       "community": 31,
       "norm_label": "getcountrycode()"
@@ -5956,7 +5956,7 @@
       "label": "attachFlagsToMatch()",
       "file_type": "code",
       "source_file": "server/services/flagService.js",
-      "source_location": "L754",
+      "source_location": "L749",
       "id": "services_flagservice_attachflagstomatch",
       "community": 56,
       "norm_label": "attachflagstomatch()"
@@ -27324,9 +27324,9 @@
       "source_file": "server/scripts/updateSoboLogo.js",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "scripts_updatesobologo",
-      "target": "scripts_updatesobologo_dirname"
+      "target": "scripts_updatesobologo_dirname",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -27334,9 +27334,9 @@
       "source_file": "server/scripts/updateSoboLogo.js",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "scripts_updatesobologo",
-      "target": "scripts_updatesobologo_filename"
+      "target": "scripts_updatesobologo_filename",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -27344,9 +27344,9 @@
       "source_file": "server/scripts/updateSoboLogo.js",
       "source_location": "L10",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "scripts_updatesobologo",
-      "target": "scripts_updatesobologo_run"
+      "target": "scripts_updatesobologo_run",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",

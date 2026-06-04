@@ -78,8 +78,8 @@ const Login = () => {
   return (
     <>
       <Helmet>
-        <title>Login - SportBuzz</title>
-        <meta name="description" content="Login to SportBuzz" />
+        <title>Login - SportsBuzz</title>
+        <meta name="description" content="Login to SportsBuzz" />
       </Helmet>
 
       <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-slate-950">
@@ -149,7 +149,7 @@ const Login = () => {
             </div>
             <div className="space-y-1">
               <CardTitle className="text-3xl font-bold tracking-tight text-white">
-                Welcome to <span className="gradient-text">SportBuzz</span>
+                Welcome to <span className="gradient-text">SportsBuzz</span>
               </CardTitle>
               <CardDescription className="text-slate-400 text-base">
                 Compare players, analyze teams, and predict wins by venue.
@@ -263,7 +263,7 @@ const Login = () => {
 
             <div className="text-center">
               <p className="text-slate-400 text-sm">
-                New to SportBuzz?{" "}
+                New to SportsBuzz?{" "}
                 <button
                   onClick={() => navigate("/signup")}
                   className="text-red-500 hover:text-red-400 font-semibold transition-colors hover:underline decoration-red-500/30 underline-offset-4"

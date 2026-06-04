@@ -70,6 +70,53 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
             </div>
         );
     };
+    // Check local flag mappings first (highest priority for user downloaded assets)
+    const safeNameLower = (name || '').toLowerCase().trim();
+    const safeShortLower = (shortName || '').toLowerCase().trim();
+
+    const localFlagMap: Record<string, string> = {
+        'sobo mumbai falcons': '/flags/t20_mumbai_2026/sobo.png',
+        'smf': '/flags/t20_mumbai_2026/sobo.png',
+        'msc maratha royals': '/flags/t20_mumbai_2026/mscmr.png',
+        'mscmr': '/flags/t20_mumbai_2026/mscmr.png',
+        'aakash tigers mws': '/flags/t20_mumbai_2026/atmws.png',
+        'atmws': '/flags/t20_mumbai_2026/atmws.png',
+        'bandra blasters': '/flags/t20_mumbai_2026/bb.png',
+        'eagle thane strikers': '/flags/t20_mumbai_2026/ets.png',
+        'triumph knights mumbai north east': '/flags/t20_mumbai_2026/tkme.png',
+        'triumphs knights mne': '/flags/t20_mumbai_2026/tkme.png',
+        'tkme': '/flags/t20_mumbai_2026/tkme.png',
+        'north mumbai panthers': '/flags/t20_mumbai_2026/mp.png',
+        'nmp': '/flags/t20_mumbai_2026/mp.png',
+        'arcs andheri': '/flags/t20_mumbai_2026/aa.png',
+        'aa': '/flags/t20_mumbai_2026/aa.png',
+    };
+
+    let resolvedLocalFlag = localFlagMap[safeNameLower] || localFlagMap[safeShortLower];
+    if (!resolvedLocalFlag) {
+        for (const [key, path] of Object.entries(localFlagMap)) {
+            if (key.length >= 3 && (safeNameLower.includes(key) || safeShortLower.includes(key))) {
+                resolvedLocalFlag = path;
+                break;
+            }
+        }
+    }
+
+    if (resolvedLocalFlag && !useTextFallback) {
+        return (
+            <img
+                src={resolvedLocalFlag}
+                alt={`${name} logo`}
+                className={cn(
+                    sizeClasses[size].width,
+                    sizeClasses[size].height,
+                    "object-contain rounded-full bg-white/10 p-1",
+                    className
+                )}
+                onError={() => setUseTextFallback(true)}
+            />
+        );
+    }
 
     if (!logo || useTextFallback) return renderTextFallback();
 
@@ -86,9 +133,9 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
 
     // Special handling for West Indies (International)
     // If name contains West Indies or logo is specific, defaults to local asset
-    const safeNameLower = (name || '').toLowerCase();
     const safeLogoLower = logo.toLowerCase();
     const isWestIndies = safeNameLower.includes('west indies') || safeLogoLower.includes('westindies') || logo === 'wi' || logo === '🌴';
+
 
     // Check if it's a football club logo (format: fb-{teamId})
     const isFootballClub = logo.startsWith('fb-');
