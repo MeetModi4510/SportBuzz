@@ -242,7 +242,12 @@ const API_FORMAT_TABS: { key: BattingFormatKey; label: string }[] = [
 ];
 
 // ─── Cricket Specific Panels ─────────────────────────────────────
-const CricketPanels = ({ player, teamColor }: { player: AnalysisPlayer; teamColor: string }) => {
+const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingFormat }: { 
+    player: AnalysisPlayer; 
+    teamColor: string;
+    apiBattingFormat: BattingFormatKey;
+    setApiBattingFormat: (fmt: BattingFormatKey) => void;
+}) => {
     const zones = player.specialData?.scoringZones || {};
     const formats = player.specialData?.formatBreakdown || {};
     const vsOpp = player.specialData?.vsOpposition || [];
@@ -255,7 +260,6 @@ const CricketPanels = ({ player, teamColor }: { player: AnalysisPlayer; teamColo
     const unit = isBowler ? "wickets" : "runs";
 
     // ── Dynamic API batting stats ──
-    const [apiBattingFormat, setApiBattingFormat] = useState<BattingFormatKey>('odi');
     const {
         battingStats: apiBattingStats,
         chartData: apiChartData,
@@ -792,6 +796,7 @@ export const PlayerAnalysisPanel = () => {
     const [activeSport, setActiveSport] = useState<AnalysisSport>("cricket");
     const [selectedPlayerId, setSelectedPlayerId] = useState<string>("cr1");
     const [selectedCountry, setSelectedCountry] = useState<string>("All");
+    const [apiBattingFormat, setApiBattingFormat] = useState<BattingFormatKey>('odi');
 
     const allPlayers = ANALYSIS_PLAYERS[activeSport];
 
@@ -840,6 +845,10 @@ export const PlayerAnalysisPanel = () => {
         selectedPlayer.formTrend.map((v, i) => ({ match: `M${i + 1}`, rating: v })),
         [selectedPlayer]
     );
+
+    // Fetch API stats here as well to power the top header
+    const { battingStats: apiBattingStats } = usePlayerBattingStats(selectedPlayer.id);
+    const currentApiFormat = activeSport === 'cricket' && apiBattingStats ? apiBattingStats[apiBattingFormat] : null;
 
     return (
         <div className="space-y-6">
@@ -982,12 +991,33 @@ export const PlayerAnalysisPanel = () => {
 
                         {/* Quick Stats Row */}
                         <div className="grid grid-cols-4 gap-3 mt-5">
-                            {Object.entries(selectedPlayer.detailedStats).slice(0, 4).map(([key, val]) => (
-                                <div key={key} className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
-                                    <p className="text-xl font-bold font-mono">{val}</p>
-                                    <p className="text-[10px] text-muted-foreground truncate mt-0.5">{key}</p>
-                                </div>
-                            ))}
+                            {activeSport === "cricket" && currentApiFormat ? (
+                                <>
+                                    <div className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
+                                        <p className="text-xl font-bold font-mono">{currentApiFormat.matches}</p>
+                                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">Matches</p>
+                                    </div>
+                                    <div className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
+                                        <p className="text-xl font-bold font-mono">{currentApiFormat.runs}</p>
+                                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">Runs</p>
+                                    </div>
+                                    <div className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
+                                        <p className="text-xl font-bold font-mono">{currentApiFormat.average.toFixed(2)}</p>
+                                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">Average</p>
+                                    </div>
+                                    <div className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
+                                        <p className="text-xl font-bold font-mono">{currentApiFormat.strikeRate.toFixed(2)}</p>
+                                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">Strike Rate</p>
+                                    </div>
+                                </>
+                            ) : (
+                                Object.entries(selectedPlayer.detailedStats).slice(0, 4).map(([key, val]) => (
+                                    <div key={key} className="bg-background/60 backdrop-blur rounded-xl p-3 text-center border border-white/5">
+                                        <p className="text-xl font-bold font-mono">{val}</p>
+                                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">{key}</p>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
 
@@ -1050,7 +1080,7 @@ export const PlayerAnalysisPanel = () => {
 
                     {/* Sport-Specific Panels — 1 column, full width for clean display */}
                     <div className="space-y-5">
-                        {activeSport === "cricket" && <CricketPanels player={selectedPlayer} teamColor={getTeamColor(selectedPlayer.country).primary} />}
+                        {activeSport === "cricket" && <CricketPanels player={selectedPlayer} teamColor={getTeamColor(selectedPlayer.country).primary} apiBattingFormat={apiBattingFormat} setApiBattingFormat={setApiBattingFormat} />}
                         {activeSport === "football" && <FootballPanels player={selectedPlayer} teamColor={getTeamColor(selectedPlayer.country).primary} />}
                         {activeSport === "basketball" && <BasketballPanels player={selectedPlayer} teamColor={getTeamColor(selectedPlayer.country).primary} />}
                         {activeSport === "tennis" && <TennisPanels player={selectedPlayer} teamColor={getTeamColor(selectedPlayer.country).primary} />}
