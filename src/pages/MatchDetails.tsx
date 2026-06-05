@@ -70,21 +70,29 @@ const MatchDetails = () => {
       };
 
       events?.forEach(event => {
-          if (event.player === playerName) {
-              if (event.type === 'Goal') playerEvents.goals++;
-              if (event.type === 'YellowCard') playerEvents.yellowCards++;
-              if (event.type === 'RedCard') playerEvents.redCards++;
-              if (event.type === 'Save') playerEvents.saves++;
-              if (event.type === 'Foul') playerEvents.fouls++;
-              if (event.type === 'ShotOnTarget') playerEvents.shotsOnTarget++;
-              if (event.type === 'Corner') playerEvents.corners++;
+          const evPlayerName = event.player?.name || event.player;
+          const evAssisterName = event.assist?.name || event.assister || event.assist || event.playerOut;
+          const evMinute = event.time?.elapsed || event.minute || parseInt(event.time);
+          const evType = event.type?.toLowerCase();
+
+          if (evPlayerName === playerName) {
+              if (evType === 'goal') playerEvents.goals++;
+              if (evType === 'card' && event.detail?.toLowerCase().includes('yellow')) playerEvents.yellowCards++;
+              if (evType === 'card' && event.detail?.toLowerCase().includes('red')) playerEvents.redCards++;
+              if (evType === 'yellowcard') playerEvents.yellowCards++;
+              if (evType === 'redcard') playerEvents.redCards++;
+              if (evType === 'save') playerEvents.saves++;
+              if (evType === 'foul') playerEvents.fouls++;
+              if (evType === 'shotontarget') playerEvents.shotsOnTarget++;
+              if (evType === 'corner') playerEvents.corners++;
           }
-          if (event.type === 'Goal' && event.assister === playerName) playerEvents.assists++;
-          if (event.type === 'Substitution') {
-              if (event.player === playerName) {
-                  playerEvents.substitution = { ...playerEvents.substitution, inMinute: event.minute };
-              } else if (event.playerOut === playerName) {
-                  playerEvents.substitution = { ...playerEvents.substitution, outMinute: event.minute, isInjured: event.commentary?.toLowerCase().includes('injur') };
+          if (evType === 'goal' && evAssisterName === playerName) playerEvents.assists++;
+          
+          if (evType === 'subst' || evType === 'substitution') {
+              if (evPlayerName === playerName) {
+                  playerEvents.substitution = { ...playerEvents.substitution, inMinute: evMinute };
+              } else if (evAssisterName === playerName) {
+                  playerEvents.substitution = { ...playerEvents.substitution, outMinute: evMinute, isInjured: event.commentary?.toLowerCase().includes('injur') };
               }
           }
       });
@@ -384,38 +392,50 @@ const MatchDetails = () => {
             </div>
 
             {/* Football Goals Section */}
-            {match.sport === 'football' && match.goals && match.goals.length > 0 && (
-              <div className="mt-6 border-t border-border/50 pt-6 max-w-lg mx-auto">
-                <div className="grid grid-cols-2 gap-x-8 gap-y-3">
-                  {match.goals.map((goal: any, idx: number) => {
-                    const isHome = goal.teamId === match.homeTeam.id;
-                    return (
-                      <div 
-                        key={idx} 
-                        className={cn(
-                          "flex items-start text-sm",
-                          isHome ? "col-start-1 justify-end flex-row-reverse text-right pr-4 border-r border-border/30" : "col-start-2 justify-start pl-4"
-                        )}
-                      >
-                        <span className="font-mono text-muted-foreground text-xs w-8 shrink-0 text-center mt-0.5">{goal.minute}'</span>
-                        <div className={cn("flex flex-col gap-0.5 mx-2", isHome ? "items-end" : "items-start")}>
-                          <span className="font-semibold text-foreground">
-                            {goal.player} 
-                            {goal.type === 'penalty' && <span className="text-muted-foreground text-[10px] ml-1 font-normal">(PEN)</span>}
-                            {goal.type === 'own_goal' && <span className="text-red-500 text-[10px] ml-1 font-normal">(OG)</span>}
-                          </span>
-                          {goal.assist && (
-                            <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                              <Footprints size={10} className="opacity-50" /> {goal.assist}
-                            </span>
+            {(() => {
+              const matchGoals = match.goals || match.events?.filter((e: any) => e.type?.toLowerCase() === 'goal').map((e: any) => ({
+                teamId: e.team?.id || (match.homeTeam?.name === e.team?.name ? match.homeTeam?.id : match.awayTeam?.id),
+                player: e.player?.name || e.player,
+                minute: e.time?.elapsed || e.minute || parseInt(e.time),
+                type: (e.detail?.toLowerCase() === 'penalty' || e.type?.toLowerCase() === 'penalty') ? 'penalty' : (e.detail?.toLowerCase() === 'own goal' || e.type?.toLowerCase() === 'own_goal') ? 'own_goal' : 'goal',
+                assist: e.assist?.name || e.assister || e.assist
+              })) || [];
+
+              if (match.sport !== 'football' || !matchGoals || matchGoals.length === 0) return null;
+
+              return (
+                <div className="mt-6 border-t border-border/50 pt-6 max-w-lg mx-auto">
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+                    {matchGoals.map((goal: any, idx: number) => {
+                      const isHome = goal.teamId === match.homeTeam.id || goal.teamId === match.homeTeam?.name || (!goal.teamId && match.homeScore > match.awayScore); // Fallback logic
+                      return (
+                        <div 
+                          key={idx} 
+                          className={cn(
+                            "flex items-start text-sm",
+                            isHome ? "col-start-1 justify-end flex-row-reverse text-right pr-4 border-r border-border/30" : "col-start-2 justify-start pl-4"
                           )}
+                        >
+                          <span className="font-mono text-muted-foreground text-xs w-8 shrink-0 text-center mt-0.5">{goal.minute}'</span>
+                          <div className={cn("flex flex-col gap-0.5 mx-2", isHome ? "items-end" : "items-start")}>
+                            <span className="font-semibold text-foreground">
+                              {goal.player} 
+                              {goal.type === 'penalty' && <span className="text-muted-foreground text-[10px] ml-1 font-normal">(PEN)</span>}
+                              {goal.type === 'own_goal' && <span className="text-red-500 text-[10px] ml-1 font-normal">(OG)</span>}
+                            </span>
+                            {goal.assist && typeof goal.assist === 'string' && (
+                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                <Footprints size={10} className="opacity-50" /> {goal.assist}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Bottom Actions */}
             <div className="flex items-center justify-center gap-3 mt-8 pt-4">
@@ -642,17 +662,17 @@ const MatchDetails = () => {
                 <div className="bg-card border border-border rounded-[2.5rem] p-4 md:p-8 overflow-hidden relative">
                     <FootballPitchLineup 
                         homeTeam={{
-                            name: match.homeTeam?.name || 'Home Team',
+                            name: match.homeTeam?.name || "Team 1",
                             logo: match.homeTeam?.logo,
                             primaryColor: match.homeTeam?.primaryColor || '#2563eb'
                         }}
                         awayTeam={{
-                            name: match.awayTeam?.name || 'Away Team',
+                            name: match.awayTeam?.name || "Team 2",
                             logo: match.awayTeam?.logo,
                             primaryColor: match.awayTeam?.primaryColor || '#ea580c'
                         }}
                         homePlayers={[
-                            ...(match.details?.lineups?.home?.startXI || match.details?.lineups?.home?.startingXI || match.details?.lineups?.home?.players || []).map((p: any) => {
+                            ...(match.lineups?.home?.startXI || match.lineups?.home?.startingXI || match.lineups?.home?.players || match.details?.lineups?.home?.startXI || match.details?.lineups?.home?.startingXI || match.details?.lineups?.home?.players || []).map((p: any) => {
                                 const isString = typeof p === 'string';
                                 const name = isString ? p : (p.player?.name || p.name || 'Unknown');
                                 const roleCode = isString ? undefined : (p.player?.pos || p.position);
@@ -665,7 +685,7 @@ const MatchDetails = () => {
                                     events: summarizePlayerEvents(name, match.events || [], parseInt(match.awayScore as string) || 0)
                                 };
                             }),
-                            ...(match.details?.lineups?.home?.substitutes || []).map((p: any) => {
+                            ...(match.lineups?.home?.substitutes || match.details?.lineups?.home?.substitutes || []).map((p: any) => {
                                 const isString = typeof p === 'string';
                                 const name = isString ? p : (p.player?.name || p.name || 'Unknown');
                                 const roleCode = isString ? undefined : (p.player?.pos || p.position);
@@ -680,7 +700,7 @@ const MatchDetails = () => {
                             })
                         ]}
                         awayPlayers={[
-                            ...(match.details?.lineups?.away?.startXI || match.details?.lineups?.away?.startingXI || match.details?.lineups?.away?.players || []).map((p: any) => {
+                            ...(match.lineups?.away?.startXI || match.lineups?.away?.startingXI || match.lineups?.away?.players || match.details?.lineups?.away?.startXI || match.details?.lineups?.away?.startingXI || match.details?.lineups?.away?.players || []).map((p: any) => {
                                 const isString = typeof p === 'string';
                                 const name = isString ? p : (p.player?.name || p.name || 'Unknown');
                                 const roleCode = isString ? undefined : (p.player?.pos || p.position);
@@ -693,7 +713,7 @@ const MatchDetails = () => {
                                     events: summarizePlayerEvents(name, match.events || [], parseInt(match.homeScore as string) || 0)
                                 };
                             }),
-                            ...(match.details?.lineups?.away?.substitutes || []).map((p: any) => {
+                            ...(match.lineups?.away?.substitutes || match.details?.lineups?.away?.substitutes || []).map((p: any) => {
                                 const isString = typeof p === 'string';
                                 const name = isString ? p : (p.player?.name || p.name || 'Unknown');
                                 const roleCode = isString ? undefined : (p.player?.pos || p.position);
@@ -707,8 +727,8 @@ const MatchDetails = () => {
                                 };
                             })
                         ]}
-                        homeFormation={match.details?.lineups?.home?.formation || '4-3-3'}
-                        awayFormation={match.details?.lineups?.away?.formation || '4-3-3'}
+                        homeFormation={match.lineups?.home?.formation || match.details?.lineups?.home?.formation || '4-3-3'}
+                        awayFormation={match.lineups?.away?.formation || match.details?.lineups?.away?.formation || '4-3-3'}
                     />
                 </div>
               ) : (cbSquadsField.loading || matchInfoField.loading) ? (
