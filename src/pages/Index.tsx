@@ -258,10 +258,10 @@ const Index = () => {
                   onChange={(e) => setSearchCategory(e.target.value as any)}
                   className="bg-transparent text-xs font-medium focus:outline-none cursor-pointer pr-2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <option className="bg-slate-950 text-white" value="all">All Fields</option>
-                  <option className="bg-slate-950 text-white" value="team">Teams</option>
-                  <option className="bg-slate-950 text-white" value="venue">Venues</option>
-                  <option className="bg-slate-950 text-white" value="type">Match Type</option>
+                  <option className="bg-popover text-foreground" value="all">All Fields</option>
+                  <option className="bg-popover text-foreground" value="team">Teams</option>
+                  <option className="bg-popover text-foreground" value="venue">Venues</option>
+                  <option className="bg-popover text-foreground" value="type">Match Type</option>
                 </select>
               </div>
 

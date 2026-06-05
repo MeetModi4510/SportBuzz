@@ -135,7 +135,7 @@ export const LiveTicker = () => {
           ) : isLive ? (
             <LiveBadge size="sm" />
           ) : (
-            <span className="bg-white/10 text-[10px] font-bold px-2 py-0.5 rounded text-white/70 uppercase tracking-wider">
+            <span className="bg-secondary text-[10px] font-bold px-2 py-0.5 rounded text-muted-foreground uppercase tracking-wider">
               Recent Result
             </span>
           )}
