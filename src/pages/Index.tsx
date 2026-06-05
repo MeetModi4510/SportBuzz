@@ -10,6 +10,7 @@ import { TrendingPlayers } from "@/components/TrendingPlayers";
 import { SportIcon } from "@/components/SportIcon";
 import { MatchCard } from "@/components/MatchCard";
 import { CreatorsSection } from "@/components/CreatorsSection";
+import { NewsSection } from "@/components/NewsSection";
 import {
   matches as mockMatches,
   players,
@@ -222,7 +223,8 @@ const Index = () => {
           {/* Live Ticker */}
           <LiveTicker />
 
-          {/* Filters and Search */}
+          {/* Global Sports News */}
+          <NewsSection />
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <SportFilter
               activeSport={activeSport}
