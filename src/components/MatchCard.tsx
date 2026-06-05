@@ -4,6 +4,7 @@ import { LiveBadge } from "./LiveBadge";
 import { SportIcon, getSportGradient, getSportBorderColor } from "./SportIcon";
 import { MapPin, Clock, Trophy, AlertCircle, Minus } from "lucide-react";
 import { TeamLogo } from "./TeamLogo";
+import { MinimalCricketCard } from "./MinimalCricketCard";
 import { formatToIST } from "@/lib/dateUtils";
 
 
@@ -15,6 +16,10 @@ interface MatchCardProps {
 }
 
 export const MatchCard = ({ match, onClick, className }: MatchCardProps) => {
+  if (match.sport === 'cricket') {
+    return <MinimalCricketCard match={match} onClick={onClick} className={className} />;
+  }
+
   const isLive = match.status === "live";
   const isUpcoming = match.status === "upcoming";
   const isCompleted = match.status === "completed";
