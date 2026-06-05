@@ -61,7 +61,7 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
             <span className="font-medium text-foreground text-sm">{match.homeTeam.name}</span>
           </div>
           <div className="flex flex-col items-end">
-             {match.inningsScores?.filter(i => i.team === 'home').map((inn, idx) => (
+             {Array.isArray(match.inningsScores) && match.inningsScores.filter(i => i.team === 'home').map((inn, idx) => (
                 <div key={idx} className="flex items-center gap-1.5">
                   <span className="font-semibold text-sm tracking-tight text-foreground">
                     {inn.score}
@@ -73,7 +73,7 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
                   )}
                 </div>
              ))}
-             {(!match.inningsScores || match.inningsScores.filter(i => i.team === 'home').length === 0) && (
+             {(!Array.isArray(match.inningsScores) || match.inningsScores.filter(i => i.team === 'home').length === 0) && (
                <span className="font-semibold text-sm tracking-tight text-foreground">
                  {match.homeScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                </span>
@@ -88,7 +88,7 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
             <span className="font-medium text-foreground text-sm">{match.awayTeam.name}</span>
           </div>
           <div className="flex flex-col items-end">
-             {match.inningsScores?.filter(i => i.team === 'away').map((inn, idx) => (
+             {Array.isArray(match.inningsScores) && match.inningsScores.filter(i => i.team === 'away').map((inn, idx) => (
                 <div key={idx} className="flex items-center gap-1.5">
                   <span className="font-semibold text-sm tracking-tight text-foreground">
                     {inn.score}
@@ -100,7 +100,7 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
                   )}
                 </div>
              ))}
-             {(!match.inningsScores || match.inningsScores.filter(i => i.team === 'away').length === 0) && (
+             {(!Array.isArray(match.inningsScores) || match.inningsScores.filter(i => i.team === 'away').length === 0) && (
                <span className="font-semibold text-sm tracking-tight text-foreground">
                  {match.awayScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                </span>
