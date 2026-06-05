@@ -35,6 +35,7 @@ import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayerCard } from "@/components/PlayerCard";
 import { SquadsList } from "@/components/SquadsList";
+import { FootballPitchLineup } from "@/components/FootballPitchLineup";
 import type { Match } from "@/data/types";
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -695,67 +696,39 @@ const MatchDetails = () => {
             <TabsContent value="lineups" className="space-y-6 animate-fade-in">
               {match?.sport === 'football' ? (
                 /* ── Football Lineups ── */
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[
-                    { team: match.homeTeam, prefix: 'Home' },
-                    { team: match.awayTeam, prefix: 'Away' }
-                  ].map((t, tIdx) => {
-                    const realLineup = match.details?.lineups ? (tIdx === 0 ? match.details.lineups.home : match.details.lineups.away) : null;
-                    const players = realLineup?.players?.map((p: any) => ({
-                      name: p.player?.name || 'Unknown',
-                      role: p.position === 'G' ? 'GK' : p.position === 'D' ? 'DF' : p.position === 'M' ? 'MF' : p.position === 'F' ? 'FW' : 'SUB',
-                      fullRole: p.position || 'Player',
-                      number: p.shirtNumber || ''
-                    })) || [];
-                    
-                    const formation = realLineup?.formation || 'Starting XI';
-
-                    if (players.length === 0) {
-                      return (
-                        <div key={tIdx} className="bg-card border border-border rounded-xl p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[200px]">
-                          <AlertTriangle className="h-8 w-8 text-muted-foreground/50" />
-                          <div>
-                            <h4 className="font-semibold text-foreground flex items-center justify-center gap-2 mb-1">
-                              <TeamLogo logo={t.team?.logo} name={t.team?.name || ''} size="sm" />
-                              {t.team?.name || t.prefix}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">Lineup data not available</p>
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div key={tIdx} className="bg-card border border-border rounded-xl p-6 space-y-4">
-                        <h4 className="font-semibold text-foreground text-lg flex items-center gap-2">
-                          <TeamLogo logo={t.team?.logo} name={t.team?.name || ''} size="sm" />
-                          {t.team?.name || t.prefix}
-                        </h4>
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider">{formation}</p>
-                        <div className="space-y-1">
-                          {players.map((p, pIdx) => (
-                            <div key={pIdx} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-secondary/20 transition-colors">
-                              <span className="flex items-center gap-3 text-sm font-medium">
-                                <span className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
-                                  {p.number}
-                                </span>
-                                <div>
-                                  <div>{p.name}</div>
-                                  <div className="text-[10px] text-muted-foreground font-normal">{p.fullRole}</div>
-                                </div>
-                              </span>
-                              <div className="flex items-center gap-1">
-                                {p.role === "GK" && <span className="text-[10px] bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded font-bold">GK</span>}
-                                {p.role === "DF" && <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">DEF</span>}
-                                {p.role === "MF" && <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded font-bold">MID</span>}
-                                {p.role === "FW" && <span className="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded font-bold">FWD</span>}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="bg-card border border-border rounded-[2.5rem] p-4 md:p-8 overflow-hidden relative">
+                    <FootballPitchLineup 
+                        homeTeam={{
+                            name: match.homeTeam?.name || 'Home Team',
+                            logo: match.homeTeam?.logo,
+                            primaryColor: match.homeTeam?.primaryColor || '#2563eb'
+                        }}
+                        awayTeam={{
+                            name: match.awayTeam?.name || 'Away Team',
+                            logo: match.awayTeam?.logo,
+                            primaryColor: match.awayTeam?.primaryColor || '#ea580c'
+                        }}
+                        homePlayers={
+                            match.details?.lineups?.home?.players?.map((p: any) => ({
+                                id: p.player?.id?.toString() || p.player?.name || Math.random().toString(),
+                                name: p.player?.name || 'Unknown',
+                                role: p.position === 'G' ? 'Goalkeeper' : p.position === 'D' ? 'Defender' : p.position === 'M' ? 'Midfielder' : 'Forward',
+                                number: p.shirtNumber,
+                                isSubstitute: false
+                            })) || []
+                        }
+                        awayPlayers={
+                            match.details?.lineups?.away?.players?.map((p: any) => ({
+                                id: p.player?.id?.toString() || p.player?.name || Math.random().toString(),
+                                name: p.player?.name || 'Unknown',
+                                role: p.position === 'G' ? 'Goalkeeper' : p.position === 'D' ? 'Defender' : p.position === 'M' ? 'Midfielder' : 'Forward',
+                                number: p.shirtNumber,
+                                isSubstitute: false
+                            })) || []
+                        }
+                        homeFormation={match.details?.lineups?.home?.formation || '4-3-3'}
+                        awayFormation={match.details?.lineups?.away?.formation || '4-3-3'}
+                    />
                 </div>
               ) : (cbSquadsField.loading || matchInfoField.loading) ? (
                 <div className="bg-card border border-border rounded-xl p-6">
