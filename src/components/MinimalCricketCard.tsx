@@ -33,48 +33,48 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
     <div
       onClick={() => onClick?.(match)}
       className={cn(
-        "group relative overflow-hidden rounded-md border border-border/30 bg-card/40 p-4 transition-colors duration-200",
-        "hover:border-border/80 hover:bg-card/80 cursor-pointer",
+        "group relative overflow-hidden rounded-xl border border-border/50 bg-card p-4 transition-all duration-200",
+        "hover:border-primary/40 hover:bg-accent/10 hover:shadow-md cursor-pointer",
         "w-full flex flex-col gap-4",
         className
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-border/30">
-        <span className="text-[11px] text-muted-foreground tracking-wider font-semibold uppercase">
+      <div className="flex items-center justify-between pb-3 border-b border-border/40">
+        <span className="text-[11px] text-muted-foreground tracking-widest font-semibold uppercase">
           {match.matchType}
         </span>
         <div className="flex items-center gap-2">
            {isLive && <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />}
-           <span className={cn("text-[10px] uppercase tracking-widest", getStatusColor())}>
+           <span className={cn("text-[11px] uppercase tracking-widest", getStatusColor())}>
              {getStatusText()}
            </span>
         </div>
       </div>
 
       {/* Teams & Score */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3.5">
         {/* Home Team */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <TeamLogo logo={match.homeTeam?.logo || ''} name={match.homeTeam?.name || 'TBA'} shortName={match.homeTeam?.shortName} size="sm" className="w-6 h-6" />
-            <span className="font-medium text-foreground text-sm">{match.homeTeam?.name || 'TBA'}</span>
+          <div className="flex items-center gap-3.5">
+            <TeamLogo logo={match.homeTeam?.logo || ''} name={match.homeTeam?.name || 'TBA'} shortName={match.homeTeam?.shortName} size="md" className="w-9 h-9" />
+            <span className="font-semibold text-foreground text-[15px] tracking-tight">{match.homeTeam?.name || 'TBA'}</span>
           </div>
           <div className="flex flex-col items-end">
              {Array.isArray(match.inningsScores) && match.inningsScores.filter(i => i?.team === 'home').map((inn, idx) => (
                 <div key={idx} className="flex items-center gap-1.5">
-                  <span className="font-semibold text-sm tracking-tight text-foreground">
+                  <span className="font-bold text-[15px] tracking-tight text-foreground">
                     {inn.score}
                   </span>
                   {inn.overs && (
-                    <span className="text-[11px] text-muted-foreground font-medium">
+                    <span className="text-xs text-muted-foreground font-medium">
                       ({inn.overs})
                     </span>
                   )}
                 </div>
              ))}
              {(!Array.isArray(match.inningsScores) || match.inningsScores.filter(i => i?.team === 'home').length === 0) && (
-               <span className="font-semibold text-sm tracking-tight text-foreground">
+               <span className="font-bold text-[15px] tracking-tight text-foreground">
                  {match.homeScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                </span>
              )}
@@ -83,25 +83,25 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
 
         {/* Away Team */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <TeamLogo logo={match.awayTeam?.logo || ''} name={match.awayTeam?.name || 'TBA'} shortName={match.awayTeam?.shortName} size="sm" className="w-6 h-6" />
-            <span className="font-medium text-foreground text-sm">{match.awayTeam?.name || 'TBA'}</span>
+          <div className="flex items-center gap-3.5">
+            <TeamLogo logo={match.awayTeam?.logo || ''} name={match.awayTeam?.name || 'TBA'} shortName={match.awayTeam?.shortName} size="md" className="w-9 h-9" />
+            <span className="font-semibold text-foreground text-[15px] tracking-tight">{match.awayTeam?.name || 'TBA'}</span>
           </div>
           <div className="flex flex-col items-end">
              {Array.isArray(match.inningsScores) && match.inningsScores.filter(i => i?.team === 'away').map((inn, idx) => (
                 <div key={idx} className="flex items-center gap-1.5">
-                  <span className="font-semibold text-sm tracking-tight text-foreground">
+                  <span className="font-bold text-[15px] tracking-tight text-foreground">
                     {inn.score}
                   </span>
                   {inn.overs && (
-                    <span className="text-[11px] text-muted-foreground font-medium">
+                    <span className="text-xs text-muted-foreground font-medium">
                       ({inn.overs})
                     </span>
                   )}
                 </div>
              ))}
              {(!Array.isArray(match.inningsScores) || match.inningsScores.filter(i => i?.team === 'away').length === 0) && (
-               <span className="font-semibold text-sm tracking-tight text-foreground">
+               <span className="font-bold text-[15px] tracking-tight text-foreground">
                  {match.awayScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                </span>
              )}
@@ -110,19 +110,19 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
       </div>
 
       {/* Footer / Match Status Summary */}
-      <div className="pt-3 border-t border-border/30 flex flex-col gap-2.5">
+      <div className="pt-3.5 border-t border-border/40 flex flex-col gap-2.5">
         {match.summaryText && (
-          <span className={cn("text-xs font-medium leading-relaxed", isLive ? "text-red-400" : "text-primary/90")}>
+          <span className={cn("text-xs font-semibold leading-relaxed", isLive ? "text-red-400" : "text-primary/90")}>
             {match.summaryText}
           </span>
         )}
-        <div className="flex items-center gap-4 text-[10px] text-muted-foreground/80 uppercase tracking-wide font-medium">
+        <div className="flex items-center gap-4 text-[11px] text-muted-foreground/80 uppercase tracking-wide font-medium">
           <div className="flex items-center gap-1.5 truncate">
-            <MapPin size={10} className="flex-shrink-0" />
+            <MapPin size={11} className="flex-shrink-0" />
             <span className="truncate">{typeof match.venue === 'object' ? match.venue?.name : match.venue || "Venue"}</span>
           </div>
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            <Clock size={10} />
+            <Clock size={11} />
             <span>{match.displayTime || formatToIST(new Date(match.startTime), 'full')}</span>
           </div>
         </div>
