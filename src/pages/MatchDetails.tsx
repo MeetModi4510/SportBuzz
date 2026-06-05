@@ -680,30 +680,43 @@ const MatchDetails = () => {
                     { team: match.homeTeam, prefix: 'Home' },
                     { team: match.awayTeam, prefix: 'Away' }
                   ].map((t, tIdx) => {
-                    const seed = (match.id || "").length + (tIdx * 7);
-                    const positions = [
-                      { role: "GK", name: "Goalkeeper" },
-                      { role: "DF", name: "Right Back" }, { role: "DF", name: "Centre Back" },
-                      { role: "DF", name: "Centre Back" }, { role: "DF", name: "Left Back" },
-                      { role: "MF", name: "Defensive Mid" }, { role: "MF", name: "Central Mid" },
-                      { role: "MF", name: "Attacking Mid" },
-                      { role: "FW", name: "Right Wing" }, { role: "FW", name: "Striker" }, { role: "FW", name: "Left Wing" },
-                    ];
-                    const surnames = [
-                      "Silva", "Martinez", "Johnson", "Müller", "García", "López", "Santos", "Anderson",
-                      "Williams", "Fernández", "Brown", "Davis", "Wilson", "Taylor", "Thomas", "Moore",
-                      "Jackson", "White", "Harris", "Clark", "Lewis", "Walker", "Hall", "Young",
-                    ];
-                    const players = positions.map((pos, idx) => {
-                      const nameIdx = (seed * 7 + idx * 3) % surnames.length;
-                      const firstName = String.fromCharCode(65 + ((seed + idx) % 26));
-                      return {
-                        name: `${firstName}. ${surnames[nameIdx]}`,
-                        role: pos.role,
-                        fullRole: pos.name,
-                        number: idx === 0 ? 1 : (idx === 9 ? 9 : (idx === 10 ? 11 : idx + 2))
-                      };
-                    });
+                    const realLineup = match.details?.lineups ? (tIdx === 0 ? match.details.lineups.home : match.details.lineups.away) : null;
+                    const players = realLineup?.players?.map((p: any) => ({
+                      name: p.player?.name || 'Unknown',
+                      role: p.position === 'G' ? 'GK' : p.position === 'D' ? 'DF' : p.position === 'M' ? 'MF' : p.position === 'F' ? 'FW' : 'SUB',
+                      fullRole: p.position || 'Player',
+                      number: p.shirtNumber || ''
+                    })) || [];
+                    
+                    const formation = realLineup?.formation || 'Starting XI';
+
+                    if (players.length === 0) {
+                      // Fallback mock
+                      const seed = (match.id || "").length + (tIdx * 7);
+                      const positions = [
+                        { role: "GK", name: "Goalkeeper" },
+                        { role: "DF", name: "Right Back" }, { role: "DF", name: "Centre Back" },
+                        { role: "DF", name: "Centre Back" }, { role: "DF", name: "Left Back" },
+                        { role: "MF", name: "Defensive Mid" }, { role: "MF", name: "Central Mid" },
+                        { role: "MF", name: "Attacking Mid" },
+                        { role: "FW", name: "Right Wing" }, { role: "FW", name: "Striker" }, { role: "FW", name: "Left Wing" },
+                      ];
+                      const surnames = [
+                        "Silva", "Martinez", "Johnson", "Müller", "García", "López", "Santos", "Anderson",
+                        "Williams", "Fernández", "Brown", "Davis", "Wilson", "Taylor", "Thomas", "Moore",
+                        "Jackson", "White", "Harris", "Clark", "Lewis", "Walker", "Hall", "Young",
+                      ];
+                      positions.forEach((pos, idx) => {
+                        const nameIdx = (seed * 7 + idx * 3) % surnames.length;
+                        const firstName = String.fromCharCode(65 + ((seed + idx) % 26));
+                        players.push({
+                          name: `${firstName}. ${surnames[nameIdx]}`,
+                          role: pos.role,
+                          fullRole: pos.name,
+                          number: idx === 0 ? 1 : (idx === 9 ? 9 : (idx === 10 ? 11 : idx + 2))
+                        });
+                      });
+                    }
 
                     return (
                       <div key={tIdx} className="bg-card border border-border rounded-xl p-6 space-y-4">
@@ -711,7 +724,7 @@ const MatchDetails = () => {
                           <TeamLogo logo={t.team?.logo} name={t.team?.name || ''} size="sm" />
                           {t.team?.name || t.prefix}
                         </h4>
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider">Starting XI (4-3-3)</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider">{formation}</p>
                         <div className="space-y-1">
                           {players.map((p, pIdx) => (
                             <div key={pIdx} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-secondary/20 transition-colors">
@@ -788,73 +801,45 @@ const MatchDetails = () => {
                     const homeTeamName = match?.homeTeam?.shortName || 'Home';
                     const awayTeamName = match?.awayTeam?.shortName || 'Away';
 
-                    const footballStatCategories = [
-                      {
-                        category: '⚽ General',
-                        stats: [
-                          { label: 'Possession (%)', home: 58, away: 42, unit: '%' },
-                          { label: 'Total Shots', home: 16, away: 11 },
-                          { label: 'Shots on Target', home: 7, away: 4 },
-                          { label: 'Shots off Target', home: 6, away: 5 },
-                          { label: 'Blocked Shots', home: 3, away: 2 },
-                          { label: 'Corners', home: 8, away: 4 },
-                          { label: 'Offsides', home: 3, away: 2 },
-                          { label: 'Pass Accuracy (%)', home: 87, away: 79, unit: '%' },
-                          { label: 'Total Passes', home: 542, away: 398 },
-                        ],
-                      },
-                      {
-                        category: '🎯 Attacking',
-                        stats: [
-                          { label: 'Goals', home: parseInt(match?.homeScore || '0'), away: parseInt(match?.awayScore || '0') },
-                          { label: 'Expected Goals (xG)', home: 2.1, away: 1.3 },
-                          { label: 'Big Chances Created', home: 4, away: 2 },
-                          { label: 'Big Chances Missed', home: 2, away: 1 },
-                          { label: 'Touches in Box', home: 32, away: 21 },
-                          { label: 'Dribbles Attempted', home: 14, away: 9 },
-                          { label: 'Dribbles Succeeded', home: 9, away: 5 },
-                          { label: 'Crosses', home: 18, away: 12 },
-                          { label: 'Cross Accuracy (%)', home: 33, away: 25, unit: '%' },
-                          { label: 'Long Balls', home: 38, away: 45 },
-                        ],
-                      },
-                      {
-                        category: '🛡️ Defending',
-                        stats: [
-                          { label: 'Tackles', home: 18, away: 23 },
-                          { label: 'Tackles Won', home: 13, away: 16 },
-                          { label: 'Interceptions', home: 11, away: 14 },
-                          { label: 'Clearances', home: 15, away: 28 },
-                          { label: 'Blocked Shots', home: 3, away: 5 },
-                          { label: 'Aerial Duels Won', home: 12, away: 15 },
-                          { label: 'Ground Duels Won', home: 48, away: 39 },
-                          { label: 'Recovery', home: 42, away: 38 },
-                        ],
-                      },
-                      {
-                        category: '🧤 Goalkeeping',
-                        stats: [
-                          { label: 'Saves', home: 3, away: 5 },
-                          { label: 'Punches', home: 1, away: 2 },
-                          { label: 'Goal Kicks', home: 7, away: 12 },
-                          { label: 'Catches', home: 4, away: 3 },
-                          { label: 'Sweeper Actions', home: 2, away: 1 },
-                          { label: 'Throws', home: 6, away: 8 },
-                          { label: 'High Claims', home: 2, away: 3 },
-                        ],
-                      },
-                      {
-                        category: '📋 Discipline',
-                        stats: [
-                          { label: 'Fouls Committed', home: 12, away: 15 },
-                          { label: 'Fouls Won', home: 15, away: 12 },
-                          { label: 'Yellow Cards', home: 2, away: 3 },
-                          { label: 'Red Cards', home: 0, away: 0 },
-                          { label: 'Free Kicks', home: 15, away: 12 },
-                          { label: 'Throw-ins', home: 22, away: 18 },
-                        ],
-                      },
-                    ];
+                    let footballStatCategories: any[] = [];
+                    
+                    if (match.details?.statistics?.[0]?.groups) {
+                        footballStatCategories = match.details.statistics[0].groups.map((group: any) => ({
+                            category: group.groupName,
+                            stats: group.statisticsItems.map((item: any) => ({
+                                label: item.name,
+                                home: parseFloat(item.home) || 0,
+                                away: parseFloat(item.away) || 0,
+                                unit: item.home?.includes('%') ? '%' : ''
+                            }))
+                        }));
+                    } else {
+                        footballStatCategories = [
+                          {
+                            category: '⚽ General',
+                            stats: [
+                              { label: 'Possession (%)', home: 58, away: 42, unit: '%' },
+                              { label: 'Total Shots', home: 16, away: 11 },
+                              { label: 'Shots on Target', home: 7, away: 4 },
+                              { label: 'Shots off Target', home: 6, away: 5 },
+                              { label: 'Blocked Shots', home: 3, away: 2 },
+                              { label: 'Corners', home: 8, away: 4 },
+                              { label: 'Offsides', home: 3, away: 2 },
+                              { label: 'Pass Accuracy (%)', home: 87, away: 79, unit: '%' },
+                              { label: 'Total Passes', home: 542, away: 398 },
+                            ],
+                          },
+                          {
+                            category: '🎯 Attacking',
+                            stats: [
+                              { label: 'Goals', home: parseInt(match?.homeScore || '0'), away: parseInt(match?.awayScore || '0') },
+                              { label: 'Expected Goals (xG)', home: 2.1, away: 1.3 },
+                              { label: 'Big Chances Created', home: 4, away: 2 },
+                              { label: 'Big Chances Missed', home: 2, away: 1 },
+                            ],
+                          }
+                        ];
+                    }
 
                     return footballStatCategories.map((cat, catIdx) => (
                       <div key={catIdx} className="bg-card border border-border rounded-xl overflow-hidden">
@@ -1121,8 +1106,29 @@ const MatchDetails = () => {
                         const homeGoals = parseInt(match.homeScore || "0");
                         const awayGoals = parseInt(match.awayScore || "0");
                         
-                        // Add goals
-                        if (match.goals && match.goals.length > 0) {
+                        if (match.details?.incidents) {
+                          match.details.incidents.forEach((inc: any) => {
+                            let type = 'info';
+                            if (inc.incidentType === 'goal') type = 'goal';
+                            else if (inc.incidentClass === 'yellow') type = 'yellow';
+                            else if (inc.incidentClass === 'red') type = 'red';
+                            else if (inc.incidentType === 'substitution') type = 'sub';
+
+                            const teamName = inc.isHome ? homeTeam : awayTeam;
+                            let text = inc.text || inc.incidentType;
+                            if (inc.player?.name) {
+                              text = `${inc.player.name} (${inc.incidentType})`;
+                              if (inc.assist1?.name) text += ` - Assist: ${inc.assist1.name}`;
+                            }
+
+                            events.push({
+                              minute: inc.time,
+                              type,
+                              team: teamName,
+                              text
+                            });
+                          });
+                        } else if (match.goals && match.goals.length > 0) {
                           match.goals.forEach((g: any) => {
                             events.push({ minute: g.minute, type: 'goal', team: g.teamId === match.homeTeam?.id ? homeTeam : awayTeam, text: `GOAL! ${g.player} scores for ${g.teamId === match.homeTeam?.id ? homeTeam : awayTeam}! ${g.assist ? `Assist by ${g.assist}.` : 'Brilliant finish.'}` });
                           });
@@ -1140,21 +1146,23 @@ const MatchDetails = () => {
                           }
                         }
                         
-                        // Add some random events
-                        events.push({ minute: 8, type: 'chance', team: homeTeam, text: `Close! A powerful shot from outside the box goes just wide.` });
-                        events.push({ minute: 24, type: 'yellow', team: awayTeam, text: `Yellow card given for a late challenge.` });
-                        events.push({ minute: 36, type: 'foul', team: homeTeam, text: `Foul committed in the midfield area.` });
-                        events.push({ minute: 45, type: 'info', team: 'Both', text: `Half time: ${homeTeam} ${homeGoals > 0 ? homeGoals : 0} - ${awayGoals > 0 ? awayGoals : 0} ${awayTeam}` });
-                        
-                        if (isCompleted || (isLive && (match.currentMinute === '2nd half' || parseInt(match.currentMinute || '0') > 45))) {
-                          events.push({ minute: 58, type: 'sub', team: homeTeam, text: `Substitution for ${homeTeam}: Tactical change.` });
-                          events.push({ minute: 67, type: 'chance', team: awayTeam, text: `Great save! The goalkeeper parries away a dangerous header.` });
-                          events.push({ minute: 75, type: 'yellow', team: homeTeam, text: `Yellow card shown for a tactical foul.` });
-                          events.push({ minute: 82, type: 'sub', team: awayTeam, text: `Substitution: Fresh legs brought on for the final minutes.` });
-                        }
-                        
-                        if (isCompleted) {
-                           events.push({ minute: 90, type: 'info', team: 'Both', text: `Full time! The referee blows the final whistle.` });
+                        if (!match.details?.incidents) {
+                          // Add some random events only if no real incidents
+                          events.push({ minute: 8, type: 'chance', team: homeTeam, text: `Close! A powerful shot from outside the box goes just wide.` });
+                          events.push({ minute: 24, type: 'yellow', team: awayTeam, text: `Yellow card given for a late challenge.` });
+                          events.push({ minute: 36, type: 'foul', team: homeTeam, text: `Foul committed in the midfield area.` });
+                          events.push({ minute: 45, type: 'info', team: 'Both', text: `Half time: ${homeTeam} ${homeGoals > 0 ? homeGoals : 0} - ${awayGoals > 0 ? awayGoals : 0} ${awayTeam}` });
+                          
+                          if (isCompleted || (isLive && (match.currentMinute === '2nd half' || parseInt(match.currentMinute || '0') > 45))) {
+                            events.push({ minute: 58, type: 'sub', team: homeTeam, text: `Substitution for ${homeTeam}: Tactical change.` });
+                            events.push({ minute: 67, type: 'chance', team: awayTeam, text: `Great save! The goalkeeper parries away a dangerous header.` });
+                            events.push({ minute: 75, type: 'yellow', team: homeTeam, text: `Yellow card shown for a tactical foul.` });
+                            events.push({ minute: 82, type: 'sub', team: awayTeam, text: `Substitution: Fresh legs brought on for the final minutes.` });
+                          }
+                          
+                          if (isCompleted) {
+                             events.push({ minute: 90, type: 'info', team: 'Both', text: `Full time! The referee blows the final whistle.` });
+                          }
                         }
                         
                         // Sort events by minute descending

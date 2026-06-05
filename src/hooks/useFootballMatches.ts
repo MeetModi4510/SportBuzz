@@ -19,9 +19,8 @@ export function useFootballMatchSquads(matchId: string | undefined) {
 }
 
 /**
- * Hook to fetch REAL football dashboard data from Football-Data.org
- * Auto-refreshes every 12 minutes (720,000 ms)
- * Returns categorized matches: league, cup, international, all
+ * Hook to fetch REAL football dashboard data (Live only) from Sofascore
+ * Auto-refreshes every 15 minutes (900,000 ms)
  */
 export function useFootballDashboard() {
     return useQuery({
@@ -29,14 +28,37 @@ export function useFootballDashboard() {
         queryFn: async () => {
             try {
                 const response = await footballApi.getDashboard();
-                return response; // Axios interceptor already unwraps response.data
+                return response as any; // Axios interceptor already unwraps response.data
             } catch (err) {
                 console.error('[useFootballDashboard] Error:', err);
-                return { league: [], cup: [], international: [], all: [], meta: { error: 'Failed to fetch' } };
+                return { live: [], meta: { error: 'Failed to fetch' } };
             }
         },
-        staleTime: 720_000, // 12 minutes — matches backend cache TTL
-        refetchInterval: 720_000, // Auto-refresh every 12 minutes
+        staleTime: 900_000, // 15 minutes
+        refetchInterval: 900_000, // Auto-refresh every 15 minutes
+        refetchOnWindowFocus: false,
+        retry: 2,
+    });
+}
+
+/**
+ * Hook to fetch Categorized football matches (Live, Upcoming, Completed)
+ * Auto-refreshes every 15 minutes
+ */
+export function useCategorizedFootballMatches() {
+    return useQuery({
+        queryKey: ['football', 'categorized'],
+        queryFn: async () => {
+            try {
+                const response = await footballApi.getCategorizedMatches();
+                return response as any;
+            } catch (err) {
+                console.error('[useCategorizedFootballMatches] Error:', err);
+                return { live: [], upcoming: [], completed: [], meta: { error: 'Failed to fetch' } };
+            }
+        },
+        staleTime: 900_000, // 15 minutes
+        refetchInterval: 900_000,
         refetchOnWindowFocus: false,
         retry: 2,
     });
@@ -44,8 +66,8 @@ export function useFootballDashboard() {
 
 /**
  * Hook to fetch a single football match detail by ID
- * Uses the hybrid backend: AllSportsApi2 (live) + Football-Data.org (scheduled/completed)
- * Auto-refreshes every 2 minutes for live matches
+ * Uses Sofascore aggregated endpoints.
+ * Lazy loaded on click, cached for 2 mins if live, otherwise 15 mins.
  */
 export function useFootballMatchDetail(matchId: string | undefined) {
     return useQuery({
@@ -60,14 +82,16 @@ export function useFootballMatchDetail(matchId: string | undefined) {
                 return null;
             }
         },
-        enabled: !!matchId && (matchId.startsWith('football-')),
-        staleTime: 120_000, // 2 minutes
+        enabled: !!matchId && matchId.startsWith('football-'),
+        staleTime: (query) => {
+            const data = query.state?.data as any;
+            return data?.status === 'live' ? 120_000 : 900_000;
+        },
         refetchInterval: (query) => {
-            // Auto-refresh every 2 minutes for live matches
-            const data = query.state.data;
+            const data = query.state?.data as any;
             return data?.status === 'live' ? 120_000 : false;
         },
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus: false,
         retry: 1,
     });
 }

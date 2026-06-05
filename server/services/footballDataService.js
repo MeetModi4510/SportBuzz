@@ -1,625 +1,253 @@
 /**
- * Football Data Service — Hybrid API Integration
+ * Football Data Service — Sofascore Integration
  * 
- * Primary:  AllSportsApi2 (RapidAPI / REcodeX) for LIVE matches
- *           GET /api/matches/live  — real-time live football events
- * 
- * Fallback: Football-Data.org for SCHEDULED + FINISHED matches
- *           GET /v4/matches  — today's matches
- *           GET /v4/matches?dateFrom=...&dateTo=...&status=...
- * 
- * Cache TTL: 10 minutes (600s)
+ * Fetches Live, Upcoming, and Completed football matches from Sofascore.
+ * Includes a robust 15-minute caching mechanism to respect API limits.
  */
 
 import axios from 'axios';
 
-// ── AllSportsApi2 (RapidAPI) ──
-const RAPID_API_HOST = 'allsportsapi2.p.rapidapi.com';
-const RAPID_API_KEY = process.env.FOOTBALL_RAPIDAPI_KEY;
+const RAPID_API_HOST = 'sofascore.p.rapidapi.com';
 const RAPID_BASE = `https://${RAPID_API_HOST}`;
 
-// ── Football-Data.org (fallback for scheduled/finished) ──
-const FD_BASE = 'https://api.football-data.org/v4';
-const FD_TOKEN = process.env.FOOTBALL_DATA_TOKEN;
+// Read key dynamically so hot-reload / env changes work without restart
+function getHeaders() {
+    const key = process.env.FOOTBALL_RAPIDAPI_KEY || 'ea08b9a9d5msh0ce1b811a3294e7p19b61bjsnb06b82498cf2';
+    return {
+        'x-rapidapi-key': key,
+        'x-rapidapi-host': RAPID_API_HOST
+    };
+}
 
-// ── 10-minute cache ──
-const CACHE_TTL = 600 * 1000; // 10 minutes in ms
+const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+
 const cache = {
     dashboard: { data: null, timestamp: 0 },
-    live: { data: null, timestamp: 0 },
-    recent: { data: null, timestamp: 0 },
-    upcoming: { data: null, timestamp: 0 }
+    categorized: { data: null, timestamp: 0 },
+    seasons: { data: {}, timestamp: 0 } // Cache current seasonId for top tournaments
 };
+
+const TOP_TOURNAMENTS = [
+    17, // Premier League
+    8,  // La Liga
+    23, // Serie A
+    35, // Bundesliga
+    7   // Champions League
+];
 
 function isCacheValid(key) {
     return cache[key]?.data && (Date.now() - cache[key].timestamp) < CACHE_TTL;
 }
 
 // ════════════════════════════════════════════════════════════════
-// CATEGORY MAPPING
+// TRANSFORMATIONS
 // ════════════════════════════════════════════════════════════════
 
-// AllSportsApi2 uses uniqueTournament.id — map the big ones
-const TOURNAMENT_CATEGORIES = {
-    // Leagues
-    17: 'league',   // Premier League
-    35: 'league',   // Bundesliga
-    23: 'league',   // Serie A
-    8: 'league',    // La Liga
-    34: 'league',   // Ligue 1
-    242: 'league',  // Eredivisie
-    325: 'league',  // Primeira Liga
-    155: 'league',  // Saudi Pro League
-    374: 'league',  // Brazilian Serie A
-    48: 'league',   // Championship
-    37: 'league',   // 2. Bundesliga
-    53: 'league',   // Liga MX
-    11: 'league',   // Argentine Liga Profesional
-    // Cups
-    7: 'cup',       // UEFA Champions League
-    679: 'cup',     // UEFA Europa League
-    17015: 'cup',   // UEFA Conference League
-    16: 'cup',      // FA Cup
-    19: 'cup',      // Copa del Rey
-    384: 'cup',     // Copa Libertadores
-    480: 'cup',     // Copa Sudamericana
-    15: 'cup',      // DFB Pokal
-    27: 'cup',      // Coppa Italia
-    // International
-    16: 'international', // duplicate intentional — overridden below
-};
+function transformSofascoreEvent(event) {
+    if (!event) return null;
 
-// For Football-Data.org competition codes
-const FD_LEAGUE_CODES = ['PL', 'BL1', 'SA', 'PD', 'FL1', 'PPL', 'DED', 'BSA', 'ELC'];
-const FD_CUP_CODES = ['CL', 'CLI', 'CDR', 'COPA'];
-const FD_INTL_CODES = ['WC', 'EC', 'CAF', 'AFC'];
+    let appStatus = 'upcoming';
+    const type = event.status?.type?.toLowerCase() || '';
+    if (type === 'inprogress') appStatus = 'live';
+    else if (type === 'finished') appStatus = 'completed';
 
-// Smart categorizer for AllSportsApi2 events
-function getCategoryFromEvent(event) {
-    const utId = event.tournament?.uniqueTournament?.id;
-    const catName = event.tournament?.category?.name?.toLowerCase() || '';
-    const tName = (event.tournament?.uniqueTournament?.name || event.tournament?.name || '').toLowerCase();
+    const homeId = event.homeTeam?.id || '';
+    const awayId = event.awayTeam?.id || '';
     
-    // Check hardcoded mapping first
-    if (TOURNAMENT_CATEGORIES[utId]) return TOURNAMENT_CATEGORIES[utId];
-    
-    // Smart heuristics
-    if (catName === 'world' || catName.includes('international') ||
-        tName.includes('world cup') || tName.includes('euro ') ||
-        tName.includes('copa america') || tName.includes('nations league') ||
-        tName.includes('africa cup') || tName.includes('asian cup')) {
-        return 'international';
-    }
-    
-    if (tName.includes('cup') || tName.includes('copa') ||
-        tName.includes('pokal') || tName.includes('coppa') ||
-        tName.includes('champions league') || tName.includes('europa league') ||
-        tName.includes('conference league') || tName.includes('libertadores') ||
-        tName.includes('knockout') || tName.includes('qualification')) {
-        return 'cup';
-    }
-    
-    return 'league'; // default
-}
+    const startTime = event.startTimestamp ? new Date(event.startTimestamp * 1000) : new Date();
 
-function getCategoryFromFD(competitionCode) {
-    if (FD_CUP_CODES.includes(competitionCode)) return 'cup';
-    if (FD_INTL_CODES.includes(competitionCode)) return 'international';
-    return 'league';
-}
-
-// ════════════════════════════════════════════════════════════════
-// TEAM LOGO HELPER
-// ════════════════════════════════════════════════════════════════
-
-// AllSportsApi2 team IDs → use Sofascore image CDN
-function getTeamLogoUrl(teamId) {
-    if (!teamId) return null;
-    return `https://api.sofascore.app/api/v1/team/${teamId}/image`;
-}
-
-// Tournament logo
-function getTournamentLogoUrl(utId) {
-    if (!utId) return null;
-    return `https://api.sofascore.app/api/v1/unique-tournament/${utId}/image`;
-}
-
-// ════════════════════════════════════════════════════════════════
-// TIME HELPERS
-// ════════════════════════════════════════════════════════════════
-
-function toIST(dateInput) {
-    try {
-        const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
-        return d.toLocaleString('en-IN', {
-            timeZone: 'Asia/Kolkata',
-            day: 'numeric',
-            month: 'short',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        }) + ' IST';
-    } catch {
-        return String(dateInput);
-    }
-}
-
-// ════════════════════════════════════════════════════════════════
-// STATUS MAPPING
-// ════════════════════════════════════════════════════════════════
-
-// AllSportsApi2 status codes
-function mapRapidStatus(statusObj) {
-    const type = statusObj?.type?.toLowerCase() || '';
-    const code = statusObj?.code;
-    
-    if (type === 'inprogress') return 'live';
-    if (type === 'finished') return 'completed';
-    if (type === 'notstarted') return 'upcoming';
-    
-    // Code-based fallback
-    if (code === 0) return 'upcoming';  // Not started
-    if (code >= 6 && code <= 14) return 'live';  // Various in-progress codes
-    if (code === 100 || code === 110 || code === 120) return 'completed'; // Ended / AET / Penalties
-    if (code === 31) return 'live';  // Halftime (still live)
-    if (code >= 60 && code <= 70) return 'completed'; // Postponed/Cancelled
-    
-    return 'upcoming';
-}
-
-// Football-Data.org statuses
-function mapFDStatus(apiStatus) {
-    switch (apiStatus) {
-        case 'IN_PLAY': case 'PAUSED': case 'HALF_TIME': case 'EXTRA_TIME': case 'PENALTY':
-            return 'live';
-        case 'FINISHED': case 'AWARDED':
-            return 'completed';
-        case 'TIMED': case 'SCHEDULED':
-            return 'upcoming';
-        default:
-            return 'upcoming';
-    }
-}
-
-// ════════════════════════════════════════════════════════════════
-// STATUS LINE / SUMMARY
-// ════════════════════════════════════════════════════════════════
-
-function computeStatusLine(homeScore, awayScore, status, homeTeam, awayTeam, statusDesc) {
-    if (status === 'completed') {
-        const h = parseInt(homeScore) || 0;
-        const a = parseInt(awayScore) || 0;
-        if (h > a) return `${homeTeam} won ${h}-${a}`;
-        if (a > h) return `${awayTeam} won ${a}-${h}`;
-        return `Match drawn ${h}-${a}`;
-    }
-    if (status === 'live') {
-        return statusDesc || 'In Progress';
-    }
-    return '';
-}
-
-// ════════════════════════════════════════════════════════════════
-// TRANSFORM: AllSportsApi2 event → our Match shape
-// ════════════════════════════════════════════════════════════════
-
-function transformRapidEvent(event) {
-    const status = mapRapidStatus(event.status);
-    const homeScore = event.homeScore?.current ?? event.homeScore?.display ?? '';
-    const awayScore = event.awayScore?.current ?? event.awayScore?.display ?? '';
-    const startTimestamp = event.startTimestamp ? event.startTimestamp * 1000 : Date.now();
-    const startTime = new Date(startTimestamp);
-    
-    const homeTeamName = event.homeTeam?.name || 'Home';
-    const awayTeamName = event.awayTeam?.name || 'Away';
-    const homeShort = event.homeTeam?.nameCode || event.homeTeam?.shortName || homeTeamName.substring(0, 3).toUpperCase();
-    const awayShort = event.awayTeam?.nameCode || event.awayTeam?.shortName || awayTeamName.substring(0, 3).toUpperCase();
-    
-    const tournamentName = event.tournament?.uniqueTournament?.name || event.tournament?.name || 'Football';
-    const utId = event.tournament?.uniqueTournament?.id;
-    
-    // Status description (e.g. "2nd half", "Halftime")
-    const statusDesc = event.status?.description || '';
-    
-    // Current minute from statusDescription or lastPeriod
-    let currentMinute = '';
-    if (status === 'live') {
-        if (event.time?.currentPeriodStartTimestamp) {
-            const elapsed = Math.floor((Date.now() / 1000 - event.time.currentPeriodStartTimestamp) / 60);
-            const periodStart = event.status?.code === 7 ? 45 : 0; // 2nd half starts at 45
-            currentMinute = `${periodStart + elapsed}'`;
-        }
-        if (statusDesc) currentMinute = statusDesc;
-    }
-    
     return {
         id: `football-${event.id}`,
         apiId: event.id,
-        source: 'allsportsapi',
+        source: 'sofascore',
         sport: 'football',
-        matchType: tournamentName,
+        matchType: event.tournament?.name || 'Football',
         competitionCode: event.tournament?.uniqueTournament?.slug || '',
-        competitionEmblem: getTournamentLogoUrl(utId),
-        category: getCategoryFromEvent(event),
+        competitionEmblem: event.tournament?.uniqueTournament?.id ? `https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image` : null,
+        category: event.tournament?.category?.name || 'league',
         homeTeam: {
-            id: `ft-${event.homeTeam?.id || 'unknown'}`,
-            name: homeTeamName,
-            shortName: homeShort,
-            logo: getTeamLogoUrl(event.homeTeam?.id),
+            id: `ft-${homeId}`,
+            name: event.homeTeam?.name || 'Home',
+            shortName: event.homeTeam?.shortName || event.homeTeam?.nameCode || 'HOM',
+            logo: homeId ? `https://api.sofascore.app/api/v1/team/${homeId}/image` : null,
             primaryColor: event.homeTeam?.teamColors?.primary || '#333333'
         },
         awayTeam: {
-            id: `ft-${event.awayTeam?.id || 'unknown'}`,
-            name: awayTeamName,
-            shortName: awayShort,
-            logo: getTeamLogoUrl(event.awayTeam?.id),
+            id: `ft-${awayId}`,
+            name: event.awayTeam?.name || 'Away',
+            shortName: event.awayTeam?.shortName || event.awayTeam?.nameCode || 'AWY',
+            logo: awayId ? `https://api.sofascore.app/api/v1/team/${awayId}/image` : null,
             primaryColor: event.awayTeam?.teamColors?.primary || '#666666'
         },
-        homeScore: homeScore !== null && homeScore !== undefined && homeScore !== '' ? String(homeScore) : '',
-        awayScore: awayScore !== null && awayScore !== undefined && awayScore !== '' ? String(awayScore) : '',
-        status,
+        homeScore: event.homeScore?.current !== undefined ? String(event.homeScore.current) : '',
+        awayScore: event.awayScore?.current !== undefined ? String(event.awayScore.current) : '',
+        status: appStatus,
         venue: {
-            name: event.venue?.stadium?.name || event.venue?.city?.name || 'Stadium',
+            name: event.venue?.name || event.venue?.stadium?.name || 'Stadium',
             city: event.venue?.city?.name || ''
         },
         startTime: startTime.toISOString(),
-        displayTime: toIST(startTime),
-        currentMinute,
-        summaryText: computeStatusLine(homeScore, awayScore, status, homeShort, awayShort, statusDesc),
-        matchday: event.roundInfo?.round || null,
-        stage: event.roundInfo?.name || null,
-        group: event.roundInfo?.slug || null,
-        referee: null,
-        score: { home: homeScore, away: awayScore },
+        displayTime: startTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true }) + ' IST',
+        currentMinute: event.status?.description === 'Halftime' ? 'HT' : '', // Can be enhanced based on status
+        summaryText: appStatus === 'completed' ? `${event.homeScore?.current > event.awayScore?.current ? event.homeTeam?.name : event.homeScore?.current < event.awayScore?.current ? event.awayTeam?.name : 'Match'} ${event.homeScore?.current === event.awayScore?.current ? 'drawn' : 'won'} ${event.homeScore?.current}-${event.awayScore?.current}` : '',
+        score: {
+            home: event.homeScore?.current,
+            away: event.awayScore?.current
+        },
         lastUpdated: new Date().toISOString()
     };
 }
 
 // ════════════════════════════════════════════════════════════════
-// TRANSFORM: Football-Data.org match → our Match shape
+// API CALLS
 // ════════════════════════════════════════════════════════════════
 
-function transformFDMatch(apiMatch) {
-    const homeScore = apiMatch.score?.fullTime?.home ?? apiMatch.score?.halfTime?.home;
-    const awayScore = apiMatch.score?.fullTime?.away ?? apiMatch.score?.halfTime?.away;
-    const appStatus = mapFDStatus(apiMatch.status);
-    
-    const homeId = apiMatch.homeTeam?.id ? String(apiMatch.homeTeam.id) : null;
-    const awayId = apiMatch.awayTeam?.id ? String(apiMatch.awayTeam.id) : null;
-    
-    const homeName = apiMatch.homeTeam?.name || 'Home';
-    const awayName = apiMatch.awayTeam?.name || 'Away';
-    const homeShort = apiMatch.homeTeam?.shortName || apiMatch.homeTeam?.tla || 'HOM';
-    const awayShort = apiMatch.awayTeam?.shortName || apiMatch.awayTeam?.tla || 'AWY';
-    
-    return {
-        id: `football-fd-${apiMatch.id}`,
-        apiId: apiMatch.id,
-        source: 'football-data',
-        sport: 'football',
-        matchType: apiMatch.competition?.name || 'Football',
-        competitionCode: apiMatch.competition?.code || 'UNKNOWN',
-        competitionEmblem: apiMatch.competition?.emblem || null,
-        category: getCategoryFromFD(apiMatch.competition?.code || ''),
-        homeTeam: {
-            id: homeId ? `fd-${homeId}` : 'fd-unknown',
-            name: homeName,
-            shortName: homeShort,
-            logo: apiMatch.homeTeam?.crest || null,
-            primaryColor: '#333333'
-        },
-        awayTeam: {
-            id: awayId ? `fd-${awayId}` : 'fd-unknown',
-            name: awayName,
-            shortName: awayShort,
-            logo: apiMatch.awayTeam?.crest || null,
-            primaryColor: '#666666'
-        },
-        homeScore: homeScore !== null && homeScore !== undefined ? String(homeScore) : '',
-        awayScore: awayScore !== null && awayScore !== undefined ? String(awayScore) : '',
-        status: appStatus,
-        venue: {
-            name: apiMatch.venue || apiMatch.homeTeam?.venue || 'Stadium',
-            city: ''
-        },
-        startTime: apiMatch.utcDate,
-        displayTime: toIST(apiMatch.utcDate),
-        currentMinute: apiMatch.minute ? `${apiMatch.minute}'` : '',
-        summaryText: computeStatusLine(
-            homeScore, awayScore, appStatus, homeShort, awayShort, ''
-        ),
-        matchday: apiMatch.matchday,
-        stage: apiMatch.stage,
-        group: apiMatch.group,
-        referee: apiMatch.referees?.[0]?.name || null,
-        score: apiMatch.score,
-        lastUpdated: apiMatch.lastUpdated
-    };
-}
-
-// ════════════════════════════════════════════════════════════════
-// API FETCHERS
-// ════════════════════════════════════════════════════════════════
-
-// AllSportsApi2 — Live matches
-async function fetchLiveMatches() {
-    if (isCacheValid('live')) {
-        console.log('[AllSportsApi] Serving live from cache');
-        return cache.live.data;
-    }
-    
+async function fetchLiveEvents() {
     try {
-        console.log('[AllSportsApi] Fetching live matches...');
-        const res = await axios.get(`${RAPID_BASE}/api/matches/live`, {
-            headers: {
-                'x-rapidapi-key': RAPID_API_KEY,
-                'x-rapidapi-host': RAPID_API_HOST
-            },
-            timeout: 15000
-        });
-        
-        // Filter football only
-        const allEvents = res.data?.events || [];
-        const footballEvents = allEvents.filter(e => 
-            e.tournament?.category?.sport?.slug === 'football' ||
-            e.tournament?.category?.sport?.id === 1
-        );
-        
-        console.log(`[AllSportsApi] Got ${footballEvents.length} live football events (of ${allEvents.length} total)`);
-        const matches = footballEvents.map(transformRapidEvent);
-        
-        // Short cache for live data (2 minutes)
-        cache.live = { data: matches, timestamp: Date.now() };
-        return matches;
+        const res = await axios.get(`${RAPID_BASE}/tournaments/get-live-events`, { headers: getHeaders(), params: { sport: 'football' }, timeout: 15000 });
+        const events = res.data?.events || [];
+        console.log(`[Sofascore] fetchLiveEvents: got ${events.length} events`);
+        return events.map(transformSofascoreEvent).filter(Boolean);
     } catch (err) {
-        console.error('[AllSportsApi] fetchLiveMatches error:', err.message);
-        return cache.live.data || [];
+        console.error('[Sofascore] fetchLiveEvents error:', err.message);
+        return [];
     }
 }
 
-// Football-Data.org — Recent finished matches
-async function fetchRecentMatches() {
-    if (isCacheValid('recent')) {
-        console.log('[FootballData] Serving recent from cache');
-        return cache.recent.data;
+async function fetchCurrentSeasons() {
+    // Only fetch if cache is invalid or missing top tournaments
+    if (Date.now() - cache.seasons.timestamp < CACHE_TTL && Object.keys(cache.seasons.data).length >= TOP_TOURNAMENTS.length) {
+        return cache.seasons.data;
+    }
+
+    const seasons = { ...cache.seasons.data };
+    for (const tId of TOP_TOURNAMENTS) {
+        if (seasons[tId]) continue;
+        try {
+            const res = await axios.get(`${RAPID_BASE}/tournaments/get-seasons`, { headers: getHeaders(), params: { tournamentId: tId }, timeout: 10000 });
+            if (res.data?.seasons?.length > 0) {
+                seasons[tId] = res.data.seasons[0].id;
+            }
+        } catch (err) {
+            console.error(`[Sofascore] fetchCurrentSeasons (${tId}) error:`, err.message);
+        }
     }
     
+    cache.seasons = { data: seasons, timestamp: Date.now() };
+    return seasons;
+}
+
+async function fetchNextMatches(tournamentId) {
     try {
-        const today = new Date();
-        const threeDaysAgo = new Date(today);
-        threeDaysAgo.setDate(today.getDate() - 3);
-        
-        const dateFrom = threeDaysAgo.toISOString().split('T')[0];
-        const dateTo = today.toISOString().split('T')[0];
-        
-        const url = `${FD_BASE}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}&status=FINISHED`;
-        console.log(`[FootballData] Fetching recent: ${url}`);
-        
-        const res = await axios.get(url, {
-            headers: { 'X-Auth-Token': FD_TOKEN },
-            timeout: 15000
-        });
-        
-        const matches = (res.data.matches || []).map(transformFDMatch);
-        cache.recent = { data: matches, timestamp: Date.now() };
-        return matches;
+        const res = await axios.get(`${RAPID_BASE}/tournaments/get-next-matches`, { headers: getHeaders(), params: { tournamentId }, timeout: 10000 });
+        return (res.data?.events || []).map(transformSofascoreEvent).filter(Boolean);
     } catch (err) {
-        console.error('[FootballData] fetchRecentMatches error:', err.message);
-        return cache.recent.data || [];
+        return [];
     }
 }
 
-// Football-Data.org — Upcoming scheduled matches
-async function fetchUpcomingMatches() {
-    if (isCacheValid('upcoming')) {
-        console.log('[FootballData] Serving upcoming from cache');
-        return cache.upcoming.data;
-    }
-    
+async function fetchLastMatches(tournamentId, seasonId) {
+    if (!seasonId) return [];
     try {
-        const today = new Date();
-        const threeDaysLater = new Date(today);
-        threeDaysLater.setDate(today.getDate() + 3);
-        
-        const dateFrom = today.toISOString().split('T')[0];
-        const dateTo = threeDaysLater.toISOString().split('T')[0];
-        
-        const url = `${FD_BASE}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}&status=SCHEDULED,TIMED`;
-        console.log(`[FootballData] Fetching upcoming: ${url}`);
-        
-        const res = await axios.get(url, {
-            headers: { 'X-Auth-Token': FD_TOKEN },
-            timeout: 15000
-        });
-        
-        const matches = (res.data.matches || []).map(transformFDMatch);
-        cache.upcoming = { data: matches, timestamp: Date.now() };
-        return matches;
+        const res = await axios.get(`${RAPID_BASE}/tournaments/get-last-matches`, { headers: getHeaders(), params: { tournamentId, seasonId }, timeout: 10000 });
+        return (res.data?.events || []).map(transformSofascoreEvent).filter(Boolean);
     } catch (err) {
-        console.error('[FootballData] fetchUpcomingMatches error:', err.message);
-        return cache.upcoming.data || [];
+        return [];
     }
 }
 
 // ════════════════════════════════════════════════════════════════
-// DASHBOARD ORCHESTRATOR
+// EXPORTS
 // ════════════════════════════════════════════════════════════════
 
-/**
- * GET DASHBOARD DATA
- * Merges live (AllSportsApi2) + finished/upcoming (Football-Data.org)
- * Selection: up to 3 per category (League, Cup, International)
- *   - 1 live + 1 upcoming + 1 completed
- *   - If no live → 1 upcoming + 2 completed
- *   - If nothing → up to 3 completed
- * 
- * Returns: { league: [...], cup: [...], international: [...], all: [...], meta: {...} }
- */
 export async function getDashboardMatches() {
-    if (isCacheValid('dashboard')) {
-        console.log('[Football] Serving dashboard from cache');
-        return cache.dashboard.data;
-    }
+    if (isCacheValid('dashboard')) return cache.dashboard.data;
+
+    const liveMatches = await fetchLiveEvents();
     
-    try {
-        // Fetch all sources in parallel
-        const [liveMatches, recentMatches, upcomingMatches] = await Promise.all([
-            fetchLiveMatches(),
-            fetchRecentMatches(),
-            fetchUpcomingMatches()
-        ]);
-        
-        // Merge all and deduplicate by team matchup + date
-        const allMatches = [...liveMatches, ...recentMatches, ...upcomingMatches];
-        
-        // Deduplicate: same teams on same day = same match
-        const seen = new Map();
-        const deduped = [];
-        for (const m of allMatches) {
-            // Prefer AllSportsApi (live) data over Football-Data
-            const dayKey = new Date(m.startTime).toISOString().split('T')[0];
-            const key = `${m.homeTeam.name.toLowerCase()}-${m.awayTeam.name.toLowerCase()}-${dayKey}`;
-            if (!seen.has(key)) {
-                seen.set(key, true);
-                deduped.push(m);
-            }
+    const result = {
+        live: liveMatches, // Dashboard only needs live matches
+        meta: {
+            totalLive: liveMatches.length,
+            cachedAt: new Date().toISOString()
         }
-        
-        // Categorize
-        const byCategory = { league: [], cup: [], international: [] };
-        for (const m of deduped) {
-            const cat = m.category;
-            if (byCategory[cat]) byCategory[cat].push(m);
-        }
-        
-        // Select up to 3 per category
-        function selectForCategory(matches) {
-            const live = matches.filter(m => m.status === 'live');
-            const upcoming = matches.filter(m => m.status === 'upcoming')
-                .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
-            const completed = matches.filter(m => m.status === 'completed')
-                .sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
-            
-            const selected = [];
-            
-            if (live.length > 0) {
-                selected.push(live[0]);
-                if (upcoming.length > 0) selected.push(upcoming[0]);
-                if (completed.length > 0) selected.push(completed[0]);
-                if (selected.length < 3 && live.length > 1) selected.push(live[1]);
-                if (selected.length < 3 && completed.length > 1) selected.push(completed[1]);
-                if (selected.length < 3 && upcoming.length > 1) selected.push(upcoming[1]);
-            } else if (upcoming.length > 0) {
-                selected.push(upcoming[0]);
-                if (completed.length > 0) selected.push(completed[0]);
-                if (completed.length > 1) selected.push(completed[1]);
-                if (selected.length < 3 && upcoming.length > 1) selected.push(upcoming[1]);
-                if (selected.length < 3 && completed.length > 2) selected.push(completed[2]);
-            } else {
-                for (let i = 0; i < Math.min(3, completed.length); i++) {
-                    selected.push(completed[i]);
-                }
-            }
-            
-            return selected.slice(0, 3);
-        }
-        
-        const result = {
-            league: selectForCategory(byCategory.league),
-            cup: selectForCategory(byCategory.cup),
-            international: selectForCategory(byCategory.international),
-            all: deduped,
-            meta: {
-                totalMatches: deduped.length,
-                liveCount: deduped.filter(m => m.status === 'live').length,
-                sources: {
-                    allSportsApi: liveMatches.length,
-                    footballData: recentMatches.length + upcomingMatches.length
-                },
-                cachedAt: new Date().toISOString(),
-                cacheTTL: CACHE_TTL / 1000
-            }
-        };
-        
-        cache.dashboard = { data: result, timestamp: Date.now() };
-        console.log(`[Football] Dashboard ready: ${result.meta.totalMatches} total, ${result.meta.liveCount} live`);
-        return result;
-    } catch (err) {
-        console.error('[Football] getDashboardMatches error:', err.message);
-        return cache.dashboard.data || {
-            league: [], cup: [], international: [], all: [],
-            meta: { totalMatches: 0, liveCount: 0, error: err.message }
-        };
-    }
+    };
+
+    cache.dashboard = { data: result, timestamp: Date.now() };
+    return result;
 }
 
-/**
- * Get a specific match by Football-Data.org match ID
- */
-export async function getMatchById(matchId) {
+export async function getCategorizedMatches() {
+    if (isCacheValid('categorized')) return cache.categorized.data;
+
+    const [liveMatches, seasons] = await Promise.all([
+        fetchLiveEvents(),
+        fetchCurrentSeasons()
+    ]);
+
+    // Fetch upcoming and completed for top tournaments
+    const upcomingPromises = TOP_TOURNAMENTS.map(tId => fetchNextMatches(tId));
+    const completedPromises = TOP_TOURNAMENTS.map(tId => fetchLastMatches(tId, seasons[tId]));
+
+    const [upcomingResults, completedResults] = await Promise.all([
+        Promise.all(upcomingPromises),
+        Promise.all(completedPromises)
+    ]);
+
+    // Flatten arrays
+    const upcomingMatches = upcomingResults.flat().sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    const completedMatches = completedResults.flat().sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+
+    // Deduplicate (Sofascore gives us unique IDs so this is easier)
+    const uniqueUpcoming = Array.from(new Map(upcomingMatches.map(m => [m.apiId, m])).values());
+    const uniqueCompleted = Array.from(new Map(completedMatches.map(m => [m.apiId, m])).values());
+
+    const result = {
+        live: liveMatches,
+        upcoming: uniqueUpcoming.slice(0, 50), // Limit to top 50
+        completed: uniqueCompleted.slice(0, 50),
+        meta: { cachedAt: new Date().toISOString() }
+    };
+
+    cache.categorized = { data: result, timestamp: Date.now() };
+    return result;
+}
+
+export async function getMatchDetail(internalId) {
+    if (!internalId || !internalId.startsWith('football-')) return null;
+    const matchId = internalId.replace('football-', '');
+
     try {
-        const url = `${FD_BASE}/matches/${matchId}`;
-        const res = await axios.get(url, {
-            headers: { 'X-Auth-Token': FD_TOKEN },
-            timeout: 15000
-        });
-        return transformFDMatch(res.data);
+        // Fetch all specific match details in parallel
+        const h = getHeaders();
+        const [detailRes, lineupsRes, statsRes, incidentsRes, graphRes] = await Promise.allSettled([
+            axios.get(`${RAPID_BASE}/matches/detail`, { headers: h, params: { matchId }, timeout: 10000 }),
+            axios.get(`${RAPID_BASE}/matches/get-lineups`, { headers: h, params: { matchId }, timeout: 10000 }),
+            axios.get(`${RAPID_BASE}/matches/get-statistics`, { headers: h, params: { matchId }, timeout: 10000 }),
+            axios.get(`${RAPID_BASE}/matches/get-incidents`, { headers: h, params: { matchId }, timeout: 10000 }),
+            axios.get(`${RAPID_BASE}/matches/get-graph`, { headers: h, params: { matchId }, timeout: 10000 })
+        ]);
+
+        const event = detailRes.status === 'fulfilled' ? detailRes.value.data?.event : null;
+        if (!event) return null;
+
+        const baseMatch = transformSofascoreEvent(event);
+        
+        return {
+            ...baseMatch,
+            details: {
+                lineups: lineupsRes.status === 'fulfilled' ? lineupsRes.value.data : null,
+                statistics: statsRes.status === 'fulfilled' ? statsRes.value.data?.statistics : null,
+                incidents: incidentsRes.status === 'fulfilled' ? incidentsRes.value.data?.incidents : null,
+                graph: graphRes.status === 'fulfilled' ? graphRes.value.data?.graph : null
+            }
+        };
     } catch (err) {
-        console.error(`[FootballData] getMatchById(${matchId}) error:`, err.message);
+        console.error(`[Sofascore] getMatchDetail(${matchId}) error:`, err.message);
         return null;
     }
 }
 
-/**
- * Get detailed match info by our internal ID (football-{apiId} or football-fd-{apiId})
- * Searches the dashboard cache first, then falls back to API fetch.
- * Returns enriched match with all available data fields.
- */
-export async function getMatchDetail(internalId) {
-    // Extract the numeric API ID from our internal format
-    const isAllSports = internalId.startsWith('football-') && !internalId.startsWith('football-fd-');
-    const isFD = internalId.startsWith('football-fd-');
-    
-    // Try to find in cached dashboard data
-    const dashboard = cache.dashboard?.data;
-    if (dashboard?.all) {
-        const found = dashboard.all.find(m => m.id === internalId);
-        if (found) {
-            console.log(`[Football] Found match ${internalId} in cache`);
-            return found;
-        }
-    }
-    
-    // Try to find in live cache
-    if (cache.live?.data) {
-        const found = cache.live.data.find(m => m.id === internalId);
-        if (found) {
-            console.log(`[Football] Found match ${internalId} in live cache`);
-            return found;
-        }
-    }
-    
-    // Fallback: fetch fresh dashboard data and search
-    try {
-        const freshDashboard = await getDashboardMatches();
-        const found = freshDashboard.all?.find(m => m.id === internalId);
-        if (found) return found;
-    } catch (err) {
-        console.error(`[Football] Fresh fetch failed for ${internalId}:`, err.message);
-    }
-    
-    // Last resort for Football-Data.org matches: direct API call
-    if (isFD) {
-        const fdId = internalId.replace('football-fd-', '');
-        return getMatchById(fdId);
-    }
-    
-    return null;
-}
-
-/**
- * Force clear cache (admin/debug)
- */
 export function clearCache() {
     for (const key of Object.keys(cache)) {
         cache[key] = { data: null, timestamp: 0 };
@@ -629,7 +257,7 @@ export function clearCache() {
 
 export default {
     getDashboardMatches,
-    getMatchById,
+    getCategorizedMatches,
     getMatchDetail,
     clearCache
 };

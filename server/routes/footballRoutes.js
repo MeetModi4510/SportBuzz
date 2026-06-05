@@ -25,7 +25,7 @@ import {
     deleteMatch
 } from '../controllers/footballMatchController.js';
 import { protect } from '../middleware/authMiddleware.js';
-import { getDashboardMatches, getMatchById as getRealMatchById, getMatchDetail, clearCache } from '../services/footballDataService.js';
+import { getDashboardMatches, getCategorizedMatches, getMatchDetail, clearCache } from '../services/footballDataService.js';
 
 const router = express.Router();
 
@@ -53,13 +53,13 @@ router.get('/detail/:id', async (req, res) => {
     }
 });
 
-// Single real match by Football-Data.org ID
-router.get('/real/:id', async (req, res) => {
+// Partitioned matches (Live, Upcoming, Completed) for the Football Tab
+router.get('/matches/categorized', async (req, res) => {
     try {
-        const match = await getRealMatchById(req.params.id);
-        if (!match) return res.status(404).json({ success: false, message: 'Match not found' });
-        res.json({ success: true, data: match });
+        const data = await getCategorizedMatches();
+        res.json({ success: true, ...data });
     } catch (err) {
+        console.error('[Football Categorized] Error:', err.message);
         res.status(500).json({ success: false, message: err.message });
     }
 });

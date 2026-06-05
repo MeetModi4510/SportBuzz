@@ -17,7 +17,7 @@ import {
 import { useLiveCricketMatches } from "@/hooks/useCricketMatches";
 import { useFeaturedCricketMatches } from "@/hooks/useFeaturedMatches";
 import { useFollowedTournamentMatches } from "@/hooks/useFollowedTournamentMatches";
-import { useFootballDashboard } from "@/hooks/useFootballMatches";
+import { useFootballDashboard, useCategorizedFootballMatches } from "@/hooks/useFootballMatches";
 import { tournamentApi } from "@/services/api";
 import { Sport, MatchStatus, Match } from "@/data/types";
 import { Helmet } from "react-helmet-async";
@@ -39,18 +39,21 @@ const Index = () => {
   const { data: cricketData, isLoading: cricketLoading } = useFeaturedCricketMatches();
   const { data: liveCricket } = useLiveCricketMatches();
 
-  // Fetch REAL football data from Football-Data.org (12-min cache)
+  // Fetch REAL football data from Sofascore (15-min cache)
   const { data: footballDashboard, isLoading: footballLoading } = useFootballDashboard();
+  
+  // Only fetch categorized football matches when the tab is active
+  const { data: categorizedFootball, isLoading: categorizedFootballLoading } = useCategorizedFootballMatches();
 
   // Get mock data for other sports (excluding cricket AND football — football is now real)
   const otherSportsMockMatches = mockMatches.filter(m => m.sport !== "cricket" && m.sport !== "football");
 
-  // Build real football matches from API response
+  // Build real football matches from API response (Live only)
   const realFootballMatches = useMemo(() => {
     if (!footballDashboard) return [];
-    const all = (footballDashboard as any).all || [];
+    const live = (footballDashboard as any).live || [];
     // Ensure each match has Date objects for startTime
-    return all.map((m: any) => ({
+    return live.map((m: any) => ({
       ...m,
       startTime: new Date(m.startTime),
     }));
@@ -68,8 +71,17 @@ const Index = () => {
       ];
     }
 
-    return [...realCricket, ...realFootballMatches, ...otherSportsMockMatches];
-  }, [cricketData, realFootballMatches, otherSportsMockMatches]);
+    let footballToDisplay = realFootballMatches;
+    if (activeSport === "football" && categorizedFootball) {
+       footballToDisplay = [
+          ...((categorizedFootball as any).live || []),
+          ...((categorizedFootball as any).upcoming || []),
+          ...((categorizedFootball as any).completed || [])
+       ].map((m: any) => ({ ...m, startTime: new Date(m.startTime) }));
+    }
+
+    return [...realCricket, ...footballToDisplay, ...otherSportsMockMatches];
+  }, [cricketData, realFootballMatches, categorizedFootball, activeSport, otherSportsMockMatches]);
 
   const filteredMatches = useMemo(() => {
     let filtered = [...allMatches];
@@ -133,20 +145,8 @@ const Index = () => {
   // Group matches by sport for display
   const footballMatches = filteredMatches.filter((m) => m.sport === "football");
   
-  // Categorized football for dashboard (from real API)
-  const footballLeague = useMemo(() => 
-    (footballDashboard as any)?.league?.map((m: any) => ({ ...m, startTime: new Date(m.startTime) })) || [], 
-    [footballDashboard]
-  );
-  const footballCup = useMemo(() => 
-    (footballDashboard as any)?.cup?.map((m: any) => ({ ...m, startTime: new Date(m.startTime) })) || [], 
-    [footballDashboard]
-  );
-  const footballInternational = useMemo(() => 
-    (footballDashboard as any)?.international?.map((m: any) => ({ ...m, startTime: new Date(m.startTime) })) || [], 
-    [footballDashboard]
-  );
-  const footballLiveCount = (footballDashboard as any)?.meta?.liveCount || 0;
+  // Categorized football for dashboard (from real API) - Now only Live
+  const footballLiveCount = (footballDashboard as any)?.meta?.totalLive || 0;
   const basketballMatches = filteredMatches.filter((m) => m.sport === "basketball");
   const tennisMatches = filteredMatches.filter((m) => m.sport === "tennis");
   
@@ -318,7 +318,7 @@ const Index = () => {
                 sport={activeSport as Sport}
                 matches={filteredMatches}
                 onMatchClick={(match) => handleMatchClick(match.id)}
-                isLoading={activeSport === "cricket" && cricketLoading}
+                isLoading={(activeSport === "cricket" && cricketLoading) || (activeSport === "football" && categorizedFootballLoading)}
               />
             </div>
           )}

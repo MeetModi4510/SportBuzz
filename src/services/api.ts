@@ -140,8 +140,8 @@ export const footballApi = {
 
     // Real Football Data (Hybrid: AllSportsApi2 + Football-Data.org)
     getDashboard: () => api.get('football/dashboard'),
+    getCategorizedMatches: () => api.get('football/matches/categorized'),
     getMatchDetail: (id: string) => api.get(`football/detail/${id}`),
-    getRealMatch: (id: string) => api.get(`football/real/${id}`)
 };
 
 export const tournamentApi = {
