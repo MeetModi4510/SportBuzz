@@ -59,41 +59,41 @@ export const CreatorsSection = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 max-w-6xl mx-auto">
           {/* Minimal Title */}
           <div className="text-center md:text-left space-y-1">
-            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
               Built by <span className="text-primary">SportBuzz</span>
             </h2>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               The engineers behind the real-time experience.
             </p>
           </div>
 
           {/* Compact Creator Badges */}
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-5">
             {creators.map((creator, i) => (
               <div 
                 key={i}
-                className="group flex items-center gap-3 p-1.5 pr-4 rounded-full border border-border/30 bg-card hover:bg-secondary/40 hover:border-primary/30 hover:shadow-md transition-all duration-300"
+                className="group flex items-center gap-3 md:gap-4 p-2 pr-5 md:pr-6 rounded-full border border-border/30 bg-card hover:bg-secondary/40 hover:border-primary/30 hover:shadow-md transition-all duration-300"
               >
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary border border-border/50 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-secondary border border-border/50 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform shadow-sm">
                   {creator.image ? (
                     <img src={creator.image} alt={creator.name} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="scale-75">{creator.icon}</div>
+                    <div className="scale-90">{creator.icon}</div>
                   )}
                 </div>
                 <div className="flex flex-col justify-center">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{creator.name}</span>
+                    <span className="text-base font-bold text-foreground group-hover:text-primary transition-colors">{creator.name}</span>
                     <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0">
                       {creator.links.github && creator.links.github !== "#" && (
-                        <a href={creator.links.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Github className="w-3.5 h-3.5" /></a>
+                        <a href={creator.links.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Github className="w-4 h-4" /></a>
                       )}
                       {creator.links.linkedin && creator.links.linkedin !== "#" && (
-                        <a href={creator.links.linkedin} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Linkedin className="w-3.5 h-3.5" /></a>
+                        <a href={creator.links.linkedin} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Linkedin className="w-4 h-4" /></a>
                       )}
                     </div>
                   </div>
-                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{creator.role}</span>
+                  <span className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">{creator.role}</span>
                 </div>
               </div>
             ))}
