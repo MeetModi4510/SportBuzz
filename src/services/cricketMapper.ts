@@ -51,7 +51,8 @@ export function mapApiMatchToModel(apiMatch: any): Match {
 
         sortedScores.forEach((inn: any, idx: number) => {
             const inning = (inn.inning || '').toLowerCase();
-            const scoreStr = `${inn.r || 0}/${inn.w || 0} (${inn.o || 0} ov)`;
+            const cleanOvers = (inn.o || '0').toString().replace(/[()]/g, '').replace(/ov/gi, '').trim();
+            const scoreStr = `${inn.r || 0}/${inn.w || 0} (${cleanOvers} ov)`;
             const isInn2 = inning.includes('2') || inning.includes('second');
             const innNum = (inning.match(/inning\s*(\d+)/i) || [])[1] || '1';
             const teamPart = inning.replace(/\s*inning\s*\d*/i, '').trim();

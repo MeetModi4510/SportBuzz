@@ -251,10 +251,12 @@ const MatchDetails = () => {
             </div>
 
             {/* Teams & Score */}
-            <div className="grid grid-cols-3 gap-4 md:gap-8 items-center">
+            <div className="bg-card/40 backdrop-blur-md border border-white/10 rounded-[2rem] p-6 md:p-10 shadow-2xl relative overflow-hidden my-6">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary/10 blur-[120px] pointer-events-none rounded-full" />
+              <div className="grid grid-cols-3 gap-4 md:gap-8 items-center relative z-10">
               {/* Home Team */}
               <div className="text-center space-y-3">
-                <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="lg" className="mx-auto" />
+                <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="md" className="mx-auto shadow-2xl ring-4 ring-background/20" />
                 <div>
                   <h2 className="text-lg md:text-xl font-bold text-foreground">{match.homeTeam?.name || "Team 1"}</h2>
                   <p className="text-sm text-muted-foreground">{match.homeTeam?.shortName}</p>
@@ -272,7 +274,7 @@ const MatchDetails = () => {
                             <span className="text-[10px] uppercase text-muted-foreground/70 font-bold mb-1">1st Inn</span>
                             <span className="text-3xl md:text-5xl font-bold font-mono score-text">{match.scoreBreakdown.home.inn1 || "—"}</span>
                           </div>
-                          <span className="text-2xl text-muted-foreground mt-4">:</span>
+                          <span className="text-sm font-bold text-muted-foreground/50 mt-4 px-3 py-1 bg-secondary/30 rounded-full backdrop-blur-sm border border-white/5">VS</span>
                           <div className="flex flex-col items-center">
                             <span className="text-[10px] uppercase text-muted-foreground/70 font-bold mb-1">1st Inn</span>
                             <span className="text-3xl md:text-5xl font-bold font-mono score-text">{match.scoreBreakdown.away.inn1 || "—"}</span>
@@ -284,7 +286,7 @@ const MatchDetails = () => {
                               <span className="text-[10px] uppercase text-muted-foreground/70 font-bold mb-1">2nd Inn</span>
                               <span className="text-2xl md:text-4xl font-bold font-mono score-text">{match.scoreBreakdown.home.inn2 || "—"}</span>
                             </div>
-                            <span className="text-xl text-muted-foreground mt-4">:</span>
+                            <span className="text-xs font-bold text-muted-foreground/50 mt-4 px-2 py-0.5 bg-secondary/30 rounded-full backdrop-blur-sm border border-white/5">VS</span>
                             <div className="flex flex-col items-center">
                               <span className="text-[10px] uppercase text-muted-foreground/70 font-bold mb-1">2nd Inn</span>
                               <span className="text-2xl md:text-4xl font-bold font-mono score-text">{match.scoreBreakdown.away.inn2 || "—"}</span>
@@ -317,7 +319,7 @@ const MatchDetails = () => {
                             <span className="text-3xl md:text-5xl font-bold font-mono score-text text-muted-foreground">—</span>
                           )}
                         </div>
-                        <span className="text-2xl text-muted-foreground mt-6">vs</span>
+                        <span className="text-sm font-bold text-muted-foreground/50 mt-6 px-3 py-1 bg-secondary/30 rounded-full backdrop-blur-sm border border-white/5">VS</span>
                         {/* Away innings column */}
                         <div className="flex flex-col items-center gap-2">
                           {match.inningsScores.filter(i => i.team === 'away').map((inn, idx) => (
@@ -376,7 +378,7 @@ const MatchDetails = () => {
                                 </span>
                               )}
                             </div>
-                            <span className="text-2xl text-muted-foreground self-center mx-2">:</span>
+                            <span className="text-sm font-bold text-muted-foreground/50 self-center mx-4 px-3 py-1 bg-secondary/30 rounded-full backdrop-blur-sm border border-white/5">VS</span>
                             <div className="flex flex-col items-center justify-center min-w-[80px]">
                               <span className={cn(
                                 "score-text leading-none tracking-tight whitespace-nowrap",
@@ -449,12 +451,14 @@ const MatchDetails = () => {
 
               {/* Away Team */}
               <div className="text-center space-y-3">
-                <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="lg" className="mx-auto" />
+                <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="md" className="mx-auto shadow-2xl ring-4 ring-background/20" />
                 <div>
                   <h2 className="text-lg md:text-xl font-bold text-foreground">{match.awayTeam?.name || "Team 2"}</h2>
                   <p className="text-sm text-muted-foreground">{match.awayTeam?.shortName}</p>
                 </div>
               </div>
+              </div>
+            </div>
             </div>
 
             {/* Match Info Bar */}
