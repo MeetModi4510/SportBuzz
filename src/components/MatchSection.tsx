@@ -130,12 +130,8 @@ export const MatchSection = ({
         return <div className="text-sm text-muted-foreground italic py-6 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No matches in this category</div>;
       }
 
-      // Determine grid columns based on active formats
-      // For 4 formats, we can use a 2x2 grid or just 4 cols. Let's use up to 3 cols max for balance.
-      const gridCols = activeFormats.length === 1 ? "lg:grid-cols-1" : activeFormats.length === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3";
-
       return (
-        <div className={cn("grid grid-cols-1 gap-6", gridCols)}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
           {activeFormats.map(format => (
             <div key={format.key} className="space-y-3">
               <h3 className={cn("text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-2 pl-2", format.color)}>
