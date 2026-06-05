@@ -47,7 +47,7 @@ export const CRICBUZZ_PLAYER_ID_MAP: Record<string, number> = {
   'livingstone': 11529, // Liam Livingstone
 
   // ─── NEW ZEALAND ───
-  'kane':     2250,   // Kane Williamson (corrected below)
+  'kane':     1393,   // Kane Williamson
   'boult':    4575,   // Trent Boult
   'conway':   12842,  // Devon Conway
   'ravindra': 19515,  // Rachin Ravindra
@@ -138,8 +138,7 @@ export const CRICBUZZ_PLAYER_ID_MAP: Record<string, number> = {
   'af11':     14017,  // Noor Ahmad
 };
 
-// ─── Override for Kane Williamson (different from David Warner) ───
-CRICBUZZ_PLAYER_ID_MAP['kane'] = 4578; // Kane Williamson's actual Cricbuzz ID
+// Kane Williamson ID already set correctly above (1393)
 
 /**
  * Look up a Cricbuzz player ID from an internal SportBuzz ID.

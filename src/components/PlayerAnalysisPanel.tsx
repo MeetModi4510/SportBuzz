@@ -1045,6 +1045,8 @@ export const PlayerAnalysisPanel = () => {
         battingStats: apiBattingStats,
         isLoading: isApiLoading,
         isError: isApiError,
+        refetch: refetchBattingHeader,
+        cricbuzzId: headerCricbuzzId,
     } = usePlayerBattingStats(selectedPlayer.id);
     const hasApiData = !!(apiBattingStats && (apiBattingStats.test || apiBattingStats.odi || apiBattingStats.t20 || apiBattingStats.ipl));
 
@@ -1053,13 +1055,17 @@ export const PlayerAnalysisPanel = () => {
         bowlingStats: apiBowlingStats,
         isLoading: isBowlingLoading,
         isError: isBowlingError,
+        refetch: refetchBowlingHeader,
     } = usePlayerBowlingStats(selectedPlayer.id);
     const hasBowlingData = !!(apiBowlingStats && (apiBowlingStats.test || apiBowlingStats.odi || apiBowlingStats.t20 || apiBowlingStats.ipl));
     const currentApiFormat = activeSport === 'cricket' && apiBattingStats ? apiBattingStats[apiBattingFormat] : null;
     const currentBowlingFormatHeader: PlayerBowlingFormat | null = activeSport === 'cricket' && apiBowlingStats ? apiBowlingStats[apiBattingFormat as BowlingFormatKey] : null;
 
-    // Determine which data to show in the header based on statsView
+    // Show toggle for ALL cricket players with a Cricbuzz ID, even while loading
+    const hasCricbuzzId = activeSport === 'cricket' && !!headerCricbuzzId;
     const showBowlingInHeader = statsView === 'bowling';
+    const isHeaderLoading = showBowlingInHeader ? isBowlingLoading : isApiLoading;
+    const isHeaderError = showBowlingInHeader ? isBowlingError : isApiError;
 
     return (
         <div className="space-y-6">
@@ -1202,7 +1208,7 @@ export const PlayerAnalysisPanel = () => {
 
                         {/* ── Dynamic API Stats (or fallback) ── */}
                         <div className="mt-6 pt-5 border-t border-border/30">
-                            {activeSport === "cricket" && (hasApiData || hasBowlingData) ? (
+                            {hasCricbuzzId ? (
                                 <div className="space-y-4">
                                     {/* Batting / Bowling Toggle */}
                                     <div className="flex items-center gap-2 flex-wrap">
@@ -1237,21 +1243,23 @@ export const PlayerAnalysisPanel = () => {
                                         {API_FORMAT_TABS.map(fmt => {
                                             const battingAvailable = apiBattingStats?.[fmt.key] !== null && apiBattingStats?.[fmt.key] !== undefined;
                                             const bowlingAvailable = apiBowlingStats?.[fmt.key as BowlingFormatKey] !== null && apiBowlingStats?.[fmt.key as BowlingFormatKey] !== undefined;
-                                            const isAvailable = showBowlingInHeader ? bowlingAvailable : battingAvailable;
+                                            const isAvailable = isHeaderLoading ? true : (showBowlingInHeader ? bowlingAvailable : battingAvailable);
                                             return (
                                                 <button
                                                     key={fmt.key}
-                                                    onClick={() => isAvailable && setApiBattingFormat(fmt.key)}
-                                                    disabled={!isAvailable}
+                                                    onClick={() => !isHeaderLoading && isAvailable && setApiBattingFormat(fmt.key)}
+                                                    disabled={isHeaderLoading || !isAvailable}
                                                     className={cn(
                                                         "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border",
-                                                        apiBattingFormat === fmt.key && isAvailable
+                                                        apiBattingFormat === fmt.key
                                                             ? "text-white border-transparent shadow-md scale-105"
+                                                            : isHeaderLoading
+                                                            ? "bg-secondary/20 text-muted-foreground/60 border-border/30"
                                                             : !isAvailable
                                                             ? "bg-secondary/20 text-muted-foreground/40 border-border/30 cursor-not-allowed"
                                                             : "bg-secondary/30 text-muted-foreground border-border hover:bg-secondary/60"
                                                     )}
-                                                    style={apiBattingFormat === fmt.key && isAvailable ? { background: FORMAT_COLORS[fmt.key], boxShadow: `0 4px 15px ${FORMAT_COLORS[fmt.key]}30` } : undefined}
+                                                    style={apiBattingFormat === fmt.key ? { background: FORMAT_COLORS[fmt.key], boxShadow: `0 4px 15px ${FORMAT_COLORS[fmt.key]}30` } : undefined}
                                                 >
                                                     {fmt.label}
                                                 </button>
@@ -1260,14 +1268,14 @@ export const PlayerAnalysisPanel = () => {
                                         
                                         {/* Status Badges */}
                                         <div className="ml-auto flex items-center gap-2">
-                                            {(showBowlingInHeader ? isBowlingLoading : isApiLoading) ? (
+                                            {isHeaderLoading ? (
                                                 <span className="px-3 py-1.5 bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-full border border-blue-500/20 flex items-center gap-1.5">
                                                     <Loader2 size={9} className="animate-spin" /> Loading
                                                 </span>
-                                            ) : (showBowlingInHeader ? isBowlingError : isApiError) ? (
-                                                <span className="px-3 py-1.5 bg-red-500/10 text-red-400 text-[10px] font-bold uppercase tracking-wider rounded-full border border-red-500/20 flex items-center gap-1.5">
-                                                    <AlertTriangle size={9} /> Error
-                                                </span>
+                                            ) : isHeaderError ? (
+                                                <button onClick={() => showBowlingInHeader ? refetchBowlingHeader() : refetchBattingHeader()} className="px-3 py-1.5 bg-red-500/10 text-red-400 text-[10px] font-bold uppercase tracking-wider rounded-full border border-red-500/20 hover:bg-red-500/20 transition-all flex items-center gap-1.5 cursor-pointer">
+                                                    <RefreshCw size={9} /> Retry
+                                                </button>
                                             ) : (
                                                 <span className="px-3 py-1.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider rounded-full border border-emerald-500/20 flex items-center gap-1.5">
                                                     <Wifi size={9} /> Live
@@ -1277,7 +1285,7 @@ export const PlayerAnalysisPanel = () => {
                                     </div>
 
                                     {/* Stat Cards Grid */}
-                                    {(showBowlingInHeader ? isBowlingLoading : isApiLoading) ? (
+                                    {isHeaderLoading ? (
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                             {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                                                 <div key={i} className="p-3.5 bg-secondary/20 rounded-xl border border-border/50">
@@ -1285,6 +1293,14 @@ export const PlayerAnalysisPanel = () => {
                                                     <div className="h-5 w-12 bg-secondary/30 rounded animate-pulse" />
                                                 </div>
                                             ))}
+                                        </div>
+                                    ) : isHeaderError ? (
+                                        <div className="p-6 flex flex-col items-center justify-center gap-3 text-center bg-secondary/5 rounded-xl border border-red-500/10">
+                                            <AlertTriangle size={20} className="text-red-400" />
+                                            <p className="text-xs text-muted-foreground">Failed to load {showBowlingInHeader ? 'bowling' : 'batting'} stats</p>
+                                            <button onClick={() => showBowlingInHeader ? refetchBowlingHeader() : refetchBattingHeader()} className="px-4 py-2 text-xs font-bold bg-red-500/10 text-red-400 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all flex items-center gap-1.5">
+                                                <RefreshCw size={11} /> Retry
+                                            </button>
                                         </div>
                                     ) : showBowlingInHeader && currentBowlingFormatHeader ? (
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -1372,7 +1388,27 @@ export const PlayerAnalysisPanel = () => {
                         <Section icon={<BarChart3 size={16} style={{ color: getTeamColor(selectedPlayer.country).primary }} />} title="Detailed Statistics"
                             subtitle="Full career numbers">
                             <div className="space-y-1 max-h-[290px] overflow-y-auto pr-1">
-                                {activeSport === 'cricket' && showBowlingInHeader && currentBowlingFormatHeader ? (
+                                {hasCricbuzzId && isHeaderLoading ? (
+                                    <>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                                            <div key={i} className={cn(
+                                                "flex items-center justify-between py-2.5 px-3 rounded-lg",
+                                                i % 2 === 0 ? "bg-secondary/10" : ""
+                                            )}>
+                                                <div className="h-3 w-20 bg-secondary/30 rounded animate-pulse" />
+                                                <div className="h-4 w-12 bg-secondary/20 rounded animate-pulse" />
+                                            </div>
+                                        ))}
+                                    </>
+                                ) : hasCricbuzzId && isHeaderError ? (
+                                    <div className="p-6 flex flex-col items-center justify-center gap-2 text-center">
+                                        <AlertTriangle size={18} className="text-red-400" />
+                                        <p className="text-xs text-muted-foreground">Stats unavailable</p>
+                                        <button onClick={() => showBowlingInHeader ? refetchBowlingHeader() : refetchBattingHeader()} className="px-3 py-1.5 text-[10px] font-bold bg-red-500/10 text-red-400 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all flex items-center gap-1.5">
+                                            <RefreshCw size={9} /> Retry
+                                        </button>
+                                    </div>
+                                ) : activeSport === 'cricket' && showBowlingInHeader && currentBowlingFormatHeader ? (
                                     <>
                                         {[
                                             { label: 'Matches', value: currentBowlingFormatHeader.matches },
