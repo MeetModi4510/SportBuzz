@@ -1,13 +1,9 @@
 import { cn } from "@/lib/utils";
 import { Match, Sport } from "@/data/types";
-import { LiveBadge } from "./LiveBadge";
-import { SportIcon, getSportGradient, getSportBorderColor } from "./SportIcon";
-import { MapPin, Clock, Trophy, AlertCircle, Minus } from "lucide-react";
-import { TeamLogo } from "./TeamLogo";
-import { MinimalCricketCard } from "./MinimalCricketCard";
 import { formatToIST } from "@/lib/dateUtils";
-
-
+import { MapPin, Clock } from "lucide-react";
+import { TeamLogo } from "./TeamLogo";
+import { getSportBorderColor } from "./SportIcon";
 
 interface MatchCardProps {
   match: Match;
@@ -16,254 +12,133 @@ interface MatchCardProps {
 }
 
 export const MatchCard = ({ match, onClick, className }: MatchCardProps) => {
-  if (match.sport === 'cricket') {
-    return <MinimalCricketCard match={match} onClick={onClick} className={className} />;
-  }
-
   const isLive = match.status === "live";
   const isUpcoming = match.status === "upcoming";
-  const isCompleted = match.status === "completed";
 
-  const getStatusBadge = () => {
-    if (isLive) return <LiveBadge size="sm" />;
-    if (isUpcoming) {
-      return (
-        <span className="text-xs px-2 py-1 bg-accent/50 text-accent-foreground rounded-full font-medium">
-          Upcoming
-        </span>
-      );
-    }
-    return (
-      <span className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-full font-medium">
-        Completed
-      </span>
-    );
-  };
-
-  const getMatchTime = () => {
-    if (isLive) {
-      if (match.sport === "cricket" && match.currentOver) {
-        return `Over ${match.currentOver}`;
-      }
-      if (match.sport === "football" && match.currentMinute) {
-        return `${match.currentMinute}'`;
-      }
-      if (match.sport === "basketball" && match.currentQuarter) {
-        return `Q${match.currentQuarter}`;
-      }
-      if (match.sport === "tennis" && match.currentSet) {
-        return `Set ${match.currentSet}`;
-      }
-      return "In Progress";
-    }
-    // Use pre-formatted IST displayTime from model, fallback to formatToIST
-    return match.displayTime || formatToIST(new Date(match.startTime), 'full');
-  };
-
-  // Determine if scores are genuinely unavailable (API limitation)
   const scoresUnavailable = (match as any)._scoresUnavailable === true || 
     (isLive && !match.homeScore && !match.awayScore);
 
-  // Get result styling based on summaryText / chaseLine
-  const getResultBar = () => {
+  const getStatusText = () => {
     if (isLive) {
-      // PROMPT 3: Show chase line if available, otherwise generic live indicator
-      if (match.chaseLine) {
-        return (
-          <div className="mt-3 p-2 bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 rounded-lg text-xs text-red-400 font-medium text-center">
-            🎯 {match.chaseLine}
-          </div>
-        );
-      }
-      return (
-        <div className="mt-3 p-2 bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 rounded-lg text-xs text-red-400 font-medium text-center animate-pulse">
-          🔴 {match.sport === 'cricket' ? (match.summaryText || 'Live') : 'Live'}
-        </div>
-      );
+      if (match.sport === "football" && match.currentMinute) return `${match.currentMinute}'`;
+      if (match.sport === "basketball" && match.currentQuarter) return `Q${match.currentQuarter}`;
+      if (match.sport === "tennis" && match.currentSet) return `Set ${match.currentSet}`;
+      if (match.sport === "cricket" && match.currentOver) return `Ov ${match.currentOver}`;
+      return "Live";
     }
-
-    if (isCompleted && match.summaryText) {
-      if (match.sport !== 'cricket') {
-        return null;
-      }
-      return (
-        <div className="mt-3 p-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-lg text-xs text-green-400 font-medium text-center">
-          🏆 {match.summaryText}
-        </div>
-      );
-    }
-
-    if (isUpcoming && match.displayTime) {
-      return (
-        <div className="mt-3 p-2 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-500/30 rounded-lg text-xs text-blue-400 font-medium text-center">
-          📅 {match.displayTime}
-        </div>
-      );
-    }
-
-    return null;
+    if (isUpcoming) return "Upcoming";
+    return "Result";
   };
+
+  const getStatusColor = () => {
+    if (isLive) return "text-red-500 font-semibold";
+    if (isUpcoming) return "text-blue-500 font-medium";
+    return "text-muted-foreground";
+  };
+
+  const themeBorder = getSportBorderColor(match.sport) || "border-border/60";
 
   return (
     <div
       onClick={() => onClick?.(match)}
       className={cn(
-        "group relative overflow-hidden rounded-xl border bg-card p-3 transition-all duration-300",
-        "hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/5 cursor-pointer",
-        "h-[280px] w-full flex flex-col",
-        `bg-gradient-to-br ${getSportGradient(match.sport)}`,
-        getSportBorderColor(match.sport),
-        isLive && "ring-2 ring-live/50 animate-pulse-live",
+        "group relative overflow-hidden rounded-xl border bg-secondary/30 p-4 transition-all duration-200",
+        themeBorder,
+        "hover:bg-secondary/50 hover:shadow-md cursor-pointer",
+        "w-full flex flex-col gap-4",
         className
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className={cn("flex items-center justify-between pb-3 border-b", themeBorder)}>
+        <span className="text-[11px] text-muted-foreground tracking-widest font-semibold uppercase">
+          {match.matchType}
+        </span>
         <div className="flex items-center gap-2">
-          <SportIcon sport={match.sport} size={16} />
-          <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
-            {match.matchType}
-          </span>
+           {isLive && <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />}
+           <span className={cn("text-[11px] uppercase tracking-widest", getStatusColor())}>
+             {getStatusText()}
+           </span>
         </div>
-        {getStatusBadge()}
       </div>
 
-      {/* Teams & Score - Flex grow to fill space */}
-      <div className="space-y-2 flex-1 flex flex-col min-h-0">
-        {match.inningsScores && match.inningsScores.length > 0 ? (
-          // Test Match Layout - Compact to fit in card
-          <div className="flex flex-col flex-1 gap-1 pr-1">
-            {/* Home Team Block */}
-            <div className="flex-1 flex flex-col justify-center">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <TeamLogo logo={match.homeTeam.logo} name={match.homeTeam.name} shortName={match.homeTeam.shortName} size="md" className="h-12 w-12" />
-                  <div className="flex flex-col justify-center">
-                    <span className="font-bold text-xl leading-none">{match.homeTeam.shortName}</span>
-                    <span className="text-xs text-muted-foreground leading-tight">{match.homeTeam.name}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-0.5 min-w-[90px]">
-                  {match.inningsScores.filter(i => i.team === 'home').map((inn, idx) => {
-                    const isLastInningOfMatch = inn === match.inningsScores![match.inningsScores!.length - 1];
-                    return (
-                      <div key={idx} className="flex items-center justify-end gap-2 w-full">
-                        <span className="text-muted-foreground text-[10px] font-mono font-medium opacity-70">({inn.inning})</span>
-                        <span className={cn("font-mono font-bold text-sm whitespace-nowrap", isLive && isLastInningOfMatch && "text-red-500")}>
-                          {inn.score}{inn.overs ? `${inn.overs}` : ''}
-                        </span>
-                      </div>
-                    );
-                  })}
-                  {match.inningsScores.filter(i => i.team === 'home').length === 0 && (
-                    <span className="text-muted-foreground text-sm font-mono">-</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Partition - Match Info/Status */}
-            <div className="flex items-center gap-2 my-0.5 shrink-0">
-              <div className="flex-1 h-px bg-border/60" />
-              <span className="text-xs text-muted-foreground font-medium px-2 text-center">
-                {isLive ? 'In Progress' : match.displayTime || formatToIST(new Date(match.startTime), 'date')}
-              </span>
-              <div className="flex-1 h-px bg-border/60" />
-            </div>
-
-            {/* Away Team Block */}
-            <div className="flex-1 flex flex-col justify-center">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <TeamLogo logo={match.awayTeam.logo} name={match.awayTeam.name} shortName={match.awayTeam.shortName} size="md" className="h-12 w-12" />
-                  <div className="flex flex-col justify-center">
-                    <span className="font-bold text-xl leading-none">{match.awayTeam.shortName}</span>
-                    <span className="text-xs text-muted-foreground leading-tight">{match.awayTeam.name}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-0.5 min-w-[90px]">
-                  {match.inningsScores.filter(i => i.team === 'away').map((inn, idx) => {
-                    const isLastInningOfMatch = inn === match.inningsScores![match.inningsScores!.length - 1];
-                    return (
-                      <div key={idx} className="flex items-center justify-end gap-2 w-full">
-                        <span className="text-muted-foreground text-[10px] font-mono font-medium opacity-70">({inn.inning})</span>
-                        <span className={cn("font-mono font-bold text-sm whitespace-nowrap", isLive && isLastInningOfMatch && "text-red-500")}>
-                          {inn.score}{inn.overs ? ` ${inn.overs}` : ''}
-                        </span>
-                      </div>
-                    );
-                  })}
-                  {match.inningsScores.filter(i => i.team === 'away').length === 0 && (
-                    <span className="text-muted-foreground text-sm font-mono">-</span>
-                  )}
-                </div>
-              </div>
-            </div>
+      {/* Teams & Score */}
+      <div className="flex flex-col gap-3.5">
+        {/* Home Team */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <TeamLogo logo={match.homeTeam?.logo || ''} name={match.homeTeam?.name || 'TBA'} shortName={match.homeTeam?.shortName} size="md" className="w-11 h-11 shadow-sm" />
+            <span className="font-semibold text-foreground text-[15px] tracking-tight">{match.homeTeam?.name || 'TBA'}</span>
           </div>
-        ) : (
-          // Standard Match Layout (ODI/T20/etc)
-          <>
-            {/* Home Team */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <TeamLogo logo={match.homeTeam.logo} name={match.homeTeam.name} shortName={match.homeTeam.shortName} size="sm" />
-                <div className="min-w-0">
-                  <p className="font-semibold text-foreground text-sm truncate">{match.homeTeam.shortName}</p>
-                  <p className="text-xs text-muted-foreground truncate">{match.homeTeam.name}</p>
-                </div>
-              </div>
-              <span className={cn(
-                "text-lg font-bold font-mono whitespace-nowrap",
-                isLive && "text-live"
-              )}>
-                {match.homeScore || (isUpcoming ? '-' : (scoresUnavailable ? '—' : '0/0'))}
-              </span>
-            </div>
+          <div className="flex flex-col items-end">
+             {Array.isArray(match.inningsScores) && match.inningsScores.length > 0 ? (
+                 match.inningsScores.filter(i => i?.team === 'home').map((inn, idx) => (
+                    <div key={idx} className="flex items-center gap-1.5">
+                      <span className="font-bold text-[15px] tracking-tight text-foreground">
+                        {inn.score}
+                      </span>
+                      {inn.overs && (
+                        <span className="text-xs text-muted-foreground font-medium">
+                          ({inn.overs})
+                        </span>
+                      )}
+                    </div>
+                 ))
+             ) : (
+                 <span className="font-bold text-[15px] tracking-tight text-foreground">
+                   {match.homeScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
+                 </span>
+             )}
+          </div>
+        </div>
 
-            {/* Divider */}
-            <div className="flex items-center gap-2">
-              <div className="flex-1 h-px bg-border" />
-              <span className="text-xs text-muted-foreground font-medium px-2">
-                {getMatchTime()}
-              </span>
-              <div className="flex-1 h-px bg-border" />
-            </div>
+        {/* Away Team */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <TeamLogo logo={match.awayTeam?.logo || ''} name={match.awayTeam?.name || 'TBA'} shortName={match.awayTeam?.shortName} size="md" className="w-11 h-11 shadow-sm" />
+            <span className="font-semibold text-foreground text-[15px] tracking-tight">{match.awayTeam?.name || 'TBA'}</span>
+          </div>
+          <div className="flex flex-col items-end">
+             {Array.isArray(match.inningsScores) && match.inningsScores.length > 0 ? (
+                 match.inningsScores.filter(i => i?.team === 'away').map((inn, idx) => (
+                    <div key={idx} className="flex items-center gap-1.5">
+                      <span className="font-bold text-[15px] tracking-tight text-foreground">
+                        {inn.score}
+                      </span>
+                      {inn.overs && (
+                        <span className="text-xs text-muted-foreground font-medium">
+                          ({inn.overs})
+                        </span>
+                      )}
+                    </div>
+                 ))
+             ) : (
+                 <span className="font-bold text-[15px] tracking-tight text-foreground">
+                   {match.awayScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
+                 </span>
+             )}
+          </div>
+        </div>
+      </div>
 
-            {/* Away Team */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <TeamLogo logo={match.awayTeam.logo} name={match.awayTeam.name} shortName={match.awayTeam.shortName} size="sm" />
-                <div className="min-w-0">
-                  <p className="font-semibold text-foreground text-sm truncate">{match.awayTeam.shortName}</p>
-                  <p className="text-xs text-muted-foreground truncate">{match.awayTeam.name}</p>
-                </div>
-              </div>
-              <span className={cn(
-                "text-lg font-bold font-mono whitespace-nowrap",
-                isLive && "text-live"
-              )}>
-                {match.awayScore || (isUpcoming ? '-' : (scoresUnavailable ? '—' : '0/0'))}
-              </span>
-            </div>
-          </>
+      {/* Footer / Match Status Summary */}
+      <div className={cn("pt-3.5 border-t flex flex-col gap-2.5", themeBorder)}>
+        {match.summaryText && (
+          <span className={cn("text-xs font-semibold leading-relaxed", isLive ? "text-red-400" : "text-primary/90")}>
+            {match.summaryText}
+          </span>
         )}
-      </div>
-
-      {/* Footer - Venue */}
-      <div className="pt-2 border-t border-border/50 flex items-center gap-3 text-xs text-muted-foreground">
-        <div className="flex items-center gap-1 truncate flex-1">
-          <MapPin size={12} className="flex-shrink-0" />
-          <span className="truncate">{typeof match.venue === 'object' ? match.venue?.name : match.venue || "Venue"}</span>
-        </div>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <Clock size={12} />
-          <span>{formatToIST(new Date(match.startTime), 'time')}</span>
+        <div className="flex items-center gap-4 text-[11px] text-muted-foreground/80 uppercase tracking-wide font-medium">
+          <div className="flex items-center gap-1.5 truncate">
+            <MapPin size={11} className="flex-shrink-0" />
+            <span className="truncate">{typeof match.venue === 'object' ? match.venue?.name : match.venue || "Venue"}</span>
+          </div>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <Clock size={11} />
+            <span>{match.displayTime || formatToIST(new Date(match.startTime), 'full')}</span>
+          </div>
         </div>
       </div>
-
-      {/* Status/Result Bar */}
-      {getResultBar()}
     </div>
   );
 };
-
