@@ -4,7 +4,7 @@ import { useFeaturedCricketMatches } from "@/hooks/useFeaturedMatches";
 import { useFollowedTournamentMatches } from "@/hooks/useFollowedTournamentMatches";
 import { tournamentApi } from "@/services/api";
 import { LiveBadge } from "./LiveBadge";
-import { SportIcon } from "./SportIcon";
+import { SportIcon, getSportBorderColor } from "./SportIcon";
 import { ChevronLeft, ChevronRight, Loader2, Bell } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import type { Match } from "@/data/types";
@@ -93,7 +93,7 @@ export const LiveTicker = () => {
 
   if (isLoading) {
     return (
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-live/10 via-card to-live/10 border border-live/30">
+      <div className="relative overflow-hidden rounded-xl border bg-secondary/30 border-border/60 transition-all duration-200">
         <div className="relative flex items-center justify-center p-4 gap-3">
           <Loader2 className="h-5 w-5 animate-spin text-live" />
           <span className="text-sm text-muted-foreground">Loading matches...</span>
@@ -113,10 +113,10 @@ export const LiveTicker = () => {
   const goToNext = () =>
     setCurrentIndex(prev => (prev + 1) % tickerMatches.length);
 
-  return (
-    <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-live/10 via-card to-live/10 border border-live/30">
-      <div className="absolute inset-0 bg-shimmer animate-shimmer" />
+  const themeBorder = currentMatch ? (getSportBorderColor(currentMatch.sport) || "border-border/60") : "border-border/60";
 
+  return (
+    <div className={cn("relative overflow-hidden rounded-xl border bg-secondary/30 transition-all duration-300", themeBorder)}>
       <div className="relative flex items-center justify-between p-4">
         {tickerMatches.length > 1 && (
           <button
