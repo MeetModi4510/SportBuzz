@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Match, Sport } from "@/data/types";
 import { MatchCard } from "./MatchCard";
@@ -27,6 +28,8 @@ export const MatchSection = ({
   isLoading = false,
   onlyLive = false,
 }: MatchSectionProps) => {
+  const [activeTab, setActiveTab] = useState<'all' | 'live' | 'upcoming' | 'recent'>('all');
+
   // Loading state
   if (isLoading) {
     return (
@@ -182,30 +185,68 @@ export const MatchSection = ({
         </div>
       </div>
 
+      {/* Tab Buttons */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
+        <button 
+          onClick={() => setActiveTab('all')}
+          className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all", activeTab === 'all' ? "bg-primary text-primary-foreground" : "bg-secondary/50 text-foreground hover:bg-secondary")}
+        >
+          All Matches
+        </button>
+        <button 
+          onClick={() => setActiveTab('live')}
+          className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2", activeTab === 'live' ? "bg-primary text-primary-foreground" : "bg-secondary/50 text-foreground hover:bg-secondary")}
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-live opacity-75 animate-ping" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-live" />
+          </span>
+          Live
+        </button>
+        <button 
+          onClick={() => setActiveTab('upcoming')}
+          className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all", activeTab === 'upcoming' ? "bg-primary text-primary-foreground" : "bg-secondary/50 text-foreground hover:bg-secondary")}
+        >
+          Upcoming
+        </button>
+        <button 
+          onClick={() => setActiveTab('recent')}
+          className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all", activeTab === 'recent' ? "bg-primary text-primary-foreground" : "bg-secondary/50 text-foreground hover:bg-secondary")}
+        >
+          Recent
+        </button>
+      </div>
+
       <div className="space-y-10">
         {/* LIVE */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-             <span className="relative flex h-3 w-3">
-               <span className="absolute inline-flex h-full w-full rounded-full bg-live opacity-75 animate-ping" />
-               <span className="relative inline-flex h-3 w-3 rounded-full bg-live" />
-             </span>
-             <h3 className="text-lg font-bold text-foreground">Live Now</h3>
+        {(activeTab === 'all' || activeTab === 'live') && (
+          <div className="space-y-4 animate-in fade-in duration-300">
+            <div className="flex items-center gap-2">
+               <span className="relative flex h-3 w-3">
+                 <span className="absolute inline-flex h-full w-full rounded-full bg-live opacity-75 animate-ping" />
+                 <span className="relative inline-flex h-3 w-3 rounded-full bg-live" />
+               </span>
+               <h3 className="text-lg font-bold text-foreground">Live Now</h3>
+            </div>
+            {renderMatchGroup(liveMatches)}
           </div>
-          {renderMatchGroup(liveMatches)}
-        </div>
+        )}
 
         {/* UPCOMING */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold text-foreground">Upcoming Matches</h3>
-          {renderMatchGroup(upcomingMatches)}
-        </div>
+        {(activeTab === 'all' || activeTab === 'upcoming') && (
+          <div className="space-y-4 animate-in fade-in duration-300">
+            <h3 className="text-lg font-bold text-foreground">Upcoming Matches</h3>
+            {renderMatchGroup(upcomingMatches)}
+          </div>
+        )}
 
         {/* RECENT / COMPLETED */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold text-foreground">Recent Matches</h3>
-          {renderMatchGroup(completedMatches)}
-        </div>
+        {(activeTab === 'all' || activeTab === 'recent') && (
+          <div className="space-y-4 animate-in fade-in duration-300">
+            <h3 className="text-lg font-bold text-foreground">Recent Matches</h3>
+            {renderMatchGroup(completedMatches)}
+          </div>
+        )}
       </div>
     </section>
   );
