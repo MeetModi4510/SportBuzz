@@ -457,11 +457,10 @@ const MatchDetails = () => {
                   <p className="text-sm text-muted-foreground">{match.awayTeam?.shortName}</p>
                 </div>
               </div>
-              </div>
             </div>
-            </div>
+          </div>
 
-            {/* Match Info Bar */}
+          {/* Match Info Bar */}
             <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 mt-8 pt-6 border-t border-border/50">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin size={16} />
