@@ -251,15 +251,18 @@ const MatchDetails = () => {
             </div>
 
             {/* Teams & Score */}
-            <div className="bg-background/80 dark:bg-card/40 backdrop-blur-xl border border-border/60 dark:border-white/10 rounded-[2rem] p-6 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl relative overflow-hidden my-6">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary/10 blur-[120px] pointer-events-none rounded-full" />
-              <div className="grid grid-cols-3 gap-4 md:gap-8 items-center relative z-10">
+            <div className="bg-gradient-to-b from-card/90 to-background/95 dark:from-slate-900/90 dark:to-background/95 backdrop-blur-2xl border border-border/50 dark:border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden my-6">
+              {/* Ambient Glow Effects */}
+              <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[150%] bg-primary/10 dark:bg-primary/20 blur-[100px] pointer-events-none rounded-full mix-blend-screen" />
+              <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[150%] bg-blue-500/10 dark:bg-blue-500/20 blur-[100px] pointer-events-none rounded-full mix-blend-screen" />
+              
+              <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 relative z-10">
               {/* Home Team */}
-              <div className="text-center space-y-3">
-                <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="md" className="mx-auto shadow-2xl ring-4 ring-background/20" />
+              <div className="flex-1 flex flex-col items-center md:items-end text-center md:text-right space-y-4">
+                <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="lg" className="shadow-[0_0_40px_rgba(0,0,0,0.15)] dark:shadow-[0_0_50px_rgba(255,255,255,0.05)] ring-1 ring-border/50 dark:ring-white/10" />
                 <div>
-                  <h2 className="text-lg md:text-xl font-bold text-foreground">{match.homeTeam?.name || "Team 1"}</h2>
-                  <p className="text-sm text-muted-foreground">{match.homeTeam?.shortName}</p>
+                  <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">{match.homeTeam?.name || "Team 1"}</h2>
+                  <p className="text-sm md:text-base text-muted-foreground font-medium uppercase tracking-widest mt-1">{match.homeTeam?.shortName}</p>
                 </div>
               </div>
 
@@ -357,38 +360,38 @@ const MatchDetails = () => {
                         
                         // Dynamically scale text down for very long scores (like Tennis sets: "6-4, 3-6, 7-6")
                         const getScoreSize = (score: string) => {
-                            if (score.length > 12) return "text-xl md:text-2xl font-semibold";
-                            if (score.length > 6) return "text-2xl md:text-3xl font-bold";
-                            return "text-4xl md:text-5xl font-bold font-mono";
+                            if (score.length > 12) return "text-2xl md:text-3xl font-bold tracking-tight";
+                            if (score.length > 6) return "text-4xl md:text-5xl font-extrabold tracking-tight";
+                            return "text-6xl md:text-7xl font-black tracking-tighter drop-shadow-md";
                         };
 
                         return (
                           <>
-                            <div className="flex flex-col items-center justify-center min-w-[80px]">
+                            <div className="flex flex-col items-center justify-center">
                               <span className={cn(
-                                "score-text leading-none tracking-tight whitespace-nowrap",
+                                "score-text leading-none whitespace-nowrap font-display",
                                 getScoreSize(home.runs),
-                                isLive && "animate-score-update"
+                                isLive && "animate-score-update text-primary"
                               )}>
                                 {home.runs}
                               </span>
                               {home.overs && (
-                                <span className="text-sm md:text-base text-muted-foreground font-mono mt-1">
+                                <span className="text-sm md:text-base text-muted-foreground font-mono mt-2 font-medium">
                                   ({home.overs})
                                 </span>
                               )}
                             </div>
-                            <span className="text-sm font-bold text-muted-foreground/50 self-center mx-4 px-3 py-1 bg-secondary/30 rounded-full backdrop-blur-sm border border-white/5">VS</span>
-                            <div className="flex flex-col items-center justify-center min-w-[80px]">
+                            <span className="text-2xl md:text-4xl font-black text-muted-foreground/30 self-center mx-4 md:mx-8 drop-shadow-sm">—</span>
+                            <div className="flex flex-col items-center justify-center">
                               <span className={cn(
-                                "score-text leading-none tracking-tight whitespace-nowrap",
+                                "score-text leading-none whitespace-nowrap font-display",
                                 getScoreSize(away.runs),
-                                isLive && "animate-score-update"
+                                isLive && "animate-score-update text-primary"
                               )}>
                                 {away.runs}
                               </span>
                               {away.overs && (
-                                <span className="text-sm md:text-base text-muted-foreground font-mono mt-1">
+                                <span className="text-sm md:text-base text-muted-foreground font-mono mt-2 font-medium">
                                   ({away.overs})
                                 </span>
                               )}
@@ -452,11 +455,11 @@ const MatchDetails = () => {
               </div>
 
               {/* Away Team */}
-              <div className="text-center space-y-3">
-                <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="md" className="mx-auto shadow-2xl ring-4 ring-background/20" />
+              <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left space-y-4">
+                <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="lg" className="shadow-[0_0_40px_rgba(0,0,0,0.15)] dark:shadow-[0_0_50px_rgba(255,255,255,0.05)] ring-1 ring-border/50 dark:ring-white/10" />
                 <div>
-                  <h2 className="text-lg md:text-xl font-bold text-foreground">{match.awayTeam?.name || "Team 2"}</h2>
-                  <p className="text-sm text-muted-foreground">{match.awayTeam?.shortName}</p>
+                  <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">{match.awayTeam?.name || "Team 2"}</h2>
+                  <p className="text-sm md:text-base text-muted-foreground font-medium uppercase tracking-widest mt-1">{match.awayTeam?.shortName}</p>
                 </div>
               </div>
             </div>
