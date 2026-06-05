@@ -26,6 +26,7 @@ export const MatchSection = ({
   showViewAll = true,
   onViewAllClick,
   isLoading = false,
+  onlyLive = false,
 }: MatchSectionProps) => {
   const [activeTab, setActiveTab] = useState<'live' | 'upcoming' | 'recent'>('live');
 
