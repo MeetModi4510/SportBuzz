@@ -163,29 +163,29 @@
     display: none;
   }
 
-  /* Custom Scrollbar - SportBuzz Theme */
+  /* Custom Scrollbar - Premium Minimalist */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-background;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-800 rounded-full border-2 border-slate-950;
-    transition: background 0.2s ease;
+    @apply bg-foreground/15 rounded-full;
+    transition: background-color 0.2s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-700;
+    @apply bg-foreground/30;
   }
 
   /* Support for Firefox */
   * {
     scrollbar-width: thin;
-    scrollbar-color: hsl(222 47% 12%) transparent;
+    scrollbar-color: hsl(var(--foreground) / 0.15) transparent;
   }
 }
 
