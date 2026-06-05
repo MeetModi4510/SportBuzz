@@ -28,11 +28,17 @@ const cache = {
 };
 
 const TOP_TOURNAMENTS = [
-    17, // Premier League
-    8,  // La Liga
-    23, // Serie A
-    35, // Bundesliga
-    7   // Champions League
+    17,   // Premier League
+    8,    // LaLiga
+    23,   // Serie A
+    35,   // Bundesliga
+    34,   // Ligue 1
+    37,   // Eredivisie
+    38,   // Belgian Pro League
+    1900, // Indian Super League
+    851,  // International Friendly Games
+    242,  // MLS
+    955   // Saudi Pro League
 ];
 
 function isCacheValid(key) {
@@ -105,9 +111,11 @@ function transformSofascoreEvent(event) {
 async function fetchLiveEvents() {
     try {
         const res = await axios.get(`${RAPID_BASE}/tournaments/get-live-events`, { headers: getHeaders(), params: { sport: 'football' }, timeout: 15000 });
-        const events = res.data?.events || [];
-        console.log(`[Sofascore] fetchLiveEvents: got ${events.length} events`);
-        return events.map(transformSofascoreEvent).filter(Boolean);
+        const allEvents = res.data?.events || [];
+        // Filter strictly by the requested TOP_TOURNAMENTS
+        const filteredEvents = allEvents.filter(event => TOP_TOURNAMENTS.includes(event.tournament?.uniqueTournament?.id));
+        console.log(`[Sofascore] fetchLiveEvents: got ${allEvents.length} events, filtered to ${filteredEvents.length}`);
+        return filteredEvents.map(transformSofascoreEvent).filter(Boolean);
     } catch (err) {
         console.error('[Sofascore] fetchLiveEvents error:', err.message);
         return [];
@@ -146,16 +154,7 @@ async function fetchNextMatches(tournamentId) {
     }
 }
 
-async function fetchScheduledEvents(categoryId) {
-    try {
-        // Fetching for today's date
-        const dateStr = new Date().toISOString().split('T')[0];
-        const res = await axios.get(`${RAPID_BASE}/tournaments/get-scheduled-events`, { headers: getHeaders(), params: { categoryId, date: dateStr }, timeout: 10000 });
-        return (res.data?.events || []).map(transformSofascoreEvent).filter(Boolean);
-    } catch (err) {
-        return [];
-    }
-}
+
 
 async function fetchLastMatches(tournamentId, seasonId) {
     if (!seasonId) return [];
@@ -196,22 +195,17 @@ export async function getCategorizedMatches() {
         fetchCurrentSeasons()
     ]);
 
-    // Categories for England (1), Spain (32), Italy (33), Germany (30)
-    const TOP_CATEGORIES = [1, 32, 33, 30];
-
-    // Fetch upcoming and completed for top tournaments
+    // Fetch upcoming and completed exclusively for top tournaments
     const nextMatchesPromises = TOP_TOURNAMENTS.map(tId => fetchNextMatches(tId));
-    const scheduledEventsPromises = TOP_CATEGORIES.map(cId => fetchScheduledEvents(cId));
     const completedPromises = TOP_TOURNAMENTS.map(tId => fetchLastMatches(tId, seasons[tId]));
 
-    const [nextResults, scheduledResults, completedResults] = await Promise.all([
+    const [nextResults, completedResults] = await Promise.all([
         Promise.all(nextMatchesPromises),
-        Promise.all(scheduledEventsPromises),
         Promise.all(completedPromises)
     ]);
 
     // Flatten arrays
-    const upcomingMatches = [...nextResults.flat(), ...scheduledResults.flat()].sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    const upcomingMatches = nextResults.flat().sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
     const completedMatches = completedResults.flat().sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
 
     // Deduplicate (Sofascore gives us unique IDs so this is easier)
