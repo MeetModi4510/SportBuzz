@@ -223,8 +223,6 @@ const Index = () => {
           {/* Live Ticker */}
           <LiveTicker />
 
-          {/* Global Sports News */}
-          <NewsSection />
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <SportFilter
               activeSport={activeSport}
@@ -328,6 +326,9 @@ const Index = () => {
 
           {/* Feature Coming Soon Placeholder for Live Tab */}
 
+
+          {/* Global Sports News */}
+          <NewsSection />
 
           <div id="trending-players">
             <TrendingPlayers players={players} onPlayerClick={handlePlayerClick} />
