@@ -1138,36 +1138,57 @@ export const PlayerAnalysisPanel = () => {
                                 key={player.id}
                                 onClick={() => setSelectedPlayerId(player.id)}
                                 className={cn(
-                                    "w-full text-left p-3.5 rounded-xl border transition-all group",
+                                    "relative w-full text-left p-3 rounded-2xl transition-all duration-300 group overflow-hidden border border-transparent",
                                     selectedPlayer.id === player.id
-                                        ? "border-primary bg-primary/10 shadow-lg shadow-primary/10"
-                                        : "border-border/50 bg-card hover:border-primary/40 hover:bg-primary/5"
+                                        ? "bg-secondary/50 shadow-sm border-border/50"
+                                        : "hover:bg-secondary/20 hover:border-border/30 hover:-translate-y-0.5"
                                 )}
                             >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-md overflow-hidden"
-                                        style={{ background: `linear-gradient(135deg, ${getTeamColor(player.country).primary}, ${getTeamColor(player.country).primary}88)` }}>
+                                {selectedPlayer.id === player.id && (
+                                    <div 
+                                        className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 rounded-r-full transition-all duration-500 shadow-[0_0_10px_rgba(0,0,0,0.2)]" 
+                                        style={{ backgroundColor: getTeamColor(player.country).primary }}
+                                    />
+                                )}
+                                <div className="flex items-center gap-4 pl-1">
+                                    <div className={cn(
+                                        "w-12 h-12 flex items-center justify-center text-sm font-bold text-white shrink-0 overflow-hidden ring-2 shadow-sm transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3",
+                                        selectedPlayer.id === player.id ? "rounded-[1rem]" : "rounded-full ring-background"
+                                    )}
+                                        style={{ 
+                                            background: `linear-gradient(135deg, ${getTeamColor(player.country).primary}, ${getTeamColor(player.country).primary}88)`,
+                                            ...(selectedPlayer.id === player.id ? { ringColor: `${getTeamColor(player.country).primary}40` } : {})
+                                        }}>
                                         {PLAYER_PHOTOS[player.id] ? (
                                             <img src={PLAYER_PHOTOS[player.id]} alt={player.name}
-                                                className="w-full h-full object-cover rounded-xl"
+                                                className="w-full h-full object-cover"
                                                 onError={(e) => { const el = e.target as HTMLImageElement; el.style.display = 'none'; const span = el.parentElement?.querySelector('span'); if (span) span.style.display = ''; }}
                                             />
                                         ) : null}
                                         <span style={PLAYER_PHOTOS[player.id] ? { display: 'none' } : undefined}>{player.image}</span>
                                     </div>
-                                    <div className="flex-1 min-w-0">
+                                    <div className="flex-1 min-w-0 py-1">
                                         <div className="flex items-center gap-2">
-                                            <span className="font-semibold text-sm truncate">{player.name}</span>
+                                            <span className={cn(
+                                                "font-bold text-sm truncate transition-colors",
+                                                selectedPlayer.id === player.id ? "text-foreground" : "text-foreground/80 group-hover:text-foreground"
+                                            )}>{player.name}</span>
                                             <div className="flex-shrink-0 flex items-center justify-center">
-                                                {getCountryFlagImg(player.country, "w-6 h-4 object-cover rounded-[2px] shadow-sm")}
+                                                {getCountryFlagImg(player.country, "w-4 h-3 object-cover rounded-[2px] shadow-sm opacity-90")}
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 mt-0.5">
-                                            <span className="text-[11px] text-muted-foreground">{player.role}</span>
-                                            <span className="text-[11px] text-muted-foreground">• Age {player.age}</span>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="text-[9px] uppercase tracking-widest font-black text-muted-foreground/70">{player.role}</span>
+                                            <span className="w-1 h-1 rounded-full bg-border" />
+                                            <span className="text-[10px] font-medium text-muted-foreground/70">{player.age} yrs</span>
                                         </div>
                                     </div>
-                                    <RatingRing value={player.overallRating} size={44} color={getTeamColor(player.country).primary} />
+                                    <div className={cn(
+                                        "transition-transform duration-500",
+                                        selectedPlayer.id === player.id ? "scale-110" : "opacity-80 group-hover:scale-105 group-hover:opacity-100"
+                                    )}>
+                                        <RatingRing value={player.overallRating} size={40} color={getTeamColor(player.country).primary} />
+                                    </div>
                                 </div>
                             </button>
                         ))}
