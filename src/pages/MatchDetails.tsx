@@ -251,7 +251,7 @@ const MatchDetails = () => {
             </div>
 
             {/* Teams & Score */}
-            <div className="bg-card/40 backdrop-blur-md border border-white/10 rounded-[2rem] p-6 md:p-10 shadow-2xl relative overflow-hidden my-6">
+            <div className="bg-background/80 dark:bg-card/40 backdrop-blur-xl border border-border/60 dark:border-white/10 rounded-[2rem] p-6 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl relative overflow-hidden my-6">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary/10 blur-[120px] pointer-events-none rounded-full" />
               <div className="grid grid-cols-3 gap-4 md:gap-8 items-center relative z-10">
               {/* Home Team */}
@@ -411,12 +411,14 @@ const MatchDetails = () => {
 
                 {/* Live Info (Overs etc) */}
                 {isLive && (
-                  <div className="text-sm font-mono text-muted-foreground bg-secondary/30 px-3 py-1 rounded-md inline-block">
-                    {match.sport === "cricket" && match.currentOver && `Over ${match.currentOver}`}
-                    {match.sport === "football" && match.currentMinute}
-                    {match.sport === "basketball" && `${match.currentQuarter} - ${match.timeRemaining}`}
-                    {match.sport === "tennis" && match.currentSet}
-                    {!match.currentOver && !match.currentMinute && "In Progress"}
+                  <div className="text-sm font-mono text-muted-foreground bg-secondary/30 px-3 py-1 rounded-md inline-flex items-center gap-2 mt-2 border border-border/40 shadow-sm">
+                    {match.sport === "cricket" && match.currentOver && <span>Over {match.currentOver}</span>}
+                    {match.sport === "football" && match.currentMinute && <span>{match.currentMinute}</span>}
+                    {match.sport === "basketball" && match.currentQuarter && <span>{match.currentQuarter} - {match.timeRemaining}</span>}
+                    {match.sport === "tennis" && match.currentSet && <span>{match.currentSet}</span>}
+                    {(!match.currentOver && !match.currentMinute && !match.currentQuarter && !match.currentSet) && (
+                      <span>In Progress</span>
+                    )}
                   </div>
                 )}
 
