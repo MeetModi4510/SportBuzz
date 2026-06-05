@@ -54,80 +54,50 @@ const creators: Creator[] = [
 
 export const CreatorsSection = () => {
   return (
-    <section className="py-20 relative overflow-hidden border-t border-border/50">
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
-      
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16 space-y-4">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight font-display">
-            Meet the <span className="gradient-text">Creators</span>
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            The dedicated team behind the innovative sports analytics and scoring platform.
-          </p>
-        </div>
+    <section className="py-8 md:py-12 border-t border-border/20 bg-background/50">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 max-w-6xl mx-auto">
+          {/* Minimal Title */}
+          <div className="text-center md:text-left space-y-1">
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+              Built by <span className="text-primary">SportBuzz</span>
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              The engineers behind the real-time experience.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {creators.map((creator, i) => (
-            <div 
-              key={i}
-              className="group relative p-6 rounded-2xl border border-border/50 bg-secondary/10 hover:bg-secondary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-sm overflow-hidden"
-            >
-              {/* Subtle accent line based on their original gradient colors but just as a tiny border */}
-              <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${creator.gradient} opacity-50 group-hover:opacity-100 transition-opacity`} />
-              
-              <div className="relative space-y-5">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full overflow-hidden bg-secondary border border-border/50 shadow-sm group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
-                    {creator.image ? (
-                      <img 
-                        src={creator.image} 
-                        alt={creator.name} 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        {creator.icon}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">{creator.name}</h3>
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">{creator.role}</p>
-                  </div>
+          {/* Compact Creator Badges */}
+          <div className="flex flex-wrap justify-center gap-3">
+            {creators.map((creator, i) => (
+              <div 
+                key={i}
+                className="group flex items-center gap-3 p-1.5 pr-4 rounded-full border border-border/30 bg-card hover:bg-secondary/40 hover:border-primary/30 hover:shadow-md transition-all duration-300"
+              >
+                <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary border border-border/50 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                  {creator.image ? (
+                    <img src={creator.image} alt={creator.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="scale-75">{creator.icon}</div>
+                  )}
                 </div>
-                
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {creator.description}
-                </p>
-                
-                <div className="pt-2 flex items-center gap-2">
-                  {creator.links.linkedin && creator.links.linkedin !== "#" && (
-                    <a 
-                      href={creator.links.linkedin} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground transition-all"
-                    >
-                      <Linkedin className="w-4 h-4" />
-                    </a>
-                  )}
-                  {creator.links.github && creator.links.github !== "#" && (
-                    <a 
-                      href={creator.links.github} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground transition-all"
-                    >
-                      <Github className="w-4 h-4" />
-                    </a>
-                  )}
+                <div className="flex flex-col justify-center">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{creator.name}</span>
+                    <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0">
+                      {creator.links.github && creator.links.github !== "#" && (
+                        <a href={creator.links.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Github className="w-3.5 h-3.5" /></a>
+                      )}
+                      {creator.links.linkedin && creator.links.linkedin !== "#" && (
+                        <a href={creator.links.linkedin} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Linkedin className="w-3.5 h-3.5" /></a>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{creator.role}</span>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
