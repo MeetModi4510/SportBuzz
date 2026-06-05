@@ -276,139 +276,39 @@ const Index = () => {
 
           {activeSport === "all" ? (
             <div id="match-sections" className="space-y-10">
-              {/* Cricket Section with Subsections */}
-              <section className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-live/10 rounded-lg">
-                    <SportIcon sport="cricket" className="w-5 h-5 text-live" />
-                  </div>
-                  <h2 className="text-xl font-bold tracking-tight">Cricket</h2>
-                  {cricketLoading && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground ml-2" />}
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                  {/* TEST Matches */}
-                  <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1 border-l-2 border-live pl-2">Test Matches</h3>
-                    <div className="flex flex-col gap-4">
-                      {testMatches.length ? (
-                        testMatches.map(match => (
-                          <MatchCard key={match.id} match={match} onClick={() => handleMatchClick(match.id)} />
-                        ))
-                      ) : (
-                        <div className="text-sm text-muted-foreground italic pl-1 py-4 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No featured Test matches</div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* ODI Matches */}
-                  <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1 border-l-2 border-blue-500 pl-2">ODI Matches</h3>
-                    <div className="flex flex-col gap-4">
-                      {odiMatches.length ? (
-                        odiMatches.map(match => (
-                          <MatchCard key={match.id} match={match} onClick={() => handleMatchClick(match.id)} />
-                        ))
-                      ) : (
-                        <div className="text-sm text-muted-foreground italic pl-1 py-4 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No featured ODI matches</div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* T20 Matches */}
-                  <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1 border-l-2 border-green-500 pl-2">T20 Matches</h3>
-                    <div className="flex flex-col gap-4">
-                      {t20Matches.length ? (
-                        t20Matches.map(match => (
-                          <MatchCard key={match.id} match={match} onClick={() => handleMatchClick(match.id)} />
-                        ))
-                      ) : (
-                        <div className="text-sm text-muted-foreground italic pl-1 py-4 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No featured T20 matches</div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* ─── FOOTBALL (Real Data from Football-Data.org) ─── */}
-              <section className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <SportIcon sport="football" size={24} />
-                  <h2 className="text-xl font-bold text-foreground">Football</h2>
-                </div>
-
-                {footballLoading ? (
-                  <div className="flex justify-center p-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : footballMatches.length === 0 ? (
-                  <div className="text-sm text-muted-foreground italic py-6 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">
-                    No football matches available right now
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* League Matches */}
-                    <div className="space-y-3">
-                      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1 border-l-2 border-green-500 pl-2">League</h3>
-                      <div className="flex flex-col gap-4">
-                        {footballLeague.length > 0 ? footballLeague.map((match: any) => (
-                          <MatchCard key={match.id} match={match} onClick={() => handleMatchClick(match.id)} />
-                        )) : (
-                          <div className="text-sm text-muted-foreground italic py-4 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No matches</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Cup Matches */}
-                    <div className="space-y-3">
-                      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1 border-l-2 border-yellow-500 pl-2">Cup</h3>
-                      <div className="flex flex-col gap-4">
-                        {footballCup.length > 0 ? footballCup.map((match: any) => (
-                          <MatchCard key={match.id} match={match} onClick={() => handleMatchClick(match.id)} />
-                        )) : (
-                          <div className="text-sm text-muted-foreground italic py-4 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No matches</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* International Matches */}
-                    <div className="space-y-3">
-                      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1 border-l-2 border-blue-500 pl-2">International</h3>
-                      <div className="flex flex-col gap-4">
-                        {footballInternational.length > 0 ? footballInternational.map((match: any) => (
-                          <MatchCard key={match.id} match={match} onClick={() => handleMatchClick(match.id)} />
-                        )) : (
-                          <div className="text-sm text-muted-foreground italic py-4 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No matches</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Fallback: if no categorization, show all */}
-                    {footballLeague.length === 0 && footballCup.length === 0 && footballInternational.length === 0 && footballMatches.length > 0 && (
-                      <div className="col-span-1 lg:col-span-3">
-                        <div className="flex flex-col gap-4">
-                          {footballMatches.map((match: any) => (
-                            <MatchCard key={match.id} match={match} onClick={() => handleMatchClick(match.id)} />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </section>
+              <MatchSection
+                title="Cricket"
+                sport="cricket"
+                matches={filteredMatches.filter(m => m.sport === "cricket")}
+                onMatchClick={(match) => handleMatchClick(match.id)}
+                onlyLive={true}
+                onViewAllClick={() => setActiveSport("cricket")}
+                isLoading={cricketLoading}
+              />
+              <MatchSection
+                title="Football"
+                sport="football"
+                matches={filteredMatches.filter(m => m.sport === "football")}
+                onMatchClick={(match) => handleMatchClick(match.id)}
+                onlyLive={true}
+                onViewAllClick={() => setActiveSport("football")}
+                isLoading={footballLoading}
+              />
               <MatchSection
                 title="Basketball"
                 sport="basketball"
-                matches={basketballMatches}
+                matches={filteredMatches.filter(m => m.sport === "basketball")}
                 onMatchClick={(match) => handleMatchClick(match.id)}
+                onlyLive={true}
+                onViewAllClick={() => setActiveSport("basketball")}
               />
               <MatchSection
                 title="Tennis"
                 sport="tennis"
-                matches={tennisMatches}
+                matches={filteredMatches.filter(m => m.sport === "tennis")}
                 onMatchClick={(match) => handleMatchClick(match.id)}
+                onlyLive={true}
+                onViewAllClick={() => setActiveSport("tennis")}
               />
             </div>
           ) : (
