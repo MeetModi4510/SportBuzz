@@ -342,7 +342,7 @@ const MatchDetails = () => {
                         </div>
                       </div>
                     ) : (
-                      /* ODI / T20 / Single Innings — parse score + overs */
+                      /* ODI / T20 / Single Innings / Tennis — parse score + overs */
                       (() => {
                         const parseScore = (raw: string | undefined) => {
                           if (!raw) return { runs: "—", overs: "" };
@@ -352,11 +352,20 @@ const MatchDetails = () => {
                         };
                         const home = parseScore(match.homeScore);
                         const away = parseScore(match.awayScore);
+                        
+                        // Dynamically scale text down for very long scores (like Tennis sets: "6-4, 3-6, 7-6")
+                        const getScoreSize = (score: string) => {
+                            if (score.length > 12) return "text-xl md:text-2xl font-semibold";
+                            if (score.length > 6) return "text-2xl md:text-3xl font-bold";
+                            return "text-4xl md:text-5xl font-bold font-mono";
+                        };
+
                         return (
                           <>
-                            <div className="flex flex-col items-center">
+                            <div className="flex flex-col items-center justify-center min-w-[80px]">
                               <span className={cn(
-                                "text-4xl md:text-5xl font-bold font-mono score-text leading-none",
+                                "score-text leading-none tracking-tight whitespace-nowrap",
+                                getScoreSize(home.runs),
                                 isLive && "animate-score-update"
                               )}>
                                 {home.runs}
@@ -367,10 +376,11 @@ const MatchDetails = () => {
                                 </span>
                               )}
                             </div>
-                            <span className="text-2xl text-muted-foreground self-center">:</span>
-                            <div className="flex flex-col items-center">
+                            <span className="text-2xl text-muted-foreground self-center mx-2">:</span>
+                            <div className="flex flex-col items-center justify-center min-w-[80px]">
                               <span className={cn(
-                                "text-4xl md:text-5xl font-bold font-mono score-text leading-none",
+                                "score-text leading-none tracking-tight whitespace-nowrap",
+                                getScoreSize(away.runs),
                                 isLive && "animate-score-update"
                               )}>
                                 {away.runs}

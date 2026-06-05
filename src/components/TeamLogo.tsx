@@ -168,12 +168,12 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
     if (isCountryCode) {
         return (
             <img
-                src={`https://flagcdn.com/w80/${logo}.png`}
+                src={`https://flagcdn.com/w160/${logo}.png`}
                 alt={`${name} flag`}
                 className={cn(
                     sizeClasses[size].width,
                     sizeClasses[size].height,
-                    "object-cover rounded shadow-sm border border-border/50",
+                    "object-cover rounded-full shadow-lg ring-4 ring-background/50 border border-border/20",
                     className
                 )}
                 onError={() => setUseTextFallback(true)}
