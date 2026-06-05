@@ -19,7 +19,9 @@ import {
   Loader2,
   Shield,
   Settings,
-  Clock
+  Clock,
+  Sun,
+  Moon
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -69,6 +71,21 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return localStorage.getItem("theme") === "light" ? "light" : "dark";
+  });
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -226,6 +243,14 @@ export const Navbar = () => {
 
           {/* Right Section */}
           <div className="flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+
             <button
               onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setSearchQuery(""); }}
               className={cn(
@@ -416,6 +441,18 @@ export const Navbar = () => {
                   <Link to="/signup" className="px-3 py-2 rounded-lg text-center bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium">Sign Up</Link>
                 </div>
               )}
+              <div className="pt-4 border-t border-border mt-2 flex justify-center">
+                <button
+                  onClick={toggleTheme}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors w-full justify-center"
+                >
+                  {theme === "light" ? (
+                    <><Moon size={18} /><span>Dark Mode</span></>
+                  ) : (
+                    <><Sun size={18} /><span>Light Mode</span></>
+                  )}
+                </button>
+              </div>
             </div>
           </nav>
         )}
