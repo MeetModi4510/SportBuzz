@@ -1,16 +1,16 @@
 # Graph Report - dev_scripts  (2026-06-05)
 
 ## Corpus Check
-- 368 files · ~1,172,686 words
+- 371 files · ~1,168,942 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2120 nodes · 3943 edges · 183 communities (157 shown, 26 thin omitted)
+- 2143 nodes · 3982 edges · 184 communities (157 shown, 27 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 8 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7b9d356f`
+- Built from commit: `2c20deca`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -73,7 +73,6 @@
 - [[_COMMUNITY_Community 55|Community 55]]
 - [[_COMMUNITY_Community 56|Community 56]]
 - [[_COMMUNITY_Community 57|Community 57]]
-- [[_COMMUNITY_Community 58|Community 58]]
 - [[_COMMUNITY_Community 59|Community 59]]
 - [[_COMMUNITY_Community 60|Community 60]]
 - [[_COMMUNITY_Community 61|Community 61]]
@@ -127,12 +126,13 @@
 - [[_COMMUNITY_Community 173|Community 173]]
 - [[_COMMUNITY_Community 174|Community 174]]
 - [[_COMMUNITY_Community 175|Community 175]]
-- [[_COMMUNITY_Community 176|Community 176]]
 - [[_COMMUNITY_Community 177|Community 177]]
-- [[_COMMUNITY_Community 178|Community 178]]
-- [[_COMMUNITY_Community 179|Community 179]]
 - [[_COMMUNITY_Community 180|Community 180]]
 - [[_COMMUNITY_Community 181|Community 181]]
+- [[_COMMUNITY_Community 183|Community 183]]
+- [[_COMMUNITY_Community 185|Community 185]]
+- [[_COMMUNITY_Community 188|Community 188]]
+- [[_COMMUNITY_Community 189|Community 189]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `cn()` - 117 edges
@@ -161,23 +161,23 @@
 ## Import Cycles
 - 1-file cycle: `src/data/achievements.ts -> src/data/achievements.ts`
 
-## Communities (183 total, 26 thin omitted)
+## Communities (184 total, 27 thin omitted)
 
 ### Community 0 - "Football Match Controller"
-Cohesion: 0.16
-Nodes (23): cache, clearCache(), computeStatusLine(), FD_CUP_CODES, FD_INTL_CODES, FD_LEAGUE_CODES, fetchLiveMatches(), fetchRecentMatches() (+15 more)
+Cohesion: 0.12
+Nodes (32): cache, clearCache(), computeStatusLine(), FD_CUP_CODES, FD_INTL_CODES, FD_LEAGUE_CODES, fetchCurrentSeasons(), fetchLastMatches() (+24 more)
 
 ### Community 1 - "UI Utils and NavLink"
 Cohesion: 0.04
-Nodes (57): MatchSection(), NavLink, NavLinkCompatProps, PlayerProfileDialog(), TrendingPlayers(), VenueAnalysisPanel(), cn(), Badge() (+49 more)
+Nodes (54): NavLink, NavLinkCompatProps, cn(), Badge(), BadgeProps, badgeVariants, Breadcrumb, BreadcrumbEllipsis() (+46 more)
 
 ### Community 2 - "Admin Audit & Settings"
-Cohesion: 0.09
-Nodes (23): LogEntry, FootballTournamentManager(), ChartData, DataVisualizationProps, EmptyState(), EmptyStateProps, PaginationProps, Activity (+15 more)
+Cohesion: 0.10
+Nodes (27): LogEntry, AdvancedSearchProps, SearchFilters, ChartData, DataVisualizationProps, PaginationProps, FantasyTeam, Favorite (+19 more)
 
 ### Community 3 - "Admin Edit Team Dialog"
-Cohesion: 0.07
-Nodes (48): EditTeamDialog(), PRESET_COLORS, ROLES, MatchManagerProps, ROLES, DetailTab, MatchFilter, PRESET_COLORS (+40 more)
+Cohesion: 0.08
+Nodes (47): EditTeamDialog(), PRESET_COLORS, ROLES, MatchManagerProps, ROLES, LabProps, DetailTab, MatchFilter (+39 more)
 
 ### Community 4 - "Player Analysis Panel"
 Cohesion: 0.11
@@ -192,32 +192,32 @@ Cohesion: 0.05
 Nodes (36): useIsMobile(), Separator, SheetContent, SheetContentProps, SheetDescription, SheetFooter(), SheetHeader(), SheetOverlay (+28 more)
 
 ### Community 7 - "Admin Player Manager"
-Cohesion: 0.08
-Nodes (37): Player, PlayerManager(), SortConfig, SortField, SortOrder, BATTING_CATEGORIES, BOWLING_CATEGORIES, FIELDING_CATEGORIES (+29 more)
+Cohesion: 0.11
+Nodes (28): Player, PlayerManager(), SortConfig, SortField, SortOrder, UserData, UserManager(), ConfirmModalProps (+20 more)
 
 ### Community 8 - "Venue Analysis Panel"
 Cohesion: 0.07
 Nodes (30): CHART_TOOLTIP, PIE_COLORS, SPORT_CONFIG, BasketballVenueStats, bernabeu, CricketVenueStats, cryptoArena, FootballVenueStats (+22 more)
 
 ### Community 9 - "Activity & Cricket Controller"
-Cohesion: 0.11
-Nodes (16): initializePassport(), initSocket(), getMatchSquads, getLeaderboard, getMyStats, asyncHandler(), errorHandler(), notFound() (+8 more)
+Cohesion: 0.06
+Nodes (34): initializePassport(), getAchievements, getActivityHistory, getActivitySummary, clearCache, getAllMatches, getLiveMatches, getMatchScorecard (+26 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.09
-Nodes (31): getAuctionAnalytics, addAuctionPlayers, clearAuctionPlayers, createAuction, deleteAuction, deleteAuctionPlayer, finalizeAuction, followAuction (+23 more)
+Cohesion: 0.10
+Nodes (29): getAuctionAnalytics, addAuctionPlayers, clearAuctionPlayers, createAuction, deleteAuction, deleteAuctionPlayer, finalizeAuction, followAuction (+21 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.10
 Nodes (20): devDependencies, autoprefixer, concurrently, eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, globals (+12 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.10
-Nodes (28): extractMatches(), fetchCricbuzz(), getCricketMatchMini(), getCricketMatchScorecard(), getLiveCricketMatches(), getRecentCricketMatches(), getUpcomingCricketMatches(), headers (+20 more)
+Cohesion: 0.09
+Nodes (30): Team, Venue, extractMatches(), fetchCricbuzz(), getCricketMatchMini(), getCricketMatchScorecard(), getLiveCricketMatches(), getRecentCricketMatches() (+22 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.18
-Nodes (12): createMatch, deleteMatch, getMatchBalls, getMatchById, getMatches, getMatchForecast, recordBall, undoLastBall (+4 more)
+Cohesion: 0.17
+Nodes (15): emitScoreUpdate(), getIO(), initSocket(), createMatch, deleteMatch, generateMatchIntelligence(), getMatchBalls, getMatchById (+7 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.06
@@ -228,16 +228,16 @@ Cohesion: 0.10
 Nodes (27): Action, ActionType, actionTypes, addToRemoveQueue(), dispatch(), genId(), listeners, memoryState (+19 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.16
-Nodes (19): MatchCard(), MatchSectionProps, PlayerCard(), PlayerCardProps, PlayerProfileDialogProps, SportFilter(), SportFilterProps, sports (+11 more)
+Cohesion: 0.14
+Nodes (12): AuctionControl(), AuctionControlProps, Notification, auctionApi, notificationApi, getSocket(), Badge(), BadgeProps (+4 more)
 
 ### Community 17 - "Community 17"
-Cohesion: 0.13
-Nodes (5): ProtectedRoute(), ProtectedRouteProps, queryClient, Toaster(), ToasterProps
+Cohesion: 0.11
+Nodes (8): EmptyState(), EmptyStateProps, ProtectedRoute(), ProtectedRouteProps, Activity, queryClient, Toaster(), ToasterProps
 
 ### Community 18 - "Community 18"
-Cohesion: 0.12
-Nodes (19): ConfirmModalProps, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter(), AlertDialogHeader(), AlertDialogOverlay (+11 more)
+Cohesion: 0.29
+Nodes (7): deleteNotification, getNotifications, markAllAsRead, markAsRead, Notification, notificationSchema, router
 
 ### Community 19 - "Community 19"
 Cohesion: 0.21
@@ -252,20 +252,20 @@ Cohesion: 0.25
 Nodes (7): NavigationMenu, NavigationMenuContent, NavigationMenuIndicator, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle, NavigationMenuViewport
 
 ### Community 22 - "Community 22"
-Cohesion: 0.17
-Nodes (11): AuditLogs(), MatchManager(), PlatformSettings(), TeamManager(), TournamentManager(), UserManager(), groupPlayersByRole(), useTournamentFollow() (+3 more)
+Cohesion: 0.40
+Nodes (3): __dirname, __filename, cricbuzzService
 
 ### Community 23 - "Community 23"
 Cohesion: 0.09
 Nodes (21): compilerOptions, allowImportingTsExtensions, baseUrl, isolatedModules, jsx, lib, module, moduleDetection (+13 more)
 
 ### Community 24 - "Community 24"
-Cohesion: 0.10
-Nodes (21): PreMatchForecast(), PreMatchForecastProps, FootballSquads(), SimplePlayer, SquadsList(), SquadsListProps, SquadsViewProps, matches (+13 more)
+Cohesion: 0.14
+Nodes (15): PreMatchForecast(), PreMatchForecastProps, getSportGradient(), useCricketDataMatch(), useCricketMatchDetails(), useFootballMatchDetail(), CacheEntry, fieldCache (+7 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.19
-Nodes (15): MatchCardProps, MinimalCricketCard(), MinimalCricketCardProps, Match, mapApiMatchToModel(), useAllCricketMatches(), useCricketMatchSquads(), useLiveCricketMatches() (+7 more)
+Cohesion: 0.29
+Nodes (11): mapApiMatchToModel(), useAllCricketMatches(), useCricketMatchSquads(), useLiveCricketMatches(), useRecentCricketMatches(), useUpcomingCricketMatches(), formatToIST(), parseGMT() (+3 more)
 
 ### Community 26 - "Community 26"
 Cohesion: 0.18
@@ -280,12 +280,12 @@ Cohesion: 0.12
 Nodes (16): aliases, components, hooks, lib, ui, utils, rsc, $schema (+8 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.20
-Nodes (12): derivePlayerPerformance(), distributePlayersToRows(), FootballPitchLineup(), FootballPitchLineupProps, getRatingColor(), getRowYPositions(), parseFormation(), PitchField() (+4 more)
+Cohesion: 0.22
+Nodes (11): derivePlayerPerformance(), distributePlayersToRows(), FootballPitchLineupProps, getRatingColor(), getRowYPositions(), parseFormation(), PitchField(), PlayerNode() (+3 more)
 
 ### Community 30 - "Community 30"
-Cohesion: 0.26
-Nodes (12): addTeamToTournament, createTournament, deleteTournament, followTournament, getTournamentById, getTournaments, getTournamentStats, recalculatePointsTable (+4 more)
+Cohesion: 0.20
+Nodes (14): addTeamToTournament, createTournament, deleteTournament, followTournament, getTournamentById, getTournaments, getTournamentStats, recalculatePointsTable (+6 more)
 
 ### Community 31 - "Community 31"
 Cohesion: 0.18
@@ -337,7 +337,7 @@ Nodes (11): buildScorecardFromBalls(), DetailTab, formatOvers(), generateDetaile
 
 ### Community 43 - "Community 43"
 Cohesion: 0.22
-Nodes (11): deleteNotification, getNotifications, markAllAsRead, markAsRead, adminOrScorer(), optionalAuth(), protect(), router (+3 more)
+Nodes (9): getLeaderboard, getMyStats, adminOrScorer(), optionalAuth(), protect(), router, extractToken(), generateToken() (+1 more)
 
 ### Community 44 - "Community 44"
 Cohesion: 0.14
@@ -391,17 +391,9 @@ Nodes (4): BowlerDetailPopup(), BowlerStat, PlayerInfo, Props
 Cohesion: 0.21
 Nodes (9): __dirname, __filename, router, convertUTCtoIST(), cricketService, __dirname, enrichMatch(), __filename (+1 more)
 
-### Community 57 - "Community 57"
-Cohesion: 0.12
-Nodes (14): emitScoreUpdate(), getIO(), addMatchEvent, createMatch, deleteMatch, finalizeMatch, getMatchById, updateMatchLineups (+6 more)
-
-### Community 58 - "Community 58"
-Cohesion: 0.25
-Nodes (4): LabProps, PlayerInfo, Props, Ball
-
 ### Community 59 - "Community 59"
-Cohesion: 0.15
-Nodes (13): Navbar(), NavItem(), NavItemProps, sports, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel (+5 more)
+Cohesion: 0.18
+Nodes (12): NavItem(), NavItemProps, sports, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioItem (+4 more)
 
 ### Community 60 - "Community 60"
 Cohesion: 0.25
@@ -448,12 +440,12 @@ Cohesion: 0.60
 Nodes (4): getMatches(), getMatchSquads(), getMockMatches(), getMockSquads()
 
 ### Community 71 - "Community 71"
-Cohesion: 0.11
-Nodes (7): getLiveMatches(), venues, HeadToHead, MatchEvent, PlayerStats, Team, Venue
+Cohesion: 0.13
+Nodes (12): PlayerCard(), PlayerCardProps, statuses, StatusFilter(), StatusFilterProps, TrendingPlayers(), TrendingPlayersProps, HeadToHead (+4 more)
 
 ### Community 72 - "Community 72"
-Cohesion: 0.15
-Nodes (16): Creator, creators, CreatorsSection(), SocialLinks, LiveBadge(), LiveBadgeProps, LiveTicker(), statuses (+8 more)
+Cohesion: 0.13
+Nodes (25): Creator, creators, CreatorsSection(), SocialLinks, LiveBadge(), LiveBadgeProps, LiveTicker(), MatchCard() (+17 more)
 
 ### Community 80 - "Community 80"
 Cohesion: 0.83
@@ -480,8 +472,8 @@ Cohesion: 0.06
 Nodes (32): 1. Index (Dashboard), 1. ProtectedRoute, 2. AdvancedSearch, 2. Profile, 3. Pagination, 3. Preferences, 4. DataVisualization, 4. Favorites (+24 more)
 
 ### Community 163 - "Community 163"
-Cohesion: 0.18
-Nodes (9): AdvancedSearchProps, SearchFilters, Step, authApi, Alert, AlertDescription, AlertTitle, alertVariants (+1 more)
+Cohesion: 0.11
+Nodes (19): AuditLogs(), FootballTournamentManager(), MatchManager(), PlatformSettings(), TeamManager(), TournamentManager(), FootballPitchLineup(), groupPlayersByRole() (+11 more)
 
 ### Community 164 - "Community 164"
 Cohesion: 0.12
@@ -496,12 +488,12 @@ Cohesion: 0.16
 Nodes (24): useBowlingDerivedStats(), usePlayerBowlingStats(), usePlayerBowlingStatsByName(), UsePlayerBowlingStatsResult, getPlayerBowlingStats(), BowlingChartData, BowlingFormatBarDataPoint, BowlingFormatKey (+16 more)
 
 ### Community 172 - "Community 172"
-Cohesion: 0.22
-Nodes (15): addTeamToTournament, createTeam, createTournament, deleteTournament, followTournament, getTeamById, getTeams, getTournamentById (+7 more)
+Cohesion: 0.13
+Nodes (23): addMatchEvent, createMatch, deleteMatch, finalizeMatch, getMatchById, updateMatchLineups, updateTimer, addTeamToTournament (+15 more)
 
 ### Community 173 - "Community 173"
-Cohesion: 0.14
-Nodes (9): BATTING_STYLES, BOWLING_STYLES, UserData, UserStats, api, favoritesApi, leaderboardApi, tournamentApi (+1 more)
+Cohesion: 0.09
+Nodes (13): PlayerInfo, Props, BATTING_STYLES, BOWLING_STYLES, UserData, UserStats, activityApi, api (+5 more)
 
 ### Community 174 - "Community 174"
 Cohesion: 0.17
@@ -511,45 +503,49 @@ Nodes (12): CricketPanels(), ANALYSIS_PLAYERS, API_FORMAT_TABS, CHART_TOOLTIP_ST
 Cohesion: 0.21
 Nodes (10): createEventNews(), createMatchReportNews(), getTournamentNews, FootballMatch, footballMatchSchema, FootballNews, footballNewsSchema, generateMatchReportContent() (+2 more)
 
-### Community 176 - "Community 176"
-Cohesion: 0.17
-Nodes (10): clearCache, getAllMatches, getLiveMatches, getMatchScorecard, getPlayerAnalysis, getRecentMatches, getTeamComparison, getUpcomingMatches (+2 more)
-
 ### Community 177 - "Community 177"
-Cohesion: 0.31
-Nodes (6): getAchievements, getActivityHistory, getActivitySummary, Achievement, achievementSchema, router
-
-### Community 178 - "Community 178"
-Cohesion: 0.40
-Nodes (3): __dirname, __filename, cricbuzzService
-
-### Community 179 - "Community 179"
-Cohesion: 0.43
-Nodes (6): getPreferences, getProfile, getUserStats, updatePreferences, updateProfile, router
+Cohesion: 0.08
+Nodes (18): MinimalCricketCard(), MinimalCricketCardProps, PlayerProfileDialog(), PlayerProfileDialogProps, FootballSquads(), SimplePlayer, SquadsList(), SquadsListProps (+10 more)
 
 ### Community 180 - "Community 180"
-Cohesion: 0.40
-Nodes (3): Notification, notificationApi, PopoverContent
+Cohesion: 0.20
+Nodes (9): ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuRadioItem, ContextMenuSeparator, ContextMenuShortcut(), ContextMenuSubContent (+1 more)
+
+### Community 183 - "Community 183"
+Cohesion: 0.25
+Nodes (6): BATTING_CATEGORIES, BOWLING_CATEGORIES, FIELDING_CATEGORIES, MEDAL, MVP_CATEGORIES, Props
+
+### Community 185 - "Community 185"
+Cohesion: 0.60
+Nodes (4): getLiveMatchId(), headers, main(), test()
+
+### Community 188 - "Community 188"
+Cohesion: 0.67
+Nodes (3): headers, main(), test()
+
+### Community 189 - "Community 189"
+Cohesion: 0.67
+Nodes (3): headers, main(), test()
 
 ## Knowledge Gaps
-- **921 isolated node(s):** `branch`, `path`, `parentBranch`, `createdAt`, `remote` (+916 more)
+- **925 isolated node(s):** `branch`, `path`, `parentBranch`, `createdAt`, `remote` (+920 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **26 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **27 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `mapApiMatchToModel()` connect `Community 25` to `Community 35`, `Community 173`?**
-  _High betweenness centrality (0.117) - this node is a cross-community bridge._
+  _High betweenness centrality (0.109) - this node is a cross-community bridge._
 - **Why does `hasMeaningfulScores()` connect `Community 35` to `Community 25`?**
-  _High betweenness centrality (0.117) - this node is a cross-community bridge._
+  _High betweenness centrality (0.109) - this node is a cross-community bridge._
 - **What connects `branch`, `path`, `parentBranch` to the rest of the system?**
-  _921 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _925 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Football Match Controller` be split into smaller, more focused modules?**
+  _Cohesion score 0.12121212121212122 - nodes in this community are weakly interconnected._
 - **Should `UI Utils and NavLink` be split into smaller, more focused modules?**
-  _Cohesion score 0.036226930963773066 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.03998519067012218 - nodes in this community are weakly interconnected._
 - **Should `Admin Audit & Settings` be split into smaller, more focused modules?**
-  _Cohesion score 0.09254362771020624 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09951923076923076 - nodes in this community are weakly interconnected._
 - **Should `Admin Edit Team Dialog` be split into smaller, more focused modules?**
-  _Cohesion score 0.07459207459207459 - nodes in this community are weakly interconnected._
-- **Should `Player Analysis Panel` be split into smaller, more focused modules?**
-  _Cohesion score 0.11052631578947368 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07594381035996488 - nodes in this community are weakly interconnected._

@@ -79,6 +79,7 @@ export interface Match {
     };
     homeLineup?: string[];
     awayLineup?: string[];
+    details?: any;
   }
 
 export interface PlayerStats {

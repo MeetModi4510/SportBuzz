@@ -701,31 +701,18 @@ const MatchDetails = () => {
                     const formation = realLineup?.formation || 'Starting XI';
 
                     if (players.length === 0) {
-                      // Fallback mock
-                      const seed = (match.id || "").length + (tIdx * 7);
-                      const positions = [
-                        { role: "GK", name: "Goalkeeper" },
-                        { role: "DF", name: "Right Back" }, { role: "DF", name: "Centre Back" },
-                        { role: "DF", name: "Centre Back" }, { role: "DF", name: "Left Back" },
-                        { role: "MF", name: "Defensive Mid" }, { role: "MF", name: "Central Mid" },
-                        { role: "MF", name: "Attacking Mid" },
-                        { role: "FW", name: "Right Wing" }, { role: "FW", name: "Striker" }, { role: "FW", name: "Left Wing" },
-                      ];
-                      const surnames = [
-                        "Silva", "Martinez", "Johnson", "Müller", "García", "López", "Santos", "Anderson",
-                        "Williams", "Fernández", "Brown", "Davis", "Wilson", "Taylor", "Thomas", "Moore",
-                        "Jackson", "White", "Harris", "Clark", "Lewis", "Walker", "Hall", "Young",
-                      ];
-                      positions.forEach((pos, idx) => {
-                        const nameIdx = (seed * 7 + idx * 3) % surnames.length;
-                        const firstName = String.fromCharCode(65 + ((seed + idx) % 26));
-                        players.push({
-                          name: `${firstName}. ${surnames[nameIdx]}`,
-                          role: pos.role,
-                          fullRole: pos.name,
-                          number: idx === 0 ? 1 : (idx === 9 ? 9 : (idx === 10 ? 11 : idx + 2))
-                        });
-                      });
+                      return (
+                        <div key={tIdx} className="bg-card border border-border rounded-xl p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[200px]">
+                          <AlertTriangle className="h-8 w-8 text-muted-foreground/50" />
+                          <div>
+                            <h4 className="font-semibold text-foreground flex items-center justify-center gap-2 mb-1">
+                              <TeamLogo logo={t.team?.logo} name={t.team?.name || ''} size="sm" />
+                              {t.team?.name || t.prefix}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">Lineup data not available</p>
+                          </div>
+                        </div>
+                      );
                     }
 
                     return (
@@ -813,43 +800,24 @@ const MatchDetails = () => {
 
                     let footballStatCategories: any[] = [];
                     
-                    if (match.details?.statistics?.[0]?.groups) {
-                        footballStatCategories = match.details.statistics[0].groups.map((group: any) => ({
-                            category: group.groupName,
-                            stats: group.statisticsItems.map((item: any) => ({
-                                label: item.name,
-                                home: parseFloat(item.home) || 0,
-                                away: parseFloat(item.away) || 0,
-                                unit: item.home?.includes('%') ? '%' : ''
-                            }))
-                        }));
-                    } else {
-                        footballStatCategories = [
-                          {
-                            category: '⚽ General',
-                            stats: [
-                              { label: 'Possession (%)', home: 58, away: 42, unit: '%' },
-                              { label: 'Total Shots', home: 16, away: 11 },
-                              { label: 'Shots on Target', home: 7, away: 4 },
-                              { label: 'Shots off Target', home: 6, away: 5 },
-                              { label: 'Blocked Shots', home: 3, away: 2 },
-                              { label: 'Corners', home: 8, away: 4 },
-                              { label: 'Offsides', home: 3, away: 2 },
-                              { label: 'Pass Accuracy (%)', home: 87, away: 79, unit: '%' },
-                              { label: 'Total Passes', home: 542, away: 398 },
-                            ],
-                          },
-                          {
-                            category: '🎯 Attacking',
-                            stats: [
-                              { label: 'Goals', home: parseInt(match?.homeScore || '0'), away: parseInt(match?.awayScore || '0') },
-                              { label: 'Expected Goals (xG)', home: 2.1, away: 1.3 },
-                              { label: 'Big Chances Created', home: 4, away: 2 },
-                              { label: 'Big Chances Missed', home: 2, away: 1 },
-                            ],
-                          }
-                        ];
+                    if (!match.details?.statistics?.[0]?.groups) {
+                      return (
+                        <div className="bg-card border border-border rounded-xl p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[200px]">
+                          <AlertTriangle className="h-8 w-8 text-muted-foreground/50" />
+                          <p className="text-sm text-muted-foreground">Statistics not available for this match</p>
+                        </div>
+                      );
                     }
+
+                    footballStatCategories = match.details.statistics[0].groups.map((group: any) => ({
+                        category: group.groupName,
+                        stats: group.statisticsItems.map((item: any) => ({
+                            label: item.name,
+                            home: parseFloat(item.home) || 0,
+                            away: parseFloat(item.away) || 0,
+                            unit: item.home?.includes('%') ? '%' : ''
+                        }))
+                    }));
 
                     return footballStatCategories.map((cat, catIdx) => (
                       <div key={catIdx} className="bg-card border border-border rounded-xl overflow-hidden">
@@ -1112,10 +1080,6 @@ const MatchDetails = () => {
                         
                         const events = [];
                         
-                        // Always generate some events
-                        const homeGoals = parseInt(match.homeScore || "0");
-                        const awayGoals = parseInt(match.awayScore || "0");
-                        
                         if (match.details?.incidents) {
                           match.details.incidents.forEach((inc: any) => {
                             let type = 'info';
@@ -1142,37 +1106,15 @@ const MatchDetails = () => {
                           match.goals.forEach((g: any) => {
                             events.push({ minute: g.minute, type: 'goal', team: g.teamId === match.homeTeam?.id ? homeTeam : awayTeam, text: `GOAL! ${g.player} scores for ${g.teamId === match.homeTeam?.id ? homeTeam : awayTeam}! ${g.assist ? `Assist by ${g.assist}.` : 'Brilliant finish.'}` });
                           });
-                        } else {
-                          // Mock goals based on score
-                          let m = 12;
-                          for(let i=0; i<homeGoals; i++) {
-                            events.push({ minute: m, type: 'goal', team: homeTeam, text: `GOAL! Spectacular strike for ${homeTeam} puts them on the scoreboard!` });
-                            m += 20;
-                          }
-                          m = 18;
-                          for(let i=0; i<awayGoals; i++) {
-                            events.push({ minute: m, type: 'goal', team: awayTeam, text: `GOAL! ${awayTeam} finds the back of the net!` });
-                            m += 25;
-                          }
                         }
                         
-                        if (!match.details?.incidents) {
-                          // Add some random events only if no real incidents
-                          events.push({ minute: 8, type: 'chance', team: homeTeam, text: `Close! A powerful shot from outside the box goes just wide.` });
-                          events.push({ minute: 24, type: 'yellow', team: awayTeam, text: `Yellow card given for a late challenge.` });
-                          events.push({ minute: 36, type: 'foul', team: homeTeam, text: `Foul committed in the midfield area.` });
-                          events.push({ minute: 45, type: 'info', team: 'Both', text: `Half time: ${homeTeam} ${homeGoals > 0 ? homeGoals : 0} - ${awayGoals > 0 ? awayGoals : 0} ${awayTeam}` });
-                          
-                          if (isCompleted || (isLive && (match.currentMinute === '2nd half' || parseInt(match.currentMinute || '0') > 45))) {
-                            events.push({ minute: 58, type: 'sub', team: homeTeam, text: `Substitution for ${homeTeam}: Tactical change.` });
-                            events.push({ minute: 67, type: 'chance', team: awayTeam, text: `Great save! The goalkeeper parries away a dangerous header.` });
-                            events.push({ minute: 75, type: 'yellow', team: homeTeam, text: `Yellow card shown for a tactical foul.` });
-                            events.push({ minute: 82, type: 'sub', team: awayTeam, text: `Substitution: Fresh legs brought on for the final minutes.` });
-                          }
-                          
-                          if (isCompleted) {
-                             events.push({ minute: 90, type: 'info', team: 'Both', text: `Full time! The referee blows the final whistle.` });
-                          }
+                        if (events.length === 0) {
+                          return (
+                            <div className="bg-card border border-border rounded-xl p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[200px]">
+                              <AlertTriangle className="h-8 w-8 text-muted-foreground/50" />
+                              <p className="text-sm text-muted-foreground">Commentary and incidents not available for this match</p>
+                            </div>
+                          );
                         }
                         
                         // Sort events by minute descending

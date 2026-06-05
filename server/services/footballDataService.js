@@ -146,6 +146,17 @@ async function fetchNextMatches(tournamentId) {
     }
 }
 
+async function fetchScheduledEvents(categoryId) {
+    try {
+        // Fetching for today's date
+        const dateStr = new Date().toISOString().split('T')[0];
+        const res = await axios.get(`${RAPID_BASE}/tournaments/get-scheduled-events`, { headers: getHeaders(), params: { categoryId, date: dateStr }, timeout: 10000 });
+        return (res.data?.events || []).map(transformSofascoreEvent).filter(Boolean);
+    } catch (err) {
+        return [];
+    }
+}
+
 async function fetchLastMatches(tournamentId, seasonId) {
     if (!seasonId) return [];
     try {
@@ -185,17 +196,22 @@ export async function getCategorizedMatches() {
         fetchCurrentSeasons()
     ]);
 
+    // Categories for England (1), Spain (32), Italy (33), Germany (30)
+    const TOP_CATEGORIES = [1, 32, 33, 30];
+
     // Fetch upcoming and completed for top tournaments
-    const upcomingPromises = TOP_TOURNAMENTS.map(tId => fetchNextMatches(tId));
+    const nextMatchesPromises = TOP_TOURNAMENTS.map(tId => fetchNextMatches(tId));
+    const scheduledEventsPromises = TOP_CATEGORIES.map(cId => fetchScheduledEvents(cId));
     const completedPromises = TOP_TOURNAMENTS.map(tId => fetchLastMatches(tId, seasons[tId]));
 
-    const [upcomingResults, completedResults] = await Promise.all([
-        Promise.all(upcomingPromises),
+    const [nextResults, scheduledResults, completedResults] = await Promise.all([
+        Promise.all(nextMatchesPromises),
+        Promise.all(scheduledEventsPromises),
         Promise.all(completedPromises)
     ]);
 
     // Flatten arrays
-    const upcomingMatches = upcomingResults.flat().sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    const upcomingMatches = [...nextResults.flat(), ...scheduledResults.flat()].sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
     const completedMatches = completedResults.flat().sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
 
     // Deduplicate (Sofascore gives us unique IDs so this is easier)
@@ -214,18 +230,24 @@ export async function getCategorizedMatches() {
 }
 
 export async function getMatchDetail(internalId) {
+    // Basic cache implementation for match details (15 min TTL)
+    const cacheKey = `detail_${internalId}`;
+    if (isCacheValid(cacheKey)) return cache[cacheKey].data;
+
     if (!internalId || !internalId.startsWith('football-')) return null;
     const matchId = internalId.replace('football-', '');
 
     try {
         // Fetch all specific match details in parallel
         const h = getHeaders();
-        const [detailRes, lineupsRes, statsRes, incidentsRes, graphRes] = await Promise.allSettled([
+        const [detailRes, lineupsRes, statsRes, incidentsRes, graphRes, playerStatsRes, playerHeatmapRes] = await Promise.allSettled([
             axios.get(`${RAPID_BASE}/matches/detail`, { headers: h, params: { matchId }, timeout: 10000 }),
             axios.get(`${RAPID_BASE}/matches/get-lineups`, { headers: h, params: { matchId }, timeout: 10000 }),
             axios.get(`${RAPID_BASE}/matches/get-statistics`, { headers: h, params: { matchId }, timeout: 10000 }),
             axios.get(`${RAPID_BASE}/matches/get-incidents`, { headers: h, params: { matchId }, timeout: 10000 }),
-            axios.get(`${RAPID_BASE}/matches/get-graph`, { headers: h, params: { matchId }, timeout: 10000 })
+            axios.get(`${RAPID_BASE}/matches/get-graph`, { headers: h, params: { matchId }, timeout: 10000 }),
+            axios.get(`${RAPID_BASE}/matches/get-player-statistics`, { headers: h, params: { matchId }, timeout: 10000 }),
+            axios.get(`${RAPID_BASE}/matches/get-player-heatmap`, { headers: h, params: { matchId }, timeout: 10000 })
         ]);
 
         const event = detailRes.status === 'fulfilled' ? detailRes.value.data?.event : null;
@@ -233,15 +255,22 @@ export async function getMatchDetail(internalId) {
 
         const baseMatch = transformSofascoreEvent(event);
         
-        return {
+        const matchData = {
             ...baseMatch,
             details: {
                 lineups: lineupsRes.status === 'fulfilled' ? lineupsRes.value.data : null,
                 statistics: statsRes.status === 'fulfilled' ? statsRes.value.data?.statistics : null,
                 incidents: incidentsRes.status === 'fulfilled' ? incidentsRes.value.data?.incidents : null,
-                graph: graphRes.status === 'fulfilled' ? graphRes.value.data?.graph : null
+                graph: graphRes.status === 'fulfilled' ? graphRes.value.data?.graph : null,
+                playerStatistics: playerStatsRes.status === 'fulfilled' ? playerStatsRes.value.data?.statistics : null,
+                playerHeatmap: playerHeatmapRes.status === 'fulfilled' ? playerHeatmapRes.value.data?.heatmap : null
             }
         };
+
+        // Store in cache
+        cache[cacheKey] = { data: matchData, timestamp: Date.now() };
+        
+        return matchData;
     } catch (err) {
         console.error(`[Sofascore] getMatchDetail(${matchId}) error:`, err.message);
         return null;

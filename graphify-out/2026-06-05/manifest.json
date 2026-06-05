@@ -100,9 +100,9 @@
     "semantic_hash": "cac197db51d775699234599a2a87f028"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\package.json": {
-    "mtime": 1777566133.8557668,
-    "ast_hash": "89c90cdb5f231c3095d44e794b49fcaa",
-    "semantic_hash": "89c90cdb5f231c3095d44e794b49fcaa"
+    "mtime": 1780653249.4211204,
+    "ast_hash": "dc91a54eb47a0ce820f545e4652f0e19",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\postcss.config.js": {
     "mtime": 1777566133.990455,
@@ -545,9 +545,9 @@
     "semantic_hash": "dda9f965d2fd638e6042356b6a6aaaf6"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\footballRoutes.js": {
-    "mtime": 1777581274.872121,
-    "ast_hash": "e28b71131c4f13dcf6062623ea871198",
-    "semantic_hash": "e28b71131c4f13dcf6062623ea871198"
+    "mtime": 1780654578.8031223,
+    "ast_hash": "87127d4f907de2a3cdf60500b1c9b61b",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\leaderboardRoutes.js": {
     "mtime": 1777566127.7157614,
@@ -660,9 +660,9 @@
     "semantic_hash": "97428d3a88e2f5a1c6c44c96ca132619"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\footballDataService.js": {
-    "mtime": 1777581258.7319841,
-    "ast_hash": "d9206b85601e00c30bd1ea87f4956eb2",
-    "semantic_hash": "d9206b85601e00c30bd1ea87f4956eb2"
+    "mtime": 1780655364.2319744,
+    "ast_hash": "20af1464f0816cab333bc13fe3c2cf7b",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\stateFlagService.js": {
     "mtime": 1777566128.3142123,
@@ -755,9 +755,9 @@
     "semantic_hash": "d0fb1a3b86f33864c7345455361ed669"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\CreatorsSection.tsx": {
-    "mtime": 1777566128.8191905,
-    "ast_hash": "da26eb9047d898878ae17b3993223bef",
-    "semantic_hash": "da26eb9047d898878ae17b3993223bef"
+    "mtime": 1780653999.7055268,
+    "ast_hash": "415a98241e07742d1aaaa223c6da543a",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\CricketPerformanceLab.tsx": {
     "mtime": 1777566128.8398285,
@@ -795,9 +795,9 @@
     "semantic_hash": "fb7c8348398ae8b8e9d970b22a76c984"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\LiveTicker.tsx": {
-    "mtime": 1777566129.1069355,
-    "ast_hash": "06368659d5542a333975d2cabf56f19a",
-    "semantic_hash": "06368659d5542a333975d2cabf56f19a"
+    "mtime": 1780653249.4296565,
+    "ast_hash": "cf7f4392a62e1a5e05363f9261eaa51b",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\LoadingSkeleton.tsx": {
     "mtime": 1777566129.1266284,
@@ -805,9 +805,9 @@
     "semantic_hash": "7021298d563800a78a80c05cd3f9d842"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\MatchCard.tsx": {
-    "mtime": 1777578474.188316,
-    "ast_hash": "f55ef390c4d9e1f87b08cbcbefdb2cd5",
-    "semantic_hash": "f55ef390c4d9e1f87b08cbcbefdb2cd5"
+    "mtime": 1780653249.434548,
+    "ast_hash": "8f6211d83643f533005be7826a4637c9",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\MatchPerformanceLab.tsx": {
     "mtime": 1777581826.0905159,
@@ -815,9 +815,9 @@
     "semantic_hash": "a213057f9bacd11b2c4a9ff6cde135b2"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\MatchSection.tsx": {
-    "mtime": 1777566129.163625,
-    "ast_hash": "cb8813092ada6f9af7509273c74d4729",
-    "semantic_hash": "cb8813092ada6f9af7509273c74d4729"
+    "mtime": 1780653249.4380488,
+    "ast_hash": "63a49d55c1ce026ea1a9f49edbe5e841",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\NavLink.tsx": {
     "mtime": 1777566129.2436473,
@@ -825,8 +825,8 @@
     "semantic_hash": "889a81fd2eb948eb406c9ccabe175918"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\Navbar.tsx": {
-    "mtime": 1780562475.485869,
-    "ast_hash": "baa9041798f71ce35c58cbb1caf33009",
+    "mtime": 1780653249.443055,
+    "ast_hash": "8cc7660194f3044425ec4b91f30cf1b0",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\NotificationPopover.tsx": {
@@ -840,8 +840,8 @@
     "semantic_hash": "cb49df0f83a76c8978c53eaef8a35043"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\PlayerAnalysisPanel.tsx": {
-    "mtime": 1780648126.87277,
-    "ast_hash": "e0a0b2e6d2c86c5a8457a9655f9df628",
+    "mtime": 1780653999.709472,
+    "ast_hash": "5c5ac413cd9a378e61022a5f94fd7855",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\PlayerCard.tsx": {
@@ -1320,9 +1320,9 @@
     "semantic_hash": "47b33729db23489dc4290297a360da41"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useFootballMatches.ts": {
-    "mtime": 1777581303.8328767,
-    "ast_hash": "9ea425b1799d1f730660c2b807cc6eeb",
-    "semantic_hash": "9ea425b1799d1f730660c2b807cc6eeb"
+    "mtime": 1780654640.701263,
+    "ast_hash": "3d0c49bae072c1a3cf484b77c31f9c50",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useFreeCricketMatch.ts": {
     "mtime": 1777566131.6515324,
@@ -1405,8 +1405,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Index.tsx": {
-    "mtime": 1780571968.3582377,
-    "ast_hash": "7bdfe9121588c34861086c6cc0b7fff7",
+    "mtime": 1780654770.4918945,
+    "ast_hash": "7bd3be5460c6bcacbe4e5926cbb1a3d4",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Leaderboard.tsx": {
@@ -1425,8 +1425,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\MatchDetails.tsx": {
-    "mtime": 1780563420.4362943,
-    "ast_hash": "e2bd8beb7d3f48897f3f2b742902a0a4",
+    "mtime": 1780654883.4788604,
+    "ast_hash": "2c40c725b8898064ec4c439c94a901bf",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\NotFound.tsx": {
@@ -1555,8 +1555,8 @@
     "semantic_hash": "34f82a26d33116b74005083b1eb00dda"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\api.ts": {
-    "mtime": 1780477344.826067,
-    "ast_hash": "316e51234d8048aaf1ec1adbb04fbd72",
+    "mtime": 1780654618.9455395,
+    "ast_hash": "c4437bc40c40440d423f128b3b400916",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\cricketApi.ts": {
@@ -2970,8 +2970,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\data\\cricbuzzPlayerIds.ts": {
-    "mtime": 1780571658.297911,
-    "ast_hash": "4974639780d62bfc37accdb3689994c0",
+    "mtime": 1780653249.4530196,
+    "ast_hash": "e0d4dd53002bc49ed0bb6776d8a2d0da",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\data\\mpl_t20_2026_flags.json": {
@@ -3072,6 +3072,31 @@
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\utils\\playerBowlingStatsTransformer.ts": {
     "mtime": 1780648126.8750265,
     "ast_hash": "fe3976bcf7d7623c786d9a012df5b63c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\MinimalCricketCard.tsx": {
+    "mtime": 1780653249.440057,
+    "ast_hash": "d237abac5cfe28deb8f30b9ff4c4ebf8",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\testRender.js": {
+    "mtime": 1780653249.4648693,
+    "ast_hash": "02d6ba0a9953a1919c7a3c0342f10599",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\test_sofascore.mjs": {
+    "mtime": 1780654142.9114711,
+    "ast_hash": "bbac7873f481c86a0fcbf8d6a10a7801",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\test_sofascore2.mjs": {
+    "mtime": 1780654230.3803082,
+    "ast_hash": "5526e64c4875e1e893c8711344409929",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\test_sofascore3.mjs": {
+    "mtime": 1780654379.7991903,
+    "ast_hash": "e85b562f825cf5721c988e5a64616976",
     "semantic_hash": ""
   }
 }
