@@ -26,9 +26,8 @@ export const MatchSection = ({
   showViewAll = true,
   onViewAllClick,
   isLoading = false,
-  onlyLive = false,
 }: MatchSectionProps) => {
-  const [activeTab, setActiveTab] = useState<'all' | 'live' | 'upcoming' | 'recent'>('all');
+  const [activeTab, setActiveTab] = useState<'live' | 'upcoming' | 'recent'>('live');
 
   // Loading state
   if (isLoading) {
@@ -184,12 +183,6 @@ export const MatchSection = ({
       {/* Tab Buttons */}
       <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
         <button 
-          onClick={() => setActiveTab('all')}
-          className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all", activeTab === 'all' ? "bg-primary text-primary-foreground" : "bg-secondary/50 text-foreground hover:bg-secondary")}
-        >
-          All Matches
-        </button>
-        <button 
           onClick={() => setActiveTab('live')}
           className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2", activeTab === 'live' ? "bg-primary text-primary-foreground" : "bg-secondary/50 text-foreground hover:bg-secondary")}
         >
@@ -215,7 +208,7 @@ export const MatchSection = ({
 
       <div className="space-y-10">
         {/* LIVE */}
-        {(activeTab === 'all' || activeTab === 'live') && (
+        {activeTab === 'live' && (
           <div className="space-y-4 animate-in fade-in duration-300">
             <div className="flex items-center gap-2">
                <span className="relative flex h-3 w-3">
@@ -229,7 +222,7 @@ export const MatchSection = ({
         )}
 
         {/* UPCOMING */}
-        {(activeTab === 'all' || activeTab === 'upcoming') && (
+        {activeTab === 'upcoming' && (
           <div className="space-y-4 animate-in fade-in duration-300">
             <h3 className="text-lg font-bold text-foreground">Upcoming Matches</h3>
             {renderMatchGroup(upcomingMatches)}
@@ -237,7 +230,7 @@ export const MatchSection = ({
         )}
 
         {/* RECENT / COMPLETED */}
-        {(activeTab === 'all' || activeTab === 'recent') && (
+        {activeTab === 'recent' && (
           <div className="space-y-4 animate-in fade-in duration-300">
             <h3 className="text-lg font-bold text-foreground">Recent Matches</h3>
             {renderMatchGroup(completedMatches)}
