@@ -27,7 +27,8 @@ import {
   Hand,
   Info,
   ListOrdered,
-  Activity
+  Activity,
+  Footprints
 } from "lucide-react";
 import { format } from "date-fns";
 import { Helmet } from "react-helmet-async";
@@ -54,7 +55,42 @@ const MatchDetails = () => {
   const [favoriteId, setFavoriteId] = useState(null);
   const [activeTab, setActiveTab] = useState('summary');
 
-  useEffect(() => {
+  const summarizePlayerEvents = (playerName: string, events: any[], teamGoalsConceded: number = 0) => {
+      const playerEvents = {
+          goals: 0,
+          assists: 0,
+          yellowCards: 0,
+          redCards: 0,
+          saves: 0,
+          fouls: 0,
+          shotsOnTarget: 0,
+          corners: 0,
+          teamGoalsConceded,
+          substitution: undefined as { inMinute?: number; outMinute?: number; isInjured?: boolean } | undefined
+      };
+
+      events?.forEach(event => {
+          if (event.player === playerName) {
+              if (event.type === 'Goal') playerEvents.goals++;
+              if (event.type === 'YellowCard') playerEvents.yellowCards++;
+              if (event.type === 'RedCard') playerEvents.redCards++;
+              if (event.type === 'Save') playerEvents.saves++;
+              if (event.type === 'Foul') playerEvents.fouls++;
+              if (event.type === 'ShotOnTarget') playerEvents.shotsOnTarget++;
+              if (event.type === 'Corner') playerEvents.corners++;
+          }
+          if (event.type === 'Goal' && event.assister === playerName) playerEvents.assists++;
+          if (event.type === 'Substitution') {
+              if (event.player === playerName) {
+                  playerEvents.substitution = { ...playerEvents.substitution, inMinute: event.minute };
+              } else if (event.playerOut === playerName) {
+                  playerEvents.substitution = { ...playerEvents.substitution, outMinute: event.minute, isInjured: event.commentary?.toLowerCase().includes('injur') };
+              }
+          }
+      });
+
+      return playerEvents;
+  };  useEffect(() => {
     const checkFav = async () => {
       if (id) {
         try {
@@ -426,6 +462,38 @@ const MatchDetails = () => {
                             )}
                           </div>
                         )}
+
+                        {/* Football Goal Scorers */}
+                        {match.sport === 'football' && match.goals && match.goals.length > 0 && (
+                          <div className="mt-8 bg-white/5 border border-white/10 rounded-2xl p-4 md:min-w-[400px] backdrop-blur-md relative z-20">
+                            <h4 className="text-[10px] uppercase font-black tracking-[0.2em] text-white/50 mb-3 border-b border-white/10 pb-2 text-center">Match Goals</h4>
+                            <div className="space-y-2">
+                              {match.goals.map((goal: any, idx: number) => {
+                                const isHome = goal.teamId === match.homeTeam.id;
+                                return (
+                                  <div key={idx} className={cn(
+                                    "flex items-center gap-3 text-xs",
+                                    isHome ? "justify-start" : "justify-end flex-row-reverse"
+                                  )}>
+                                    <span className="font-mono text-white/60 font-bold w-6 text-center">{goal.minute}'</span>
+                                    <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center">⚽</div>
+                                    <div className={cn("flex flex-col", isHome ? "items-start" : "items-end")}>
+                                      <span className="font-bold text-white tracking-wide">
+                                        {goal.player} {goal.type === 'penalty' && <span className="text-white/40 text-[10px] ml-1">(P)</span>}
+                                        {goal.type === 'own_goal' && <span className="text-red-400 text-[10px] ml-1">(OG)</span>}
+                                      </span>
+                                      {goal.assist && (
+                                        <span className="text-[9px] text-white/50 uppercase tracking-wider flex items-center gap-1">
+                                          <Footprints size={8} className="opacity-70" /> {goal.assist}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -677,24 +745,62 @@ const MatchDetails = () => {
                             logo: match.awayTeam?.logo,
                             primaryColor: match.awayTeam?.primaryColor || '#ea580c'
                         }}
-                        homePlayers={
-                            match.details?.lineups?.home?.players?.map((p: any) => ({
-                                id: p.player?.id?.toString() || p.player?.name || Math.random().toString(),
-                                name: p.player?.name || 'Unknown',
-                                role: p.position === 'G' ? 'Goalkeeper' : p.position === 'D' ? 'Defender' : p.position === 'M' ? 'Midfielder' : 'Forward',
-                                number: p.shirtNumber,
-                                isSubstitute: false
-                            })) || []
-                        }
-                        awayPlayers={
-                            match.details?.lineups?.away?.players?.map((p: any) => ({
-                                id: p.player?.id?.toString() || p.player?.name || Math.random().toString(),
-                                name: p.player?.name || 'Unknown',
-                                role: p.position === 'G' ? 'Goalkeeper' : p.position === 'D' ? 'Defender' : p.position === 'M' ? 'Midfielder' : 'Forward',
-                                number: p.shirtNumber,
-                                isSubstitute: false
-                            })) || []
-                        }
+                        homePlayers={[
+                            ...(match.details?.lineups?.home?.startXI || match.details?.lineups?.home?.startingXI || match.details?.lineups?.home?.players || []).map((p: any) => {
+                                const isString = typeof p === 'string';
+                                const name = isString ? p : (p.player?.name || p.name || 'Unknown');
+                                const roleCode = isString ? undefined : (p.player?.pos || p.position);
+                                return {
+                                    id: isString ? name : (p.player?.id?.toString() || name || Math.random().toString()),
+                                    name: name,
+                                    role: roleCode === 'G' ? 'Goalkeeper' : roleCode === 'D' ? 'Defender' : roleCode === 'M' ? 'Midfielder' : 'Forward',
+                                    number: isString ? undefined : (p.player?.number || p.shirtNumber || p.number),
+                                    isSubstitute: false,
+                                    events: summarizePlayerEvents(name, match.events || [], parseInt(match.awayScore as string) || 0)
+                                };
+                            }),
+                            ...(match.details?.lineups?.home?.substitutes || []).map((p: any) => {
+                                const isString = typeof p === 'string';
+                                const name = isString ? p : (p.player?.name || p.name || 'Unknown');
+                                const roleCode = isString ? undefined : (p.player?.pos || p.position);
+                                return {
+                                    id: isString ? name : (p.player?.id?.toString() || name || Math.random().toString()),
+                                    name: name,
+                                    role: roleCode === 'G' ? 'Goalkeeper' : roleCode === 'D' ? 'Defender' : roleCode === 'M' ? 'Midfielder' : 'Forward',
+                                    number: isString ? undefined : (p.player?.number || p.shirtNumber || p.number),
+                                    isSubstitute: true,
+                                    events: summarizePlayerEvents(name, match.events || [], parseInt(match.awayScore as string) || 0)
+                                };
+                            })
+                        ]}
+                        awayPlayers={[
+                            ...(match.details?.lineups?.away?.startXI || match.details?.lineups?.away?.startingXI || match.details?.lineups?.away?.players || []).map((p: any) => {
+                                const isString = typeof p === 'string';
+                                const name = isString ? p : (p.player?.name || p.name || 'Unknown');
+                                const roleCode = isString ? undefined : (p.player?.pos || p.position);
+                                return {
+                                    id: isString ? name : (p.player?.id?.toString() || name || Math.random().toString()),
+                                    name: name,
+                                    role: roleCode === 'G' ? 'Goalkeeper' : roleCode === 'D' ? 'Defender' : roleCode === 'M' ? 'Midfielder' : 'Forward',
+                                    number: isString ? undefined : (p.player?.number || p.shirtNumber || p.number),
+                                    isSubstitute: false,
+                                    events: summarizePlayerEvents(name, match.events || [], parseInt(match.homeScore as string) || 0)
+                                };
+                            }),
+                            ...(match.details?.lineups?.away?.substitutes || []).map((p: any) => {
+                                const isString = typeof p === 'string';
+                                const name = isString ? p : (p.player?.name || p.name || 'Unknown');
+                                const roleCode = isString ? undefined : (p.player?.pos || p.position);
+                                return {
+                                    id: isString ? name : (p.player?.id?.toString() || name || Math.random().toString()),
+                                    name: name,
+                                    role: roleCode === 'G' ? 'Goalkeeper' : roleCode === 'D' ? 'Defender' : roleCode === 'M' ? 'Midfielder' : 'Forward',
+                                    number: isString ? undefined : (p.player?.number || p.shirtNumber || p.number),
+                                    isSubstitute: true,
+                                    events: summarizePlayerEvents(name, match.events || [], parseInt(match.homeScore as string) || 0)
+                                };
+                            })
+                        ]}
                         homeFormation={match.details?.lineups?.home?.formation || '4-3-3'}
                         awayFormation={match.details?.lineups?.away?.formation || '4-3-3'}
                     />
