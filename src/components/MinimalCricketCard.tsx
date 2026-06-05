@@ -57,11 +57,11 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
         {/* Home Team */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <TeamLogo logo={match.homeTeam.logo} name={match.homeTeam.name} shortName={match.homeTeam.shortName} size="sm" className="w-6 h-6" />
-            <span className="font-medium text-foreground text-sm">{match.homeTeam.name}</span>
+            <TeamLogo logo={match.homeTeam?.logo || ''} name={match.homeTeam?.name || 'TBA'} shortName={match.homeTeam?.shortName} size="sm" className="w-6 h-6" />
+            <span className="font-medium text-foreground text-sm">{match.homeTeam?.name || 'TBA'}</span>
           </div>
           <div className="flex flex-col items-end">
-             {Array.isArray(match.inningsScores) && match.inningsScores.filter(i => i.team === 'home').map((inn, idx) => (
+             {Array.isArray(match.inningsScores) && match.inningsScores.filter(i => i?.team === 'home').map((inn, idx) => (
                 <div key={idx} className="flex items-center gap-1.5">
                   <span className="font-semibold text-sm tracking-tight text-foreground">
                     {inn.score}
@@ -73,7 +73,7 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
                   )}
                 </div>
              ))}
-             {(!Array.isArray(match.inningsScores) || match.inningsScores.filter(i => i.team === 'home').length === 0) && (
+             {(!Array.isArray(match.inningsScores) || match.inningsScores.filter(i => i?.team === 'home').length === 0) && (
                <span className="font-semibold text-sm tracking-tight text-foreground">
                  {match.homeScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                </span>
@@ -84,11 +84,11 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
         {/* Away Team */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <TeamLogo logo={match.awayTeam.logo} name={match.awayTeam.name} shortName={match.awayTeam.shortName} size="sm" className="w-6 h-6" />
-            <span className="font-medium text-foreground text-sm">{match.awayTeam.name}</span>
+            <TeamLogo logo={match.awayTeam?.logo || ''} name={match.awayTeam?.name || 'TBA'} shortName={match.awayTeam?.shortName} size="sm" className="w-6 h-6" />
+            <span className="font-medium text-foreground text-sm">{match.awayTeam?.name || 'TBA'}</span>
           </div>
           <div className="flex flex-col items-end">
-             {Array.isArray(match.inningsScores) && match.inningsScores.filter(i => i.team === 'away').map((inn, idx) => (
+             {Array.isArray(match.inningsScores) && match.inningsScores.filter(i => i?.team === 'away').map((inn, idx) => (
                 <div key={idx} className="flex items-center gap-1.5">
                   <span className="font-semibold text-sm tracking-tight text-foreground">
                     {inn.score}
@@ -100,7 +100,7 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
                   )}
                 </div>
              ))}
-             {(!Array.isArray(match.inningsScores) || match.inningsScores.filter(i => i.team === 'away').length === 0) && (
+             {(!Array.isArray(match.inningsScores) || match.inningsScores.filter(i => i?.team === 'away').length === 0) && (
                <span className="font-semibold text-sm tracking-tight text-foreground">
                  {match.awayScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                </span>
