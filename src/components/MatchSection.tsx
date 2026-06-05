@@ -57,7 +57,12 @@ export const MatchSection = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <SportIcon sport={sport} size={24} />
-            <h2 className="text-2xl font-bold font-display text-foreground">{title}</h2>
+            <div className="flex items-baseline gap-3">
+              <h2 className="text-2xl font-bold font-display text-foreground">{title}</h2>
+              <span className="text-xs font-semibold text-muted-foreground/80 tracking-widest uppercase">
+                All Live Matches
+              </span>
+            </div>
           </div>
           {showViewAll && onViewAllClick && (
             <button onClick={onViewAllClick} className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary/50 hover:bg-secondary border border-border/50 text-sm text-foreground transition-all font-medium">
