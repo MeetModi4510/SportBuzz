@@ -111,48 +111,40 @@ export const MatchSection = ({
         const type = m.matchType?.toLowerCase() || '';
         return type === "t20" || type === "t20i";
       });
+      const other = groupMatches.filter((m) => {
+        const type = m.matchType?.toLowerCase() || '';
+        return type !== "test" && type !== "odi" && type !== "t20" && type !== "t20i";
+      });
+
+      const activeFormats = [
+        { name: "Test Matches", key: "test", data: test, color: "border-red-500" },
+        { name: "ODI Matches", key: "odi", data: odi, color: "border-blue-500" },
+        { name: "T20 Matches", key: "t20", data: t20, color: "border-green-500" },
+        { name: "Other Matches", key: "other", data: other, color: "border-purple-500" },
+      ].filter(format => format.data.length > 0);
+
+      if (activeFormats.length === 0) {
+        return <div className="text-sm text-muted-foreground italic py-6 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No matches in this category</div>;
+      }
+
+      // Determine grid columns based on active formats
+      // For 4 formats, we can use a 2x2 grid or just 4 cols. Let's use up to 3 cols max for balance.
+      const gridCols = activeFormats.length === 1 ? "lg:grid-cols-1" : activeFormats.length === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3";
 
       return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* TEST Matches */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-2 border-red-500 pl-2">Test Matches</h3>
-            <div className="flex flex-col gap-4">
-              {test.length > 0 ? (
-                test.map(match => (
+        <div className={cn("grid grid-cols-1 gap-6", gridCols)}>
+          {activeFormats.map(format => (
+            <div key={format.key} className="space-y-3">
+              <h3 className={cn("text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-2 pl-2", format.color)}>
+                {format.name}
+              </h3>
+              <div className="flex flex-col gap-4">
+                {format.data.map(match => (
                   <MatchCard key={match.id} match={match} onClick={onMatchClick} />
-                ))
-              ) : (
-                <div className="text-sm text-muted-foreground italic py-4 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No matches</div>
-              )}
+                ))}
+              </div>
             </div>
-          </div>
-          {/* ODI Matches */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-2 border-blue-500 pl-2">ODI Matches</h3>
-            <div className="flex flex-col gap-4">
-              {odi.length > 0 ? (
-                odi.map(match => (
-                  <MatchCard key={match.id} match={match} onClick={onMatchClick} />
-                ))
-              ) : (
-                <div className="text-sm text-muted-foreground italic py-4 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No matches</div>
-              )}
-            </div>
-          </div>
-          {/* T20 Matches */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-2 border-green-500 pl-2">T20 Matches</h3>
-            <div className="flex flex-col gap-4">
-              {t20.length > 0 ? (
-                t20.map(match => (
-                  <MatchCard key={match.id} match={match} onClick={onMatchClick} />
-                ))
-              ) : (
-                <div className="text-sm text-muted-foreground italic py-4 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No matches</div>
-              )}
-            </div>
-          </div>
+          ))}
         </div>
       );
     }
