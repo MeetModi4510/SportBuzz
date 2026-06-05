@@ -33,8 +33,8 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
     <div
       onClick={() => onClick?.(match)}
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-border/50 bg-card p-4 transition-all duration-200",
-        "hover:border-primary/40 hover:bg-accent/10 hover:shadow-md cursor-pointer",
+        "group relative overflow-hidden rounded-xl border border-border/60 bg-secondary/30 p-4 transition-all duration-200",
+        "hover:border-primary/50 hover:bg-secondary/50 hover:shadow-md cursor-pointer",
         "w-full flex flex-col gap-4",
         className
       )}
@@ -56,8 +56,8 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
       <div className="flex flex-col gap-3.5">
         {/* Home Team */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <TeamLogo logo={match.homeTeam?.logo || ''} name={match.homeTeam?.name || 'TBA'} shortName={match.homeTeam?.shortName} size="md" className="w-9 h-9" />
+          <div className="flex items-center gap-4">
+            <TeamLogo logo={match.homeTeam?.logo || ''} name={match.homeTeam?.name || 'TBA'} shortName={match.homeTeam?.shortName} size="md" className="w-11 h-11 shadow-sm" />
             <span className="font-semibold text-foreground text-[15px] tracking-tight">{match.homeTeam?.name || 'TBA'}</span>
           </div>
           <div className="flex flex-col items-end">
@@ -83,8 +83,8 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
 
         {/* Away Team */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <TeamLogo logo={match.awayTeam?.logo || ''} name={match.awayTeam?.name || 'TBA'} shortName={match.awayTeam?.shortName} size="md" className="w-9 h-9" />
+          <div className="flex items-center gap-4">
+            <TeamLogo logo={match.awayTeam?.logo || ''} name={match.awayTeam?.name || 'TBA'} shortName={match.awayTeam?.shortName} size="md" className="w-11 h-11 shadow-sm" />
             <span className="font-semibold text-foreground text-[15px] tracking-tight">{match.awayTeam?.name || 'TBA'}</span>
           </div>
           <div className="flex flex-col items-end">
