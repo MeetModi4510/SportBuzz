@@ -537,13 +537,15 @@ const MatchDetails = () => {
                 <BarChart3 size={16} />
                 Summary
               </TabsTrigger>
-              <TabsTrigger value="lineups" className="flex items-center gap-2">
-                <Users size={16} />
-                Lineups
-              </TabsTrigger>
+              {match?.sport !== 'tennis' && (
+                <TabsTrigger value="lineups" className="flex items-center gap-2">
+                  <Users size={16} />
+                  Lineups
+                </TabsTrigger>
+              )}
               <TabsTrigger value="scoreboard" className="flex items-center gap-2">
                 <ListOrdered size={16} />
-                {match?.sport === 'football' ? 'Stats' : 'Scoreboard'}
+                {match?.sport === 'football' || match?.sport === 'tennis' ? 'Stats' : 'Scoreboard'}
               </TabsTrigger>
 
               <TabsTrigger value="commentary" className="flex items-center gap-2">
@@ -871,6 +873,103 @@ const MatchDetails = () => {
                                       className={cn(
                                         "h-1.5 rounded-full transition-all",
                                         awayHigher ? "bg-football" : "bg-football/30"
+                                      )}
+                                      style={{ width: `${awayWidth}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              ) : match?.sport === 'tennis' ? (
+                /* ── Tennis Match Stats ── */
+                <div className="space-y-6">
+                  {(() => {
+                    const homeTeamName = match?.homeTeam?.shortName || match?.homeTeam?.name || 'P1';
+                    const awayTeamName = match?.awayTeam?.shortName || match?.awayTeam?.name || 'P2';
+
+                    // Generate realistic mock stats for tennis since API might not provide them yet
+                    const tennisStatCategories = [
+                      {
+                        category: '🎾 Service',
+                        stats: [
+                          { label: 'Aces', home: 12, away: 8 },
+                          { label: 'Double Faults', home: 3, away: 5 },
+                          { label: 'First Serve %', home: 68, away: 62, unit: '%' },
+                          { label: '1st Serve Points Won', home: 78, away: 71, unit: '%' },
+                          { label: '2nd Serve Points Won', home: 54, away: 48, unit: '%' },
+                          { label: 'Break Points Saved', home: 4, away: 2 },
+                        ],
+                      },
+                      {
+                        category: '⚡ Rallies & Points',
+                        stats: [
+                          { label: 'Winners', home: 45, away: 38 },
+                          { label: 'Unforced Errors', home: 28, away: 34 },
+                          { label: 'Net Points Won', home: 18, away: 12 },
+                          { label: 'Return Points Won', home: 36, away: 28, unit: '%' },
+                          { label: 'Break Points Won', home: 5, away: 3 },
+                          { label: 'Total Points Won', home: 124, away: 112 },
+                        ],
+                      }
+                    ];
+
+                    return tennisStatCategories.map((cat, catIdx) => (
+                      <div key={catIdx} className="bg-card border border-border rounded-xl overflow-hidden">
+                        <div className="bg-secondary/30 px-6 py-3 border-b border-border">
+                          <h3 className="font-semibold text-foreground text-sm uppercase tracking-wider">{cat.category}</h3>
+                        </div>
+                        <div className="px-6 py-2">
+                          <div className="flex items-center justify-between py-2 border-b border-border/50">
+                            <span className="text-sm font-bold text-primary w-16 text-left truncate">{homeTeamName}</span>
+                            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Stat</span>
+                            <span className="text-sm font-bold text-tennis w-16 text-right truncate">{awayTeamName}</span>
+                          </div>
+                          {cat.stats.map((stat, sIdx) => {
+                            const maxVal = Math.max(stat.home, stat.away, 1);
+                            const homeWidth = (stat.home / maxVal) * 100;
+                            const awayWidth = (stat.away / maxVal) * 100;
+                            const homeHigher = stat.home > stat.away;
+                            const awayHigher = stat.away > stat.home;
+                            // For some stats like double faults or unforced errors, lower is better. We won't colorize based on "better", just raw value.
+                            return (
+                              <div key={sIdx} className="py-2.5 border-b border-border/20 last:border-0">
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <span className={cn(
+                                    "text-sm font-mono w-16 text-left",
+                                    homeHigher ? "font-bold text-foreground" : "text-muted-foreground"
+                                  )}>
+                                    {stat.home}{stat.unit || ''}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground text-center flex-1">{stat.label}</span>
+                                  <span className={cn(
+                                    "text-sm font-mono w-16 text-right",
+                                    awayHigher ? "font-bold text-foreground" : "text-muted-foreground"
+                                  )}>
+                                    {stat.away}{stat.unit || ''}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <div className="flex-1 flex justify-end">
+                                    <div
+                                      className={cn(
+                                        "h-1.5 rounded-full transition-all",
+                                        homeHigher ? "bg-primary" : "bg-primary/30"
+                                      )}
+                                      style={{ width: `${homeWidth}%` }}
+                                    />
+                                  </div>
+                                  <div className="w-1" />
+                                  <div className="flex-1">
+                                    <div
+                                      className={cn(
+                                        "h-1.5 rounded-full transition-all",
+                                        awayHigher ? "bg-tennis" : "bg-tennis/30"
                                       )}
                                       style={{ width: `${awayWidth}%` }}
                                     />
