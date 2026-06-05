@@ -273,7 +273,7 @@ export const Navbar = () => {
                         <span className="text-sm font-medium">{user.fullName || user.email}</span>
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 bg-slate-900 border-slate-700">
+                    <DropdownMenuContent align="end" className="w-56 bg-popover border-border">
                       {(user as any).role === 'admin' || (user as any).role === 'scorer' ? (
                         <>
                           <DropdownMenuItem asChild>
@@ -281,7 +281,7 @@ export const Navbar = () => {
                               <Shield size={16} className="mr-2" />Admin Dashboard
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator className="bg-slate-700" />
+                          <DropdownMenuSeparator className="bg-border" />
                         </>
                       ) : null}
                       <DropdownMenuItem asChild><Link to="/profile" className="cursor-pointer"><User size={16} className="mr-2" />My Profile</Link></DropdownMenuItem>
@@ -332,23 +332,23 @@ export const Navbar = () => {
 
             {/* Results Dropdown */}
             {showDropdown && (
-              <div className="absolute left-0 right-0 mt-2 mx-4 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden z-[100] max-h-[70vh] overflow-y-auto">
+              <div className="absolute left-0 right-0 mt-2 mx-4 bg-popover border border-border rounded-2xl shadow-2xl overflow-hidden z-[100] max-h-[70vh] overflow-y-auto">
                 {!dataLoaded ? (
                   <div className="flex items-center justify-center py-8 gap-3">
                     <Loader2 size={20} className="animate-spin text-primary" />
-                    <span className="text-sm text-slate-400">Loading data...</span>
+                    <span className="text-sm text-muted-foreground">Loading data...</span>
                   </div>
                 ) : !hasResults ? (
                   <div className="flex flex-col items-center py-10 gap-2">
-                    <Search size={32} className="text-slate-700" />
-                    <p className="text-sm text-slate-500">No results for "<span className="text-white font-medium">{searchQuery}</span>"</p>
+                    <Search size={32} className="text-muted-foreground/50" />
+                    <p className="text-sm text-muted-foreground">No results for "<span className="text-foreground font-medium">{searchQuery}</span>"</p>
                   </div>
                 ) : (
                   <>
                     {searchResults.tournaments.length > 0 && (
                       <div>
-                        <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-700/50">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <div className="px-4 py-2.5 bg-secondary/50 border-b border-border">
+                          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
                             <Trophy size={12} className="text-yellow-500" /> Tournaments
                           </p>
                         </div>
@@ -356,20 +356,20 @@ export const Navbar = () => {
                           <button
                             key={t._id}
                             onClick={() => handleTournamentClick(t)}
-                            className="w-full flex items-center gap-4 px-5 py-3 hover:bg-slate-800/70 transition-colors text-left group"
+                            className="w-full flex items-center gap-4 px-5 py-3 hover:bg-secondary/70 transition-colors text-left group"
                           >
                             {t.logo ? (
-                              <img src={t.logo} alt={t.name} className="w-10 h-10 rounded-xl object-cover border border-slate-700" />
+                              <img src={t.logo} alt={t.name} className="w-10 h-10 rounded-xl object-cover border border-border" />
                             ) : (
-                              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center border border-slate-700">
+                              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center border border-border">
                                 <Trophy size={18} className="text-blue-400" />
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className="text-white text-sm font-semibold truncate group-hover:text-blue-400 transition-colors">{t.name}</p>
-                              <p className="text-xs text-slate-500 truncate">{t.matchType || 'Tournament'} · {t.teams?.length || 0} teams</p>
+                              <p className="text-foreground text-sm font-semibold truncate group-hover:text-blue-400 transition-colors">{t.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">{t.matchType || 'Tournament'} · {t.teams?.length || 0} teams</p>
                             </div>
-                            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider bg-slate-800 px-2 py-1 rounded-md">{t.status || 'Active'}</span>
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-secondary px-2 py-1 rounded-md">{t.status || 'Active'}</span>
                           </button>
                         ))}
                       </div>
@@ -377,8 +377,8 @@ export const Navbar = () => {
 
                     {searchResults.players.length > 0 && (
                       <div>
-                        <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-700/50 border-t">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <div className="px-4 py-2.5 bg-secondary/50 border-b border-border border-t">
+                          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
                             <Users size={12} className="text-emerald-500" /> Players
                           </p>
                         </div>
@@ -386,18 +386,18 @@ export const Navbar = () => {
                           <button
                             key={`${p.name}-${i}`}
                             onClick={() => handlePlayerClick(p)}
-                            className="w-full flex items-center gap-4 px-5 py-3 hover:bg-slate-800/70 transition-colors text-left group"
+                            className="w-full flex items-center gap-4 px-5 py-3 hover:bg-secondary/70 transition-colors text-left group"
                           >
                             {p.photo ? (
-                              <img src={p.photo} alt={p.name} className="w-10 h-10 rounded-full object-cover border border-slate-700" />
+                              <img src={p.photo} alt={p.name} className="w-10 h-10 rounded-full object-cover border border-border" />
                             ) : (
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600/20 to-blue-600/20 flex items-center justify-center border border-slate-700">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600/20 to-blue-600/20 flex items-center justify-center border border-border">
                                 <User size={18} className="text-emerald-400" />
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className="text-white text-sm font-semibold truncate group-hover:text-emerald-400 transition-colors">{p.name}</p>
-                              <p className="text-xs text-slate-500 truncate">{p.role} · {p.team}</p>
+                              <p className="text-foreground text-sm font-semibold truncate group-hover:text-emerald-400 transition-colors">{p.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">{p.role} · {p.team}</p>
                             </div>
                           </button>
                         ))}

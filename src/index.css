@@ -6,11 +6,11 @@
 
 @layer base {
   :root {
-    /* Light Mode Colors (Default) */
-    --background: 0 0% 100%;
+    /* Light Mode Colors (Soft & Premium) */
+    --background: 210 40% 98%; /* Soft off-white */
     --foreground: 222 47% 11%;
 
-    --card: 0 0% 100%;
+    --card: 0 0% 100%; /* Pure white for cards */
     --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
@@ -19,20 +19,20 @@
     --primary: 142 76% 36%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 210 40% 92%; /* Soft light gray, NOT dark navy! */
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 217 33% 91%;
-    --muted-foreground: 215 14% 34%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 217 91% 60%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 210 40% 92%;
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 217 33% 88%;
-    --input: 217 33% 96%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
     --ring: 142 76% 36%;
 
     --radius: 0.75rem;
