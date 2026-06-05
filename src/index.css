@@ -6,11 +6,11 @@
 
 @layer base {
   :root {
-    /* Light Mode Colors (Premium Cool Slate Tint) */
-    --background: 220 33% 94%; /* Rich cool slate-blue background, far from pure white */
-    --foreground: 222 47% 11%; /* Deep navy text for crisp contrast */
+    /* Light Mode Colors (Pristine & Colorful Mesh) */
+    --background: 0 0% 98%; /* Pristine light background */
+    --foreground: 222 47% 11%;
 
-    --card: 0 0% 100%; /* Pure white for cards to pop against the slate background */
+    --card: 0 0% 100%; /* Pure white for cards */
     --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
@@ -19,20 +19,20 @@
     --primary: 142 76% 36%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 33% 86%; /* A beautifully deeper slate for buttons and interactive elements */
+    --secondary: 210 20% 96%; /* Very soft gray for buttons, crisp */
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 220 33% 88%; /* Soft tinted gray for muted areas */
-    --muted-foreground: 215 20% 45%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 220 33% 86%;
+    --accent: 210 20% 96%;
     --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 33% 84%; /* Visibly rich borders to separate elements */
-    --input: 220 33% 88%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
     --ring: 142 76% 36%;
 
     --radius: 0.75rem;
@@ -139,6 +139,28 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* Colorful, subtle mesh gradient for Light Mode */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(34, 197, 94, 0.08), transparent 40%),
+      radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.08), transparent 40%),
+      radial-gradient(circle at 50% 80%, rgba(249, 115, 22, 0.05), transparent 40%);
+    pointer-events: none;
+  }
+
+  .dark body::before {
+    display: none;
   }
 
   /* Custom Scrollbar - SportBuzz Theme */
