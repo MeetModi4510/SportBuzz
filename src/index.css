@@ -6,11 +6,11 @@
 
 @layer base {
   :root {
-    /* Light Mode Colors (Soft & Premium) */
-    --background: 210 40% 98%; /* Soft off-white */
-    --foreground: 222 47% 11%;
+    /* Light Mode Colors (Premium Cool Slate Tint) */
+    --background: 220 33% 94%; /* Rich cool slate-blue background, far from pure white */
+    --foreground: 222 47% 11%; /* Deep navy text for crisp contrast */
 
-    --card: 0 0% 100%; /* Pure white for cards */
+    --card: 0 0% 100%; /* Pure white for cards to pop against the slate background */
     --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
@@ -19,20 +19,20 @@
     --primary: 142 76% 36%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 92%; /* Soft light gray, NOT dark navy! */
+    --secondary: 220 33% 86%; /* A beautifully deeper slate for buttons and interactive elements */
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 220 33% 88%; /* Soft tinted gray for muted areas */
+    --muted-foreground: 215 20% 45%;
 
-    --accent: 210 40% 92%;
+    --accent: 220 33% 86%;
     --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
+    --border: 220 33% 84%; /* Visibly rich borders to separate elements */
+    --input: 220 33% 88%;
     --ring: 142 76% 36%;
 
     --radius: 0.75rem;
