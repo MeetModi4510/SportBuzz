@@ -24,12 +24,20 @@ export const SportFilter = ({ activeSport, onSportChange, className }: SportFilt
           key={sport.id}
           onClick={() => onSportChange(sport.id)}
           className={cn(
-            "flex items-center gap-2 px-5 py-2 rounded-full font-bold text-sm",
+            "flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm",
             "transition-all duration-300 whitespace-nowrap",
             "border",
             activeSport === sport.id
-              ? "bg-gradient-to-r from-[#D4AF37] to-[#F3E5AB] text-[#0a0a0a] border-transparent shadow-[0_0_20px_rgba(212,175,55,0.3)]"
-              : "bg-[#121212] text-[#D4AF37]/50 border-[#D4AF37]/20 hover:bg-[#1a1a1a] hover:text-[#D4AF37]"
+              ? sport.id === "all"
+                ? "bg-primary text-primary-foreground border-primary"
+                : sport.id === "cricket"
+                ? "bg-cricket/20 text-cricket border-cricket/50"
+                : sport.id === "football"
+                ? "bg-football/20 text-football border-football/50"
+                : sport.id === "basketball"
+                ? "bg-basketball/20 text-basketball border-basketball/50"
+                : "bg-tennis/20 text-tennis border-tennis/50"
+              : "bg-secondary/50 text-muted-foreground border-border hover:bg-secondary hover:text-foreground"
           )}
         >
           {sport.id !== "all" && <SportIcon sport={sport.id as Sport} size={16} />}
