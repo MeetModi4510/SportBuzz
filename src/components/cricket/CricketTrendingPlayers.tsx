@@ -179,14 +179,14 @@ export function PlayerProfileModal({
               </div>
             )}
 
-            {(info.rankings.test || info.rankings.odi || info.rankings.t20) && (
+            {(info?.rankings?.test || info?.rankings?.odi || info?.rankings?.t20) && (
               <div>
                 <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
                   <Trophy size={12} className="text-amber-400" /> ICC Rankings
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
                   {(['test', 'odi', 't20'] as const).map((fmt) => {
-                    const rank = info.rankings[fmt];
+                    const rank = info?.rankings?.[fmt];
                     return (
                       <div
                         key={fmt}
