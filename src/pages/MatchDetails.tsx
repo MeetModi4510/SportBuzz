@@ -287,13 +287,13 @@ const MatchDetails = () => {
                {/* 2. Main Score Area */}
                <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-10 md:py-14 gap-8 relative">
                    {/* Home Team */}
-                   <div className="flex-1 flex flex-col-reverse md:flex-row items-center justify-end gap-5 w-full z-10">
-                       <div className="text-center md:text-right">
-                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{match.homeTeam?.name || "Team 1"}</h2>
-                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{match.homeTeam?.shortName}</p>
+                   <div className="flex-1 flex flex-col-reverse md:flex-row items-center justify-end gap-5 w-full z-10 overflow-hidden">
+                       <div className="text-center md:text-right min-w-0">
+                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight truncate">{match.homeTeam?.name || "Team 1"}</h2>
+                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1 truncate">{match.homeTeam?.shortName}</p>
                        </div>
-                       <div className="p-3 rounded-full bg-background border border-border/40 shadow-sm flex items-center justify-center">
-                           <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="lg" className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-full ring-1 ring-border/50 bg-muted/20" />
+                       <div className="p-3 rounded-full bg-background border border-border/40 shadow-sm flex items-center justify-center shrink-0">
+                           <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="lg" className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-full ring-1 ring-border/50 bg-muted/20 shrink-0" />
                        </div>
                    </div>
 
@@ -380,13 +380,13 @@ const MatchDetails = () => {
                    </div>
 
                    {/* Away Team */}
-                   <div className="flex-1 flex flex-col md:flex-row items-center justify-start gap-5 w-full z-10">
-                       <div className="p-3 rounded-full bg-background border border-border/40 shadow-sm flex items-center justify-center">
-                           <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="lg" className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-full ring-1 ring-border/50 bg-muted/20" />
+                   <div className="flex-1 flex flex-col md:flex-row items-center justify-start gap-5 w-full z-10 overflow-hidden">
+                       <div className="p-3 rounded-full bg-background border border-border/40 shadow-sm flex items-center justify-center shrink-0">
+                           <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="lg" className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-full ring-1 ring-border/50 bg-muted/20 shrink-0" />
                        </div>
-                       <div className="text-center md:text-left">
-                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{match.awayTeam?.name || "Team 2"}</h2>
-                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{match.awayTeam?.shortName}</p>
+                       <div className="text-center md:text-left min-w-0">
+                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight truncate">{match.awayTeam?.name || "Team 2"}</h2>
+                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1 truncate">{match.awayTeam?.shortName}</p>
                        </div>
                    </div>
                </div>
