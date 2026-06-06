@@ -50,7 +50,7 @@ const SquadsView = ({ homeTeam, awayTeam, homePlayers, awayPlayers, homeRestOfSq
                                     </div>
                                     {/* Player image — left side for home team */}
                                     <CricketPlayerImage
-                                        playerId={player.faceImageId || player.id}
+                                        playerId={player.id || player.faceImageId}
                                         playerName={player.name}
                                         size={36}
                                     />
@@ -113,7 +113,7 @@ const SquadsView = ({ homeTeam, awayTeam, homePlayers, awayPlayers, homeRestOfSq
                                     {player.role && <span className="text-[10px] text-muted-foreground">{player.role}</span>}
                                     {/* Player image — right side for away team */}
                                     <CricketPlayerImage
-                                        playerId={player.faceImageId || player.id}
+                                        playerId={player.id || player.faceImageId}
                                         playerName={player.name}
                                         size={36}
                                         align="right"

@@ -954,7 +954,7 @@ const MatchDetails = () => {
                                              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                              <div className="flex items-center gap-4 relative z-10 w-full justify-between md:justify-end">
                                                 <div className="md:absolute md:left-4 z-20 shrink-0">
-                                                   <CricketPlayerImage playerId={p1.faceImageId || p1.id} playerName={p1.name} size={40} />
+                                                   <CricketPlayerImage playerId={p1.id || p1.faceImageId} playerName={p1.name} size={40} />
                                                 </div>
                                                 <div className="flex flex-col items-start md:items-end z-10 ml-12 md:ml-0">
                                                    <span className="font-bold text-foreground text-sm md:text-base tracking-tight">{p1.name}</span>
@@ -991,7 +991,7 @@ const MatchDetails = () => {
                                                    </div>
                                                 </div>
                                                 <div className="md:absolute md:right-4 z-20 shrink-0">
-                                                   <CricketPlayerImage playerId={p2.faceImageId || p2.id} playerName={p2.name} size={40} align="right" />
+                                                   <CricketPlayerImage playerId={p2.id || p2.faceImageId} playerName={p2.name} size={40} align="right" />
                                                 </div>
                                              </div>
                                           </div>
