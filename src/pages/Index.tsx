@@ -21,6 +21,7 @@ import { useLiveCricketMatches } from "@/hooks/useCricketMatches";
 import { useFeaturedCricketMatches } from "@/hooks/useFeaturedMatches";
 import { useFollowedTournamentMatches } from "@/hooks/useFollowedTournamentMatches";
 import { useFootballDashboard, useCategorizedFootballMatches } from "@/hooks/useFootballMatches";
+import { useTrendingPerformers } from "@/hooks/useTrendingPerformers";
 import { tournamentApi } from "@/services/api";
 import { Sport, MatchStatus, Match } from "@/data/types";
 import { Helmet } from "react-helmet-async";
@@ -41,6 +42,7 @@ const Index = () => {
   // Using backend proxy for all data - optimized for API quota
   const { data: cricketData, isLoading: cricketLoading } = useFeaturedCricketMatches();
   const { data: liveCricket } = useLiveCricketMatches();
+  const { trendingPlayers, sourceMatch } = useTrendingPerformers(liveCricket || []);
 
   // Fetch REAL football data from Sofascore (15-min cache)
   const { data: footballDashboard, isLoading: footballLoading } = useFootballDashboard();
@@ -345,7 +347,11 @@ const Index = () => {
 
           <div id="trending-players" className="mt-8">
             <TrendingPlayers 
-              players={activeSport === "all" ? players : players.filter(p => p.sport === activeSport)} 
+              players={
+                activeSport === "all" || activeSport === "cricket"
+                  ? (trendingPlayers.length > 0 ? trendingPlayers : players.filter(p => activeSport === "all" || p.sport === activeSport))
+                  : players.filter(p => p.sport === activeSport)
+              } 
               onPlayerClick={handlePlayerClick} 
             />
           </div>
