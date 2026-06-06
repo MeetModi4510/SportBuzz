@@ -602,7 +602,7 @@ async function checkPlayerImageExists(playerId) {
             const req = https.default.request({
                 method: 'HEAD',
                 hostname: CB_IMAGE_HOST,
-                path: `/img/v1/i1/c${playerId}/i.jpg`,
+                path: `/img/v1/192x192/i1/c${playerId}/i.jpg`,
                 headers: cbImageHeaders
             }, (res) => {
                 const exists = res.statusCode === 200;
@@ -630,7 +630,7 @@ async function streamPlayerImage(playerId, res) {
         const req = https.default.request({
             method: 'GET',
             hostname: CB_IMAGE_HOST,
-            path: `/img/v1/i1/c${playerId}/i.jpg`,
+            path: `/img/v1/192x192/i1/c${playerId}/i.jpg`,
             headers: cbImageHeaders
         }, (imgRes) => {
             if (imgRes.statusCode !== 200) {
