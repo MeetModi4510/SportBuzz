@@ -11,7 +11,8 @@ const API_BASE = import.meta.env.PROD
 
 const getImageUrl = (imageId: string | null) => {
   if (!imageId) return null;
-  return `${API_BASE}/api/cricket/cb/player-image/${imageId}`;
+  // Use public CDN directly to avoid RapidAPI rate limit (429) when loading multiple news images
+  return `https://static.cricbuzz.com/a/img/v1/i1/c${imageId}/i.jpg`;
 };
 
 export const CricketNewsSection = () => {
