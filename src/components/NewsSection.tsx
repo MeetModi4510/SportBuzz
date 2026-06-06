@@ -94,22 +94,20 @@ export const NewsSection = () => {
                     "bg-gradient-to-br from-yellow-500 to-amber-500"
                   )} />
 
-                  {/* LIVE badge for cricket API news */}
-                  {(news as any).isLive && (
-                    <div className="absolute top-3 right-3 z-20">
-                      <span className="text-[9px] font-bold text-green-400 bg-green-500/15 border border-green-500/25 px-1.5 py-0.5 rounded-full">
-                        LIVE
-                      </span>
-                    </div>
-                  )}
-
                   <div className="relative z-10 flex flex-col h-full justify-between gap-3 pointer-events-none">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <SportIcon sport={news.sport} size={16} />
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium bg-secondary/50 px-2 py-0.5 rounded-full border border-border/50">
-                          <Clock size={12} />
-                          {news.timestamp}
+                        <div className="flex items-center gap-2">
+                          {(news as any).isLive && (
+                            <span className="text-[9px] font-bold text-green-400 bg-green-500/15 border border-green-500/25 px-1.5 py-0.5 rounded-full">
+                              LIVE
+                            </span>
+                          )}
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium bg-secondary/50 px-2 py-0.5 rounded-full border border-border/50">
+                            <Clock size={12} />
+                            {news.timestamp}
+                          </div>
                         </div>
                       </div>
                       <h3 className="text-base font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
