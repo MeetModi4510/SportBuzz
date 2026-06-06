@@ -236,34 +236,40 @@ const CricketSquads = ({ match, matchData, isLoading }: { match: Match; matchDat
     // Prioritize persisted lineups from match model
     const m = match as any;
     if (m.homeLineup && m.homeLineup.length > 0) {
-        homePlayers = m.homeLineup.map((name: string) => ({ name }));
+        homePlayers = m.homeLineup.map((name: string) => {
+            const found = m.homeTeam?.players?.find((p: any) => typeof p !== 'string' && norm(p.name) === norm(name));
+            return found ? { ...found, name } : { name };
+        });
         if (m.homeTeam?.players) {
             const playingNames = m.homeLineup.map((n: string) => norm(n));
             homeRestOfSquad = (m.homeTeam.players)
-                .map((p: any) => ({ name: typeof p === 'string' ? p : p.name }))
+                .map((p: any) => (typeof p === 'string' ? { name: p } : p))
                 .filter((p: any) => !playingNames.includes(norm(p.name)));
         }
     } else if ((match.homeTeam as any)?.players) {
         // If no saved lineup, default to first 11 as "Playing XI" and rest as "Rest of Squad"
         const fullSquad = ((match.homeTeam as any).players)
-            .map((p: any) => ({ name: typeof p === 'string' ? p : p.name }));
+            .map((p: any) => (typeof p === 'string' ? { name: p } : p));
         
         homePlayers = fullSquad.slice(0, 11);
         homeRestOfSquad = fullSquad.slice(11);
     }
 
     if (m.awayLineup && m.awayLineup.length > 0) {
-        awayPlayers = m.awayLineup.map((name: string) => ({ name }));
+        awayPlayers = m.awayLineup.map((name: string) => {
+            const found = m.awayTeam?.players?.find((p: any) => typeof p !== 'string' && norm(p.name) === norm(name));
+            return found ? { ...found, name } : { name };
+        });
         if (m.awayTeam?.players) {
             const playingNames = m.awayLineup.map((n: string) => norm(n));
             awayRestOfSquad = (m.awayTeam.players)
-                .map((p: any) => ({ name: typeof p === 'string' ? p : p.name }))
+                .map((p: any) => (typeof p === 'string' ? { name: p } : p))
                 .filter((p: any) => !playingNames.includes(norm(p.name)));
         }
     } else if ((match.awayTeam as any)?.players) {
         // Same for away team
         const fullSquad = ((match.awayTeam as any).players)
-            .map((p: any) => ({ name: typeof p === 'string' ? p : p.name }));
+            .map((p: any) => (typeof p === 'string' ? { name: p } : p));
             
         awayPlayers = fullSquad.slice(0, 11);
         awayRestOfSquad = fullSquad.slice(11);
