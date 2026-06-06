@@ -1016,92 +1016,103 @@ const MatchDetails = () => {
                             </span>
                           </div>
 
-                          {/* Batting Table */}
-                          <div className="overflow-x-auto bg-secondary/10 rounded-lg border border-border/50">
-                            <table className="w-full text-sm">
-                              <thead className="bg-secondary/30 text-muted-foreground text-xs uppercase">
-                                <tr>
-                                  <th className="py-2 px-3 text-left">Batter</th>
-                                  <th className="py-2 px-2 text-right">R</th>
-                                  <th className="py-2 px-2 text-right">B</th>
-                                  <th className="py-2 px-2 text-right">4s</th>
-                                  <th className="py-2 px-2 text-right">6s</th>
-                                  <th className="py-2 px-2 text-right">SR</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-border/30">
-                                {inn.batsmen?.map((b: any, bIdx: number) => (
-                                  <tr key={bIdx} className="hover:bg-secondary/20">
-                                    <td className="py-2 px-3 font-medium">
-                                      <span className="flex items-center gap-1">
-                                        {b.name}
-                                        {b.isCaptain && <span className="text-[10px] bg-primary/20 text-primary px-1 rounded font-bold">C</span>}
-                                        {b.isKeeper && <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1 rounded font-bold">WK</span>}
-                                      </span>
-                                      {b.dismissal && <span className="block text-xs text-muted-foreground font-normal">{b.dismissal}</span>}
-                                    </td>
-                                    <td className="py-2 px-2 text-right font-bold text-foreground">{b.runs}</td>
-                                    <td className="py-2 px-2 text-right text-muted-foreground">{b.balls}</td>
-                                    <td className="py-2 px-2 text-right text-muted-foreground">{b.fours}</td>
-                                    <td className="py-2 px-2 text-right text-muted-foreground">{b.sixes}</td>
-                                    <td className="py-2 px-2 text-right text-muted-foreground">{b.strikeRate}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                          {/* Minimalist Batting Grid */}
+                          <div className="bg-transparent space-y-1">
+                            {/* Header */}
+                            <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1.5fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1.5fr] gap-2 px-3 py-2 text-[10px] uppercase tracking-widest text-muted-foreground/60 font-semibold border-b border-border/20">
+                              <div className="text-left">Batter</div>
+                              <div className="text-right">R</div>
+                              <div className="text-right">B</div>
+                              <div className="text-right">4s</div>
+                              <div className="text-right">6s</div>
+                              <div className="text-right">SR</div>
+                            </div>
+                            
+                            {/* Rows */}
+                            <div className="space-y-0.5 pt-1">
+                              {inn.batsmen?.map((b: any, bIdx: number) => {
+                                const isNotOut = b.dismissal?.toLowerCase().includes('not out') || b.dismissal === 'batting';
+                                return (
+                                <div key={bIdx} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1.5fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1.5fr] gap-2 px-3 py-2.5 bg-secondary/5 hover:bg-secondary/20 transition-colors rounded-sm items-center group">
+                                  <div className="flex flex-col overflow-hidden pr-2">
+                                    <span className="flex items-center gap-1.5 font-medium text-sm text-foreground/90 truncate">
+                                      <span className={cn("truncate", isNotOut && "text-foreground font-semibold")}>{b.name}</span>
+                                      {isNotOut && <span className="w-1.5 h-1.5 shrink-0 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse" title="Not Out"></span>}
+                                      {b.isCaptain && <span className="text-[9px] text-primary font-bold shrink-0">C</span>}
+                                      {b.isKeeper && <span className="text-[9px] text-blue-400 font-bold shrink-0">WK</span>}
+                                    </span>
+                                    {b.dismissal && !isNotOut && (
+                                      <span className="text-[10px] text-muted-foreground/50 italic truncate mt-0.5 group-hover:text-muted-foreground/80 transition-colors">{b.dismissal}</span>
+                                    )}
+                                  </div>
+                                  <div className="text-right font-bold text-foreground font-mono text-sm self-center">{b.runs}</div>
+                                  <div className="text-right text-muted-foreground/80 font-mono text-sm self-center">{b.balls}</div>
+                                  <div className="text-right text-muted-foreground/50 font-mono text-sm self-center">{b.fours}</div>
+                                  <div className="text-right text-muted-foreground/50 font-mono text-sm self-center">{b.sixes}</div>
+                                  <div className="text-right text-muted-foreground/80 font-mono text-sm self-center">{b.strikeRate}</div>
+                                </div>
+                              )})}
+                            </div>
                           </div>
 
                           {/* Extras */}
                           {inn.extras && (
-                            <div className="text-xs text-muted-foreground px-3 py-2 bg-secondary/10 rounded-lg">
-                              <span className="font-medium text-foreground">Extras: </span>
-                              {inn.extras.total ?? 0} (b {inn.extras.byes ?? 0}, lb {inn.extras.legbyes ?? 0}, w {inn.extras.wides ?? 0}, nb {inn.extras.noballs ?? 0})
+                            <div className="flex items-center justify-between px-3 py-2.5 bg-secondary/5 rounded-sm border border-border/10">
+                              <span className="text-[11px] uppercase tracking-widest text-muted-foreground/70 font-semibold">Extras</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono font-bold text-foreground">{inn.extras.total ?? 0}</span>
+                                <span className="text-[10px] text-muted-foreground/60 font-mono">
+                                  (b {inn.extras.byes ?? 0}, lb {inn.extras.legbyes ?? 0}, w {inn.extras.wides ?? 0}, nb {inn.extras.noballs ?? 0})
+                                </span>
+                              </div>
                             </div>
                           )}
 
-                          {/* Bowling Table */}
-                          <div className="overflow-x-auto bg-secondary/10 rounded-lg border border-border/50">
-                            <table className="w-full text-sm">
-                              <thead className="bg-secondary/30 text-muted-foreground text-xs uppercase">
-                                <tr>
-                                  <th className="py-2 px-3 text-left">Bowler</th>
-                                  <th className="py-2 px-2 text-right">O</th>
-                                  <th className="py-2 px-2 text-right">M</th>
-                                  <th className="py-2 px-2 text-right">R</th>
-                                  <th className="py-2 px-2 text-right">W</th>
-                                  <th className="py-2 px-2 text-right">Eco</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-border/30">
-                                {inn.bowlers?.map((b: any, bIdx: number) => (
-                                  <tr key={bIdx} className="hover:bg-secondary/20">
-                                    <td className="py-2 px-3 font-medium">
-                                      <span className="flex items-center gap-1">
-                                        {b.name}
-                                        {b.isCaptain && <span className="text-[10px] bg-primary/20 text-primary px-1 rounded font-bold">C</span>}
-                                      </span>
-                                    </td>
-                                    <td className="py-2 px-2 text-right text-muted-foreground">{b.overs}</td>
-                                    <td className="py-2 px-2 text-right text-muted-foreground">{b.maidens}</td>
-                                    <td className="py-2 px-2 text-right text-muted-foreground">{b.runs}</td>
-                                    <td className="py-2 px-2 text-right font-bold text-primary">{b.wickets}</td>
-                                    <td className="py-2 px-2 text-right text-muted-foreground">{b.economy}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                          {/* Minimalist Bowling Grid */}
+                          <div className="bg-transparent space-y-1 mt-6">
+                            {/* Header */}
+                            <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1.5fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1.5fr] gap-2 px-3 py-2 text-[10px] uppercase tracking-widest text-muted-foreground/60 font-semibold border-b border-border/20">
+                              <div className="text-left">Bowler</div>
+                              <div className="text-right">O</div>
+                              <div className="text-right">M</div>
+                              <div className="text-right">R</div>
+                              <div className="text-right">W</div>
+                              <div className="text-right">Eco</div>
+                            </div>
+                            
+                            {/* Rows */}
+                            <div className="space-y-0.5 pt-1">
+                              {inn.bowlers?.map((b: any, bIdx: number) => (
+                                <div key={bIdx} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1.5fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1.5fr] gap-2 px-3 py-2.5 bg-secondary/5 hover:bg-secondary/20 transition-colors rounded-sm items-center">
+                                  <div className="flex flex-col overflow-hidden pr-2">
+                                    <span className="flex items-center gap-1.5 font-medium text-sm text-foreground/90 truncate">
+                                      <span className="truncate">{b.name}</span>
+                                      {b.isCaptain && <span className="text-[9px] text-primary font-bold shrink-0">C</span>}
+                                    </span>
+                                  </div>
+                                  <div className="text-right text-muted-foreground/80 font-mono text-sm self-center">{b.overs}</div>
+                                  <div className="text-right text-muted-foreground/50 font-mono text-sm self-center">{b.maidens}</div>
+                                  <div className="text-right text-foreground/90 font-mono text-sm self-center">{b.runs}</div>
+                                  <div className="text-right font-bold text-primary font-mono text-sm self-center">{b.wickets}</div>
+                                  <div className="text-right text-muted-foreground/80 font-mono text-sm self-center">{b.economy}</div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
 
                           {/* Fall of Wickets */}
                           {inn.fallOfWickets && inn.fallOfWickets.length > 0 && (
-                            <div className="text-xs text-muted-foreground px-3 py-2 bg-secondary/10 rounded-lg">
-                              <span className="font-medium text-foreground">Fall of Wickets: </span>
-                              {inn.fallOfWickets.map((f: any, fIdx: number) => (
-                                <span key={fIdx}>
-                                  {f.score}/{f.wicketNum} ({f.batsmanName}, {f.overs} ov)
-                                  {fIdx < inn.fallOfWickets.length - 1 && ', '}
-                                </span>
-                              ))}
+                            <div className="mt-4 px-4 py-3 bg-secondary/5 rounded-lg border border-border/10">
+                              <span className="block text-[10px] uppercase tracking-widest text-muted-foreground/60 font-semibold mb-2">Fall of Wickets</span>
+                              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                {inn.fallOfWickets.map((f: any, fIdx: number) => (
+                                  <span key={fIdx} className="text-xs text-muted-foreground/80 flex items-center gap-1.5">
+                                    <span className="font-mono font-medium text-foreground/90">{f.score}/{f.wicketNum}</span>
+                                    <span className="text-[10px] opacity-70 truncate max-w-[100px] md:max-w-[150px]">{f.batsmanName}</span>
+                                    <span className="font-mono text-[10px] opacity-60">({f.overs})</span>
+                                  </span>
+                                ))}
+                              </div>
                             </div>
                           )}
                         </div>
