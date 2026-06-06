@@ -254,7 +254,7 @@ const MatchDetails = () => {
         {/* Match Header */}
         {/* Match Header */}
         <section className="bg-background pt-8 pb-12">
-          <div className="container mx-auto px-4 max-w-4xl">
+          <div className="container mx-auto px-4 max-w-7xl">
             {/* The Premium Card */}
             <div className="relative overflow-hidden rounded-[2rem] bg-card border border-border/40 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
                
