@@ -752,37 +752,110 @@ const MatchDetails = () => {
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
                 </div>
-              ) : cbSquadsField.data?.teams && cbSquadsField.data.teams.length > 0 ? (
-                /* ── Cricbuzz Squads (from Scorecard data) ── */
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {cbSquadsField.data.teams.map((team: any, tIdx: number) => (
-                    <div key={tIdx} className="bg-card border border-border rounded-xl p-6 space-y-4">
-                      <h4 className="font-semibold text-foreground text-lg flex items-center gap-2">
-                        <Users size={18} className="text-primary" />
-                        {team.teamName}
-                        {team.shortName && <span className="text-xs text-muted-foreground">({team.shortName})</span>}
-                      </h4>
-                      <p className="text-xs text-muted-foreground uppercase tracking-wider">Playing XI</p>
-                      <div className="space-y-1">
-                        {team.players.map((p: any, pIdx: number) => (
-                          <div key={pIdx} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-secondary/20 transition-colors">
-                            <span className="flex items-center gap-2 text-sm font-medium">
-                              <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
-                                {pIdx + 1}
-                              </span>
-                              {p.name}
-                            </span>
-                            <div className="flex items-center gap-1">
-                              {p.isCaptain && <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>}
-                              {p.isKeeper && <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">WK</span>}
-                              <span className="text-xs text-muted-foreground ml-1">{p.role}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              ) : (cbSquadsField.data?.teams?.length || match?.homeTeam?.players?.length || match?.awayTeam?.players?.length) ? (
+                /* ── Cricket Head-to-Head Lineups ── */
+                (() => {
+                  const apiTeams = cbSquadsField.data?.teams || [];
+                  const teams: any[] = [];
+                  
+                  // Extract Team 1 (Home)
+                  const homeApiTeam = apiTeams.find((t: any) => t.teamName === match?.homeTeam?.name || t.teamId === match?.homeTeam?.id) || apiTeams[0];
+                  if (homeApiTeam && homeApiTeam.teamName === match?.homeTeam?.name) {
+                     teams.push(homeApiTeam);
+                  } else if (match?.homeTeam?.players?.length) {
+                     teams.push({ teamName: match.homeTeam.name, shortName: match.homeTeam.shortName, players: match.homeTeam.players });
+                  } else if (homeApiTeam) {
+                     teams.push(homeApiTeam);
+                  } else {
+                     teams.push({ teamName: match?.homeTeam?.name || "Team 1", shortName: match?.homeTeam?.shortName || "T1", players: [] });
+                  }
+
+                  // Extract Team 2 (Away)
+                  const awayApiTeam = apiTeams.find((t: any) => t !== homeApiTeam);
+                  if (awayApiTeam) {
+                     teams.push(awayApiTeam);
+                  } else if (match?.awayTeam?.players?.length) {
+                     teams.push({ teamName: match.awayTeam.name, shortName: match.awayTeam.shortName, players: match.awayTeam.players });
+                  } else {
+                     teams.push({ teamName: match?.awayTeam?.name || "Team 2", shortName: match?.awayTeam?.shortName || "T2", players: [] });
+                  }
+
+                  return (
+                     <div className="bg-card border border-border rounded-[2rem] p-6 md:p-10 shadow-sm max-w-5xl mx-auto">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6 border-b border-border/50 pb-8">
+                           {/* Team 1 Header */}
+                           <div className="flex items-center gap-4 w-full md:w-[40%] justify-center md:justify-start">
+                              <TeamLogo logo={match?.homeTeam?.logo} name={teams[0]?.teamName || "Team 1"} size="lg" className="w-16 h-16 shadow-sm bg-background border border-border/50" />
+                              <div className="text-center md:text-left">
+                                 <h3 className="text-xl md:text-2xl font-bold text-foreground">{teams[0]?.teamName}</h3>
+                                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">{teams[0]?.shortName}</p>
+                              </div>
+                           </div>
+                           
+                           {/* VS Divider */}
+                           <div className="w-full md:w-[20%] flex flex-col items-center justify-center">
+                              <span className="text-2xl md:text-3xl font-black text-muted-foreground/20 italic mb-2">VS</span>
+                              <span className="text-[9px] uppercase tracking-[0.2em] text-primary font-bold bg-primary/10 border border-primary/20 px-3 py-1 rounded-full shadow-sm">Playing XI</span>
+                           </div>
+                           
+                           {/* Team 2 Header */}
+                           <div className="flex items-center gap-4 w-full md:w-[40%] justify-center md:justify-end md:flex-row-reverse text-center md:text-right">
+                              <TeamLogo logo={match?.awayTeam?.logo} name={teams[1]?.teamName || "Team 2"} size="lg" className="w-16 h-16 shadow-sm bg-background border border-border/50" />
+                              <div>
+                                 <h3 className="text-xl md:text-2xl font-bold text-foreground">{teams[1]?.teamName}</h3>
+                                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">{teams[1]?.shortName}</p>
+                              </div>
+                           </div>
+                        </div>
+
+                        {/* Players List */}
+                        <div className="space-y-2">
+                           {Array.from({ length: Math.max(teams[0]?.players?.length || 0, teams[1]?.players?.length || 0, 11) }).map((_, i) => {
+                              const p1 = teams[0]?.players?.[i];
+                              const p2 = teams[1]?.players?.[i];
+                              return (
+                                 <div key={i} className="flex flex-col md:flex-row items-center justify-between group rounded-xl overflow-hidden bg-secondary/10 border border-border/40 hover:border-primary/30 transition-colors shadow-sm">
+                                    {/* Team 1 Player */}
+                                    <div className="flex-1 flex items-center gap-3 p-3 md:p-4 w-full group-hover:bg-primary/5 transition-colors">
+                                       <span className="text-primary font-bold w-6 shrink-0 text-center text-sm">{i + 1}</span>
+                                       {p1 ? (
+                                          <>
+                                             <span className="font-semibold text-foreground flex-1 truncate text-sm">{p1.name}</span>
+                                             <div className="flex items-center gap-1.5 shrink-0">
+                                                {p1.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>}
+                                                {p1.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">WK</span>}
+                                                <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest ml-2 w-16 text-right truncate">{p1.role || p1.position}</span>
+                                             </div>
+                                          </>
+                                       ) : <span className="text-muted-foreground/30 italic flex-1 font-medium text-sm">—</span>}
+                                    </div>
+
+                                    {/* Center Divider */}
+                                    <div className="w-full md:w-12 h-px md:h-full flex justify-center items-center bg-border/20 md:bg-transparent shrink-0">
+                                       <span className="hidden md:block w-px h-8 bg-border/40"></span>
+                                    </div>
+
+                                    {/* Team 2 Player */}
+                                    <div className="flex-1 flex items-center gap-3 p-3 md:p-4 w-full md:flex-row-reverse md:text-right bg-secondary/20 md:bg-transparent group-hover:bg-primary/5 transition-colors">
+                                       <span className="text-primary font-bold w-6 shrink-0 text-left md:text-center hidden md:block text-sm">{i + 1}</span>
+                                       {p2 ? (
+                                          <>
+                                             <span className="font-semibold text-foreground flex-1 truncate text-sm">{p2.name}</span>
+                                             <div className="flex items-center gap-1.5 shrink-0 md:flex-row-reverse">
+                                                {p2.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>}
+                                                {p2.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">WK</span>}
+                                                <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest md:mr-2 md:ml-0 ml-2 w-16 md:text-left truncate">{p2.role || p2.position}</span>
+                                             </div>
+                                          </>
+                                       ) : <span className="text-muted-foreground/30 italic flex-1 md:text-right font-medium text-sm">—</span>}
+                                    </div>
+                                 </div>
+                              );
+                           })}
+                        </div>
+                     </div>
+                  );
+                })()
               ) : (
                 /* ── Fallback to existing SquadsList ── */
                 <SquadsList match={match} matchData={rawApiData} isLoading={matchInfoField.loading} />
