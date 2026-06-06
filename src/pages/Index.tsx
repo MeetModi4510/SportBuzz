@@ -10,6 +10,9 @@ import { TrendingPlayers } from "@/components/TrendingPlayers";
 import { SportIcon } from "@/components/SportIcon";
 import { MatchCard } from "@/components/MatchCard";
 import { CreatorsSection } from "@/components/CreatorsSection";
+import { CricketNewsSection } from '@/components/cricket/CricketNewsSection';
+import { CricketRankings } from '@/components/cricket/CricketRankings';
+import { TournamentHub } from '@/components/cricket/TournamentHub';
 import { NewsSection } from "@/components/NewsSection";
 import {
   matches as mockMatches,
@@ -326,11 +329,25 @@ const Index = () => {
 
           {/* Feature Coming Soon Placeholder for Live Tab */}
 
+          {/* Dynamic Sport-Specific Components */}
+          {activeSport === "cricket" && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <TournamentHub />
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                <div className="xl:col-span-2">
+                  <CricketNewsSection />
+                </div>
+                <div className="xl:col-span-1">
+                  <CricketRankings />
+                </div>
+              </div>
+            </div>
+          )}
 
-          {/* Global Sports News */}
-          <NewsSection />
+          {/* Global Sports News - Only on 'All' Tab */}
+          {activeSport === "all" && <NewsSection />}
 
-          <div id="trending-players">
+          <div id="trending-players" className="mt-8">
             <TrendingPlayers players={players} onPlayerClick={handlePlayerClick} />
           </div>
 
