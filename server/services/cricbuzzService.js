@@ -258,24 +258,50 @@ async function getMatchInfo(cbId) {
 }
 
 // ─── Player Extra Info (shared helper) ───────────────────────────────────────
+// Uses NAME-based search (returns faceImageId directly, 24h cache)
+// Avoids the expensive /stats/v1/player/{id} endpoint that causes 429
 const playerExtraCache = new NodeCache({ stdTTL: 86400 }); // 24-hour cache
-async function getPlayerExtraInfoGlobal(playerId) {
-    if (!playerId) return { role: null, faceImageId: null };
-    const cacheKey = `cb_extra_g_${playerId}`;
+
+async function getPlayerExtraInfoByName(playerName) {
+    if (!playerName) return { faceImageId: null };
+    const cacheKey = `cb_extra_name_${playerName.toLowerCase().replace(/\s+/g, '_')}`;
     const hit = playerExtraCache.get(cacheKey);
     if (hit) return hit;
     try {
-        const pRes = await axios.get(`${CB_BASE}/stats/v1/player/${playerId}`, { headers: cbHeaders });
-        const info = {
-            role: pRes.data?.role || null,
-            faceImageId: pRes.data?.faceImageId || null,
-        };
-        if (info.role || info.faceImageId) playerExtraCache.set(cacheKey, info);
+        const res = await axios.get(`${CB_BASE}/stats/v1/player/search`, {
+            headers: cbHeaders,
+            params: { plrN: playerName },
+        });
+        const first = (res.data?.player || [])[0];
+        const info = { faceImageId: first?.faceImageId ? String(first.faceImageId) : null };
+        if (info.faceImageId) playerExtraCache.set(cacheKey, info);
         return info;
     } catch {
-        return { role: null, faceImageId: null };
+        return { faceImageId: null };
     }
 }
+
+// Kept for backward compat — now resolves by name internally
+async function getPlayerExtraInfoGlobal(playerId, playerName) {
+    if (playerName) return getPlayerExtraInfoByName(playerName);
+    return { faceImageId: null };
+}
+
+// Batch resolver with concurrency limit (max 3 parallel to avoid 429)
+async function batchResolvePlayerImages(players) {
+    // players: array of { name, id }
+    const CONCURRENCY = 3;
+    const results = new Array(players.length).fill({ faceImageId: null });
+    let i = 0;
+    while (i < players.length) {
+        const batch = players.slice(i, i + CONCURRENCY);
+        const settled = await Promise.all(batch.map(p => getPlayerExtraInfoByName(p.name)));
+        settled.forEach((info, j) => { results[i + j] = info; });
+        i += CONCURRENCY;
+    }
+    return results;
+}
+
 
 // ─── Scorecard ─────────────────────────────────────────────────────────────────
 async function getScorecard(cbId) {
@@ -291,18 +317,6 @@ async function getScorecard(cbId) {
             return { error: 'No scorecard data from Cricbuzz', data: null };
         }
 
-        // Collect all unique player IDs across all innings (batsmen + bowlers)
-        const playerIdSet = new Set();
-        raw.scorecard.forEach(inn => {
-            (inn.batsman || []).forEach(b => { if (b.id) playerIdSet.add(String(b.id)); });
-            (inn.bowler  || []).forEach(b => { if (b.id) playerIdSet.add(String(b.id)); });
-        });
-
-        // Fetch faceImageId for all players in parallel (24-hour cache per player)
-        const playerIds = Array.from(playerIdSet);
-        const extraInfoArr = await Promise.all(playerIds.map(id => getPlayerExtraInfoGlobal(id)));
-        const playerExtraMap = {};
-        playerIds.forEach((id, i) => { playerExtraMap[id] = extraInfoArr[i]; });
 
         const innings = raw.scorecard.map((inn, idx) => {
             const fowArray = Array.isArray(inn.fow) ? inn.fow : (inn.fow?.fow || []);
@@ -319,11 +333,11 @@ async function getScorecard(cbId) {
                 isFollowOn: inn.isfollowon || false,
                 batsmen: (inn.batsman || []).map(b => {
                     const pid = b.id ? String(b.id) : null;
-                    const extra = pid ? playerExtraMap[pid] : null;
                     return {
                         name: b.name || b.nickname || 'Unknown',
                         id: pid,
-                        faceImageId: extra?.faceImageId ? String(extra.faceImageId) : null,
+                        faceImageId: null, // Resolved lazily on frontend one-by-one
+
                         runs: b.runs ?? 0,
                         balls: b.balls ?? 0,
                         fours: b.fours ?? 0,
@@ -336,11 +350,11 @@ async function getScorecard(cbId) {
                 }),
                 bowlers: (inn.bowler || []).map(b => {
                     const pid = b.id ? String(b.id) : null;
-                    const extra = pid ? playerExtraMap[pid] : null;
                     return {
                         name: b.name || b.nickname || 'Unknown',
                         id: pid,
-                        faceImageId: extra?.faceImageId ? String(extra.faceImageId) : null,
+                        faceImageId: null, // Resolved lazily on frontend one-by-one
+
                         overs: b.overs || '0',
                         maidens: b.maidens ?? 0,
                         runs: b.runs ?? 0,
@@ -423,35 +437,6 @@ async function getSquads(cbId) {
             return { error: 'No scorecard data to extract squads from', data: null };
         }
 
-        async function getPlayerExtraInfo(playerId) {
-            if (!playerId) return { role: null, faceImageId: null };
-            const cacheKey = `cb_extra_${playerId}`;
-            const cachedInfo = cache.get(cacheKey);
-            if (cachedInfo) return cachedInfo;
-
-            try {
-                const pRes = await axios.get(`${CB_BASE}/stats/v1/player/${playerId}`, { headers: cbHeaders });
-                const info = {
-                    role: pRes.data?.role || null,
-                    faceImageId: pRes.data?.faceImageId || null
-                };
-                if (info.role || info.faceImageId) cache.set(cacheKey, info, 86400); // Cache 24 hours
-                return info;
-            } catch {
-                return { role: null, faceImageId: null };
-            }
-        }
-
-        function normalizeRole(role) {
-            if (!role) return 'Batsman';
-            const r = role.toLowerCase();
-            if (r.includes('wk') || r.includes('keeper')) return 'WK-Batsman';
-            if (r === 'bowler') return 'Bowler';
-            if (r.includes('allrounder') || r.includes('all-rounder') || r.includes('all rounder')) return 'All-rounder';
-            if (r.includes('batter') || r.includes('batsman')) return 'Batsman';
-            return role;
-        }
-
         const teams = {};
 
         raw.scorecard.forEach(inn => {
@@ -513,12 +498,7 @@ async function getSquads(cbId) {
             }
         }
 
-        const infoPromises = allPlayers.map(p => getPlayerExtraInfo(p.id));
-        const infos = await Promise.all(infoPromises);
-        allPlayers.forEach((p, i) => {
-            p.resolvedRole = normalizeRole(infos[i].role);
-            p.faceImageId = infos[i].faceImageId;
-        });
+        // faceImageId is resolved lazily on the frontend one-by-one
 
         const teamsArray = Object.values(teams).map(t => ({
             teamName: t.teamName,

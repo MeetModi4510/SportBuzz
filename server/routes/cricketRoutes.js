@@ -191,6 +191,22 @@ router.get('/cb/player-search', async (req, res) => {
     }
 });
 
+// ─── Resolve Face Image ID (lightweight, for lazy one-by-one loading) ──────────
+// GET /api/cricket/cb/resolve-face?name={playerName}
+// Returns just { faceImageId } — used by frontend to resolve images sequentially.
+// Uses the player search cache (24h TTL) so repeated calls are free.
+router.get('/cb/resolve-face', async (req, res) => {
+    try {
+        const name = req.query.name;
+        if (!name) return res.json({ faceImageId: null });
+        const result = await cricbuzzService.searchPlayerByName(name);
+        const first = result?.data?.[0];
+        res.json({ faceImageId: first?.faceImageId || null });
+    } catch {
+        res.json({ faceImageId: null });
+    }
+});
+
 // ─── Cricket News ───────────────────────────────────────────────────────────────
 // GET /api/cricket/news
 // Returns latest cricket news from Cricbuzz, cached 30 minutes.
