@@ -620,89 +620,99 @@ const MatchDetails = () => {
                      <Info className="w-4 h-4 text-muted-foreground" />
                      <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Match Information</h3>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                        <Tag size={12}/> Match Type
-                      </span>
-                      <span className="font-semibold text-sm text-foreground">{match.matchType || "T20"}</span>
-                    </div>
-                    
-                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2 md:col-span-1">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                        <MapPin size={12}/> Venue
-                      </span>
-                      <span className="font-semibold text-sm text-foreground truncate" title={`${match.venue?.name}${match.venue?.city ? `, ${match.venue?.city}` : ''}`}>
-                        {match.venue?.name || "Stadium"}{match.venue?.city && `, ${match.venue?.city}`}
-                      </span>
+                  <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
+                    <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/40">
+                      
+                      {/* Column 1: Core Details */}
+                      <div className="p-6 md:p-8 space-y-8">
+                        
+                        {/* Match Type & Status */}
+                        <div className="flex items-start gap-4">
+                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Tag size={18}/></div>
+                          <div>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Match Type</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold text-sm text-foreground">{match.matchType || "T20"}</p>
+                              <span className="w-1 h-1 rounded-full bg-border/60"></span>
+                              <span className={cn("font-medium text-xs flex items-center gap-1.5", isLive ? "text-red-500" : "text-muted-foreground")}>
+                                {isLive ? <><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/> In Progress</> : isCompleted ? 'Completed' : 'Upcoming'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Venue Info */}
+                        <div className="flex items-start gap-4">
+                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><MapPin size={18}/></div>
+                          <div>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Venue</p>
+                            <p className="font-semibold text-sm text-foreground leading-snug">{match.venue?.name || "Stadium"}{match.venue?.city && `, ${match.venue?.city}`}</p>
+                            <p className="text-[11px] font-medium text-muted-foreground mt-1.5">Capacity: {match.venue?.capacity ? match.venue.capacity.toLocaleString() : "38,200"}</p>
+                          </div>
+                        </div>
+                        
+                        {/* Date & Time */}
+                        <div className="flex items-start gap-4">
+                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Clock size={18}/></div>
+                          <div>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Date & Time</p>
+                            <p className="font-semibold text-sm text-foreground">
+                              {match.displayTime && (match.sport === 'cricket' || match.sport === 'football')
+                                ? match.displayTime
+                                : format(match.startTime || new Date(), "MMMM d, yyyy • h:mm a")}
+                            </p>
+                          </div>
+                        </div>
+
+                      </div>
+
+                      {/* Column 2: Officials & Toss */}
+                      <div className="p-6 md:p-8 space-y-8 bg-muted/5">
+                        
+                        {/* Toss */}
+                        <div className="flex items-start gap-4">
+                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Coins size={18}/></div>
+                          <div>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Toss Result</p>
+                            <p className="font-semibold text-sm text-foreground leading-snug">
+                              {match.tossResult || (rawApiData?.tossWinner ? `${rawApiData.tossWinner} chose to ${rawApiData.tossChoice}` : "India won the toss and chose to bat")}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Umpires */}
+                        <div className="flex items-start gap-4">
+                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Eye size={18}/></div>
+                          <div>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">On-Field Umpires</p>
+                            <p className="font-semibold text-sm text-foreground">
+                              {rawApiData?.umpire1 ? `${rawApiData.umpire1}, ${rawApiData.umpire2}` : "R. Kettleborough, N. Llong"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Referee */}
+                        <div className="flex items-start gap-4">
+                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Shield size={18}/></div>
+                          <div>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Match Referee</p>
+                            <p className="font-semibold text-sm text-foreground">
+                              {match.referee || rawApiData?.referee || "J. Srinath"}
+                            </p>
+                          </div>
+                        </div>
+
+                      </div>
                     </div>
 
-                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                        <Clock size={12}/> Date & Time
-                      </span>
-                      <span className="font-semibold text-sm text-foreground">
-                        {match.displayTime && (match.sport === 'cricket' || match.sport === 'football')
-                          ? match.displayTime
-                          : format(match.startTime || new Date(), "MMM d, yyyy • h:mm a")}
-                      </span>
-                    </div>
-
-                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                        <Activity size={12}/> Status
-                      </span>
-                      <span className={cn(
-                        "font-semibold text-sm",
-                        isLive ? "text-red-500 flex items-center gap-1.5" : "text-foreground"
-                      )}>
-                        {isLive ? <><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/> In Progress</> : isCompleted ? 'Completed' : 'Upcoming'}
-                      </span>
-                    </div>
-                    
-                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                        <Coins size={12}/> Toss Winner
-                      </span>
-                      <span className="font-semibold text-sm text-foreground">
-                        {match.tossResult || (rawApiData?.tossWinner ? `${rawApiData.tossWinner} chose to ${rawApiData.tossChoice}` : "India won the toss and chose to bat")}
-                      </span>
-                    </div>
-
-                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2 md:col-span-1">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                        <Users size={12}/> Capacity
-                      </span>
-                      <span className="font-semibold text-sm text-foreground">
-                        {match.venue?.capacity ? match.venue.capacity.toLocaleString() : "38,200"}
-                      </span>
-                    </div>
-
-                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2 md:col-span-1">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                        <Shield size={12}/> Match Referee
-                      </span>
-                      <span className="font-semibold text-sm text-foreground">
-                        {match.referee || rawApiData?.referee || "J. Srinath"}
-                      </span>
-                    </div>
-                    
-                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2 md:col-span-2">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                        <Eye size={12}/> Umpires
-                      </span>
-                      <span className="font-semibold text-sm text-foreground">
-                        {rawApiData?.umpire1 ? `${rawApiData.umpire1}, ${rawApiData.umpire2}` : "R. Kettleborough, N. Llong"}
-                      </span>
-                    </div>
-
+                    {/* Man of the Match (Full Width Footer) */}
                     {match.manOfTheMatch && (
-                      <div className="bg-card border border-primary/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-primary/50 transition-colors shadow-sm col-span-2 md:col-span-4 relative overflow-hidden group">
-                        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-primary/10 to-transparent pointer-events-none transition-opacity group-hover:opacity-100 opacity-50"/>
-                        <span className="text-[10px] font-bold text-primary uppercase tracking-widest flex items-center gap-1.5 relative z-10">
-                          <Trophy size={12}/> Man of the Match
-                        </span>
-                        <span className="font-bold text-base text-foreground relative z-10">{typeof match.manOfTheMatch === 'object' ? match.manOfTheMatch?.name : match.manOfTheMatch}</span>
+                      <div className="border-t border-border/40 bg-gradient-to-r from-primary/10 via-transparent to-transparent p-6 md:px-8 flex items-center gap-5">
+                        <div className="p-3.5 bg-primary/20 rounded-2xl text-primary ring-1 ring-primary/30"><Trophy size={18}/></div>
+                        <div>
+                          <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Player of the Match</p>
+                          <p className="font-bold text-base text-foreground tracking-tight">{typeof match.manOfTheMatch === 'object' ? match.manOfTheMatch?.name : match.manOfTheMatch}</p>
+                        </div>
                       </div>
                     )}
                   </div>
