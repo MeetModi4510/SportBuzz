@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 export const CricketNewsSection = () => {
   const { news, loading, error } = useCricketNews();
   const [selectedArticle, setSelectedArticle] = useState<CricketNewsItem | null>(null);
+  const [isViewAllOpen, setIsViewAllOpen] = useState(false);
 
   if (loading) {
     return (
@@ -31,6 +32,7 @@ export const CricketNewsSection = () => {
   const sideArticles = news.slice(1, 4); // Take next 3
 
   return (
+    <>
     <Dialog open={!!selectedArticle} onOpenChange={(open) => !open && setSelectedArticle(null)}>
       <section className="bg-card/20 rounded-[2rem] border border-border/40 p-6 md:p-8">
         {/* Header */}
@@ -44,7 +46,10 @@ export const CricketNewsSection = () => {
               <p className="text-sm text-muted-foreground">Latest in the world of Cricket</p>
             </div>
           </div>
-          <button className="text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
+          <button 
+            onClick={() => setIsViewAllOpen(true)}
+            className="text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+          >
             View All <ChevronRight size={16} />
           </button>
         </div>
@@ -137,5 +142,45 @@ export const CricketNewsSection = () => {
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Modal for View All News */}
+    <Dialog open={isViewAllOpen} onOpenChange={setIsViewAllOpen}>
+      <DialogContent className="sm:max-w-[900px] border-border/50 bg-background/95 backdrop-blur-xl rounded-3xl max-h-[85vh] overflow-y-auto overflow-x-hidden p-6 md:p-8 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+        <DialogHeader className="mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 text-primary rounded-lg">
+              <SportIcon sport="cricket" size={24} />
+            </div>
+            <DialogTitle className="text-2xl md:text-3xl font-bold tracking-tight">All Cricket News</DialogTitle>
+          </div>
+        </DialogHeader>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {news.map((article, index) => (
+            <div 
+              key={article.id || index}
+              onClick={() => { setIsViewAllOpen(false); setSelectedArticle(article); }}
+              className="group flex flex-col justify-between p-5 rounded-3xl border border-border/40 bg-card/40 cursor-pointer hover:border-white/20 hover:bg-secondary/20 transition-all duration-300"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-2.5 py-1 rounded-full truncate max-w-[100px]">{article.source}</span>
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground font-medium whitespace-nowrap">
+                    <Clock size={12} />
+                    {article.timestamp}
+                  </div>
+                </div>
+                <h4 className="text-base font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-3">
+                  {article.headline || article.title}
+                </h4>
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                  {article.snippet}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
