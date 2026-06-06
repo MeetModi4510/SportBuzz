@@ -19,9 +19,10 @@ interface PlayerCardProps {
   onClick?: () => void;
   className?: string;
   compact?: boolean;
+  hideStats?: boolean;
 }
 
-export const PlayerCard = ({ player, onClick, className, compact = false }: PlayerCardProps) => {
+export const PlayerCard = ({ player, onClick, className, compact = false, hideStats = false }: PlayerCardProps) => {
   const [imgError, setImgError] = useState(false);
 
   if (!player) return null;
@@ -235,7 +236,7 @@ export const PlayerCard = ({ player, onClick, className, compact = false }: Play
         )}
 
         {/* Main stat highlight */}
-        {!player.matchStats && (
+        {!player.matchStats && !hideStats && (
           <div className="flex items-center gap-2 p-2 rounded-lg bg-secondary/50">
             <TrendingUp size={16} className="text-primary" />
             <span className="text-sm font-medium text-foreground">{getMainStat()}</span>
@@ -243,28 +244,30 @@ export const PlayerCard = ({ player, onClick, className, compact = false }: Play
         )}
 
         {/* Quick stats */}
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          {player.stats.matches && (
-            <div className="text-muted-foreground">
-              <span className="text-foreground font-medium">{player.stats.matches}</span> matches
-            </div>
-          )}
-          {player.stats.average && (
-            <div className="text-muted-foreground">
-              <span className="text-foreground font-medium">{player.stats.average}</span> avg
-            </div>
-          )}
-          {player.stats.assists !== undefined && (
-            <div className="text-muted-foreground">
-              <span className="text-foreground font-medium">{player.stats.assists}</span> assists
-            </div>
-          )}
-          {player.stats.wins && (
-            <div className="text-muted-foreground">
-              <span className="text-foreground font-medium">{player.stats.wins}</span> wins
-            </div>
-          )}
-        </div>
+        {!hideStats && (
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            {player.stats.matches && (
+              <div className="text-muted-foreground">
+                <span className="text-foreground font-medium">{player.stats.matches}</span> matches
+              </div>
+            )}
+            {player.stats.average && (
+              <div className="text-muted-foreground">
+                <span className="text-foreground font-medium">{player.stats.average}</span> avg
+              </div>
+            )}
+            {player.stats.assists !== undefined && (
+              <div className="text-muted-foreground">
+                <span className="text-foreground font-medium">{player.stats.assists}</span> assists
+              </div>
+            )}
+            {player.stats.wins && (
+              <div className="text-muted-foreground">
+                <span className="text-foreground font-medium">{player.stats.wins}</span> wins
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Hover overlay */}

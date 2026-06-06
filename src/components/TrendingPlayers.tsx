@@ -111,6 +111,7 @@ export const TrendingPlayers = ({
                 <PlayerCard
                   player={item as Player}
                   onClick={() => onPlayerClick?.(item as Player)}
+                  hideStats={true}
                 />
               )}
             </div>
