@@ -323,9 +323,7 @@ const MatchDetails = () => {
                            <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{match.homeTeam?.name || "Team 1"}</h2>
                            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{match.homeTeam?.shortName}</p>
                        </div>
-                       <div className="p-3 rounded-2xl bg-background border border-border/40 shadow-sm flex items-center justify-center shrink-0">
-                           <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-cover rounded-md ring-1 ring-border/50 bg-muted/20 shrink-0" />
-                       </div>
+                       <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
                    </div>
 
                    {/* Score Center */}
@@ -412,9 +410,7 @@ const MatchDetails = () => {
 
                    {/* Away Team */}
                    <div className="flex-1 flex flex-col md:flex-row items-center justify-start gap-5 w-full z-10">
-                       <div className="p-3 rounded-2xl bg-background border border-border/40 shadow-sm flex items-center justify-center shrink-0">
-                           <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-cover rounded-md ring-1 ring-border/50 bg-muted/20 shrink-0" />
-                       </div>
+                       <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
                        <div className="text-center md:text-left">
                            <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{match.awayTeam?.name || "Team 2"}</h2>
                            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{match.awayTeam?.shortName}</p>
