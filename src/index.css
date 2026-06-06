@@ -73,45 +73,76 @@
   }
 
   .dark {
-    /* Dark Mode Colors - Elegant Minimalist */
+    /* --- OLD DARK MODE COLORS (Preserved for easy revert) --- 
     --background: 220 10% 4%;
     --foreground: 210 20% 98%;
-
     --card: 220 10% 6%;
     --card-foreground: 210 20% 98%;
-
     --popover: 220 10% 6%;
     --popover-foreground: 210 20% 98%;
-
     --primary: 142 76% 45%;
     --primary-foreground: 220 10% 4%;
-
     --secondary: 220 10% 12%;
     --secondary-foreground: 210 20% 98%;
-
     --muted: 220 10% 12%;
     --muted-foreground: 215 15% 60%;
-
     --accent: 220 10% 16%;
     --accent-foreground: 210 20% 98%;
-
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 20% 98%;
-
     --border: 220 10% 12%;
     --input: 220 10% 12%;
     --ring: 142 76% 45%;
-
     --glass: 222 47% 12% / 0.8;
     --glass-border: 217 33% 25% / 0.5;
-
     --gradient-primary: linear-gradient(135deg, hsl(142 76% 45%), hsl(142 76% 35%));
     --gradient-live: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 84% 50%));
     --gradient-card: linear-gradient(180deg, hsl(222 47% 10%), hsl(222 47% 8%));
-
     --shadow-glow: 0 0 30px hsl(142 76% 45% / 0.3);
     --shadow-live: 0 0 20px hsl(0 84% 60% / 0.4);
     --shadow-card: 0 8px 32px hsl(222 47% 4% / 0.5);
+    ------------------------------------------------------- */
+
+    /* NEW Ultra-Premium Dark Mode Colors - Monochromatic & Elegant */
+    --background: 220 10% 2%; /* Deep Obsidian */
+    --foreground: 0 0% 100%; /* Pure White */
+
+    --card: 220 10% 4%; /* Slightly elevated obsidian */
+    --card-foreground: 0 0% 100%;
+
+    --popover: 220 10% 4%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 0 0% 100%; /* Pure White as primary accent */
+    --primary-foreground: 220 10% 2%;
+
+    --secondary: 220 10% 8%; /* Dark frosted glass tone */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 10% 8%;
+    --muted-foreground: 215 15% 65%; /* Soft Silver */
+
+    --accent: 220 10% 12%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 10% 10%; /* Almost invisible border */
+    --input: 220 10% 8%;
+    --ring: 0 0% 100%; /* White ring */
+
+    --glass: 0 0% 100% / 0.02; /* Extremely subtle glass */
+    --glass-border: 0 0% 100% / 0.05;
+
+    /* Removed all colorful gradients - replaced with subtle tonal shifts */
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 100%), hsl(0 0% 90%));
+    --gradient-live: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 84% 50%));
+    --gradient-card: linear-gradient(180deg, hsl(220 10% 4%), hsl(220 10% 2%));
+
+    --shadow-glow: 0 0 30px hsl(0 0% 100% / 0.1);
+    --shadow-live: 0 0 20px hsl(0 84% 60% / 0.4);
+    --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.8);
 
     --sidebar-background: 222 47% 8%;
     --sidebar-foreground: 210 40% 98%;

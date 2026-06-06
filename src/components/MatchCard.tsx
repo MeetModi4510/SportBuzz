@@ -32,20 +32,20 @@ export const MatchCard = ({ match, onClick, className, showSeriesName }: MatchCa
   };
 
   const getStatusColor = () => {
-    if (isLive) return "text-red-500 font-semibold";
-    if (isUpcoming) return "text-blue-500 font-medium";
+    if (isLive) return "text-foreground font-bold";
+    if (isUpcoming) return "text-muted-foreground font-medium";
     return "text-muted-foreground";
   };
 
-  const themeBorder = getSportBorderColor(match.sport) || "border-border/60";
+  const themeBorder = "border-white/5";
 
   return (
     <div
       onClick={() => onClick?.(match)}
       className={cn(
-        "group relative overflow-hidden rounded-xl border bg-secondary/30 p-4 transition-all duration-200",
+        "group relative overflow-hidden rounded-2xl border bg-white/[0.02] backdrop-blur-md p-4 transition-all duration-300",
         themeBorder,
-        "hover:bg-secondary/50 hover:shadow-md cursor-pointer",
+        "hover:-translate-y-1 hover:bg-white/[0.04] hover:shadow-[0_8px_30px_rgba(0,0,0,0.8)] hover:border-white/10 cursor-pointer",
         "w-full flex flex-col gap-4",
         className
       )}
@@ -55,9 +55,9 @@ export const MatchCard = ({ match, onClick, className, showSeriesName }: MatchCa
         <span className="text-[11px] text-muted-foreground tracking-widest font-semibold uppercase truncate mr-2" title={match.seriesName || match.matchType}>
           {showSeriesName && match.seriesName ? match.seriesName : match.matchType}
         </span>
-        <div className="flex items-center gap-2">
-           {isLive && <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />}
-           <span className={cn("text-[11px] uppercase tracking-widest", getStatusColor())}>
+        <div className="flex items-center gap-2 bg-white/5 px-2.5 py-1 rounded-full">
+           {isLive && <span className="h-1.5 w-1.5 rounded-full bg-foreground animate-pulse" />}
+           <span className={cn("text-[9px] font-bold uppercase tracking-widest", getStatusColor())}>
              {getStatusText()}
            </span>
         </div>
