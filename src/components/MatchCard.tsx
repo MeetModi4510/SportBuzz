@@ -9,9 +9,10 @@ interface MatchCardProps {
   match: Match;
   onClick?: (match: Match) => void;
   className?: string;
+  showSeriesName?: boolean;
 }
 
-export const MatchCard = ({ match, onClick, className }: MatchCardProps) => {
+export const MatchCard = ({ match, onClick, className, showSeriesName }: MatchCardProps) => {
   const isLive = match.status === "live";
   const isUpcoming = match.status === "upcoming";
 
@@ -51,8 +52,8 @@ export const MatchCard = ({ match, onClick, className }: MatchCardProps) => {
     >
       {/* Header */}
       <div className={cn("flex items-center justify-between pb-3 border-b", themeBorder)}>
-        <span className="text-[11px] text-muted-foreground tracking-widest font-semibold uppercase">
-          {match.matchType}
+        <span className="text-[11px] text-muted-foreground tracking-widest font-semibold uppercase truncate mr-2" title={match.seriesName || match.matchType}>
+          {showSeriesName && match.seriesName ? match.seriesName : match.matchType}
         </span>
         <div className="flex items-center gap-2">
            {isLive && <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />}

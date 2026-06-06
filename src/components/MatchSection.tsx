@@ -59,6 +59,18 @@ export const MatchSection = ({
       );
     }
 
+    if (onlyLive) {
+      return (
+        <div className="flex overflow-x-auto snap-x gap-6 pb-6 pt-2 scrollbar-hide">
+          {groupMatches.map(match => (
+            <div key={match.id} className="snap-start shrink-0 w-[300px] md:w-[380px] h-full flex flex-col transition-all hover:-translate-y-1">
+              <MatchCard match={match} onClick={onMatchClick} showSeriesName={true} />
+            </div>
+          ))}
+        </div>
+      );
+    }
+
     // Group matches by seriesName
     const grouped = groupMatches.reduce((acc, match) => {
       let series = match.seriesName || "Other Matches";
