@@ -58,6 +58,7 @@ const MatchDetails = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null);
   const [activeTab, setActiveTab] = useState('summary');
+  const [activeInningsIndex, setActiveInningsIndex] = useState<number>(-1);
 
   const summarizePlayerEvents = (playerName: string, events: any[], teamGoalsConceded: number = 0) => {
       const playerEvents = {
@@ -1180,20 +1181,43 @@ const MatchDetails = () => {
                         </div>
                       )}
 
-                      {cbScorecardField.data.innings.map((inn: any, idx: number) => (
-                        <div key={idx} className="space-y-4">
-                          <div className="flex items-center justify-between border-b border-border pb-2">
-                            <h4 className="font-semibold text-foreground uppercase tracking-wider">
-                              {inn.teamName || `Innings ${idx + 1}`}
-                              {inn.isDeclared && <span className="text-xs text-muted-foreground ml-2">(d)</span>}
-                            </h4>
-                            <span className="text-sm font-mono font-bold text-primary">
-                              {inn.score}/{inn.wickets} ({inn.overs} ov)
-                            </span>
+                      {(() => {
+                        const inningsList = cbScorecardField.data.innings;
+                        if (!inningsList || inningsList.length === 0) return null;
+                        
+                        const displayIndex = activeInningsIndex === -1 ? inningsList.length - 1 : activeInningsIndex;
+                        const inn = inningsList[displayIndex];
+                        if (!inn) return null;
+
+                        return (
+                        <div className="space-y-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-4 gap-4">
+                            <div className="relative min-w-[250px]">
+                              <select 
+                                value={displayIndex} 
+                                onChange={(e) => setActiveInningsIndex(Number(e.target.value))}
+                                className="w-full bg-secondary border border-border text-foreground text-sm font-bold rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer appearance-none hover:bg-secondary/80 pr-10"
+                              >
+                                {inningsList.map((inning: any, idx: number) => (
+                                  <option key={idx} value={idx} className="bg-background text-foreground py-2">
+                                    {inning.teamName || `Innings ${idx + 1}`} {inning.isDeclared ? '(d)' : ''}
+                                  </option>
+                                ))}
+                              </select>
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                              </div>
+                            </div>
+                            <div className="flex flex-col sm:items-end">
+                              <span className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Score</span>
+                              <span className="text-2xl sm:text-3xl font-mono font-black text-primary leading-none">
+                                {inn.score}/{inn.wickets} <span className="text-sm text-muted-foreground font-medium ml-1">({inn.overs} ov)</span>
+                              </span>
+                            </div>
                           </div>
 
                           {/* Card-Based Batting Scorecard */}
-                          <div className="pt-4 pb-8">
+                          <div className="pt-2 pb-8">
                             <h5 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 font-bold mb-4 px-1">Batting</h5>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                               {(() => {
@@ -1320,7 +1344,8 @@ const MatchDetails = () => {
                             </div>
                           </div>
                         </div>
-                      ))}
+                        );
+                      })()}
                     </div>
                   ) : rawApiData?.score && Array.isArray(rawApiData.score) && rawApiData.score.length > 0 ? (
                     /* ── CricketData.org Summary Fallback ── */
