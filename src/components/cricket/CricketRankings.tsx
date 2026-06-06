@@ -217,7 +217,7 @@ export const CricketRankings = () => {
       </div>
 
       {/* Rankings Table */}
-      <div className="overflow-y-auto overflow-x-auto -mx-2 px-2 flex-1 max-h-[360px] scrollbar-thin">
+      <div className="overflow-y-auto overflow-x-hidden -mx-2 px-2 flex-1 max-h-[360px] scrollbar-thin pr-1">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-10 gap-3">
             <Loader2 size={28} className="text-primary animate-spin" />
