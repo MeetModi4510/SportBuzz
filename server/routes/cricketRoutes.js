@@ -188,4 +188,21 @@ router.get('/news', async (req, res) => {
     }
 });
 
+// ─── ICC Team Rankings ─────────────────────────────────────────────────────────
+// GET /api/cricket/rankings/:format  (format: odi | test | t20)
+// Lazy loaded per tab click. Cached 1 week, force-refreshed on Wednesdays.
+router.get('/rankings/:format', async (req, res) => {
+    const { format } = req.params;
+    const allowed = ['odi', 'test', 't20'];
+    if (!allowed.includes(format.toLowerCase())) {
+        return res.status(400).json({ error: 'Invalid format. Use: odi, test, t20' });
+    }
+    try {
+        const result = await cricbuzzService.getTeamRankings(format.toLowerCase());
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ data: [], error: error.message });
+    }
+});
+
 export default router;

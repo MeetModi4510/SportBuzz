@@ -703,6 +703,102 @@ async function getCricketNews() {
     }
 }
 
+// ─── ICC Team Rankings ───────────────────────────────────────────────────────────
+const rankingsCache = new NodeCache({ stdTTL: 604800 }); // 1 week default TTL
+
+// Cricbuzz imageId → ISO 3166-1 alpha-2 country code (for flagcdn)
+const CB_IMAGE_TO_FLAG = {
+    '776162': 'in',  // India
+    '776202': 'au',  // Australia
+    '776237': 'gb-eng', // England
+    '776287': 'za',  // South Africa
+    '776247': 'nz',  // New Zealand
+    '776257': 'pk',  // Pakistan
+    '776222': 'lk',  // Sri Lanka
+    '776167': 'bd',  // Bangladesh
+    '776227': 'wi',  // West Indies
+    '776232': 'zw',  // Zimbabwe
+    '776242': 'af',  // Afghanistan
+    '776312': 'ie',  // Ireland
+    '776307': 'nl',  // Netherlands
+    '776302': 'sc',  // Scotland
+    '776297': 'zw',  // Zimbabwe alt
+    '776292': 'na',  // Namibia
+    '776317': 'us',  // USA
+    '776322': 'ug',  // Uganda
+    '776172': 'np',  // Nepal
+    '776327': 'oman', // Oman — fallback to text
+    '776332': 'pa',  // Papua New Guinea
+    '776337': 'kw',  // Kuwait
+    '776342': 'sg',  // Singapore
+    '776347': 'hk',  // Hong Kong
+    '776352': 'ke',  // Kenya
+    '776357': 'tz',  // Tanzania
+    '776362': 'ca',  // Canada
+};
+
+function shouldRefreshRankings(format) {
+    // Force refresh on Wednesday (day 3 in JS Date, 0=Sun)
+    const now = new Date();
+    const isWednesday = now.getDay() === 3;
+    if (!isWednesday) return false;
+
+    const cacheKey = `rankings_${format}`;
+    const meta = rankingsCache.get(`${cacheKey}_meta`);
+    if (!meta) return true;
+
+    // If already refreshed today (Wednesday), don't re-fetch
+    const lastRefreshDate = new Date(meta.refreshedAt).toDateString();
+    return lastRefreshDate !== now.toDateString();
+}
+
+async function getTeamRankings(format) {
+    const cacheKey = `rankings_${format}`;
+    const cached = rankingsCache.get(cacheKey);
+
+    // Return cache unless it's Wednesday refresh time
+    if (cached && !shouldRefreshRankings(format)) return cached;
+
+    const newsApiKey = process.env.CRICBUZZ_CRICKET_NEWS || RAPIDAPI_KEY;
+    const rankHost = 'cricbuzz-cricket2.p.rapidapi.com';
+
+    try {
+        const res = await axios.get(
+            `https://${rankHost}/stats/v1/rankings/teams?isWomen=0&formatType=${format}`,
+            { headers: { 'x-rapidapi-key': newsApiKey, 'x-rapidapi-host': rankHost } }
+        );
+
+        const raw = res.data?.rank || [];
+        const hasMatches = raw.length > 0 && raw[0].matches != null && raw[0].matches !== '';
+
+        const teams = raw.map(t => ({
+            rank: parseInt(t.rank),
+            id: t.id,
+            name: t.name,
+            rating: parseInt(t.rating) || 0,
+            points: parseInt(t.points) || 0,
+            matches: hasMatches ? (parseInt(t.matches) || 0) : null,
+            flagCode: CB_IMAGE_TO_FLAG[t.imageId] || null,
+            lastUpdatedOn: t.lastUpdatedOn || null,
+        }));
+
+        const result = {
+            data: teams,
+            hasMatches,
+            lastUpdatedOn: teams[0]?.lastUpdatedOn || null,
+            error: null,
+        };
+
+        rankingsCache.set(cacheKey, result, 604800); // 1 week
+        rankingsCache.set(`${cacheKey}_meta`, { refreshedAt: Date.now() }, 604800);
+        return result;
+    } catch (err) {
+        console.error(`[CRICBUZZ] Rankings fetch error (${format}):`, err.message);
+        if (cached) return cached; // serve stale on error
+        return { data: [], hasMatches: false, lastUpdatedOn: null, error: 'Failed to fetch rankings' };
+    }
+}
+
 // ─── Export ────────────────────────────────────────────────────────────────────
 export const cricbuzzService = {
     getLiveMatches,
@@ -717,6 +813,7 @@ export const cricbuzzService = {
     checkPlayerImageExists,
     streamPlayerImage,
     getCricketNews,
+    getTeamRankings,
 };
 
 export default cricbuzzService;
