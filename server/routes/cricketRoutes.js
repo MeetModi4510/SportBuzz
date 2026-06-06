@@ -176,4 +176,16 @@ router.get('/cb/player-image/:playerId', async (req, res) => {
     }
 });
 
+// ─── Cricket News ───────────────────────────────────────────────────────────────
+// GET /api/cricket/news
+// Returns latest cricket news from Cricbuzz, cached 30 minutes.
+router.get('/news', async (req, res) => {
+    try {
+        const result = await cricbuzzService.getCricketNews();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ data: [], error: error.message });
+    }
+});
+
 export default router;

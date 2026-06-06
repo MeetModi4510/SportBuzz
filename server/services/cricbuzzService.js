@@ -645,6 +645,64 @@ async function streamPlayerImage(playerId, res) {
     }
 }
 
+// ─── Cricket News ───────────────────────────────────────────────────────────────
+const newsCache = new NodeCache({ stdTTL: 1800 }); // 30-minute cache
+
+function formatNewsTimestamp(pubTimestamp) {
+    if (!pubTimestamp) return 'Just now';
+    const pub = new Date(parseInt(pubTimestamp));
+    const diff = Date.now() - pub.getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
+}
+
+async function getCricketNews() {
+    const cacheKey = 'cb_news_index';
+    const cached = newsCache.get(cacheKey);
+    if (cached) return cached;
+
+    const newsApiKey = process.env.CRICBUZZ_CRICKET_NEWS || RAPIDAPI_KEY;
+    const newsHost = 'cricbuzz-cricket2.p.rapidapi.com';
+
+    try {
+        const res = await axios.get(`https://${newsHost}/news/v1/index`, {
+            headers: {
+                'x-rapidapi-key': newsApiKey,
+                'x-rapidapi-host': newsHost,
+            }
+        });
+
+        const storyList = res.data?.storyList || [];
+        const articles = storyList
+            .filter(item => item.story)
+            .map(item => {
+                const s = item.story;
+                return {
+                    id: String(s.id),
+                    title: s.seoHeadline || s.hline || 'Cricket News',
+                    headline: s.hline || s.seoHeadline || 'Cricket News',
+                    snippet: s.intro || '',
+                    timestamp: formatNewsTimestamp(s.pubTime),
+                    context: s.context || '',
+                    imageId: s.coverImage?.id || s.imageId || null,
+                    source: s.source || 'Cricbuzz',
+                    sport: 'cricket',
+                };
+            });
+
+        const result = { data: articles, error: null };
+        newsCache.set(cacheKey, result, 1800); // 30 min
+        return result;
+    } catch (err) {
+        console.error('[CRICBUZZ] News fetch error:', err.message);
+        newsCache.set(cacheKey, { data: [], error: 'Failed to fetch news' }, 60);
+        return { data: [], error: 'Failed to fetch news' };
+    }
+}
+
 // ─── Export ────────────────────────────────────────────────────────────────────
 export const cricbuzzService = {
     getLiveMatches,
@@ -658,6 +716,7 @@ export const cricbuzzService = {
     getPlayerInfo,
     checkPlayerImageExists,
     streamPlayerImage,
+    getCricketNews,
 };
 
 export default cricbuzzService;

@@ -530,9 +530,9 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\cricketRoutes.js": {
-    "mtime": 1779209303.2098982,
-    "ast_hash": "23cb79f4e745b636dc8ffc7cec1924e3",
-    "semantic_hash": "23cb79f4e745b636dc8ffc7cec1924e3"
+    "mtime": 1780743796.7590468,
+    "ast_hash": "5efc69cef43c1f03114d1f1f5806abf1",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\favoritesRoutes.js": {
     "mtime": 1777566127.6611502,
@@ -640,8 +640,8 @@
     "semantic_hash": "61f1a12201876545b2461e5a3fefd2a2"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\cricbuzzService.js": {
-    "mtime": 1780737086.0754287,
-    "ast_hash": "8e5749751334a527987b0d6b88ce012d",
+    "mtime": 1780743779.0653586,
+    "ast_hash": "ad09be0cc513539335a282eaa7f33237",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\cricketApiService.js": {
@@ -880,9 +880,9 @@
     "semantic_hash": "f3ae57327e40008df639ceb35a14d828"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\SquadsList.tsx": {
-    "mtime": 1777566129.4220147,
-    "ast_hash": "c0beef9fcc9d0423130e26fb7814b805",
-    "semantic_hash": "c0beef9fcc9d0423130e26fb7814b805"
+    "mtime": 1780742127.3288941,
+    "ast_hash": "70241dc74d3c09253ea1ff48b68e44fc",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\StatusFilter.tsx": {
     "mtime": 1777566129.4920118,
@@ -1405,8 +1405,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Index.tsx": {
-    "mtime": 1780659603.4676924,
-    "ast_hash": "8bbf8407b235a5a773faeadaa4798a08",
+    "mtime": 1780743649.9847271,
+    "ast_hash": "3de1034bc7710f70d9573a98739b88fe",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Leaderboard.tsx": {
@@ -1415,8 +1415,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\LiveMatchViewer.tsx": {
-    "mtime": 1780737431.610076,
-    "ast_hash": "504aa77e56e16321e09316c2c52ab706",
+    "mtime": 1780742286.0587132,
+    "ast_hash": "c593497e773955995a01d063ee0b8172",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Login.tsx": {
@@ -1425,7 +1425,7 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\MatchDetails.tsx": {
-    "mtime": 1780740788.392728,
+    "mtime": 1780742714.4815416,
     "ast_hash": "f45fc1fd56ca1c60b11f705a1184ae3f",
     "semantic_hash": ""
   },
@@ -3100,13 +3100,33 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\NewsSection.tsx": {
-    "mtime": 1780659603.460471,
-    "ast_hash": "5713fbc059e9c038c438f97a92a641c9",
+    "mtime": 1780743853.5231686,
+    "ast_hash": "91bf8a2555cf447604072884a2f3391e",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\data\\mockNewsData.ts": {
     "mtime": 1780659603.4615371,
     "ast_hash": "b21478e5b3a104c4c138c419d03d7e5d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\CricketPlayerImage.tsx": {
+    "mtime": 1780742101.6659193,
+    "ast_hash": "1fc3e7c45e7e3928494106a1c4263571",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\cricket\\CricketNewsSection.tsx": {
+    "mtime": 1780743649.9804783,
+    "ast_hash": "a7e5dfa807db2e57899b0a8fe3bc2ed7",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\cricket\\CricketRankings.tsx": {
+    "mtime": 1780743649.9804783,
+    "ast_hash": "aa29fbfd8cd80809b65a7d797762f9ac",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useCricketNews.ts": {
+    "mtime": 1780743809.3587997,
+    "ast_hash": "b23d263fc32cc029be3a5e0656250497",
     "semantic_hash": ""
   }
 }

@@ -1,15 +1,40 @@
 import { useState } from 'react';
 import { ChevronRight, Clock } from 'lucide-react';
 import { mockNewsData, type NewsItem } from '@/data/mockNewsData';
+import { useCricketNews, type CricketNewsItem } from '@/hooks/useCricketNews';
 import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+// Merge type: can be mock NewsItem OR live CricketNewsItem
+type DisplayNewsItem = (NewsItem | CricketNewsItem) & { isLive?: boolean };
 
 export const NewsSection = () => {
-  const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<DisplayNewsItem | null>(null);
+  const { news: liveNews, loading } = useCricketNews();
 
-  // Duplicate data to make the continuous marquee loop seamlessly
-  const marqueeData = [...mockNewsData, ...mockNewsData];
+  // Non-cricket mock news (football, tennis, basketball etc.)
+  const nonCricketMock = mockNewsData.filter(n => n.sport !== 'cricket');
+
+  // Live cricket news from API (or fallback to mock cricket if still loading)
+  const cricketMockFallback = mockNewsData.filter(n => n.sport === 'cricket');
+  const cricketItems: DisplayNewsItem[] = (liveNews.length > 0
+    ? liveNews.map(n => ({ ...n, isLive: true }))
+    : (!loading ? cricketMockFallback : []));
+
+  // Final combined list: mix live cricket with mock other sports
+  // Interleave: cricket first, then others, then repeat — keeps visual variety
+  const combined: DisplayNewsItem[] = [];
+  const nonCricket = [...nonCricketMock];
+  let ci = 0, ni = 0;
+  while (ci < cricketItems.length || ni < nonCricket.length) {
+    if (ci < cricketItems.length) combined.push(cricketItems[ci++]);
+    if (ci < cricketItems.length) combined.push(cricketItems[ci++]);
+    if (ni < nonCricket.length) combined.push(nonCricket[ni++]);
+  }
+
+  // Duplicate for seamless marquee loop
+  const marqueeData = combined.length > 0 ? [...combined, ...combined] : [];
 
   return (
     <Dialog open={!!selectedArticle} onOpenChange={(open) => !open && setSelectedArticle(null)}>
@@ -22,6 +47,16 @@ export const NewsSection = () => {
               <h2 className="text-lg md:text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                 Breaking <span className="text-primary">News</span>
               </h2>
+              {loading && (
+                <span className="text-[10px] text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-full border border-border/40 animate-pulse">
+                  Loading cricket news…
+                </span>
+              )}
+              {!loading && liveNews.length > 0 && (
+                <span className="text-[10px] text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
+                  LIVE
+                </span>
+              )}
             </div>
             <button className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors">
               View All <ChevronRight size={16} />
@@ -30,14 +65,14 @@ export const NewsSection = () => {
 
           {/* Marquee Container */}
           <div className="relative flex overflow-hidden -mx-4 px-4 mask-edges">
-            <div 
+            <div
               className={cn(
                 "flex gap-4 w-max animate-marquee hover:[animation-play-state:paused]",
                 selectedArticle && "[animation-play-state:paused]"
               )}
             >
               {marqueeData.map((news, index) => (
-                <div 
+                <div
                   key={`${news.id}-${index}`}
                   onClick={() => setSelectedArticle(news)}
                   className={cn(
@@ -59,6 +94,15 @@ export const NewsSection = () => {
                     "bg-gradient-to-br from-yellow-500 to-amber-500"
                   )} />
 
+                  {/* LIVE badge for cricket API news */}
+                  {(news as any).isLive && (
+                    <div className="absolute top-3 right-3 z-20">
+                      <span className="text-[9px] font-bold text-green-400 bg-green-500/15 border border-green-500/25 px-1.5 py-0.5 rounded-full">
+                        LIVE
+                      </span>
+                    </div>
+                  )}
+
                   <div className="relative z-10 flex flex-col h-full justify-between gap-3 pointer-events-none">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
@@ -69,11 +113,18 @@ export const NewsSection = () => {
                         </div>
                       </div>
                       <h3 className="text-base font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                        {news.title}
+                        {/* For live news use short headline (hline), else the title */}
+                        {(news as CricketNewsItem).headline || news.title}
                       </h3>
                       <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                         {news.snippet}
                       </p>
+                      {/* Context tag for live cricket news */}
+                      {(news as CricketNewsItem).context && (
+                        <span className="inline-block text-[10px] text-blue-400/70 bg-blue-500/10 border border-blue-500/15 px-1.5 py-0.5 rounded-full truncate max-w-full">
+                          {(news as CricketNewsItem).context}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -86,21 +137,41 @@ export const NewsSection = () => {
         <DialogContent className="sm:max-w-[500px] border-border/50 bg-background/95 backdrop-blur-xl">
           <DialogHeader className="space-y-4">
             <div className="flex items-center justify-between mt-2">
-              <SportIcon sport={selectedArticle?.sport || 'cricket'} size={24} />
+              <div className="flex items-center gap-2">
+                <SportIcon sport={selectedArticle?.sport || 'cricket'} size={24} />
+                {(selectedArticle as any)?.isLive && (
+                  <span className="text-[10px] font-bold text-green-400 bg-green-500/15 border border-green-500/25 px-2 py-0.5 rounded-full">
+                    LIVE • Cricbuzz
+                  </span>
+                )}
+              </div>
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground font-medium bg-secondary/50 px-3 py-1 rounded-full border border-border/50">
                 <Clock size={14} />
                 {selectedArticle?.timestamp}
               </div>
             </div>
-            <DialogTitle className="text-xl md:text-2xl leading-snug">{selectedArticle?.title}</DialogTitle>
+            <DialogTitle className="text-xl md:text-2xl leading-snug">
+              {(selectedArticle as CricketNewsItem)?.headline || selectedArticle?.title}
+            </DialogTitle>
           </DialogHeader>
-          <div className="pt-4">
+          <div className="pt-4 space-y-3">
+            {(selectedArticle as CricketNewsItem)?.context && (
+              <span className="inline-block text-xs text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 rounded-full">
+                {(selectedArticle as CricketNewsItem).context}
+              </span>
+            )}
             <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
               {selectedArticle?.snippet}
             </p>
-            <div className="mt-6 p-4 rounded-xl bg-secondary/30 border border-border/50 text-sm text-muted-foreground text-center">
-              (Full article content would be fetched from a CMS and displayed here)
-            </div>
+            {(selectedArticle as any)?.isLive ? (
+              <div className="mt-4 p-4 rounded-xl bg-blue-500/5 border border-blue-500/20 text-sm text-blue-400/80 text-center">
+                📰 Source: Cricbuzz — Full article available on Cricbuzz.com
+              </div>
+            ) : (
+              <div className="mt-4 p-4 rounded-xl bg-secondary/30 border border-border/50 text-sm text-muted-foreground text-center">
+                (Full article content would be fetched from a CMS and displayed here)
+              </div>
+            )}
           </div>
         </DialogContent>
 
