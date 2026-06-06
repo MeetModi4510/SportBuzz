@@ -51,6 +51,34 @@ import { useToast } from "@/hooks/use-toast";
 const MatchPerformanceLab = lazy(() => import("@/components/MatchPerformanceLab"));
 const CricketPerformanceLab = lazy(() => import("@/components/CricketPerformanceLab"));
 
+const generateDynamicOfficials = (id: string, homeTeam: string, awayTeam: string) => {
+  let hash = 0;
+  for (let i = 0; i < (id || "").length; i++) {
+    hash = (id || "").charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const absHash = Math.abs(hash) || 0;
+  
+  const umpires = [
+    "M. Erasmus, R. Kettleborough",
+    "A. Dar, S. Ravi",
+    "B. Oxenford, R. Tucker",
+    "P. Reiffel, N. Llong",
+    "J. Wilson, M. Gough",
+    "C. Gaffaney, R. Illingworth",
+    "R. Kettleborough, M. Gough"
+  ];
+  const referees = ["J. Srinath", "R. Madugalle", "C. Broad", "D. Boon", "A. Pycroft", "R. Richardson"];
+  const choices = ["bat", "bowl"];
+  
+  const tossWinner = (absHash % 2 === 0) ? (homeTeam || "Home Team") : (awayTeam || "Away Team");
+  
+  return {
+    umpires: umpires[absHash % umpires.length],
+    referee: referees[absHash % referees.length],
+    tossResult: `${tossWinner} won the toss and chose to ${choices[absHash % choices.length]}`
+  };
+};
+
 const MatchDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -670,38 +698,45 @@ const MatchDetails = () => {
                       {/* Column 2: Officials & Toss */}
                       <div className="p-6 md:p-8 space-y-8 bg-muted/5">
                         
-                        {/* Toss */}
-                        <div className="flex items-start gap-4">
-                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Coins size={18}/></div>
-                          <div>
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Toss Result</p>
-                            <p className="font-semibold text-sm text-foreground leading-snug">
-                              {match.tossResult || (rawApiData?.tossWinner ? `${rawApiData.tossWinner} chose to ${rawApiData.tossChoice}` : "India won the toss and chose to bat")}
-                            </p>
-                          </div>
-                        </div>
+                        {(() => {
+                          const dynamicInfo = generateDynamicOfficials(match.id, match.homeTeam?.name, match.awayTeam?.name);
+                          return (
+                            <>
+                              {/* Toss */}
+                              <div className="flex items-start gap-4">
+                                <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Coins size={18}/></div>
+                                <div>
+                                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Toss Result</p>
+                                  <p className="font-semibold text-sm text-foreground leading-snug">
+                                    {match.tossResult || (rawApiData?.tossWinner ? `${rawApiData.tossWinner} chose to ${rawApiData.tossChoice}` : dynamicInfo.tossResult)}
+                                  </p>
+                                </div>
+                              </div>
 
-                        {/* Umpires */}
-                        <div className="flex items-start gap-4">
-                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Eye size={18}/></div>
-                          <div>
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">On-Field Umpires</p>
-                            <p className="font-semibold text-sm text-foreground">
-                              {rawApiData?.umpire1 ? `${rawApiData.umpire1}, ${rawApiData.umpire2}` : "R. Kettleborough, N. Llong"}
-                            </p>
-                          </div>
-                        </div>
+                              {/* Umpires */}
+                              <div className="flex items-start gap-4">
+                                <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Eye size={18}/></div>
+                                <div>
+                                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">On-Field Umpires</p>
+                                  <p className="font-semibold text-sm text-foreground">
+                                    {rawApiData?.umpire1 ? `${rawApiData.umpire1}, ${rawApiData.umpire2}` : dynamicInfo.umpires}
+                                  </p>
+                                </div>
+                              </div>
 
-                        {/* Referee */}
-                        <div className="flex items-start gap-4">
-                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Shield size={18}/></div>
-                          <div>
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Match Referee</p>
-                            <p className="font-semibold text-sm text-foreground">
-                              {match.referee || rawApiData?.referee || "J. Srinath"}
-                            </p>
-                          </div>
-                        </div>
+                              {/* Referee */}
+                              <div className="flex items-start gap-4">
+                                <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Shield size={18}/></div>
+                                <div>
+                                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Match Referee</p>
+                                  <p className="font-semibold text-sm text-foreground">
+                                    {match.referee || rawApiData?.referee || dynamicInfo.referee}
+                                  </p>
+                                </div>
+                              </div>
+                            </>
+                          );
+                        })()}
 
                       </div>
                     </div>
