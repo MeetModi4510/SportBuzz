@@ -402,9 +402,6 @@ const MatchDetails = () => {
                     </div>
                 </div>
             </div>
-          </div>
-        </section>
-
             {/* Football Goals Section */}
             {(() => {
               const matchGoals = match.goals || match.events?.filter((e: any) => e.type?.toLowerCase() === 'goal').map((e: any) => ({
