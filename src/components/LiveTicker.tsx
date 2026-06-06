@@ -89,11 +89,11 @@ export const LiveTicker = () => {
   if (tickerMatches.length === 0) return null;
 
   return (
-    <div className="w-full bg-card/60 border-b border-border/30 overflow-hidden backdrop-blur-md flex items-center h-12 md:h-14 relative shadow-sm">
+    <div className="w-full bg-card border-b border-border/60 overflow-hidden flex items-center h-14 md:h-16 relative shadow-md">
        {/* "LIVE SCORES" sticky label on the left */}
-       <div className="absolute left-0 top-0 bottom-0 z-20 flex items-center bg-background/95 backdrop-blur-xl border-r border-border/30 px-4 md:px-6 shadow-[8px_0_20px_rgba(0,0,0,0.8)]">
+       <div className="absolute left-0 top-0 bottom-0 z-20 flex items-center bg-card border-r border-border/60 px-4 md:px-6 shadow-[8px_0_20px_rgba(0,0,0,0.6)]">
          <span className="flex items-center gap-2 text-[10px] md:text-xs font-bold text-red-500 uppercase tracking-[0.15em] whitespace-nowrap">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.9)]" /> LIVE SCORES
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.9)]" /> LIVE SCORES
          </span>
        </div>
 
@@ -120,12 +120,12 @@ export const LiveTicker = () => {
               const isLive = match.status === "live";
 
               return (
-                <div key={`${match._id}-${idx}`} className="flex items-center px-8 md:px-12 border-r border-border/20 last:border-0 cursor-pointer hover:bg-secondary/20 transition-colors h-full group">
-                   <div className="flex items-center gap-4 md:gap-6">
+                <div key={`${match._id}-${idx}`} className="flex items-center px-8 md:px-14 border-r border-border/40 last:border-0 cursor-pointer hover:bg-secondary/10 transition-colors h-full group">
+                   <div className="flex items-center gap-5 md:gap-8">
                      
                      {/* Match type / Status */}
-                     <div className="flex flex-col justify-center gap-0.5">
-                       <span className="text-[10px] md:text-[11px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 group-hover:text-foreground transition-colors">
+                     <div className="flex flex-col justify-center gap-1">
+                       <span className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 group-hover:text-foreground transition-colors">
                           {isLive && match.sport === "cricket" && (match as any).currentOver && (
                             <span className="text-red-400 font-bold">OVER {(match as any).currentOver}</span>
                           )}
@@ -136,22 +136,22 @@ export const LiveTicker = () => {
                        </span>
                      </div>
                      
-                     <div className="w-[1px] h-5 bg-border/40 mx-1" />
+                     <div className="w-[1px] h-6 bg-border/50 mx-1" />
 
                      {/* Match Teams and Scores */}
-                     <div className="flex items-center gap-3 md:gap-4">
-                       <div className="flex items-center gap-2.5">
-                         <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="sm" className="w-5 h-5 drop-shadow-md" />
-                         <span className="font-semibold text-xs md:text-sm text-foreground uppercase tracking-wider">{match.homeTeam?.shortName}</span>
-                         <span className="font-bold text-sm md:text-base text-foreground ml-1">{homeScore}</span>
+                     <div className="flex items-center gap-4 md:gap-5">
+                       <div className="flex items-center gap-3">
+                         <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="sm" className="w-5 h-5 md:w-6 md:h-6 drop-shadow-md" />
+                         <span className="font-bold text-sm md:text-base text-foreground uppercase tracking-wider">{match.homeTeam?.shortName}</span>
+                         <span className="font-extrabold text-base md:text-lg text-foreground ml-1">{homeScore}</span>
                        </div>
                        
-                       <span className="text-muted-foreground/30 font-light text-xs mx-1 md:mx-2">vs</span>
+                       <span className="text-muted-foreground/40 font-medium text-xs mx-1 md:mx-2">vs</span>
                        
-                       <div className="flex items-center gap-2.5">
-                         <span className="font-bold text-sm md:text-base text-foreground mr-1">{awayScore}</span>
-                         <span className="font-semibold text-xs md:text-sm text-foreground uppercase tracking-wider">{match.awayTeam?.shortName}</span>
-                         <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="sm" className="w-5 h-5 drop-shadow-md" />
+                       <div className="flex items-center gap-3">
+                         <span className="font-extrabold text-base md:text-lg text-foreground mr-1">{awayScore}</span>
+                         <span className="font-bold text-sm md:text-base text-foreground uppercase tracking-wider">{match.awayTeam?.shortName}</span>
+                         <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="sm" className="w-5 h-5 md:w-6 md:h-6 drop-shadow-md" />
                        </div>
                      </div>
 
