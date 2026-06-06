@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import {
   TrendingUp, X, Loader2, AlertCircle, User as UserIcon,
@@ -68,14 +68,14 @@ function PlayerAvatar({
 }
 
 // ─── Player Profile Modal ─────────────────────────────────────────────────────
-function PlayerProfileModal({
+export function PlayerProfileModal({
   player,
   info,
   loadingInfo,
   onClose,
 }: {
   player: TrendingPlayerEntry;
-  info: CricbuzzPlayerInfo | null;
+  info: any;
   loadingInfo: boolean;
   onClose: () => void;
 }) {
@@ -249,7 +249,7 @@ function PlayerProfileModal({
 }
 
 // ─── Player Card ──────────────────────────────────────────────────────────────
-function TrendingCard({
+export function TrendingCard({
   player,
   index,
   onClick,
@@ -317,9 +317,28 @@ export function CricketTrendingPlayers({ className }: { className?: string }) {
 
   const [selectedPlayer, setSelectedPlayer] = useState<TrendingPlayerEntry | null>(null);
 
-  // Fetch immediately on mount — no scroll trigger needed
+  const observerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    fetchTrending();
+    const currentRef = observerRef.current;
+    if (!currentRef) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          fetchTrending();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(currentRef);
+
+    return () => {
+      observer.disconnect();
+    };
   }, [fetchTrending]);
 
   const handlePlayerClick = (player: TrendingPlayerEntry) => {
@@ -344,7 +363,7 @@ export function CricketTrendingPlayers({ className }: { className?: string }) {
   };
 
   return (
-    <section className={cn('space-y-5', className)}>
+    <section ref={observerRef} className={cn('space-y-5', className)}>
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="p-2.5 rounded-xl bg-primary/10">
@@ -381,7 +400,7 @@ export function CricketTrendingPlayers({ className }: { className?: string }) {
       {/* Player grid */}
       {!loading && trending?.data && trending.data.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {trending.data.slice(0, 12).map((player, i) => (
+          {trending.data.slice(0, 6).map((player, i) => (
             <TrendingCard
               key={player.id}
               player={player}

@@ -22,7 +22,8 @@ import { useLiveCricketMatches } from "@/hooks/useCricketMatches";
 import { useFeaturedCricketMatches } from "@/hooks/useFeaturedMatches";
 import { useFollowedTournamentMatches } from "@/hooks/useFollowedTournamentMatches";
 import { useFootballDashboard, useCategorizedFootballMatches } from "@/hooks/useFootballMatches";
-import { useTrendingPerformers } from "@/hooks/useTrendingPerformers";
+import { useCricketTrendingPlayers } from "@/hooks/useCricketTrending";
+import { useCricbuzzPlayerInfo } from "@/hooks/useCricbuzzPlayerInfo";
 import { tournamentApi } from "@/services/api";
 import { Sport, MatchStatus, Match } from "@/data/types";
 import { Helmet } from "react-helmet-async";
@@ -52,7 +53,8 @@ const Index = () => {
     ].filter(m => m.status === 'live');
   }, [cricketData]);
 
-  const { trendingPlayers, sourceMatch } = useTrendingPerformers(liveCricketMatches);
+  const { trending: cricketTrending, fetchTrending: fetchCricketTrending } = useCricketTrendingPlayers();
+  const { playerInfo: cricketPlayerInfo, loading: cricketPlayerLoading, fetchPlayerInfo: fetchCricketPlayerInfo, clearPlayerInfo: clearCricketPlayerInfo } = useCricbuzzPlayerInfo();
 
   // Fetch REAL football data from Sofascore (15-min cache)
   const { data: footballDashboard, isLoading: footballLoading } = useFootballDashboard();
@@ -357,10 +359,20 @@ const Index = () => {
 
           {/* Trending Players */}
           <div id="trending-players" className="mt-8">
-            <TrendingPlayers 
-              players={activeSport === "all" ? players : players.filter(p => p.sport === activeSport)}
-              onPlayerClick={handlePlayerClick} 
-            />
+            {activeSport === "cricket" ? (
+              <CricketTrendingPlayers />
+            ) : (
+              <TrendingPlayers 
+                players={activeSport === "all" ? players : players.filter(p => p.sport === activeSport)}
+                cricketTrending={activeSport === "all" ? cricketTrending?.data : undefined}
+                onCricketPlayerClick={(player) => fetchCricketPlayerInfo(player.id)}
+                cricketPlayerInfo={cricketPlayerInfo?.data}
+                cricketPlayerLoading={cricketPlayerLoading}
+                clearCricketPlayerInfo={clearCricketPlayerInfo}
+                onPlayerClick={handlePlayerClick} 
+                fetchCricketTrending={activeSport === "all" ? fetchCricketTrending : undefined}
+              />
+            )}
           </div>
 
           {/* Creators Section */}
