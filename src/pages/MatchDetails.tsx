@@ -1020,40 +1020,61 @@ const MatchDetails = () => {
                           <div className="pt-4 pb-8">
                             <h5 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 font-bold mb-4 px-1">Batting</h5>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-                              {inn.batsmen?.map((b: any, bIdx: number) => {
-                                const isNotOut = b.dismissal?.toLowerCase().includes('not out') || b.dismissal === 'batting';
-                                return (
-                                <div key={bIdx} className={cn(
-                                  "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group",
-                                  isNotOut ? "border-primary/40 shadow-[0_4px_20px_rgba(var(--primary),0.1)]" : "border-border/40 shadow-sm"
-                                )}>
-                                  {/* Subtle background glow for not out */}
-                                  {isNotOut && <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 blur-2xl rounded-full"></div>}
+                              {(() => {
+                                // Find the first two batsmen who are "batting" or "not out" - these are the active ones at the crease
+                                const activeBatterIndices = (inn.batsmen || [])
+                                  .map((b: any, idx: number) => {
+                                    const rawDismissal = b.dismissal?.toLowerCase() || '';
+                                    return (rawDismissal.includes('not out') || rawDismissal === 'batting' || rawDismissal === '') ? idx : -1;
+                                  })
+                                  .filter((idx: number) => idx !== -1)
+                                  .slice(0, 2);
+
+                                return inn.batsmen?.map((b: any, bIdx: number) => {
+                                  const rawDismissal = b.dismissal?.toLowerCase() || '';
+                                  const isEligibleNotOut = rawDismissal.includes('not out') || rawDismissal === 'batting' || rawDismissal === '';
+                                  const isActiveAtCrease = activeBatterIndices.includes(bIdx);
+                                  const isYetToBat = isEligibleNotOut && !isActiveAtCrease;
                                   
-                                  <div className="flex justify-between items-start gap-2 relative z-10">
-                                    <div className="flex flex-col">
-                                      <h4 className={cn("font-bold text-sm leading-tight break-words", isNotOut ? "text-foreground" : "text-foreground/80")}>{b.name}</h4>
-                                      <div className="flex items-center gap-1.5 mt-1.5">
-                                        {isNotOut && <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" title="Not Out"></span>}
-                                        {b.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>}
-                                        {b.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">WK</span>}
+                                  const displayDismissal = isYetToBat ? "Yet to bat" : 
+                                                          (isActiveAtCrease ? "Batting" : 
+                                                          (b.dismissal || "Batting"));
+
+                                  return (
+                                  <div key={bIdx} className={cn(
+                                    "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group",
+                                    isActiveAtCrease ? "border-primary/40 shadow-[0_4px_20px_rgba(var(--primary),0.1)]" : "border-border/40 shadow-sm"
+                                  )}>
+                                    {/* Subtle background glow for not out */}
+                                    {isActiveAtCrease && <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 blur-2xl rounded-full pointer-events-none"></div>}
+                                    
+                                    <div className="flex justify-between items-start gap-2 relative z-10">
+                                      <div className="flex flex-col">
+                                        <h4 className={cn("font-bold text-sm leading-tight break-words", isActiveAtCrease ? "text-foreground" : "text-foreground/80")}>{b.name}</h4>
+                                        <div className="flex items-center gap-1.5 mt-1.5">
+                                          {isActiveAtCrease && <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" title="Not Out"></span>}
+                                          {b.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>}
+                                          {b.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">WK</span>}
+                                        </div>
                                       </div>
+                                      <span className={cn("text-3xl font-black tracking-tighter leading-none shrink-0", isActiveAtCrease ? "text-primary" : "text-foreground")}>{b.runs}</span>
                                     </div>
-                                    <span className={cn("text-3xl font-black tracking-tighter leading-none shrink-0", isNotOut ? "text-primary" : "text-foreground")}>{b.runs}</span>
+                                    
+                                    <div className={cn("text-[10px] italic mt-3 mb-4 line-clamp-2 h-7 relative z-10 font-medium", 
+                                      isYetToBat ? "text-muted-foreground/40" : "text-muted-foreground/70"
+                                    )}>
+                                      {displayDismissal}
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-4 gap-1 text-center border-t border-border/20 pt-3 relative z-10">
+                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">Balls</span><span className="font-mono text-xs font-bold text-foreground/90">{b.balls}</span></div>
+                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">4s</span><span className="font-mono text-xs font-medium text-muted-foreground">{b.fours}</span></div>
+                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">6s</span><span className="font-mono text-xs font-medium text-muted-foreground">{b.sixes}</span></div>
+                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">SR</span><span className="font-mono text-xs font-bold text-foreground/90">{b.strikeRate}</span></div>
+                                    </div>
                                   </div>
-                                  
-                                  <div className="text-[10px] text-muted-foreground/70 italic mt-3 mb-4 line-clamp-2 h-7 relative z-10 font-medium">
-                                    {b.dismissal && !isNotOut ? b.dismissal : "Batting"}
-                                  </div>
-                                  
-                                  <div className="grid grid-cols-4 gap-1 text-center border-t border-border/20 pt-3 relative z-10">
-                                    <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">Balls</span><span className="font-mono text-xs font-bold text-foreground/90">{b.balls}</span></div>
-                                    <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">4s</span><span className="font-mono text-xs font-medium text-muted-foreground">{b.fours}</span></div>
-                                    <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">6s</span><span className="font-mono text-xs font-medium text-muted-foreground">{b.sixes}</span></div>
-                                    <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">SR</span><span className="font-mono text-xs font-bold text-foreground/90">{b.strikeRate}</span></div>
-                                  </div>
-                                </div>
-                              )})}
+                                )});
+                              })()}
                             </div>
                           </div>
 
