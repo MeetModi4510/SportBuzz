@@ -60,7 +60,7 @@ export const CreatorsSection = () => {
           {/* Minimal Title */}
           <div className="text-center md:text-left space-y-1">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-              Built by <span className="text-primary">SportBuzz</span>
+              <span className="text-primary">SportBuzz</span> Built By
             </h2>
             <p className="text-sm text-muted-foreground">
               The engineers behind the real-time experience.
