@@ -198,13 +198,13 @@ const Index = () => {
 
         <main className="container mx-auto px-4 py-6 space-y-8">
           {/* Hero Section */}
-          <section className="text-center py-16 space-y-6 rounded-[2.5rem] bg-card/20 border border-border/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-sm relative overflow-hidden mt-4">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/[0.05] via-transparent to-transparent pointer-events-none" />
-            <h1 className="text-5xl md:text-7xl font-black font-display tracking-tighter text-foreground relative z-10 leading-tight">
+          <section className="text-center py-16 space-y-6 rounded-[2.5rem] bg-gradient-to-br from-[#1c1c1c] via-[#121212] to-[#0a0a0a] border border-[#D4AF37]/20 shadow-[inset_0_1px_0_0_rgba(212,175,55,0.1),0_20px_50px_rgba(0,0,0,0.7)] relative overflow-hidden mt-4">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#D4AF37]/10 via-transparent to-transparent pointer-events-none" />
+            <h1 className="text-5xl md:text-7xl font-black font-display tracking-tighter text-white relative z-10 leading-tight drop-shadow-sm">
               Live Sports.<br className="md:hidden" />
-              <span className="text-muted-foreground font-light tracking-tight ml-3">Elevated.</span>
+              <span className="bg-gradient-to-r from-[#F3E5AB] to-[#D4AF37] bg-clip-text text-transparent font-light tracking-tight ml-3">Elevated.</span>
             </h1>
-            <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto font-medium tracking-wide relative z-10">
+            <p className="text-[#D4AF37]/60 text-lg md:text-xl max-w-2xl mx-auto font-medium tracking-wide relative z-10">
               Real-time scores, deep analytics, and performance insights across the globe's premier sporting events.
             </p>
             {/* Live match badge hidden per user request */}
@@ -224,7 +224,7 @@ const Index = () => {
           {/* Live Ticker */}
           <LiveTicker />
 
-          <div className="sticky top-20 z-40 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-3xl bg-black/40 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+          <div className="sticky top-20 z-40 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-3xl bg-[#0a0a0a]/80 backdrop-blur-2xl border border-[#D4AF37]/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
             <SportFilter
               activeSport={activeSport}
               onSportChange={setActiveSport}
@@ -232,7 +232,7 @@ const Index = () => {
 
             <div className="flex items-center gap-3 flex-1 md:flex-initial">
               {/* Search Bar & Category Select */}
-              <div className="flex items-center gap-2 flex-1 md:flex-initial bg-white/5 border border-white/10 rounded-full p-1.5 shadow-inner transition-all focus-within:ring-1 focus-within:ring-white/20 focus-within:bg-white/10">
+              <div className="flex items-center gap-2 flex-1 md:flex-initial bg-[#121212] border border-[#D4AF37]/20 rounded-full p-1.5 shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] transition-all focus-within:ring-1 focus-within:ring-[#D4AF37]/40 focus-within:bg-[#1a1a1a]">
                 <div className="relative flex-1 md:w-64 flex items-center">
                   <Search className="absolute left-3 text-muted-foreground" size={16} />
                   <input

@@ -23,8 +23,8 @@ export const StatusFilter = ({ activeStatus, onStatusChange, className }: Status
           className={cn(
             "px-5 py-2 rounded-full font-bold text-sm transition-all duration-300 border",
             activeStatus === status.id
-              ? "bg-foreground text-background border-transparent shadow-[0_0_15px_rgba(255,255,255,0.2)]"
-              : "bg-transparent text-muted-foreground border-white/10 hover:bg-white/5 hover:text-foreground"
+              ? "bg-gradient-to-r from-[#D4AF37] to-[#F3E5AB] text-[#0a0a0a] border-transparent shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+              : "bg-[#121212] text-[#D4AF37]/50 border-[#D4AF37]/20 hover:bg-[#1a1a1a] hover:text-[#D4AF37]"
           )}
         >
           {status.label}
