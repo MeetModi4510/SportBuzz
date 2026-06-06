@@ -258,54 +258,46 @@ export function TrendingCard({
   index: number;
   onClick: () => void;
 }) {
-  const medal = MEDAL[player.rank as keyof typeof MEDAL];
   const [hovered, setHovered] = useState(false);
 
   return (
     <button
+      type="button"
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className={cn(
-        'relative group w-full h-full flex flex-col text-left rounded-2xl border bg-gradient-to-br transition-all duration-300 overflow-hidden',
-        'hover:scale-[1.03] hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-        medal
-          ? `${medal.bg} ${medal.glow} shadow-lg`
-          : 'from-card/80 to-card/40 border-border/30 hover:border-border/60 hover:shadow-secondary/20'
+        'group relative w-full h-full flex flex-col text-left overflow-hidden rounded-2xl transition-all duration-500 ease-out',
+        'bg-card/40 border border-border/30 backdrop-blur-sm',
+        'hover:bg-card/80 hover:border-primary/30 hover:shadow-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary'
       )}
-      style={{ animationDelay: `${index * 80}ms` }}
+      style={{ animationDelay: `${index * 50}ms` }}
     >
-      {medal && (
-        <span className="absolute top-2 left-2 text-base leading-none z-10">{medal.badge}</span>
-      )}
-      {!medal && (
-        <span className="absolute top-2 left-2 text-[10px] font-black text-muted-foreground z-10 bg-background/60 px-1.5 py-0.5 rounded-full">
-          #{player.rank}
-        </span>
-      )}
+      {/* Subtle Rank Indicator */}
+      <span className="absolute top-3 right-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 group-hover:text-primary/60 transition-colors z-10">
+        #{player.rank}
+      </span>
 
-      <div className="relative pt-6 px-4 pb-2 flex justify-center">
-        <PlayerAvatar faceImageId={player.faceImageId} name={player.name} size="sm" />
-        <div className={cn(
-          'absolute inset-0 bg-primary/5 transition-opacity duration-300 rounded-t-2xl',
-          hovered ? 'opacity-100' : 'opacity-0'
-        )} />
-      </div>
-
-      <div className="px-3 pb-4 text-center space-y-1 flex-1 flex flex-col justify-end">
-        <p className="text-xs font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
-          {player.name}
-        </p>
-        <div className="flex items-center justify-center gap-1.5">
-          <PlayerFlag flagCode={player.flagCode} flagLocal={player.flagLocal} country={player.teamName} size="sm" />
-          <p className="text-[10px] text-muted-foreground truncate max-w-[80px]">{player.teamName}</p>
+      {/* Avatar Container */}
+      <div className="relative pt-8 px-4 pb-3 flex justify-center items-center">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative z-10 transition-transform duration-500 ease-out group-hover:scale-[1.08] group-hover:-translate-y-1">
+          <PlayerAvatar faceImageId={player.faceImageId} name={player.name} size="sm" />
         </div>
       </div>
 
-      <div className={cn(
-        'absolute bottom-0 inset-x-0 h-0.5 bg-primary transition-transform duration-300 origin-left',
-        hovered ? 'scale-x-100' : 'scale-x-0'
-      )} />
+      {/* Content */}
+      <div className="px-4 pb-5 text-center space-y-1.5 flex-1 flex flex-col justify-end relative z-10">
+        <p className="text-[13px] font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+          {player.name}
+        </p>
+        <div className="flex items-center justify-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity duration-500">
+          <PlayerFlag flagCode={player.flagCode} flagLocal={player.flagLocal} country={player.teamName} size="sm" />
+          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.2em] truncate max-w-[80px]">
+            {player.teamName}
+          </span>
+        </div>
+      </div>
     </button>
   );
 }
