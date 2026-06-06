@@ -771,7 +771,7 @@ function shouldRefreshRankings(format) {
     const isWednesday = now.getDay() === 3 && now.getHours() >= 18;
     if (!isWednesday) return false;
 
-    const cacheKey = `rankings_v2_${format}`;
+    const cacheKey = `rankings_v3_${format}`;
     const meta = rankingsCache.get(`${cacheKey}_meta`);
     if (!meta) return true;
 
@@ -782,7 +782,7 @@ function shouldRefreshRankings(format) {
 
 
 async function getTeamRankings(format) {
-    const cacheKey = `rankings_v2_${format}`;
+    const cacheKey = `rankings_v3_${format}`;
     const cached = rankingsCache.get(cacheKey);
 
     // Return cache unless it's Wednesday refresh time
@@ -797,7 +797,13 @@ async function getTeamRankings(format) {
             { headers: { 'x-rapidapi-key': newsApiKey, 'x-rapidapi-host': rankHost } }
         );
 
-        const raw = res.data?.rank || [];
+        let raw = res.data?.rank || [];
+        
+        // Limit to top 15 teams for T20 format only
+        if (format === 't20') {
+            raw = raw.slice(0, 15);
+        }
+
         const hasMatches = raw.length > 0 && raw[0].matches != null && raw[0].matches !== '';
 
         const teams = raw.map(t => {
