@@ -781,77 +781,101 @@ const MatchDetails = () => {
                   }
 
                   return (
-                     <div className="bg-card border border-border rounded-[2rem] p-6 md:p-10 shadow-sm max-w-5xl mx-auto">
-                        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6 border-b border-border/50 pb-8">
+                     <div className="bg-card border border-border rounded-[2.5rem] p-6 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] max-w-5xl mx-auto relative overflow-hidden">
+                        {/* Subtle background decoration */}
+                        <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg aspect-square bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+                        
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 border-b border-border/30 pb-10 relative z-10">
                            {/* Team 1 Header */}
-                           <div className="flex items-center gap-4 w-full md:w-[40%] justify-center md:justify-start">
-                              <TeamLogo logo={match?.homeTeam?.logo} name={teams[0]?.teamName || "Team 1"} size="lg" className="w-16 h-16 shadow-sm bg-background border border-border/50" />
+                           <div className="flex items-center gap-5 w-full md:w-[40%] justify-center md:justify-start relative group cursor-default">
+                              <div className="relative">
+                                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full group-hover:bg-primary/30 transition-colors duration-500" />
+                                 <TeamLogo logo={match?.homeTeam?.logo} name={teams[0]?.teamName || "Team 1"} size="lg" className="w-20 h-20 shadow-xl bg-background border border-border/20 relative z-10 transition-transform duration-500 group-hover:scale-105" />
+                              </div>
                               <div className="text-center md:text-left">
-                                 <h3 className="text-xl md:text-2xl font-bold text-foreground">{teams[0]?.teamName}</h3>
-                                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">{teams[0]?.shortName}</p>
+                                 <h3 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">{teams[0]?.teamName}</h3>
+                                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.3em] mt-1">{teams[0]?.shortName}</p>
                               </div>
                            </div>
                            
                            {/* VS Divider */}
-                           <div className="w-full md:w-[20%] flex flex-col items-center justify-center">
-                              <span className="text-2xl md:text-3xl font-black text-muted-foreground/20 italic mb-2">VS</span>
-                              <span className="text-[9px] uppercase tracking-[0.2em] text-primary font-bold bg-primary/10 border border-primary/20 px-3 py-1 rounded-full shadow-sm">Playing XI</span>
+                           <div className="w-full md:w-[20%] flex flex-col items-center justify-center relative">
+                              <span className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-muted-foreground/40 to-muted-foreground/10 italic mb-3 drop-shadow-sm">VS</span>
+                              <span className="text-[10px] uppercase tracking-[0.25em] text-primary font-black bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full shadow-inner backdrop-blur-sm">Playing XI</span>
                            </div>
                            
                            {/* Team 2 Header */}
-                           <div className="flex items-center gap-4 w-full md:w-[40%] justify-center md:justify-end md:flex-row-reverse text-center md:text-right">
-                              <TeamLogo logo={match?.awayTeam?.logo} name={teams[1]?.teamName || "Team 2"} size="lg" className="w-16 h-16 shadow-sm bg-background border border-border/50" />
+                           <div className="flex items-center gap-5 w-full md:w-[40%] justify-center md:justify-end md:flex-row-reverse text-center md:text-right relative group cursor-default">
+                              <div className="relative">
+                                 <div className="absolute inset-0 bg-football/20 blur-xl rounded-full group-hover:bg-football/30 transition-colors duration-500" />
+                                 <TeamLogo logo={match?.awayTeam?.logo} name={teams[1]?.teamName || "Team 2"} size="lg" className="w-20 h-20 shadow-xl bg-background border border-border/20 relative z-10 transition-transform duration-500 group-hover:scale-105" />
+                              </div>
                               <div>
-                                 <h3 className="text-xl md:text-2xl font-bold text-foreground">{teams[1]?.teamName}</h3>
-                                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">{teams[1]?.shortName}</p>
+                                 <h3 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">{teams[1]?.teamName}</h3>
+                                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.3em] mt-1">{teams[1]?.shortName}</p>
                               </div>
                            </div>
                         </div>
 
                         {/* Players List */}
-                        <div className="space-y-2">
+                        <div className="relative pt-6 pb-2">
+                           {/* Central Vertical Line */}
+                           <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-border/60 to-transparent hidden md:block -translate-x-1/2" />
+                           
+                           <div className="space-y-3">
                            {Array.from({ length: Math.max(teams[0]?.players?.length || 0, teams[1]?.players?.length || 0, 11) }).map((_, i) => {
                               const p1 = teams[0]?.players?.[i];
                               const p2 = teams[1]?.players?.[i];
                               return (
-                                 <div key={i} className="flex flex-col md:flex-row items-center justify-between group rounded-xl overflow-hidden bg-secondary/10 border border-border/40 hover:border-primary/30 transition-colors shadow-sm">
+                                 <div key={i} className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 relative z-10 w-full group">
+                                    
                                     {/* Team 1 Player */}
-                                    <div className="flex-1 flex items-center gap-3 p-3 md:p-4 w-full group-hover:bg-primary/5 transition-colors">
-                                       <span className="text-primary font-bold w-6 shrink-0 text-center text-sm">{i + 1}</span>
+                                    <div className="flex-1 w-full flex justify-end">
                                        {p1 ? (
-                                          <>
-                                             <span className="font-semibold text-foreground flex-1 truncate text-sm">{p1.name}</span>
-                                             <div className="flex items-center gap-1.5 shrink-0">
-                                                {p1.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>}
-                                                {p1.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">WK</span>}
-                                                <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest ml-2 w-16 text-right truncate">{p1.role || p1.position}</span>
+                                          <div className="relative flex items-center bg-gradient-to-r from-transparent to-secondary/40 pl-4 pr-10 md:pr-12 py-3 rounded-l-full border-r-4 border-primary/50 group-hover:border-primary transition-all cursor-default w-full md:w-[90%] justify-between md:justify-end overflow-hidden backdrop-blur-sm">
+                                             <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                             <div className="flex flex-col items-start md:items-end relative z-10">
+                                                <span className="font-bold text-foreground text-sm md:text-base tracking-tight">{p1.name}</span>
+                                                <div className="flex items-center gap-2 mt-0.5">
+                                                   <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-widest">{p1.role || p1.position}</span>
+                                                   {p1.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold shadow-sm">C</span>}
+                                                   {p1.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold shadow-sm">WK</span>}
+                                                </div>
                                              </div>
-                                          </>
-                                       ) : <span className="text-muted-foreground/30 italic flex-1 font-medium text-sm">—</span>}
+                                          </div>
+                                       ) : (
+                                          <div className="w-full md:w-[90%] opacity-0 hidden md:block" />
+                                       )}
                                     </div>
 
-                                    {/* Center Divider */}
-                                    <div className="w-full md:w-12 h-px md:h-full flex justify-center items-center bg-border/20 md:bg-transparent shrink-0">
-                                       <span className="hidden md:block w-px h-8 bg-border/40"></span>
+                                    {/* Center Number Badge */}
+                                    <div className="w-9 h-9 md:w-11 md:h-11 rounded-full bg-background border-[3px] border-secondary flex items-center justify-center shadow-lg shrink-0 z-20 relative md:absolute md:left-1/2 md:-translate-x-1/2 group-hover:border-primary/50 group-hover:scale-110 transition-transform duration-300">
+                                       <span className="font-black text-xs md:text-sm text-foreground/70">{i + 1}</span>
                                     </div>
 
                                     {/* Team 2 Player */}
-                                    <div className="flex-1 flex items-center gap-3 p-3 md:p-4 w-full md:flex-row-reverse md:text-right bg-secondary/20 md:bg-transparent group-hover:bg-primary/5 transition-colors">
-                                       <span className="text-primary font-bold w-6 shrink-0 text-left md:text-center hidden md:block text-sm">{i + 1}</span>
+                                    <div className="flex-1 w-full flex justify-start">
                                        {p2 ? (
-                                          <>
-                                             <span className="font-semibold text-foreground flex-1 truncate text-sm">{p2.name}</span>
-                                             <div className="flex items-center gap-1.5 shrink-0 md:flex-row-reverse">
-                                                {p2.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>}
-                                                {p2.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">WK</span>}
-                                                <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest md:mr-2 md:ml-0 ml-2 w-16 md:text-left truncate">{p2.role || p2.position}</span>
+                                          <div className="relative flex items-center bg-gradient-to-l from-transparent to-secondary/40 pr-4 pl-10 md:pl-12 py-3 rounded-r-full border-l-4 border-football/50 group-hover:border-football transition-all cursor-default w-full md:w-[90%] justify-between md:justify-start overflow-hidden backdrop-blur-sm">
+                                             <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-football/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                             <div className="flex flex-col items-end md:items-start relative z-10">
+                                                <span className="font-bold text-foreground text-sm md:text-base tracking-tight">{p2.name}</span>
+                                                <div className="flex items-center gap-2 mt-0.5 flex-row-reverse md:flex-row">
+                                                   <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-widest">{p2.role || p2.position}</span>
+                                                   {p2.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold shadow-sm">C</span>}
+                                                   {p2.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold shadow-sm">WK</span>}
+                                                </div>
                                              </div>
-                                          </>
-                                       ) : <span className="text-muted-foreground/30 italic flex-1 md:text-right font-medium text-sm">—</span>}
+                                          </div>
+                                       ) : (
+                                          <div className="w-full md:w-[90%] opacity-0 hidden md:block" />
+                                       )}
                                     </div>
                                  </div>
                               );
                            })}
+                           </div>
                         </div>
                      </div>
                   );
