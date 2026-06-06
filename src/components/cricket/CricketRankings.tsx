@@ -64,41 +64,26 @@ export const CricketRankings = () => {
         </div>
       </div>
 
-      {/* Rankings Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left">
-          <thead className="text-xs text-muted-foreground uppercase bg-secondary/30">
-            <tr>
-              <th className="px-6 py-4 rounded-l-xl font-semibold">Pos</th>
-              <th className="px-6 py-4 font-semibold">Team</th>
-              <th className="px-6 py-4 font-semibold text-center">Points</th>
-              <th className="px-6 py-4 rounded-r-xl font-semibold text-right">Rating</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mockTeamRankings[activeFormat].map((row, index) => (
-              <tr key={row.team} className="border-b border-border/10 last:border-0 hover:bg-white/[0.02] transition-colors group">
-                <td className="px-6 py-4">
-                  <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs bg-secondary/50 text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary transition-colors">
-                    {row.rank}
-                  </div>
-                </td>
-                <td className="px-6 py-4 font-medium flex items-center gap-3">
-                  <TeamLogo logo={row.logo} name={row.team} size="sm" className="w-8 h-8 rounded-full shadow-sm" />
-                  <span className="text-base text-foreground group-hover:text-primary transition-colors">{row.team}</span>
-                </td>
-                <td className="px-6 py-4 text-center text-muted-foreground font-medium">
-                  {row.points.toLocaleString()}
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-primary/10 text-primary font-bold text-sm">
-                    {row.rating}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Rankings Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        {mockTeamRankings[activeFormat].slice(0, 5).map((row, index) => (
+          <div key={row.team} className="flex flex-col items-center justify-center p-4 rounded-2xl bg-secondary/20 border border-border/30 hover:border-border/60 hover:bg-secondary/40 transition-all duration-300 group">
+            <div className="flex items-center justify-between w-full mb-3">
+              <span className={cn(
+                "text-xs font-bold px-2 py-0.5 rounded-full",
+                row.rank === 1 ? "bg-yellow-500/20 text-yellow-500" :
+                row.rank === 2 ? "bg-slate-300/20 text-slate-300" :
+                row.rank === 3 ? "bg-amber-600/20 text-amber-500" :
+                "bg-primary/10 text-primary"
+              )}>
+                #{row.rank}
+              </span>
+              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{row.rating} RTG</span>
+            </div>
+            <TeamLogo logo={row.logo} name={row.team} size="md" className="w-12 h-12 rounded-full shadow-sm mb-2 group-hover:scale-110 transition-transform duration-300" />
+            <span className="text-sm font-bold text-foreground text-center truncate w-full">{row.team}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
