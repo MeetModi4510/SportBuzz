@@ -672,14 +672,6 @@ const MatchDetails = () => {
                   </div>
                 </div>
               )}
-                            <span className="text-foreground font-medium">{match.manOfTheMatch.name}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
 
               {/* Upcoming: minimal info card */}
               {isUpcoming && (
