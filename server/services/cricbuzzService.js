@@ -736,6 +736,34 @@ const CB_IMAGE_TO_FLAG = {
     '776357': 'tz',  // Tanzania
     '776362': 'ca',  // Canada
 };
+const TEAM_NAME_TO_FLAG = {
+    'india': 'in',
+    'australia': 'au',
+    'england': 'gb-eng',
+    'south africa': 'za',
+    'new zealand': 'nz',
+    'pakistan': 'pk',
+    'sri lanka': 'lk',
+    'bangladesh': 'bd',
+    'west indies': 'wi',
+    'zimbabwe': 'zw',
+    'afghanistan': 'af',
+    'ireland': 'ie',
+    'netherlands': 'nl',
+    'scotland': 'sc',
+    'namibia': 'na',
+    'usa': 'us',
+    'uganda': 'ug',
+    'nepal': 'np',
+    'oman': 'oman',
+    'papua new guinea': 'pa',
+    'kuwait': 'kw',
+    'singapore': 'sg',
+    'hong kong': 'hk',
+    'kenya': 'ke',
+    'tanzania': 'tz',
+    'canada': 'ca'
+};
 
 function shouldRefreshRankings(format) {
     // Force refresh on Wednesday (day 3 in JS Date, 0=Sun) at or after 6 PM (18:00)
@@ -743,7 +771,7 @@ function shouldRefreshRankings(format) {
     const isWednesday = now.getDay() === 3 && now.getHours() >= 18;
     if (!isWednesday) return false;
 
-    const cacheKey = `rankings_${format}`;
+    const cacheKey = `rankings_v2_${format}`;
     const meta = rankingsCache.get(`${cacheKey}_meta`);
     if (!meta) return true;
 
@@ -754,7 +782,7 @@ function shouldRefreshRankings(format) {
 
 
 async function getTeamRankings(format) {
-    const cacheKey = `rankings_${format}`;
+    const cacheKey = `rankings_v2_${format}`;
     const cached = rankingsCache.get(cacheKey);
 
     // Return cache unless it's Wednesday refresh time
@@ -772,16 +800,20 @@ async function getTeamRankings(format) {
         const raw = res.data?.rank || [];
         const hasMatches = raw.length > 0 && raw[0].matches != null && raw[0].matches !== '';
 
-        const teams = raw.map(t => ({
-            rank: parseInt(t.rank),
-            id: t.id,
-            name: t.name,
-            rating: parseInt(t.rating) || 0,
-            points: parseInt(t.points) || 0,
-            matches: hasMatches ? (parseInt(t.matches) || 0) : null,
-            flagCode: CB_IMAGE_TO_FLAG[t.imageId] || null,
-            lastUpdatedOn: t.lastUpdatedOn || null,
-        }));
+        const teams = raw.map(t => {
+            const teamNameLower = (t.name || '').toLowerCase();
+            const flagCode = TEAM_NAME_TO_FLAG[teamNameLower] || CB_IMAGE_TO_FLAG[t.imageId] || null;
+            return {
+                rank: parseInt(t.rank),
+                id: t.id,
+                name: t.name,
+                rating: parseInt(t.rating) || 0,
+                points: parseInt(t.points) || 0,
+                matches: hasMatches ? (parseInt(t.matches) || 0) : null,
+                flagCode: flagCode,
+                lastUpdatedOn: t.lastUpdatedOn || null,
+            };
+        });
 
         const result = {
             data: teams,

@@ -132,11 +132,11 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
     // This is our primary detection for "International" matches
     const isCountryCode = /^[a-z]{2}(-[a-z]{3})?$/.test(logo);
 
-    // Special handling for West Indies (International)
-    // If name contains West Indies or logo is specific, defaults to local asset
+    // Special handling for West Indies, Sri Lanka, and England (use local assets)
     const safeLogoLower = logo.toLowerCase();
     const isWestIndies = safeNameLower.includes('west indies') || safeLogoLower.includes('westindies') || logo === 'wi' || logo === '🌴';
-
+    const isSriLanka = safeNameLower.includes('sri lanka') || safeLogoLower === 'lk' || safeLogoLower === 'sl';
+    const isEngland = safeNameLower.includes('england') || safeLogoLower === 'gb-eng' || safeLogoLower === 'eng';
 
     // Check if it's a football club logo (format: fb-{teamId})
     const isFootballClub = logo.startsWith('fb-');
@@ -147,7 +147,7 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
     // Check if it's a basketball team logo (format: bb-{teamId})
     const isBasketballTeam = logo.startsWith('bb-');
 
-    // 1. West Indies Local Asset (Priority for WI)
+    // 1. Local Assets for West Indies, Sri Lanka, and England
     if (isWestIndies) {
         return (
             <img
@@ -156,7 +156,39 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
                 className={cn(
                     sizeClasses[size].width,
                     sizeClasses[size].height,
-                    "object-contain p-1 bg-white/10 rounded",
+                    "object-cover rounded-full",
+                    className
+                )}
+                onError={() => setUseTextFallback(true)}
+            />
+        );
+    }
+
+    if (isSriLanka) {
+        return (
+            <img
+                src="/flags/srilanka.png"
+                alt={`${name} flag`}
+                className={cn(
+                    sizeClasses[size].width,
+                    sizeClasses[size].height,
+                    "object-cover rounded-full",
+                    className
+                )}
+                onError={() => setUseTextFallback(true)}
+            />
+        );
+    }
+
+    if (isEngland) {
+        return (
+            <img
+                src="/flags/england.png"
+                alt={`${name} flag`}
+                className={cn(
+                    sizeClasses[size].width,
+                    sizeClasses[size].height,
+                    "object-cover rounded-full",
                     className
                 )}
                 onError={() => setUseTextFallback(true)}
