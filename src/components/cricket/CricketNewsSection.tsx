@@ -5,6 +5,15 @@ import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
+const API_BASE = import.meta.env.PROD
+  ? 'https://sportbuzz-backend.onrender.com'
+  : 'http://localhost:5000';
+
+const getImageUrl = (imageId: string | null) => {
+  if (!imageId) return null;
+  return `${API_BASE}/api/cricket/cb/player-image/${imageId}`;
+};
+
 export const CricketNewsSection = () => {
   const { news, loading, error } = useCricketNews();
   const [selectedArticle, setSelectedArticle] = useState<CricketNewsItem | null>(null);
@@ -63,9 +72,20 @@ export const CricketNewsSection = () => {
               onClick={() => setSelectedArticle(featuredArticle)}
               className="md:col-span-7 group relative overflow-hidden rounded-3xl border border-border/40 bg-card/40 cursor-pointer min-h-[300px] flex flex-col justify-end p-6 hover:border-white/20 transition-all duration-500"
             >
-              {/* Optional: Add image background here if available */}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent z-10" />
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent transition-opacity duration-500" />
+              {/* Background Image */}
+              {featuredArticle.imageId && (
+                <img 
+                  src={getImageUrl(featuredArticle.imageId)!} 
+                  alt={featuredArticle.headline}
+                  className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-700 group-hover:scale-105"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              )}
+              
+              <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/60 to-transparent z-10" />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent transition-opacity duration-500 z-10" />
               
               <div className="relative z-20 space-y-3">
                 <div className="flex items-center gap-2">
@@ -104,9 +124,23 @@ export const CricketNewsSection = () => {
                       {article.timestamp}
                     </div>
                   </div>
-                  <h4 className="text-sm font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                    {article.headline || article.title}
-                  </h4>
+                  <div className="flex gap-4 items-center">
+                    <h4 className="text-sm font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2 flex-1">
+                      {article.headline || article.title}
+                    </h4>
+                    {article.imageId && (
+                      <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-secondary/30 relative border border-border/30">
+                        <img 
+                          src={getImageUrl(article.imageId)!} 
+                          alt={article.headline}
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -128,6 +162,18 @@ export const CricketNewsSection = () => {
           <DialogTitle className="text-2xl md:text-3xl leading-snug">{selectedArticle?.headline || selectedArticle?.title}</DialogTitle>
         </DialogHeader>
         <div className="pt-4 space-y-4">
+          {selectedArticle?.imageId && (
+            <div className="w-full h-48 md:h-64 rounded-2xl overflow-hidden relative border border-border/40">
+              <img 
+                src={getImageUrl(selectedArticle.imageId)!} 
+                alt="Article"
+                className="absolute inset-0 w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            </div>
+          )}
           <p className="text-foreground/90 leading-relaxed text-base md:text-lg">
             {selectedArticle?.snippet}
           </p>
