@@ -163,4 +163,17 @@ router.get('/cb/commentary/:matchId', async (req, res) => {
     }
 });
 
+// ─── Cricket Player Image Proxy ────────────────────────────────────────────────
+// GET /api/cricket/cb/player-image/:playerId
+// Streams the player image from Cricbuzz (cricbuzz-cricket host) through our
+// backend so the browser never needs the RapidAPI key.
+// Images are cached for 1 hour on the service level.
+router.get('/cb/player-image/:playerId', async (req, res) => {
+    try {
+        await cricbuzzService.streamPlayerImage(req.params.playerId, res);
+    } catch (error) {
+        res.status(204).end();
+    }
+});
+
 export default router;

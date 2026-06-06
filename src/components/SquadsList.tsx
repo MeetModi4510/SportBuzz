@@ -2,6 +2,7 @@
 import { TeamLogo } from "@/components/TeamLogo";
 import { FootballPitchLineup } from "@/components/FootballPitchLineup";
 import { useFootballMatchSquads } from "@/hooks/useFootballMatches";
+import { CricketPlayerImage } from "@/components/CricketPlayerImage";
 import { Loader2, Users } from "lucide-react";
 import type { Match } from "@/data/types";
 import { players } from "@/data/mockData";
@@ -43,10 +44,20 @@ const SquadsView = ({ homeTeam, awayTeam, homePlayers, awayPlayers, homeRestOfSq
                                     key={player.id || idx}
                                     className="flex items-center gap-3 p-3 bg-card border border-border/50 rounded-lg hover:border-primary/30 transition-colors"
                                 >
-                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-secondary text-xs font-mono text-muted-foreground">
+                                    {/* Number badge */}
+                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-secondary text-xs font-mono text-muted-foreground shrink-0">
                                         {idx + 1}
                                     </div>
+                                    {/* Player image — left side for home team */}
+                                    <CricketPlayerImage
+                                        playerId={player.id}
+                                        playerName={player.name}
+                                        size={36}
+                                    />
                                     <span className="font-medium text-foreground">{player.name}</span>
+                                    {player.isCaptain && <span className="ml-auto text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded">C</span>}
+                                    {player.isKeeper && <span className="text-[10px] font-bold text-blue-400 bg-blue-400/10 border border-blue-400/20 px-1.5 py-0.5 rounded">WK</span>}
+                                    {player.role && <span className="text-[10px] text-muted-foreground ml-auto">{player.role}</span>}
                                 </div>
                             ))}
                         </div>
@@ -93,10 +104,20 @@ const SquadsView = ({ homeTeam, awayTeam, homePlayers, awayPlayers, homeRestOfSq
                                     key={player.id || idx}
                                     className="flex items-center gap-3 p-3 bg-card border border-border/50 rounded-lg hover:border-primary/30 transition-colors"
                                 >
-                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-secondary text-xs font-mono text-muted-foreground">
+                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-secondary text-xs font-mono text-muted-foreground shrink-0">
                                         {idx + 1}
                                     </div>
-                                    <span className="font-medium text-foreground">{player.name}</span>
+                                    <span className="font-medium text-foreground flex-1">{player.name}</span>
+                                    {player.isCaptain && <span className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded">C</span>}
+                                    {player.isKeeper && <span className="text-[10px] font-bold text-blue-400 bg-blue-400/10 border border-blue-400/20 px-1.5 py-0.5 rounded">WK</span>}
+                                    {player.role && <span className="text-[10px] text-muted-foreground">{player.role}</span>}
+                                    {/* Player image — right side for away team */}
+                                    <CricketPlayerImage
+                                        playerId={player.id}
+                                        playerName={player.name}
+                                        size={36}
+                                        align="right"
+                                    />
                                 </div>
                             ))}
                         </div>

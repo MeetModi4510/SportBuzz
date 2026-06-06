@@ -1,7 +1,7 @@
 # Graph Report - dev_scripts  (2026-06-06)
 
 ## Corpus Check
-- 373 files · ~1,170,512 words
+- 373 files · ~1,171,580 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5d7f4ed0`
+- Built from commit: `7ccfd908`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -261,11 +261,11 @@ Nodes (21): compilerOptions, allowImportingTsExtensions, baseUrl, isolatedModule
 
 ### Community 24 - "Community 24"
 Cohesion: 0.10
-Nodes (22): FootballPitchLineup(), PreMatchForecast(), PreMatchForecastProps, FootballSquads(), SimplePlayer, SquadsList(), SquadsListProps, SquadsViewProps (+14 more)
+Nodes (22): FootballPitchLineup(), FootballSquads(), SimplePlayer, SquadsList(), SquadsListProps, SquadsViewProps, TeamLogo(), TeamLogoProps (+14 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.18
-Nodes (18): MatchCardProps, MatchPerformanceLabProps, MinimalCricketCard(), MinimalCricketCardProps, Match, useCricketDataMatch(), mapApiMatchToModel(), useAllCricketMatches() (+10 more)
+Cohesion: 0.27
+Nodes (12): MinimalCricketCard(), mapApiMatchToModel(), useAllCricketMatches(), useCricketMatchSquads(), useLiveCricketMatches(), useRecentCricketMatches(), useUpcomingCricketMatches(), formatToIST() (+4 more)
 
 ### Community 26 - "Community 26"
 Cohesion: 0.18
@@ -273,7 +273,7 @@ Nodes (14): cache, cbHeaders, __dirname, fetchMatchesList(), __filename, getAllM
 
 ### Community 27 - "Community 27"
 Cohesion: 0.08
-Nodes (16): AnalyticsSection(), CHART_TOOLTIP_STYLE, generateMockData(), HEATMAP_BY_ROLE, HEATMAP_COLORS, MatchEvent, MockPlayer, normalizeRole() (+8 more)
+Nodes (19): MatchCardProps, AnalyticsSection(), CHART_TOOLTIP_STYLE, generateMockData(), HEATMAP_BY_ROLE, HEATMAP_COLORS, MatchEvent, MatchPerformanceLabProps (+11 more)
 
 ### Community 28 - "Community 28"
 Cohesion: 0.12
@@ -444,12 +444,12 @@ Cohesion: 0.60
 Nodes (4): getMatches(), getMatchSquads(), getMockMatches(), getMockSquads()
 
 ### Community 71 - "Community 71"
-Cohesion: 0.14
-Nodes (9): statuses, StatusFilter(), StatusFilterProps, HeadToHead, MatchEvent, MatchStatus, PlayerStats, Team (+1 more)
+Cohesion: 0.08
+Nodes (19): PlayerCardProps, PlayerProfileDialog(), PlayerProfileDialogProps, statuses, StatusFilter(), StatusFilterProps, TrendingPlayers(), TrendingPlayersProps (+11 more)
 
 ### Community 72 - "Community 72"
-Cohesion: 0.15
-Nodes (18): Creator, creators, CreatorsSection(), SocialLinks, LiveBadge(), LiveBadgeProps, LiveTicker(), MatchCard() (+10 more)
+Cohesion: 0.16
+Nodes (15): Creator, creators, CreatorsSection(), SocialLinks, LiveBadge(), LiveBadgeProps, LiveTicker(), NewsSection() (+7 more)
 
 ### Community 80 - "Community 80"
 Cohesion: 0.83
@@ -508,8 +508,8 @@ Cohesion: 0.21
 Nodes (10): createEventNews(), createMatchReportNews(), getTournamentNews, FootballMatch, footballMatchSchema, FootballNews, footballNewsSchema, generateMatchReportContent() (+2 more)
 
 ### Community 177 - "Community 177"
-Cohesion: 0.15
-Nodes (17): MatchSection(), MatchSectionProps, PlayerCard(), PlayerCardProps, PlayerProfileDialog(), PlayerProfileDialogProps, SportFilter(), SportFilterProps (+9 more)
+Cohesion: 0.22
+Nodes (13): MatchCard(), MatchSection(), MatchSectionProps, PlayerCard(), SportFilter(), SportFilterProps, sports, getSportBorderColor() (+5 more)
 
 ### Community 180 - "Community 180"
 Cohesion: 0.20
@@ -535,7 +535,7 @@ Nodes (3): headers, main(), test()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `mapApiMatchToModel()` connect `Community 25` to `Community 35`, `Community 173`?**
+- **Why does `mapApiMatchToModel()` connect `Community 25` to `Community 24`, `Community 35`, `Community 173`?**
   _High betweenness centrality (0.109) - this node is a cross-community bridge._
 - **Why does `hasMeaningfulScores()` connect `Community 35` to `Community 25`?**
   _High betweenness centrality (0.109) - this node is a cross-community bridge._

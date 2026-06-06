@@ -19,6 +19,19 @@ const cbHeaders = {
     'x-rapidapi-host': RAPIDAPI_HOST
 };
 
+// ─── Image Proxy Config ────────────────────────────────────────────────────────
+const CB_IMAGE_KEY = process.env.CRICBUZZ_IMAGE_RAPIDAPI_KEY || process.env.FOOTBALL_RAPIDAPI_KEY;
+const CB_IMAGE_HOST = 'cricbuzz-cricket.p.rapidapi.com';
+const CB_IMAGE_BASE = `https://${CB_IMAGE_HOST}`;
+
+const cbImageHeaders = {
+    'x-rapidapi-key': CB_IMAGE_KEY,
+    'x-rapidapi-host': CB_IMAGE_HOST
+};
+
+// Separate cache for player images (1 hour TTL)
+const imageCache = new NodeCache({ stdTTL: 3600 });
+
 if (!RAPIDAPI_KEY) {
     console.error('[CRICBUZZ] RapidAPI key is MISSING in environment variables!');
 }
@@ -273,6 +286,7 @@ async function getScorecard(cbId) {
                 isFollowOn: inn.isfollowon || false,
                 batsmen: (inn.batsman || []).map(b => ({
                     name: b.name || b.nickname || 'Unknown',
+                    id: b.id ? String(b.id) : null,
                     runs: b.runs ?? 0,
                     balls: b.balls ?? 0,
                     fours: b.fours ?? 0,
@@ -284,6 +298,7 @@ async function getScorecard(cbId) {
                 })),
                 bowlers: (inn.bowler || []).map(b => ({
                     name: b.name || b.nickname || 'Unknown',
+                    id: b.id ? String(b.id) : null,
                     overs: b.overs || '0',
                     maidens: b.maidens ?? 0,
                     runs: b.runs ?? 0,
@@ -434,6 +449,7 @@ async function getSquads(cbId) {
             shortName: t.shortName,
             players: Array.from(t.players.values()).map(p => ({
                 name: p.name,
+                id: p.id ? String(p.id) : null,
                 isCaptain: p.isCaptain,
                 isKeeper: p.isKeeper,
                 role: p.resolvedRole || 'Batsman',
@@ -567,6 +583,68 @@ async function getPlayerInfo(playerId) {
     }
 }
 
+// ─── Player Image Proxy ────────────────────────────────────────────────────────
+// Returns a boolean indicating image availability, cached for 1 hour.
+async function checkPlayerImageExists(playerId) {
+    if (!playerId) return false;
+    const cacheKey = `cb_img_exists_${playerId}`;
+    const cached = imageCache.get(cacheKey);
+    if (cached !== undefined) return cached;
+
+    try {
+        const https = await import('https');
+        return await new Promise((resolve) => {
+            const req = https.default.request({
+                method: 'HEAD',
+                hostname: CB_IMAGE_HOST,
+                path: `/img/v1/i1/c${playerId}/i.jpg`,
+                headers: cbImageHeaders
+            }, (res) => {
+                const exists = res.statusCode === 200;
+                imageCache.set(cacheKey, exists, 3600);
+                resolve(exists);
+            });
+            req.on('error', () => { imageCache.set(cacheKey, false, 3600); resolve(false); });
+            req.end();
+        });
+    } catch {
+        imageCache.set(cacheKey, false, 3600);
+        return false;
+    }
+}
+
+// Stream the player image from Cricbuzz to the frontend (via backend proxy)
+async function streamPlayerImage(playerId, res) {
+    if (!playerId) { res.status(404).end(); return; }
+    const cacheKey = `cb_img_exists_${playerId}`;
+    const cached = imageCache.get(cacheKey);
+    if (cached === false) { res.status(204).end(); return; }
+
+    try {
+        const https = await import('https');
+        const req = https.default.request({
+            method: 'GET',
+            hostname: CB_IMAGE_HOST,
+            path: `/img/v1/i1/c${playerId}/i.jpg`,
+            headers: cbImageHeaders
+        }, (imgRes) => {
+            if (imgRes.statusCode !== 200) {
+                imageCache.set(cacheKey, false, 3600);
+                res.status(204).end();
+                return;
+            }
+            imageCache.set(cacheKey, true, 3600);
+            res.setHeader('Content-Type', imgRes.headers['content-type'] || 'image/jpeg');
+            res.setHeader('Cache-Control', 'public, max-age=3600');
+            imgRes.pipe(res);
+        });
+        req.on('error', () => res.status(204).end());
+        req.end();
+    } catch {
+        res.status(204).end();
+    }
+}
+
 // ─── Export ────────────────────────────────────────────────────────────────────
 export const cricbuzzService = {
     getLiveMatches,
@@ -577,7 +655,9 @@ export const cricbuzzService = {
     getScorecard,
     getSquads,
     getCommentary,
-    getPlayerInfo
+    getPlayerInfo,
+    checkPlayerImageExists,
+    streamPlayerImage,
 };
 
 export default cricbuzzService;

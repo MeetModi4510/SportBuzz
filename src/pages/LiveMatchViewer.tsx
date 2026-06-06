@@ -15,6 +15,7 @@ import { LiveStatCard } from "@/components/LiveStatCard";
 import { BatsmanDetailPopup } from "@/components/BatsmanDetailPopup";
 import { BowlerDetailPopup } from "@/components/BowlerDetailPopup";
 import { SquadsList } from "@/components/SquadsList";
+import { CricketPlayerImage } from "@/components/CricketPlayerImage";
 import { ANALYSIS_PLAYERS } from "@/data/playerAnalysisData";
 
 const API_BASE = import.meta.env.PROD 
@@ -145,6 +146,8 @@ const LiveMatchViewer = () => {
     const [selectedBowler, setSelectedBowler] = useState<{ name: string; inning: number } | null>(null);
     const [playerStatsCache, setPlayerStatsCache] = useState<Record<string, any>>({}); // Added playerStatsCache state
     const [matchupCache, setMatchupCache] = useState<Record<string, any>>({}); // Matchup stats: "bowler-batsman" -> stats
+    // Map of playerName -> Cricbuzz player ID (for images)
+    const [cbPlayerIdMap, setCbPlayerIdMap] = useState<Record<string, string>>({});
 
     useEffect(() => {
         // Only auto-switch to Inning 2 ONCE when it's detected and we haven't switched yet
@@ -153,6 +156,31 @@ const LiveMatchViewer = () => {
             setHasAutoSwitchedInning(true);
         }
     }, [balls, hasAutoSwitchedInning]);
+
+    /* ── Fetch Cricbuzz player IDs for images (once per match) ── */
+    useEffect(() => {
+        if (!match) return;
+        const cbId = (match as any).cbMatchId;
+        if (!cbId) return;
+        if (Object.keys(cbPlayerIdMap).length > 0) return; // already fetched
+
+        const fetchCbPlayerIds = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/cricket/cb/scorecard/${cbId}`);
+                const json = await res.json();
+                const innings = json?.data?.innings || [];
+                const idMap: Record<string, string> = {};
+                innings.forEach((inn: any) => {
+                    (inn.batsmen || []).forEach((b: any) => { if (b.id && b.name) idMap[b.name] = b.id; });
+                    (inn.bowlers || []).forEach((b: any) => { if (b.id && b.name) idMap[b.name] = b.id; });
+                });
+                if (Object.keys(idMap).length > 0) setCbPlayerIdMap(idMap);
+            } catch {
+                // Silently fail — images will fallback to silhouette
+            }
+        };
+        fetchCbPlayerIds();
+    }, [match]);
 
     useEffect(() => {
         if (!id) return;
@@ -985,6 +1013,7 @@ const LiveMatchViewer = () => {
                                 bowlStats={bowl1Stats}
                                 balls={inning1Balls}
                                 teamPlayers={match.homeTeam.players}
+                                cbPlayerIdMap={cbPlayerIdMap}
                                 onBatsmanClick={(name) => setSelectedBatsman({ name, inning: 1 })}
                                 onBowlerClick={(name) => setSelectedBowler({ name, inning: 1 })}
                             />
@@ -1001,6 +1030,7 @@ const LiveMatchViewer = () => {
                                 bowlStats={bowl2Stats}
                                 balls={inning2Balls}
                                 teamPlayers={match.awayTeam.players}
+                                cbPlayerIdMap={cbPlayerIdMap}
                                 onBatsmanClick={(name) => setSelectedBatsman({ name, inning: 2 })}
                                 onBowlerClick={(name) => setSelectedBowler({ name, inning: 2 })}
                             />
@@ -1653,11 +1683,12 @@ const LiveMatchViewer = () => {
 };
 
 /* ── Sub-Component: Innings Scorecard ── */
-const InningsScorecard = ({ inning, teamName, teamLogo, score, batStats, bowlStats, balls, teamPlayers, onBatsmanClick, onBowlerClick }: {
+const InningsScorecard = ({ inning, teamName, teamLogo, score, batStats, bowlStats, balls, teamPlayers, cbPlayerIdMap, onBatsmanClick, onBowlerClick }: {
     inning: number; teamName: string; teamLogo?: string;
     score: { runs: number; wickets: number; overs: number };
     batStats: BatsmanStat[]; bowlStats: BowlerStat[]; balls: Ball[];
     teamPlayers?: any[];
+    cbPlayerIdMap?: Record<string, string>;
     onBatsmanClick?: (name: string) => void;
     onBowlerClick?: (name: string) => void;
 }) => {
@@ -1715,11 +1746,19 @@ const InningsScorecard = ({ inning, teamName, teamLogo, score, batStats, bowlSta
                             {batStats.map(b => (
                                 <tr key={b.name} className="border-b border-slate-800/40 hover:bg-slate-800/20 transition-colors cursor-pointer" onClick={() => onBatsmanClick?.(b.name)}>
                                     <td className="py-2.5 pl-4">
-                                        <div className="flex items-center gap-2">
-                                            <p className="text-white font-medium text-sm hover:text-blue-400 transition-colors">{b.name}</p>
-                                            {!b.isOut && <span className="text-[10px] text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded">*</span>}
+                                        <div className="flex items-center gap-2.5">
+                                            {/* Player photo — 36px, falls back to silhouette */}
+                                            <CricketPlayerImage
+                                                playerId={cbPlayerIdMap?.[b.name] || null}
+                                                playerName={b.name}
+                                                size={36}
+                                            />
+                                            <div>
+                                                <p className="text-white font-medium text-sm hover:text-blue-400 transition-colors">{b.name}</p>
+                                                {!b.isOut && <span className="text-[10px] text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded">*</span>}
+                                            </div>
                                         </div>
-                                        <p className="text-slate-500 text-[11px]">{b.isOut ? b.dismissalText : "batting"}</p>
+                                        <p className="text-slate-500 text-[11px] ml-[52px]">{b.isOut ? b.dismissalText : "batting"}</p>
                                     </td>
                                     <td className="text-center text-white font-bold">{b.runs}</td>
                                     <td className="text-center text-slate-400">{b.balls}</td>
