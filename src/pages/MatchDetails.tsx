@@ -1295,16 +1295,26 @@ const MatchDetails = () => {
                                     {/* Subtle background glow for not out */}
                                     {isActiveAtCrease && <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 blur-2xl rounded-full pointer-events-none"></div>}
                                     
-                                    <div className="flex justify-between items-start gap-2 relative z-10">
-                                      <div className="flex flex-col">
-                                        <h4 className={cn("font-bold text-sm leading-tight break-words", isActiveAtCrease ? "text-foreground" : "text-foreground/80")}>{b.name}</h4>
-                                        <div className="flex items-center gap-1.5 mt-1.5">
-                                          {isActiveAtCrease && <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" title="Not Out"></span>}
-                                          {b.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>}
-                                          {b.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">WK</span>}
+                                    <div className="flex items-start gap-3 relative z-10">
+                                      <CricketPlayerImage
+                                        playerId={b.faceImageId || b.id}
+                                        playerName={b.name}
+                                        size={40}
+                                        className="shrink-0 mt-0.5"
+                                      />
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-start gap-2">
+                                          <div className="flex flex-col min-w-0">
+                                            <h4 className={cn("font-bold text-sm leading-tight break-words", isActiveAtCrease ? "text-foreground" : "text-foreground/80")}>{b.name}</h4>
+                                            <div className="flex items-center gap-1.5 mt-1">
+                                              {isActiveAtCrease && <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" title="Not Out"></span>}
+                                              {b.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>}
+                                              {b.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">WK</span>}
+                                            </div>
+                                          </div>
+                                          <span className={cn("text-3xl font-black tracking-tighter leading-none shrink-0", isActiveAtCrease ? "text-primary" : "text-foreground")}>{b.runs}</span>
                                         </div>
                                       </div>
-                                      <span className={cn("text-3xl font-black tracking-tighter leading-none shrink-0", isActiveAtCrease ? "text-primary" : "text-foreground")}>{b.runs}</span>
                                     </div>
                                     
                                     <div className={cn("text-[10px] italic mt-3 mb-4 line-clamp-2 h-7 relative z-10 font-medium", 
@@ -1368,15 +1378,26 @@ const MatchDetails = () => {
                                 )}>
                                   {/* Subtle background glow for high wicket takers */}
                                   {parseInt(b.wickets) >= 3 && <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 blur-2xl rounded-full"></div>}
-                                  
-                                  <div className="flex justify-between items-start gap-2 relative z-10">
-                                    <div className="flex flex-col">
-                                      <h4 className="font-bold text-sm leading-tight break-words text-foreground/90">{b.name}</h4>
-                                      {b.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold mt-1.5 inline-block w-max">C</span>}
-                                    </div>
-                                    <div className="flex flex-col items-end leading-none shrink-0">
-                                       <span className={cn("text-3xl font-black tracking-tighter", parseInt(b.wickets) > 0 ? "text-primary" : "text-muted-foreground/50")}>{b.wickets}</span>
-                                       <span className="text-[8px] text-muted-foreground/60 uppercase tracking-widest mt-1 font-bold">Wickets</span>
+
+                                  {/* Player photo + name + wickets row */}
+                                  <div className="flex items-start gap-3 relative z-10">
+                                    <CricketPlayerImage
+                                      playerId={b.faceImageId || b.id}
+                                      playerName={b.name}
+                                      size={40}
+                                      className="shrink-0 mt-0.5"
+                                    />
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex justify-between items-start gap-1">
+                                        <div className="flex flex-col min-w-0">
+                                          <h4 className="font-bold text-sm leading-tight break-words text-foreground/90">{b.name}</h4>
+                                          {b.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold mt-1.5 inline-block w-max">C</span>}
+                                        </div>
+                                        <div className="flex flex-col items-end leading-none shrink-0">
+                                           <span className={cn("text-3xl font-black tracking-tighter", parseInt(b.wickets) > 0 ? "text-primary" : "text-muted-foreground/50")}>{b.wickets}</span>
+                                           <span className="text-[8px] text-muted-foreground/60 uppercase tracking-widest mt-1 font-bold">Wickets</span>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                   

@@ -19,7 +19,7 @@ import {
   players,
 } from "@/data/mockData";
 import { useLiveCricketMatches } from "@/hooks/useCricketMatches";
-import { useFeaturedCricketMatches } from "@/hooks/useFeaturedMatches";
+import { useFeaturedLiveCricketMatches, useFeaturedUpcomingCricketMatches, useFeaturedRecentCricketMatches } from "@/hooks/useFeaturedMatches";
 import { useFollowedTournamentMatches } from "@/hooks/useFollowedTournamentMatches";
 import { useFootballDashboard, useCategorizedFootballMatches } from "@/hooks/useFootballMatches";
 import { useCricketTrendingPlayers, useCricbuzzPlayerInfo } from "@/hooks/useCricketTrending";
@@ -39,18 +39,28 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCategory, setSearchCategory] = useState<"all" | "team" | "venue" | "type">("all");
 
-  // Fetch featured cricket data by format (Test, ODI, T20)
-  // Using backend proxy for all data - optimized for API quota
-  const { data: cricketData, isLoading: cricketLoading } = useFeaturedCricketMatches();
-  
+  // ─── Cricket: lazy-load by filter ───────────────────────────────────────────
+  // Live: always on (initial load). Upcoming/Recent: only enabled on demand.
+  const { data: liveData,     isLoading: liveLoading     } = useFeaturedLiveCricketMatches();
+  const { data: upcomingData, isLoading: upcomingLoading } = useFeaturedUpcomingCricketMatches(
+    activeSport === 'cricket' && activeStatus === 'upcoming'
+  );
+  const { data: recentData,   isLoading: recentLoading   } = useFeaturedRecentCricketMatches(
+    activeSport === 'cricket' && activeStatus === 'completed'
+  );
+
+  // Merge whichever slices are loaded — live always, others when fetched
+  const cricketData = {
+    test: [...(liveData?.test || []), ...(upcomingData?.test || []), ...(recentData?.test || [])],
+    odi:  [...(liveData?.odi  || []), ...(upcomingData?.odi  || []), ...(recentData?.odi  || [])],
+    t20:  [...(liveData?.t20  || []), ...(upcomingData?.t20  || []), ...(recentData?.t20  || [])],
+  };
+  const cricketLoading = liveLoading || upcomingLoading || recentLoading;
+
   const liveCricketMatches = useMemo(() => {
-    if (!cricketData) return [];
-    return [
-      ...(cricketData.test || []),
-      ...(cricketData.odi || []),
-      ...(cricketData.t20 || [])
-    ].filter(m => m.status === 'live');
-  }, [cricketData]);
+    return [...(liveData?.test || []), ...(liveData?.odi || []), ...(liveData?.t20 || [])]
+      .filter(m => m.status === 'live');
+  }, [liveData]);
 
   const { trending: cricketTrending, fetchTrending: fetchCricketTrending } = useCricketTrendingPlayers();
   const { playerInfo: cricketPlayerInfo, loading: cricketPlayerLoading, fetchPlayerInfo: fetchCricketPlayerInfo, clearPlayerInfo: clearCricketPlayerInfo } = useCricbuzzPlayerInfo();

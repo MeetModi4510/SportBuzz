@@ -105,7 +105,41 @@ export const cricketApi = {
             console.error("getFeaturedMatches failed:", error);
             return { test: [], odi: [], t20: [] };
         }
-    }
+    },
+
+    /** Helper to call one of the lazy featured endpoints and map matches */
+    _fetchFeaturedSlice: async (endpoint: string): Promise<{ test: Match[], odi: Match[], t20: Match[] }> => {
+        try {
+            const res = await api.get(endpoint);
+            const data = res?.data ?? res;
+            const processFormat = (formatData: any): Match[] => {
+                if (!Array.isArray(formatData)) return [];
+                return formatData
+                    .map((m: any) => { try { return mapApiMatchToModel(m); } catch { return null; } })
+                    .filter(Boolean) as Match[];
+            };
+            return {
+                test: processFormat(data?.test),
+                odi:  processFormat(data?.odi),
+                t20:  processFormat(data?.t20),
+            };
+        } catch (error) {
+            console.error(`[cricketApi] ${endpoint} failed:`, error);
+            return { test: [], odi: [], t20: [] };
+        }
+    },
+
+    /** Only live — called on initial load. Cached 15 min on server. */
+    getLiveCricketFeatured: (): Promise<{ test: Match[], odi: Match[], t20: Match[] }> =>
+        cricketApi._fetchFeaturedSlice('featured/matches/live'),
+
+    /** Only upcoming — called lazily when user clicks "Upcoming". Cached 30 min. */
+    getUpcomingCricketFeatured: (): Promise<{ test: Match[], odi: Match[], t20: Match[] }> =>
+        cricketApi._fetchFeaturedSlice('featured/matches/upcoming'),
+
+    /** Only recent/completed — called lazily when user clicks "Completed". Cached 30 min. */
+    getRecentCricketFeatured: (): Promise<{ test: Match[], odi: Match[], t20: Match[] }> =>
+        cricketApi._fetchFeaturedSlice('featured/matches/recent'),
 };
 
 export const footballApi = {

@@ -257,6 +257,26 @@ async function getMatchInfo(cbId) {
     return { status: 'failed', reason: 'Match not found', data: null };
 }
 
+// ─── Player Extra Info (shared helper) ───────────────────────────────────────
+const playerExtraCache = new NodeCache({ stdTTL: 86400 }); // 24-hour cache
+async function getPlayerExtraInfoGlobal(playerId) {
+    if (!playerId) return { role: null, faceImageId: null };
+    const cacheKey = `cb_extra_g_${playerId}`;
+    const hit = playerExtraCache.get(cacheKey);
+    if (hit) return hit;
+    try {
+        const pRes = await axios.get(`${CB_BASE}/stats/v1/player/${playerId}`, { headers: cbHeaders });
+        const info = {
+            role: pRes.data?.role || null,
+            faceImageId: pRes.data?.faceImageId || null,
+        };
+        if (info.role || info.faceImageId) playerExtraCache.set(cacheKey, info);
+        return info;
+    } catch {
+        return { role: null, faceImageId: null };
+    }
+}
+
 // ─── Scorecard ─────────────────────────────────────────────────────────────────
 async function getScorecard(cbId) {
     const cacheKey = `cb_scard_${cbId}`;
@@ -271,6 +291,19 @@ async function getScorecard(cbId) {
             return { error: 'No scorecard data from Cricbuzz', data: null };
         }
 
+        // Collect all unique player IDs across all innings (batsmen + bowlers)
+        const playerIdSet = new Set();
+        raw.scorecard.forEach(inn => {
+            (inn.batsman || []).forEach(b => { if (b.id) playerIdSet.add(String(b.id)); });
+            (inn.bowler  || []).forEach(b => { if (b.id) playerIdSet.add(String(b.id)); });
+        });
+
+        // Fetch faceImageId for all players in parallel (24-hour cache per player)
+        const playerIds = Array.from(playerIdSet);
+        const extraInfoArr = await Promise.all(playerIds.map(id => getPlayerExtraInfoGlobal(id)));
+        const playerExtraMap = {};
+        playerIds.forEach((id, i) => { playerExtraMap[id] = extraInfoArr[i]; });
+
         const innings = raw.scorecard.map((inn, idx) => {
             const fowArray = Array.isArray(inn.fow) ? inn.fow : (inn.fow?.fow || []);
 
@@ -284,29 +317,39 @@ async function getScorecard(cbId) {
                 runRate: inn.runrate || '0.00',
                 isDeclared: inn.isdeclared || false,
                 isFollowOn: inn.isfollowon || false,
-                batsmen: (inn.batsman || []).map(b => ({
-                    name: b.name || b.nickname || 'Unknown',
-                    id: b.id ? String(b.id) : null,
-                    runs: b.runs ?? 0,
-                    balls: b.balls ?? 0,
-                    fours: b.fours ?? 0,
-                    sixes: b.sixes ?? 0,
-                    strikeRate: b.strkrate || '0.00',
-                    dismissal: b.outdec || 'not out',
-                    isCaptain: b.iscaptain || false,
-                    isKeeper: b.iskeeper || false,
-                })),
-                bowlers: (inn.bowler || []).map(b => ({
-                    name: b.name || b.nickname || 'Unknown',
-                    id: b.id ? String(b.id) : null,
-                    overs: b.overs || '0',
-                    maidens: b.maidens ?? 0,
-                    runs: b.runs ?? 0,
-                    wickets: b.wickets ?? 0,
-                    economy: b.economy || '0.00',
-                    isCaptain: b.iscaptain || false,
-                    isKeeper: b.iskeeper || false,
-                })),
+                batsmen: (inn.batsman || []).map(b => {
+                    const pid = b.id ? String(b.id) : null;
+                    const extra = pid ? playerExtraMap[pid] : null;
+                    return {
+                        name: b.name || b.nickname || 'Unknown',
+                        id: pid,
+                        faceImageId: extra?.faceImageId ? String(extra.faceImageId) : null,
+                        runs: b.runs ?? 0,
+                        balls: b.balls ?? 0,
+                        fours: b.fours ?? 0,
+                        sixes: b.sixes ?? 0,
+                        strikeRate: b.strkrate || '0.00',
+                        dismissal: b.outdec || 'not out',
+                        isCaptain: b.iscaptain || false,
+                        isKeeper: b.iskeeper || false,
+                    };
+                }),
+                bowlers: (inn.bowler || []).map(b => {
+                    const pid = b.id ? String(b.id) : null;
+                    const extra = pid ? playerExtraMap[pid] : null;
+                    return {
+                        name: b.name || b.nickname || 'Unknown',
+                        id: pid,
+                        faceImageId: extra?.faceImageId ? String(extra.faceImageId) : null,
+                        overs: b.overs || '0',
+                        maidens: b.maidens ?? 0,
+                        runs: b.runs ?? 0,
+                        wickets: b.wickets ?? 0,
+                        economy: b.economy || '0.00',
+                        isCaptain: b.iscaptain || false,
+                        isKeeper: b.iskeeper || false,
+                    };
+                }),
                 extras: inn.extras || {},
                 fallOfWickets: fowArray.map((f, idx) => ({
                     batsmanName: f.batsmanname || f.batname || 'Unknown',
@@ -328,12 +371,41 @@ async function getScorecard(cbId) {
             error: null,
         };
 
-        cache.set(cacheKey, result, 900); // Cache scorecard for 15 minutes for real-time tracking
+        cache.set(cacheKey, result, 900); // Cache scorecard for 15 minutes
         return result;
     } catch (err) {
         console.error(`[CRICBUZZ] Scorecard error for ${cbId}:`, err.message);
         cache.set(cacheKey, { error: 'Failed to fetch Cricbuzz scorecard', data: null }, 10);
         return { error: 'Failed to fetch Cricbuzz scorecard', data: null };
+    }
+}
+
+// ─── Player Search by Name ─────────────────────────────────────────────────────
+const playerSearchCache = new NodeCache({ stdTTL: 86400 }); // 24-hour cache
+async function searchPlayerByName(name) {
+    if (!name) return { data: [], error: null };
+    const cacheKey = `cb_plrsearch_${name.toLowerCase().replace(/\s+/g, '_')}`;
+    const cached = playerSearchCache.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+        const res = await axios.get(`${CB_BASE}/stats/v1/player/search`, {
+            headers: cbHeaders,
+            params: { plrN: name },
+        });
+        const players = (res.data?.player || []).map(p => ({
+            id: String(p.id),
+            name: p.name,
+            teamName: p.teamName || '',
+            faceImageId: p.faceImageId ? String(p.faceImageId) : null,
+            dob: p.dob || null,
+        }));
+        const result = { data: players, error: null };
+        playerSearchCache.set(cacheKey, result);
+        return result;
+    } catch (err) {
+        console.error(`[CRICBUZZ] Player search error for "${name}":`, err.message);
+        return { data: [], error: err.message };
     }
 }
 
@@ -1128,6 +1200,7 @@ export const cricbuzzService = {
     getSquads,
     getCommentary,
     getPlayerInfo,
+    searchPlayerByName,
     checkPlayerImageExists,
     streamPlayerImage,
     getCricketNews,

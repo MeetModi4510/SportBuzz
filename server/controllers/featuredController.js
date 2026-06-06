@@ -451,4 +451,104 @@ export const getFeaturedMatches = async (req, res) => {
     }
 };
 
-export default { getFeaturedMatches };
+// ─────────────────────────────────────────────────────────────────────────────
+// LAZY ENDPOINTS — only called when user selects the filter
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Shared helper: categorize and enrich a flat match list */
+const categorizeAndEnrich = async (rawMatches, shouldEnrichLive = false) => {
+    const matches = rawMatches.filter(Boolean);
+    matches.forEach(m => fixMatchType(m));
+
+    const categories = { test: [], odi: [], t20: [] };
+    matches.forEach(match => {
+        const type = (match.matchType || '').toLowerCase();
+        if      (type.includes('test') || type.includes('fclass'))                            categories.test.push(match);
+        else if (type.includes('odi')  || type.includes('list-a'))                            categories.odi.push(match);
+        else if (type.includes('t20')  || type.includes('t10') || type.includes('hundred'))  categories.t20.push(match);
+    });
+
+    const selectedTest = selectFeaturedMatches(categories.test);
+    const selectedODI  = selectFeaturedMatches(categories.odi);
+    const selectedT20  = selectFeaturedMatches(categories.t20);
+
+    if (shouldEnrichLive) {
+        const [eTest, eODI, eT20] = await Promise.all([
+            enrichLiveWithMatchInfo(selectedTest),
+            enrichLiveWithMatchInfo(selectedODI),
+            enrichLiveWithMatchInfo(selectedT20),
+        ]);
+        return { test: eTest, odi: eODI, t20: eT20 };
+    }
+
+    return { test: selectedTest, odi: selectedODI, t20: selectedT20 };
+};
+
+/**
+ * GET /api/featured/matches/live
+ * Only fetches live matches from Cricbuzz — cached 15 min.
+ * Called on initial page load.
+ */
+export const getFeaturedLive = async (req, res) => {
+    try {
+        const liveRaw = await cricketService.getLiveMatches().catch(err => {
+            console.error('[FEATURED/LIVE] error:', err.message);
+            return [];
+        });
+
+        // getLiveMatches returns array directly
+        const rawArray = Array.isArray(liveRaw) ? liveRaw : (liveRaw?.data || []);
+        const result = await categorizeAndEnrich(rawArray, true);
+
+        return res.json({ success: true, data: result, cacheTTL: 900 });
+    } catch (error) {
+        console.error('[FEATURED/LIVE] error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch live matches', error: error.message });
+    }
+};
+
+/**
+ * GET /api/featured/matches/upcoming
+ * Only fetches upcoming matches — cached 30 min.
+ * Called lazily when user clicks the Upcoming filter.
+ */
+export const getFeaturedUpcoming = async (req, res) => {
+    try {
+        const raw = await cricketService.getUpcomingMatches().catch(err => {
+            console.error('[FEATURED/UPCOMING] error:', err.message);
+            return [];
+        });
+
+        const rawArray = Array.isArray(raw) ? raw : (raw?.data || []);
+        const result = await categorizeAndEnrich(rawArray, false);
+
+        return res.json({ success: true, data: result, cacheTTL: 1800 });
+    } catch (error) {
+        console.error('[FEATURED/UPCOMING] error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch upcoming matches', error: error.message });
+    }
+};
+
+/**
+ * GET /api/featured/matches/recent
+ * Only fetches recent/completed matches — cached 30 min.
+ * Called lazily when user clicks the Completed filter.
+ */
+export const getFeaturedRecent = async (req, res) => {
+    try {
+        const raw = await cricketService.getRecentMatches().catch(err => {
+            console.error('[FEATURED/RECENT] error:', err.message);
+            return [];
+        });
+
+        const rawArray = Array.isArray(raw) ? raw : (raw?.data || []);
+        const result = await categorizeAndEnrich(rawArray, false);
+
+        return res.json({ success: true, data: result, cacheTTL: 1800 });
+    } catch (error) {
+        console.error('[FEATURED/RECENT] error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch recent matches', error: error.message });
+    }
+};
+
+export default { getFeaturedMatches, getFeaturedLive, getFeaturedUpcoming, getFeaturedRecent };

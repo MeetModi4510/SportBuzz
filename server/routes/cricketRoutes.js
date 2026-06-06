@@ -176,6 +176,21 @@ router.get('/cb/player-image/:playerId', async (req, res) => {
     }
 });
 
+// ─── Cricket Player Search ──────────────────────────────────────────────────────
+// GET /api/cricket/cb/player-search?name={playerName}
+// Searches for a player by name, returns id, faceImageId, teamName, dob.
+// Results cached 24 hours.
+router.get('/cb/player-search', async (req, res) => {
+    try {
+        const name = req.query.name;
+        if (!name) return res.status(400).json({ error: 'Missing ?name= query param', data: [] });
+        const result = await cricbuzzService.searchPlayerByName(name);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message, data: [] });
+    }
+});
+
 // ─── Cricket News ───────────────────────────────────────────────────────────────
 // GET /api/cricket/news
 // Returns latest cricket news from Cricbuzz, cached 30 minutes.

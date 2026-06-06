@@ -2,27 +2,61 @@ import { useQuery } from "@tanstack/react-query";
 import { cricketApi } from "../services/api";
 import { Match } from "../data/types";
 
-// PROMPT 2: Frontend auto-refresh = 12 minutes (720,000ms), aligned to backend cache TTL of 720s
-const REFRESH_INTERVAL_MS = 720_000; // 12 minutes
+type CricketFormatData = { test: Match[], odi: Match[], t20: Match[] };
+const EMPTY: CricketFormatData = { test: [], odi: [], t20: [] };
 
-export function useFeaturedCricketMatches() {
-    return useQuery({
-        queryKey: ['cricket', 'matches', 'featured'],
-        queryFn: async (): Promise<{ test: Match[], odi: Match[], t20: Match[] }> => {
-            console.log("[DEBUG] useFeaturedCricketMatches: Fetching matches...");
+// ─── LIVE (always fetched on load, auto-refresh 15 min) ────────────────────────
+export function useFeaturedLiveCricketMatches() {
+    return useQuery<CricketFormatData>({
+        queryKey: ['cricket', 'featured', 'live'],
+        queryFn: async () => {
             try {
-                const matches = await cricketApi.getFeaturedMatches();
-                console.log("[DEBUG] useFeaturedCricketMatches: Received matches:", matches);
-                return matches || { test: [], odi: [], t20: [] };
-            } catch (error) {
-                console.error("[DEBUG] useFeaturedCricketMatches: Error fetching:", error);
-                return { test: [], odi: [], t20: [] };
+                return await cricketApi.getLiveCricketFeatured();
+            } catch {
+                return EMPTY;
             }
         },
-        // PROMPT 2: True 12-minute cycle — frontend refresh aligned to backend cache TTL
-        refetchInterval: REFRESH_INTERVAL_MS,
-        // staleTime slightly less than TTL so we never serve overly stale data
-        staleTime: REFRESH_INTERVAL_MS - 30_000, // 11m 30s
+        refetchInterval: 900_000,   // 15 min
+        staleTime:       870_000,   // 14.5 min
         retry: 1,
     });
+}
+
+// ─── UPCOMING (lazy — only fetched when user selects filter) ───────────────────
+export function useFeaturedUpcomingCricketMatches(enabled: boolean) {
+    return useQuery<CricketFormatData>({
+        queryKey: ['cricket', 'featured', 'upcoming'],
+        queryFn: async () => {
+            try {
+                return await cricketApi.getUpcomingCricketFeatured();
+            } catch {
+                return EMPTY;
+            }
+        },
+        enabled,
+        staleTime: 1_800_000,  // 30 min — upstream cache is 30 min
+        retry: 1,
+    });
+}
+
+// ─── RECENT/COMPLETED (lazy — only fetched when user selects filter) ───────────
+export function useFeaturedRecentCricketMatches(enabled: boolean) {
+    return useQuery<CricketFormatData>({
+        queryKey: ['cricket', 'featured', 'recent'],
+        queryFn: async () => {
+            try {
+                return await cricketApi.getRecentCricketFeatured();
+            } catch {
+                return EMPTY;
+            }
+        },
+        enabled,
+        staleTime: 1_800_000,  // 30 min
+        retry: 1,
+    });
+}
+
+// ─── LEGACY: backward-compat alias ────────────────────────────────────────────
+export function useFeaturedCricketMatches() {
+    return useFeaturedLiveCricketMatches();
 }
