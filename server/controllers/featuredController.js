@@ -243,36 +243,45 @@ const selectFeaturedMatches = (matches = []) => {
 
     const selected = [];
     const usedIds  = new Set();
+    const activeSeriesNames = new Set();
 
-    const pick1 = (pool) => {
+    const pickMatches = (pool, limit, condition = () => true) => {
+        let count = 0;
         for (const m of pool) {
-            if (!usedIds.has(m.id)) {
+            if (count >= limit) break;
+            if (!usedIds.has(m.id) && condition(m)) {
                 // Attach flags + IST display time
                 const enriched = attachFlagsToMatch(m);
                 enriched.displayTime  = toIST(m.dateTimeGMT || m.date);
                 enriched.chaseLine    = buildChaseLine(m);
                 selected.push(enriched);
                 usedIds.add(m.id);
-                return true;
+                if (m.seriesName || m.series) activeSeriesNames.add(m.seriesName || m.series);
+                count++;
             }
         }
-        return false;
+        return count;
     };
 
-    if (livePool.length > 0) {
-        // RULE 1: 1 Live + 1 Upcoming + 1 Completed
-        pick1(livePool);
-        pick1(upcomingPool);
-        pick1(completedPool);
-    } else if (upcomingPool.length > 0) {
-        // RULE 2: No live → 1 Upcoming + 2 Completed
-        pick1(upcomingPool);
-        pick1(completedPool);
-        pick1(completedPool);
-    } else {
-        // RULE 3: No live, no upcoming → 2 Completed only
-        pick1(completedPool);
-        pick1(completedPool);
+    // 1. Show up to 5 live matches
+    pickMatches(livePool, 5);
+
+    // 2. Upcoming matches: prioritize live matches' series, then fill up to 15
+    let pickedUpcoming = 0;
+    if (activeSeriesNames.size > 0) {
+        pickedUpcoming += pickMatches(upcomingPool, 15, m => activeSeriesNames.has(m.seriesName || m.series));
+    }
+    if (pickedUpcoming < 15) {
+        pickedUpcoming += pickMatches(upcomingPool, 15 - pickedUpcoming);
+    }
+
+    // 3. Recent matches: prioritize live matches' series, then fill up to 10
+    let pickedRecent = 0;
+    if (activeSeriesNames.size > 0) {
+        pickedRecent += pickMatches(completedPool, 10, m => activeSeriesNames.has(m.seriesName || m.series));
+    }
+    if (pickedRecent < 10) {
+        pickedRecent += pickMatches(completedPool, 10 - pickedRecent);
     }
 
     return selected;
