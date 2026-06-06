@@ -738,9 +738,9 @@ const CB_IMAGE_TO_FLAG = {
 };
 
 function shouldRefreshRankings(format) {
-    // Force refresh on Wednesday (day 3 in JS Date, 0=Sun)
+    // Force refresh on Wednesday (day 3 in JS Date, 0=Sun) at or after 6 PM (18:00)
     const now = new Date();
-    const isWednesday = now.getDay() === 3;
+    const isWednesday = now.getDay() === 3 && now.getHours() >= 18;
     if (!isWednesday) return false;
 
     const cacheKey = `rankings_${format}`;
@@ -751,6 +751,7 @@ function shouldRefreshRankings(format) {
     const lastRefreshDate = new Date(meta.refreshedAt).toDateString();
     return lastRefreshDate !== now.toDateString();
 }
+
 
 async function getTeamRankings(format) {
     const cacheKey = `rankings_${format}`;

@@ -530,8 +530,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\cricketRoutes.js": {
-    "mtime": 1780742083.6623917,
-    "ast_hash": "7d8d9ade8bf1cc499eb9cc97b7e087db",
+    "mtime": 1780743796.7590468,
+    "ast_hash": "5efc69cef43c1f03114d1f1f5806abf1",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\favoritesRoutes.js": {
@@ -640,8 +640,8 @@
     "semantic_hash": "61f1a12201876545b2461e5a3fefd2a2"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\cricbuzzService.js": {
-    "mtime": 1780742069.728958,
-    "ast_hash": "0063257f9484d19d5808961119510b93",
+    "mtime": 1780743779.0653586,
+    "ast_hash": "ad09be0cc513539335a282eaa7f33237",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\cricketApiService.js": {
@@ -3100,8 +3100,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\NewsSection.tsx": {
-    "mtime": 1780659603.460471,
-    "ast_hash": "5713fbc059e9c038c438f97a92a641c9",
+    "mtime": 1780743853.5231686,
+    "ast_hash": "91bf8a2555cf447604072884a2f3391e",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\data\\mockNewsData.ts": {
@@ -3122,6 +3122,11 @@
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\cricket\\CricketRankings.tsx": {
     "mtime": 1780743649.9804783,
     "ast_hash": "aa29fbfd8cd80809b65a7d797762f9ac",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useCricketNews.ts": {
+    "mtime": 1780743809.3587997,
+    "ast_hash": "b23d263fc32cc029be3a5e0656250497",
     "semantic_hash": ""
   }
 }

@@ -145,7 +145,7 @@ export const CricketRankings = () => {
       </div>
 
       {/* Rankings Table */}
-      <div className="overflow-x-auto -mx-2 px-2 flex-1">
+      <div className="overflow-y-auto overflow-x-auto -mx-2 px-2 flex-1 max-h-[440px] scrollbar-thin">
         {isTeams && loading ? (
           <div className="flex flex-col items-center justify-center py-10 gap-3">
             <Loader2 size={28} className="text-primary animate-spin" />
@@ -163,8 +163,8 @@ export const CricketRankings = () => {
             </button>
           </div>
         ) : (
-          <table className="w-full text-xs text-left border-separate border-spacing-y-1.5">
-            <thead className="text-[10px] text-muted-foreground uppercase tracking-widest sticky top-0 bg-card/80 backdrop-blur-sm z-10">
+          <table className="w-full text-xs text-left border-separate border-spacing-y-1.5 relative">
+            <thead className="text-[10px] text-muted-foreground uppercase tracking-widest sticky top-0 bg-background/95 backdrop-blur-sm z-10">
               <tr>
                 <th className="py-2 px-2 font-semibold w-8">Pos</th>
                 <th className="py-2 px-2 font-semibold">
@@ -174,7 +174,7 @@ export const CricketRankings = () => {
                   <th className="py-2 px-2 font-semibold text-center">M</th>
                 )}
                 <th className="py-2 px-2 font-semibold text-center">Pts</th>
-                <th className="py-2 px-2 font-semibold text-right">Rtg</th>
+                <th className="py-2 px-2 font-semibold text-center">Rtg</th>
               </tr>
             </thead>
             <tbody>
@@ -253,7 +253,7 @@ export const CricketRankings = () => {
 
                     {/* Rating */}
                     <td className={cn(
-                      'py-2 px-2 rounded-r-xl border-y border-r transition-all duration-300 text-right',
+                      'py-2 px-2 rounded-r-xl border-y border-r transition-all duration-300 text-center',
                       medal
                         ? `${medal.bg} group-hover:border-border/50`
                         : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
