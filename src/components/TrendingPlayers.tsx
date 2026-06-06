@@ -98,7 +98,7 @@ export const TrendingPlayers = ({
           return (
             <div
               key={isApi ? item.id : (item as Player).id}
-              className="animate-slide-up relative"
+              className="animate-slide-up relative h-full"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               {isApi ? (

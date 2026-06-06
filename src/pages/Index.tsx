@@ -146,8 +146,9 @@ const Index = () => {
     navigate(`/match/${matchId}`, { state: { from: 'dashboard', section: 'matches' } });
   };
 
-  const handlePlayerClick = (player: { id: string }) => {
-    navigate(`/player/${player.id}`, { state: { from: 'dashboard', section: 'trending' } });
+  const handlePlayerClick = (player: { id: string, name?: string }) => {
+    const routeId = player.name ? player.name.replace(/\s+/g, '-') : player.id;
+    navigate(`/player/${routeId}`, { state: { from: 'dashboard', section: 'trending' } });
   };
 
   // Scroll to section when navigating back using React Router hash

@@ -165,7 +165,7 @@ export const PlayerCard = ({ player, onClick, className, compact = false, hideSt
     <div
       onClick={onClick}
       className={cn(
-        "group relative overflow-hidden rounded-xl bg-card border border-border",
+        "group relative overflow-hidden rounded-xl bg-card border border-border h-full flex flex-col",
         "cursor-pointer transition-all duration-300 card-hover",
         className
       )}
@@ -185,7 +185,7 @@ export const PlayerCard = ({ player, onClick, className, compact = false, hideSt
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-3 flex-1 flex flex-col">
         <div>
           <h3 className="font-semibold text-foreground text-lg truncate" title={player.name}>{player.name}</h3>
           <p className="text-sm text-muted-foreground">{player.position}</p>

@@ -59,7 +59,7 @@ function PlayerAvatar({
 
   return (
     <img
-      src={`${API_BASE}/api/cricket/cb/player-image/${faceImageId}`}
+      src={`https://static.cricbuzz.com/a/img/v1/192x192/i1/c${faceImageId}/i.jpg`}
       alt={name}
       onError={() => setErr(true)}
       className={cn(cls, 'rounded-2xl object-cover border border-border/30 flex-shrink-0')}
@@ -267,7 +267,7 @@ export function TrendingCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className={cn(
-        'relative group w-full text-left rounded-2xl border bg-gradient-to-br transition-all duration-300 overflow-hidden',
+        'relative group w-full h-full flex flex-col text-left rounded-2xl border bg-gradient-to-br transition-all duration-300 overflow-hidden',
         'hover:scale-[1.03] hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
         medal
           ? `${medal.bg} ${medal.glow} shadow-lg`
@@ -292,7 +292,7 @@ export function TrendingCard({
         )} />
       </div>
 
-      <div className="px-3 pb-4 text-center space-y-1">
+      <div className="px-3 pb-4 text-center space-y-1 flex-1 flex flex-col justify-end">
         <p className="text-xs font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
           {player.name}
         </p>
