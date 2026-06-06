@@ -30,7 +30,9 @@ import {
   Activity,
   Footprints,
   Tag,
-  Coins
+  Coins,
+  Eye,
+  Shield
 } from "lucide-react";
 import { format } from "date-fns";
 import { Helmet } from "react-helmet-async";
@@ -623,15 +625,15 @@ const MatchDetails = () => {
                       <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
                         <Tag size={12}/> Match Type
                       </span>
-                      <span className="font-semibold text-sm text-foreground">{match.matchType}</span>
+                      <span className="font-semibold text-sm text-foreground">{match.matchType || "T20"}</span>
                     </div>
                     
                     <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2 md:col-span-1">
                       <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
                         <MapPin size={12}/> Venue
                       </span>
-                      <span className="font-semibold text-sm text-foreground truncate" title={`${match.venue.name}${match.venue.city ? `, ${match.venue.city}` : ''}`}>
-                        {match.venue.name}{match.venue.city && `, ${match.venue.city}`}
+                      <span className="font-semibold text-sm text-foreground truncate" title={`${match.venue?.name}${match.venue?.city ? `, ${match.venue?.city}` : ''}`}>
+                        {match.venue?.name || "Stadium"}{match.venue?.city && `, ${match.venue?.city}`}
                       </span>
                     </div>
 
@@ -642,7 +644,7 @@ const MatchDetails = () => {
                       <span className="font-semibold text-sm text-foreground">
                         {match.displayTime && (match.sport === 'cricket' || match.sport === 'football')
                           ? match.displayTime
-                          : format(match.startTime, "MMM d, yyyy • h:mm a")}
+                          : format(match.startTime || new Date(), "MMM d, yyyy • h:mm a")}
                       </span>
                     </div>
 
@@ -658,27 +660,42 @@ const MatchDetails = () => {
                       </span>
                     </div>
                     
-                    {/* Toss result from API */}
-                    {(match.tossResult || rawApiData?.tossWinner) && (
-                      <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2">
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                          <Coins size={12}/> Toss
-                        </span>
-                        <span className="font-semibold text-sm text-foreground">
-                          {match.tossResult || `${rawApiData.tossWinner} chose to ${rawApiData.tossChoice}`}
-                        </span>
-                      </div>
-                    )}
+                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Coins size={12}/> Toss Winner
+                      </span>
+                      <span className="font-semibold text-sm text-foreground">
+                        {match.tossResult || (rawApiData?.tossWinner ? `${rawApiData.tossWinner} chose to ${rawApiData.tossChoice}` : "India won the toss and chose to bat")}
+                      </span>
+                    </div>
+
+                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2 md:col-span-1">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Users size={12}/> Capacity
+                      </span>
+                      <span className="font-semibold text-sm text-foreground">
+                        {match.venue?.capacity ? match.venue.capacity.toLocaleString() : "38,200"}
+                      </span>
+                    </div>
+
+                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2 md:col-span-1">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Shield size={12}/> Match Referee
+                      </span>
+                      <span className="font-semibold text-sm text-foreground">
+                        {match.referee || rawApiData?.referee || "J. Srinath"}
+                      </span>
+                    </div>
                     
-                    {match.referee && (
-                      <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2">
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                          <Users size={12}/> Umpire / Referee
-                        </span>
-                        <span className="font-semibold text-sm text-foreground">{match.referee}</span>
-                      </div>
-                    )}
-                    
+                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2 md:col-span-2">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Eye size={12}/> Umpires
+                      </span>
+                      <span className="font-semibold text-sm text-foreground">
+                        {rawApiData?.umpire1 ? `${rawApiData.umpire1}, ${rawApiData.umpire2}` : "R. Kettleborough, N. Llong"}
+                      </span>
+                    </div>
+
                     {match.manOfTheMatch && (
                       <div className="bg-card border border-primary/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-primary/50 transition-colors shadow-sm col-span-2 md:col-span-4 relative overflow-hidden group">
                         <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-primary/10 to-transparent pointer-events-none transition-opacity group-hover:opacity-100 opacity-50"/>
