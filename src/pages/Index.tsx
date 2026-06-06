@@ -344,7 +344,10 @@ const Index = () => {
           {activeSport === "all" && <NewsSection />}
 
           <div id="trending-players" className="mt-8">
-            <TrendingPlayers players={players} onPlayerClick={handlePlayerClick} />
+            <TrendingPlayers 
+              players={activeSport === "all" ? players : players.filter(p => p.sport === activeSport)} 
+              onPlayerClick={handlePlayerClick} 
+            />
           </div>
 
           {/* Creators Section */}
