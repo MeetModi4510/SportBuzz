@@ -357,9 +357,11 @@ const Index = () => {
           <div id="trending-players" className="mt-8">
             <TrendingPlayers 
               players={
-                activeSport === "all" || activeSport === "cricket"
-                  ? (trendingPlayers.length > 0 ? trendingPlayers : players.filter(p => activeSport === "all" || p.sport === activeSport))
-                  : players.filter(p => p.sport === activeSport)
+                activeSport === "all" 
+                  ? (trendingPlayers.length > 0 ? [...trendingPlayers, ...players.filter(p => p.sport !== 'cricket')] : players)
+                  : activeSport === "cricket"
+                    ? (trendingPlayers.length > 0 ? trendingPlayers : players.filter(p => p.sport === "cricket"))
+                    : players.filter(p => p.sport === activeSport)
               } 
               onPlayerClick={handlePlayerClick} 
             />

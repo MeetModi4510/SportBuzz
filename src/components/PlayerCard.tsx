@@ -186,7 +186,7 @@ export const PlayerCard = ({ player, onClick, className, compact = false }: Play
       {/* Content */}
       <div className="p-4 space-y-3">
         <div>
-          <h3 className="font-semibold text-foreground text-lg">{player.name}</h3>
+          <h3 className="font-semibold text-foreground text-lg truncate" title={player.name}>{player.name}</h3>
           <p className="text-sm text-muted-foreground">{player.position}</p>
         </div>
 
