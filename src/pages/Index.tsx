@@ -12,6 +12,7 @@ import { MatchCard } from "@/components/MatchCard";
 import { CreatorsSection } from "@/components/CreatorsSection";
 import { CricketNewsSection } from '@/components/cricket/CricketNewsSection';
 import { CricketRankings } from '@/components/cricket/CricketRankings';
+import { CricketTrendingPlayers } from '@/components/cricket/CricketTrendingPlayers';
 import { NewsSection } from "@/components/NewsSection";
 import {
   matches as mockMatches,
@@ -354,17 +355,25 @@ const Index = () => {
           {/* Global Sports News - Only on 'All' Tab */}
           {activeSport === "all" && <NewsSection />}
 
-          <div id="trending-players" className="mt-8">
-            <TrendingPlayers 
-              players={
-                activeSport === "all" 
-                  ? (trendingPlayers.length > 0 ? [...trendingPlayers, ...players.filter(p => p.sport !== 'cricket')] : players)
-                  : activeSport === "cricket"
-                    ? (trendingPlayers.length > 0 ? trendingPlayers : players.filter(p => p.sport === "cricket"))
-                    : players.filter(p => p.sport === activeSport)
-              } 
-              onPlayerClick={handlePlayerClick} 
-            />
+          {/* Trending Players */}
+          <div id="trending-players" className="mt-8 space-y-10">
+            {/* Cricket Trending: always show on 'all' and 'cricket' tabs (live API) */}
+            {(activeSport === "all" || activeSport === "cricket") && (
+              <CricketTrendingPlayers />
+            )}
+            {/* Other sports mock players — shown on 'all' tab (below cricket) or their own tab */}
+            {activeSport === "all" && players.filter(p => p.sport !== 'cricket').length > 0 && (
+              <TrendingPlayers
+                players={players.filter(p => p.sport !== 'cricket')}
+                onPlayerClick={handlePlayerClick}
+              />
+            )}
+            {activeSport !== "all" && activeSport !== "cricket" && (
+              <TrendingPlayers
+                players={players.filter(p => p.sport === activeSport)}
+                onPlayerClick={handlePlayerClick}
+              />
+            )}
           </div>
 
           {/* Creators Section */}

@@ -236,4 +236,31 @@ router.get('/player-rankings/:category/:format', async (req, res) => {
     }
 });
 
+// ─── Trending Players ──────────────────────────────────────────────────────────
+// GET /api/cricket/trending-players
+// Scroll-triggered; cached 24 hours server-side.
+router.get('/trending-players', async (req, res) => {
+    try {
+        const result = await cricbuzzService.getTrendingPlayers();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ data: [], error: error.message });
+    }
+});
+
+// GET /api/cricket/player-info/:id
+// Click-triggered; cached 24 hours server-side.
+router.get('/player-info/:id', async (req, res) => {
+    const { id } = req.params;
+    if (!id || isNaN(Number(id))) {
+        return res.status(400).json({ data: null, error: 'Invalid player ID' });
+    }
+    try {
+        const result = await cricbuzzService.getCricbuzzPlayerInfo(id);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ data: null, error: error.message });
+    }
+});
+
 export default router;

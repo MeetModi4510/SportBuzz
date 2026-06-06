@@ -20,7 +20,7 @@ const cbHeaders = {
 };
 
 // ─── Image Proxy Config ────────────────────────────────────────────────────────
-const CB_IMAGE_KEY = process.env.CRICBUZZ_IMAGE_RAPIDAPI_KEY || process.env.FOOTBALL_RAPIDAPI_KEY;
+const CB_IMAGE_KEY = process.env.CRICBUZZ_CRICKET_NEWS || process.env.CRICBUZZ_IMAGE_RAPIDAPI_KEY || process.env.FOOTBALL_RAPIDAPI_KEY;
 const CB_IMAGE_HOST = 'cricbuzz-cricket.p.rapidapi.com';
 const CB_IMAGE_BASE = `https://${CB_IMAGE_HOST}`;
 
@@ -1006,6 +1006,112 @@ async function getPlayerRankings(category, format) {
     }
 }
 
+// ─── Trending Players ─────────────────────────────────────────────────────────
+const trendingCache = new NodeCache({ stdTTL: 86400 }); // 24 hours
+
+async function getTrendingPlayers() {
+    const cacheKey = 'trending_players_v1';
+    const cached = trendingCache.get(cacheKey);
+    if (cached) return cached;
+
+    // Use the CRICBUZZ_CRICKET_NEWS key (new key provided by user)
+    const apiKey = process.env.CRICBUZZ_CRICKET_NEWS || process.env.FOOTBALL_RAPIDAPI_KEY || RAPIDAPI_KEY;
+    const host = 'cricbuzz-cricket2.p.rapidapi.com';
+
+    try {
+        const res = await axios.get(
+            `https://${host}/stats/v1/player/trending`,
+            { headers: { 'x-rapidapi-key': apiKey, 'x-rapidapi-host': host } }
+        );
+
+        const rawPlayers = res.data?.player || [];
+        const players = rawPlayers.map((p, idx) => {
+            const teamLower = (p.teamName || '').toLowerCase();
+            const isLocal = LOCAL_FLAG_COUNTRIES.has(teamLower);
+            const localPath = LOCAL_FLAG_PATH[teamLower] || null;
+            const flagCode = COUNTRY_NAME_TO_FLAG[teamLower] || null;
+            return {
+                rank: idx + 1,
+                id: p.id,
+                name: p.name,
+                teamName: p.teamName || '',
+                faceImageId: p.faceImageId || null,
+                flagCode: isLocal ? null : flagCode,
+                flagLocal: isLocal ? localPath : null,
+            };
+        });
+
+        const result = {
+            data: players,
+            lastUpdatedOn: new Date().toISOString(),
+            error: null,
+        };
+
+        trendingCache.set(cacheKey, result, 86400);
+        return result;
+    } catch (err) {
+        console.error('[CRICBUZZ] Trending players error:', err.message);
+        if (cached) return cached;
+        return { data: [], lastUpdatedOn: null, error: 'Failed to fetch trending players' };
+    }
+}
+
+// ─── Cricbuzz Player Info (click-triggered) ───────────────────────────────────
+const playerInfoCache = new NodeCache({ stdTTL: 86400 }); // 24 hours
+
+async function getCricbuzzPlayerInfo(playerId) {
+    const cacheKey = `playerProfile:${playerId}`;
+    const cached = playerInfoCache.get(cacheKey);
+    if (cached) return cached;
+
+    // Use the CRICBUZZ_CRICKET_NEWS key (new key provided by user)
+    const apiKey = process.env.CRICBUZZ_CRICKET_NEWS || process.env.FOOTBALL_RAPIDAPI_KEY || RAPIDAPI_KEY;
+    const host = 'cricbuzz-cricket2.p.rapidapi.com';
+
+    try {
+        const res = await axios.get(
+            `https://${host}/stats/v1/player/${playerId}`,
+            { headers: { 'x-rapidapi-key': apiKey, 'x-rapidapi-host': host } }
+        );
+
+        const d = res.data;
+        const countryLower = (d.country || '').toLowerCase();
+        const isLocal = LOCAL_FLAG_COUNTRIES.has(countryLower);
+        const localPath = LOCAL_FLAG_PATH[countryLower] || null;
+        const flagCode = COUNTRY_NAME_TO_FLAG[countryLower] || null;
+
+        const result = {
+            data: {
+                id: playerId,
+                name: d.name || '',
+                country: d.country || '',
+                flagCode: isLocal ? null : flagCode,
+                flagLocal: isLocal ? localPath : null,
+                role: d.role || '',
+                battingStyle: d.battingStyle || '',
+                bowlingStyle: d.bowlingStyle || '',
+                faceImageId: d.faceImageId || null,
+                bio: d.bio || '',
+                dateOfBirth: d.dateOfBirth || '',
+                rankings: {
+                    test: d.rankings?.bat?.test || d.rankings?.bowl?.test || null,
+                    odi: d.rankings?.bat?.odi || d.rankings?.bowl?.odi || null,
+                    t20: d.rankings?.bat?.t20i || d.rankings?.bowl?.t20i || null,
+                },
+                teams: d.teams || [],
+            },
+            error: null,
+        };
+
+        playerInfoCache.set(cacheKey, result, 86400);
+        return result;
+    } catch (err) {
+        console.error(`[CRICBUZZ] Player info error (${playerId}):`, err.message);
+        if (cached) return cached;
+        return { data: null, error: 'Failed to fetch player info' };
+    }
+}
+
 // ─── Export ────────────────────────────────────────────────────────────────────
 export const cricbuzzService = {
     getLiveMatches,
@@ -1023,6 +1129,8 @@ export const cricbuzzService = {
     getCricketNewsDetail,
     getTeamRankings,
     getPlayerRankings,
+    getTrendingPlayers,
+    getCricbuzzPlayerInfo,
 };
 
 export default cricbuzzService;
