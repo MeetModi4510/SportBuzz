@@ -308,10 +308,10 @@ async function getScorecard(cbId) {
                     isKeeper: b.iskeeper || false,
                 })),
                 extras: inn.extras || {},
-                fallOfWickets: fowArray.map(f => ({
+                fallOfWickets: fowArray.map((f, idx) => ({
                     batsmanName: f.batsmanname || f.batname || 'Unknown',
                     score: f.runs ?? f.score ?? 0,
-                    wicketNum: f.wktnbr ?? 0,
+                    wicketNum: f.wktnbr ?? f.wktNum ?? f.wktNbr ?? f.wicketNum ?? (idx + 1),
                     overs: f.overnbr ?? f.overs ?? 0,
                 })),
             };
