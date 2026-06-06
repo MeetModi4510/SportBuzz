@@ -33,10 +33,10 @@ export const CricketRankings = () => {
   const [activeFormat, setActiveFormat] = useState<Format>('Test');
 
   return (
-    <div className="bg-card/40 backdrop-blur-md rounded-[2rem] border border-border/50 p-6 md:p-8 flex flex-col gap-6">
+    <div className="bg-card/40 backdrop-blur-md rounded-3xl border border-border/40 p-6 md:p-8 flex flex-col gap-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-yellow-500/10 text-yellow-500 rounded-xl">
+          <div className="p-2.5 bg-primary/10 text-primary rounded-xl">
             <Trophy size={24} />
           </div>
           <div>
