@@ -28,7 +28,9 @@ import {
   Info,
   ListOrdered,
   Activity,
-  Footprints
+  Footprints,
+  Tag,
+  Coins
 } from "lucide-react";
 import { format } from "date-fns";
 import { Helmet } from "react-helmet-async";
@@ -574,70 +576,102 @@ const MatchDetails = () => {
 
               {/* Match Status & Result (Live + Completed) */}
               {!isUpcoming && match.summaryText && (
-                <div className="bg-secondary/10 border border-border/20 rounded-2xl p-8 space-y-4 shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <BarChart3 className="w-5 h-5 text-primary" />
-                    <h3 className="font-semibold text-foreground">{isCompleted ? 'Match Result' : 'Match Status'}</h3>
+                <div className="relative overflow-hidden bg-card border border-border/40 rounded-2xl p-6 md:p-8 flex items-center gap-6 group shadow-sm transition-all hover:border-border/60">
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary" />
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Activity className="w-6 h-6 text-primary" />
                   </div>
-                  <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
-                    <p className="text-lg font-bold text-foreground leading-relaxed text-center italic">
-                      "{match.summaryText}"
-                    </p>
+                  <div>
+                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 block">
+                      {isCompleted ? 'Match Result' : 'Current Status'}
+                    </span>
+                    <h3 className="text-lg md:text-xl font-bold text-foreground tracking-tight leading-snug">
+                      {match.summaryText}
+                    </h3>
                   </div>
                 </div>
               )}
 
-              {/* Match Details Card */}
+              {/* Match Details Grid */}
               {!isUpcoming && (
-                <div className="bg-secondary/10 border border-border/20 rounded-2xl p-8 space-y-6 shadow-sm">
-                  <h3 className="font-semibold text-foreground">Match Details</h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Match Type</span>
-                      <span className="text-foreground font-medium">{match.matchType}</span>
+                <div className="space-y-4 mt-8">
+                  <div className="flex items-center gap-2 px-1 mb-2">
+                     <Info className="w-4 h-4 text-muted-foreground" />
+                     <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Match Information</h3>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Tag size={12}/> Match Type
+                      </span>
+                      <span className="font-semibold text-sm text-foreground">{match.matchType}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Venue</span>
-                      <span className="text-foreground font-medium">{match.venue.name}{match.venue.city && `, ${match.venue.city}`}</span>
+                    
+                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2 md:col-span-1">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <MapPin size={12}/> Venue
+                      </span>
+                      <span className="font-semibold text-sm text-foreground truncate" title={`${match.venue.name}${match.venue.city ? `, ${match.venue.city}` : ''}`}>
+                        {match.venue.name}{match.venue.city && `, ${match.venue.city}`}
+                      </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Date & Time</span>
-                      <span className="text-foreground font-medium">
+
+                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Clock size={12}/> Date & Time
+                      </span>
+                      <span className="font-semibold text-sm text-foreground">
                         {match.displayTime && (match.sport === 'cricket' || match.sport === 'football')
                           ? match.displayTime
                           : format(match.startTime, "MMM d, yyyy • h:mm a")}
                       </span>
                     </div>
+
+                    <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Activity size={12}/> Status
+                      </span>
+                      <span className={cn(
+                        "font-semibold text-sm",
+                        isLive ? "text-red-500 flex items-center gap-1.5" : "text-foreground"
+                      )}>
+                        {isLive ? <><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/> In Progress</> : isCompleted ? 'Completed' : 'Upcoming'}
+                      </span>
+                    </div>
+                    
                     {/* Toss result from API */}
                     {(match.tossResult || rawApiData?.tossWinner) && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Toss</span>
-                        <span className="text-foreground font-medium">
+                      <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                          <Coins size={12}/> Toss
+                        </span>
+                        <span className="font-semibold text-sm text-foreground">
                           {match.tossResult || `${rawApiData.tossWinner} chose to ${rawApiData.tossChoice}`}
                         </span>
                       </div>
                     )}
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Status</span>
-                      <span className={cn(
-                        "font-medium",
-                        isLive ? "text-green-500" : "text-foreground"
-                      )}>
-                        {isLive ? 'In Progress' : isCompleted ? 'Completed' : 'Upcoming'}
-                      </span>
-                    </div>
+                    
                     {match.referee && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Umpire / Referee</span>
-                        <span className="text-foreground font-medium">{match.referee}</span>
+                      <div className="bg-card border border-border/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-border/60 transition-colors shadow-sm col-span-2">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                          <Users size={12}/> Umpire / Referee
+                        </span>
+                        <span className="font-semibold text-sm text-foreground">{match.referee}</span>
                       </div>
                     )}
+                    
                     {match.manOfTheMatch && (
-                      <div className="pt-2 mt-2 border-t border-border">
-                        <div className="flex justify-between items-center">
-                          <span className="text-muted-foreground">Man of the Match</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary font-bold">MOM</span>
+                      <div className="bg-card border border-primary/30 rounded-xl p-4 flex flex-col gap-1.5 hover:border-primary/50 transition-colors shadow-sm col-span-2 md:col-span-4 relative overflow-hidden group">
+                        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-primary/10 to-transparent pointer-events-none transition-opacity group-hover:opacity-100 opacity-50"/>
+                        <span className="text-[10px] font-bold text-primary uppercase tracking-widest flex items-center gap-1.5 relative z-10">
+                          <Trophy size={12}/> Man of the Match
+                        </span>
+                        <span className="font-bold text-base text-foreground relative z-10">{match.manOfTheMatch}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
                             <span className="text-foreground font-medium">{match.manOfTheMatch.name}</span>
                           </div>
                         </div>
