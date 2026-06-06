@@ -173,7 +173,7 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
                 className={cn(
                     sizeClasses[size].width,
                     sizeClasses[size].height,
-                    "object-cover rounded-full shadow-lg ring-4 ring-background/50 border border-border/20",
+                    "object-cover rounded-full",
                     className
                 )}
                 onError={() => setUseTextFallback(true)}
@@ -281,7 +281,7 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
                 className={cn(
                     sizeClasses[size].width,
                     sizeClasses[size].height,
-                    "object-contain rounded-full bg-white/10 p-1",
+                    "object-contain",
                     className
                 )}
                 onError={() => setUseTextFallback(true)}
