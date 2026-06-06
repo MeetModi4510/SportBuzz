@@ -1016,10 +1016,10 @@ const MatchDetails = () => {
                             </span>
                           </div>
 
-                          {/* Minimalist Batting Grid */}
-                          <div className="bg-transparent space-y-1">
+                          {/* Ultra-Minimalist Batting Grid */}
+                          <div className="pt-2 pb-6">
                             {/* Header */}
-                            <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1.5fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1.5fr] gap-2 px-3 py-2 text-[10px] uppercase tracking-widest text-muted-foreground/60 font-semibold border-b border-border/20">
+                            <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1fr] gap-4 pb-2 text-[9px] uppercase tracking-[0.2em] text-muted-foreground/40 font-semibold border-b border-border/10">
                               <div className="text-left">Batter</div>
                               <div className="text-right">R</div>
                               <div className="text-right">B</div>
@@ -1029,27 +1029,28 @@ const MatchDetails = () => {
                             </div>
                             
                             {/* Rows */}
-                            <div className="space-y-0.5 pt-1">
+                            <div className="flex flex-col">
                               {inn.batsmen?.map((b: any, bIdx: number) => {
                                 const isNotOut = b.dismissal?.toLowerCase().includes('not out') || b.dismissal === 'batting';
                                 return (
-                                <div key={bIdx} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1.5fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1.5fr] gap-2 px-3 py-2.5 bg-secondary/5 hover:bg-secondary/20 transition-colors rounded-sm items-center group">
-                                  <div className="flex flex-col overflow-hidden pr-2">
-                                    <span className="flex items-center gap-1.5 font-medium text-sm text-foreground/90 truncate">
-                                      <span className={cn("truncate", isNotOut && "text-foreground font-semibold")}>{b.name}</span>
-                                      {isNotOut && <span className="w-1.5 h-1.5 shrink-0 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse" title="Not Out"></span>}
-                                      {b.isCaptain && <span className="text-[9px] text-primary font-bold shrink-0">C</span>}
-                                      {b.isKeeper && <span className="text-[9px] text-blue-400 font-bold shrink-0">WK</span>}
+                                <div key={bIdx} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1fr] gap-4 py-3 border-b border-border/5 last:border-0 items-center group transition-colors hover:bg-secondary/5">
+                                  <div className="flex flex-col overflow-hidden">
+                                    <span className={cn(
+                                      "text-sm font-light tracking-wide truncate", 
+                                      isNotOut ? "text-foreground font-medium" : "text-foreground/80"
+                                    )}>
+                                      {b.name}
+                                      {isNotOut && <span className="ml-1.5 text-primary text-[10px] align-top">*</span>}
                                     </span>
                                     {b.dismissal && !isNotOut && (
-                                      <span className="text-[10px] text-muted-foreground/50 italic truncate mt-0.5 group-hover:text-muted-foreground/80 transition-colors">{b.dismissal}</span>
+                                      <span className="text-[10px] text-muted-foreground/40 font-light truncate mt-0.5 group-hover:text-muted-foreground/60 transition-colors">{b.dismissal}</span>
                                     )}
                                   </div>
-                                  <div className="text-right font-bold text-foreground font-mono text-sm self-center">{b.runs}</div>
-                                  <div className="text-right text-muted-foreground/80 font-mono text-sm self-center">{b.balls}</div>
-                                  <div className="text-right text-muted-foreground/50 font-mono text-sm self-center">{b.fours}</div>
-                                  <div className="text-right text-muted-foreground/50 font-mono text-sm self-center">{b.sixes}</div>
-                                  <div className="text-right text-muted-foreground/80 font-mono text-sm self-center">{b.strikeRate}</div>
+                                  <div className={cn("text-right text-sm tabular-nums self-center", isNotOut ? "text-foreground font-medium" : "text-foreground/80")}>{b.runs}</div>
+                                  <div className="text-right text-muted-foreground/50 text-[13px] tabular-nums self-center">{b.balls}</div>
+                                  <div className="text-right text-muted-foreground/30 text-[13px] tabular-nums self-center">{b.fours}</div>
+                                  <div className="text-right text-muted-foreground/30 text-[13px] tabular-nums self-center">{b.sixes}</div>
+                                  <div className="text-right text-muted-foreground/50 text-[13px] tabular-nums self-center">{b.strikeRate}</div>
                                 </div>
                               )})}
                             </div>
@@ -1057,21 +1058,21 @@ const MatchDetails = () => {
 
                           {/* Extras */}
                           {inn.extras && (
-                            <div className="flex items-center justify-between px-3 py-2.5 bg-secondary/5 rounded-sm border border-border/10">
-                              <span className="text-[11px] uppercase tracking-widest text-muted-foreground/70 font-semibold">Extras</span>
-                              <div className="flex items-center gap-2">
-                                <span className="font-mono font-bold text-foreground">{inn.extras.total ?? 0}</span>
-                                <span className="text-[10px] text-muted-foreground/60 font-mono">
+                            <div className="flex items-center gap-4 py-2 border-t border-b border-border/10">
+                              <span className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground/40 font-semibold w-24">Extras</span>
+                              <div className="flex items-center gap-3">
+                                <span className="text-sm font-medium text-foreground">{inn.extras.total ?? 0}</span>
+                                <span className="text-[10px] text-muted-foreground/40 font-light tracking-wide">
                                   (b {inn.extras.byes ?? 0}, lb {inn.extras.legbyes ?? 0}, w {inn.extras.wides ?? 0}, nb {inn.extras.noballs ?? 0})
                                 </span>
                               </div>
                             </div>
                           )}
 
-                          {/* Minimalist Bowling Grid */}
-                          <div className="bg-transparent space-y-1 mt-6">
+                          {/* Ultra-Minimalist Bowling Grid */}
+                          <div className="pt-8 pb-6">
                             {/* Header */}
-                            <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1.5fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1.5fr] gap-2 px-3 py-2 text-[10px] uppercase tracking-widest text-muted-foreground/60 font-semibold border-b border-border/20">
+                            <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1.5fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1.5fr] gap-4 pb-2 text-[9px] uppercase tracking-[0.2em] text-muted-foreground/40 font-semibold border-b border-border/10">
                               <div className="text-left">Bowler</div>
                               <div className="text-right">O</div>
                               <div className="text-right">M</div>
@@ -1081,20 +1082,19 @@ const MatchDetails = () => {
                             </div>
                             
                             {/* Rows */}
-                            <div className="space-y-0.5 pt-1">
+                            <div className="flex flex-col">
                               {inn.bowlers?.map((b: any, bIdx: number) => (
-                                <div key={bIdx} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1.5fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1.5fr] gap-2 px-3 py-2.5 bg-secondary/5 hover:bg-secondary/20 transition-colors rounded-sm items-center">
-                                  <div className="flex flex-col overflow-hidden pr-2">
-                                    <span className="flex items-center gap-1.5 font-medium text-sm text-foreground/90 truncate">
-                                      <span className="truncate">{b.name}</span>
-                                      {b.isCaptain && <span className="text-[9px] text-primary font-bold shrink-0">C</span>}
+                                <div key={bIdx} className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1.5fr] md:grid-cols-[4fr_1fr_1fr_1fr_1fr_1.5fr] gap-4 py-3 border-b border-border/5 last:border-0 items-center group transition-colors hover:bg-secondary/5">
+                                  <div className="flex flex-col overflow-hidden">
+                                    <span className="text-sm font-light tracking-wide text-foreground/80 truncate group-hover:text-foreground transition-colors">
+                                      {b.name}
                                     </span>
                                   </div>
-                                  <div className="text-right text-muted-foreground/80 font-mono text-sm self-center">{b.overs}</div>
-                                  <div className="text-right text-muted-foreground/50 font-mono text-sm self-center">{b.maidens}</div>
-                                  <div className="text-right text-foreground/90 font-mono text-sm self-center">{b.runs}</div>
-                                  <div className="text-right font-bold text-primary font-mono text-sm self-center">{b.wickets}</div>
-                                  <div className="text-right text-muted-foreground/80 font-mono text-sm self-center">{b.economy}</div>
+                                  <div className="text-right text-muted-foreground/60 text-[13px] tabular-nums self-center">{b.overs}</div>
+                                  <div className="text-right text-muted-foreground/30 text-[13px] tabular-nums self-center">{b.maidens}</div>
+                                  <div className="text-right text-foreground/80 text-sm tabular-nums self-center">{b.runs}</div>
+                                  <div className="text-right text-primary font-medium text-sm tabular-nums self-center">{b.wickets}</div>
+                                  <div className="text-right text-muted-foreground/50 text-[13px] tabular-nums self-center">{b.economy}</div>
                                 </div>
                               ))}
                             </div>
@@ -1102,15 +1102,15 @@ const MatchDetails = () => {
 
                           {/* Fall of Wickets */}
                           {inn.fallOfWickets && inn.fallOfWickets.length > 0 && (
-                            <div className="mt-4 px-4 py-3 bg-secondary/5 rounded-lg border border-border/10">
-                              <span className="block text-[10px] uppercase tracking-widest text-muted-foreground/60 font-semibold mb-2">Fall of Wickets</span>
-                              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                            <div className="pt-2 pb-4">
+                              <span className="block text-[9px] uppercase tracking-[0.2em] text-muted-foreground/40 font-semibold mb-3">Fall of Wickets</span>
+                              <div className="flex flex-wrap gap-x-6 gap-y-2">
                                 {inn.fallOfWickets.map((f: any, fIdx: number) => (
-                                  <span key={fIdx} className="text-xs text-muted-foreground/80 flex items-center gap-1.5">
-                                    <span className="font-mono font-medium text-foreground/90">{f.score}/{f.wicketNum}</span>
-                                    <span className="text-[10px] opacity-70 truncate max-w-[100px] md:max-w-[150px]">{f.batsmanName}</span>
-                                    <span className="font-mono text-[10px] opacity-60">({f.overs})</span>
-                                  </span>
+                                  <div key={fIdx} className="flex items-baseline gap-1.5 group cursor-default">
+                                    <span className="text-[13px] font-medium text-foreground/70 group-hover:text-foreground transition-colors tabular-nums">{f.score}/{f.wicketNum}</span>
+                                    <span className="text-[10px] text-muted-foreground/40 font-light truncate max-w-[120px]">{f.batsmanName}</span>
+                                    <span className="text-[9px] text-muted-foreground/30 tabular-nums">({f.overs})</span>
+                                  </div>
                                 ))}
                               </div>
                             </div>
