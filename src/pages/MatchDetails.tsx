@@ -248,42 +248,52 @@ const MatchDetails = () => {
         </div>
 
         {/* Match Header */}
-        <section className="bg-background pb-10 pt-6">
-          <div className="container mx-auto px-4 max-w-4xl">
-            {/* Top Meta Bar */}
-            <div className="flex flex-col sm:flex-row items-center justify-between mb-10 gap-4 pb-4">
-                <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-foreground uppercase tracking-widest">{match.tournament?.name || match.matchType}</span>
-                    {isLive && (
-                        <span className="text-[10px] font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded-sm flex items-center gap-1.5 uppercase tracking-wider">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /> LIVE
-                        </span>
-                    )}
-                    {isCompleted && (
-                        <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-sm uppercase tracking-wider flex items-center gap-1">
-                            <CheckCircle2 size={12} /> COMPLETED
-                        </span>
-                    )}
-                </div>
-                <div className="flex items-center gap-4 text-[11px] text-muted-foreground font-medium">
-                    <span className="flex items-center gap-1.5"><MapPin size={12} /> {typeof match.venue === 'object' ? match.venue?.name : match.venue || "Venue"}</span>
-                    <span className="flex items-center gap-1.5"><Clock size={12} /> {match.displayTime && (match.sport === 'cricket' || match.sport === 'football') ? match.displayTime : format(match.startTime, "MMM d, yyyy • h:mm a")}</span>
-                </div>
-            </div>
-
-            {/* Main Scoreboard */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8 py-4">
-                {/* Home Team */}
-                <div className="flex-1 flex flex-col items-center md:items-start gap-4">
-                    <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="lg" className="w-16 h-16 md:w-20 md:h-20 bg-background border border-border" />
-                    <div className="text-center md:text-left">
-                        <h2 className="text-xl md:text-2xl font-bold text-foreground tracking-tight">{match.homeTeam?.name || "Team 1"}</h2>
-                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mt-1">{match.homeTeam?.shortName}</p>
+        <section className="bg-background pt-4 pb-12 relative">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="relative bg-secondary/10 border border-border/40 rounded-[2.5rem] p-6 md:p-12 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-md">
+               {/* Background glows */}
+               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+               <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
+               <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-football/20 rounded-full blur-[120px] pointer-events-none" />
+               
+               <div className="relative z-10">
+                 {/* Top Meta Bar */}
+                 <div className="flex flex-col sm:flex-row items-center justify-between mb-10 gap-4 border-b border-border/20 pb-6">
+                    <div className="flex items-center gap-3">
+                        <span className="text-xs font-bold text-foreground uppercase tracking-[0.2em]">{match.tournament?.name || match.matchType}</span>
+                        {isLive && (
+                            <span className="text-[10px] font-bold text-red-500 bg-red-500/10 px-3 py-1 rounded-full flex items-center gap-2 uppercase tracking-wider shadow-inner shadow-red-500/20 border border-red-500/20">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" /> LIVE
+                            </span>
+                        )}
+                        {isCompleted && (
+                            <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 border border-emerald-500/20">
+                                <CheckCircle2 size={12} /> COMPLETED
+                            </span>
+                        )}
                     </div>
-                </div>
+                    <div className="flex items-center gap-5 text-[11px] text-muted-foreground font-medium bg-background/50 backdrop-blur px-4 py-1.5 rounded-full border border-border/30">
+                        <span className="flex items-center gap-1.5"><MapPin size={13} className="text-primary/70" /> {typeof match.venue === 'object' ? match.venue?.name : match.venue || "Venue"}</span>
+                        <span className="flex items-center gap-1.5"><Clock size={13} className="text-primary/70" /> {match.displayTime && (match.sport === 'cricket' || match.sport === 'football') ? match.displayTime : format(match.startTime, "MMM d, yyyy • h:mm a")}</span>
+                    </div>
+                 </div>
 
-                {/* Score Area */}
-                <div className="flex flex-col items-center justify-center shrink-0 min-w-[200px]">
+                 {/* Main Scoreboard */}
+                 <div className="flex flex-col md:flex-row items-center justify-between gap-10 py-4">
+                     {/* Home Team */}
+                     <div className="flex-1 flex flex-col items-center md:items-start gap-5 relative group cursor-default">
+                         <div className="relative">
+                             <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full group-hover:bg-primary/30 transition-colors duration-500" />
+                             <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="lg" className="w-20 h-20 md:w-28 md:h-28 bg-background border-2 border-border/20 shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-105" />
+                         </div>
+                         <div className="text-center md:text-left">
+                             <h2 className="text-2xl md:text-4xl font-black text-foreground tracking-tight drop-shadow-sm">{match.homeTeam?.name || "Team 1"}</h2>
+                             <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.3em] mt-2">{match.homeTeam?.shortName}</p>
+                         </div>
+                     </div>
+
+                     {/* Score Area */}
+                     <div className="flex flex-col items-center justify-center shrink-0 min-w-[200px] relative z-20">
                   {isTestMatch && match.scoreBreakdown ? (
                     <div className="flex flex-col items-center gap-3">
                       <div className="flex items-center gap-6">
@@ -345,15 +355,15 @@ const MatchDetails = () => {
                       const away = parseScore(match.awayScore);
 
                       return (
-                        <div className="flex items-center gap-8">
+                        <div className="flex items-center gap-6 md:gap-10">
                           <div className="flex flex-col items-center">
-                            <span className="text-5xl md:text-7xl font-light tracking-wide text-foreground">{home.runs}</span>
-                            {home.overs && <span className="text-xs text-muted-foreground font-medium mt-2 tracking-widest uppercase">({home.overs})</span>}
+                            <span className="text-[4rem] md:text-[6rem] font-black tracking-tighter text-foreground drop-shadow-md leading-none">{home.runs}</span>
+                            {home.overs && <span className="text-xs text-muted-foreground font-bold mt-3 tracking-[0.2em] uppercase bg-secondary/50 px-2 py-0.5 rounded">{home.overs}</span>}
                           </div>
-                          <span className="text-muted-foreground/20 text-4xl font-extralight mb-4">-</span>
+                          <span className="text-muted-foreground/30 text-5xl md:text-6xl font-black italic mb-4">-</span>
                           <div className="flex flex-col items-center">
-                            <span className="text-5xl md:text-7xl font-light tracking-wide text-foreground">{away.runs}</span>
-                            {away.overs && <span className="text-xs text-muted-foreground font-medium mt-2 tracking-widest uppercase">({away.overs})</span>}
+                            <span className="text-[4rem] md:text-[6rem] font-black tracking-tighter text-foreground drop-shadow-md leading-none">{away.runs}</span>
+                            {away.overs && <span className="text-xs text-muted-foreground font-bold mt-3 tracking-[0.2em] uppercase bg-secondary/50 px-2 py-0.5 rounded">{away.overs}</span>}
                           </div>
                         </div>
                       );
@@ -362,14 +372,14 @@ const MatchDetails = () => {
 
                   {/* Summary Status Text */}
                   {(match.sport === 'cricket' || match.sport === 'football') && match.summaryText && (
-                    <div className="mt-4 px-4 py-1.5 bg-primary/5 rounded-sm">
-                      <p className="text-[11px] font-semibold text-primary">{match.summaryText}</p>
+                    <div className="mt-6 px-5 py-2 bg-primary/10 rounded-full border border-primary/20 shadow-inner backdrop-blur-sm">
+                      <p className="text-xs font-bold text-primary uppercase tracking-widest">{match.summaryText}</p>
                     </div>
                   )}
 
                   {/* Match Time / Live Info */}
                   {isLive && (
-                    <div className="text-[10px] font-bold text-foreground/70 tracking-widest uppercase mt-3">
+                    <div className="text-[11px] font-black text-foreground/80 tracking-[0.2em] uppercase mt-4 bg-background/50 px-4 py-1.5 rounded-full border border-border/40">
                       {match.sport === "cricket" && match.currentOver && <span>Over {match.currentOver}</span>}
                       {match.sport === "football" && match.currentMinute && <span>{match.currentMinute}</span>}
                       {match.sport === "basketball" && match.currentQuarter && <span>{match.currentQuarter} - {match.timeRemaining}</span>}
@@ -379,17 +389,22 @@ const MatchDetails = () => {
                       )}
                     </div>
                   )}
-                </div>
+                 </div>
 
-                {/* Away Team */}
-                <div className="flex-1 flex flex-col items-center md:items-end gap-4">
-                    <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="lg" className="w-16 h-16 md:w-20 md:h-20 bg-background border border-border" />
-                    <div className="text-center md:text-right">
-                        <h2 className="text-xl md:text-2xl font-bold text-foreground tracking-tight">{match.awayTeam?.name || "Team 2"}</h2>
-                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mt-1">{match.awayTeam?.shortName}</p>
-                    </div>
-                </div>
-            </div>
+                 {/* Away Team */}
+                 <div className="flex-1 flex flex-col items-center md:items-end gap-5 relative group cursor-default">
+                     <div className="relative">
+                         <div className="absolute inset-0 bg-football/20 blur-xl rounded-full group-hover:bg-football/30 transition-colors duration-500" />
+                         <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="lg" className="w-20 h-20 md:w-28 md:h-28 bg-background border-2 border-border/20 shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-105" />
+                     </div>
+                     <div className="text-center md:text-right">
+                         <h2 className="text-2xl md:text-4xl font-black text-foreground tracking-tight drop-shadow-sm">{match.awayTeam?.name || "Team 2"}</h2>
+                         <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.3em] mt-2">{match.awayTeam?.shortName}</p>
+                     </div>
+                 </div>
+             </div>
+             </div>
+             </div>
 
             {/* Football Goals Section */}
             {(() => {
