@@ -147,7 +147,7 @@ export const LiveTicker = () => {
                            <span className="font-extrabold text-base md:text-lg text-foreground ml-1">{homeScore}</span>
                          </div>
                          
-                         <span className="text-muted-foreground/40 font-medium text-xs mx-1 md:mx-2">vs</span>
+                         <span className="text-muted-foreground/40 font-medium text-xs w-[24px] text-center shrink-0">vs</span>
                          
                          <div className="flex items-center gap-3">
                            <span className="font-extrabold text-base md:text-lg text-foreground mr-1">{awayScore}</span>

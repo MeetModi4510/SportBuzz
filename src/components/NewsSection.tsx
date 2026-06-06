@@ -64,7 +64,7 @@ export const NewsSection = () => {
           </div>
 
           {/* Marquee Container */}
-          <div className="relative flex overflow-hidden -mx-4 px-4 mask-edges">
+          <div className="relative flex overflow-hidden -mx-4 px-4 py-4 mask-edges">
             <div
               className={cn(
                 "flex gap-4 w-max animate-marquee hover:[animation-play-state:paused]",
