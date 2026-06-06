@@ -60,7 +60,7 @@ export const CreatorsSection = () => {
           {/* Minimal Title */}
           <div className="text-center md:text-left space-y-1">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-              <span className="text-primary">SportBuzz</span> Built By
+              <span className="text-primary">SportsBuzz</span> Built By
             </h2>
             <p className="text-sm text-muted-foreground">
               The engineers behind the real-time experience.
@@ -70,7 +70,7 @@ export const CreatorsSection = () => {
           {/* Compact Creator Badges */}
           <div className="flex flex-wrap justify-center gap-4 md:gap-5">
             {creators.map((creator, i) => (
-              <div 
+              <div
                 key={i}
                 className="group flex items-center gap-3 md:gap-4 p-2 pr-5 md:pr-6 rounded-full border border-border/30 bg-card hover:bg-secondary/40 hover:border-primary/30 hover:shadow-md transition-all duration-300"
               >
