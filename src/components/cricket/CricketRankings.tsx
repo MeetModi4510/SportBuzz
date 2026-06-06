@@ -217,7 +217,7 @@ export const CricketRankings = () => {
       </div>
 
       {/* Rankings Table */}
-      <div className="overflow-y-auto overflow-x-auto -mx-2 px-2 flex-1 max-h-[440px] scrollbar-thin">
+      <div className="overflow-y-auto overflow-x-auto -mx-2 px-2 flex-1 max-h-[360px] scrollbar-thin">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-10 gap-3">
             <Loader2 size={28} className="text-primary animate-spin" />
@@ -236,14 +236,14 @@ export const CricketRankings = () => {
           </div>
         ) : isTeams ? (
           /* ── TEAMS TABLE ── */
-          <table className="w-full text-xs text-left border-separate border-spacing-y-1.5 relative">
-            <thead className="text-[10px] text-muted-foreground uppercase tracking-widest sticky top-0 bg-background/95 backdrop-blur-sm z-10">
+          <table className="w-full text-sm text-left border-separate border-spacing-y-2 relative">
+            <thead className="text-xs text-muted-foreground uppercase tracking-widest sticky top-0 bg-background/95 backdrop-blur-sm z-10">
               <tr>
-                <th className="py-2 px-2 font-semibold w-8">Pos</th>
-                <th className="py-2 px-2 font-semibold">Team</th>
-                {hasMatches && <th className="py-2 px-2 font-semibold text-center">M</th>}
-                <th className="py-2 px-2 font-semibold text-center">PTS</th>
-                <th className="py-2 px-2 font-semibold text-center">RTG</th>
+                <th className="py-3 px-3 font-semibold w-10">Pos</th>
+                <th className="py-3 px-3 font-semibold">Team</th>
+                {hasMatches && <th className="py-3 px-3 font-semibold text-center">M</th>}
+                <th className="py-3 px-3 font-semibold text-center">PTS</th>
+                <th className="py-3 px-3 font-semibold text-center">RTG</th>
               </tr>
             </thead>
             <tbody>
@@ -252,12 +252,12 @@ export const CricketRankings = () => {
                 return (
                   <tr key={row.name} className="group transition-all duration-300">
                     <td className={cn(
-                      'py-2 px-2 rounded-l-xl border-y border-l transition-all duration-300',
+                      'py-3 px-3 rounded-l-xl border-y border-l transition-all duration-300',
                       medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
                     )}>
-                      <div className="flex items-center justify-center w-5 h-5 rounded-full font-bold text-[10px]">
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs">
                         {medal ? (
-                          <span className="text-sm leading-none">{medal.badge}</span>
+                          <span className="text-base leading-none">{medal.badge}</span>
                         ) : (
                           <span className="bg-background/50 text-muted-foreground group-hover:text-primary transition-colors w-full h-full flex items-center justify-center rounded-full">
                             {row.rank}
@@ -266,15 +266,15 @@ export const CricketRankings = () => {
                       </div>
                     </td>
                     <td className={cn(
-                      'py-2 px-2 border-y transition-all duration-300 font-medium',
+                      'py-3 px-3 border-y transition-all duration-300 font-medium',
                       medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
                     )}>
-                      <div className="flex items-center gap-2 max-w-[130px]">
+                      <div className="flex items-center gap-3">
                         <TeamLogo
                           logo={row.flagCode || ''}
                           name={row.name}
                           size="sm"
-                          className="w-5 h-5 rounded-full shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+                          className="w-6 h-6 rounded-full shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
                         />
                         <span className={cn('group-hover:text-primary transition-colors truncate', medal ? medal.text : 'text-foreground')}>
                           {row.name}
@@ -283,24 +283,24 @@ export const CricketRankings = () => {
                     </td>
                     {hasMatches && (
                       <td className={cn(
-                        'py-2 px-2 border-y transition-all duration-300 text-center text-muted-foreground',
+                        'py-3 px-3 border-y transition-all duration-300 text-center text-muted-foreground',
                         medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
                       )}>
                         {row.matches ?? '—'}
                       </td>
                     )}
                     <td className={cn(
-                      'py-2 px-2 border-y transition-all duration-300 text-center font-mono text-muted-foreground',
+                      'py-3 px-3 border-y transition-all duration-300 text-center font-mono text-muted-foreground',
                       medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
                     )}>
                       {typeof row.points === 'number' ? row.points.toLocaleString() : row.points}
                     </td>
                     <td className={cn(
-                      'py-2 px-2 rounded-r-xl border-y border-r transition-all duration-300 text-center',
+                      'py-3 px-3 rounded-r-xl border-y border-r transition-all duration-300 text-center',
                       medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
                     )}>
                       <span className={cn(
-                        'inline-flex items-center justify-center px-2 py-0.5 rounded-md font-bold',
+                        'inline-flex items-center justify-center px-2 py-1 rounded-md font-bold',
                         medal ? `bg-background/40 ${medal.text}` : 'bg-primary/10 text-primary'
                       )}>
                         {row.rating}
@@ -313,15 +313,15 @@ export const CricketRankings = () => {
           </table>
         ) : (
           /* ── PLAYERS TABLE ── */
-          <table className="w-full text-xs text-left border-separate border-spacing-y-1.5 relative">
-            <thead className="text-[10px] text-muted-foreground uppercase tracking-widest sticky top-0 bg-background/95 backdrop-blur-sm z-10">
+          <table className="w-full text-sm text-left border-separate border-spacing-y-2 relative">
+            <thead className="text-xs text-muted-foreground uppercase tracking-widest sticky top-0 bg-background/95 backdrop-blur-sm z-10">
               <tr>
-                <th className="py-2 px-2 font-semibold w-7">Pos</th>
-                <th className="py-2 px-2 font-semibold">Player</th>
-                <th className="py-2 px-2 font-semibold">Country</th>
-                <th className="py-2 px-2 font-semibold text-center">PTS</th>
-                <th className="py-2 px-2 font-semibold text-center">RTG</th>
-                <th className="py-2 px-2 font-semibold text-center">↕</th>
+                <th className="py-3 px-3 font-semibold w-10">Pos</th>
+                <th className="py-3 px-3 font-semibold">Player</th>
+                <th className="py-3 px-3 font-semibold">Country</th>
+                <th className="py-3 px-3 font-semibold text-center">PTS</th>
+                <th className="py-3 px-3 font-semibold text-center">RTG</th>
+                <th className="py-3 px-3 font-semibold text-center">↕</th>
               </tr>
             </thead>
             <tbody>
@@ -331,12 +331,12 @@ export const CricketRankings = () => {
                   <tr key={`${row.id}_${row.rank}`} className="group transition-all duration-300">
                     {/* Rank */}
                     <td className={cn(
-                      'py-1.5 px-2 rounded-l-xl border-y border-l transition-all duration-300',
+                      'py-2.5 px-3 rounded-l-xl border-y border-l transition-all duration-300',
                       medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
                     )}>
-                      <div className="flex items-center justify-center w-5 h-5 rounded-full font-bold text-[10px]">
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs">
                         {medal ? (
-                          <span className="text-sm leading-none">{medal.badge}</span>
+                          <span className="text-base leading-none">{medal.badge}</span>
                         ) : (
                           <span className="bg-background/50 text-muted-foreground group-hover:text-primary transition-colors w-full h-full flex items-center justify-center rounded-full">
                             {row.rank}
@@ -347,13 +347,13 @@ export const CricketRankings = () => {
 
                     {/* Player name + photo */}
                     <td className={cn(
-                      'py-1.5 px-2 border-y transition-all duration-300 font-medium',
+                      'py-2.5 px-3 border-y transition-all duration-300 font-medium',
                       medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
                     )}>
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <PlayerAvatar faceImageId={row.faceImageId} name={row.name} />
+                      <div className="flex items-center gap-2 min-w-0">
+                        <PlayerAvatar faceImageId={row.faceImageId} name={row.name} className="w-6 h-6" />
                         <span className={cn(
-                          'group-hover:text-primary transition-colors truncate max-w-[90px]',
+                          'group-hover:text-primary transition-colors truncate max-w-[130px]',
                           medal ? medal.text : 'text-foreground'
                         )}>
                           {row.name}
@@ -363,16 +363,17 @@ export const CricketRankings = () => {
 
                     {/* Country + flag */}
                     <td className={cn(
-                      'py-1.5 px-2 border-y transition-all duration-300',
+                      'py-2.5 px-3 border-y transition-all duration-300',
                       medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
                     )}>
-                      <div className="flex items-center gap-1.5 min-w-0">
+                      <div className="flex items-center gap-2 min-w-0">
                         <PlayerFlag
                           flagCode={row.flagCode}
                           flagLocal={row.flagLocal}
                           country={row.country}
+                          className="w-5 h-3.5"
                         />
-                        <span className="text-muted-foreground truncate max-w-[60px] text-[10px]">
+                        <span className="text-muted-foreground truncate max-w-[80px] text-xs">
                           {row.country}
                         </span>
                       </div>
@@ -380,7 +381,7 @@ export const CricketRankings = () => {
 
                     {/* Points */}
                     <td className={cn(
-                      'py-1.5 px-2 border-y transition-all duration-300 text-center font-mono text-muted-foreground',
+                      'py-2.5 px-3 border-y transition-all duration-300 text-center font-mono text-muted-foreground',
                       medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
                     )}>
                       {typeof row.points === 'number' ? row.points.toLocaleString() : '—'}
@@ -388,11 +389,11 @@ export const CricketRankings = () => {
 
                     {/* Rating */}
                     <td className={cn(
-                      'py-1.5 px-2 border-y transition-all duration-300 text-center',
+                      'py-2.5 px-3 border-y transition-all duration-300 text-center',
                       medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
                     )}>
                       <span className={cn(
-                        'inline-flex items-center justify-center px-2 py-0.5 rounded-md font-bold',
+                        'inline-flex items-center justify-center px-2 py-1 rounded-md font-bold',
                         medal ? `bg-background/40 ${medal.text}` : 'bg-primary/10 text-primary'
                       )}>
                         {row.rating}
