@@ -422,7 +422,7 @@ export function CricketTrendingPlayers({ className }: { className?: string }) {
       {selectedPlayer && (
         <PlayerProfileModal
           player={selectedPlayer}
-          info={playerInfo?.data ?? null}
+          info={playerInfo?.data}
           loadingInfo={loadingInfo}
           onClose={handleCloseModal}
         />
