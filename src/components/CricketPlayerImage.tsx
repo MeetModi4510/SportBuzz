@@ -29,7 +29,7 @@ export const CricketPlayerImage = ({
   const [status, setStatus] = useState<"loading" | "ok" | "fallback">("loading");
 
   const imageUrl = playerId
-    ? `https://static.cricbuzz.com/a/img/v1/170x153/i1/c${playerId}/i.jpg`
+    ? `${API_BASE}/api/cricket/cb/player-image/${playerId}`
     : null;
 
   const dimensionStyle = { width: size, height: size, minWidth: size };
