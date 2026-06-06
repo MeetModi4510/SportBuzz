@@ -351,19 +351,22 @@ async function getSquads(cbId) {
             return { error: 'No scorecard data to extract squads from', data: null };
         }
 
-        async function getPlayerRole(playerId) {
-            if (!playerId) return null;
-            const roleKey = `cb_role_${playerId}`;
-            const cachedRole = cache.get(roleKey);
-            if (cachedRole) return cachedRole;
+        async function getPlayerExtraInfo(playerId) {
+            if (!playerId) return { role: null, faceImageId: null };
+            const cacheKey = `cb_extra_${playerId}`;
+            const cachedInfo = cache.get(cacheKey);
+            if (cachedInfo) return cachedInfo;
 
             try {
                 const pRes = await axios.get(`${CB_BASE}/stats/v1/player/${playerId}`, { headers: cbHeaders });
-                const role = pRes.data?.role || null;
-                if (role) cache.set(roleKey, role, 86400); // Cache 24 hours
-                return role;
+                const info = {
+                    role: pRes.data?.role || null,
+                    faceImageId: pRes.data?.faceImageId || null
+                };
+                if (info.role || info.faceImageId) cache.set(cacheKey, info, 86400); // Cache 24 hours
+                return info;
             } catch {
-                return null;
+                return { role: null, faceImageId: null };
             }
         }
 
@@ -438,21 +441,23 @@ async function getSquads(cbId) {
             }
         }
 
-        const rolePromises = allPlayers.map(p => getPlayerRole(p.id));
-        const roles = await Promise.all(rolePromises);
+        const infoPromises = allPlayers.map(p => getPlayerExtraInfo(p.id));
+        const infos = await Promise.all(infoPromises);
         allPlayers.forEach((p, i) => {
-            p.resolvedRole = normalizeRole(roles[i]);
+            p.resolvedRole = normalizeRole(infos[i].role);
+            p.faceImageId = infos[i].faceImageId;
         });
 
         const teamsArray = Object.values(teams).map(t => ({
             teamName: t.teamName,
             shortName: t.shortName,
             players: Array.from(t.players.values()).map(p => ({
-                name: p.name,
                 id: p.id ? String(p.id) : null,
+                name: p.name,
                 isCaptain: p.isCaptain,
                 isKeeper: p.isKeeper,
                 role: p.resolvedRole || 'Batsman',
+                faceImageId: p.faceImageId || null
             })),
         }));
 
