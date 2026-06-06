@@ -166,11 +166,11 @@ export const CricketNewsSection = () => {
         </DialogHeader>
         <div className="pt-4 space-y-4">
           {selectedArticle?.imageId && (
-            <div className="w-full h-48 md:h-64 rounded-2xl overflow-hidden relative border border-border/40">
+            <div className="w-full rounded-2xl overflow-hidden relative border border-border/40 bg-black/20 flex justify-center items-center">
               <img 
                 src={getImageUrl(selectedArticle.imageId)!} 
                 alt="Article"
-                className="absolute inset-0 w-full h-full object-cover"
+                className="w-full h-auto max-h-[400px] object-contain"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}
