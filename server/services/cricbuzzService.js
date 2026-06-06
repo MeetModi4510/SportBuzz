@@ -838,6 +838,133 @@ async function getTeamRankings(format) {
     }
 }
 
+// ─── ICC Player Rankings ─────────────────────────────────────────────────────────
+const playerRankingsCache = new NodeCache({ stdTTL: 604800 }); // 1 week
+
+// Country name → ISO code for flagcdn
+const COUNTRY_NAME_TO_FLAG = {
+    'india': 'in',
+    'australia': 'au',
+    'england': 'gb-eng',
+    'south africa': 'za',
+    'new zealand': 'nz',
+    'pakistan': 'pk',
+    'sri lanka': 'lk',
+    'bangladesh': 'bd',
+    'west indies': 'wi',
+    'zimbabwe': 'zw',
+    'afghanistan': 'af',
+    'ireland': 'ie',
+    'netherlands': 'nl',
+    'scotland': 'sc',
+    'namibia': 'na',
+    'usa': 'us',
+    'united states of america': 'us',
+    'uganda': 'ug',
+    'nepal': 'np',
+    'oman': 'om',
+    'papua new guinea': 'pg',
+    'kuwait': 'kw',
+    'singapore': 'sg',
+    'hong kong': 'hk',
+    'kenya': 'ke',
+    'tanzania': 'tz',
+    'canada': 'ca',
+    'united arab emirates': 'ae',
+    'uae': 'ae',
+    'sri lanka': 'lk',
+};
+
+// Countries that use locally stored flag images (public/flags/*.png)
+const LOCAL_FLAG_COUNTRIES = new Set([
+    'west indies',
+    'sri lanka',
+    'england',
+    'usa',
+    'united states of america',
+    'scotland',
+    'united arab emirates',
+    'uae',
+    'oman',
+]);
+
+// Local flag paths for countries with saved images
+const LOCAL_FLAG_PATH = {
+    'west indies': '/flags/westindies.png',
+    'sri lanka': '/flags/srilanka.png',
+    'england': '/flags/england.png',
+    'usa': '/flags/usa.png',
+    'united states of america': '/flags/usa.png',
+    'scotland': '/flags/scotland.png',
+    'united arab emirates': '/flags/unitedarabemirates.png',
+    'uae': '/flags/unitedarabemirates.png',
+    'oman': '/flags/oman.png',
+};
+
+function shouldRefreshPlayerRankings(cacheKey) {
+    const now = new Date();
+    const isWednesdayAfter6PM = now.getDay() === 3 && now.getHours() >= 18;
+    if (!isWednesdayAfter6PM) return false;
+    const meta = playerRankingsCache.get(`${cacheKey}_meta`);
+    if (!meta) return true;
+    const lastRefreshDate = new Date(meta.refreshedAt).toDateString();
+    return lastRefreshDate !== now.toDateString();
+}
+
+async function getPlayerRankings(category, format) {
+    // category: 'batsmen' | 'bowlers' | 'allrounders'
+    // format:   'odi' | 'test' | 't20'
+    const cacheKey = `player_rankings_v1_${category}_${format}`;
+    const cached = playerRankingsCache.get(cacheKey);
+    if (cached && !shouldRefreshPlayerRankings(cacheKey)) return cached;
+
+    const apiKey = process.env.CRICBUZZ_CRICKET_NEWS || RAPIDAPI_KEY;
+    const host = 'cricbuzz-cricket2.p.rapidapi.com';
+
+    try {
+        const res = await axios.get(
+            `https://${host}/stats/v1/rankings/${category}?isWomen=0&formatType=${format}`,
+            { headers: { 'x-rapidapi-key': apiKey, 'x-rapidapi-host': host } }
+        );
+
+        const rawList = (res.data?.rank || []).slice(0, 15);
+
+        const players = rawList.map(p => {
+            const countryLower = (p.country || '').toLowerCase();
+            const isLocal = LOCAL_FLAG_COUNTRIES.has(countryLower);
+            const localPath = LOCAL_FLAG_PATH[countryLower] || null;
+            const flagCode = COUNTRY_NAME_TO_FLAG[countryLower] || null;
+            return {
+                rank: parseInt(p.rank),
+                id: p.id,
+                name: p.name,
+                country: p.country,
+                flagCode: isLocal ? null : flagCode,
+                flagLocal: isLocal ? localPath : null,
+                faceImageId: p.faceImageId || null,
+                rating: parseInt(p.rating) || 0,
+                points: parseInt(p.points) || 0,
+                trend: p.trend || 'Flat',
+                lastUpdatedOn: p.lastUpdatedOn || null,
+            };
+        });
+
+        const result = {
+            data: players,
+            lastUpdatedOn: players[0]?.lastUpdatedOn || null,
+            error: null,
+        };
+
+        playerRankingsCache.set(cacheKey, result, 604800);
+        playerRankingsCache.set(`${cacheKey}_meta`, { refreshedAt: Date.now() }, 604800);
+        return result;
+    } catch (err) {
+        console.error(`[CRICBUZZ] Player rankings error (${category}/${format}):`, err.message);
+        if (cached) return cached;
+        return { data: [], lastUpdatedOn: null, error: 'Failed to fetch player rankings' };
+    }
+}
+
 // ─── Export ────────────────────────────────────────────────────────────────────
 export const cricbuzzService = {
     getLiveMatches,
@@ -853,6 +980,7 @@ export const cricbuzzService = {
     streamPlayerImage,
     getCricketNews,
     getTeamRankings,
+    getPlayerRankings,
 };
 
 export default cricbuzzService;

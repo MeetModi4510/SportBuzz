@@ -205,4 +205,26 @@ router.get('/rankings/:format', async (req, res) => {
     }
 });
 
+// ─── ICC Player Rankings ───────────────────────────────────────────────────────
+// GET /api/cricket/player-rankings/:category/:format
+// category: batsmen | bowlers | allrounders
+// format:   odi | test | t20
+router.get('/player-rankings/:category/:format', async (req, res) => {
+    const { category, format } = req.params;
+    const allowedCategories = ['batsmen', 'bowlers', 'allrounders'];
+    const allowedFormats = ['odi', 'test', 't20'];
+    if (!allowedCategories.includes(category.toLowerCase())) {
+        return res.status(400).json({ error: 'Invalid category. Use: batsmen, bowlers, allrounders' });
+    }
+    if (!allowedFormats.includes(format.toLowerCase())) {
+        return res.status(400).json({ error: 'Invalid format. Use: odi, test, t20' });
+    }
+    try {
+        const result = await cricbuzzService.getPlayerRankings(category.toLowerCase(), format.toLowerCase());
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ data: [], error: error.message });
+    }
+});
+
 export default router;
