@@ -904,7 +904,7 @@ const MatchDetails = () => {
                            <div className="flex items-center gap-5 w-full md:w-[40%] justify-center md:justify-start relative group cursor-default">
                               <div className="relative">
                                  <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full group-hover:bg-primary/30 transition-colors duration-500" />
-                                 <TeamLogo logo={match?.homeTeam?.logo} name={teams[0]?.teamName || "Team 1"} size="lg" className="w-20 h-20 shadow-xl bg-background border border-border/20 relative z-10 transition-transform duration-500 group-hover:scale-105" />
+                                 <TeamLogo logo={match?.homeTeam?.logo} name={teams[0]?.teamName || "Team 1"} size="lg" className="w-20 h-20 drop-shadow-md relative z-10 transition-transform duration-500 group-hover:scale-105" />
                               </div>
                               <div className="text-center md:text-left">
                                  <h3 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">{teams[0]?.teamName}</h3>
@@ -922,7 +922,7 @@ const MatchDetails = () => {
                            <div className="flex items-center gap-5 w-full md:w-[40%] justify-center md:justify-end md:flex-row-reverse text-center md:text-right relative group cursor-default">
                               <div className="relative">
                                  <div className="absolute inset-0 bg-football/20 blur-xl rounded-full group-hover:bg-football/30 transition-colors duration-500" />
-                                 <TeamLogo logo={match?.awayTeam?.logo} name={teams[1]?.teamName || "Team 2"} size="lg" className="w-20 h-20 shadow-xl bg-background border border-border/20 relative z-10 transition-transform duration-500 group-hover:scale-105" />
+                                 <TeamLogo logo={match?.awayTeam?.logo} name={teams[1]?.teamName || "Team 2"} size="lg" className="w-20 h-20 drop-shadow-md relative z-10 transition-transform duration-500 group-hover:scale-105" />
                               </div>
                               <div>
                                  <h3 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">{teams[1]?.teamName}</h3>
