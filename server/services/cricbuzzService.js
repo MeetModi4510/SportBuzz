@@ -771,7 +771,7 @@ function shouldRefreshRankings(format) {
     const isWednesday = now.getDay() === 3 && now.getHours() >= 18;
     if (!isWednesday) return false;
 
-    const cacheKey = `rankings_v3_${format}`;
+    const cacheKey = `rankings_v4_${format}`;
     const meta = rankingsCache.get(`${cacheKey}_meta`);
     if (!meta) return true;
 
@@ -782,7 +782,7 @@ function shouldRefreshRankings(format) {
 
 
 async function getTeamRankings(format) {
-    const cacheKey = `rankings_v3_${format}`;
+    const cacheKey = `rankings_v4_${format}`;
     const cached = rankingsCache.get(cacheKey);
 
     // Return cache unless it's Wednesday refresh time
@@ -808,7 +808,10 @@ async function getTeamRankings(format) {
 
         const teams = raw.map(t => {
             const teamNameLower = (t.name || '').toLowerCase();
-            const flagCode = TEAM_NAME_TO_FLAG[teamNameLower] || CB_IMAGE_TO_FLAG[t.imageId] || null;
+            const isLocal = LOCAL_FLAG_COUNTRIES.has(teamNameLower);
+            const localPath = LOCAL_FLAG_PATH[teamNameLower] || null;
+            const standardFlagCode = TEAM_NAME_TO_FLAG[teamNameLower] || CB_IMAGE_TO_FLAG[t.imageId] || null;
+            
             return {
                 rank: parseInt(t.rank),
                 id: t.id,
@@ -816,7 +819,7 @@ async function getTeamRankings(format) {
                 rating: parseInt(t.rating) || 0,
                 points: parseInt(t.points) || 0,
                 matches: hasMatches ? (parseInt(t.matches) || 0) : null,
-                flagCode: flagCode,
+                flagCode: isLocal ? localPath : standardFlagCode,
                 lastUpdatedOn: t.lastUpdatedOn || null,
             };
         });
