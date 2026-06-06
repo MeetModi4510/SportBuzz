@@ -43,20 +43,19 @@ export const MatchCard = ({ match, onClick, className, showSeriesName }: MatchCa
     <div
       onClick={() => onClick?.(match)}
       className={cn(
-        "group relative overflow-hidden rounded-2xl border bg-white/[0.02] backdrop-blur-md p-4 transition-all duration-300",
-        themeBorder,
-        "hover:-translate-y-1 hover:bg-white/[0.04] hover:shadow-[0_8px_30px_rgba(0,0,0,0.8)] hover:border-white/10 cursor-pointer",
-        "w-full flex flex-col gap-4",
+        "group relative overflow-hidden rounded-[1.5rem] bg-card border border-white/[0.03] p-5 transition-all duration-300",
+        "hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6)] hover:border-white/10 cursor-pointer",
+        "w-full flex flex-col gap-5",
         className
       )}
     >
-      {/* Header */}
-      <div className={cn("flex items-center justify-between pb-3 border-b", themeBorder)}>
-        <span className="text-[11px] text-muted-foreground tracking-widest font-semibold uppercase truncate mr-2" title={match.seriesName || match.matchType}>
+      {/* Header - Completely borderless, ultra minimal */}
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] text-muted-foreground tracking-[0.2em] font-semibold uppercase truncate mr-2 opacity-80" title={match.seriesName || match.matchType}>
           {showSeriesName && match.seriesName ? match.seriesName : match.matchType}
         </span>
-        <div className="flex items-center gap-2 bg-white/5 px-2.5 py-1 rounded-full">
-           {isLive && <span className="h-1.5 w-1.5 rounded-full bg-foreground animate-pulse" />}
+        <div className="flex items-center gap-2">
+           {isLive && <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]" />}
            <span className={cn("text-[9px] font-bold uppercase tracking-widest", getStatusColor())}>
              {getStatusText()}
            </span>
@@ -64,29 +63,29 @@ export const MatchCard = ({ match, onClick, className, showSeriesName }: MatchCa
       </div>
 
       {/* Teams & Score */}
-      <div className="flex flex-col gap-3.5">
+      <div className="flex flex-col gap-4">
         {/* Home Team */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <TeamLogo logo={match.homeTeam?.logo || ''} name={match.homeTeam?.name || 'TBA'} shortName={match.homeTeam?.shortName} size="md" className="w-11 h-11 shadow-sm" />
-            <span className="font-semibold text-foreground text-[15px] tracking-tight">{match.homeTeam?.name || 'TBA'}</span>
+          <div className="flex items-center gap-3.5">
+            <TeamLogo logo={match.homeTeam?.logo || ''} name={match.homeTeam?.name || 'TBA'} shortName={match.homeTeam?.shortName} size="md" className="w-10 h-10 ring-1 ring-white/10 shadow-sm" />
+            <span className="font-bold text-foreground text-[17px] tracking-tight">{match.homeTeam?.name || 'TBA'}</span>
           </div>
           <div className="flex flex-col items-end">
              {Array.isArray(match.inningsScores) && match.inningsScores.length > 0 ? (
                  match.inningsScores.filter(i => i?.team === 'home').map((inn, idx) => (
                     <div key={idx} className="flex items-center gap-1.5">
-                      <span className="font-bold text-[15px] tracking-tight text-foreground">
+                      <span className="font-black text-[19px] tracking-tighter text-foreground">
                         {inn.score}
                       </span>
                       {inn.overs && (
-                        <span className="text-xs text-muted-foreground font-medium">
+                        <span className="text-xs text-muted-foreground font-medium opacity-70">
                           ({inn.overs})
                         </span>
                       )}
                     </div>
                  ))
              ) : (
-                 <span className="font-bold text-[15px] tracking-tight text-foreground">
+                 <span className="font-black text-[19px] tracking-tighter text-foreground">
                    {match.homeScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                  </span>
              )}
@@ -95,26 +94,26 @@ export const MatchCard = ({ match, onClick, className, showSeriesName }: MatchCa
 
         {/* Away Team */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <TeamLogo logo={match.awayTeam?.logo || ''} name={match.awayTeam?.name || 'TBA'} shortName={match.awayTeam?.shortName} size="md" className="w-11 h-11 shadow-sm" />
-            <span className="font-semibold text-foreground text-[15px] tracking-tight">{match.awayTeam?.name || 'TBA'}</span>
+          <div className="flex items-center gap-3.5">
+            <TeamLogo logo={match.awayTeam?.logo || ''} name={match.awayTeam?.name || 'TBA'} shortName={match.awayTeam?.shortName} size="md" className="w-10 h-10 ring-1 ring-white/10 shadow-sm" />
+            <span className="font-bold text-foreground text-[17px] tracking-tight">{match.awayTeam?.name || 'TBA'}</span>
           </div>
           <div className="flex flex-col items-end">
              {Array.isArray(match.inningsScores) && match.inningsScores.length > 0 ? (
                  match.inningsScores.filter(i => i?.team === 'away').map((inn, idx) => (
                     <div key={idx} className="flex items-center gap-1.5">
-                      <span className="font-bold text-[15px] tracking-tight text-foreground">
+                      <span className="font-black text-[19px] tracking-tighter text-foreground">
                         {inn.score}
                       </span>
                       {inn.overs && (
-                        <span className="text-xs text-muted-foreground font-medium">
+                        <span className="text-xs text-muted-foreground font-medium opacity-70">
                           ({inn.overs})
                         </span>
                       )}
                     </div>
                  ))
              ) : (
-                 <span className="font-bold text-[15px] tracking-tight text-foreground">
+                 <span className="font-black text-[19px] tracking-tighter text-foreground">
                    {match.awayScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                  </span>
              )}
@@ -122,20 +121,20 @@ export const MatchCard = ({ match, onClick, className, showSeriesName }: MatchCa
         </div>
       </div>
 
-      {/* Footer / Match Status Summary */}
-      <div className={cn("pt-3.5 border-t flex flex-col gap-2.5", themeBorder)}>
+      {/* Footer / Match Status Summary - No Borders */}
+      <div className="flex flex-col gap-2 pt-2">
         {match.summaryText && (
-          <span className={cn("text-xs font-semibold leading-relaxed", isLive ? "text-red-400" : "text-primary/90")}>
+          <span className={cn("text-xs font-semibold leading-relaxed tracking-wide", isLive ? "text-red-400" : "text-primary/90")}>
             {match.summaryText}
           </span>
         )}
-        <div className="flex items-center gap-4 text-[11px] text-muted-foreground/80 uppercase tracking-wide font-medium">
+        <div className="flex items-center gap-4 text-[10px] text-muted-foreground/50 uppercase tracking-widest font-semibold mt-1">
           <div className="flex items-center gap-1.5 truncate">
-            <MapPin size={11} className="flex-shrink-0" />
+            <MapPin size={10} className="flex-shrink-0" />
             <span className="truncate">{typeof match.venue === 'object' ? match.venue?.name : match.venue || "Venue"}</span>
           </div>
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            <Clock size={11} />
+            <Clock size={10} />
             <span>{match.displayTime || formatToIST(new Date(match.startTime), 'full')}</span>
           </div>
         </div>
