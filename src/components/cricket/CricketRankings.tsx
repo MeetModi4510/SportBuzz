@@ -62,16 +62,18 @@ function PlayerFlag({
   flagCode,
   flagLocal,
   country,
+  className,
 }: {
   flagCode: string | null;
   flagLocal: string | null;
   country: string;
+  className?: string;
 }) {
   const [error, setError] = useState(false);
 
   if (error) {
     return (
-      <span className="w-4 h-4 rounded-full bg-secondary/30 flex-shrink-0 inline-block" />
+      <span className={cn("w-4 h-4 rounded-full bg-secondary/30 flex-shrink-0 inline-block", className)} />
     );
   }
 
@@ -81,7 +83,7 @@ function PlayerFlag({
         src={flagLocal}
         alt={country}
         onError={() => setError(true)}
-        className="w-4 h-4 rounded-full object-cover flex-shrink-0"
+        className={cn("w-4 h-4 rounded-full object-cover flex-shrink-0", className)}
       />
     );
   }
@@ -92,21 +94,21 @@ function PlayerFlag({
         src={`https://flagcdn.com/w40/${flagCode}.png`}
         alt={country}
         onError={() => setError(true)}
-        className="w-4 h-4 rounded-full object-cover flex-shrink-0"
+        className={cn("w-4 h-4 rounded-full object-cover flex-shrink-0", className)}
       />
     );
   }
 
-  return <span className="w-4 h-4 rounded-full bg-secondary/30 flex-shrink-0 inline-block" />;
+  return <span className={cn("w-4 h-4 rounded-full bg-secondary/30 flex-shrink-0 inline-block", className)} />;
 }
 
-function PlayerAvatar({ faceImageId, name }: { faceImageId: string | null; name: string }) {
+function PlayerAvatar({ faceImageId, name, className }: { faceImageId: string | null; name: string; className?: string; }) {
   const [error, setError] = useState(false);
 
   if (!faceImageId || error) {
     // Silhouette fallback
     return (
-      <div className="w-7 h-7 rounded-full bg-secondary/40 flex items-center justify-center flex-shrink-0 overflow-hidden border border-border/30">
+      <div className={cn("w-7 h-7 rounded-full bg-secondary/40 flex items-center justify-center flex-shrink-0 overflow-hidden border border-border/30", className)}>
         <svg viewBox="0 0 24 24" className="w-4 h-4 text-muted-foreground fill-current" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
         </svg>
@@ -119,7 +121,7 @@ function PlayerAvatar({ faceImageId, name }: { faceImageId: string | null; name:
       src={`${API_BASE}/api/cricket/cb/player-image/${faceImageId}`}
       alt={name}
       onError={() => setError(true)}
-      className="w-7 h-7 rounded-full object-cover flex-shrink-0 border border-border/30"
+      className={cn("w-7 h-7 rounded-full object-cover flex-shrink-0 border border-border/30", className)}
     />
   );
 }

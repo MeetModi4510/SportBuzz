@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
   TrendingUp, X, Loader2, AlertCircle, User as UserIcon,
-  Globe, Shield, Trophy, Calendar, Zap
+  Globe, Shield, Trophy, Calendar, Zap, Star
 } from 'lucide-react';
 import {
   useCricketTrendingPlayers,

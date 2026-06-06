@@ -370,8 +370,8 @@ const FootballSquads = ({ match }: { match: Match }) => {
             }}
             homePlayers={homePlayers}
             awayPlayers={awayPlayers}
-            homeFormation={m.lineups?.home?.formation || squads?.homeFormation || '4-4-2'}
-            awayFormation={m.lineups?.away?.formation || squads?.awayFormation || '4-4-2'}
+            homeFormation={m.lineups?.home?.formation || (squads as any)?.homeFormation || '4-4-2'}
+            awayFormation={m.lineups?.away?.formation || (squads as any)?.awayFormation || '4-4-2'}
         />
     );
 };
