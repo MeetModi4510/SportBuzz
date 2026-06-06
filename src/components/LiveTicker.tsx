@@ -116,103 +116,81 @@ export const LiveTicker = () => {
   const themeBorder = currentMatch ? (getSportBorderColor(currentMatch.sport) || "border-border/60") : "border-border/60";
 
   return (
-    <div className={cn("relative overflow-hidden rounded-xl border bg-card transition-all duration-300", themeBorder)}>
-      <div className="flex items-center justify-between px-2 py-3">
-        {tickerMatches.length > 1 && (
-          <button
-            onClick={goToPrev}
-            className="p-1 text-muted-foreground hover:text-foreground transition-colors shrink-0"
-          >
-            <ChevronLeft size={16} />
-          </button>
-        )}
+    <div className="w-full bg-card/40 border-b border-border/30 overflow-hidden backdrop-blur-sm">
+      <div className="flex items-center overflow-x-auto scrollbar-hide snap-x px-2 py-2.5 gap-2.5">
+        {tickerMatches.map((match, idx) => {
+          const isLive = match.status === "live";
+          const isFollowedTournament = (match as any).isFollowedTournament;
 
-        <div className="flex-1 flex items-center justify-between px-2 sm:px-4">
-          {/* Left: Meta */}
-          <div className="hidden md:flex items-center gap-3 w-[25%] shrink-0">
-            {isLive ? (
-              <span className="flex items-center gap-1.5 text-[10px] font-semibold text-red-500 uppercase tracking-widest">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /> LIVE
-              </span>
-            ) : (
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
-                RECENT
-              </span>
-            )}
-            <span className="w-[1px] h-3 bg-border" />
-            <div className="flex items-center gap-1.5">
-              {isFollowedTournament ? (
-                <Bell size={12} className="text-yellow-500" />
-              ) : (
-                <SportIcon sport={currentMatch.sport} size={12} className="text-muted-foreground" />
+          return (
+            <div 
+              key={match._id || idx}
+              className="flex-shrink-0 snap-start flex flex-col justify-center min-w-[200px] max-w-[240px] bg-secondary/10 border border-border/40 rounded-lg px-3.5 py-2.5 hover:bg-secondary/30 hover:border-border transition-all cursor-pointer group"
+            >
+              {/* Top Meta */}
+              <div className="flex items-center justify-between mb-2.5 border-b border-border/30 pb-2">
+                <div className="flex items-center gap-1.5">
+                   {isLive ? (
+                     <span className="flex items-center gap-1 text-[9px] font-bold text-red-500 uppercase tracking-widest">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_4px_rgba(239,68,68,0.8)]" /> LIVE
+                     </span>
+                   ) : (
+                     <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">RECENT</span>
+                   )}
+                </div>
+                <div className="flex items-center gap-1">
+                  {isFollowedTournament ? (
+                    <Bell size={10} className="text-yellow-500" />
+                  ) : (
+                    <SportIcon sport={match.sport} size={10} className="text-muted-foreground" />
+                  )}
+                  <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest truncate max-w-[80px]">
+                    {match.matchType}
+                  </span>
+                </div>
+              </div>
+
+              {/* Teams & Scores */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="sm" className="w-4 h-4 drop-shadow-sm" />
+                    <span className="font-semibold text-xs text-foreground">{match.homeTeam?.shortName}</span>
+                  </div>
+                  <span className="font-bold text-[13px] text-foreground tracking-tight">
+                    {match.homeScore || (match.status?.includes(match.homeTeam?.name || "") ? "W" : "-")}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="sm" className="w-4 h-4 drop-shadow-sm" />
+                    <span className="font-semibold text-xs text-foreground">{match.awayTeam?.shortName}</span>
+                  </div>
+                  <span className="font-bold text-[13px] text-foreground tracking-tight">
+                    {match.awayScore || (match.status?.includes(match.awayTeam?.name || "") ? "W" : "-")}
+                  </span>
+                </div>
+              </div>
+
+              {/* Optional Footer Status (e.g. Over, test break) */}
+              {(match.sport === "cricket" && (match as any).currentOver || (match as any).testBreakStatus) && (
+                <div className="mt-2 pt-2 border-t border-border/20">
+                  {match.sport === "cricket" && (match as any).currentOver ? (
+                    <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-widest">
+                      Over {(match as any).currentOver}
+                    </span>
+                  ) : (match as any).testBreakStatus ? (
+                    <span className="text-[9px] font-semibold text-orange-400 uppercase tracking-widest">
+                      {(match as any).testBreakStatus}
+                    </span>
+                  ) : null}
+                </div>
               )}
-              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest truncate max-w-[120px]">
-                {currentMatch.matchType}
-              </span>
             </div>
-          </div>
-
-          {/* Center: Score */}
-          <div className="flex flex-1 items-center justify-center gap-3 sm:gap-6">
-            <div className="flex flex-1 items-center justify-end gap-2.5">
-              <span className="font-semibold text-sm text-foreground">{currentMatch.homeTeam?.shortName}</span>
-              <TeamLogo logo={currentMatch.homeTeam?.logo} name={currentMatch.homeTeam?.name || "Team 1"} size="sm" className="w-5 h-5" />
-              <span className="font-bold text-base text-foreground ml-1 sm:ml-2">
-                {currentMatch.homeScore || (currentMatch.status?.includes(currentMatch.homeTeam?.name || "") ? "W" : "-")}
-              </span>
-            </div>
-
-            <span className="text-border font-light text-lg">-</span>
-
-            <div className="flex flex-1 items-center justify-start gap-2.5">
-              <span className="font-bold text-base text-foreground mr-1 sm:mr-2">
-                {currentMatch.awayScore || (currentMatch.status?.includes(currentMatch.awayTeam?.name || "") ? "W" : "-")}
-              </span>
-              <TeamLogo logo={currentMatch.awayTeam?.logo} name={currentMatch.awayTeam?.name || "Team 2"} size="sm" className="w-5 h-5" />
-              <span className="font-semibold text-sm text-foreground">{currentMatch.awayTeam?.shortName}</span>
-            </div>
-          </div>
-
-          {/* Right: Status */}
-          <div className="hidden md:flex items-center justify-end gap-3 w-[25%] shrink-0">
-            {currentMatch.sport === "cricket" && (currentMatch as any).currentOver && (
-              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">
-                Over {(currentMatch as any).currentOver}
-              </span>
-            )}
-            {(currentMatch as any).testBreakStatus && (
-              <span className="text-[10px] font-medium text-orange-400 uppercase tracking-widest">
-                {(currentMatch as any).testBreakStatus}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {tickerMatches.length > 1 && (
-          <button
-            onClick={goToNext}
-            className="p-1 text-muted-foreground hover:text-foreground transition-colors shrink-0"
-          >
-            <ChevronRight size={16} />
-          </button>
-        )}
+          );
+        })}
       </div>
-
-      {/* Pagination */}
-      {tickerMatches.length > 1 && (
-        <div className="flex items-center justify-center gap-1 pb-1.5">
-          {tickerMatches.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={cn(
-                "h-[3px] rounded-full transition-all duration-300",
-                index === currentIndex ? "bg-foreground w-4" : "bg-muted-foreground/20 w-1.5 hover:bg-muted-foreground/40"
-              )}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 };
