@@ -666,20 +666,13 @@ const MatchDetails = () => {
                         <span className="text-[10px] font-bold text-primary uppercase tracking-widest flex items-center gap-1.5 relative z-10">
                           <Trophy size={12}/> Man of the Match
                         </span>
-                        <span className="font-bold text-base text-foreground relative z-10">{match.manOfTheMatch}</span>
+                        <span className="font-bold text-base text-foreground relative z-10">{typeof match.manOfTheMatch === 'object' ? match.manOfTheMatch?.name : match.manOfTheMatch}</span>
                       </div>
                     )}
                   </div>
                 </div>
               )}
-                            <span className="text-foreground font-medium">{match.manOfTheMatch.name}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+
 
               {/* Upcoming: minimal info card */}
               {isUpcoming && (

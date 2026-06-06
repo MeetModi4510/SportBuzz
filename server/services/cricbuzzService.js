@@ -24,7 +24,7 @@ if (!RAPIDAPI_KEY) {
 }
 
 // ─── Cache ─────────────────────────────────────────────────────────────────────
-const cache = new NodeCache({ stdTTL: 600 }); // Default 10 minutes
+const cache = new NodeCache({ stdTTL: 900 }); // Default 15 minutes
 
 // ─── Helper: Normalize Cricbuzz overs notation ────────────────────────────────
 // Cricbuzz sends overs as X.B where B is ball number (1-6).
@@ -139,14 +139,14 @@ async function fetchMatchesList(endpoint) {
                             cbMatches.push(mapped);
                             
                             // Seed individual match cache for high performance
-                            cache.set(`cb_match_${mapped.id}`, mapped, 600);
+                            cache.set(`cb_match_${mapped.id}`, mapped, 900);
                         }
                     });
                 });
             });
         }
         
-        cache.set(cacheKey, cbMatches, 300); // Cache list for 5 minutes
+        cache.set(cacheKey, cbMatches, 900); // Cache list for 15 minutes
         return cbMatches;
     } catch (err) {
         console.error(`[CRICBUZZ] Failed to fetch match list (${endpoint}):`, err.message);
@@ -197,7 +197,7 @@ async function getMatchInfo(cbId) {
     const allMatches = await getAllMatchesCombined();
     const found = allMatches.find(m => m.id === String(cbId));
     if (found) {
-        cache.set(`cb_match_${cbId}`, found, 600);
+        cache.set(`cb_match_${cbId}`, found, 900);
         return { status: 'success', data: found };
     }
 
@@ -234,7 +234,7 @@ async function getMatchInfo(cbId) {
                 }))
             };
             
-            cache.set(`cb_match_${cbId}`, reconstructed, 600);
+            cache.set(`cb_match_${cbId}`, reconstructed, 900);
             return { status: 'success', data: reconstructed };
         }
     } catch (err) {
@@ -313,7 +313,7 @@ async function getScorecard(cbId) {
             error: null,
         };
 
-        cache.set(cacheKey, result, 30); // Cache scorecard for 30 seconds for real-time tracking
+        cache.set(cacheKey, result, 900); // Cache scorecard for 15 minutes for real-time tracking
         return result;
     } catch (err) {
         console.error(`[CRICBUZZ] Scorecard error for ${cbId}:`, err.message);
@@ -519,7 +519,7 @@ async function getCommentary(cbId) {
             error: null,
         };
 
-        cache.set(cacheKey, result, 10); // Cache commentary for 10 seconds for real-time play
+        cache.set(cacheKey, result, 900); // Cache commentary for 15 minutes for real-time play
         return result;
     } catch (err) {
         console.error(`[CRICBUZZ] Commentary error for ${cbId}:`, err.message);

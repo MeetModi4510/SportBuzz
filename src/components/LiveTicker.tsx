@@ -89,7 +89,6 @@ export const LiveTicker = () => {
   if (tickerMatches.length === 0) return null;
 
   return (
-  return (
     <div className="w-full bg-card/40 border-b border-border/30 overflow-hidden backdrop-blur-sm flex items-center h-10 md:h-11 relative">
        {/* "LIVE SCORES" sticky label on the left */}
        <div className="absolute left-0 top-0 bottom-0 z-20 flex items-center bg-background/90 backdrop-blur-md border-r border-border/30 px-3 md:px-5 shadow-[5px_0_15px_rgba(0,0,0,0.6)]">

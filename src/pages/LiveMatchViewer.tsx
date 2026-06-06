@@ -1599,7 +1599,7 @@ const LiveMatchViewer = () => {
                    ════════════════════════════════════════════ */}
                 {activeTab === "lineups" && (
                     <div className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800">
-                        <SquadsList match={match} />
+                        <SquadsList match={match as any} />
                     </div>
                 )}
             </div>

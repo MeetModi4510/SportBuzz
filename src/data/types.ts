@@ -68,7 +68,8 @@ export interface Match {
   }[];
   referee?: string;
   attendance?: string;
-  manOfTheMatch?: { id: string; name: string };
+  manOfTheMatch?: { id: string; name: string } | string;
+  tournament?: { id?: string | number; name?: string; slug?: string };
   tossResult?: string;
   detailedStats?: {
     category: string;
@@ -81,6 +82,10 @@ export interface Match {
     homeLineup?: string[];
     awayLineup?: string[];
     details?: any;
+    lineups?: {
+      home?: { starters?: any[]; substitutes?: any[]; formation?: string; startXI?: any[]; startingXI?: any[]; players?: any[] };
+      away?: { starters?: any[]; substitutes?: any[]; formation?: string; startXI?: any[]; startingXI?: any[]; players?: any[] };
+    };
   }
 
 export interface PlayerStats {
