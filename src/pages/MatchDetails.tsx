@@ -248,10 +248,10 @@ const MatchDetails = () => {
         </div>
 
         {/* Match Header */}
-        <section className="bg-card border-b border-border pb-8 pt-4">
+        <section className="bg-background pb-10 pt-6">
           <div className="container mx-auto px-4 max-w-4xl">
             {/* Top Meta Bar */}
-            <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4 border-b border-border/50 pb-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between mb-10 gap-4 pb-4">
                 <div className="flex items-center gap-3">
                     <span className="text-xs font-bold text-foreground uppercase tracking-widest">{match.tournament?.name || match.matchType}</span>
                     {isLive && (
@@ -345,15 +345,15 @@ const MatchDetails = () => {
                       const away = parseScore(match.awayScore);
 
                       return (
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-8">
                           <div className="flex flex-col items-center">
-                            <span className="text-4xl md:text-6xl font-bold tracking-tight text-foreground">{home.runs}</span>
-                            {home.overs && <span className="text-xs text-muted-foreground font-medium mt-1">({home.overs})</span>}
+                            <span className="text-5xl md:text-7xl font-light tracking-wide text-foreground">{home.runs}</span>
+                            {home.overs && <span className="text-xs text-muted-foreground font-medium mt-2 tracking-widest uppercase">({home.overs})</span>}
                           </div>
-                          <span className="text-muted-foreground/30 text-3xl font-light mb-4">-</span>
+                          <span className="text-muted-foreground/20 text-4xl font-extralight mb-4">-</span>
                           <div className="flex flex-col items-center">
-                            <span className="text-4xl md:text-6xl font-bold tracking-tight text-foreground">{away.runs}</span>
-                            {away.overs && <span className="text-xs text-muted-foreground font-medium mt-1">({away.overs})</span>}
+                            <span className="text-5xl md:text-7xl font-light tracking-wide text-foreground">{away.runs}</span>
+                            {away.overs && <span className="text-xs text-muted-foreground font-medium mt-2 tracking-widest uppercase">({away.overs})</span>}
                           </div>
                         </div>
                       );
@@ -475,8 +475,8 @@ const MatchDetails = () => {
                         }
                       }}
                     className={cn(
-                        "flex items-center gap-2 px-4 py-2 rounded-md font-medium text-xs transition-colors",
-                        isFavorite ? "bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/30 dark:text-red-400" : "bg-secondary/50 text-foreground hover:bg-secondary"
+                        "flex items-center gap-2 px-5 py-2 rounded-full font-medium text-xs transition-all border",
+                        isFavorite ? "bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20" : "bg-transparent text-muted-foreground border-transparent hover:bg-secondary/30 hover:text-foreground"
                     )}
                 >
                     <Heart size={14} className={isFavorite ? "fill-current" : ""} />
@@ -492,7 +492,7 @@ const MatchDetails = () => {
                           });
                         }
                       }}
-                    className="flex items-center gap-2 px-4 py-2 bg-secondary/50 text-foreground hover:bg-secondary rounded-md font-medium text-xs transition-colors"
+                    className="flex items-center gap-2 px-5 py-2 bg-transparent text-muted-foreground hover:bg-secondary/30 hover:text-foreground rounded-full font-medium text-xs transition-all"
                 >
                     <Share2 size={14} />
                     Share
@@ -503,29 +503,44 @@ const MatchDetails = () => {
 
         {/* Match Content Tabs */}
         <section className="container mx-auto px-4 py-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="w-full justify-start bg-secondary/50 p-1 rounded-lg overflow-x-auto">
-              <TabsTrigger value="summary" className="flex items-center gap-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+            <TabsList className="w-full justify-start bg-transparent border-b border-border/30 rounded-none h-auto p-0 space-x-6 overflow-x-auto pb-px">
+              <TabsTrigger 
+                value="summary" 
+                className="flex items-center gap-2 px-1 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-all"
+              >
                 <BarChart3 size={16} />
                 Summary
               </TabsTrigger>
               {match?.sport !== 'tennis' && (
-                <TabsTrigger value="lineups" className="flex items-center gap-2">
+                <TabsTrigger 
+                  value="lineups" 
+                  className="flex items-center gap-2 px-1 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-all"
+                >
                   <Users size={16} />
                   Lineups
                 </TabsTrigger>
               )}
-              <TabsTrigger value="scoreboard" className="flex items-center gap-2">
+              <TabsTrigger 
+                value="scoreboard" 
+                className="flex items-center gap-2 px-1 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-all"
+              >
                 <ListOrdered size={16} />
                 {match?.sport === 'football' || match?.sport === 'tennis' ? 'Stats' : 'Scoreboard'}
               </TabsTrigger>
 
-              <TabsTrigger value="commentary" className="flex items-center gap-2">
+              <TabsTrigger 
+                value="commentary" 
+                className="flex items-center gap-2 px-1 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-all"
+              >
                 <MessageSquare size={16} />
                 Commentary
               </TabsTrigger>
               {(match?.sport === 'football' || match?.sport === 'cricket') && (
-                <TabsTrigger value="performance" className="flex items-center gap-2">
+                <TabsTrigger 
+                  value="performance" 
+                  className="flex items-center gap-2 px-1 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-all"
+                >
                   <Activity size={16} />
                   Performance Lab
                 </TabsTrigger>
@@ -553,7 +568,7 @@ const MatchDetails = () => {
 
               {/* Match Status & Result (Live + Completed) */}
               {!isUpcoming && match.summaryText && (
-                <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                <div className="bg-secondary/10 border border-border/20 rounded-2xl p-8 space-y-4 shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
                     <BarChart3 className="w-5 h-5 text-primary" />
                     <h3 className="font-semibold text-foreground">{isCompleted ? 'Match Result' : 'Match Status'}</h3>
@@ -568,7 +583,7 @@ const MatchDetails = () => {
 
               {/* Match Details Card */}
               {!isUpcoming && (
-                <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                <div className="bg-secondary/10 border border-border/20 rounded-2xl p-8 space-y-6 shadow-sm">
                   <h3 className="font-semibold text-foreground">Match Details</h3>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">

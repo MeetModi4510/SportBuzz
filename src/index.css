@@ -73,33 +73,33 @@
   }
 
   .dark {
-    /* Dark Mode Colors */
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
+    /* Dark Mode Colors - Elegant Minimalist */
+    --background: 220 10% 4%;
+    --foreground: 210 20% 98%;
 
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
+    --card: 220 10% 6%;
+    --card-foreground: 210 20% 98%;
 
-    --popover: 222 47% 10%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 10% 6%;
+    --popover-foreground: 210 20% 98%;
 
     --primary: 142 76% 45%;
-    --primary-foreground: 222 47% 6%;
+    --primary-foreground: 220 10% 4%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 220 10% 12%;
+    --secondary-foreground: 210 20% 98%;
 
-    --muted: 217 33% 14%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 220 10% 12%;
+    --muted-foreground: 215 15% 60%;
 
-    --accent: 217 33% 20%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 220 10% 16%;
+    --accent-foreground: 210 20% 98%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 210 20% 98%;
 
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
+    --border: 220 10% 12%;
+    --input: 220 10% 12%;
     --ring: 142 76% 45%;
 
     --glass: 222 47% 12% / 0.8;
