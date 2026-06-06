@@ -244,6 +244,7 @@ const selectFeaturedMatches = (matches = []) => {
     const selected = [];
     const usedIds  = new Set();
     const activeSeriesNames = new Set();
+    const activeTeams = new Set();
 
     const pickMatches = (pool, limit, condition = () => true) => {
         let count = 0;
@@ -256,29 +257,42 @@ const selectFeaturedMatches = (matches = []) => {
                 enriched.chaseLine    = buildChaseLine(m);
                 selected.push(enriched);
                 usedIds.add(m.id);
-                if (m.seriesName || m.series) activeSeriesNames.add(m.seriesName || m.series);
+                if (m.seriesName || m.series) activeSeriesNames.add((m.seriesName || m.series).toLowerCase());
+                if (Array.isArray(m.teams)) m.teams.forEach(t => activeTeams.add(t.toLowerCase()));
                 count++;
             }
         }
         return count;
     };
 
+    const isMatchRelated = (m) => {
+        const sName = (m.seriesName || m.series || '').toLowerCase();
+        if (activeSeriesNames.has(sName)) return true;
+        // If series name differs, check if it's the exact same matchup (both teams match)
+        if (Array.isArray(m.teams) && m.teams.length >= 2) {
+            const t1 = m.teams[0].toLowerCase();
+            const t2 = m.teams[1].toLowerCase();
+            if (activeTeams.has(t1) && activeTeams.has(t2)) return true;
+        }
+        return false;
+    };
+
     // 1. Show up to 5 live matches
     pickMatches(livePool, 5);
 
-    // 2. Upcoming matches: prioritize live matches' series, then fill up to 15
+    // 2. Upcoming matches: prioritize live matches' series/matchups, then fill up to 15
     let pickedUpcoming = 0;
-    if (activeSeriesNames.size > 0) {
-        pickedUpcoming += pickMatches(upcomingPool, 15, m => activeSeriesNames.has(m.seriesName || m.series));
+    if (activeSeriesNames.size > 0 || activeTeams.size > 0) {
+        pickedUpcoming += pickMatches(upcomingPool, 15, isMatchRelated);
     }
     if (pickedUpcoming < 15) {
         pickedUpcoming += pickMatches(upcomingPool, 15 - pickedUpcoming);
     }
 
-    // 3. Recent matches: prioritize live matches' series, then fill up to 10
+    // 3. Recent matches: prioritize live matches' series/matchups, then fill up to 10
     let pickedRecent = 0;
-    if (activeSeriesNames.size > 0) {
-        pickedRecent += pickMatches(completedPool, 10, m => activeSeriesNames.has(m.seriesName || m.series));
+    if (activeSeriesNames.size > 0 || activeTeams.size > 0) {
+        pickedRecent += pickMatches(completedPool, 10, isMatchRelated);
     }
     if (pickedRecent < 10) {
         pickedRecent += pickMatches(completedPool, 10 - pickedRecent);
