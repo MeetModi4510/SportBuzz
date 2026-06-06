@@ -51,3 +51,40 @@ export function useCricketNews(): UseCricketNewsResult {
 
   return { news, loading, error };
 }
+
+export function useCricketNewsDetail(articleId: string | null) {
+  const [content, setContent] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!articleId) {
+      setContent([]);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    const fetchDetail = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/cricket/news/${articleId}`);
+        const json = await res.json();
+        if (!cancelled) {
+          setContent(json.data || []);
+          setError(json.error || null);
+        }
+      } catch (e: any) {
+        if (!cancelled) setError('Failed to load article detail');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchDetail();
+    return () => { cancelled = true; };
+  }, [articleId]);
+
+  return { content, loading, error };
+}

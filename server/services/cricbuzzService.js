@@ -703,6 +703,44 @@ async function getCricketNews() {
     }
 }
 
+async function getCricketNewsDetail(storyId) {
+    if (!storyId) return { error: 'Missing storyId', data: null };
+
+    const cacheKey = `cb_news_detail_${storyId}`;
+    const cached = newsCache.get(cacheKey);
+    if (cached) return cached;
+
+    const newsApiKey = process.env.CRICBUZZ_CRICKET_NEWS || RAPIDAPI_KEY;
+    const newsHost = 'cricbuzz-cricket2.p.rapidapi.com';
+
+    try {
+        const res = await axios.get(`https://${newsHost}/news/v1/detail/${storyId}`, {
+            headers: {
+                'x-rapidapi-key': newsApiKey,
+                'x-rapidapi-host': newsHost,
+            }
+        });
+
+        const contentArray = res.data?.content || [];
+        // Extract paragraphs
+        const paragraphs = contentArray
+            .filter(item => item.content && item.content.contentType === 'text')
+            .map(item => {
+                // Strip strange @L0$ tags from Cricbuzz text
+                let text = item.content.contentValue || '';
+                text = text.replace(/@L\d+\$/g, '');
+                return text;
+            });
+
+        const result = { data: paragraphs, error: null };
+        newsCache.set(cacheKey, result, 86400); // 24 hours, news detail doesn't change
+        return result;
+    } catch (err) {
+        console.error(`[CRICBUZZ] News detail fetch error for ${storyId}:`, err.message);
+        return { data: [], error: 'Failed to fetch news detail' };
+    }
+}
+
 // ─── ICC Team Rankings ───────────────────────────────────────────────────────────
 const rankingsCache = new NodeCache({ stdTTL: 604800 }); // 1 week default TTL
 
@@ -982,6 +1020,7 @@ export const cricbuzzService = {
     checkPlayerImageExists,
     streamPlayerImage,
     getCricketNews,
+    getCricketNewsDetail,
     getTeamRankings,
     getPlayerRankings,
 };

@@ -188,6 +188,15 @@ router.get('/news', async (req, res) => {
     }
 });
 
+router.get('/news/:id', async (req, res) => {
+    try {
+        const result = await cricbuzzService.getCricketNewsDetail(req.params.id);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ data: null, error: error.message });
+    }
+});
+
 // ─── ICC Team Rankings ─────────────────────────────────────────────────────────
 // GET /api/cricket/rankings/:format  (format: odi | test | t20)
 // Lazy loaded per tab click. Cached 1 week, force-refreshed on Wednesdays.

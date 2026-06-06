@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronRight, Clock, Loader2, AlertCircle } from 'lucide-react';
-import { useCricketNews, type CricketNewsItem } from '@/hooks/useCricketNews';
+import { useCricketNews, useCricketNewsDetail, type CricketNewsItem } from '@/hooks/useCricketNews';
 import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -17,6 +17,7 @@ const getImageUrl = (imageId: string | null) => {
 export const CricketNewsSection = () => {
   const { news, loading, error } = useCricketNews();
   const [selectedArticle, setSelectedArticle] = useState<CricketNewsItem | null>(null);
+  const { content: detailContent, loading: detailLoading } = useCricketNewsDetail(selectedArticle?.id || null);
   const [isViewAllOpen, setIsViewAllOpen] = useState(false);
 
   if (loading) {
@@ -174,9 +175,23 @@ export const CricketNewsSection = () => {
               />
             </div>
           )}
-          <p className="text-foreground/90 leading-relaxed text-base md:text-lg">
-            {selectedArticle?.snippet}
-          </p>
+          {detailLoading ? (
+            <div className="flex justify-center items-center py-10">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            </div>
+          ) : detailContent && detailContent.length > 0 ? (
+            <div className="space-y-4">
+              {detailContent.map((paragraph, idx) => (
+                <p key={idx} className="text-foreground/90 leading-relaxed text-base md:text-lg">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-foreground/90 leading-relaxed text-base md:text-lg">
+              {selectedArticle?.snippet}
+            </p>
+          )}
           {selectedArticle?.context && (
             <div className="mt-6 p-5 rounded-2xl bg-secondary/30 border border-border/50">
               <h4 className="text-sm font-bold text-foreground mb-2">Context</h4>
