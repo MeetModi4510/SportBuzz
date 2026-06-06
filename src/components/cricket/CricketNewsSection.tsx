@@ -34,7 +34,7 @@ export const CricketNewsSection = () => {
   return (
     <>
     <Dialog open={!!selectedArticle} onOpenChange={(open) => !open && setSelectedArticle(null)}>
-      <section className="bg-card/20 rounded-[2rem] border border-border/40 p-6 md:p-8">
+      <section className="bg-card/20 rounded-[2rem] border border-border/40 p-6 md:p-8 h-full flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -55,7 +55,7 @@ export const CricketNewsSection = () => {
         </div>
 
         {/* Bento Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 flex-1">
           
           {/* Featured Article (Large) */}
           {featuredArticle && (

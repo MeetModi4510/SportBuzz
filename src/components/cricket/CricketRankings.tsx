@@ -319,7 +319,6 @@ export const CricketRankings = () => {
                 <th className="py-3 px-3 font-semibold w-10">Pos</th>
                 <th className="py-3 px-3 font-semibold">Player</th>
                 <th className="py-3 px-3 font-semibold">Country</th>
-                <th className="py-3 px-3 font-semibold text-center">PTS</th>
                 <th className="py-3 px-3 font-semibold text-center">RTG</th>
                 <th className="py-3 px-3 font-semibold text-center">↕</th>
               </tr>
@@ -379,13 +378,7 @@ export const CricketRankings = () => {
                       </div>
                     </td>
 
-                    {/* Points */}
-                    <td className={cn(
-                      'py-2.5 px-3 border-y transition-all duration-300 text-center font-mono text-muted-foreground',
-                      medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
-                    )}>
-                      {typeof row.points === 'number' ? row.points.toLocaleString() : '—'}
-                    </td>
+
 
                     {/* Rating */}
                     <td className={cn(
