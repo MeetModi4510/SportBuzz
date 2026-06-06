@@ -40,7 +40,9 @@ import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayerCard } from "@/components/PlayerCard";
 import { SquadsList } from "@/components/SquadsList";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FootballPitchLineup } from "@/components/FootballPitchLineup";
+import { CricketPlayerImage } from "@/components/CricketPlayerImage";
 import type { Match } from "@/data/types";
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -950,12 +952,17 @@ const MatchDetails = () => {
                                        {p1 ? (
                                           <div className="relative flex items-center bg-gradient-to-r from-transparent to-secondary/40 pl-4 pr-10 md:pr-12 py-3 rounded-l-full border-r-4 border-primary/50 group-hover:border-primary transition-all cursor-default w-full md:w-[90%] justify-between md:justify-end overflow-hidden backdrop-blur-sm">
                                              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                             <div className="flex flex-col items-start md:items-end relative z-10">
-                                                <span className="font-bold text-foreground text-sm md:text-base tracking-tight">{p1.name}</span>
-                                                <div className="flex items-center gap-2 mt-0.5">
-                                                   <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-widest">{p1.role || p1.position}</span>
-                                                   {p1.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold shadow-sm">C</span>}
-                                                   {p1.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold shadow-sm">WK</span>}
+                                             <div className="flex items-center gap-4 relative z-10 w-full justify-between md:justify-end">
+                                                <div className="md:absolute md:left-4 z-20 shrink-0">
+                                                   <CricketPlayerImage playerId={p1.id || p1.faceImageId} playerName={p1.name} size={40} />
+                                                </div>
+                                                <div className="flex flex-col items-start md:items-end z-10 ml-12 md:ml-0">
+                                                   <span className="font-bold text-foreground text-sm md:text-base tracking-tight">{p1.name}</span>
+                                                   <div className="flex items-center gap-2 mt-0.5">
+                                                      <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-widest">{p1.role || p1.position}</span>
+                                                      {p1.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold shadow-sm">C</span>}
+                                                      {p1.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold shadow-sm">WK</span>}
+                                                   </div>
                                                 </div>
                                              </div>
                                           </div>
@@ -974,12 +981,17 @@ const MatchDetails = () => {
                                        {p2 ? (
                                           <div className="relative flex items-center bg-gradient-to-l from-transparent to-secondary/40 pr-4 pl-10 md:pl-12 py-3 rounded-r-full border-l-4 border-football/50 group-hover:border-football transition-all cursor-default w-full md:w-[90%] justify-between md:justify-start overflow-hidden backdrop-blur-sm">
                                              <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-football/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                             <div className="flex flex-col items-end md:items-start relative z-10">
-                                                <span className="font-bold text-foreground text-sm md:text-base tracking-tight">{p2.name}</span>
-                                                <div className="flex items-center gap-2 mt-0.5 flex-row-reverse md:flex-row">
-                                                   <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-widest">{p2.role || p2.position}</span>
-                                                   {p2.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold shadow-sm">C</span>}
-                                                   {p2.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold shadow-sm">WK</span>}
+                                             <div className="flex items-center gap-4 relative z-10 w-full justify-between md:justify-start flex-row-reverse md:flex-row">
+                                                <div className="flex flex-col items-end md:items-start z-10 mr-12 md:mr-0">
+                                                   <span className="font-bold text-foreground text-sm md:text-base tracking-tight">{p2.name}</span>
+                                                   <div className="flex items-center gap-2 mt-0.5 flex-row-reverse md:flex-row">
+                                                      <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-widest">{p2.role || p2.position}</span>
+                                                      {p2.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold shadow-sm">C</span>}
+                                                      {p2.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold shadow-sm">WK</span>}
+                                                   </div>
+                                                </div>
+                                                <div className="md:absolute md:right-4 z-20 shrink-0">
+                                                   <CricketPlayerImage playerId={p2.id || p2.faceImageId} playerName={p2.name} size={40} align="right" />
                                                 </div>
                                              </div>
                                           </div>
