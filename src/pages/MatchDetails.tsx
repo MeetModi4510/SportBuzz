@@ -250,264 +250,280 @@ const MatchDetails = () => {
         </div>
 
         {/* Match Header */}
+        {/* Match Header */}
         <section className="bg-background pt-8 pb-12">
           <div className="container mx-auto px-4 max-w-4xl">
-            {/* Minimal Meta Info Bar */}
-            <div className="flex flex-col md:flex-row items-center justify-between mb-10 pb-4 border-b border-border/40 gap-4">
-               <div className="flex items-center gap-3">
-                  {isLive && (
-                     <span className="flex items-center gap-2 text-xs font-semibold text-red-500 uppercase tracking-widest">
-                         <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /> LIVE
-                     </span>
-                  )}
-                  {isCompleted && (
-                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
-                         COMPLETED
-                     </span>
-                  )}
-                  {(!isLive && !isCompleted) && (
-                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">UPCOMING</span>
-                  )}
-                  <span className="w-1 h-1 rounded-full bg-border" />
-                  <span className="text-xs font-medium text-foreground uppercase tracking-widest">{match.tournament?.name || match.matchType}</span>
+            {/* The Premium Card */}
+            <div className="relative overflow-hidden rounded-[2rem] bg-card border border-border/40 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+               
+               {/* 1. Top Meta Bar */}
+               <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-4 border-b border-border/40 bg-muted/10 gap-3">
+                  <div className="flex items-center gap-3">
+                     {isLive && (
+                        <span className="flex items-center gap-2 text-[10px] font-bold text-red-500 uppercase tracking-widest bg-red-500/10 px-2.5 py-1 rounded-full">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /> LIVE
+                        </span>
+                     )}
+                     {isCompleted && (
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-secondary/30 px-2.5 py-1 rounded-full">
+                            COMPLETED
+                        </span>
+                     )}
+                     {(!isLive && !isCompleted) && (
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-secondary/30 px-2.5 py-1 rounded-full">
+                            UPCOMING
+                        </span>
+                     )}
+                     <span className="text-xs font-semibold text-foreground uppercase tracking-widest">{match.tournament?.name || match.matchType}</span>
+                  </div>
+                  <div className="flex items-center gap-5 text-xs text-muted-foreground font-medium">
+                     <span className="flex items-center gap-1.5"><MapPin size={14} className="text-muted-foreground/60" /> {typeof match.venue === 'object' ? match.venue?.name : match.venue || "Venue"}</span>
+                     <span className="hidden sm:flex items-center gap-1.5"><Clock size={14} className="text-muted-foreground/60" /> {match.displayTime && (match.sport === 'cricket' || match.sport === 'football') ? match.displayTime : format(match.startTime, "MMM d, yyyy • h:mm a")}</span>
+                  </div>
                </div>
-               <div className="flex items-center gap-5 text-xs text-muted-foreground font-medium">
-                  <span className="flex items-center gap-1.5"><MapPin size={14} className="text-muted-foreground/60" /> {typeof match.venue === 'object' ? match.venue?.name : match.venue || "Venue"}</span>
-                  <span className="flex items-center gap-1.5"><Clock size={14} className="text-muted-foreground/60" /> {match.displayTime && (match.sport === 'cricket' || match.sport === 'football') ? match.displayTime : format(match.startTime, "MMM d, yyyy • h:mm a")}</span>
-               </div>
-            </div>
 
-            {/* Main Score Area */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-10 md:gap-14 py-4">
-                {/* Home Team */}
-                <div className="flex-1 flex flex-col-reverse md:flex-row items-center justify-end gap-5 w-full">
-                    <div className="text-center md:text-right">
-                        <h2 className="text-2xl md:text-3xl font-semibold text-foreground tracking-tight">{match.homeTeam?.name || "Team 1"}</h2>
-                        <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-[0.25em] mt-1.5">{match.homeTeam?.shortName}</p>
-                    </div>
-                    <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="lg" className="w-16 h-16 md:w-20 md:h-20 shadow-sm border border-border/20 rounded-full" />
-                </div>
-
-                {/* Score Center */}
-                <div className="flex flex-col items-center justify-center shrink-0">
-                  {isTestMatch && match.scoreBreakdown ? (
-                     // Test Match Score Breakdown layout
-                     <div className="flex flex-col items-center gap-3">
-                       <div className="flex items-center gap-6 md:gap-8">
-                         <span className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">{match.scoreBreakdown.home.inn1 || "—"}</span>
-                         <span className="text-border text-2xl font-light">-</span>
-                         <span className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">{match.scoreBreakdown.away.inn1 || "—"}</span>
+               {/* 2. Main Score Area */}
+               <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-10 md:py-14 gap-8 relative">
+                   {/* Home Team */}
+                   <div className="flex-1 flex flex-col-reverse md:flex-row items-center justify-end gap-5 w-full z-10">
+                       <div className="text-center md:text-right">
+                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{match.homeTeam?.name || "Team 1"}</h2>
+                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{match.homeTeam?.shortName}</p>
                        </div>
-                       {(match.scoreBreakdown.home.inn2 || match.scoreBreakdown.away.inn2) && (
-                         <div className="flex items-center gap-4 text-muted-foreground">
-                           <span className="text-xl md:text-2xl font-medium">{match.scoreBreakdown.home.inn2 || "—"}</span>
-                           <span className="text-border text-lg">-</span>
-                           <span className="text-xl md:text-2xl font-medium">{match.scoreBreakdown.away.inn2 || "—"}</span>
-                         </div>
-                       )}
-                     </div>
-                  ) : isTestMatch && match.inningsScores && match.inningsScores.length > 0 ? (
-                     // Test Match Innings Array layout
-                     <div className="flex items-start justify-center gap-8 md:gap-10">
-                       <div className="flex flex-col items-center gap-3">
-                         {match.inningsScores.filter(i => i.team === 'home').map((inn, idx) => (
-                           <div key={idx} className="flex flex-col items-center">
-                             <span className={cn(
-                               "font-bold tracking-tight",
-                               idx === 0 ? "text-4xl md:text-5xl text-foreground" : "text-xl md:text-2xl text-muted-foreground"
-                             )}>
-                               {inn.score || "—"}
-                             </span>
-                             {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-medium">{inn.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
-                           </div>
-                         ))}
+                       <div className="p-3 rounded-full bg-background border border-border/40 shadow-sm">
+                           <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="lg" className="w-16 h-16 md:w-20 md:h-20" />
                        </div>
-                       {match.inningsScores.filter(i => i.team === 'away').length > 0 && (
-                         <span className="text-border text-2xl font-light mt-2">-</span>
-                       )}
-                       <div className="flex flex-col items-center gap-3">
-                         {match.inningsScores.filter(i => i.team === 'away').map((inn, idx) => (
-                           <div key={idx} className="flex flex-col items-center">
-                             <span className={cn(
-                               "font-bold tracking-tight",
-                               idx === 0 ? "text-4xl md:text-5xl text-foreground" : "text-xl md:text-2xl text-muted-foreground"
-                             )}>
-                               {inn.score || "—"}
-                             </span>
-                             {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-medium">{inn.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
-                           </div>
-                         ))}
-                       </div>
-                     </div>
-                  ) : (
-                     // Standard T20/ODI layout
-                     (() => {
-                       const parseScore = (raw: string | undefined) => {
-                         if (!raw) return { runs: "—", overs: "" };
-                         const m = raw.match(/^([\d\/]+(?:\s*\(d\))?)\s*\((.+?)\)\s*$/);
-                         if (m) return { runs: m[1].trim(), overs: m[2].trim() };
-                         return { runs: raw, overs: "" };
-                       };
-                       const home = parseScore(match.homeScore);
-                       const away = parseScore(match.awayScore);
-                       const showAway = away.runs !== "—" && away.runs !== "";
+                   </div>
 
-                       return (
-                         <div className="flex items-center gap-6 md:gap-10">
-                           <div className="flex flex-col items-center">
-                             <span className="text-5xl md:text-6xl font-bold tracking-tight text-foreground">{home.runs}</span>
-                             {home.overs && <span className="text-[11px] text-muted-foreground font-medium mt-1.5 uppercase tracking-[0.2em]">{home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
-                           </div>
-                           {showAway && (
-                             <>
-                               <span className="text-border text-4xl font-light mb-4">-</span>
-                               <div className="flex flex-col items-center">
-                                 <span className="text-5xl md:text-6xl font-bold tracking-tight text-foreground">{away.runs}</span>
-                                 {away.overs && <span className="text-[11px] text-muted-foreground font-medium mt-1.5 uppercase tracking-[0.2em]">{away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
-                               </div>
-                             </>
-                           )}
-                         </div>
-                       );
-                     })()
-                  )}
-
-                  {/* Summary Status Text */}
-                  {(match.sport === 'cricket' || match.sport === 'football') && match.summaryText && (
-                    <div className="mt-8 text-center">
-                      <p className="text-[11px] font-semibold text-primary uppercase tracking-widest">{match.summaryText}</p>
-                    </div>
-                  )}
-
-                  {/* Match Time / Live Info */}
-                  {isLive && (
-                    <div className="text-[11px] font-semibold text-muted-foreground uppercase mt-2 text-center tracking-[0.2em] flex items-center justify-center gap-2">
-                      {match.sport === "cricket" && match.currentOver && <span>Over {match.currentOver}</span>}
-                      {match.sport === "football" && match.currentMinute && <><Clock size={12} className="animate-pulse text-red-500" /> <span>{match.currentMinute}</span></>}
-                      {match.sport === "basketball" && match.currentQuarter && <span>{match.currentQuarter} - {match.timeRemaining}</span>}
-                      {match.sport === "tennis" && match.currentSet && <span>{match.currentSet}</span>}
-                      {(!match.currentOver && !match.currentMinute && !match.currentQuarter && !match.currentSet) && (
-                        <span>In Progress</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Away Team */}
-                <div className="flex-1 flex flex-col md:flex-row items-center justify-start gap-5 w-full">
-                    <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="lg" className="w-16 h-16 md:w-20 md:h-20 shadow-sm border border-border/20 rounded-full" />
-                    <div className="text-center md:text-left">
-                        <h2 className="text-2xl md:text-3xl font-semibold text-foreground tracking-tight">{match.awayTeam?.name || "Team 2"}</h2>
-                        <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-[0.25em] mt-1.5">{match.awayTeam?.shortName}</p>
-                    </div>
-                </div>
-            </div>
-            {/* Football Goals Section */}
-            {(() => {
-              const matchGoals = match.goals || match.events?.filter((e: any) => e.type?.toLowerCase() === 'goal').map((e: any) => ({
-                teamId: e.team?.id || (match.homeTeam?.name === e.team?.name ? match.homeTeam?.id : match.awayTeam?.id),
-                player: e.player?.name || e.player,
-                minute: e.time?.elapsed || e.minute || parseInt(e.time),
-                type: (e.detail?.toLowerCase() === 'penalty' || e.type?.toLowerCase() === 'penalty') ? 'penalty' : (e.detail?.toLowerCase() === 'own goal' || e.type?.toLowerCase() === 'own_goal') ? 'own_goal' : 'goal',
-                assist: e.assist?.name || e.assister || e.assist
-              })) || [];
-
-              if (match.sport !== 'football' || !matchGoals || matchGoals.length === 0) return null;
-
-              return (
-                <div className="mt-6 border-t border-border/50 pt-6 max-w-lg mx-auto">
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-3">
-                    {matchGoals.map((goal: any, idx: number) => {
-                      const isHome = goal.teamId === match.homeTeam.id || goal.teamId === match.homeTeam?.name || (!goal.teamId && match.homeScore > match.awayScore); // Fallback logic
-                      return (
-                        <div 
-                          key={idx} 
-                          className={cn(
-                            "flex items-start text-sm",
-                            isHome ? "col-start-1 justify-end flex-row-reverse text-right pr-4 border-r border-border/30" : "col-start-2 justify-start pl-4"
+                   {/* Score Center */}
+                   <div className="flex flex-col items-center justify-center shrink-0 z-10 min-w-[200px]">
+                     {isTestMatch && match.scoreBreakdown ? (
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="flex items-center gap-6">
+                            <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">{match.scoreBreakdown.home.inn1 || "—"}</span>
+                            <span className="text-border text-2xl font-light">-</span>
+                            <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">{match.scoreBreakdown.away.inn1 || "—"}</span>
+                          </div>
+                          {(match.scoreBreakdown.home.inn2 || match.scoreBreakdown.away.inn2) && (
+                            <div className="flex items-center gap-4 text-muted-foreground">
+                              <span className="text-xl md:text-2xl font-bold">{match.scoreBreakdown.home.inn2 || "—"}</span>
+                              <span className="text-border text-lg">-</span>
+                              <span className="text-xl md:text-2xl font-bold">{match.scoreBreakdown.away.inn2 || "—"}</span>
+                            </div>
                           )}
-                        >
-                          <span className="font-mono text-muted-foreground text-xs w-8 shrink-0 text-center mt-0.5">{goal.minute}'</span>
-                          <div className={cn("flex flex-col gap-0.5 mx-2", isHome ? "items-end" : "items-start")}>
-                            <span className="font-semibold text-foreground">
-                              {goal.player} 
-                              {goal.type === 'penalty' && <span className="text-muted-foreground text-[10px] ml-1 font-normal">(PEN)</span>}
-                              {goal.type === 'own_goal' && <span className="text-red-500 text-[10px] ml-1 font-normal">(OG)</span>}
-                            </span>
-                            {goal.assist && typeof goal.assist === 'string' && (
-                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                                <Footprints size={10} className="opacity-50" /> {goal.assist}
-                              </span>
-                            )}
+                        </div>
+                     ) : isTestMatch && match.inningsScores && match.inningsScores.length > 0 ? (
+                        <div className="flex items-start justify-center gap-8 md:gap-10">
+                          <div className="flex flex-col items-center gap-3">
+                            {match.inningsScores.filter(i => i.team === 'home').map((inn, idx) => (
+                              <div key={idx} className="flex flex-col items-center">
+                                <span className={cn(
+                                  "font-black tracking-tighter",
+                                  idx === 0 ? "text-4xl md:text-5xl text-foreground" : "text-xl md:text-2xl text-muted-foreground"
+                                )}>
+                                  {inn.score || "—"}
+                                </span>
+                                {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{inn.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                              </div>
+                            ))}
+                          </div>
+                          {match.inningsScores.filter(i => i.team === 'away').length > 0 && (
+                            <span className="text-border text-2xl font-light mt-2">-</span>
+                          )}
+                          <div className="flex flex-col items-center gap-3">
+                            {match.inningsScores.filter(i => i.team === 'away').map((inn, idx) => (
+                              <div key={idx} className="flex flex-col items-center">
+                                <span className={cn(
+                                  "font-black tracking-tighter",
+                                  idx === 0 ? "text-4xl md:text-5xl text-foreground" : "text-xl md:text-2xl text-muted-foreground"
+                                )}>
+                                  {inn.score || "—"}
+                                </span>
+                                {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{inn.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                              </div>
+                            ))}
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })()}
+                     ) : (
+                        (() => {
+                          const parseScore = (raw: string | undefined) => {
+                            if (!raw) return { runs: "—", overs: "" };
+                            const m = raw.match(/^([\d\/]+(?:\s*\(d\))?)\s*\((.+?)\)\s*$/);
+                            if (m) return { runs: m[1].trim(), overs: m[2].trim() };
+                            return { runs: raw, overs: "" };
+                          };
+                          const home = parseScore(match.homeScore);
+                          const away = parseScore(match.awayScore);
+                          const showAway = away.runs !== "—" && away.runs !== "";
 
-            {/* Bottom Actions */}
-            <div className="flex items-center justify-center gap-3 mt-8 pt-4">
-                <button
-                    onClick={async () => {
-                        if (!match) return;
-                        try {
-                          if (isFavorite && favoriteId) {
-                            await favoritesApi.remove(favoriteId);
-                            setIsFavorite(false);
-                            setFavoriteId(null);
-                            toast({ title: "Removed", description: "Match removed from favorites" });
-                          } else {
-                            const response = await favoritesApi.add({
-                              matchId: match.id,
-                              sport: match.sport,
-                              teams: {
-                                team1: match.homeTeam?.name || "Team 1",
-                                team2: match.awayTeam?.name || "Team 2"
-                              },
-                              date: match.startTime instanceof Date 
-                                      ? match.startTime.toISOString() 
-                                      : new Date(match.startTime || Date.now()).toISOString(),
-                              venue: typeof match.venue === 'object' ? match.venue?.name || "Venue" : match.venue || "Venue",
-                              status: match.status
-                            }) as any;
-                            setIsFavorite(true);
-                            setFavoriteId(response.data._id);
-                            toast({ title: "Added", description: "Match added to favorites" });
-                          }
-                        } catch (error: any) {
-                          toast({
-                            title: "Error",
-                            description: error.response?.data?.message || "Failed to add to favorites.",
-                            variant: "destructive"
-                          });
-                        }
-                      }}
-                    className={cn(
-                        "flex items-center gap-2 px-5 py-2 rounded-full font-medium text-xs transition-all border",
-                        isFavorite ? "bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20" : "bg-transparent text-muted-foreground border-transparent hover:bg-secondary/30 hover:text-foreground"
-                    )}
-                >
-                    <Heart size={14} className={isFavorite ? "fill-current" : ""} />
-                    {isFavorite ? "Favorited" : "Favorite"}
-                </button>
-                <button
-                    onClick={() => {
-                        if (navigator.share) {
-                          navigator.share({
-                            title: `${match?.homeTeam?.name} vs ${match?.awayTeam?.name}`,
-                            text: `Check out the match: ${match?.homeTeam?.name} vs ${match?.awayTeam?.name} on SportsBuzz`,
-                            url: window.location.href,
-                          });
-                        }
-                      }}
-                    className="flex items-center gap-2 px-5 py-2 bg-transparent text-muted-foreground hover:bg-secondary/30 hover:text-foreground rounded-full font-medium text-xs transition-all"
-                >
-                    <Share2 size={14} />
-                    Share
-                </button>
+                          return (
+                            <div className="flex items-center gap-6 md:gap-10">
+                              <div className="flex flex-col items-center">
+                                <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground">{home.runs}</span>
+                                {home.overs && <span className="text-[10px] text-muted-foreground font-semibold mt-2 uppercase tracking-widest bg-secondary/30 px-3 py-1 rounded-full">{home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                              </div>
+                              {showAway && (
+                                <>
+                                  <span className="text-border text-4xl font-light mb-4">-</span>
+                                  <div className="flex flex-col items-center">
+                                    <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground">{away.runs}</span>
+                                    {away.overs && <span className="text-[10px] text-muted-foreground font-semibold mt-2 uppercase tracking-widest bg-secondary/30 px-3 py-1 rounded-full">{away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          );
+                        })()
+                     )}
+                   </div>
+
+                   {/* Away Team */}
+                   <div className="flex-1 flex flex-col md:flex-row items-center justify-start gap-5 w-full z-10">
+                       <div className="p-3 rounded-full bg-background border border-border/40 shadow-sm">
+                           <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="lg" className="w-16 h-16 md:w-20 md:h-20" />
+                       </div>
+                       <div className="text-center md:text-left">
+                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{match.awayTeam?.name || "Team 2"}</h2>
+                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{match.awayTeam?.shortName}</p>
+                       </div>
+                   </div>
+               </div>
+
+               {/* Football Goals Section */}
+               {(() => {
+                 const matchGoals = match.goals || match.events?.filter((e: any) => e.type?.toLowerCase() === 'goal').map((e: any) => ({
+                   teamId: e.team?.id || (match.homeTeam?.name === e.team?.name ? match.homeTeam?.id : match.awayTeam?.id),
+                   player: e.player?.name || e.player,
+                   minute: e.time?.elapsed || e.minute || parseInt(e.time),
+                   type: (e.detail?.toLowerCase() === 'penalty' || e.type?.toLowerCase() === 'penalty') ? 'penalty' : (e.detail?.toLowerCase() === 'own goal' || e.type?.toLowerCase() === 'own_goal') ? 'own_goal' : 'goal',
+                   assist: e.assist?.name || e.assister || e.assist
+                 })) || [];
+
+                 if (match.sport !== 'football' || !matchGoals || matchGoals.length === 0) return null;
+
+                 return (
+                   <div className="border-t border-border/40 py-6 bg-muted/5">
+                     <div className="max-w-lg mx-auto grid grid-cols-2 gap-x-8 gap-y-3 px-6">
+                       {matchGoals.map((goal: any, idx: number) => {
+                         const isHome = goal.teamId === match.homeTeam.id || goal.teamId === match.homeTeam?.name || (!goal.teamId && match.homeScore > match.awayScore); // Fallback logic
+                         return (
+                           <div 
+                             key={idx} 
+                             className={cn(
+                               "flex items-start text-sm",
+                               isHome ? "col-start-1 justify-end flex-row-reverse text-right pr-4 border-r border-border/30" : "col-start-2 justify-start pl-4"
+                             )}
+                           >
+                             <span className="font-mono text-muted-foreground text-xs w-8 shrink-0 text-center mt-0.5">{goal.minute}'</span>
+                             <div className={cn("flex flex-col gap-0.5 mx-2", isHome ? "items-end" : "items-start")}>
+                               <span className="font-semibold text-foreground">
+                                 {goal.player} 
+                                 {goal.type === 'penalty' && <span className="text-muted-foreground text-[10px] ml-1 font-normal">(PEN)</span>}
+                                 {goal.type === 'own_goal' && <span className="text-red-500 text-[10px] ml-1 font-normal">(OG)</span>}
+                               </span>
+                               {goal.assist && typeof goal.assist === 'string' && (
+                                 <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                   <Footprints size={10} className="opacity-50" /> {goal.assist}
+                                 </span>
+                               )}
+                             </div>
+                           </div>
+                         );
+                       })}
+                     </div>
+                   </div>
+                 );
+               })()}
+
+               {/* 3. Bottom Footer */}
+               <div className="flex flex-col sm:flex-row items-center justify-between px-6 md:px-10 py-4 bg-muted/10 border-t border-border/40 gap-4">
+                   {/* Status Area */}
+                   <div className="flex flex-col items-center sm:items-start gap-1">
+                      {(match.sport === 'cricket' || match.sport === 'football') && match.summaryText && (
+                        <span className="text-[11px] font-bold text-primary uppercase tracking-widest">{match.summaryText}</span>
+                      )}
+                      
+                      {isLive && (
+                        <div className="text-[10px] font-bold text-red-500 tracking-widest uppercase flex items-center gap-2">
+                          {match.sport === "cricket" && match.currentOver && <span>OVER {match.currentOver}</span>}
+                          {match.sport === "football" && match.currentMinute && <><Clock size={12} className="animate-pulse" /> <span>{match.currentMinute}</span></>}
+                          {match.sport === "basketball" && match.currentQuarter && <span>{match.currentQuarter} - {match.timeRemaining}</span>}
+                          {match.sport === "tennis" && match.currentSet && <span>{match.currentSet}</span>}
+                          {(!match.currentOver && !match.currentMinute && !match.currentQuarter && !match.currentSet) && (
+                            <span>IN PROGRESS</span>
+                          )}
+                        </div>
+                      )}
+                      {(!match.summaryText && !isLive) && (
+                         <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
+                           {isCompleted ? "MATCH ENDED" : "MATCH UPCOMING"}
+                         </span>
+                      )}
+                   </div>
+
+                   {/* Actions */}
+                   <div className="flex items-center gap-3">
+                       <button
+                           onClick={async () => {
+                               if (!match) return;
+                               try {
+                                 if (isFavorite && favoriteId) {
+                                   await favoritesApi.remove(favoriteId);
+                                   setIsFavorite(false);
+                                   setFavoriteId(null);
+                                   toast({ title: "Removed", description: "Match removed from favorites" });
+                                 } else {
+                                   const response = await favoritesApi.add({
+                                     matchId: match.id,
+                                     sport: match.sport,
+                                     teams: {
+                                       team1: match.homeTeam?.name || "Team 1",
+                                       team2: match.awayTeam?.name || "Team 2"
+                                     },
+                                     date: match.startTime instanceof Date 
+                                             ? match.startTime.toISOString() 
+                                             : new Date(match.startTime || Date.now()).toISOString(),
+                                     venue: typeof match.venue === 'object' ? match.venue?.name || "Venue" : match.venue || "Venue",
+                                     status: match.status
+                                   }) as any;
+                                   setIsFavorite(true);
+                                   setFavoriteId(response.data._id);
+                                   toast({ title: "Added", description: "Match added to favorites" });
+                                 }
+                               } catch (error: any) {
+                                 toast({
+                                   title: "Error",
+                                   description: error.response?.data?.message || "Failed to add to favorites.",
+                                   variant: "destructive"
+                                 });
+                               }
+                             }}
+                           className={cn(
+                               "flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-[11px] uppercase tracking-wider transition-all border",
+                               isFavorite ? "bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20" : "bg-background shadow-sm text-foreground border-border/40 hover:bg-secondary hover:border-border"
+                           )}
+                       >
+                           <Heart size={14} className={isFavorite ? "fill-current" : ""} />
+                           {isFavorite ? "Saved" : "Save"}
+                       </button>
+                       <button
+                           onClick={() => {
+                               if (navigator.share) {
+                                 navigator.share({
+                                   title: `${match?.homeTeam?.name} vs ${match?.awayTeam?.name}`,
+                                   text: `Check out the match: ${match?.homeTeam?.name} vs ${match?.awayTeam?.name} on SportsBuzz`,
+                                   url: window.location.href,
+                                 });
+                               }
+                             }}
+                           className="flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-[11px] uppercase tracking-wider transition-all border border-border/40 bg-background shadow-sm text-foreground hover:bg-secondary hover:border-border"
+                       >
+                           <Share2 size={14} />
+                           Share
+                       </button>
+                   </div>
+               </div>
+               
             </div>
           </div>
         </section>
