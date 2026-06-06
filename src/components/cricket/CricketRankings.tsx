@@ -21,10 +21,31 @@ const CATEGORY_API_MAP: Record<Exclude<Category, 'Teams'>, PlayerRankingCategory
 };
 
 // Medal styling for top 3
-const MEDAL_STYLES: Record<number, { bg: string; text: string; badge: string }> = {
-  1: { bg: 'bg-amber-500/10 border-amber-500/30', text: 'text-amber-400', badge: '🥇' },
-  2: { bg: 'bg-slate-400/10 border-slate-400/30', text: 'text-slate-300', badge: '🥈' },
-  3: { bg: 'bg-orange-700/10 border-orange-700/30', text: 'text-orange-500', badge: '🥉' },
+const MEDAL_STYLES: Record<number, { bg: string; text: string; badge: React.ReactNode }> = {
+  1: { bg: 'bg-[#FFD700]/10 border-[#FFD700]/30', text: 'text-[#FFD700]', badge: '🥇' },
+  2: { bg: 'bg-[#C0C0C0]/10 border-[#C0C0C0]/30', text: 'text-[#C0C0C0]', badge: '🥈' },
+  3: { bg: 'bg-[#CD7F32]/10 border-[#CD7F32]/30', text: 'text-[#CD7F32]', badge: '🥉' },
+};
+
+const COUNTRY_SHORT_NAMES: Record<string, string> = {
+  'New Zealand': 'NZ',
+  'Australia': 'AUS',
+  'India': 'IND',
+  'South Africa': 'RSA',
+  'England': 'ENG',
+  'Pakistan': 'PAK',
+  'Sri Lanka': 'SL',
+  'Bangladesh': 'BAN',
+  'Afghanistan': 'AFG',
+  'West Indies': 'WI',
+  'Ireland': 'IRE',
+  'Zimbabwe': 'ZIM',
+  'Netherlands': 'NED',
+  'Scotland': 'SCO',
+  'United Arab Emirates': 'UAE',
+  'United States of America': 'USA',
+  'Oman': 'OMA',
+  'Nepal': 'NEP'
 };
 
 const API_BASE = import.meta.env.PROD
@@ -349,10 +370,10 @@ export const CricketRankings = () => {
                       'py-2.5 px-3 border-y transition-all duration-300 font-medium',
                       medal ? `${medal.bg} group-hover:border-border/50` : 'bg-secondary/10 border-border/20 group-hover:border-border/50 group-hover:bg-secondary/30'
                     )}>
-                      <div className="flex items-center gap-2 min-w-0">
-                        <PlayerAvatar faceImageId={row.faceImageId} name={row.name} className="w-6 h-6" />
+                      <div className="flex items-center gap-3 min-w-0">
+                        <PlayerAvatar faceImageId={row.faceImageId} name={row.name} className="w-8 h-8" />
                         <span className={cn(
-                          'group-hover:text-primary transition-colors truncate max-w-[130px]',
+                          'group-hover:text-primary transition-colors truncate max-w-[160px] text-base font-semibold tracking-tight',
                           medal ? medal.text : 'text-foreground'
                         )}>
                           {row.name}
@@ -370,10 +391,10 @@ export const CricketRankings = () => {
                           flagCode={row.flagCode}
                           flagLocal={row.flagLocal}
                           country={row.country}
-                          className="w-5 h-3.5"
+                          className="w-7 h-5"
                         />
-                        <span className="text-muted-foreground truncate max-w-[80px] text-xs">
-                          {row.country}
+                        <span className="text-muted-foreground truncate max-w-[80px] text-sm font-medium tracking-wide">
+                          {COUNTRY_SHORT_NAMES[row.country] || row.country.slice(0,3).toUpperCase()}
                         </span>
                       </div>
                     </td>
