@@ -12,7 +12,8 @@ const API_BASE = import.meta.env.PROD
 const getImageUrl = (imageId: string | null) => {
   if (!imageId) return null;
   // Use public CDN directly to avoid RapidAPI rate limit (429) when loading multiple news images
-  return `https://static.cricbuzz.com/a/img/v1/i1/c${imageId}/i.jpg`;
+  // Using 1080x720 for high quality instead of default low-res thumbnail
+  return `https://static.cricbuzz.com/a/img/v1/1080x720/i1/c${imageId}/i.jpg`;
 };
 
 export const CricketNewsSection = () => {
@@ -152,7 +153,7 @@ export const CricketNewsSection = () => {
       </section>
 
       {/* Modal for full article */}
-      <DialogContent className="sm:max-w-[600px] border-border/50 bg-background/95 backdrop-blur-xl rounded-3xl">
+      <DialogContent className="sm:max-w-[700px] border-border/50 bg-background/95 backdrop-blur-xl rounded-3xl max-h-[85vh] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
         <DialogHeader className="space-y-4">
           <div className="flex items-center justify-between mt-2">
             <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">{selectedArticle?.source}</span>
