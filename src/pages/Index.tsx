@@ -330,9 +330,13 @@ const Index = () => {
 
           {/* Dynamic Sport-Specific Components */}
           {activeSport === "cricket" && (
-            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-12">
-              <CricketRankings />
-              <CricketNewsSection />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-12">
+              <div className="lg:col-span-2">
+                <CricketNewsSection />
+              </div>
+              <div className="lg:col-span-1">
+                <CricketRankings />
+              </div>
             </div>
           )}
 

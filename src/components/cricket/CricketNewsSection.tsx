@@ -1,107 +1,141 @@
 import { useState } from 'react';
-import { ChevronRight, Clock } from 'lucide-react';
-import { mockNewsData, type NewsItem } from '@/data/mockNewsData';
+import { ChevronRight, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { useCricketNews, type CricketNewsItem } from '@/hooks/useCricketNews';
 import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export const CricketNewsSection = () => {
-  const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
+  const { news, loading, error } = useCricketNews();
+  const [selectedArticle, setSelectedArticle] = useState<CricketNewsItem | null>(null);
 
-  const cricketNews = mockNewsData.filter(news => news.sport === 'cricket');
-  const marqueeData = [...cricketNews, ...cricketNews, ...cricketNews]; // Triple it to ensure enough items for marquee
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 bg-card/20 rounded-[2rem] border border-border/40">
+        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground">Loading latest cricket news...</p>
+      </div>
+    );
+  }
 
-  if (cricketNews.length === 0) return null;
+  if (error || !news || news.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 bg-card/20 rounded-[2rem] border border-red-500/20">
+        <AlertCircle className="w-8 h-8 text-red-500 mb-4" />
+        <p className="text-muted-foreground">Failed to load news or no news available.</p>
+      </div>
+    );
+  }
+
+  const featuredArticle = news[0];
+  const sideArticles = news.slice(1, 4); // Take next 3
 
   return (
     <Dialog open={!!selectedArticle} onOpenChange={(open) => !open && setSelectedArticle(null)}>
-      <section className="py-6 border-b border-border/40 bg-background/30 overflow-hidden">
-        <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
+      <section className="bg-card/20 rounded-[2rem] border border-border/40 p-6 md:p-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-primary/10 text-primary rounded-xl">
               <SportIcon sport="cricket" size={20} />
-              <h2 className="text-lg md:text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                Cricket News
-              </h2>
             </div>
-            <button className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors">
-              View All <ChevronRight size={16} />
-            </button>
-          </div>
-
-          {/* Marquee Container */}
-          <div className="relative flex overflow-hidden -mx-4 px-4 mask-edges">
-            <div 
-              className={cn(
-                "flex gap-4 w-max animate-marquee hover:[animation-play-state:paused]",
-                selectedArticle && "[animation-play-state:paused]"
-              )}
-            >
-              {marqueeData.map((news, index) => (
-                <div 
-                  key={`${news.id}-${index}`}
-                  onClick={() => setSelectedArticle(news)}
-                  className={cn(
-                    "min-w-[280px] md:min-w-[320px] max-w-[320px] flex-shrink-0 cursor-pointer",
-                    "group relative p-5 rounded-2xl border bg-card/40 backdrop-blur-sm border-border/40 hover:border-white/20",
-                    "hover:-translate-y-1 hover:shadow-lg transition-all duration-300"
-                  )}
-                >
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-[0.03] bg-white rounded-2xl transition-opacity duration-300 pointer-events-none" />
-
-                  <div className="relative z-10 flex flex-col h-full justify-between gap-3 pointer-events-none">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded">Update</span>
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium bg-secondary/50 px-2 py-0.5 rounded-full border border-border/50">
-                          <Clock size={12} />
-                          {news.timestamp}
-                        </div>
-                      </div>
-                      <h3 className="text-base font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                        {news.title}
-                      </h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                        {news.snippet}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div>
+              <h2 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">Top Stories</h2>
+              <p className="text-sm text-muted-foreground">Latest in the world of Cricket</p>
             </div>
           </div>
+          <button className="text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
+            View All <ChevronRight size={16} />
+          </button>
         </div>
 
-        {/* Modal for full article */}
-        <DialogContent className="sm:max-w-[500px] border-border/50 bg-background/95 backdrop-blur-xl">
-          <DialogHeader className="space-y-4">
-            <div className="flex items-center justify-between mt-2">
-              <SportIcon sport="cricket" size={24} />
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground font-medium bg-secondary/50 px-3 py-1 rounded-full border border-border/50">
-                <Clock size={14} />
-                {selectedArticle?.timestamp}
+        {/* Bento Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          
+          {/* Featured Article (Large) */}
+          {featuredArticle && (
+            <div 
+              onClick={() => setSelectedArticle(featuredArticle)}
+              className="md:col-span-7 group relative overflow-hidden rounded-3xl border border-border/40 bg-card/40 cursor-pointer min-h-[300px] flex flex-col justify-end p-6 hover:border-white/20 transition-all duration-500"
+            >
+              {/* Optional: Add image background here if available */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent z-10" />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent transition-opacity duration-500" />
+              
+              <div className="relative z-20 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-2.5 py-1 rounded-full">Featured</span>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                    <Clock size={12} />
+                    {featuredArticle.timestamp}
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                  {featuredArticle.headline || featuredArticle.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                  {featuredArticle.snippet}
+                </p>
+                <p className="text-xs font-semibold text-muted-foreground mt-2 uppercase tracking-wide">
+                  Via {featuredArticle.source}
+                </p>
               </div>
             </div>
-            <DialogTitle className="text-xl md:text-2xl leading-snug">{selectedArticle?.title}</DialogTitle>
-          </DialogHeader>
-          <div className="pt-4">
-            <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-              {selectedArticle?.snippet}
-            </p>
-            <div className="mt-6 p-4 rounded-xl bg-secondary/30 border border-border/50 text-sm text-muted-foreground text-center">
-              (Full article content would be fetched from a CMS and displayed here)
+          )}
+
+          {/* Side Articles (Vertical Stack) */}
+          <div className="md:col-span-5 flex flex-col gap-4">
+            {sideArticles.map((article, index) => (
+              <div 
+                key={article.id || index}
+                onClick={() => setSelectedArticle(article)}
+                className="group relative flex flex-col justify-center p-5 rounded-3xl border border-border/40 bg-card/40 cursor-pointer flex-1 hover:border-white/20 hover:bg-secondary/20 transition-all duration-300"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{article.source}</span>
+                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground font-medium">
+                      <Clock size={12} />
+                      {article.timestamp}
+                    </div>
+                  </div>
+                  <h4 className="text-sm font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                    {article.headline || article.title}
+                  </h4>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* Modal for full article */}
+      <DialogContent className="sm:max-w-[600px] border-border/50 bg-background/95 backdrop-blur-xl rounded-3xl">
+        <DialogHeader className="space-y-4">
+          <div className="flex items-center justify-between mt-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">{selectedArticle?.source}</span>
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground font-medium bg-secondary/50 px-3 py-1 rounded-full border border-border/50">
+              <Clock size={14} />
+              {selectedArticle?.timestamp}
             </div>
           </div>
-        </DialogContent>
-
-        <style>{`
-          .mask-edges {
-            -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-            mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-          }
-        `}</style>
-      </section>
+          <DialogTitle className="text-2xl md:text-3xl leading-snug">{selectedArticle?.headline || selectedArticle?.title}</DialogTitle>
+        </DialogHeader>
+        <div className="pt-4 space-y-4">
+          <p className="text-foreground/90 leading-relaxed text-base md:text-lg">
+            {selectedArticle?.snippet}
+          </p>
+          {selectedArticle?.context && (
+            <div className="mt-6 p-5 rounded-2xl bg-secondary/30 border border-border/50">
+              <h4 className="text-sm font-bold text-foreground mb-2">Context</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {selectedArticle.context}
+              </p>
+            </div>
+          )}
+        </div>
+      </DialogContent>
     </Dialog>
   );
 };
