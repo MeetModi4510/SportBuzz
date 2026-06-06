@@ -190,10 +190,10 @@ const Index = () => {
   const followedLiveMatches = useFollowedTournamentMatches(tournamentList);
   
   const liveCount = useMemo(() => {
-    const apiLiveCount = liveCricket?.filter(m => m.status === 'live').length || 0;
+    const apiLiveCount = liveCricketMatches?.length || 0;
     const followedLiveCount = followedLiveMatches.length;
     return apiLiveCount + followedLiveCount;
-  }, [liveCricket, followedLiveMatches]);
+  }, [liveCricketMatches, followedLiveMatches]);
 
 
   return (
