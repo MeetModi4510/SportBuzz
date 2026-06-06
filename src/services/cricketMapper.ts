@@ -93,6 +93,7 @@ export function mapApiMatchToModel(apiMatch: any): Match {
         id: apiMatch.id || Math.random().toString(36).substr(2, 9),
         sport: 'cricket',
         matchType: (apiMatch.matchType || apiMatch.type || 'CRICKET').toUpperCase(),
+        seriesName: apiMatch.seriesName || apiMatch.series_name || apiMatch.series || apiMatch.tournament?.name || apiMatch.tournament || 'Other Series',
         homeTeam: {
             id: `cricket-${team1Info.id || team1Name.replace(/\s+/g, '-')}`,
             name: team1Name,

@@ -31,6 +31,7 @@ export interface Match {
   venue: Venue;
   startTime: Date;
   matchType: string;
+  seriesName?: string;
   nameDescription?: string; // e.g. "2nd Quarter-Final"
   scoreBreakdown?: {
     home: { inn1?: string; inn2?: string };

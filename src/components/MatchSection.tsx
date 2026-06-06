@@ -49,6 +49,47 @@ export const MatchSection = ({
   }
 
   const liveMatches = matches.filter((m) => m.status === "live");
+
+  const renderMatchGroup = (groupMatches: Match[]) => {
+    if (groupMatches.length === 0) {
+      return (
+        <div className="text-sm text-muted-foreground italic py-6 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">
+          No matches in this category
+        </div>
+      );
+    }
+
+    // Group matches by seriesName
+    const grouped = groupMatches.reduce((acc, match) => {
+      let series = match.seriesName || "Other Matches";
+      if (typeof series !== 'string') series = "Other Matches";
+      
+      if (!acc[series]) {
+        acc[series] = [];
+      }
+      acc[series].push(match);
+      return acc;
+    }, {} as Record<string, Match[]>);
+
+    return (
+      <div className="space-y-10">
+        {Object.entries(grouped).map(([series, matchesInSeries]) => (
+          <div key={series} className="space-y-4">
+            <h3 className="text-sm font-bold text-foreground uppercase tracking-widest border-l-4 border-primary pl-3 py-1">
+              {series}
+            </h3>
+            <div className="flex overflow-x-auto snap-x gap-6 pb-6 pt-2">
+              {matchesInSeries.map(match => (
+                <div key={match.id} className="snap-start shrink-0 w-[300px] md:w-[380px] h-full flex flex-col transition-all hover:-translate-y-1">
+                  <MatchCard match={match} onClick={onMatchClick} />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
   
   if (onlyLive) {
     return (
@@ -77,15 +118,7 @@ export const MatchSection = ({
             No Live Matches
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {liveMatches.map((match) => (
-              <MatchCard
-                key={match.id}
-                match={match}
-                onClick={onMatchClick}
-              />
-            ))}
-          </div>
+          renderMatchGroup(liveMatches)
         )}
       </section>
     );
@@ -111,67 +144,6 @@ export const MatchSection = ({
     );
   }
 
-  const renderMatchGroup = (groupMatches: Match[]) => {
-    if (sport === "cricket") {
-      const test = groupMatches.filter((m) => m.matchType?.toLowerCase() === "test");
-      const odi = groupMatches.filter((m) => m.matchType?.toLowerCase() === "odi");
-      const t20 = groupMatches.filter((m) => {
-        const type = m.matchType?.toLowerCase() || '';
-        return type === "t20" || type === "t20i";
-      });
-      const other = groupMatches.filter((m) => {
-        const type = m.matchType?.toLowerCase() || '';
-        return type !== "test" && type !== "odi" && type !== "t20" && type !== "t20i";
-      });
-
-      const activeFormats = [
-        { name: "Test Matches", key: "test", data: test, color: "border-red-500" },
-        { name: "ODI Matches", key: "odi", data: odi, color: "border-blue-500" },
-        { name: "T20 Matches", key: "t20", data: t20, color: "border-green-500" },
-        { name: "Other Matches", key: "other", data: other, color: "border-purple-500" },
-      ].filter(format => format.data.length > 0);
-
-      if (activeFormats.length === 0) {
-        return <div className="text-sm text-muted-foreground italic py-6 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">No matches in this category</div>;
-      }
-
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-          {activeFormats.map(format => (
-            <div key={format.key} className="space-y-3">
-              <h3 className={cn("text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-2 pl-2", format.color)}>
-                {format.name}
-              </h3>
-              <div className="flex flex-col gap-4">
-                {format.data.map(match => (
-                  <MatchCard key={match.id} match={match} onClick={onMatchClick} />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    // Default for other sports
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {groupMatches.length > 0 ? (
-          groupMatches.map((match) => (
-            <MatchCard
-              key={match.id}
-              match={match}
-              onClick={onMatchClick}
-            />
-          ))
-        ) : (
-          <div className="col-span-full text-sm text-muted-foreground italic py-4 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">
-            No matches in this category
-          </div>
-        )}
-      </div>
-    );
-  };
 
   return (
     <section className={cn("space-y-8", className)}>
