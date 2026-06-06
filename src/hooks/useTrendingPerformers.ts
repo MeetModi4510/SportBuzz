@@ -29,9 +29,9 @@ export function useTrendingPerformers(liveMatches: Match[]) {
       // Process Batsmen
       inn.batsmen?.forEach((b: any) => {
         if (!b.name) return;
-        const runs = b.runs || 0;
-        const fours = b.fours || 0;
-        const sixes = b.sixes || 0;
+        const runs = Number(b.runs) || 0;
+        const fours = Number(b.fours) || 0;
+        const sixes = Number(b.sixes) || 0;
         const points = runs + (fours * 1) + (sixes * 2);
 
         if (playerMap.has(b.name)) {
@@ -57,10 +57,10 @@ export function useTrendingPerformers(liveMatches: Match[]) {
       // Process Bowlers
       inn.bowlers?.forEach((b: any) => {
         if (!b.name) return;
-        const wickets = b.wickets || 0;
-        const maidens = b.maidens || 0;
-        const runsConceded = b.runs || 0;
-        const overs = parseFloat(b.overs || 0);
+        const wickets = Number(b.wickets) || 0;
+        const maidens = Number(b.maidens) || 0;
+        const runsConceded = Number(b.runs) || 0;
+        const overs = parseFloat(b.overs || '0');
         const points = (wickets * 25) + (maidens * 12);
 
         if (playerMap.has(b.name)) {

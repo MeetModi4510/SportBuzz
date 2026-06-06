@@ -41,8 +41,17 @@ const Index = () => {
   // Fetch featured cricket data by format (Test, ODI, T20)
   // Using backend proxy for all data - optimized for API quota
   const { data: cricketData, isLoading: cricketLoading } = useFeaturedCricketMatches();
-  const { data: liveCricket } = useLiveCricketMatches();
-  const { trendingPlayers, sourceMatch } = useTrendingPerformers(liveCricket || []);
+  
+  const liveCricketMatches = useMemo(() => {
+    if (!cricketData) return [];
+    return [
+      ...(cricketData.test || []),
+      ...(cricketData.odi || []),
+      ...(cricketData.t20 || [])
+    ].filter(m => m.status === 'live');
+  }, [cricketData]);
+
+  const { trendingPlayers, sourceMatch } = useTrendingPerformers(liveCricketMatches);
 
   // Fetch REAL football data from Sofascore (15-min cache)
   const { data: footballDashboard, isLoading: footballLoading } = useFootballDashboard();
