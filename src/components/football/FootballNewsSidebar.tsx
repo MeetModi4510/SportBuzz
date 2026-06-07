@@ -1,8 +1,8 @@
 import { useFootballNews } from "../../hooks/football/useFootballQueries";
-import { Loader2, TrendingUp, Clock, ExternalLink, Newspaper } from "lucide-react";
+import { Loader2, Clock, Zap, Trophy, ArrowRightLeft, Shield, Globe } from "lucide-react";
 import { useState } from "react";
 
-// Hardcoded premium football news for when the API returns nothing
+// Curated fallback news when the API returns nothing
 const FALLBACK_NEWS = [
   {
     id: "fb-1",
@@ -10,176 +10,151 @@ const FALLBACK_NEWS = [
     summary: "The 48-team tournament across USA, Mexico, and Canada is set to be the biggest World Cup ever. Stadiums in all 16 host cities are now match-ready.",
     source: "FIFA",
     publishedAt: new Date().toISOString(),
-    image: null,
-    url: "#",
+    category: "world-cup",
   },
   {
     id: "fb-2",
     title: "Champions League final delivers an instant classic with dramatic late winner",
     summary: "A stoppage-time goal sends fans into delirium as the European crown changes hands in one of the most thrilling finals in recent memory.",
     source: "UEFA",
-    publishedAt: new Date(Date.now() - 3600000).toISOString(),
-    image: null,
-    url: "#",
+    publishedAt: new Date(Date.now() - 2 * 3600000).toISOString(),
+    category: "champions-league",
   },
   {
     id: "fb-3",
-    title: "Transfer window heats up: Record-breaking deal expected before deadline day",
+    title: "Record-breaking transfer deal expected before deadline day closes",
     summary: "Multiple top clubs are locked in negotiations for one of the most coveted attackers in world football, with a fee expected to surpass €150M.",
     source: "Transfer Intel",
-    publishedAt: new Date(Date.now() - 7200000).toISOString(),
-    image: null,
-    url: "#",
+    publishedAt: new Date(Date.now() - 5 * 3600000).toISOString(),
+    category: "transfers",
   },
   {
     id: "fb-4",
     title: "Premier League clubs begin pre-season preparations ahead of new campaign",
     summary: "Squads are being assembled, new signings are settling in, and managers are finalising their tactical blueprints for the season ahead.",
-    source: "PL",
-    publishedAt: new Date(Date.now() - 14400000).toISOString(),
-    image: null,
-    url: "#",
+    source: "Premier League",
+    publishedAt: new Date(Date.now() - 12 * 3600000).toISOString(),
+    category: "league",
   },
   {
     id: "fb-5",
-    title: "Emerging talent spotlight: Five young stars ready to break through this season",
+    title: "Five young stars ready to break through this season across Europe's top leagues",
     summary: "From La Masia graduates to Bundesliga wonderkids, these five players are tipped for stardom by scouts across Europe.",
-    source: "Scouting",
-    publishedAt: new Date(Date.now() - 21600000).toISOString(),
-    image: null,
-    url: "#",
+    source: "Scouting Report",
+    publishedAt: new Date(Date.now() - 18 * 3600000).toISOString(),
+    category: "talent",
+  },
+  {
+    id: "fb-6",
+    title: "International friendlies wrap-up — Key tactical takeaways from latest matches",
+    summary: "National team coaches are trialling new formations and giving debuts to emerging talent ahead of the major tournament.",
+    source: "International",
+    publishedAt: new Date(Date.now() - 24 * 3600000).toISOString(),
+    category: "international",
   },
 ];
 
-// Source badge color map for a premium feel
-const SOURCE_COLORS: Record<string, string> = {
-  FIFA: "from-amber-500/20 to-amber-600/10 text-amber-400 border-amber-500/30",
-  UEFA: "from-blue-500/20 to-blue-600/10 text-blue-400 border-blue-500/30",
-  "Transfer Intel": "from-emerald-500/20 to-emerald-600/10 text-emerald-400 border-emerald-500/30",
-  PL: "from-purple-500/20 to-purple-600/10 text-purple-400 border-purple-500/30",
-  Scouting: "from-cyan-500/20 to-cyan-600/10 text-cyan-400 border-cyan-500/30",
-};
-
-function getSourceColor(source: string) {
-  return SOURCE_COLORS[source] || "from-white/10 to-white/5 text-white/70 border-white/20";
-}
+// Visual themes for each card position — creates variety without images
+const CARD_THEMES = [
+  { gradient: "from-amber-500/15 via-orange-500/8 to-transparent", accent: "text-amber-400", border: "border-amber-500/20", icon: Trophy },
+  { gradient: "from-blue-500/15 via-indigo-500/8 to-transparent", accent: "text-blue-400", border: "border-blue-500/20", icon: Shield },
+  { gradient: "from-emerald-500/15 via-teal-500/8 to-transparent", accent: "text-emerald-400", border: "border-emerald-500/20", icon: ArrowRightLeft },
+  { gradient: "from-purple-500/15 via-violet-500/8 to-transparent", accent: "text-purple-400", border: "border-purple-500/20", icon: Zap },
+  { gradient: "from-cyan-500/15 via-sky-500/8 to-transparent", accent: "text-cyan-400", border: "border-cyan-500/20", icon: Globe },
+  { gradient: "from-rose-500/15 via-pink-500/8 to-transparent", accent: "text-rose-400", border: "border-rose-500/20", icon: Trophy },
+];
 
 function timeAgo(dateStr: string) {
-  const now = Date.now();
-  const then = new Date(dateStr).getTime();
-  const diff = Math.max(0, now - then);
+  const diff = Math.max(0, Date.now() - new Date(dateStr).getTime());
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return "Just now";
   if (mins < 60) return `${mins}m ago`;
   const hours = Math.floor(mins / 60);
   if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
+  return `${Math.floor(hours / 24)}d ago`;
 }
 
 export function FootballNewsSidebar() {
   const { data: apiNews, isLoading } = useFootballNews();
-  const [imgErrors, setImgErrors] = useState<Set<string>>(new Set());
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
   const news = apiNews && apiNews.length > 0 ? apiNews : FALLBACK_NEWS;
 
-  const handleImgError = (id: string) => {
-    setImgErrors(prev => new Set(prev).add(id));
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="w-5 h-5 animate-spin text-white/30" />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      {isLoading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-5 h-5 animate-spin text-white/30" />
-        </div>
-      ) : (
-        <>
-          {/* Featured / Hero card */}
-          {news.length > 0 && (
-            <a
-              href={news[0].url || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-500"
-            >
-              {/* Image or gradient placeholder */}
-              {news[0].image && !imgErrors.has(news[0].id) ? (
-                <div className="relative aspect-[2.2/1] overflow-hidden">
-                  <img
-                    src={news[0].image}
-                    alt={news[0].title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                    onError={() => handleImgError(news[0].id)}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {news.slice(0, 6).map((item: any, idx: number) => {
+        const theme = CARD_THEMES[idx % CARD_THEMES.length];
+        const IconComponent = theme.icon;
+        const isHovered = hoveredIdx === idx;
+        const isFirst = idx === 0;
+
+        return (
+          <div
+            key={item.id || idx}
+            className={`
+              group relative overflow-hidden rounded-2xl border transition-all duration-500 cursor-pointer
+              ${isFirst ? "md:col-span-2 lg:col-span-2" : ""}
+              ${isHovered ? `${theme.border} bg-white/[0.03] scale-[1.01]` : "border-white/[0.05] bg-white/[0.015]"}
+            `}
+            onMouseEnter={() => setHoveredIdx(idx)}
+            onMouseLeave={() => setHoveredIdx(null)}
+          >
+            {/* Gradient background glow */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+            
+            {/* Decorative icon */}
+            <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-700">
+              <IconComponent size={isFirst ? 140 : 100} strokeWidth={0.5} />
+            </div>
+
+            {/* Content */}
+            <div className={`relative z-10 ${isFirst ? "p-7" : "p-5"}`}>
+              {/* Top row: source + time */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-1.5 h-1.5 rounded-full ${theme.accent.replace("text-", "bg-")} group-hover:animate-pulse`} />
+                  <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${theme.accent} opacity-80`}>
+                    {item.source}
+                  </span>
                 </div>
-              ) : (
-                <div className="relative aspect-[2.5/1] overflow-hidden bg-gradient-to-br from-white/[0.04] via-white/[0.02] to-transparent">
-                  <div className="absolute inset-0 flex items-center justify-center opacity-[0.04]">
-                    <Newspaper size={120} strokeWidth={0.5} />
-                  </div>
-                </div>
+                <span className="text-[10px] text-white/25 font-medium flex items-center gap-1">
+                  <Clock size={9} />
+                  {timeAgo(item.publishedAt)}
+                </span>
+              </div>
+
+              {/* Title */}
+              <h3 className={`
+                font-bold leading-tight text-white/90 group-hover:text-white transition-colors duration-300
+                ${isFirst ? "text-xl md:text-2xl" : "text-sm"}
+              `}>
+                {item.title}
+              </h3>
+
+              {/* Summary — only for larger cards */}
+              {(isFirst || idx < 3) && (
+                <p className={`
+                  text-white/35 leading-relaxed mt-3 group-hover:text-white/45 transition-colors duration-300
+                  ${isFirst ? "text-sm line-clamp-3" : "text-xs line-clamp-2"}
+                `}>
+                  {item.summary}
+                </p>
               )}
 
-              <div className="p-5 -mt-12 relative z-10">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className={`text-[10px] font-bold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full border bg-gradient-to-r ${getSourceColor(news[0].source)}`}>
-                    {news[0].source}
-                  </span>
-                  <span className="text-[10px] text-white/30 font-medium flex items-center gap-1">
-                    <Clock size={9} />
-                    {timeAgo(news[0].publishedAt)}
-                  </span>
-                </div>
-                <h3 className="text-lg font-bold leading-tight text-white group-hover:text-white/90 transition-colors line-clamp-2">
-                  {news[0].title}
-                </h3>
-                <p className="text-xs text-white/40 mt-2 line-clamp-2 leading-relaxed">
-                  {news[0].summary}
-                </p>
-              </div>
-            </a>
-          )}
-
-          {/* Remaining news items — compact list */}
-          <div className="grid gap-1">
-            {news.slice(1).map((item, idx) => (
-              <a
-                key={item.id || idx}
-                href={item.url || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-start gap-4 p-4 rounded-xl border border-transparent hover:border-white/[0.06] hover:bg-white/[0.02] transition-all duration-300"
-              >
-                {/* Number indicator */}
-                <div className="shrink-0 w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[11px] font-bold text-white/25 group-hover:text-white/50 group-hover:border-white/10 transition-all">
-                  {String(idx + 2).padStart(2, "0")}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className={`text-[9px] font-bold uppercase tracking-[0.12em] px-2 py-0.5 rounded-full border bg-gradient-to-r ${getSourceColor(item.source)}`}>
-                      {item.source}
-                    </span>
-                    <span className="text-[10px] text-white/25 font-medium">
-                      {timeAgo(item.publishedAt)}
-                    </span>
-                  </div>
-                  <h4 className="text-sm font-semibold text-white/80 leading-snug line-clamp-2 group-hover:text-white transition-colors">
-                    {item.title}
-                  </h4>
-                </div>
-
-                <ExternalLink
-                  size={12}
-                  className="shrink-0 mt-1 text-white/10 group-hover:text-white/30 transition-colors"
-                />
-              </a>
-            ))}
+              {/* Bottom accent line */}
+              <div className={`mt-4 h-px bg-gradient-to-r ${theme.gradient} opacity-0 group-hover:opacity-60 transition-opacity duration-500`} />
+            </div>
           </div>
-        </>
-      )}
+        );
+      })}
     </div>
   );
 }
