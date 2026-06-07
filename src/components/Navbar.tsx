@@ -30,6 +30,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Sidebar from "@/components/layout/Sidebar";
 import NotificationPopover from "./NotificationPopover";
 import { tournamentApi, teamApi } from "@/services/api";
 
@@ -205,19 +207,32 @@ export const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-lg">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative">
-              <Zap className="h-8 w-8 text-primary transition-transform group-hover:scale-110" fill="currentColor" />
-              <div className="absolute inset-0 bg-primary/30 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-            <span className="text-xl font-bold gradient-text font-display">SportsBuzz</span>
-          </Link>
+          {/* Drawer & Logo */}
+          <div className="flex items-center gap-3">
+            <Sheet>
+              <SheetTrigger asChild>
+                <button className="p-2 -ml-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors" aria-label="Open Sidebar">
+                  <Menu size={24} />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="left" className="p-0 w-72 border-r border-border/50 bg-card/95 backdrop-blur-md">
+                <Sidebar className="w-full lg:flex h-full border-r-0 bg-transparent flex" />
+              </SheetContent>
+            </Sheet>
+
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="relative">
+                <Zap className="h-8 w-8 text-primary transition-transform group-hover:scale-110" fill="currentColor" />
+                <div className="absolute inset-0 bg-primary/30 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+              <span className="text-xl font-bold gradient-text font-display">SportsBuzz</span>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
             <NavItem to="/" icon={<Home size={18} />} label="Dashboard" isActive={location.pathname === "/"} />
-            <NavItem to="/football" icon={<SportIcon sport="football" size={18} />} label="Football Hub" isActive={location.pathname.startsWith("/football")} />
+
             <NavItem to="/performance-lab" icon={<BarChart3 size={18} />} label="Performance Lab" isActive={location.pathname === "/performance-lab"} />
             <NavItem to="/create" icon={<PlusCircle size={18} />} label="Create" isActive={location.pathname === "/create"} />
           </nav>

@@ -23,8 +23,24 @@ export const PRIORITY_LEAGUES = [
   10, // Friendlies
   15, // FIFA World Cup Qualifiers
   21, // Friendlies - Men
-  666, // Friendlies Women
 ];
+
+const isMensFootball = (match: FootballMatch) => {
+  const leagueName = (match.league?.name || '').toLowerCase();
+  const homeName = (match.teams?.home?.name || '').toLowerCase();
+  const awayName = (match.teams?.away?.name || '').toLowerCase();
+  
+  // RegEx to check for U-17, U17, U 17, U20, U19, U21, etc.
+  const youthRegex = /\bu[- ]?(17|19|20|21)\b/i;
+  // RegEx to check for Women, (W), or ' W' at the end
+  const womenRegex = /\bwomen\b|\(w\)| w$/i;
+
+  if (youthRegex.test(leagueName) || womenRegex.test(leagueName)) return false;
+  if (youthRegex.test(homeName) || womenRegex.test(homeName)) return false;
+  if (youthRegex.test(awayName) || womenRegex.test(awayName)) return false;
+  
+  return true;
+};
 
 export const footballApi = {
   async getLiveMatches(forceRefresh = false): Promise<FootballMatch[]> {
@@ -42,8 +58,8 @@ export const footballApi = {
 
     let matches: FootballMatch[] = response.data.response || [];
     
-    // Filter to only prioritize leagues requested
-    matches = matches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
+    // Filter to only prioritize leagues requested and ensure it's men's football
+    matches = matches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id) && isMensFootball(m));
     
     // Cache live matches for 15 minutes to save API limits
     cacheManager.set(cacheKey, matches, 15);
@@ -76,7 +92,7 @@ export const footballApi = {
       }
     }
 
-    const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
+    const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id) && isMensFootball(m));
     cacheManager.set(cacheKey, priorityMatches, 15);
     return priorityMatches;
   },
@@ -107,7 +123,7 @@ export const footballApi = {
       }
     }
 
-    const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
+    const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id) && isMensFootball(m));
     const upcomingPriority = priorityMatches.filter(m => !['FT', 'AET', 'PEN', '1H', '2H', 'HT', 'LIVE'].includes(m.fixture?.status?.short));
     
     cacheManager.set(cacheKey, upcomingPriority, 15);

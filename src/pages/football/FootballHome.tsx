@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Navbar } from "../../components/Navbar";
-import Sidebar from "../../components/layout/Sidebar";
 import { FootballMatchCard } from "../../components/football/FootballMatchCard";
 import { useLiveFootballMatches, useRecentFootballMatches, useUpcomingFootballMatches } from "../../hooks/football/useFootballQueries";
 import { Loader2, RefreshCw } from "lucide-react";
@@ -74,13 +73,10 @@ export default function FootballHome() {
         <meta name="description" content="Live football scores, recent results, and upcoming fixtures from top global leagues." />
       </Helmet>
 
-      <div className="min-h-screen flex bg-background">
-        <Sidebar />
-        
-        <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
-          <Navbar />
+      <div className="min-h-screen bg-background">
+        <Navbar />
 
-          <main className="container mx-auto px-4 py-6 space-y-8 flex-1">
+        <main className="container mx-auto px-4 py-6 space-y-8">
           {/* Header & Controls */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-border/40 pb-4">
             <h1 className="text-3xl font-bold font-display tracking-tight text-foreground">Football Hub</h1>
@@ -149,7 +145,6 @@ export default function FootballHome() {
             </div>
           )}
         </main>
-        </div>
       </div>
     </>
   );
