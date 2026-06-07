@@ -46,17 +46,17 @@ export function TransferCard({ transferData }: TransferCardProps) {
   };
 
   return (
-    <div className="group relative w-[380px] shrink-0 cursor-pointer rounded-xl bg-[#111111] border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 shadow-lg overflow-hidden flex flex-col">
+    <div className="group relative w-[420px] shrink-0 cursor-pointer rounded-xl bg-[#111111] border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 shadow-lg overflow-hidden flex flex-col min-h-[180px]">
       
       {/* Top Accent Line */}
       <div className={`w-full h-1 ${accentColor} opacity-80`} />
 
-      <div className="p-4 flex flex-col h-full relative z-10">
+      <div className="p-5 flex flex-col h-full relative z-10">
         
         {/* Header section */}
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-[#1a1a1a] border border-white/10 flex items-center justify-center shrink-0">
+        <div className="flex justify-between items-start mb-5">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-[#1a1a1a] border border-white/10 flex items-center justify-center shrink-0">
               {!imgError && player.photo ? (
                 <img 
                   src={player.photo} 
@@ -69,33 +69,33 @@ export function TransferCard({ transferData }: TransferCardProps) {
               )}
             </div>
             <div>
-              <h3 className="text-base font-black text-white tracking-tight uppercase leading-none mb-1 line-clamp-1">{player.name}</h3>
-              <div className="flex items-center gap-1.5 text-[10px] font-semibold text-white/40 tracking-wider">
-                <CalendarDays size={10} />
+              <h3 className="text-lg font-black text-white tracking-tight uppercase leading-none mb-1.5 line-clamp-1">{player.name}</h3>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-white/40 tracking-wider">
+                <CalendarDays size={12} />
                 <span>{formattedDate}</span>
               </div>
             </div>
           </div>
           
-          <div className={`px-2 py-1 rounded bg-[#1a1a1a] border border-white/5 text-[10px] font-black tracking-widest uppercase ${textColor}`}>
+          <div className={`px-3 py-1.5 rounded bg-[#1a1a1a] border border-white/5 text-xs font-black tracking-widest uppercase ${textColor}`}>
             {priceDisplay}
           </div>
         </div>
 
         {/* Transfer Path Box */}
-        <div className="mt-auto bg-[#0a0a0a] rounded-lg p-3 border border-white/5 flex items-center justify-between group-hover:bg-[#161616] transition-colors">
-          <div className="flex items-center gap-2 max-w-[40%]">
+        <div className="mt-auto bg-[#0a0a0a] rounded-lg p-3.5 border border-white/5 flex items-center justify-between group-hover:bg-[#161616] transition-colors">
+          <div className="flex items-center gap-3 max-w-[40%]">
             {renderTeamLogo(latestTransfer.teams.out)}
-            <span className="text-[10px] font-bold text-white/70 uppercase tracking-wide truncate">{latestTransfer.teams.out.name}</span>
+            <span className="text-xs font-bold text-white/70 uppercase tracking-wide truncate">{latestTransfer.teams.out.name}</span>
           </div>
 
           <div className="text-white/20 shrink-0 mx-2">
-            <ArrowRight size={14} className="opacity-70 group-hover:text-white/50 group-hover:translate-x-1 transition-all" />
+            <ArrowRight size={16} className="opacity-70 group-hover:text-white/50 group-hover:translate-x-1 transition-all" />
           </div>
 
-          <div className="flex items-center gap-2 max-w-[40%] flex-row-reverse text-right">
+          <div className="flex items-center gap-3 max-w-[40%] flex-row-reverse text-right">
             {renderTeamLogo(latestTransfer.teams.in)}
-            <span className="text-[10px] font-black text-white uppercase tracking-wide truncate">{latestTransfer.teams.in.name}</span>
+            <span className="text-xs font-black text-white uppercase tracking-wide truncate">{latestTransfer.teams.in.name}</span>
           </div>
         </div>
 
