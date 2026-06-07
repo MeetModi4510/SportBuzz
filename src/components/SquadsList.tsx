@@ -1,7 +1,7 @@
 
 import { TeamLogo } from "@/components/TeamLogo";
 import { FootballPitchLineup } from "@/components/FootballPitchLineup";
-import { useFootballMatchSquads } from "@/hooks/useFootballMatches";
+// Deleted hook import
 import { CricketPlayerImage } from "@/components/CricketPlayerImage";
 import { Loader2, Users } from "lucide-react";
 import type { Match } from "@/data/types";
@@ -289,7 +289,9 @@ const CricketSquads = ({ match, matchData, isLoading }: { match: Match; matchDat
 };
 
 const FootballSquads = ({ match }: { match: Match }) => {
-    const { data: squads, isLoading } = useFootballMatchSquads(match.id);
+    // Legacy API removed. We now use the new football module for new matches.
+    const squads = undefined;
+    const isLoading = false;
 
     if (isLoading) {
         return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;

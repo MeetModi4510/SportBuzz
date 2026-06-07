@@ -6,7 +6,6 @@ import { TeamLogo } from "@/components/TeamLogo";
 import { matches, players } from "@/data/mockData";
 import { useCricketMatchDetails, useCricketMatchSquads } from "@/hooks/useCricketMatches";
 import { useCricketDataMatch } from "@/hooks/useCricketDataMatch";
-import { useFootballMatchDetail } from "@/hooks/useFootballMatches";
 import { useMatchFieldData } from "@/hooks/useMatchFieldData";
 import { cn } from "@/lib/utils";
 import {
@@ -166,7 +165,9 @@ const MatchDetails = () => {
   } = useCricketMatchDetails(isCricketMatch ? id?.replace("cricket-", "") : undefined);
 
   // ── Football Hook ──
-  const { data: footballMatchData, isLoading: footballLoading } = useFootballMatchDetail(isFootballMatch ? id : undefined);
+  // Football matches now route to /football/match/:id.
+  const footballMatchData = undefined;
+  const footballLoading = false;
 
   // Find mock match for other sports
   const mockMatch = matches.find((m) => m.id === id);
