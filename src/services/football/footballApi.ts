@@ -168,8 +168,21 @@ export const footballApi = {
     }
 
     try {
-      const response = await api.get('/football/news');
-      const news = response.data || [];
+      // Use the new RapidAPI live-news endpoint
+      const response: any = await api.get('/football/live-news');
+      // Because api.ts response interceptor auto-unwraps response.data,
+      // response is already { success: true, data: [...] }
+      const rawNews = response?.data || [];
+      
+      // Map RapidAPI headline to title for the sidebar component
+      const news = Array.isArray(rawNews) ? rawNews.map((item: any) => ({
+        ...item,
+        title: item.headLine || item.headline || 'Football News',
+        summary: item.summary || 'Click to read full story on SportsBuzz Football.',
+        source: item.source || 'RapidAPI',
+        publishedAt: item.publishedAt || new Date().toISOString(),
+      })) : [];
+      
       cacheManager.set(cacheKey, news, 30); // Cache for 30 minutes
       return news;
     } catch (error) {
