@@ -10,6 +10,7 @@ interface SidebarProps {
 const mainNavItems = [
   { title: "Dashboard", icon: Home, path: "/" },
   { title: "Football Hub", icon: Trophy, path: "/football" },
+  { title: "Cricket Center", icon: Activity, path: "/cricket" },
   { title: "Performance Lab", icon: Activity, path: "/performance-lab" },
 ];
 

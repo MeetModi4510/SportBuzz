@@ -44,6 +44,7 @@ import FootballPlayerProfile from "./pages/football/FootballPlayerProfile";
 import FootballHome from "./pages/football/FootballHome";
 import MatchCenter from "./pages/football/MatchCenter";
 import PlayerProfile from "./pages/football/PlayerProfile";
+import CricketHome from "./pages/cricket/CricketHome";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -234,6 +235,9 @@ const App = () => {
               <Route path="/auction/owner/:id" element={<OwnerPanel />} />
               <Route path="/auction/live/:id" element={<LiveAuction />} />
               <Route path="/auction/analytics/:id" element={<ProtectedRoute><AuctionAnalytics /></ProtectedRoute>} />
+
+              {/* Cricket Routes */}
+              <Route path="/cricket" element={<ProtectedRoute><CricketHome /></ProtectedRoute>} />
 
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
