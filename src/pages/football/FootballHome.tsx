@@ -158,7 +158,7 @@ export default function FootballHome() {
               </div>
             ) : (
               <div className="relative overflow-hidden w-full group py-4 -mx-4 px-4 md:mx-0 md:px-0">
-                <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-6">
+                <div className="flex w-max animate-[marquee_120s_linear_infinite] hover:[animation-play-state:paused] gap-6">
                   {/* Duplicate the array twice to ensure a seamless infinite scroll loop */}
                   {[...recentTransfers, ...recentTransfers, ...recentTransfers, ...recentTransfers].map((transfer, idx) => (
                     <div key={idx} className="shrink-0">
