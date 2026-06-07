@@ -12,7 +12,7 @@ const RAPID_BASE = `https://${RAPID_API_HOST}`;
 
 // Read key dynamically so hot-reload / env changes work without restart
 function getHeaders() {
-    const key = process.env.FOOTBALL_RAPIDAPI_KEY || 'ea08b9a9d5msh0ce1b811a3294e7p19b61bjsnb06b82498cf2';
+    const key = process.env.FOOTBALL_RAPIDAPI_KEY;
     return {
         'x-rapidapi-key': key,
         'x-rapidapi-host': RAPID_API_HOST
@@ -309,6 +309,7 @@ export async function getGlobalFootballNews() {
     ];
 }
 
+
 export async function getFootballLiveNews() {
     const cacheKey = 'footballLiveNews';
     const TTL = 60 * 60 * 1000; // 1 hour cache
@@ -319,7 +320,7 @@ export async function getFootballLiveNews() {
     try {
         const res = await axios.get('https://fotmob-api.p.rapidapi.com/api/v1/news/trending?ccode3=USA', {
             headers: {
-                'x-rapidapi-key': process.env.football_news || 'ea08b9a9d5msh0ce1b811a3294e7p19b61bjsnb06b82498cf2',
+                'x-rapidapi-key': process.env.football_news,
                 'x-rapidapi-host': 'fotmob-api.p.rapidapi.com'
             },
             timeout: 10000
