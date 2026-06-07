@@ -41,6 +41,9 @@ import FootballPointsTable from "./pages/football/FootballPointsTable";
 import FootballMatchResult from "./pages/football/FootballMatchResult";
 import FootballTeamProfile from "./pages/football/FootballTeamProfile";
 import FootballPlayerProfile from "./pages/football/FootballPlayerProfile";
+import FootballHome from "./pages/football/FootballHome";
+import MatchCenter from "./pages/football/MatchCenter";
+import PlayerProfile from "./pages/football/PlayerProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -212,6 +215,9 @@ const App = () => {
               />
 
               {/* Football Routes */}
+              <Route path="/football" element={<ProtectedRoute><FootballHome /></ProtectedRoute>} />
+              <Route path="/football/match/:id" element={<ProtectedRoute><MatchCenter /></ProtectedRoute>} />
+              <Route path="/football/player/:id" element={<ProtectedRoute><PlayerProfile /></ProtectedRoute>} />
               <Route path="/football/tournament/create" element={<ProtectedRoute><FootballTournamentCreate /></ProtectedRoute>} />
               <Route path="/football/tournament/:id" element={<ProtectedRoute><FootballTournamentDetails /></ProtectedRoute>} />
               <Route path="/football/score/football/:id" element={<ProtectedRoute><FootballScoringPanel /></ProtectedRoute>} />

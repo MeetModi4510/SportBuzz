@@ -217,6 +217,7 @@ export const Navbar = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
             <NavItem to="/" icon={<Home size={18} />} label="Dashboard" isActive={location.pathname === "/"} />
+            <NavItem to="/football" icon={<SportIcon sport="football" size={18} />} label="Football Hub" isActive={location.pathname.startsWith("/football")} />
             <NavItem to="/performance-lab" icon={<BarChart3 size={18} />} label="Performance Lab" isActive={location.pathname === "/performance-lab"} />
             <NavItem to="/create" icon={<PlusCircle size={18} />} label="Create" isActive={location.pathname === "/create"} />
           </nav>
