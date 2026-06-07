@@ -46,7 +46,7 @@ export function TransferCard({ transferData }: TransferCardProps) {
   };
 
   return (
-    <div className="group relative w-[340px] shrink-0 cursor-pointer rounded-xl bg-[#111111] border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 shadow-lg overflow-hidden flex flex-col">
+    <div className="group relative w-[380px] shrink-0 cursor-pointer rounded-xl bg-[#111111] border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 shadow-lg overflow-hidden flex flex-col">
       
       {/* Top Accent Line */}
       <div className={`w-full h-1 ${accentColor} opacity-80`} />

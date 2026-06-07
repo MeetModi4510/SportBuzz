@@ -157,12 +157,15 @@ export default function FootballHome() {
                 <p className="text-white/40 font-medium">No transfers available.</p>
               </div>
             ) : (
-              <div className="flex overflow-x-auto gap-6 pb-10 pt-4 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-4 items-center">
-                {recentTransfers.map((transfer, idx) => (
-                  <div key={idx} className="snap-center shrink-0">
-                    <TransferCard transferData={transfer} />
-                  </div>
-                ))}
+              <div className="relative overflow-hidden w-full group py-4 -mx-4 px-4 md:mx-0 md:px-0">
+                <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-6">
+                  {/* Duplicate the array twice to ensure a seamless infinite scroll loop */}
+                  {[...recentTransfers, ...recentTransfers, ...recentTransfers, ...recentTransfers].map((transfer, idx) => (
+                    <div key={idx} className="shrink-0">
+                      <TransferCard transferData={transfer} />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </section>
