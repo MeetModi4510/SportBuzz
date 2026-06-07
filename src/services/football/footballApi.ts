@@ -240,14 +240,14 @@ export const footballApi = {
         return PRIORITY_CLUBS.some(club => outName.includes(club) || inName.includes(club));
       });
 
-      // Show transfers of 1 week in one go
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      // Show transfers from the last 30 days
+      const pastDate = new Date();
+      pastDate.setDate(pastDate.getDate() - 30);
       
       const recentPriorityTransfers = priorityTransfers.filter(t => {
         if (!t.transfers || t.transfers.length === 0) return false;
         const transferDate = new Date(t.transfers[0].date);
-        return transferDate >= oneWeekAgo;
+        return transferDate >= pastDate;
       });
 
       if (recentPriorityTransfers.length > 0) {
