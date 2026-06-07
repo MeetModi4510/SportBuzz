@@ -1,14 +1,15 @@
-import { FootballLineup, FootballTeam } from "../../types/football";
+import { FootballLineup, FootballTeam, FootballEvent } from "../../types/football";
 import { TeamLogo } from "../TeamLogo";
-import { Users } from "lucide-react";
+import { Users, ArrowUp, ArrowDown } from "lucide-react";
 
 interface MatchLineupsProps {
   lineups: FootballLineup[];
   homeTeam: FootballTeam;
   awayTeam: FootballTeam;
+  events?: FootballEvent[];
 }
 
-export function MatchLineups({ lineups, homeTeam, awayTeam }: MatchLineupsProps) {
+export function MatchLineups({ lineups, homeTeam, awayTeam, events = [] }: MatchLineupsProps) {
   if (!lineups || lineups.length !== 2) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground bg-secondary/10 rounded-xl border border-border/30">
@@ -128,24 +129,28 @@ export function MatchLineups({ lineups, homeTeam, awayTeam }: MatchLineupsProps)
       </div>
 
       {/* Substitutes & Manager */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 items-stretch">
         {/* Home Subs */}
-        <div className="space-y-6">
-          <div className="space-y-4">
+        <div className="flex flex-col h-full space-y-6">
+          <div className="flex-1 space-y-4">
             <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-2">Substitutes</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {homeLineup.substitutes.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3 bg-secondary/10 p-2 rounded-lg border border-border/20">
-                  <span className="w-6 h-6 rounded-full bg-background border border-border/30 flex items-center justify-center text-[10px] font-bold opacity-70">
-                    {item.player.number}
-                  </span>
-                  <p className="font-medium text-xs flex-1 opacity-90 truncate">{item.player.name}</p>
-                </div>
-              ))}
+              {homeLineup.substitutes.map((item, idx) => {
+                const isSubbedIn = events.some(e => e.type === "subst" && e.team.id === homeTeam.id && e.player.id === item.player.id);
+                return (
+                  <div key={idx} className="flex items-center gap-3 bg-secondary/10 p-2 rounded-lg border border-border/20">
+                    <span className="w-6 h-6 rounded-full bg-background border border-border/30 flex items-center justify-center text-[10px] font-bold opacity-70">
+                      {item.player.number}
+                    </span>
+                    <p className="font-medium text-xs flex-1 opacity-90 truncate">{item.player.name}</p>
+                    {isSubbedIn && <ArrowUp className="w-4 h-4 text-green-500" />}
+                  </div>
+                );
+              })}
             </div>
           </div>
-          <div className="bg-secondary/20 p-4 rounded-xl border border-border/40 flex items-center gap-4">
-             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+          <div className="bg-secondary/20 p-4 rounded-xl border border-border/40 flex items-center gap-4 mt-auto">
+             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 shrink-0">
                <Users className="w-5 h-5 text-primary" />
              </div>
              <div>
@@ -156,22 +161,26 @@ export function MatchLineups({ lineups, homeTeam, awayTeam }: MatchLineupsProps)
         </div>
 
         {/* Away Subs */}
-        <div className="space-y-6">
-          <div className="space-y-4">
+        <div className="flex flex-col h-full space-y-6">
+          <div className="flex-1 space-y-4">
             <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-2 md:text-right">Substitutes</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {awayLineup.substitutes.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3 bg-secondary/10 p-2 rounded-lg border border-border/20 md:flex-row-reverse md:text-right">
-                  <span className="w-6 h-6 rounded-full bg-background border border-border/30 flex items-center justify-center text-[10px] font-bold opacity-70">
-                    {item.player.number}
-                  </span>
-                  <p className="font-medium text-xs flex-1 opacity-90 truncate">{item.player.name}</p>
-                </div>
-              ))}
+              {awayLineup.substitutes.map((item, idx) => {
+                const isSubbedIn = events.some(e => e.type === "subst" && e.team.id === awayTeam.id && e.player.id === item.player.id);
+                return (
+                  <div key={idx} className="flex items-center gap-3 bg-secondary/10 p-2 rounded-lg border border-border/20 md:flex-row-reverse md:text-right">
+                    <span className="w-6 h-6 rounded-full bg-background border border-border/30 flex items-center justify-center text-[10px] font-bold opacity-70">
+                      {item.player.number}
+                    </span>
+                    <p className="font-medium text-xs flex-1 opacity-90 truncate">{item.player.name}</p>
+                    {isSubbedIn && <ArrowUp className="w-4 h-4 text-green-500" />}
+                  </div>
+                );
+              })}
             </div>
           </div>
-          <div className="bg-secondary/20 p-4 rounded-xl border border-border/40 flex items-center gap-4 md:flex-row-reverse md:text-right">
-             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+          <div className="bg-secondary/20 p-4 rounded-xl border border-border/40 flex items-center gap-4 md:flex-row-reverse md:text-right mt-auto">
+             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 shrink-0">
                <Users className="w-5 h-5 text-primary" />
              </div>
              <div>
