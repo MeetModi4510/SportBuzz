@@ -140,21 +140,6 @@ export const MatchSection = ({
   const upcomingMatches = matches.filter((m) => m.status === "upcoming");
   const completedMatches = matches.filter((m) => m.status === "completed" || m.status === "recent");
 
-  if (matches.length === 0) {
-    return (
-      <section className={cn("space-y-4", className)}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <SportIcon sport={sport} size={24} />
-            <h2 className="text-2xl font-bold font-display text-foreground">{title}</h2>
-          </div>
-        </div>
-        <div className="text-center py-12 text-muted-foreground">
-          <p>No {title.toLowerCase()} matches found</p>
-        </div>
-      </section>
-    );
-  }
 
 
   return (
