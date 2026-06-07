@@ -271,6 +271,44 @@ export async function getMatchDetail(internalId) {
     }
 }
 
+export async function getGlobalFootballNews() {
+    // Return high-quality mock data for the UI
+    return [
+        {
+            id: 1,
+            title: "Real Madrid secure stunning comeback victory in Champions League",
+            summary: "Los Blancos score two late goals to overcome a resilient defensive display, securing their spot in the next round.",
+            image: "https://images.unsplash.com/photo-1518605368461-1e1e127cc481?q=80&w=600&auto=format&fit=crop",
+            source: "Football Daily",
+            publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+        },
+        {
+            id: 2,
+            title: "Premier League Title Race Heats Up as Top Three Win",
+            summary: "Arsenal, Liverpool, and Manchester City all secure crucial victories this weekend to keep the title race wide open.",
+            image: "https://images.unsplash.com/photo-1486286701208-1d58e82b7db5?q=80&w=600&auto=format&fit=crop",
+            source: "Sports Buzz",
+            publishedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+        },
+        {
+            id: 3,
+            title: "Managerial Shakeup: Historic Club Parts Ways with Head Coach",
+            summary: "Following a string of disappointing results, the board has decided to make a change ahead of the crucial derby.",
+            image: "https://images.unsplash.com/photo-1516731415730-0c37489ebce9?q=80&w=600&auto=format&fit=crop",
+            source: "Global Soccer News",
+            publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
+        },
+        {
+            id: 4,
+            title: "Record Breaking Transfer Almost Complete",
+            summary: "The highly anticipated move of the summer is reportedly in its final stages with medicals scheduled for tomorrow.",
+            image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=600&auto=format&fit=crop",
+            source: "Transfer Expert",
+            publishedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+        }
+    ];
+}
+
 export function clearCache() {
     for (const key of Object.keys(cache)) {
         cache[key] = { data: null, timestamp: 0 };
@@ -282,5 +320,6 @@ export default {
     getDashboardMatches,
     getCategorizedMatches,
     getMatchDetail,
+    getGlobalFootballNews,
     clearCache
 };

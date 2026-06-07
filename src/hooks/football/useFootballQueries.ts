@@ -44,3 +44,12 @@ export const useRecentTransfers = () => {
     staleTime: 6 * 60 * 60 * 1000, // 6 hours
   });
 };
+
+export const useFootballNews = () => {
+  return useQuery({
+    queryKey: ['football', 'news'],
+    queryFn: () => footballApi.getGlobalNews(false),
+    ...NO_AUTO_REFETCH,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+  });
+};

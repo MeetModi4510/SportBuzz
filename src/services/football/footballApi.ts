@@ -1,4 +1,5 @@
 import { footballApiClient } from './apiClient';
+import api from '../api';
 import { cacheManager } from '../../utils/football/cacheManager';
 import { FootballMatch, FootballTransferData } from '../../types/football';
 
@@ -184,5 +185,23 @@ export const footballApi = {
 
     cacheManager.set(cacheKey, uniqueTransfers, 60); // Cache for 1 hour
     return uniqueTransfers;
+  },
+
+  async getGlobalNews(forceRefresh = false): Promise<any[]> {
+    const cacheKey = 'global_news';
+    if (!forceRefresh) {
+      const cached = cacheManager.get<any[]>(cacheKey);
+      if (cached && cached.length > 0) return cached;
+    }
+
+    try {
+      const response = await api.get('/football/news');
+      const news = response.data || [];
+      cacheManager.set(cacheKey, news, 30); // Cache for 30 minutes
+      return news;
+    } catch (error) {
+      console.error("Failed to fetch global football news", error);
+      return [];
+    }
   }
 };
