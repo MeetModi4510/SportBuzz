@@ -84,7 +84,15 @@ export default function MatchCenter() {
         <Navbar />
 
         {/* Header / Scoreboard */}
-        <div className="relative pt-8 pb-12 border-b border-border/20 bg-background">
+        <div className="relative pt-8 pb-16 border-b border-border/20 overflow-hidden bg-background">
+          {/* Premium Background Effects */}
+          <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
+          <div 
+            className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"
+            style={{ maskImage: 'radial-gradient(ellipse at center, black 20%, transparent 80%)', WebkitMaskImage: 'radial-gradient(ellipse at center, black 20%, transparent 80%)' }} 
+          />
+
           <div className="container mx-auto px-4 relative z-10">
             <button 
               onClick={() => navigate(-1)}
@@ -95,8 +103,8 @@ export default function MatchCenter() {
             </button>
 
             {/* League Pill */}
-            <div className="flex justify-center mb-8">
-              <span className="text-[10px] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase bg-secondary/30 border border-border/40 px-6 py-2 rounded-full backdrop-blur-sm">
+            <div className="flex justify-center mb-10">
+              <span className="text-[10px] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase bg-secondary/30 border border-border/40 px-6 py-2 rounded-full backdrop-blur-md shadow-sm">
                 {match.league.name} {match.fixture.venue.city ? `• ${match.fixture.venue.city}` : ''}
               </span>
             </div>
@@ -105,27 +113,28 @@ export default function MatchCenter() {
               
               {/* Home Team */}
               <div className="flex flex-col items-center flex-1 w-0">
-                <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-secondary/20 flex items-center justify-center p-3 mb-4 border border-border/30 shadow-md">
-                  <TeamLogo logo={match.teams.home.logo} name={match.teams.home.name} size="lg" className="w-full h-full object-contain filter drop-shadow-lg" />
+                <div className="w-24 h-24 md:w-36 md:h-36 flex items-center justify-center mb-4 relative group">
+                  <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                  <TeamLogo logo={match.teams.home.logo} name={match.teams.home.name} size="lg" className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] z-10 transform group-hover:scale-105 transition-transform duration-500" />
                 </div>
-                <span className="font-bold text-lg md:text-2xl text-center leading-tight tracking-tight text-foreground/90">
+                <span className="font-extrabold text-xl md:text-3xl text-center leading-tight tracking-tight text-foreground drop-shadow-sm">
                   {match.teams.home.name}
                 </span>
               </div>
 
               {/* Score / Status */}
               <div className="flex flex-col items-center justify-center shrink-0 w-32 md:w-48">
-                <div className="text-5xl md:text-7xl font-black tracking-tighter flex items-center justify-center gap-3 tabular-nums drop-shadow-md">
+                <div className="text-6xl md:text-8xl font-black tracking-tighter flex items-center justify-center gap-3 tabular-nums drop-shadow-2xl">
                   <span className={match.goals.home !== null && match.goals.away !== null && match.goals.home > match.goals.away ? "text-foreground" : "text-foreground/80"}>
                     {match.goals.home ?? '-'}
                   </span>
-                  <span className="text-muted-foreground/30 font-light text-4xl md:text-6xl pb-2">-</span>
+                  <span className="text-muted-foreground/30 font-light text-5xl md:text-7xl pb-2">-</span>
                   <span className={match.goals.home !== null && match.goals.away !== null && match.goals.away > match.goals.home ? "text-foreground" : "text-foreground/80"}>
                     {match.goals.away ?? '-'}
                   </span>
                 </div>
-                <div className="mt-3 flex items-center justify-center gap-2 bg-secondary/40 px-4 py-1 rounded-md border border-border/40 backdrop-blur-sm">
-                  {isLive && <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />}
+                <div className="mt-4 flex items-center justify-center gap-2 bg-secondary/40 px-5 py-1.5 rounded-md border border-border/40 backdrop-blur-md shadow-sm">
+                  {isLive && <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" />}
                   <span className={`font-bold tracking-[0.1em] uppercase text-[10px] md:text-xs ${isLive ? 'text-red-500' : 'text-muted-foreground'}`}>
                     {isLive ? `${match.fixture.status.elapsed}'` : match.fixture.status.short}
                   </span>
@@ -134,10 +143,11 @@ export default function MatchCenter() {
 
               {/* Away Team */}
               <div className="flex flex-col items-center flex-1 w-0">
-                <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-secondary/20 flex items-center justify-center p-3 mb-4 border border-border/30 shadow-md">
-                  <TeamLogo logo={match.teams.away.logo} name={match.teams.away.name} size="lg" className="w-full h-full object-contain filter drop-shadow-lg" />
+                <div className="w-24 h-24 md:w-36 md:h-36 flex items-center justify-center mb-4 relative group">
+                  <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                  <TeamLogo logo={match.teams.away.logo} name={match.teams.away.name} size="lg" className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] z-10 transform group-hover:scale-105 transition-transform duration-500" />
                 </div>
-                <span className="font-bold text-lg md:text-2xl text-center leading-tight tracking-tight text-foreground/90">
+                <span className="font-extrabold text-xl md:text-3xl text-center leading-tight tracking-tight text-foreground drop-shadow-sm">
                   {match.teams.away.name}
                 </span>
               </div>
