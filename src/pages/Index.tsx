@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Search, X, Bell } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
+import Sidebar from "@/components/layout/Sidebar";
 import { SportFilter } from "@/components/SportFilter";
 import { StatusFilter } from "@/components/StatusFilter";
 import { MatchSection } from "@/components/MatchSection";
@@ -241,10 +242,13 @@ const Index = () => {
         />
       </Helmet>
 
-      <div className="min-h-screen">
-        <Navbar />
+      <div className="min-h-screen flex bg-background">
+        <Sidebar />
+        
+        <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+          <Navbar />
 
-        <main className="container mx-auto px-4 py-6 space-y-8">
+          <main className="container mx-auto px-4 py-6 space-y-8 flex-1">
           {/* Hero Section */}
           <section className="text-center py-8 space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold font-display">
@@ -429,6 +433,7 @@ const Index = () => {
             </div>
           </div>
         </footer>
+        </div>
       </div>
     </>
   );
