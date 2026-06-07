@@ -56,11 +56,21 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [] }: Match
   const homeRowsSorted = getRows(homeLineup.startXI, true);
 
   const renderPlayer = (item: any, isHome: boolean) => (
-    <div key={item.player.id} className="flex flex-col items-center justify-center w-16 group">
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold font-display shadow-lg border-2 ${isHome ? 'bg-blue-600 text-white border-white/50' : 'bg-red-600 text-white border-white/50'}`}>
-        {item.player.number}
+    <div key={item.player.id} className="flex flex-col items-center justify-center w-16 md:w-20 group z-10 transition-transform hover:scale-110">
+      <div className={`relative w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xs md:text-sm font-bold font-display shadow-xl border-[3px] overflow-hidden ${isHome ? 'bg-blue-600 text-white border-blue-400/80' : 'bg-red-600 text-white border-red-400/80'}`}>
+        <span className="absolute z-0">{item.player.number}</span>
+        {item.player.id && (
+          <img 
+            src={`https://media.api-sports.io/football/players/${item.player.id}.png`} 
+            alt={item.player.name}
+            className="absolute inset-0 w-full h-full object-cover z-10"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        )}
       </div>
-      <div className="mt-1 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[10px] text-white font-medium text-center truncate w-full shadow-sm">
+      <div className="mt-1 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] md:text-xs text-white font-medium text-center truncate w-full shadow-md z-20">
         {item.player.name.split(' ').pop()}
       </div>
     </div>
