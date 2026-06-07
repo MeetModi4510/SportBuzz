@@ -146,22 +146,36 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [] }: Match
             <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-2">Substitutes</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {homeLineup.substitutes.map((item, idx) => {
-                const isSubbedIn = events.some(e => e.type === "subst" && e.team.id === homeTeam.id && e.player.id === item.player.id);
+                const isSubbedIn = events.some(e => e.type.toLowerCase() === "subst" && e.team.id === homeTeam.id && (e.player.id === item.player.id || e.assist.id === item.player.id));
                 return (
                   <div key={idx} className="flex items-center gap-3 bg-secondary/10 p-2 rounded-lg border border-border/20">
-                    <span className="w-6 h-6 rounded-full bg-background border border-border/30 flex items-center justify-center text-[10px] font-bold opacity-70">
-                      {item.player.number}
-                    </span>
+                    <div className="relative w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 overflow-hidden">
+                      <span className="text-[10px] font-bold opacity-70 absolute z-0">{item.player.number}</span>
+                      {item.player.id && (
+                        <img 
+                          src={`https://media.api-sports.io/football/players/${item.player.id}.png`} 
+                          alt={item.player.name}
+                          className="absolute inset-0 w-full h-full object-cover z-10"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      )}
+                    </div>
                     <p className="font-medium text-xs flex-1 opacity-90 truncate">{item.player.name}</p>
-                    {isSubbedIn && <ArrowUp className="w-4 h-4 text-green-500" />}
+                    {isSubbedIn && <ArrowUp className="w-4 h-4 text-green-500 shrink-0" />}
                   </div>
                 );
               })}
             </div>
           </div>
           <div className="bg-secondary/20 p-4 rounded-xl border border-border/40 flex items-center gap-4 mt-auto">
-             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 shrink-0">
-               <Users className="w-5 h-5 text-primary" />
+             <div className="relative w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/30 shrink-0 overflow-hidden">
+               {homeLineup.coach?.photo ? (
+                 <img src={homeLineup.coach.photo} alt={homeLineup.coach.name} className="w-full h-full object-cover" />
+               ) : (
+                 <Users className="w-6 h-6 text-primary" />
+               )}
              </div>
              <div>
                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-0.5">Manager</p>
@@ -176,22 +190,36 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [] }: Match
             <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-2 md:text-right">Substitutes</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {awayLineup.substitutes.map((item, idx) => {
-                const isSubbedIn = events.some(e => e.type === "subst" && e.team.id === awayTeam.id && e.player.id === item.player.id);
+                const isSubbedIn = events.some(e => e.type.toLowerCase() === "subst" && e.team.id === awayTeam.id && (e.player.id === item.player.id || e.assist.id === item.player.id));
                 return (
                   <div key={idx} className="flex items-center gap-3 bg-secondary/10 p-2 rounded-lg border border-border/20 md:flex-row-reverse md:text-right">
-                    <span className="w-6 h-6 rounded-full bg-background border border-border/30 flex items-center justify-center text-[10px] font-bold opacity-70">
-                      {item.player.number}
-                    </span>
+                    <div className="relative w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 overflow-hidden">
+                      <span className="text-[10px] font-bold opacity-70 absolute z-0">{item.player.number}</span>
+                      {item.player.id && (
+                        <img 
+                          src={`https://media.api-sports.io/football/players/${item.player.id}.png`} 
+                          alt={item.player.name}
+                          className="absolute inset-0 w-full h-full object-cover z-10"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      )}
+                    </div>
                     <p className="font-medium text-xs flex-1 opacity-90 truncate">{item.player.name}</p>
-                    {isSubbedIn && <ArrowUp className="w-4 h-4 text-green-500" />}
+                    {isSubbedIn && <ArrowUp className="w-4 h-4 text-green-500 shrink-0" />}
                   </div>
                 );
               })}
             </div>
           </div>
           <div className="bg-secondary/20 p-4 rounded-xl border border-border/40 flex items-center gap-4 md:flex-row-reverse md:text-right mt-auto">
-             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 shrink-0">
-               <Users className="w-5 h-5 text-primary" />
+             <div className="relative w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/30 shrink-0 overflow-hidden">
+               {awayLineup.coach?.photo ? (
+                 <img src={awayLineup.coach.photo} alt={awayLineup.coach.name} className="w-full h-full object-cover" />
+               ) : (
+                 <Users className="w-6 h-6 text-primary" />
+               )}
              </div>
              <div>
                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-0.5">Manager</p>
