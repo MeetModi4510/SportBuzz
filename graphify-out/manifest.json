@@ -545,8 +545,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\footballRoutes.js": {
-    "mtime": 1780821827.0197268,
-    "ast_hash": "8d3cad539365b2c28d1aa5c01fc4d12d",
+    "mtime": 1780827717.6535587,
+    "ast_hash": "dab246152db9847a5a0e3a7f70fa1018",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\leaderboardRoutes.js": {
@@ -660,8 +660,8 @@
     "semantic_hash": "97428d3a88e2f5a1c6c44c96ca132619"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\footballDataService.js": {
-    "mtime": 1780821827.022304,
-    "ast_hash": "e6efaa12aef32936c80fd98d8b53db16",
+    "mtime": 1780827919.7736382,
+    "ast_hash": "45a43460a077e5bbe0c4e58838839938",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\stateFlagService.js": {
@@ -795,8 +795,8 @@
     "semantic_hash": "fb7c8348398ae8b8e9d970b22a76c984"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\LiveTicker.tsx": {
-    "mtime": 1780820239.0546193,
-    "ast_hash": "a0d0140c1a82d203214239b871959b8d",
+    "mtime": 1780825932.686722,
+    "ast_hash": "b53be858cfd8f3161a71c6386f1ce9a9",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\LoadingSkeleton.tsx": {
@@ -1420,8 +1420,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\MatchDetails.tsx": {
-    "mtime": 1780820239.0765924,
-    "ast_hash": "49b856218b902cfdae4013583a2dd0a6",
+    "mtime": 1780823740.3726401,
+    "ast_hash": "615bc8771059509dfaca3de39f128eb9",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\NotFound.tsx": {
@@ -3080,8 +3080,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\NewsSection.tsx": {
-    "mtime": 1780820239.063597,
-    "ast_hash": "9155437658887e2c92a747559c3b5793",
+    "mtime": 1780827900.4395077,
+    "ast_hash": "8aac6916d6aafddc1dc65351ff3c853e",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\data\\mockNewsData.ts": {
@@ -3150,8 +3150,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballMatchCard.tsx": {
-    "mtime": 1780820239.066603,
-    "ast_hash": "e56afd627ea299f00e10a3d4e925ea41",
+    "mtime": 1780823740.3689787,
+    "ast_hash": "523d4bbe50e7e0905fe821deb4e1160f",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\MatchEvents.tsx": {
@@ -3195,8 +3195,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\FootballHome.tsx": {
-    "mtime": 1780821827.031411,
-    "ast_hash": "359659960541a3e7b6522407652faf4b",
+    "mtime": 1780825648.4884155,
+    "ast_hash": "faca46f1feb6818c92a945548a63c1a1",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\MatchCenter.tsx": {
@@ -3210,13 +3210,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\football\\apiClient.ts": {
-    "mtime": 1780820239.0826395,
-    "ast_hash": "af050c264ba36af3615d23b968f2c14f",
+    "mtime": 1780825648.4904232,
+    "ast_hash": "702008570ff030b9add1f4e78c9cbb86",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\football\\footballApi.ts": {
-    "mtime": 1780821827.0353715,
-    "ast_hash": "21b4a9226f4c9c77fa380f02bc6c6f7b",
+    "mtime": 1780825648.4949446,
+    "ast_hash": "7d56f71c105f20bad044589d66df0579",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\types\\football\\index.ts": {
@@ -3245,8 +3245,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballNewsSidebar.tsx": {
-    "mtime": 1780821827.022304,
-    "ast_hash": "4a8f53cc3bc7266246d4fbfa40615688",
+    "mtime": 1780825648.4843898,
+    "ast_hash": "5926c4665d8d1310da23676d3a620110",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\HeroFeaturedMatch.tsx": {
@@ -3255,8 +3255,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\TransferCard.tsx": {
-    "mtime": 1780821827.0278423,
-    "ast_hash": "73fd2281e2c419abdeda5bc09977a5dc",
+    "mtime": 1780823740.3706036,
+    "ast_hash": "ffab7d23cae93a123567138801cfacf8",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\football\\mockFootballData.ts": {
@@ -3267,6 +3267,11 @@
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\test_transfers.js": {
     "mtime": 1780821827.037882,
     "ast_hash": "628c6787562c53504bcae64902735077",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useFootballNews.ts": {
+    "mtime": 1780827889.3954246,
+    "ast_hash": "7b6b28f69a7751548228c226b21022d8",
     "semantic_hash": ""
   }
 }

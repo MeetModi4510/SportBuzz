@@ -18,17 +18,19 @@ export function useFootballNews() {
 
     const fetchNews = async () => {
       try {
-        const res = await api.get('/football/live-news');
-        if (res.data?.success && Array.isArray(res.data.data)) {
+        // Note: api.ts response interceptor auto-unwraps response.data,
+        // so `res` is already the parsed JSON body: { success: true, data: [...] }
+        const res = await api.get('/football/live-news') as any;
+        if (res?.success && Array.isArray(res.data)) {
           if (mounted) {
             // Transform the rapidapi response format
-            const formatted = res.data.data.map((item: any) => ({
+            const formatted = res.data.map((item: any) => ({
               id: item.id,
               sport: 'football',
               headline: item.headLine || item.headline || 'Football Update',
               snippet: 'Click to read full story on SportsBuzz Football.',
               isLive: true,
-              timestamp: 'Just now' // RapidAPI endpoint doesn't return timestamp, assuming live
+              timestamp: 'Just now'
             }));
             setNews(formatted);
           }
