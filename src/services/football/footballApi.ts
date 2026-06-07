@@ -50,43 +50,64 @@ export const footballApi = {
     const cacheKey = 'recent_matches';
     if (!forceRefresh) {
       const cached = cacheManager.get<FootballMatch[]>(cacheKey);
-      if (cached) return cached;
+      if (cached && cached.length > 0) return cached;
     }
 
-    const today = new Date();
-    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const dateTo = today.toISOString().split('T')[0];
-    const dateFrom = lastWeek.toISOString().split('T')[0];
-
-    // Due to API limits, we might not want to fetch EVERYTHING. 
-    // We will fetch for a specific top league to limit requests if needed, or just today's past matches.
-    const response = await footballApiClient.get('/fixtures', {
-      params: { date: dateTo, status: 'FT-AET-PEN' },
+    // Fetch last 3 days to guarantee we find *some* matches from priority leagues
+    const dates = [0, 1, 2].map(daysAgo => {
+      const d = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
+      return d.toISOString().split('T')[0];
     });
 
-    let matches: FootballMatch[] = response.data.response || [];
-    matches = matches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
-    cacheManager.set(cacheKey, matches, 30); // Cache 30 mins
-    return matches;
+    let allMatches: FootballMatch[] = [];
+    for (const dateStr of dates) {
+      try {
+        const response = await footballApiClient.get('/fixtures', {
+          params: { date: dateStr, status: 'FT-AET-PEN' },
+        });
+        const matches: FootballMatch[] = response.data.response || [];
+        allMatches = [...allMatches, ...matches];
+      } catch (err) {
+        console.error('Failed to fetch recent matches for', dateStr);
+      }
+    }
+
+    const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
+    cacheManager.set(cacheKey, priorityMatches, 6 * 60); // Cache for 6 HOURS to save API limits
+    return priorityMatches;
   },
 
   async getUpcomingMatches(forceRefresh = false): Promise<FootballMatch[]> {
     const cacheKey = 'upcoming_matches';
     if (!forceRefresh) {
       const cached = cacheManager.get<FootballMatch[]>(cacheKey);
-      if (cached) return cached;
+      if (cached && cached.length > 0) return cached;
     }
 
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const dateString = tomorrow.toISOString().split('T')[0];
-
-    const response = await footballApiClient.get('/fixtures', {
-      params: { date: dateString },
+    // Fetch next 3 days to guarantee we find *some* scheduled matches
+    const dates = [1, 2, 3].map(daysAhead => {
+      const d = new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000);
+      return d.toISOString().split('T')[0];
     });
 
-    let matches: FootballMatch[] = response.data.response || [];
-    matches = matches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
-    cacheManager.set(cacheKey, matches, 60); // Cache 1 hour
-    return matches;
+    let allMatches: FootballMatch[] = [];
+    for (const dateStr of dates) {
+      try {
+        const response = await footballApiClient.get('/fixtures', {
+          params: { date: dateStr },
+        });
+        const matches: FootballMatch[] = response.data.response || [];
+        allMatches = [...allMatches, ...matches];
+      } catch (err) {
+        console.error('Failed to fetch upcoming matches for', dateStr);
+      }
+    }
+
+    const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
+    // Filter out matches that are live or finished
+    const upcomingPriority = priorityMatches.filter(m => !['FT', 'AET', 'PEN', '1H', '2H', 'HT', 'LIVE'].includes(m.fixture?.status?.short));
+    
+    cacheManager.set(cacheKey, upcomingPriority, 6 * 60); // Cache for 6 HOURS to save API limits
+    return upcomingPriority;
   }
 };

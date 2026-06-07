@@ -23,7 +23,7 @@ export const useRecentFootballMatches = () => {
     queryKey: ['football', 'recent'],
     queryFn: () => footballApi.getRecentMatches(false),
     ...NO_AUTO_REFETCH,
-    staleTime: 30 * 60 * 1000, // 30 mins
+    staleTime: 6 * 60 * 60 * 1000, // 6 hours
   });
 };
 
@@ -32,6 +32,6 @@ export const useUpcomingFootballMatches = () => {
     queryKey: ['football', 'upcoming'],
     queryFn: () => footballApi.getUpcomingMatches(false),
     ...NO_AUTO_REFETCH,
-    staleTime: 60 * 60 * 1000, // 1 hour
+    staleTime: 6 * 60 * 60 * 1000, // 6 hours
   });
 };
