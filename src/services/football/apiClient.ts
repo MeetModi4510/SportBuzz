@@ -13,6 +13,17 @@ export const footballApiClient = axios.create({
   },
 });
 
+const TRANSFERS_API_KEY = import.meta.env.VITE_FOOTBALL_TRANSFERS_API_KEY || '';
+
+export const transfersApiClient = axios.create({
+  baseURL: `https://${API_HOST}`,
+  headers: {
+    'x-rapidapi-host': API_HOST,
+    'x-rapidapi-key': TRANSFERS_API_KEY,
+    'x-apisports-key': TRANSFERS_API_KEY,
+  },
+});
+
 // Interceptor to handle errors globally if needed
 footballApiClient.interceptors.response.use(
   (response) => {
@@ -24,7 +35,20 @@ footballApiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('API-Football Request Failed:', error);
+    return Promise.reject(error);
+  }
+);
+
+transfersApiClient.interceptors.response.use(
+  (response) => {
+    if (response.data?.errors && Object.keys(response.data.errors).length > 0) {
+      console.error('Transfers API Error:', response.data.errors);
+      return Promise.reject(new Error('Transfers API Error: ' + JSON.stringify(response.data.errors)));
+    }
+    return response;
+  },
+  (error) => {
+    console.error('Transfers API Request Failed:', error);
     return Promise.reject(error);
   }
 );
