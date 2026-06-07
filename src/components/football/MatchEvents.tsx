@@ -24,45 +24,68 @@ export function MatchEvents({ events, homeTeam, awayTeam }: MatchEventsProps) {
   });
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="relative border-l-2 border-border/40 ml-4 md:ml-[50%]">
+    <div className="max-w-2xl mx-auto relative py-8">
+      {/* Central Timeline Line */}
+      <div className="absolute top-0 bottom-0 left-6 md:left-1/2 w-[2px] bg-border/40 -translate-x-1/2" />
+      
+      <div className="space-y-8">
         {sortedEvents.map((event, idx) => {
           const isHome = event.team.id === homeTeam.id;
 
           return (
-            <div key={idx} className={`relative flex items-center mb-8 ${isHome ? 'md:flex-row-reverse md:mr-[50%] md:pr-8' : 'md:ml-0 md:pl-8'} pl-8`}>
-              {/* Timeline dot */}
-              <div className="absolute w-4 h-4 bg-background border-2 border-primary rounded-full left-[-9px] md:left-auto md:right-[-9px]" style={isHome ? { right: '-9px', left: 'auto' } : {}} />
+            <div key={idx} className="relative flex items-center w-full">
+              {/* Timeline Dot */}
+              <div className="absolute left-6 md:left-1/2 w-4 h-4 bg-background border-[3px] border-primary rounded-full -translate-x-1/2 z-10" />
 
-              {/* Event Content */}
-              <div className={`bg-secondary/20 border border-border/40 p-4 rounded-xl flex-1 ${isHome ? 'md:text-right' : 'text-left'}`}>
-                <div className={`flex items-center gap-2 mb-1 ${isHome ? 'md:justify-end' : ''}`}>
-                  <span className="font-bold text-primary">{event.time.elapsed}'{event.time.extra ? `+${event.time.extra}` : ''}</span>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
-                    {event.type}
-                  </span>
-                </div>
-                <div className="font-medium text-foreground">
-                  {event.player.name}
-                </div>
-                {event.assist.name && (
-                  <div className="text-sm text-muted-foreground mt-1">
-                    Assist: {event.assist.name}
+              {/* Event Content Container */}
+              <div className={`w-full flex ${isHome ? 'md:justify-start' : 'md:justify-end'}`}>
+                {/* Event Box Wrapper */}
+                <div className={`w-[calc(100%-4rem)] md:w-[calc(50%-2rem)] ml-16 md:ml-0 ${isHome ? 'md:mr-8 text-left md:text-right' : 'md:ml-8 text-left'}`}>
+                  
+                  <div className="bg-secondary/20 hover:bg-secondary/30 transition-colors border border-border/40 p-4 rounded-xl shadow-sm">
+                    <div className={`flex items-center gap-3 mb-2 ${isHome ? 'md:justify-end' : ''}`}>
+                      <span className="font-extrabold text-primary text-sm">
+                        {event.time.elapsed}'{event.time.extra ? `+${event.time.extra}` : ''}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-background border border-border/50 px-2.5 py-1 rounded-md">
+                        {event.type}
+                      </span>
+                    </div>
+                    
+                    <div className="font-semibold text-foreground text-base">
+                      {event.player.name}
+                    </div>
+                    
+                    {event.assist.name && (
+                      <div className="text-sm text-muted-foreground mt-1.5 flex items-center gap-1.5 opacity-90">
+                        {isHome ? (
+                          <>
+                            <span className="md:hidden">Assist:</span> {event.assist.name} <span className="hidden md:inline text-[10px] uppercase font-bold tracking-widest opacity-50 border border-border px-1 rounded">Assist</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-[10px] uppercase font-bold tracking-widest opacity-50 border border-border px-1 rounded">Assist</span> {event.assist.name}
+                          </>
+                        )}
+                      </div>
+                    )}
+                    
+                    {event.detail && event.detail !== "Normal Goal" && (
+                      <div className="text-xs text-muted-foreground/70 mt-2 font-medium">
+                        {event.detail} {event.comments ? `- ${event.comments}` : ''}
+                      </div>
+                    )}
                   </div>
-                )}
-                {event.detail && event.detail !== "Normal Goal" && (
-                  <div className="text-xs opacity-70 mt-1">
-                    {event.detail} {event.comments ? `- ${event.comments}` : ''}
-                  </div>
-                )}
+                </div>
               </div>
             </div>
           );
         })}
+
         {/* Match End Marker */}
-        <div className="relative flex items-center pl-8 md:pl-0 md:justify-center mt-8">
-          <div className="absolute md:relative left-[-16px] md:left-auto w-8 h-8 bg-secondary rounded-full flex items-center justify-center border border-border/40 text-muted-foreground">
-            <Play className="w-4 h-4" />
+        <div className="relative flex w-full">
+          <div className="absolute left-6 md:left-1/2 -translate-x-1/2 w-8 h-8 bg-background rounded-full flex items-center justify-center border-2 border-border/40 text-muted-foreground z-10 shadow-sm">
+            <Play className="w-3.5 h-3.5" />
           </div>
         </div>
       </div>
