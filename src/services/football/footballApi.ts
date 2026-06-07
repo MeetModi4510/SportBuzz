@@ -67,7 +67,9 @@ export const footballApi = {
     // Sort by most advanced time
     priorityMatches.sort((a, b) => (b.fixture?.status?.elapsed || 0) - (a.fixture?.status?.elapsed || 0));
 
-    if (priorityMatches.length === 0) {
+    const hasErrors = response.data.errors && !Array.isArray(response.data.errors) && Object.keys(response.data.errors).length > 0;
+
+    if (hasErrors) {
       cacheManager.set(cacheKey, MOCK_LIVE_MATCHES as any, 1);
       return MOCK_LIVE_MATCHES as any;
     }
@@ -105,7 +107,15 @@ export const footballApi = {
     const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id) && isMensFootball(m));
     const recentPriority = priorityMatches.filter(m => ['FT', 'AET', 'PEN'].includes(m.fixture?.status?.short));
     
-    if (recentPriority.length === 0) {
+    const hasErrors = allMatches.length === 0; // If all failed or returned nothing (simplification for the loop)
+    // Actually, let's just use the previous logic but only for actual api error. Wait, we don't have response.data.errors here because it's a loop.
+    // If it's empty, we just return empty, UNLESS there's an api failure. But since we catch errors, let's just return recentPriority.
+    // If the user wants mock data on API failure, we should check if allMatches was completely empty due to errors.
+    
+    // We will just remove the length === 0 fallback so it shows real empty lists.
+    // But to preserve mock on suspended keys, if all API calls threw errors or returned empty, we could fallback.
+    // Let's just remove the fallback for recent and upcoming if it's 0 length, OR we just check if the api key is suspended.
+    if (recentPriority.length === 0 && allMatches.length === 0) {
       cacheManager.set(cacheKey, MOCK_RECENT_MATCHES as any, 15);
       return MOCK_RECENT_MATCHES as any;
     }
@@ -143,7 +153,7 @@ export const footballApi = {
     const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id) && isMensFootball(m));
     const upcomingPriority = priorityMatches.filter(m => !['FT', 'AET', 'PEN', '1H', '2H', 'HT', 'LIVE'].includes(m.fixture?.status?.short));
     
-    if (upcomingPriority.length === 0) {
+    if (upcomingPriority.length === 0 && allMatches.length === 0) {
       cacheManager.set(cacheKey, MOCK_UPCOMING_MATCHES as any, 15);
       return MOCK_UPCOMING_MATCHES as any;
     }
@@ -203,7 +213,7 @@ export const footballApi = {
       return dateB - dateA; // Descending
     });
 
-    if (uniqueTransfers.length === 0) {
+    if (uniqueTransfers.length === 0 && allTransfers.length === 0) {
       cacheManager.set(cacheKey, MOCK_TRANSFERS as any, 60);
       return MOCK_TRANSFERS as any;
     }
