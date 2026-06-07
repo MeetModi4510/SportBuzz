@@ -14,8 +14,8 @@ export function TransferCard({ transferData }: TransferCardProps) {
   if (!latestTransfer) return null;
 
   const priceDisplay = latestTransfer.price || latestTransfer.type || 'Transfer';
-  const isFree = priceDisplay === 'FREE';
-  const isLoan = priceDisplay === 'LOAN';
+  const isFree = priceDisplay.toUpperCase().includes('FREE');
+  const isLoan = priceDisplay.toUpperCase().includes('LOAN');
 
   // Format date elegantly
   const dateObj = new Date(latestTransfer.date);
