@@ -20,6 +20,10 @@ export const PRIORITY_LEAGUES = [
   3, // Europa League
   848, // Conference League
   9, // Copa America
+  10, // Friendlies
+  15, // FIFA World Cup Qualifiers
+  21, // Friendlies - Men
+  666, // Friendlies Women
 ];
 
 export const footballApi = {
