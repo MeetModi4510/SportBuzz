@@ -1,5 +1,6 @@
 import { FootballTransferData } from "../../types/football";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowRightLeft, CalendarDays, User } from "lucide-react";
+import { useState } from "react";
 
 interface TransferCardProps {
   transferData: FootballTransferData;
@@ -8,93 +9,92 @@ interface TransferCardProps {
 export function TransferCard({ transferData }: TransferCardProps) {
   const { player, transfers } = transferData;
   const latestTransfer = transfers[0];
+  const [imgError, setImgError] = useState(false);
 
   if (!latestTransfer) return null;
 
   const priceDisplay = latestTransfer.price || latestTransfer.type || 'Transfer';
+  const isFree = priceDisplay === 'FREE';
+  const isLoan = priceDisplay === 'LOAN';
 
-  // Extract just the number if it's €X.XM for cleaner display, else keep text
-  const isEuroValue = priceDisplay.startsWith('€');
-  const mainPrice = isEuroValue ? priceDisplay.replace('€', '') : (priceDisplay === 'FREE' ? 'FREE' : priceDisplay === 'LOAN' ? 'LOAN' : priceDisplay);
-  const currencySymbol = isEuroValue ? '€' : '';
+  // Format date elegantly
+  const dateObj = new Date(latestTransfer.date);
+  const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
-    <div className="relative group w-[260px] h-[380px] shrink-0 cursor-pointer">
-      {/* FUT Card Base Shape */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#18181b] via-[#0f0f11] to-[#050505] rounded-t-full rounded-b-[2.5rem] border-[1px] border-white/10 shadow-2xl overflow-hidden transition-all duration-500 group-hover:border-[#d4af37]/40 group-hover:shadow-[0_0_40px_rgba(212,175,55,0.15)] group-hover:-translate-y-3">
-        
-        {/* Glow Effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.12)_0%,transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-        
-        {/* Player Photo (Cutout) */}
-        {player.photo && (
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[200px] h-[200px] z-10 transition-transform duration-700 group-hover:scale-[1.15] origin-bottom">
+    <div className="group relative w-[320px] shrink-0 cursor-pointer p-5 rounded-3xl bg-[#0a0a0a] border border-white/5 hover:border-white/10 transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] flex flex-col justify-between min-h-[160px] overflow-hidden">
+      
+      {/* Subtle Glow Background */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-white/[0.02] rounded-full blur-3xl group-hover:bg-white/[0.04] transition-colors" />
+
+      {/* Header: Fee & Date */}
+      <div className="flex items-center justify-between mb-4 relative z-10">
+        <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5 backdrop-blur-sm
+          ${isFree ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 
+            isLoan ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
+            'bg-white/10 text-white border border-white/20'}`}>
+          {priceDisplay}
+        </div>
+        <div className="flex items-center gap-1.5 text-white/40 text-xs font-medium">
+          <CalendarDays size={12} />
+          {formattedDate}
+        </div>
+      </div>
+
+      {/* Player Info */}
+      <div className="flex items-center gap-4 mb-5 relative z-10">
+        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/10 overflow-hidden relative">
+          {!imgError && player.photo ? (
             <img 
               src={player.photo} 
               alt={player.name}
-              className="w-full h-full object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.8)]"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
+              className="w-full h-full object-cover scale-110"
+              onError={() => setImgError(true)}
             />
-            {/* Fade out bottom of player image for seamless blend into background */}
-            <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#0f0f11] via-[#0f0f11]/80 to-transparent" />
-          </div>
-        )}
+          ) : (
+            <User size={20} className="text-white/30" />
+          )}
+        </div>
+        <div className="flex flex-col">
+          <h3 className="text-lg font-bold text-white tracking-tight leading-tight line-clamp-1">{player.name}</h3>
+          <span className="text-xs text-white/40 font-medium mt-0.5">Football Player</span>
+        </div>
+      </div>
 
-        {/* Top Left Stats (Rating / Price Style) */}
-        <div className="absolute top-10 left-5 z-20 flex flex-col items-center">
-          <div className="flex items-start">
-            {currencySymbol && <span className="text-sm font-bold text-[#d4af37] mt-1">{currencySymbol}</span>}
-            <span className="text-3xl font-black text-[#d4af37] tracking-tighter drop-shadow-md">
-              {mainPrice}
-            </span>
+      {/* Divider */}
+      <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
+
+      {/* Teams Transfer Path */}
+      <div className="flex items-center justify-between relative z-10 px-2">
+        {/* Out Team */}
+        <div className="flex items-center gap-2 max-w-[40%]">
+          <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center shrink-0 p-1">
+            <img 
+              src={latestTransfer.teams.out.logo} 
+              alt={latestTransfer.teams.out.name}
+              className="w-full h-full object-contain"
+              onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIHN0cm9rZS13aWR0aD0iMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='; }}
+            />
           </div>
-          <div className="w-8 h-[1px] bg-[#d4af37]/30 my-1" />
-          <span className="text-[9px] font-black text-white/40 tracking-widest uppercase">FEE</span>
+          <span className="text-[11px] font-semibold text-white/60 truncate">{latestTransfer.teams.out.name}</span>
         </div>
 
-        {/* Top Right Date */}
-        <div className="absolute top-10 right-5 z-20 flex flex-col items-center opacity-40 group-hover:opacity-100 transition-opacity">
-          <span className="text-[10px] font-black text-white tracking-widest">
-            {new Date(latestTransfer.date).toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
-          </span>
-          <span className="text-lg font-black text-white leading-none tracking-tighter">
-            {new Date(latestTransfer.date).getDate()}
-          </span>
+        {/* Arrow */}
+        <div className="text-white/20 mx-2">
+          <ArrowRightLeft size={14} className="opacity-50" />
         </div>
 
-        {/* Content Area */}
-        <div className="absolute bottom-0 left-0 right-0 h-[160px] flex flex-col items-center justify-end pb-8 px-4 z-20">
-          
-          {/* Player Name */}
-          <h3 className="text-2xl font-black tracking-tight text-white text-center leading-none mb-3 w-full truncate uppercase drop-shadow-lg">
-            {player.name}
-          </h3>
-
-          {/* Divider Line */}
-          <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/40 to-transparent mb-4" />
-
-          {/* Teams Transfer Path */}
-          <div className="flex items-center justify-center gap-6 w-full">
-            {/* Out Team */}
-            <div className="flex flex-col items-center gap-2 w-16 group-hover:-translate-x-1 transition-transform">
-              <img src={latestTransfer.teams.out.logo} alt={latestTransfer.teams.out.name} className="w-8 h-8 object-contain drop-shadow-lg opacity-60 grayscale group-hover:grayscale-0 transition-all" />
-              <span className="text-[8px] font-bold text-white/40 text-center truncate w-full uppercase tracking-wider">{latestTransfer.teams.out.name}</span>
-            </div>
-
-            {/* Arrow */}
-            <div className="relative">
-              <ArrowRight size={16} className="text-[#d4af37] opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-            </div>
-
-            {/* In Team */}
-            <div className="flex flex-col items-center gap-2 w-16 group-hover:translate-x-1 transition-transform">
-              <img src={latestTransfer.teams.in.logo} alt={latestTransfer.teams.in.name} className="w-10 h-10 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:drop-shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all" />
-              <span className="text-[9px] font-black text-white text-center truncate w-full uppercase tracking-wider">{latestTransfer.teams.in.name}</span>
-            </div>
+        {/* In Team */}
+        <div className="flex items-center gap-2 max-w-[40%] flex-row-reverse text-right">
+          <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 p-1 border border-white/10 shadow-[0_0_10px_rgba(255,255,255,0.05)] group-hover:border-white/30 transition-colors">
+            <img 
+              src={latestTransfer.teams.in.logo} 
+              alt={latestTransfer.teams.in.name}
+              className="w-full h-full object-contain"
+              onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIHN0cm9rZS13aWR0aD0iMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='; }}
+            />
           </div>
-
+          <span className="text-[11px] font-bold text-white truncate">{latestTransfer.teams.in.name}</span>
         </div>
       </div>
     </div>
