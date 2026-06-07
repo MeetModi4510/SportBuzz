@@ -176,7 +176,7 @@ export const footballApi = {
   },
 
   async getRecentTransfers(forceRefresh = false): Promise<FootballTransferData[]> {
-    const cacheKey = 'recent_transfers';
+    const cacheKey = 'recent_transfers_v2';
     const CACHE_TTL_MINUTES = 12 * 60; // 12 hours
 
     if (!forceRefresh) {
