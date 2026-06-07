@@ -17,7 +17,7 @@ const memoryCache = new Map<string, string | null>();
 
 // Seed memory cache from localStorage on load
 try {
-  const stored = localStorage.getItem('_cbFaceCache');
+  const stored = localStorage.getItem('_cbFaceCacheV2');
   if (stored) {
     const parsed = JSON.parse(stored);
     Object.entries(parsed).forEach(([k, v]) => memoryCache.set(k, v as string | null));
@@ -27,8 +27,8 @@ try {
 function persistCache() {
   try {
     const obj: Record<string, string | null> = {};
-    memoryCache.forEach((v, k) => { obj[k] = v; });
-    localStorage.setItem('_cbFaceCache', JSON.stringify(obj));
+    memoryCache.forEach((v, k) => { if (v) obj[k] = v; }); // Don't persist nulls permanently
+    localStorage.setItem('_cbFaceCacheV2', JSON.stringify(obj));
   } catch { /* ignore */ }
 }
 
