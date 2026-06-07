@@ -1,5 +1,5 @@
 import { FootballTransferData } from "../../types/football";
-import { ArrowRight, ArrowRightLeft, CalendarDays, User } from "lucide-react";
+import { ArrowRight, CalendarDays, User } from "lucide-react";
 import { useState } from "react";
 
 interface TransferCardProps {
@@ -21,89 +21,84 @@ export function TransferCard({ transferData }: TransferCardProps) {
   const dateObj = new Date(latestTransfer.date);
   const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
+  // Determine accent color
+  const accentColor = isFree ? 'bg-emerald-500' : isLoan ? 'bg-blue-500' : 'bg-white';
+  const textColor = isFree ? 'text-emerald-500' : isLoan ? 'text-blue-500' : 'text-white';
+
+  const renderTeamLogo = (team: { logo: string, name: string }) => {
+    if (team.name.toLowerCase().includes('free agent') || team.name === 'Unknown') {
+      return (
+        <div className="w-8 h-8 rounded bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+          <span className="font-black text-[10px] text-white/50">FA</span>
+        </div>
+      );
+    }
+    return (
+      <div className="w-8 h-8 rounded bg-white flex items-center justify-center shrink-0 p-1">
+        <img 
+          src={team.logo} 
+          alt={team.name}
+          className="w-full h-full object-contain"
+          onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIHN0cm9rZS13aWR0aD0iMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='; }}
+        />
+      </div>
+    );
+  };
+
   return (
-    <div className="group relative w-[320px] shrink-0 cursor-pointer p-5 rounded-3xl bg-[#0a0a0a] border border-white/5 hover:border-white/10 transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] flex flex-col justify-between min-h-[160px] overflow-hidden">
+    <div className="group relative w-[340px] shrink-0 cursor-pointer rounded-xl bg-[#111111] border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 shadow-lg overflow-hidden flex flex-col">
       
-      {/* Subtle Glow Background */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-white/[0.02] rounded-full blur-3xl group-hover:bg-white/[0.04] transition-colors" />
+      {/* Top Accent Line */}
+      <div className={`w-full h-1 ${accentColor} opacity-80`} />
 
-      {/* Header: Fee & Date */}
-      <div className="flex items-center justify-between mb-4 relative z-10">
-        <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5 backdrop-blur-sm
-          ${isFree ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 
-            isLoan ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
-            'bg-white/10 text-white border border-white/20'}`}>
-          {priceDisplay}
-        </div>
-        <div className="flex items-center gap-1.5 text-white/40 text-xs font-medium">
-          <CalendarDays size={12} />
-          {formattedDate}
-        </div>
-      </div>
-
-      {/* Player Info */}
-      <div className="flex items-center gap-4 mb-5 relative z-10">
-        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/10 overflow-hidden relative">
-          {!imgError && player.photo ? (
-            <img 
-              src={player.photo} 
-              alt={player.name}
-              className="w-full h-full object-cover scale-110"
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <User size={20} className="text-white/30" />
-          )}
-        </div>
-        <div className="flex flex-col">
-          <h3 className="text-lg font-bold text-white tracking-tight leading-tight line-clamp-1">{player.name}</h3>
-          <span className="text-xs text-white/40 font-medium mt-0.5">Football Player</span>
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
-
-      {/* Teams Transfer Path */}
-      <div className="flex items-center justify-between relative z-10 px-2">
-        {/* Out Team */}
-        <div className="flex items-center gap-2 max-w-[40%]">
-          <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center shrink-0 p-1 overflow-hidden">
-            {latestTransfer.teams.out.name.toLowerCase().includes('free agent') || latestTransfer.teams.out.name === 'Unknown' ? (
-              <div className="w-full h-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-black text-[8px] rounded-full">FA</div>
-            ) : (
-              <img 
-                src={latestTransfer.teams.out.logo} 
-                alt={latestTransfer.teams.out.name}
-                className="w-full h-full object-contain"
-                onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIHN0cm9rZS13aWR0aD0iMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='; }}
-              />
-            )}
+      <div className="p-4 flex flex-col h-full relative z-10">
+        
+        {/* Header section */}
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-[#1a1a1a] border border-white/10 flex items-center justify-center shrink-0">
+              {!imgError && player.photo ? (
+                <img 
+                  src={player.photo} 
+                  alt={player.name}
+                  className="w-full h-full object-cover"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <User size={16} className="text-white/30" />
+              )}
+            </div>
+            <div>
+              <h3 className="text-base font-black text-white tracking-tight uppercase leading-none mb-1 line-clamp-1">{player.name}</h3>
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold text-white/40 tracking-wider">
+                <CalendarDays size={10} />
+                <span>{formattedDate}</span>
+              </div>
+            </div>
           </div>
-          <span className="text-[11px] font-semibold text-white/60 truncate">{latestTransfer.teams.out.name}</span>
-        </div>
-
-        {/* Arrow */}
-        <div className="text-white/20 mx-2 shrink-0">
-          <ArrowRightLeft size={14} className="opacity-50" />
-        </div>
-
-        {/* In Team */}
-        <div className="flex items-center gap-2 max-w-[40%] flex-row-reverse text-right">
-          <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 p-1 overflow-hidden border border-white/10 shadow-[0_0_10px_rgba(255,255,255,0.05)] group-hover:border-white/30 transition-colors">
-            {latestTransfer.teams.in.name.toLowerCase().includes('free agent') || latestTransfer.teams.in.name === 'Unknown' ? (
-              <div className="w-full h-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-black text-[8px] rounded-full">FA</div>
-            ) : (
-              <img 
-                src={latestTransfer.teams.in.logo} 
-                alt={latestTransfer.teams.in.name}
-                className="w-full h-full object-contain"
-                onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIHN0cm9rZS13aWR0aD0iMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='; }}
-              />
-            )}
+          
+          <div className={`px-2 py-1 rounded bg-[#1a1a1a] border border-white/5 text-[10px] font-black tracking-widest uppercase ${textColor}`}>
+            {priceDisplay}
           </div>
-          <span className="text-[11px] font-bold text-white truncate">{latestTransfer.teams.in.name}</span>
         </div>
+
+        {/* Transfer Path Box */}
+        <div className="mt-auto bg-[#0a0a0a] rounded-lg p-3 border border-white/5 flex items-center justify-between group-hover:bg-[#161616] transition-colors">
+          <div className="flex items-center gap-2 max-w-[40%]">
+            {renderTeamLogo(latestTransfer.teams.out)}
+            <span className="text-[10px] font-bold text-white/70 uppercase tracking-wide truncate">{latestTransfer.teams.out.name}</span>
+          </div>
+
+          <div className="text-white/20 shrink-0 mx-2">
+            <ArrowRight size={14} className="opacity-70 group-hover:text-white/50 group-hover:translate-x-1 transition-all" />
+          </div>
+
+          <div className="flex items-center gap-2 max-w-[40%] flex-row-reverse text-right">
+            {renderTeamLogo(latestTransfer.teams.in)}
+            <span className="text-[10px] font-black text-white uppercase tracking-wide truncate">{latestTransfer.teams.in.name}</span>
+          </div>
+        </div>
+
       </div>
     </div>
   );
