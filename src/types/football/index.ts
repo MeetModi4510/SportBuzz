@@ -115,3 +115,16 @@ export interface FootballMatch {
   statistics?: FootballTeamStatistics[];
   players?: FootballMatchPlayerStat[];
 }
+
+export interface FootballTransferData {
+  player: { id: number; name: string };
+  update: string;
+  transfers: {
+    date: string;
+    type: string;
+    teams: {
+      in: { id: number; name: string; logo: string };
+      out: { id: number; name: string; logo: string };
+    };
+  }[];
+}

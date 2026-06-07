@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Navbar } from "../../components/Navbar";
 import { FootballMatchCard } from "../../components/football/FootballMatchCard";
-import { useLiveFootballMatches, useRecentFootballMatches, useUpcomingFootballMatches } from "../../hooks/football/useFootballQueries";
+import { TransferCard } from "../../components/football/TransferCard";
+import { useLiveFootballMatches, useRecentFootballMatches, useUpcomingFootballMatches, useRecentTransfers } from "../../hooks/football/useFootballQueries";
 import { Loader2, RefreshCw } from "lucide-react";
 import { footballApi } from "../../services/football/footballApi";
 import { useQueryClient } from "@tanstack/react-query";
 
-type Tab = "live" | "recent" | "upcoming";
+type Tab = "live" | "recent" | "upcoming" | "transfers";
 
 export default function FootballHome() {
   const [activeTab, setActiveTab] = useState<Tab>("live");
@@ -20,6 +21,7 @@ export default function FootballHome() {
   const { data: liveMatches, isLoading: liveLoading, refetch: refetchLive } = useLiveFootballMatches();
   const { data: recentMatches, isLoading: recentLoading, refetch: refetchRecent } = useRecentFootballMatches();
   const { data: upcomingMatches, isLoading: upcomingLoading, refetch: refetchUpcoming } = useUpcomingFootballMatches();
+  const { data: recentTransfers, isLoading: transfersLoading } = useRecentTransfers();
 
   const handleMatchClick = (matchId: number) => {
     navigate(`/football/match/${matchId}`);
@@ -37,6 +39,9 @@ export default function FootballHome() {
       } else if (activeTab === "upcoming") {
         await footballApi.getUpcomingMatches(true);
         await queryClient.invalidateQueries({ queryKey: ['football', 'upcoming'] });
+      } else if (activeTab === "transfers") {
+        await footballApi.getRecentTransfers(true);
+        await queryClient.invalidateQueries({ queryKey: ['football', 'transfers'] });
       }
     } finally {
       setIsRefreshing(false);
@@ -46,7 +51,8 @@ export default function FootballHome() {
   const isLoading = 
     (activeTab === "live" && liveLoading) ||
     (activeTab === "recent" && recentLoading) ||
-    (activeTab === "upcoming" && upcomingLoading);
+    (activeTab === "upcoming" && upcomingLoading) ||
+    (activeTab === "transfers" && transfersLoading);
 
   const currentMatches = useMemo(() => {
     if (activeTab === "live") return liveMatches || [];
@@ -70,10 +76,10 @@ export default function FootballHome() {
     <>
       <Helmet>
         <title>Football Hub | SportsBuzz</title>
-        <meta name="description" content="Live football scores, recent results, and upcoming fixtures from top global leagues." />
+        <meta name="description" content="Live football scores, recent results, upcoming fixtures, and transfers from top global leagues." />
       </Helmet>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-20">
         <Navbar />
 
         <main className="container mx-auto px-4 py-6 space-y-8">
@@ -101,6 +107,12 @@ export default function FootballHome() {
                 >
                   Upcoming
                 </button>
+                <button
+                  onClick={() => setActiveTab("transfers")}
+                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'transfers' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  Transfers
+                </button>
               </div>
 
               <button
@@ -119,12 +131,24 @@ export default function FootballHome() {
             <div className="flex items-center justify-center py-20">
               <Loader2 className="w-8 h-8 animate-spin text-primary/60" />
             </div>
+          ) : activeTab === "transfers" ? (
+            !recentTransfers || recentTransfers.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center border border-border/40 rounded-xl bg-secondary/10">
+                <p className="text-muted-foreground font-medium">No recent transfers available.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in duration-300">
+                {recentTransfers.map((transfer, idx) => (
+                  <TransferCard key={idx} transferData={transfer} />
+                ))}
+              </div>
+            )
           ) : currentMatches.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center border border-border/40 rounded-xl bg-secondary/10">
               <p className="text-muted-foreground font-medium">No matches available for this category right now.</p>
             </div>
           ) : (
-            <div className="space-y-10">
+            <div className="space-y-10 animate-in fade-in duration-300">
               {Object.entries(groupedMatches).map(([leagueName, matches]) => (
                 <section key={leagueName} className="space-y-4">
                   <div className="flex items-center gap-3 border-b border-border/30 pb-2">

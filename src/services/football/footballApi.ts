@@ -1,6 +1,6 @@
 import { footballApiClient } from './apiClient';
 import { cacheManager } from '../../utils/football/cacheManager';
-import { FootballMatch } from '../../types/football';
+import { FootballMatch, FootballTransferData } from '../../types/football';
 
 // Priority League IDs as requested
 export const PRIORITY_LEAGUES = [
@@ -129,5 +129,60 @@ export const footballApi = {
     
     cacheManager.set(cacheKey, upcomingPriority, 15);
     return upcomingPriority;
+  },
+
+  async getRecentTransfers(forceRefresh = false): Promise<FootballTransferData[]> {
+    const cacheKey = 'recent_transfers';
+    if (!forceRefresh) {
+      const cached = cacheManager.get<FootballTransferData[]>(cacheKey);
+      if (cached && cached.length > 0) return cached;
+    }
+
+    const PRIORITY_TEAMS = [
+      541, // Real Madrid
+      529, // Barcelona
+      50, // Man City
+      42, // Arsenal
+      40, // Liverpool
+      33, // Man Utd
+      157, // Bayern Munich
+      85, // PSG
+      496, // Juventus
+      505, // Inter Milan
+    ];
+
+    let allTransfers: FootballTransferData[] = [];
+    
+    // We fetch them concurrently
+    const promises = PRIORITY_TEAMS.map(teamId => 
+      footballApiClient.get('/transfers', { params: { team: teamId } })
+        .then(res => res.data.response || [])
+        .catch(() => [])
+    );
+
+    const results = await Promise.all(promises);
+    results.forEach(teamTransfers => {
+      allTransfers = [...allTransfers, ...teamTransfers];
+    });
+
+    // Deduplicate by player ID since multiple teams might report the same transfer
+    const uniqueTransfersMap = new Map<number, FootballTransferData>();
+    allTransfers.forEach(t => {
+      if (!uniqueTransfersMap.has(t.player.id)) {
+        uniqueTransfersMap.set(t.player.id, t);
+      }
+    });
+
+    let uniqueTransfers = Array.from(uniqueTransfersMap.values());
+
+    // Sort by latest transfer date.
+    uniqueTransfers.sort((a, b) => {
+      const dateA = new Date(a.transfers[0]?.date || a.update || 0).getTime();
+      const dateB = new Date(b.transfers[0]?.date || b.update || 0).getTime();
+      return dateB - dateA; // Descending
+    });
+
+    cacheManager.set(cacheKey, uniqueTransfers, 60); // Cache for 1 hour
+    return uniqueTransfers;
   }
 };

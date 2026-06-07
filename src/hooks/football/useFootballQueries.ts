@@ -35,3 +35,12 @@ export const useUpcomingFootballMatches = () => {
     staleTime: 6 * 60 * 60 * 1000, // 6 hours
   });
 };
+
+export const useRecentTransfers = () => {
+  return useQuery({
+    queryKey: ['football', 'transfers'],
+    queryFn: () => footballApi.getRecentTransfers(false),
+    ...NO_AUTO_REFETCH,
+    staleTime: 6 * 60 * 60 * 1000, // 6 hours
+  });
+};
