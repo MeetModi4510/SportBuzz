@@ -168,14 +168,6 @@ export const footballApi = {
     getTournamentStats: (id: string) => api.get(`football/tournaments/${id}/stats`),
     getTournamentNews: (id: string) => api.get(`football/tournaments/${id}/news`),
     
-    // External/Existing
-    getMatchSquads: (matchId: string) => api.get(`football/match/${matchId}/squads`),
-    getLiveMatches: () => api.get('football/matches/live'),
-
-    // Real Football Data (Hybrid: AllSportsApi2 + Football-Data.org)
-    getDashboard: () => api.get('football/dashboard'),
-    getCategorizedMatches: () => api.get('football/matches/categorized'),
-    getMatchDetail: (id: string) => api.get(`football/detail/${id}`),
 };
 
 export const tournamentApi = {

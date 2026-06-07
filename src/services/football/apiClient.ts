@@ -9,6 +9,7 @@ export const footballApiClient = axios.create({
   headers: {
     'x-rapidapi-host': API_HOST,
     'x-rapidapi-key': API_KEY,
+    'x-apisports-key': API_KEY, // Critical for direct api-sports.io domain
   },
 });
 
