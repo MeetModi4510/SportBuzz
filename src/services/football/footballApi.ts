@@ -37,8 +37,8 @@ export const footballApi = {
 
     let matches: FootballMatch[] = response.data.response || [];
     
-    // Cache live matches for only 1 minute to stay real-time
-    cacheManager.set(cacheKey, matches, 1);
+    // Cache live matches for 15 minutes to save API limits
+    cacheManager.set(cacheKey, matches, 15);
     return matches;
   },
 
