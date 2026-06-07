@@ -19,6 +19,7 @@ export const PRIORITY_LEAGUES = [
   2, // Champions League
   3, // Europa League
   848, // Conference League
+  9, // Copa America
 ];
 
 export const footballApi = {
@@ -36,6 +37,9 @@ export const footballApi = {
     });
 
     let matches: FootballMatch[] = response.data.response || [];
+    
+    // Filter to only prioritize leagues requested
+    matches = matches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
     
     // Cache live matches for 15 minutes to save API limits
     cacheManager.set(cacheKey, matches, 15);
@@ -61,6 +65,7 @@ export const footballApi = {
     });
 
     let matches: FootballMatch[] = response.data.response || [];
+    matches = matches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
     cacheManager.set(cacheKey, matches, 30); // Cache 30 mins
     return matches;
   },
@@ -80,6 +85,7 @@ export const footballApi = {
     });
 
     let matches: FootballMatch[] = response.data.response || [];
+    matches = matches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
     cacheManager.set(cacheKey, matches, 60); // Cache 1 hour
     return matches;
   }
