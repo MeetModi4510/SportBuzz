@@ -68,31 +68,39 @@ export function TransferCard({ transferData }: TransferCardProps) {
       <div className="flex items-center justify-between relative z-10 px-2">
         {/* Out Team */}
         <div className="flex items-center gap-2 max-w-[40%]">
-          <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center shrink-0 p-1">
-            <img 
-              src={latestTransfer.teams.out.logo} 
-              alt={latestTransfer.teams.out.name}
-              className="w-full h-full object-contain"
-              onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIHN0cm9rZS13aWR0aD0iMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='; }}
-            />
+          <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center shrink-0 p-1 overflow-hidden">
+            {latestTransfer.teams.out.name.toLowerCase().includes('free agent') || latestTransfer.teams.out.name === 'Unknown' ? (
+              <div className="w-full h-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-black text-[8px] rounded-full">FA</div>
+            ) : (
+              <img 
+                src={latestTransfer.teams.out.logo} 
+                alt={latestTransfer.teams.out.name}
+                className="w-full h-full object-contain"
+                onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIHN0cm9rZS13aWR0aD0iMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='; }}
+              />
+            )}
           </div>
           <span className="text-[11px] font-semibold text-white/60 truncate">{latestTransfer.teams.out.name}</span>
         </div>
 
         {/* Arrow */}
-        <div className="text-white/20 mx-2">
+        <div className="text-white/20 mx-2 shrink-0">
           <ArrowRightLeft size={14} className="opacity-50" />
         </div>
 
         {/* In Team */}
         <div className="flex items-center gap-2 max-w-[40%] flex-row-reverse text-right">
-          <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 p-1 border border-white/10 shadow-[0_0_10px_rgba(255,255,255,0.05)] group-hover:border-white/30 transition-colors">
-            <img 
-              src={latestTransfer.teams.in.logo} 
-              alt={latestTransfer.teams.in.name}
-              className="w-full h-full object-contain"
-              onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIHN0cm9rZS13aWR0aD0iMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='; }}
-            />
+          <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 p-1 overflow-hidden border border-white/10 shadow-[0_0_10px_rgba(255,255,255,0.05)] group-hover:border-white/30 transition-colors">
+            {latestTransfer.teams.in.name.toLowerCase().includes('free agent') || latestTransfer.teams.in.name === 'Unknown' ? (
+              <div className="w-full h-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-black text-[8px] rounded-full">FA</div>
+            ) : (
+              <img 
+                src={latestTransfer.teams.in.logo} 
+                alt={latestTransfer.teams.in.name}
+                className="w-full h-full object-contain"
+                onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIHN0cm9rZS13aWR0aD0iMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='; }}
+              />
+            )}
           </div>
           <span className="text-[11px] font-bold text-white truncate">{latestTransfer.teams.in.name}</span>
         </div>
