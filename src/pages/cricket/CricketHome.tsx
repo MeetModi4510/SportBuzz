@@ -62,7 +62,7 @@ export default function CricketHome() {
                 </div>
               ) : (
                 <MatchSection
-                  title="Cricket Matches"
+                  title="Fixtures & Results"
                   sport="cricket"
                   matches={currentMatches}
                   onMatchClick={(match) => handleMatchClick(match.id)}
