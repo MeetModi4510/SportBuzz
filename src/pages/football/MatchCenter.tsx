@@ -297,7 +297,7 @@ export default function MatchCenter() {
           
           {activeTab === "lineups" && (
             <div className="animate-in fade-in duration-300">
-              <MatchLineups lineups={match.lineups || []} homeTeam={match.teams.home} awayTeam={match.teams.away} events={match.events || []} />
+              <MatchLineups lineups={match.details?.lineups || match.lineups || []} homeTeam={match.teams.home} awayTeam={match.teams.away} events={match.details?.incidents || match.events || []} playerStats={match.details?.playerStatistics || match.players || []} />
             </div>
           )}
 

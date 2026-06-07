@@ -2,14 +2,17 @@ import { FootballLineup, FootballTeam, FootballEvent } from "../../types/footbal
 import { TeamLogo } from "../TeamLogo";
 import { Users, ArrowUp, ArrowDown } from "lucide-react";
 
+import { FootballMatchPlayerStat } from "../../types/football";
+
 interface MatchLineupsProps {
   lineups: FootballLineup[];
   homeTeam: FootballTeam;
   awayTeam: FootballTeam;
   events?: FootballEvent[];
+  playerStats?: FootballMatchPlayerStat[];
 }
 
-export function MatchLineups({ lineups, homeTeam, awayTeam, events = [] }: MatchLineupsProps) {
+export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerStats = [] }: MatchLineupsProps) {
   if (!lineups || lineups.length !== 2) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground bg-secondary/10 rounded-xl border border-border/30">
@@ -55,26 +58,55 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [] }: Match
   const awayRowsSorted = getRows(awayLineup.startXI, false);
   const homeRowsSorted = getRows(homeLineup.startXI, true);
 
-  const renderPlayer = (item: any, isHome: boolean) => (
-    <div key={item.player.id} className="flex flex-col items-center justify-center w-16 md:w-20 group z-10 transition-transform hover:scale-110">
-      <div className={`relative w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xs md:text-sm font-bold font-display shadow-xl border-[3px] overflow-hidden ${isHome ? 'bg-blue-600 text-white border-blue-400/80' : 'bg-red-600 text-white border-red-400/80'}`}>
-        <span className="absolute z-0">{item.player.number}</span>
-        {item.player.id && (
-          <img 
-            src={`https://media.api-sports.io/football/players/${item.player.id}.png`} 
-            alt={item.player.name}
-            className="absolute inset-0 w-full h-full object-cover z-10"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        )}
+  const getPlayerRating = (playerId: number) => {
+    if (!playerStats || playerStats.length === 0) return null;
+    for (const teamStat of playerStats) {
+      const p = teamStat.players.find(p => p.player.id === playerId);
+      if (p && p.statistics && p.statistics[0] && p.statistics[0].games.rating) {
+        return parseFloat(p.statistics[0].games.rating).toFixed(1);
+      }
+    }
+    return null;
+  };
+
+  const renderPlayer = (item: any, isHome: boolean) => {
+    const rating = getPlayerRating(item.player.id);
+    const getRatingColor = (r: string) => {
+      const val = parseFloat(r);
+      if (val >= 8.0) return 'bg-green-500 text-white border-green-700';
+      if (val >= 7.0) return 'bg-emerald-500 text-white border-emerald-700';
+      if (val >= 6.0) return 'bg-yellow-500 text-white border-yellow-700';
+      return 'bg-red-500 text-white border-red-700';
+    };
+
+    return (
+      <div key={item.player.id} className="flex flex-col items-center justify-center w-16 md:w-20 group z-10 transition-transform hover:scale-110">
+        <div className="relative">
+          <div className={`relative w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xs md:text-sm font-bold font-display shadow-xl border-[3px] overflow-hidden ${isHome ? 'bg-blue-600 text-white border-blue-400/80' : 'bg-red-600 text-white border-red-400/80'}`}>
+            <span className="absolute z-0">{item.player.number}</span>
+            {item.player.id && (
+              <img 
+                src={`https://media.api-sports.io/football/players/${item.player.id}.png`} 
+                alt={item.player.name}
+                className="absolute inset-0 w-full h-full object-cover z-10"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            )}
+          </div>
+          {rating && (
+            <div className={`absolute -top-1 -right-2 text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded-sm border shadow-lg z-20 ${getRatingColor(rating)}`}>
+              {rating}
+            </div>
+          )}
+        </div>
+        <div className="mt-1 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] md:text-xs text-white font-medium text-center truncate w-full shadow-md z-20">
+          {item.player.name.split(' ').pop()}
+        </div>
       </div>
-      <div className="mt-1 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] md:text-xs text-white font-medium text-center truncate w-full shadow-md z-20">
-        {item.player.name.split(' ').pop()}
-      </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="max-w-3xl mx-auto animate-in fade-in duration-300 space-y-8">
