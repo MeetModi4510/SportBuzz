@@ -85,6 +85,17 @@ export interface FootballLineup {
   substitutes: FootballPlayerInfo[];
 }
 
+export interface FootballMatchPlayerStat {
+  team: { id: number; name: string; logo: string };
+  players: {
+    player: { id: number; name: string; photo: string };
+    statistics: {
+      games: { rating: string | null; minutes: number | null };
+      goals: { total: number | null; assists: number | null };
+    }[];
+  }[];
+}
+
 export interface FootballMatch {
   fixture: FootballFixture;
   league: FootballLeague;
@@ -102,4 +113,18 @@ export interface FootballMatch {
   events?: FootballEvent[];
   lineups?: FootballLineup[];
   statistics?: FootballTeamStatistics[];
+  players?: FootballMatchPlayerStat[];
+}
+
+export interface FootballTransferData {
+  player: { id: number; name: string };
+  update: string;
+  transfers: {
+    date: string;
+    type: string;
+    teams: {
+      in: { id: number; name: string; logo: string };
+      out: { id: number; name: string; logo: string };
+    };
+  }[];
 }
