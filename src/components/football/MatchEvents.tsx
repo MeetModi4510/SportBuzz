@@ -34,15 +34,20 @@ const renderEventIcon = (type: string, detail: string) => {
 };
 
 const getEventStyle = (type: string, detail: string) => {
+  // Use a unified, minimalistic glassmorphic style without radiant colors
+  return "border-border/30 bg-secondary/10 hover:bg-secondary/20 shadow-sm";
+};
+
+const getIconColor = (type: string, detail: string) => {
   const t = type.toLowerCase();
-  if (t === "goal") return "border-green-500/30 bg-green-500/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]";
+  if (t === "goal") return "text-primary bg-primary/10";
   if (t === "card") {
     return detail.toLowerCase().includes("red") 
-      ? "border-red-500/30 bg-red-500/10 shadow-[0_0_15px_rgba(239,68,68,0.1)]" 
-      : "border-yellow-500/30 bg-yellow-500/10 shadow-[0_0_15px_rgba(234,179,8,0.1)]";
+      ? "text-red-500 bg-red-500/10" 
+      : "text-yellow-500 bg-yellow-500/10";
   }
-  if (t === "subst") return "border-blue-500/30 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.1)]";
-  return "border-border/40 bg-secondary/30";
+  if (t === "subst") return "text-blue-500 bg-blue-500/10";
+  return "text-muted-foreground bg-secondary/50";
 };
 
 export function MatchEvents({ events, homeTeam, awayTeam }: MatchEventsProps) {
@@ -87,10 +92,10 @@ export function MatchEvents({ events, homeTeam, awayTeam }: MatchEventsProps) {
                       
                       {/* Icon & Time Column */}
                       <div className="flex flex-col items-center gap-1.5 shrink-0">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-md bg-background/80 border border-border/50 backdrop-blur-sm">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm border border-border/40 ${getIconColor(event.type, event.detail)}`}>
                           {renderEventIcon(event.type, event.detail)}
                         </div>
-                        <span className="font-black text-foreground text-sm tracking-tighter">
+                        <span className="font-bold text-foreground text-sm tracking-tighter">
                           {event.time.elapsed}'{event.time.extra ? `+${event.time.extra}` : ''}
                         </span>
                       </div>
