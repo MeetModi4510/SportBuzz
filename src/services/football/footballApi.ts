@@ -191,17 +191,31 @@ export const footballApi = {
       const rawTransfers = response.data?.transfers || [];
 
       // Map FotMob response to our FootballTransferData interface
-      const allTransfers: FootballTransferData[] = rawTransfers.map((t: any) => ({
-        player: {
-          id: t.playerId,
-          name: t.name
-        },
-        update: t.transferDate,
-        transfers: [
-          {
-            date: t.transferDate,
-            type: t.transferType?.text || t.fee?.feeText || 'Transfer',
-            teams: {
+      const allTransfers: FootballTransferData[] = rawTransfers.map((t: any) => {
+        // Price formatting
+        let priceStr = t.fee?.feeText || t.transferType?.text || 'Transfer';
+        if (t.fee?.value && t.fee.value > 0) {
+          const valueInM = (t.fee.value / 1000000).toFixed(1);
+          priceStr = `€${valueInM}M`;
+        } else if (t.fee?.localizedFeeText === 'on_loan' || t.transferType?.text === 'on loan') {
+          priceStr = 'LOAN';
+        } else if (t.fee?.localizedFeeText === 'free_transfer' || t.transferType?.text === 'free') {
+          priceStr = 'FREE';
+        }
+
+        return {
+          player: {
+            id: t.playerId,
+            name: t.name,
+            photo: t.playerId ? `https://images.fotmob.com/image_resources/playerimages/${t.playerId}.png` : undefined
+          },
+          update: t.transferDate,
+          transfers: [
+            {
+              date: t.transferDate,
+              type: t.transferType?.text || t.fee?.feeText || 'Transfer',
+              price: priceStr,
+              teams: {
               out: {
                 id: t.fromClubId,
                 name: t.fromClub || t.fromClubFullName || 'Unknown',

@@ -117,11 +117,12 @@ export interface FootballMatch {
 }
 
 export interface FootballTransferData {
-  player: { id: number; name: string };
+  player: { id: number; name: string; photo?: string };
   update: string;
   transfers: {
     date: string;
     type: string;
+    price?: string;
     teams: {
       in: { id: number; name: string; logo: string };
       out: { id: number; name: string; logo: string };
