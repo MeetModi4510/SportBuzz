@@ -82,10 +82,19 @@ export const NewsSection = () => {
               {marqueeData.map((news, index) => (
                 <div
                   key={`${news.id}-${index}`}
-                  onClick={() => setSelectedArticle(news)}
+                  onClick={() => {
+                    if (news.sport === 'football' && (news as any).pageUrl) {
+                      const url = (news as any).pageUrl.startsWith('/') 
+                        ? `https://www.fotmob.com${(news as any).pageUrl}`
+                        : (news as any).pageUrl;
+                      window.open(url, '_blank');
+                    } else {
+                      setSelectedArticle(news);
+                    }
+                  }}
                   className={cn(
-                    "min-w-[280px] md:min-w-[320px] max-w-[320px] flex-shrink-0 cursor-pointer",
-                    "group relative p-5 rounded-2xl border bg-card/40 backdrop-blur-sm",
+                    "min-w-[280px] md:min-w-[320px] max-w-[320px] flex-shrink-0 cursor-pointer flex flex-col",
+                    "group relative rounded-2xl border bg-card/40 backdrop-blur-sm overflow-hidden",
                     "hover:-translate-y-1 hover:shadow-lg transition-all duration-300",
                     news.sport === 'cricket' ? "border-blue-500/20 hover:border-blue-500/40" :
                     news.sport === 'football' ? "border-green-500/20 hover:border-green-500/40" :
@@ -95,14 +104,22 @@ export const NewsSection = () => {
                 >
                   {/* Subtle gradient background based on sport */}
                   <div className={cn(
-                    "absolute inset-0 opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300 pointer-events-none",
+                    "absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none",
                     news.sport === 'cricket' ? "bg-gradient-to-br from-blue-500 to-indigo-500" :
                     news.sport === 'football' ? "bg-gradient-to-br from-green-500 to-emerald-500" :
                     news.sport === 'basketball' ? "bg-gradient-to-br from-orange-500 to-red-500" :
                     "bg-gradient-to-br from-yellow-500 to-amber-500"
                   )} />
 
-                  <div className="relative z-10 flex flex-col h-full justify-between gap-3 pointer-events-none">
+                  {/* Football Image Header */}
+                  {news.sport === 'football' && (news as any).imageUrl && (
+                    <div className="w-full h-32 overflow-hidden shrink-0 border-b border-border/10 relative">
+                      <img src={(news as any).imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+                    </div>
+                  )}
+
+                  <div className="relative z-10 flex flex-col h-full justify-between gap-3 p-5 pointer-events-none">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <SportIcon sport={news.sport} size={16} />
@@ -113,9 +130,19 @@ export const NewsSection = () => {
                             </span>
                           )}
                           {(news as any).isLive && news.sport === 'football' && (
-                            <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/25 px-1.5 py-0.5 rounded-full animate-pulse">
-                              NEW
-                            </span>
+                            <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                              {(news as any).sourceIconUrl && (
+                                <img src={(news as any).sourceIconUrl} className="w-3 h-3 object-contain" alt="" />
+                              )}
+                              <span className="text-[9px] font-bold text-emerald-400">
+                                {(news as any).sourceStr || 'NEW'}
+                              </span>
+                              {(news as any).sourceStr && (
+                                <span className="text-[9px] font-bold text-emerald-400/50 ml-0.5 animate-pulse">
+                                  • NEW
+                                </span>
+                              )}
+                            </div>
                           )}
                           <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium bg-secondary/50 px-2 py-0.5 rounded-full border border-border/50">
                             <Clock size={12} />
@@ -127,9 +154,11 @@ export const NewsSection = () => {
                         {/* For live news use short headline (hline), else the title */}
                         {(news as CricketNewsItem).headline || news.title}
                       </h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                        {news.snippet}
-                      </p>
+                      {!((news.sport === 'football' && (news as any).imageUrl)) && (
+                        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                          {news.snippet}
+                        </p>
+                      )}
                       {/* Context tag for live cricket news */}
                       {(news as CricketNewsItem).context && (
                         <span className="inline-block text-[10px] text-blue-400/70 bg-blue-500/10 border border-blue-500/15 px-1.5 py-0.5 rounded-full truncate max-w-full">

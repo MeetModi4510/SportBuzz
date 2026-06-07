@@ -279,16 +279,16 @@ export const footballApi = {
       // response is already { success: true, data: [...] }
       const rawNews = response?.data || [];
       
-      // Map RapidAPI headline to title for the sidebar component
+      // Map FotMob response for the sidebar component
       const news = Array.isArray(rawNews) ? rawNews.map((item: any) => ({
         ...item,
-        title: item.headLine || item.headline || 'Football News',
+        title: item.title || item.headLine || item.headline || 'Football News',
         summary: item.summary || 'Click to read full story on SportsBuzz Football.',
-        source: item.source || 'RapidAPI',
-        publishedAt: item.publishedAt || new Date().toISOString(),
+        source: item.sourceStr || item.source || 'FotMob',
+        publishedAt: item.gmtTime || item.publishedAt || new Date().toISOString(),
       })) : [];
       
-      cacheManager.set(cacheKey, news, 30); // Cache for 30 minutes
+      cacheManager.set(cacheKey, news, 60); // Cache for 60 minutes
       return news;
     } catch (error) {
       console.error("Failed to fetch global football news", error);

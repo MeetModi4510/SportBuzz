@@ -311,22 +311,22 @@ export async function getGlobalFootballNews() {
 
 export async function getFootballLiveNews() {
     const cacheKey = 'footballLiveNews';
-    const TTL = 10 * 60 * 1000; // 10 minutes cache
+    const TTL = 60 * 60 * 1000; // 1 hour cache
     if (cache[cacheKey]?.data && (Date.now() - cache[cacheKey].timestamp) < TTL) {
         return cache[cacheKey].data;
     }
 
     try {
-        const res = await axios.get('https://football_api12.p.rapidapi.com/players/news', {
+        const res = await axios.get('https://fotmob-api.p.rapidapi.com/api/v1/news/trending?ccode3=USA', {
             headers: {
                 'x-rapidapi-key': process.env.football_news || 'ea08b9a9d5msh0ce1b811a3294e7p19b61bjsnb06b82498cf2',
-                'x-rapidapi-host': 'football_api12.p.rapidapi.com'
+                'x-rapidapi-host': 'fotmob-api.p.rapidapi.com'
             },
             timeout: 10000
         });
         
-        // Ensure data is array
-        const newsData = Array.isArray(res.data) ? res.data : [];
+        // Ensure data is array from items
+        const newsData = Array.isArray(res.data?.items) ? res.data.items : [];
         
         cache[cacheKey] = { data: newsData, timestamp: Date.now() };
         return newsData;

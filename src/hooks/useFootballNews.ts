@@ -7,6 +7,20 @@ export interface FootballNewsItem {
   headline: string;
   isLive: boolean;
   timestamp: string;
+  imageUrl?: string;
+  sourceStr?: string;
+  sourceIconUrl?: string;
+  pageUrl?: string;
+}
+
+function timeAgo(dateStr: string) {
+  const diff = Math.max(0, Date.now() - new Date(dateStr).getTime());
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
 }
 
 export function useFootballNews() {
@@ -18,19 +32,20 @@ export function useFootballNews() {
 
     const fetchNews = async () => {
       try {
-        // Note: api.ts response interceptor auto-unwraps response.data,
-        // so `res` is already the parsed JSON body: { success: true, data: [...] }
         const res = await api.get('/football/live-news') as any;
         if (res?.success && Array.isArray(res.data)) {
           if (mounted) {
-            // Transform the rapidapi response format
             const formatted = res.data.map((item: any) => ({
-              id: item.id,
+              id: item.id || Math.random().toString(),
               sport: 'football',
-              headline: item.headLine || item.headline || 'Football Update',
+              headline: item.title || item.headline || 'Football Update',
               snippet: 'Click to read full story on SportsBuzz Football.',
               isLive: true,
-              timestamp: 'Just now'
+              timestamp: item.gmtTime ? timeAgo(item.gmtTime) : 'Just now',
+              imageUrl: item.imageUrl,
+              sourceStr: item.sourceStr,
+              sourceIconUrl: item.sourceIconUrl,
+              pageUrl: item.page?.url
             }));
             setNews(formatted);
           }
@@ -44,8 +59,8 @@ export function useFootballNews() {
 
     fetchNews();
 
-    // Poll every 10 minutes (600000ms) to sync with backend cache
-    const interval = setInterval(fetchNews, 600000);
+    // Poll every 1 hour (3600000ms) to sync with backend cache
+    const interval = setInterval(fetchNews, 3600000);
 
     return () => {
       mounted = false;
