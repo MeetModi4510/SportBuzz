@@ -176,7 +176,7 @@ export const footballApi = {
   },
 
   async getRecentTransfers(forceRefresh = false): Promise<FootballTransferData[]> {
-    const cacheKey = 'recent_transfers_v2';
+    const cacheKey = 'recent_transfers_v3';
     const CACHE_TTL_MINUTES = 12 * 60; // 12 hours
 
     if (!forceRefresh) {
@@ -241,7 +241,6 @@ export const footballApi = {
       }
       
       // Fallback if empty (e.g., no transfers in the last week)
-      cacheManager.set(cacheKey, MOCK_TRANSFERS as any, CACHE_TTL_MINUTES);
       return MOCK_TRANSFERS as any;
 
     } catch (err) {

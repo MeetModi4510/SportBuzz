@@ -13,7 +13,7 @@ export const footballApiClient = axios.create({
   },
 });
 
-const TRANSFERS_API_KEY = import.meta.env.VITE_FOOTBALL_TRANSFERS_API_KEY || '';
+const TRANSFERS_API_KEY = '982d5ee668msh085573a4a340b18p114ab3jsn335eb6f0210c';
 const TRANSFERS_API_HOST = 'fotmob-api.p.rapidapi.com';
 
 export const transfersApiClient = axios.create({
