@@ -99,16 +99,16 @@ export function MatchEvents({ events, homeTeam, awayTeam }: MatchEventsProps) {
                       <div className={`flex flex-col flex-1 justify-center py-1 ${isHome ? 'text-left md:text-right' : 'text-left'}`}>
                         {event.type.toLowerCase() === "subst" ? (
                           <div className="space-y-1.5">
-                            <div className={`flex items-center gap-2 ${isHome ? 'md:justify-end' : ''}`}>
-                              <ArrowUp className="w-4 h-4 text-green-500" />
-                              <span className="font-bold text-foreground text-sm md:text-base leading-tight">IN: {event.player.name}</span>
-                            </div>
                             {event.assist.name && (
                               <div className={`flex items-center gap-2 ${isHome ? 'md:justify-end' : ''}`}>
-                                <ArrowDown className="w-4 h-4 text-red-500" />
-                                <span className="font-medium text-muted-foreground text-sm leading-tight">OUT: {event.assist.name}</span>
+                                <ArrowUp className="w-4 h-4 text-green-500" />
+                                <span className="font-bold text-foreground text-sm md:text-base leading-tight">IN: {event.assist.name}</span>
                               </div>
                             )}
+                            <div className={`flex items-center gap-2 ${isHome ? 'md:justify-end' : ''}`}>
+                              <ArrowDown className="w-4 h-4 text-red-500" />
+                              <span className="font-medium text-muted-foreground text-sm leading-tight">OUT: {event.player.name}</span>
+                            </div>
                           </div>
                         ) : (
                           <>
