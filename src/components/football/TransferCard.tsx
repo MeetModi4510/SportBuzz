@@ -22,8 +22,8 @@ export function TransferCard({ transferData }: TransferCardProps) {
   const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   // Determine accent color
-  const accentColor = isFree ? 'bg-emerald-500' : isLoan ? 'bg-blue-500' : 'bg-white';
-  const textColor = isFree ? 'text-emerald-500' : isLoan ? 'text-blue-500' : 'text-white';
+  const accentColor = isFree ? 'bg-emerald-500' : isLoan ? 'bg-blue-500' : 'bg-[#d4af37]';
+  const textColor = isFree ? 'text-emerald-500' : isLoan ? 'text-blue-500' : 'text-[#d4af37]';
 
   const renderTeamLogo = (team: { logo: string, name: string }) => {
     if (team.name.toLowerCase().includes('free agent') || team.name === 'Unknown') {
