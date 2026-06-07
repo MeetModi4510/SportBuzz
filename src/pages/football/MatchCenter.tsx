@@ -84,89 +84,111 @@ export default function MatchCenter() {
         <Navbar />
 
         {/* Header / Scoreboard */}
-        <div className="relative pt-6 pb-12 overflow-hidden border-b border-border/20 bg-gradient-to-b from-background to-secondary/5">
-          {/* Subtle background glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[300px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
-
+        <div className="relative pt-8 pb-12 border-b border-border/20 bg-background">
           <div className="container mx-auto px-4 relative z-10">
             <button 
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors group w-max"
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors group w-max"
             >
               <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
               Back
             </button>
 
-            <div className="flex flex-col items-center justify-center max-w-4xl mx-auto">
-              <span className="text-[10px] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase bg-secondary/40 border border-border/40 px-5 py-2 rounded-full mb-10 backdrop-blur-md shadow-sm">
-                {match.league.name} • {match.fixture.venue.city}
+            {/* League Pill */}
+            <div className="flex justify-center mb-8">
+              <span className="text-[10px] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase bg-secondary/30 border border-border/40 px-6 py-2 rounded-full backdrop-blur-sm">
+                {match.league.name} {match.fixture.venue.city ? `• ${match.fixture.venue.city}` : ''}
               </span>
+            </div>
 
-              <div className="flex items-stretch justify-center w-full gap-2 md:gap-12">
+            <div className="flex items-center justify-center max-w-4xl mx-auto gap-4 md:gap-12">
+              
+              {/* Home Team */}
+              <div className="flex flex-col items-center flex-1 w-0">
+                <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-secondary/20 flex items-center justify-center p-3 mb-4 border border-border/30 shadow-md">
+                  <TeamLogo logo={match.teams.home.logo} name={match.teams.home.name} size="lg" className="w-full h-full object-contain filter drop-shadow-lg" />
+                </div>
+                <span className="font-bold text-lg md:text-2xl text-center leading-tight tracking-tight text-foreground/90">
+                  {match.teams.home.name}
+                </span>
+              </div>
+
+              {/* Score / Status */}
+              <div className="flex flex-col items-center justify-center shrink-0 w-32 md:w-48">
+                <div className="text-5xl md:text-7xl font-black tracking-tighter flex items-center justify-center gap-3 tabular-nums drop-shadow-md">
+                  <span className={match.goals.home !== null && match.goals.away !== null && match.goals.home > match.goals.away ? "text-foreground" : "text-foreground/80"}>
+                    {match.goals.home ?? '-'}
+                  </span>
+                  <span className="text-muted-foreground/30 font-light text-4xl md:text-6xl pb-2">-</span>
+                  <span className={match.goals.home !== null && match.goals.away !== null && match.goals.away > match.goals.home ? "text-foreground" : "text-foreground/80"}>
+                    {match.goals.away ?? '-'}
+                  </span>
+                </div>
+                <div className="mt-3 flex items-center justify-center gap-2 bg-secondary/40 px-4 py-1 rounded-md border border-border/40 backdrop-blur-sm">
+                  {isLive && <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />}
+                  <span className={`font-bold tracking-[0.1em] uppercase text-[10px] md:text-xs ${isLive ? 'text-red-500' : 'text-muted-foreground'}`}>
+                    {isLive ? `${match.fixture.status.elapsed}'` : match.fixture.status.short}
+                  </span>
+                </div>
+              </div>
+
+              {/* Away Team */}
+              <div className="flex flex-col items-center flex-1 w-0">
+                <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-secondary/20 flex items-center justify-center p-3 mb-4 border border-border/30 shadow-md">
+                  <TeamLogo logo={match.teams.away.logo} name={match.teams.away.name} size="lg" className="w-full h-full object-contain filter drop-shadow-lg" />
+                </div>
+                <span className="font-bold text-lg md:text-2xl text-center leading-tight tracking-tight text-foreground/90">
+                  {match.teams.away.name}
+                </span>
+              </div>
+
+            </div>
+
+            {/* Unified Goalscorers Section */}
+            {(homeGoals.length > 0 || awayGoals.length > 0) && (
+              <div className="max-w-2xl mx-auto mt-10 grid grid-cols-2 gap-0 border-t border-border/20 pt-6">
                 
-                {/* Home Team */}
-                <div className="flex flex-col items-center flex-1 w-0">
-                  <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-background/50 flex items-center justify-center p-4 mb-5 border border-border/30 shadow-2xl backdrop-blur-md hover:scale-105 transition-transform duration-500">
-                    <TeamLogo logo={match.teams.home.logo} name={match.teams.home.name} size="lg" className="w-full h-full object-contain filter drop-shadow-xl" />
-                  </div>
-                  <span className="font-extrabold text-lg md:text-3xl text-center leading-tight tracking-tight mb-5">
-                    {match.teams.home.name}
-                  </span>
-                  {homeGoals.length > 0 && (
-                    <div className="flex flex-col items-center gap-2 w-full">
-                      {homeGoals.map((goal, idx) => (
-                        <div key={idx} className="flex items-center justify-center flex-wrap gap-1.5 text-[11px] md:text-sm text-muted-foreground text-center">
-                          <span className="font-semibold text-foreground/90">{goal.player.name}</span>
-                          <span className="text-primary font-bold">{goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
-                          {goal.assist.name && <span className="opacity-60 text-[10px] hidden md:inline">({goal.assist.name})</span>}
-                        </div>
-                      ))}
+                {/* Home Goals */}
+                <div className="flex flex-col items-end gap-2 pr-4 md:pr-8 border-r border-border/20">
+                  {homeGoals.map((goal, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="flex flex-col items-end">
+                        <span className="font-semibold text-foreground/80">{goal.player.name}</span>
+                        {goal.assist.name && <span className="text-[10px] opacity-60">({goal.assist.name})</span>}
+                      </div>
+                      <div className="flex items-center gap-1.5 opacity-80">
+                        <span className="text-primary font-bold text-xs">{goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-foreground/60">
+                          <circle cx="12" cy="12" r="10" fill="none" strokeWidth="2" stroke="currentColor"/>
+                          <path d="M12 12l2.5-2h-5z" stroke="currentColor" />
+                        </svg>
+                      </div>
                     </div>
-                  )}
+                  ))}
                 </div>
-
-                {/* Score / Status */}
-                <div className="flex flex-col items-center justify-start pt-4 md:pt-8 px-2 md:px-6">
-                  <div className="text-5xl md:text-8xl font-black tracking-tighter flex items-center gap-3 md:gap-6 drop-shadow-2xl font-display">
-                    <span className={match.goals.home !== null && match.goals.away !== null && match.goals.home > match.goals.away ? "text-primary" : "text-foreground"}>
-                      {match.goals.home ?? '-'}
-                    </span>
-                    <span className="text-muted-foreground/20 font-light text-4xl md:text-7xl pb-2">:</span>
-                    <span className={match.goals.home !== null && match.goals.away !== null && match.goals.away > match.goals.home ? "text-primary" : "text-foreground"}>
-                      {match.goals.away ?? '-'}
-                    </span>
-                  </div>
-                  <div className="mt-6 flex items-center justify-center gap-2 bg-background/60 px-4 py-1.5 rounded-md backdrop-blur-md border border-border/40 shadow-sm">
-                    {isLive && <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" />}
-                    <span className={`font-bold tracking-[0.15em] uppercase text-[10px] md:text-xs ${isLive ? 'text-red-500' : 'text-muted-foreground'}`}>
-                      {isLive ? `${match.fixture.status.elapsed}'` : match.fixture.status.long}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Away Team */}
-                <div className="flex flex-col items-center flex-1 w-0">
-                  <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-background/50 flex items-center justify-center p-4 mb-5 border border-border/30 shadow-2xl backdrop-blur-md hover:scale-105 transition-transform duration-500">
-                    <TeamLogo logo={match.teams.away.logo} name={match.teams.away.name} size="lg" className="w-full h-full object-contain filter drop-shadow-xl" />
-                  </div>
-                  <span className="font-extrabold text-lg md:text-3xl text-center leading-tight tracking-tight mb-5">
-                    {match.teams.away.name}
-                  </span>
-                  {awayGoals.length > 0 && (
-                    <div className="flex flex-col items-center gap-2 w-full">
-                      {awayGoals.map((goal, idx) => (
-                        <div key={idx} className="flex items-center justify-center flex-wrap gap-1.5 text-[11px] md:text-sm text-muted-foreground text-center">
-                          <span className="font-semibold text-foreground/90">{goal.player.name}</span>
-                          <span className="text-primary font-bold">{goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
-                          {goal.assist.name && <span className="opacity-60 text-[10px] hidden md:inline">({goal.assist.name})</span>}
-                        </div>
-                      ))}
+                
+                {/* Away Goals */}
+                <div className="flex flex-col items-start gap-2 pl-4 md:pl-8">
+                  {awayGoals.map((goal, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1.5 opacity-80">
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-foreground/60">
+                          <circle cx="12" cy="12" r="10" fill="none" strokeWidth="2" stroke="currentColor"/>
+                          <path d="M12 12l2.5-2h-5z" stroke="currentColor" />
+                        </svg>
+                        <span className="text-primary font-bold text-xs">{goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <span className="font-semibold text-foreground/80">{goal.player.name}</span>
+                        {goal.assist.name && <span className="text-[10px] opacity-60">({goal.assist.name})</span>}
+                      </div>
                     </div>
-                  )}
+                  ))}
                 </div>
 
               </div>
-            </div>
+            )}
+            
           </div>
         </div>
 
