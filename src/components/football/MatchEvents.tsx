@@ -33,6 +33,18 @@ const renderEventIcon = (type: string, detail: string) => {
   return <Activity className="w-4 h-4 text-muted-foreground" />;
 };
 
+const getEventStyle = (type: string, detail: string) => {
+  const t = type.toLowerCase();
+  if (t === "goal") return "border-green-500/30 bg-green-500/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]";
+  if (t === "card") {
+    return detail.toLowerCase().includes("red") 
+      ? "border-red-500/30 bg-red-500/10 shadow-[0_0_15px_rgba(239,68,68,0.1)]" 
+      : "border-yellow-500/30 bg-yellow-500/10 shadow-[0_0_15px_rgba(234,179,8,0.1)]";
+  }
+  if (t === "subst") return "border-blue-500/30 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.1)]";
+  return "border-border/40 bg-secondary/30";
+};
+
 export function MatchEvents({ events, homeTeam, awayTeam }: MatchEventsProps) {
   if (!events || events.length === 0) {
     return (
@@ -57,70 +69,85 @@ export function MatchEvents({ events, homeTeam, awayTeam }: MatchEventsProps) {
       <div className="space-y-8">
         {sortedEvents.map((event, idx) => {
           const isHome = event.team.id === homeTeam.id;
+          const rowDirectionClass = isHome ? 'flex-row md:flex-row-reverse' : 'flex-row';
 
           return (
             <div key={idx} className="relative flex items-center w-full">
               {/* Timeline Dot */}
-              <div className="absolute left-6 md:left-1/2 w-4 h-4 bg-background border-[3px] border-primary rounded-full -translate-x-1/2 z-10 flex items-center justify-center">
-                 {/* Optional internal dot */}
-              </div>
+              <div className="absolute left-6 md:left-1/2 w-4 h-4 bg-background border-[3px] border-primary rounded-full -translate-x-1/2 z-10 flex items-center justify-center shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
 
               {/* Event Content Container */}
               <div className={`w-full flex ${isHome ? 'md:justify-start' : 'md:justify-end'}`}>
                 {/* Event Box Wrapper */}
-                <div className={`w-[calc(100%-4rem)] md:w-[calc(50%-2rem)] ml-16 md:ml-0 ${isHome ? 'md:mr-8 text-left md:text-right' : 'md:ml-8 text-left'}`}>
+                <div className={`w-[calc(100%-3rem)] md:w-[calc(50%-1.5rem)] ml-14 md:ml-0 ${isHome ? 'md:mr-6' : 'md:ml-6'}`}>
                   
-                  <div className="bg-secondary/20 hover:bg-secondary/30 transition-colors border border-border/40 p-4 rounded-xl shadow-sm">
-                    <div className={`flex items-center gap-2 mb-3 ${isHome ? 'md:justify-end' : ''}`}>
-                      <span className="font-extrabold text-primary text-sm min-w-[36px]">
-                        {event.time.elapsed}'{event.time.extra ? `+${event.time.extra}` : ''}
-                      </span>
-                      {renderEventIcon(event.type, event.detail)}
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-background border border-border/50 px-2 py-0.5 rounded-md ml-1">
-                        {event.type}
-                      </span>
-                    </div>
+                  <div className={`transition-all duration-300 p-4 rounded-xl backdrop-blur-md border ${getEventStyle(event.type, event.detail)}`}>
                     
-                    {event.type.toLowerCase() === "subst" ? (
-                      <div className="mt-2 space-y-1.5">
-                        <div className={`flex items-center gap-2 ${isHome ? 'md:justify-end' : ''}`}>
-                          <ArrowUp className="w-4 h-4 text-green-500" />
-                          <span className="font-bold text-foreground text-sm">IN: {event.player.name}</span>
+                    <div className={`flex items-center gap-4 ${rowDirectionClass}`}>
+                      
+                      {/* Icon & Time Column */}
+                      <div className="flex flex-col items-center gap-1.5 shrink-0">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-md bg-background/80 border border-border/50 backdrop-blur-sm">
+                          {renderEventIcon(event.type, event.detail)}
                         </div>
-                        {event.assist.name && (
-                          <div className={`flex items-center gap-2 ${isHome ? 'md:justify-end' : ''}`}>
-                            <ArrowDown className="w-4 h-4 text-red-500" />
-                            <span className="font-medium text-muted-foreground text-sm">OUT: {event.assist.name}</span>
-                          </div>
-                        )}
+                        <span className="font-black text-foreground text-sm tracking-tighter">
+                          {event.time.elapsed}'{event.time.extra ? `+${event.time.extra}` : ''}
+                        </span>
                       </div>
-                    ) : (
-                      <>
-                        <div className="font-semibold text-foreground text-base">
-                          {event.player.name}
-                        </div>
-                        
-                        {event.assist.name && (
-                          <div className={`text-sm text-muted-foreground mt-1.5 flex items-center gap-1.5 opacity-90 ${isHome ? 'md:justify-end' : ''}`}>
-                            {isHome ? (
-                              <>
-                                <span className="md:hidden">Assist:</span> {event.assist.name} <span className="hidden md:inline text-[10px] uppercase font-bold tracking-widest opacity-50 border border-border px-1 rounded">Assist</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="text-[10px] uppercase font-bold tracking-widest opacity-50 border border-border px-1 rounded">Assist</span> {event.assist.name}
-                              </>
+
+                      {/* Details Column */}
+                      <div className={`flex flex-col flex-1 justify-center py-1 ${isHome ? 'text-left md:text-right' : 'text-left'}`}>
+                        {event.type.toLowerCase() === "subst" ? (
+                          <div className="space-y-1.5">
+                            <div className={`flex items-center gap-2 ${isHome ? 'md:justify-end' : ''}`}>
+                              <ArrowUp className="w-4 h-4 text-green-500" />
+                              <span className="font-bold text-foreground text-sm md:text-base leading-tight">IN: {event.player.name}</span>
+                            </div>
+                            {event.assist.name && (
+                              <div className={`flex items-center gap-2 ${isHome ? 'md:justify-end' : ''}`}>
+                                <ArrowDown className="w-4 h-4 text-red-500" />
+                                <span className="font-medium text-muted-foreground text-sm leading-tight">OUT: {event.assist.name}</span>
+                              </div>
                             )}
                           </div>
+                        ) : (
+                          <>
+                            <div className="font-bold text-foreground text-base leading-tight">
+                              {event.player.name}
+                            </div>
+                            
+                            {event.assist.name && (
+                              <div className={`text-sm text-muted-foreground mt-1 flex items-center gap-1.5 opacity-90 ${isHome ? 'md:justify-end' : ''}`}>
+                                {isHome ? (
+                                  <>
+                                    <span className="md:hidden text-[10px] uppercase font-bold tracking-widest opacity-50 border border-border px-1 rounded">Assist</span> 
+                                    {event.assist.name} 
+                                    <span className="hidden md:inline text-[10px] uppercase font-bold tracking-widest opacity-50 border border-border px-1 rounded">Assist</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="text-[10px] uppercase font-bold tracking-widest opacity-50 border border-border px-1 rounded">Assist</span> {event.assist.name}
+                                  </>
+                                )}
+                              </div>
+                            )}
+                            
+                            <div className={`text-xs font-semibold mt-1.5 ${isHome ? 'md:text-right' : ''}`}>
+                              {event.type.toLowerCase() === 'card' ? (
+                                <span className={event.detail.toLowerCase().includes("red") ? "text-red-500" : "text-yellow-500"}>
+                                  {event.detail} {event.comments ? `- ${event.comments}` : ''}
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground/70">
+                                  {event.detail !== "Normal Goal" ? `${event.detail} ${event.comments ? `- ${event.comments}` : ''}` : 'Goal'}
+                                </span>
+                              )}
+                            </div>
+                          </>
                         )}
-                        
-                        {event.detail && event.detail !== "Normal Goal" && (
-                          <div className={`text-xs text-muted-foreground/70 mt-2 font-medium ${isHome ? 'md:text-right' : ''}`}>
-                            {event.detail} {event.comments ? `- ${event.comments}` : ''}
-                          </div>
-                        )}
-                      </>
-                    )}
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </div>
