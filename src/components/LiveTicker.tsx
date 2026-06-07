@@ -115,8 +115,10 @@ export const LiveTicker = () => {
           <div className="flex whitespace-nowrap animate-ticker w-max items-center h-full">
             {/* Render list twice for infinite smooth scrolling */}
             {[...tickerMatches, ...tickerMatches].map((match, idx) => {
-              const homeScore = match.homeScore || (match.status?.includes(match.homeTeam?.name || "") ? "W" : "-");
-              const awayScore = match.awayScore || (match.status?.includes(match.awayTeam?.name || "") ? "W" : "-");
+              const homeScoreRaw = match.homeScore || (match.status?.includes(match.homeTeam?.name || "") ? "W" : "-");
+              const awayScoreRaw = match.awayScore || (match.status?.includes(match.awayTeam?.name || "") ? "W" : "-");
+              const homeScore = typeof homeScoreRaw === 'string' ? homeScoreRaw.trim() : homeScoreRaw;
+              const awayScore = typeof awayScoreRaw === 'string' ? awayScoreRaw.trim() : awayScoreRaw;
               const isLive = match.status === "live";
 
               return (
@@ -140,16 +142,18 @@ export const LiveTicker = () => {
                        <div className="w-[1px] h-6 bg-border/80 mx-1" />
 
                        {/* Match Teams and Scores */}
-                       <div className="flex items-center gap-4 md:gap-5">
-                         <div className="flex items-center gap-3">
+                       <div className="flex items-center">
+                         <div className="flex items-center justify-end gap-2 md:gap-3 pr-4 md:pr-5 border-r border-transparent">
                            <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="sm" className="w-5 h-5 md:w-6 md:h-6 drop-shadow-md" />
                            <span className="font-bold text-sm md:text-base text-foreground uppercase tracking-wider">{match.homeTeam?.shortName}</span>
                            <span className="font-extrabold text-base md:text-lg text-foreground ml-1">{homeScore}</span>
                          </div>
                          
-                         <span className="text-muted-foreground/40 font-medium text-xs w-[24px] text-center shrink-0">vs</span>
+                         <div className="flex items-center justify-center min-w-[32px] md:min-w-[40px] shrink-0">
+                           <span className="text-muted-foreground/40 font-medium text-xs tracking-wider uppercase">vs</span>
+                         </div>
                          
-                         <div className="flex items-center gap-3">
+                         <div className="flex items-center justify-start gap-2 md:gap-3 pl-4 md:pl-5 border-l border-transparent">
                            <span className="font-extrabold text-base md:text-lg text-foreground mr-1">{awayScore}</span>
                            <span className="font-bold text-sm md:text-base text-foreground uppercase tracking-wider">{match.awayTeam?.shortName}</span>
                            <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="sm" className="w-5 h-5 md:w-6 md:h-6 drop-shadow-md" />
