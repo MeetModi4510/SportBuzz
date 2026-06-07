@@ -79,24 +79,16 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [] }: Match
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-300 space-y-8">
       
-      {/* Formation Headers */}
-      <div className="flex justify-between items-center bg-secondary/20 p-4 rounded-xl border border-border/40">
+      {/* Away Team Header (Top) */}
+      <div className="flex justify-center items-center bg-secondary/20 p-3 rounded-xl border border-border/40 max-w-[200px] mx-auto shadow-sm mb-4">
         <div className="flex items-center gap-3">
-          <TeamLogo logo={homeTeam.logo} name={homeTeam.name} size="sm" />
-          <div>
-            <h3 className="font-bold text-sm md:text-base leading-tight">{homeTeam.name}</h3>
-            <p className="text-xs text-muted-foreground">{homeLineup.formation}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 text-right">
-          <div>
-            <h3 className="font-bold text-sm md:text-base leading-tight">{awayTeam.name}</h3>
-            <p className="text-xs text-muted-foreground">{awayLineup.formation}</p>
-          </div>
           <TeamLogo logo={awayTeam.logo} name={awayTeam.name} size="sm" />
+          <div className="text-left">
+            <h3 className="font-bold text-sm md:text-base leading-tight">{awayTeam.name}</h3>
+            <p className="text-[10px] text-muted-foreground tracking-widest uppercase font-bold">{awayLineup.formation}</p>
+          </div>
         </div>
       </div>
-
       {/* The Pitch */}
       <div className="relative w-full aspect-[2/3] md:aspect-[3/4] max-w-2xl mx-auto rounded-lg overflow-hidden shadow-2xl border-4 border-green-900 bg-green-700 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]">
         {/* Pitch Markings */}
@@ -138,6 +130,16 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [] }: Match
         </div>
       </div>
 
+      {/* Home Team Header (Bottom) */}
+      <div className="flex justify-center items-center bg-secondary/20 p-3 rounded-xl border border-border/40 max-w-[200px] mx-auto shadow-sm mt-4">
+        <div className="flex items-center gap-3">
+          <TeamLogo logo={homeTeam.logo} name={homeTeam.name} size="sm" />
+          <div className="text-left">
+            <h3 className="font-bold text-sm md:text-base leading-tight">{homeTeam.name}</h3>
+            <p className="text-[10px] text-muted-foreground tracking-widest uppercase font-bold">{homeLineup.formation}</p>
+          </div>
+        </div>
+      </div>
       {/* Substitutes & Manager */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 items-stretch">
         {/* Home Subs */}
