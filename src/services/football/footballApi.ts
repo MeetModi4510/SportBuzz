@@ -216,20 +216,21 @@ export const footballApi = {
               type: t.transferType?.text || t.fee?.feeText || 'Transfer',
               price: priceStr,
               teams: {
-              out: {
-                id: t.fromClubId,
-                name: t.fromClub || t.fromClubFullName || 'Unknown',
-                logo: t.fromClubId > 0 ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.fromClubId}.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
-              },
-              in: {
-                id: t.toClubId,
-                name: t.toClub || t.toClubFullName || 'Unknown',
-                logo: t.toClubId > 0 ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.toClubId}.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
+                out: {
+                  id: t.fromClubId,
+                  name: t.fromClub || t.fromClubFullName || 'Unknown',
+                  logo: t.fromClubId > 0 ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.fromClubId}.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
+                },
+                in: {
+                  id: t.toClubId,
+                  name: t.toClub || t.toClubFullName || 'Unknown',
+                  logo: t.toClubId > 0 ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.toClubId}.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
+                }
               }
             }
-          }
-        ]
-      }));
+          ]
+        };
+      });
 
       // Filter using the PRIORITY_CLUBS list since FotMob lacks league info
       const priorityTransfers = allTransfers.filter(t => {
