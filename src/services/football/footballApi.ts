@@ -26,7 +26,8 @@ export const footballApi = {
     const cacheKey = 'live_matches';
     if (!forceRefresh) {
       const cached = cacheManager.get<FootballMatch[]>(cacheKey);
-      if (cached) return cached;
+      // If we cached an empty array, bypass it so we don't get stuck with 0 live matches
+      if (cached && cached.length > 0) return cached;
     }
 
     // Only fetch matches for priority leagues to save payload size if possible, or fetch all live and filter
@@ -36,9 +37,8 @@ export const footballApi = {
 
     let matches: FootballMatch[] = response.data.response || [];
     
-    // Filter to only prioritize leagues requested if needed, or group them later
-    // Cache for 15 minutes
-    cacheManager.set(cacheKey, matches, 15);
+    // Cache live matches for only 1 minute to stay real-time
+    cacheManager.set(cacheKey, matches, 1);
     return matches;
   },
 

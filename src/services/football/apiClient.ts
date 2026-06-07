@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Ensure you set VITE_API_FOOTBALL_KEY in your .env or hosting environment (e.g., Render)
-const API_KEY = import.meta.env.VITE_API_FOOTBALL_KEY;
+const API_KEY = import.meta.env.VITE_API_FOOTBALL_KEY || '675d4ba0167ac198b14ffffc77a7720b';
 const API_HOST = 'v3.football.api-sports.io';
 
 export const footballApiClient = axios.create({

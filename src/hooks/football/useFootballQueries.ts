@@ -14,7 +14,7 @@ export const useLiveFootballMatches = () => {
     queryKey: ['football', 'live'],
     queryFn: () => footballApi.getLiveMatches(false),
     ...NO_AUTO_REFETCH,
-    staleTime: 15 * 60 * 1000, // 15 mins
+    staleTime: 1 * 60 * 1000, // 1 min
   });
 };
 

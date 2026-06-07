@@ -78,19 +78,19 @@ const Index = () => {
   // Helper to map new FootballMatch format to the legacy Match interface for the dashboard
   const mapFootballToLegacyMatch = (m: any, status: 'live' | 'upcoming' | 'completed'): Match => {
     return {
-      id: m.fixture.id.toString(),
+      id: m.fixture?.id?.toString() || Math.random().toString(),
       sport: 'football',
       status: status,
-      seriesName: m.league.name,
-      matchType: m.league.country,
-      homeTeam: { name: m.teams.home.name, logo: m.teams.home.logo },
-      awayTeam: { name: m.teams.away.name, logo: m.teams.away.logo },
-      homeScore: status === 'upcoming' ? undefined : (m.goals.home?.toString() || '0'),
-      awayScore: status === 'upcoming' ? undefined : (m.goals.away?.toString() || '0'),
-      startTime: new Date(m.fixture.date),
-      venue: m.fixture.venue.name,
-      displayTime: status === 'live' ? `${m.fixture.status.elapsed}'` : undefined,
-      summaryText: status === 'completed' ? m.fixture.status.long : undefined,
+      seriesName: m.league?.name || "Football Match",
+      matchType: m.league?.country || "International",
+      homeTeam: { name: m.teams?.home?.name || "TBA", logo: m.teams?.home?.logo },
+      awayTeam: { name: m.teams?.away?.name || "TBA", logo: m.teams?.away?.logo },
+      homeScore: status === 'upcoming' ? undefined : (m.goals?.home?.toString() || '0'),
+      awayScore: status === 'upcoming' ? undefined : (m.goals?.away?.toString() || '0'),
+      startTime: new Date(m.fixture?.date || Date.now()),
+      venue: m.fixture?.venue?.name || "TBA",
+      displayTime: status === 'live' ? `${m.fixture?.status?.elapsed || 0}'` : undefined,
+      summaryText: status === 'completed' ? m.fixture?.status?.long : undefined,
     } as Match;
   };
 
