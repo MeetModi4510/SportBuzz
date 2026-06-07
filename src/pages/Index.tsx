@@ -21,7 +21,7 @@ import {
 import { useLiveCricketMatches } from "@/hooks/useCricketMatches";
 import { useFeaturedLiveCricketMatches, useFeaturedUpcomingCricketMatches, useFeaturedRecentCricketMatches } from "@/hooks/useFeaturedMatches";
 import { useFollowedTournamentMatches } from "@/hooks/useFollowedTournamentMatches";
-import { useFootballDashboard, useCategorizedFootballMatches } from "@/hooks/useFootballMatches";
+import { useLiveFootballMatches, useUpcomingFootballMatches, useRecentFootballMatches } from "@/hooks/football/useFootballQueries";
 import { useCricketTrendingPlayers, useCricbuzzPlayerInfo } from "@/hooks/useCricketTrending";
 import { tournamentApi } from "@/services/api";
 import { Sport, MatchStatus, Match } from "@/data/types";
@@ -65,25 +65,40 @@ const Index = () => {
   const { trending: cricketTrending, fetchTrending: fetchCricketTrending } = useCricketTrendingPlayers();
   const { playerInfo: cricketPlayerInfo, loading: cricketPlayerLoading, fetchPlayerInfo: fetchCricketPlayerInfo, clearPlayerInfo: clearCricketPlayerInfo } = useCricbuzzPlayerInfo();
 
-  // Fetch REAL football data from Sofascore (15-min cache)
-  const { data: footballDashboard, isLoading: footballLoading } = useFootballDashboard();
+  // Fetch REAL football data from API-Football
+  const { data: liveFootballData, isLoading: footballLoading } = useLiveFootballMatches();
+  const { data: upcomingFootballData, isLoading: upcomingFootballLoading } = useUpcomingFootballMatches();
+  const { data: recentFootballData, isLoading: recentFootballLoading } = useRecentFootballMatches();
   
-  // Only fetch categorized football matches when the tab is active
-  const { data: categorizedFootball, isLoading: categorizedFootballLoading } = useCategorizedFootballMatches();
+  const categorizedFootballLoading = upcomingFootballLoading || recentFootballLoading;
 
   // Get mock data for other sports (excluding cricket AND football — football is now real)
   const otherSportsMockMatches = mockMatches.filter(m => m.sport !== "cricket" && m.sport !== "football");
 
+  // Helper to map new FootballMatch format to the legacy Match interface for the dashboard
+  const mapFootballToLegacyMatch = (m: any, status: 'live' | 'upcoming' | 'completed'): Match => {
+    return {
+      id: m.fixture.id.toString(),
+      sport: 'football',
+      status: status,
+      seriesName: m.league.name,
+      matchType: m.league.country,
+      homeTeam: { name: m.teams.home.name, logo: m.teams.home.logo },
+      awayTeam: { name: m.teams.away.name, logo: m.teams.away.logo },
+      homeScore: status === 'upcoming' ? undefined : (m.goals.home?.toString() || '0'),
+      awayScore: status === 'upcoming' ? undefined : (m.goals.away?.toString() || '0'),
+      startTime: new Date(m.fixture.date),
+      venue: m.fixture.venue.name,
+      displayTime: status === 'live' ? `${m.fixture.status.elapsed}'` : undefined,
+      summaryText: status === 'completed' ? m.fixture.status.long : undefined,
+    } as Match;
+  };
+
   // Build real football matches from API response (Live only)
   const realFootballMatches = useMemo(() => {
-    if (!footballDashboard) return [];
-    const live = (footballDashboard as any).live || [];
-    // Ensure each match has Date objects for startTime
-    return live.map((m: any) => ({
-      ...m,
-      startTime: new Date(m.startTime),
-    }));
-  }, [footballDashboard]);
+    if (!liveFootballData) return [];
+    return liveFootballData.map(m => mapFootballToLegacyMatch(m, 'live'));
+  }, [liveFootballData]);
 
   // Combine ALL featured cricket data + real football + other mock
   const allMatches = useMemo(() => {
@@ -98,16 +113,18 @@ const Index = () => {
     }
 
     let footballToDisplay = realFootballMatches;
-    if (activeSport === "football" && categorizedFootball) {
+    if (activeSport === "football") {
+       const mappedUpcoming = (upcomingFootballData || []).map(m => mapFootballToLegacyMatch(m, 'upcoming'));
+       const mappedRecent = (recentFootballData || []).map(m => mapFootballToLegacyMatch(m, 'completed'));
        footballToDisplay = [
-          ...((categorizedFootball as any).live || []),
-          ...((categorizedFootball as any).upcoming || []),
-          ...((categorizedFootball as any).completed || [])
-       ].map((m: any) => ({ ...m, startTime: new Date(m.startTime) }));
+          ...realFootballMatches,
+          ...mappedUpcoming,
+          ...mappedRecent
+       ];
     }
 
     return [...realCricket, ...footballToDisplay, ...otherSportsMockMatches];
-  }, [cricketData, realFootballMatches, categorizedFootball, activeSport, otherSportsMockMatches]);
+  }, [cricketData, realFootballMatches, upcomingFootballData, recentFootballData, activeSport, otherSportsMockMatches]);
 
   const filteredMatches = useMemo(() => {
     let filtered = [...allMatches];
@@ -143,7 +160,12 @@ const Index = () => {
   }, [allMatches, activeSport, activeStatus, searchQuery, searchCategory]);
 
   const handleMatchClick = (matchId: string) => {
-    navigate(`/match/${matchId}`, { state: { from: 'dashboard', section: 'matches' } });
+    const match = filteredMatches.find(m => m.id === matchId);
+    if (match?.sport === 'football') {
+      navigate(`/football/match/${matchId}`);
+    } else {
+      navigate(`/match/${matchId}`, { state: { from: 'dashboard', section: 'matches' } });
+    }
   };
 
   const handlePlayerClick = (player: { id: string, name?: string }) => {
@@ -173,7 +195,7 @@ const Index = () => {
   const footballMatches = filteredMatches.filter((m) => m.sport === "football");
   
   // Categorized football for dashboard (from real API) - Now only Live
-  const footballLiveCount = (footballDashboard as any)?.meta?.totalLive || 0;
+  const footballLiveCount = liveFootballData?.length || 0;
   const basketballMatches = filteredMatches.filter((m) => m.sport === "basketball");
   const tennisMatches = filteredMatches.filter((m) => m.sport === "tennis");
   
