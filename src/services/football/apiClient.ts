@@ -14,13 +14,13 @@ export const footballApiClient = axios.create({
 });
 
 const TRANSFERS_API_KEY = import.meta.env.VITE_FOOTBALL_TRANSFERS_API_KEY || '';
+const TRANSFERS_API_HOST = 'fotmob-api.p.rapidapi.com';
 
 export const transfersApiClient = axios.create({
-  baseURL: `https://${API_HOST}`,
+  baseURL: `https://${TRANSFERS_API_HOST}`,
   headers: {
-    'x-rapidapi-host': API_HOST,
+    'x-rapidapi-host': TRANSFERS_API_HOST,
     'x-rapidapi-key': TRANSFERS_API_KEY,
-    'x-apisports-key': TRANSFERS_API_KEY,
   },
 });
 

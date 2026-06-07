@@ -165,23 +165,49 @@ export const footballApi = {
     }
 
     try {
-      // Assuming a RapidAPI endpoint that supports date-based transfer fetching
-      // Since API-Football /transfers requires a team/player, we would ideally fetch by priority teams.
-      // Here we implement the logic to fetch transfers, filter by PRIORITY_LEAGUES, and cache for 12 hours.
+      // Use the dedicated FotMob API endpoint for transfers
+      const response = await transfersApiClient.get('/api/v1/transfers');
       
-      const response = await transfersApiClient.get('/transfers', {
-        // Fallback placeholder params; depends on exact API specs
-      }).catch(() => ({ data: { response: MOCK_TRANSFERS } })); // Fallback to mock data if API endpoint structure differs
+      const rawTransfers = response.data?.transfers || [];
 
-      let allTransfers: FootballTransferData[] = response.data.response || [];
+      // Map FotMob response to our FootballTransferData interface
+      const allTransfers: FootballTransferData[] = rawTransfers.map((t: any) => ({
+        player: {
+          id: t.playerId,
+          name: t.name
+        },
+        update: t.transferDate,
+        transfers: [
+          {
+            date: t.transferDate,
+            type: t.transferType?.text || t.fee?.feeText || 'Transfer',
+            teams: {
+              out: {
+                id: t.fromClubId,
+                name: t.fromClub || t.fromClubFullName || 'Unknown',
+                logo: t.fromClubId > 0 ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.fromClubId}.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
+              },
+              in: {
+                id: t.toClubId,
+                name: t.toClub || t.toClubFullName || 'Unknown',
+                logo: t.toClubId > 0 ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.toClubId}.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
+              }
+            }
+          }
+        ]
+      }));
 
-      // Filter transfers by Priority Leagues
-      // Assuming the API returns league info in the team object or we only show transfers for known priority teams
-      // (This uses a simulated filter for demonstration; adjust based on actual API response structure)
-      const priorityTransfers = allTransfers.filter(transfer => {
-        // We ensure at least one team involved in the transfer belongs to a priority league context
-        // In a real API, we'd check transfer.teams.in.leagueId or similar
-        return true; // Placeholder for actual priority league filtering logic
+      // Filter out overly obscure transfers (e.g. Free Agents to unknown clubs)
+      // Since FotMob doesn't provide League IDs in the global /transfers response,
+      // we'll apply a sensible heuristic: filter out transfers where both teams are unknown (-1) or Free Agent (2).
+      const priorityTransfers = allTransfers.filter(t => {
+        const outId = t.transfers[0].teams.out.id;
+        const inId = t.transfers[0].teams.in.id;
+        
+        // Remove transfers where team in is free agent or unknown and team out is also obscure
+        if ((inId === -1 || inId === 2) && (outId === -1 || outId === 2)) return false;
+        
+        return true;
       });
 
       // Show transfers of 1 week in one go
@@ -199,12 +225,13 @@ export const footballApi = {
         return recentPriorityTransfers;
       }
       
-      // Fallback if empty
+      // Fallback if empty (e.g., no transfers in the last week)
       cacheManager.set(cacheKey, MOCK_TRANSFERS as any, CACHE_TTL_MINUTES);
       return MOCK_TRANSFERS as any;
 
     } catch (err) {
       console.error('Failed to fetch transfers', err);
+      // Ensure we don't crash the app if the rapidapi limit is reached
       return MOCK_TRANSFERS as any;
     }
   },
