@@ -309,6 +309,35 @@ export async function getGlobalFootballNews() {
     ];
 }
 
+export async function getFootballLiveNews() {
+    const cacheKey = 'footballLiveNews';
+    const TTL = 10 * 60 * 1000; // 10 minutes cache
+    if (cache[cacheKey]?.data && (Date.now() - cache[cacheKey].timestamp) < TTL) {
+        return cache[cacheKey].data;
+    }
+
+    try {
+        const res = await axios.get('https://football_api12.p.rapidapi.com/players/news', {
+            headers: {
+                'x-rapidapi-key': process.env.football_news || 'ea08b9a9d5msh0ce1b811a3294e7p19b61bjsnb06b82498cf2',
+                'x-rapidapi-host': 'football_api12.p.rapidapi.com'
+            },
+            timeout: 10000
+        });
+        
+        // Ensure data is array
+        const newsData = Array.isArray(res.data) ? res.data : [];
+        
+        cache[cacheKey] = { data: newsData, timestamp: Date.now() };
+        return newsData;
+    } catch (err) {
+        console.error('[Football Live News] Error fetching:', err.message);
+        // Fallback to cache if exists even if expired
+        if (cache[cacheKey]?.data) return cache[cacheKey].data;
+        return [];
+    }
+}
+
 export function clearCache() {
     for (const key of Object.keys(cache)) {
         cache[key] = { data: null, timestamp: 0 };
@@ -321,5 +350,6 @@ export default {
     getCategorizedMatches,
     getMatchDetail,
     getGlobalFootballNews,
+    getFootballLiveNews,
     clearCache
 };

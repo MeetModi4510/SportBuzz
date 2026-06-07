@@ -2,35 +2,43 @@ import { useState } from 'react';
 import { ChevronRight, Clock } from 'lucide-react';
 import { mockNewsData, type NewsItem } from '@/data/mockNewsData';
 import { useCricketNews, type CricketNewsItem } from '@/hooks/useCricketNews';
+import { useFootballNews, type FootballNewsItem } from '@/hooks/useFootballNews';
 import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-// Merge type: can be mock NewsItem OR live CricketNewsItem
-type DisplayNewsItem = (NewsItem | CricketNewsItem) & { isLive?: boolean };
+// Merge type: can be mock NewsItem OR live CricketNewsItem OR live FootballNewsItem
+type DisplayNewsItem = (NewsItem | CricketNewsItem | FootballNewsItem) & { isLive?: boolean; snippet?: string; title?: string };
 
 export const NewsSection = () => {
   const [selectedArticle, setSelectedArticle] = useState<DisplayNewsItem | null>(null);
-  const { news: liveNews, loading } = useCricketNews();
+  
+  const { news: liveNews, loading: cricketLoading } = useCricketNews();
+  const { news: liveFootball, loading: footballLoading } = useFootballNews();
 
-  // Non-cricket mock news (football, tennis, basketball etc.)
-  const nonCricketMock = mockNewsData.filter(n => n.sport !== 'cricket');
+  // Non-cricket/football mock news (tennis, basketball etc.)
+  const otherMock = mockNewsData.filter(n => n.sport !== 'cricket' && n.sport !== 'football');
 
   // Live cricket news from API (or fallback to mock cricket if still loading)
   const cricketMockFallback = mockNewsData.filter(n => n.sport === 'cricket');
   const cricketItems: DisplayNewsItem[] = (liveNews.length > 0
     ? liveNews.map(n => ({ ...n, isLive: true }))
-    : (!loading ? cricketMockFallback : []));
+    : (!cricketLoading ? cricketMockFallback : []));
 
-  // Final combined list: mix live cricket with mock other sports
-  // Interleave: cricket first, then others, then repeat — keeps visual variety
+  // Live football news from API (or fallback to mock football if still loading)
+  const footballMockFallback = mockNewsData.filter(n => n.sport === 'football');
+  const footballItems: DisplayNewsItem[] = (liveFootball.length > 0
+    ? liveFootball.map(n => ({ ...n, isLive: true }))
+    : (!footballLoading ? footballMockFallback : []));
+
+  // Final combined list: mix live cricket, live football, and mock other sports
   const combined: DisplayNewsItem[] = [];
-  const nonCricket = [...nonCricketMock];
-  let ci = 0, ni = 0;
-  while (ci < cricketItems.length || ni < nonCricket.length) {
+  let ci = 0, fi = 0, oi = 0;
+  while (ci < cricketItems.length || fi < footballItems.length || oi < otherMock.length) {
     if (ci < cricketItems.length) combined.push(cricketItems[ci++]);
+    if (fi < footballItems.length) combined.push(footballItems[fi++]);
     if (ci < cricketItems.length) combined.push(cricketItems[ci++]);
-    if (ni < nonCricket.length) combined.push(nonCricket[ni++]);
+    if (oi < otherMock.length) combined.push(otherMock[oi++]);
   }
 
   // Duplicate for seamless marquee loop
@@ -40,24 +48,24 @@ export const NewsSection = () => {
     <Dialog open={!!selectedArticle} onOpenChange={(open) => !open && setSelectedArticle(null)}>
       <section className="py-6 border-b border-border/40 bg-background/30 overflow-hidden">
         <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <h2 className="text-lg md:text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                Breaking <span className="text-primary">News</span>
-              </h2>
-              {loading && (
-                <span className="text-[10px] text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-full border border-border/40 animate-pulse">
-                  Loading cricket news…
-                </span>
-              )}
-              {!loading && liveNews.length > 0 && (
-                <span className="text-[10px] text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
-                  LIVE
-                </span>
-              )}
-            </div>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <h2 className="text-lg md:text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                    Breaking <span className="text-primary">News</span>
+                  </h2>
+                  {(cricketLoading || footballLoading) && (
+                    <span className="text-[10px] text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-full border border-border/40 animate-pulse">
+                      Loading news…
+                    </span>
+                  )}
+                  {!(cricketLoading || footballLoading) && (liveNews.length > 0 || liveFootball.length > 0) && (
+                    <span className="text-[10px] text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
+                      LIVE
+                    </span>
+                  )}
+                </div>
             <button className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors">
               View All <ChevronRight size={16} />
             </button>
@@ -99,9 +107,14 @@ export const NewsSection = () => {
                       <div className="flex items-center justify-between">
                         <SportIcon sport={news.sport} size={16} />
                         <div className="flex items-center gap-2">
-                          {(news as any).isLive && (
+                          {(news as any).isLive && news.sport !== 'football' && (
                             <span className="text-[9px] font-bold text-green-400 bg-green-500/15 border border-green-500/25 px-1.5 py-0.5 rounded-full">
                               LIVE
+                            </span>
+                          )}
+                          {(news as any).isLive && news.sport === 'football' && (
+                            <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/25 px-1.5 py-0.5 rounded-full animate-pulse">
+                              NEW
                             </span>
                           )}
                           <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium bg-secondary/50 px-2 py-0.5 rounded-full border border-border/50">
@@ -123,6 +136,11 @@ export const NewsSection = () => {
                           {(news as CricketNewsItem).context}
                         </span>
                       )}
+                      {news.sport === 'football' && (news as any).isLive && (
+                        <span className="inline-block text-[10px] text-emerald-400/70 bg-emerald-500/10 border border-emerald-500/15 px-1.5 py-0.5 rounded-full truncate max-w-full">
+                          Football
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -137,9 +155,14 @@ export const NewsSection = () => {
             <div className="flex items-center justify-between mt-2">
               <div className="flex items-center gap-2">
                 <SportIcon sport={selectedArticle?.sport || 'cricket'} size={24} />
-                {(selectedArticle as any)?.isLive && (
+                {(selectedArticle as any)?.isLive && selectedArticle?.sport !== 'football' && (
                   <span className="text-[10px] font-bold text-green-400 bg-green-500/15 border border-green-500/25 px-2 py-0.5 rounded-full">
                     LIVE • Cricbuzz
+                  </span>
+                )}
+                {(selectedArticle as any)?.isLive && selectedArticle?.sport === 'football' && (
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/25 px-2 py-0.5 rounded-full">
+                    NEW • Football Daily
                   </span>
                 )}
               </div>
@@ -161,9 +184,13 @@ export const NewsSection = () => {
             <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
               {selectedArticle?.snippet}
             </p>
-            {(selectedArticle as any)?.isLive ? (
+            {(selectedArticle as any)?.isLive && selectedArticle?.sport === 'cricket' ? (
               <div className="mt-4 p-4 rounded-xl bg-blue-500/5 border border-blue-500/20 text-sm text-blue-400/80 text-center">
                 📰 Source: Cricbuzz — Full article available on Cricbuzz.com
+              </div>
+            ) : (selectedArticle as any)?.isLive && selectedArticle?.sport === 'football' ? (
+              <div className="mt-4 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-sm text-emerald-400/80 text-center">
+                📰 Source: RapidAPI — Read the latest updates
               </div>
             ) : (
               <div className="mt-4 p-4 rounded-xl bg-secondary/30 border border-border/50 text-sm text-muted-foreground text-center">

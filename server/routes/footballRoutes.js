@@ -25,7 +25,7 @@ import {
     deleteMatch
 } from '../controllers/footballMatchController.js';
 import { protect } from '../middleware/authMiddleware.js';
-import { getDashboardMatches, getCategorizedMatches, getMatchDetail, getGlobalFootballNews, clearCache } from '../services/footballDataService.js';
+import { getDashboardMatches, getCategorizedMatches, getMatchDetail, getGlobalFootballNews, getFootballLiveNews, clearCache } from '../services/footballDataService.js';
 
 const router = express.Router();
 
@@ -40,6 +40,18 @@ router.get('/news', async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 });
+
+// Live Football News (from RapidAPI)
+router.get('/live-news', async (req, res) => {
+    try {
+        const data = await getFootballLiveNews();
+        res.json({ success: true, data });
+    } catch (err) {
+        console.error('[Football Live News] Route Error:', err.message);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 // Dashboard: returns categorized matches (league/cup/international) with 10-min cache
 router.get('/dashboard', async (req, res) => {
     try {
