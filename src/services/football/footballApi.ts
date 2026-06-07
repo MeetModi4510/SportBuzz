@@ -107,14 +107,7 @@ export const footballApi = {
     const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id) && isMensFootball(m));
     const recentPriority = priorityMatches.filter(m => ['FT', 'AET', 'PEN'].includes(m.fixture?.status?.short));
     
-    const hasErrors = allMatches.length === 0; // If all failed or returned nothing (simplification for the loop)
-    // Actually, let's just use the previous logic but only for actual api error. Wait, we don't have response.data.errors here because it's a loop.
-    // If it's empty, we just return empty, UNLESS there's an api failure. But since we catch errors, let's just return recentPriority.
-    // If the user wants mock data on API failure, we should check if allMatches was completely empty due to errors.
-    
-    // We will just remove the length === 0 fallback so it shows real empty lists.
-    // But to preserve mock on suspended keys, if all API calls threw errors or returned empty, we could fallback.
-    // Let's just remove the fallback for recent and upcoming if it's 0 length, OR we just check if the api key is suspended.
+    // Fallback to mock data only if API returned nothing at all (e.g. suspended key)
     if (recentPriority.length === 0 && allMatches.length === 0) {
       cacheManager.set(cacheKey, MOCK_RECENT_MATCHES as any, 15);
       return MOCK_RECENT_MATCHES as any;
@@ -162,64 +155,9 @@ export const footballApi = {
     return upcomingPriority;
   },
 
-  async getRecentTransfers(forceRefresh = false): Promise<FootballTransferData[]> {
-    const cacheKey = 'recent_transfers';
-    if (!forceRefresh) {
-      const cached = cacheManager.get<FootballTransferData[]>(cacheKey);
-      if (cached && cached.length > 0) return cached;
-    }
-
-    const PRIORITY_TEAMS = [
-      541, // Real Madrid
-      529, // Barcelona
-      50, // Man City
-      42, // Arsenal
-      40, // Liverpool
-      33, // Man Utd
-      157, // Bayern Munich
-      85, // PSG
-      496, // Juventus
-      505, // Inter Milan
-    ];
-
-    let allTransfers: FootballTransferData[] = [];
-    
-    // We fetch them concurrently
-    const promises = PRIORITY_TEAMS.map(teamId => 
-      footballApiClient.get('/transfers', { params: { team: teamId } })
-        .then(res => res.data.response || [])
-        .catch(() => [])
-    );
-
-    const results = await Promise.all(promises);
-    results.forEach(teamTransfers => {
-      allTransfers = [...allTransfers, ...teamTransfers];
-    });
-
-    // Deduplicate by player ID since multiple teams might report the same transfer
-    const uniqueTransfersMap = new Map<number, FootballTransferData>();
-    allTransfers.forEach(t => {
-      if (!uniqueTransfersMap.has(t.player.id)) {
-        uniqueTransfersMap.set(t.player.id, t);
-      }
-    });
-
-    let uniqueTransfers = Array.from(uniqueTransfersMap.values());
-
-    // Sort by latest transfer date.
-    uniqueTransfers.sort((a, b) => {
-      const dateA = new Date(a.transfers[0]?.date || a.update || 0).getTime();
-      const dateB = new Date(b.transfers[0]?.date || b.update || 0).getTime();
-      return dateB - dateA; // Descending
-    });
-
-    if (uniqueTransfers.length === 0 && allTransfers.length === 0) {
-      cacheManager.set(cacheKey, MOCK_TRANSFERS as any, 60);
-      return MOCK_TRANSFERS as any;
-    }
-
-    cacheManager.set(cacheKey, uniqueTransfers, 60); // Cache for 1 hour
-    return uniqueTransfers;
+  // Transfers endpoint is not available on free-tier API plans — always use curated mock data
+  async getRecentTransfers(_forceRefresh = false): Promise<FootballTransferData[]> {
+    return MOCK_TRANSFERS as any;
   },
 
   async getGlobalNews(forceRefresh = false): Promise<any[]> {
