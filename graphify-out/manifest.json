@@ -660,8 +660,8 @@
     "semantic_hash": "97428d3a88e2f5a1c6c44c96ca132619"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\footballDataService.js": {
-    "mtime": 1780827919.7736382,
-    "ast_hash": "45a43460a077e5bbe0c4e58838839938",
+    "mtime": 1780833867.0669017,
+    "ast_hash": "bda07844d664f99f20c98bf110240526",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\stateFlagService.js": {
@@ -3080,8 +3080,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\NewsSection.tsx": {
-    "mtime": 1780827900.4395077,
-    "ast_hash": "8aac6916d6aafddc1dc65351ff3c853e",
+    "mtime": 1780833934.3263104,
+    "ast_hash": "faff012eb6876f4e634009b596690f41",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\data\\mockNewsData.ts": {
@@ -3195,8 +3195,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\FootballHome.tsx": {
-    "mtime": 1780825648.4884155,
-    "ast_hash": "faca46f1feb6818c92a945548a63c1a1",
+    "mtime": 1780833746.3214285,
+    "ast_hash": "8653df26cc83a833a8230c017a314310",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\MatchCenter.tsx": {
@@ -3210,18 +3210,18 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\football\\apiClient.ts": {
-    "mtime": 1780825648.4904232,
-    "ast_hash": "702008570ff030b9add1f4e78c9cbb86",
+    "mtime": 1780833746.3214285,
+    "ast_hash": "97ca9f80a19e343d500dde9f3fb7e6c4",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\football\\footballApi.ts": {
-    "mtime": 1780825648.4949446,
-    "ast_hash": "7d56f71c105f20bad044589d66df0579",
+    "mtime": 1780834663.9189582,
+    "ast_hash": "83524467abd60106de5f98536b23c361",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\types\\football\\index.ts": {
-    "mtime": 1780821827.0368762,
-    "ast_hash": "e14273c7efa544bf6dbd39efb976e098",
+    "mtime": 1780833746.3249454,
+    "ast_hash": "189daafd84698475fc7f08f5221a6d5c",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\utils\\football\\cacheManager.ts": {
@@ -3245,8 +3245,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballNewsSidebar.tsx": {
-    "mtime": 1780825648.4843898,
-    "ast_hash": "5926c4665d8d1310da23676d3a620110",
+    "mtime": 1780834338.6653864,
+    "ast_hash": "eb3ddf79fbec6b7248efa11cd03cdc91",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\HeroFeaturedMatch.tsx": {
@@ -3255,8 +3255,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\TransferCard.tsx": {
-    "mtime": 1780823740.3706036,
-    "ast_hash": "ffab7d23cae93a123567138801cfacf8",
+    "mtime": 1780833746.3204296,
+    "ast_hash": "2a0d90580db16ceb1aae3888cb9b31b4",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\football\\mockFootballData.ts": {
@@ -3270,8 +3270,18 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useFootballNews.ts": {
-    "mtime": 1780827889.3954246,
-    "ast_hash": "7b6b28f69a7751548228c226b21022d8",
+    "mtime": 1780833889.8367536,
+    "ast_hash": "45c2051085036aa2df899da0b4060622",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\fotmob_transfers.json": {
+    "mtime": 1780833746.318102,
+    "ast_hash": "3133708031786e8c3fe752acf6564554",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\testTransfers.ts": {
+    "mtime": 1780833746.3259456,
+    "ast_hash": "f93056d102055f6a023e19cca7c2e483",
     "semantic_hash": ""
   }
 }
