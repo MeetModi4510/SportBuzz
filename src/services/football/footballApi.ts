@@ -27,6 +27,26 @@ export const PRIORITY_LEAGUES = [
   21, // Friendlies - Men
 ];
 
+// Top clubs for filtering transfers since FotMob doesn't provide League IDs
+export const PRIORITY_CLUBS = [
+  // Premier League
+  'arsenal', 'aston villa', 'bournemouth', 'brentford', 'brighton', 'chelsea', 'crystal palace', 'everton', 'fulham', 'liverpool', 'luton', 'man city', 'manchester city', 'man united', 'manchester united', 'newcastle', 'nottm forest', 'nottingham forest', 'sheff utd', 'sheffield united', 'tottenham', 'spurs', 'west ham', 'wolves',
+  // La Liga
+  'athletic club', 'atletico madrid', 'barcelona', 'real madrid', 'real sociedad', 'sevilla', 'valencia', 'villarreal', 'girona', 'betis',
+  // Serie A
+  'ac milan', 'inter', 'juventus', 'napoli', 'roma', 'lazio', 'atalanta', 'fiorentina', 'bologna',
+  // Bundesliga
+  'bayern munich', 'dortmund', 'bayer leverkusen', 'rb leipzig', 'eintracht frankfurt', 'stuttgart',
+  // Ligue 1
+  'psg', 'paris saint-germain', 'monaco', 'marseille', 'lyon', 'lille', 'lens',
+  // Others
+  'al nassr', 'al hilal', 'al ittihad', 'al ahli',
+  'inter miami', 'lafc', 'la galaxy',
+  'ajax', 'psv', 'feyenoord',
+  'porto', 'benfica', 'sporting cp', 'sporting lisbon',
+  'celtic', 'rangers', 'galatasaray', 'fenerbahce', 'besiktas'
+];
+
 const isMensFootball = (match: FootballMatch) => {
   const leagueName = (match.league?.name || '').toLowerCase();
   const homeName = (match.teams?.home?.name || '').toLowerCase();
@@ -197,17 +217,12 @@ export const footballApi = {
         ]
       }));
 
-      // Filter out overly obscure transfers (e.g. Free Agents to unknown clubs)
-      // Since FotMob doesn't provide League IDs in the global /transfers response,
-      // we'll apply a sensible heuristic: filter out transfers where both teams are unknown (-1) or Free Agent (2).
+      // Filter using the PRIORITY_CLUBS list since FotMob lacks league info
       const priorityTransfers = allTransfers.filter(t => {
-        const outId = t.transfers[0].teams.out.id;
-        const inId = t.transfers[0].teams.in.id;
+        const outName = t.transfers[0].teams.out.name.toLowerCase();
+        const inName = t.transfers[0].teams.in.name.toLowerCase();
         
-        // Remove transfers where team in is free agent or unknown and team out is also obscure
-        if ((inId === -1 || inId === 2) && (outId === -1 || outId === 2)) return false;
-        
-        return true;
+        return PRIORITY_CLUBS.some(club => outName.includes(club) || inName.includes(club));
       });
 
       // Show transfers of 1 week in one go
