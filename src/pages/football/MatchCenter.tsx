@@ -7,8 +7,11 @@ import { footballApi } from "../../services/football/footballApi";
 import { footballApiClient } from "../../services/football/apiClient";
 import { cacheManager } from "../../utils/football/cacheManager";
 import { Loader2, ArrowLeft } from "lucide-react";
-import { FootballMatch } from "../../types/football";
+import { FootballMatch } from "../../types/football/index";
 import { TeamLogo } from "../../components/TeamLogo";
+import { MatchEvents } from "../../components/football/MatchEvents";
+import { MatchStatistics } from "../../components/football/MatchStatistics";
+import { MatchLineups } from "../../components/football/MatchLineups";
 
 type MatchTab = "overview" | "events" | "statistics" | "lineups" | "standings";
 
@@ -68,6 +71,9 @@ export default function MatchCenter() {
                  match.fixture.status.short === "ET" ||
                  match.fixture.status.short === "P";
 
+  const homeGoals = match.events?.filter(e => e.type === "Goal" && e.team.id === match.teams.home.id) || [];
+  const awayGoals = match.events?.filter(e => e.type === "Goal" && e.team.id === match.teams.away.id) || [];
+
   return (
     <>
       <Helmet>
@@ -100,6 +106,16 @@ export default function MatchCenter() {
                   <span className="font-bold text-lg md:text-xl text-center leading-tight">
                     {match.teams.home.name}
                   </span>
+                  {homeGoals.length > 0 && (
+                    <div className="flex flex-col items-center text-xs text-muted-foreground mt-1 space-y-1">
+                      {homeGoals.map((goal, idx) => (
+                        <div key={idx} className="flex flex-wrap justify-center items-center gap-1 text-center">
+                          <span className="font-medium text-foreground/80">{goal.player.name} {goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
+                          {goal.assist.name && <span className="text-[10px] opacity-70">({goal.assist.name})</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Score / Status */}
@@ -121,6 +137,16 @@ export default function MatchCenter() {
                   <span className="font-bold text-lg md:text-xl text-center leading-tight">
                     {match.teams.away.name}
                   </span>
+                  {awayGoals.length > 0 && (
+                    <div className="flex flex-col items-center text-xs text-muted-foreground mt-1 space-y-1">
+                      {awayGoals.map((goal, idx) => (
+                        <div key={idx} className="flex flex-wrap justify-center items-center gap-1 text-center">
+                          <span className="font-medium text-foreground/80">{goal.player.name} {goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
+                          {goal.assist.name && <span className="text-[10px] opacity-70">({goal.assist.name})</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -174,27 +200,19 @@ export default function MatchCenter() {
 
           {activeTab === "events" && (
             <div className="animate-in fade-in duration-300">
-              {/* Event component to be built - mapping match.events if they exist */}
-              <p className="text-center text-muted-foreground py-10 bg-secondary/10 rounded-xl border border-border/30">
-                {match.events && match.events.length > 0 ? "Events List..." : "No events available yet."}
-              </p>
+              <MatchEvents events={match.events || []} homeTeam={match.teams.home} awayTeam={match.teams.away} />
             </div>
           )}
 
           {activeTab === "statistics" && (
             <div className="animate-in fade-in duration-300">
-              {/* Statistics to be built */}
-              <p className="text-center text-muted-foreground py-10 bg-secondary/10 rounded-xl border border-border/30">
-                Detailed statistics loading logic to be implemented.
-              </p>
+              <MatchStatistics statistics={match.statistics || []} homeTeam={match.teams.home} awayTeam={match.teams.away} />
             </div>
           )}
           
           {activeTab === "lineups" && (
             <div className="animate-in fade-in duration-300">
-              <p className="text-center text-muted-foreground py-10 bg-secondary/10 rounded-xl border border-border/30">
-                Lineups and visual pitch to be implemented.
-              </p>
+              <MatchLineups lineups={match.lineups || []} homeTeam={match.teams.home} awayTeam={match.teams.away} />
             </div>
           )}
 

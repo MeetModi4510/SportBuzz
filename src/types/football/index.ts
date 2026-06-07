@@ -42,6 +42,49 @@ export interface FootballGoals {
   away: number | null;
 }
 
+export interface FootballEvent {
+  time: { elapsed: number; extra: number | null };
+  team: { id: number; name: string; logo: string };
+  player: { id: number | null; name: string };
+  assist: { id: number | null; name: string | null };
+  type: string;
+  detail: string;
+  comments: string | null;
+}
+
+export interface FootballStatistic {
+  type: string;
+  value: string | number | null;
+}
+
+export interface FootballTeamStatistics {
+  team: { id: number; name: string; logo: string };
+  statistics: FootballStatistic[];
+}
+
+export interface FootballPlayerInfo {
+  player: {
+    id: number;
+    name: string;
+    number: number;
+    pos: string;
+    grid: string | null;
+  };
+}
+
+export interface FootballLineup {
+  team: {
+    id: number;
+    name: string;
+    logo: string;
+    colors: any;
+  };
+  coach: { id: number; name: string; photo: string };
+  formation: string;
+  startXI: FootballPlayerInfo[];
+  substitutes: FootballPlayerInfo[];
+}
+
 export interface FootballMatch {
   fixture: FootballFixture;
   league: FootballLeague;
@@ -56,7 +99,7 @@ export interface FootballMatch {
     extratime: FootballGoals;
     penalty: FootballGoals;
   };
-  events?: any[];
-  lineups?: any[];
-  statistics?: any[];
+  events?: FootballEvent[];
+  lineups?: FootballLineup[];
+  statistics?: FootballTeamStatistics[];
 }
