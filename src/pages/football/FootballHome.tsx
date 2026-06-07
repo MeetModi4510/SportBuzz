@@ -72,103 +72,113 @@ export default function FootballHome() {
         <meta name="description" content="Live football scores, recent results, upcoming fixtures, and transfers from top global leagues." />
       </Helmet>
 
-      <div className="min-h-screen bg-background pb-20 selection:bg-primary/20">
+      <div className="min-h-screen bg-[#050505] text-white pb-24 selection:bg-white/20">
         <Navbar />
 
-        <main className="container mx-auto px-4 py-8 max-w-7xl">
+        <main className="container mx-auto px-4 py-12 max-w-7xl space-y-16">
           
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-            <h1 className="text-4xl font-black font-display tracking-tight text-foreground">Football Hub</h1>
-            <button
-              onClick={handleManualRefresh}
-              disabled={isRefreshing}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 border-border/50 rounded-xl hover:bg-secondary/50 transition-colors text-foreground disabled:opacity-50"
-            >
-              <RefreshCw size={16} className={isRefreshing ? "animate-spin" : ""} />
-              Sync Data
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            {/* Match Center (Left, spans 8 cols) */}
-            <div className="lg:col-span-8 flex flex-col gap-6">
-              <div className="bg-secondary/5 border border-border/40 rounded-[2rem] p-6 md:p-8 flex-1 min-h-[500px]">
-                
-                {/* Tabs */}
-                <div className="flex overflow-x-auto p-1.5 bg-background/60 backdrop-blur-md rounded-2xl border border-border/50 w-max max-w-full mb-8 shadow-sm hide-scrollbar">
-                  <button onClick={() => setActiveTab("live")} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'live' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}>Live Matches</button>
-                  <button onClick={() => setActiveTab("recent")} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'recent' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}>Recent Results</button>
-                  <button onClick={() => setActiveTab("upcoming")} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'upcoming' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}>Upcoming</button>
-                </div>
-
-                {/* Match Grid */}
-                {isLoading ? (
-                  <div className="flex items-center justify-center py-32">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary/60" />
-                  </div>
-                ) : currentMatches.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-32 text-center rounded-2xl bg-background/40 border border-border/20">
-                    <p className="text-muted-foreground font-semibold">No matches available for this category right now.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-12 animate-in fade-in duration-500">
-                    {Object.entries(groupedMatches).map(([leagueName, matches]) => (
-                      <section key={leagueName} className="space-y-5">
-                        <div className="flex items-center gap-3 border-b-2 border-border/20 pb-3">
-                          <img src={matches[0].league.logo} alt={leagueName} className="w-7 h-7 object-contain drop-shadow-sm" />
-                          <h2 className="text-xl font-bold tracking-tight uppercase text-foreground/80">{leagueName}</h2>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-5">
-                          {matches.map(match => (
-                            <FootballMatchCard 
-                              key={match.fixture.id} 
-                              match={match} 
-                              onClick={() => handleMatchClick(match.fixture.id)} 
-                            />
-                          ))}
-                        </div>
-                      </section>
-                    ))}
-                  </div>
-                )}
+          {/* Minimalist Header */}
+          <div className="flex flex-col md:flex-row items-baseline justify-between gap-4">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white">Football.</h1>
+            <div className="flex items-center gap-4">
+              {/* Sleek pill-shaped tabs */}
+              <div className="flex p-1 bg-white/5 backdrop-blur-3xl rounded-full border border-white/10">
+                <button onClick={() => setActiveTab("live")} className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'live' ? 'bg-white text-black shadow-lg scale-105' : 'text-white/60 hover:text-white'}`}>Live</button>
+                <button onClick={() => setActiveTab("recent")} className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'recent' ? 'bg-white text-black shadow-lg scale-105' : 'text-white/60 hover:text-white'}`}>Recent</button>
+                <button onClick={() => setActiveTab("upcoming")} className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'upcoming' ? 'bg-white text-black shadow-lg scale-105' : 'text-white/60 hover:text-white'}`}>Upcoming</button>
               </div>
-            </div>
 
-            {/* Trending News (Right, spans 4 cols) */}
-            <div className="lg:col-span-4 flex flex-col gap-6">
-               <FootballNewsSidebar />
+              <button
+                onClick={handleManualRefresh}
+                disabled={isRefreshing}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold border border-white/10 rounded-full hover:bg-white/10 transition-colors text-white disabled:opacity-50 backdrop-blur-md"
+              >
+                <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
+                Sync
+              </button>
             </div>
-
-            {/* Transfers Market (Bottom, spans full width) */}
-            <div className="lg:col-span-12">
-               <div className="bg-secondary/5 border border-border/40 rounded-[2rem] p-6 md:p-8">
-                 <div className="flex items-center gap-3 mb-8 border-b border-border/20 pb-4">
-                   <div className="p-2 bg-primary/10 rounded-xl text-primary">
-                     <ArrowRightLeft size={24} strokeWidth={2.5} />
-                   </div>
-                   <h2 className="text-2xl font-black tracking-tight">Global Transfer Market</h2>
-                 </div>
-                 
-                 {transfersLoading ? (
-                   <div className="flex items-center justify-center py-20">
-                     <Loader2 className="w-8 h-8 animate-spin text-primary/60" />
-                   </div>
-                 ) : !recentTransfers || recentTransfers.length === 0 ? (
-                   <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl bg-background/40 border border-border/20">
-                     <p className="text-muted-foreground font-semibold">No recent transfers available.</p>
-                   </div>
-                 ) : (
-                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 animate-in fade-in duration-500">
-                     {recentTransfers.map((transfer, idx) => (
-                       <TransferCard key={idx} transferData={transfer} />
-                     ))}
-                   </div>
-                 )}
-               </div>
-            </div>
-
           </div>
+
+          {/* Match Center (Horizontal Scroll) */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 px-2">
+              <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              <h2 className="text-xl font-bold tracking-tight text-white/90">Matches</h2>
+            </div>
+            
+            {isLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-6 h-6 animate-spin text-white/40" />
+              </div>
+            ) : currentMatches.length === 0 ? (
+              <div className="py-20 text-center">
+                <p className="text-white/40 font-medium">No matches to display.</p>
+              </div>
+            ) : (
+              <div className="space-y-10">
+                {Object.entries(groupedMatches).map(([leagueName, matches]) => (
+                  <div key={leagueName} className="space-y-4">
+                    <div className="flex items-center gap-3 px-2">
+                      <img src={matches[0].league.logo} alt={leagueName} className="w-5 h-5 object-contain opacity-80" />
+                      <h3 className="text-sm font-semibold tracking-wider uppercase text-white/60">{leagueName}</h3>
+                    </div>
+                    {/* Horizontal scroll container */}
+                    <div className="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+                      {matches.map(match => (
+                        <div key={match.fixture.id} className="snap-start shrink-0 w-[300px] md:w-[350px]">
+                          <FootballMatchCard 
+                            match={match} 
+                            onClick={() => handleMatchClick(match.fixture.id)} 
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <hr className="border-white/5" />
+
+          {/* Transfers Market (Horizontal Scroll) */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 px-2">
+              <ArrowRightLeft size={18} className="text-white/80" />
+              <h2 className="text-xl font-bold tracking-tight text-white/90">Transfer Intel</h2>
+            </div>
+            
+            {transfersLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-6 h-6 animate-spin text-white/40" />
+              </div>
+            ) : !recentTransfers || recentTransfers.length === 0 ? (
+              <div className="py-20 text-center">
+                <p className="text-white/40 font-medium">No transfers available.</p>
+              </div>
+            ) : (
+              <div className="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+                {recentTransfers.map((transfer, idx) => (
+                  <div key={idx} className="snap-start shrink-0 w-[280px] md:w-[320px]">
+                    <TransferCard transferData={transfer} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <hr className="border-white/5" />
+
+          {/* Latest News (Vertical List) */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 px-2">
+              <h2 className="text-xl font-bold tracking-tight text-white/90">Latest News</h2>
+            </div>
+            <div className="max-w-4xl">
+              <FootballNewsSidebar />
+            </div>
+          </section>
+
         </main>
       </div>
     </>
