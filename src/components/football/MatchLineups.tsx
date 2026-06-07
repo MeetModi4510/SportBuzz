@@ -77,67 +77,76 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [] }: Match
   );
 
   return (
-    <div className="max-w-4xl mx-auto animate-in fade-in duration-300 space-y-8">
+    <div className="max-w-3xl mx-auto animate-in fade-in duration-300 space-y-8">
       
-      {/* Away Team Header (Top) */}
-      <div className="flex justify-center items-center bg-secondary/20 p-3 rounded-xl border border-border/40 max-w-[200px] mx-auto shadow-sm mb-4">
-        <div className="flex items-center gap-3">
-          <TeamLogo logo={awayTeam.logo} name={awayTeam.name} size="sm" />
-          <div className="text-left">
-            <h3 className="font-bold text-sm md:text-base leading-tight">{awayTeam.name}</h3>
-            <p className="text-[10px] text-muted-foreground tracking-widest uppercase font-bold">{awayLineup.formation}</p>
+      {/* Unified Pitch Card */}
+      <div className="rounded-2xl overflow-hidden border border-border/30 shadow-2xl bg-background flex flex-col">
+        
+        {/* Away Team Header (Top) */}
+        <div className="flex justify-between items-center bg-secondary/20 p-4 px-6 border-b border-border/40 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center p-1 border border-border/30 shadow-sm">
+              <TeamLogo logo={awayTeam.logo} name={awayTeam.name} size="sm" />
+            </div>
+            <h3 className="font-bold text-sm md:text-base leading-tight text-foreground">{awayTeam.name}</h3>
+          </div>
+          <span className="text-[10px] md:text-xs text-muted-foreground tracking-widest uppercase font-bold bg-background/60 px-3 py-1 rounded-full border border-border/40 shadow-sm">
+            {awayLineup.formation}
+          </span>
+        </div>
+
+        {/* The Pitch */}
+        <div className="relative w-full aspect-[2/3] md:aspect-[3/4] bg-green-800 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] border-y-4 border-green-900/80 shadow-inner">
+          {/* Pitch Markings */}
+          <div className="absolute inset-0 border-[3px] border-white/30 m-4 md:m-6 rounded-sm" />
+          <div className="absolute top-1/2 left-4 right-4 md:left-6 md:right-6 h-0 border-t-[3px] border-white/30" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-[3px] border-white/30 rounded-full" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white/30 rounded-full" />
+          
+          {/* Penalty Areas */}
+          <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 w-48 md:w-64 h-24 border-[3px] border-white/30 border-t-0" />
+          <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-48 md:w-64 h-24 border-[3px] border-white/30 border-b-0" />
+          
+          {/* Goal Areas */}
+          <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 w-20 md:w-28 h-8 md:h-10 border-[3px] border-white/30 border-t-0" />
+          <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-20 md:w-28 h-8 md:h-10 border-[3px] border-white/30 border-b-0" />
+
+          {/* Players Container */}
+          <div className="absolute inset-0 flex flex-col m-4 md:m-6 py-4 md:py-8">
+            {/* Away Team (Top Half) */}
+            <div className="flex-1 flex flex-col justify-between">
+              {awayRowsSorted.map((row, idx) => (
+                <div key={`away-row-${idx}`} className="flex justify-around items-center w-full">
+                  {row.map(item => renderPlayer(item, false))}
+                </div>
+              ))}
+            </div>
+
+            {/* Spacer between halves */}
+            <div className="h-16" />
+
+            {/* Home Team (Bottom Half) */}
+            <div className="flex-1 flex flex-col justify-between">
+              {homeRowsSorted.map((row, idx) => (
+                <div key={`home-row-${idx}`} className="flex justify-around items-center w-full">
+                  {row.map(item => renderPlayer(item, true))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-      {/* The Pitch */}
-      <div className="relative w-full aspect-[2/3] md:aspect-[3/4] max-w-2xl mx-auto rounded-lg overflow-hidden shadow-2xl border-4 border-green-900 bg-green-700 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]">
-        {/* Pitch Markings */}
-        <div className="absolute inset-0 border-[3px] border-white/30 m-4 rounded-sm" />
-        <div className="absolute top-1/2 left-4 right-4 h-0 border-t-[3px] border-white/30" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-[3px] border-white/30 rounded-full" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white/30 rounded-full" />
-        
-        {/* Penalty Areas */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 w-48 h-24 border-[3px] border-white/30 border-t-0" />
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-48 h-24 border-[3px] border-white/30 border-b-0" />
-        
-        {/* Goal Areas */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-8 border-[3px] border-white/30 border-t-0" />
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-20 h-8 border-[3px] border-white/30 border-b-0" />
 
-        {/* Players Container */}
-        <div className="absolute inset-0 flex flex-col m-4 py-4">
-          {/* Away Team (Top Half) */}
-          <div className="flex-1 flex flex-col justify-between">
-            {awayRowsSorted.map((row, idx) => (
-              <div key={`away-row-${idx}`} className="flex justify-around items-center w-full">
-                {row.map(item => renderPlayer(item, false))}
-              </div>
-            ))}
+        {/* Home Team Header (Bottom) */}
+        <div className="flex justify-between items-center bg-secondary/20 p-4 px-6 border-t border-border/40 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center p-1 border border-border/30 shadow-sm">
+              <TeamLogo logo={homeTeam.logo} name={homeTeam.name} size="sm" />
+            </div>
+            <h3 className="font-bold text-sm md:text-base leading-tight text-foreground">{homeTeam.name}</h3>
           </div>
-
-          {/* Spacer between halves */}
-          <div className="h-12" />
-
-          {/* Home Team (Bottom Half) */}
-          <div className="flex-1 flex flex-col justify-between">
-            {homeRowsSorted.map((row, idx) => (
-              <div key={`home-row-${idx}`} className="flex justify-around items-center w-full">
-                {row.map(item => renderPlayer(item, true))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Home Team Header (Bottom) */}
-      <div className="flex justify-center items-center bg-secondary/20 p-3 rounded-xl border border-border/40 max-w-[200px] mx-auto shadow-sm mt-4">
-        <div className="flex items-center gap-3">
-          <TeamLogo logo={homeTeam.logo} name={homeTeam.name} size="sm" />
-          <div className="text-left">
-            <h3 className="font-bold text-sm md:text-base leading-tight">{homeTeam.name}</h3>
-            <p className="text-[10px] text-muted-foreground tracking-widest uppercase font-bold">{homeLineup.formation}</p>
-          </div>
+          <span className="text-[10px] md:text-xs text-muted-foreground tracking-widest uppercase font-bold bg-background/60 px-3 py-1 rounded-full border border-border/40 shadow-sm">
+            {homeLineup.formation}
+          </span>
         </div>
       </div>
       {/* Substitutes & Manager */}
