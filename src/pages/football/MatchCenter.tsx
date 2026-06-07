@@ -84,34 +84,41 @@ export default function MatchCenter() {
         <Navbar />
 
         {/* Header / Scoreboard */}
-        <div className="bg-secondary/20 border-b border-border/40 pb-6 pt-4">
-          <div className="container mx-auto px-4">
+        <div className="relative pt-6 pb-12 overflow-hidden border-b border-border/20 bg-gradient-to-b from-background to-secondary/5">
+          {/* Subtle background glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[300px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+
+          <div className="container mx-auto px-4 relative z-10">
             <button 
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors group w-max"
             >
-              <ArrowLeft size={16} />
+              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
               Back
             </button>
 
-            <div className="flex flex-col items-center justify-center gap-4 text-center">
-              <span className="text-xs font-semibold tracking-widest text-muted-foreground uppercase bg-secondary px-3 py-1 rounded-full">
-                {match.league.name}
+            <div className="flex flex-col items-center justify-center max-w-4xl mx-auto">
+              <span className="text-[10px] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase bg-secondary/40 border border-border/40 px-5 py-2 rounded-full mb-10 backdrop-blur-md shadow-sm">
+                {match.league.name} • {match.fixture.venue.city}
               </span>
 
-              <div className="flex items-center justify-center gap-8 md:gap-16 mt-4 w-full max-w-2xl">
+              <div className="flex items-stretch justify-center w-full gap-2 md:gap-12">
+                
                 {/* Home Team */}
-                <div className="flex flex-col items-center gap-3 flex-1">
-                  <TeamLogo logo={match.teams.home.logo} name={match.teams.home.name} size="lg" className="w-20 h-20 md:w-24 md:h-24 shadow-md" />
-                  <span className="font-bold text-lg md:text-xl text-center leading-tight">
+                <div className="flex flex-col items-center flex-1 w-0">
+                  <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-background/50 flex items-center justify-center p-4 mb-5 border border-border/30 shadow-2xl backdrop-blur-md hover:scale-105 transition-transform duration-500">
+                    <TeamLogo logo={match.teams.home.logo} name={match.teams.home.name} size="lg" className="w-full h-full object-contain filter drop-shadow-xl" />
+                  </div>
+                  <span className="font-extrabold text-lg md:text-3xl text-center leading-tight tracking-tight mb-5">
                     {match.teams.home.name}
                   </span>
                   {homeGoals.length > 0 && (
-                    <div className="flex flex-col items-center text-xs text-muted-foreground mt-1 space-y-1">
+                    <div className="flex flex-col items-center gap-2 w-full">
                       {homeGoals.map((goal, idx) => (
-                        <div key={idx} className="flex flex-wrap justify-center items-center gap-1 text-center">
-                          <span className="font-medium text-foreground/80">{goal.player.name} {goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
-                          {goal.assist.name && <span className="text-[10px] opacity-70">({goal.assist.name})</span>}
+                        <div key={idx} className="flex items-center justify-center flex-wrap gap-1.5 text-[11px] md:text-sm text-muted-foreground text-center">
+                          <span className="font-semibold text-foreground/90">{goal.player.name}</span>
+                          <span className="text-primary font-bold">{goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
+                          {goal.assist.name && <span className="opacity-60 text-[10px] hidden md:inline">({goal.assist.name})</span>}
                         </div>
                       ))}
                     </div>
@@ -119,35 +126,45 @@ export default function MatchCenter() {
                 </div>
 
                 {/* Score / Status */}
-                <div className="flex flex-col items-center gap-2 min-w-[120px]">
-                  <div className="text-4xl md:text-6xl font-black tracking-tighter tabular-nums font-display">
-                    {match.goals.home ?? '-'}<span className="text-muted-foreground/30 mx-2">:</span>{match.goals.away ?? '-'}
+                <div className="flex flex-col items-center justify-start pt-4 md:pt-8 px-2 md:px-6">
+                  <div className="text-5xl md:text-8xl font-black tracking-tighter flex items-center gap-3 md:gap-6 drop-shadow-2xl font-display">
+                    <span className={match.goals.home !== null && match.goals.away !== null && match.goals.home > match.goals.away ? "text-primary" : "text-foreground"}>
+                      {match.goals.home ?? '-'}
+                    </span>
+                    <span className="text-muted-foreground/20 font-light text-4xl md:text-7xl pb-2">:</span>
+                    <span className={match.goals.home !== null && match.goals.away !== null && match.goals.away > match.goals.home ? "text-primary" : "text-foreground"}>
+                      {match.goals.away ?? '-'}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {isLive && <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />}
-                    <span className={`font-semibold tracking-wide uppercase text-sm ${isLive ? 'text-red-500' : 'text-muted-foreground'}`}>
+                  <div className="mt-6 flex items-center justify-center gap-2 bg-background/60 px-4 py-1.5 rounded-md backdrop-blur-md border border-border/40 shadow-sm">
+                    {isLive && <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" />}
+                    <span className={`font-bold tracking-[0.15em] uppercase text-[10px] md:text-xs ${isLive ? 'text-red-500' : 'text-muted-foreground'}`}>
                       {isLive ? `${match.fixture.status.elapsed}'` : match.fixture.status.long}
                     </span>
                   </div>
                 </div>
 
                 {/* Away Team */}
-                <div className="flex flex-col items-center gap-3 flex-1">
-                  <TeamLogo logo={match.teams.away.logo} name={match.teams.away.name} size="lg" className="w-20 h-20 md:w-24 md:h-24 shadow-md" />
-                  <span className="font-bold text-lg md:text-xl text-center leading-tight">
+                <div className="flex flex-col items-center flex-1 w-0">
+                  <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-background/50 flex items-center justify-center p-4 mb-5 border border-border/30 shadow-2xl backdrop-blur-md hover:scale-105 transition-transform duration-500">
+                    <TeamLogo logo={match.teams.away.logo} name={match.teams.away.name} size="lg" className="w-full h-full object-contain filter drop-shadow-xl" />
+                  </div>
+                  <span className="font-extrabold text-lg md:text-3xl text-center leading-tight tracking-tight mb-5">
                     {match.teams.away.name}
                   </span>
                   {awayGoals.length > 0 && (
-                    <div className="flex flex-col items-center text-xs text-muted-foreground mt-1 space-y-1">
+                    <div className="flex flex-col items-center gap-2 w-full">
                       {awayGoals.map((goal, idx) => (
-                        <div key={idx} className="flex flex-wrap justify-center items-center gap-1 text-center">
-                          <span className="font-medium text-foreground/80">{goal.player.name} {goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
-                          {goal.assist.name && <span className="text-[10px] opacity-70">({goal.assist.name})</span>}
+                        <div key={idx} className="flex items-center justify-center flex-wrap gap-1.5 text-[11px] md:text-sm text-muted-foreground text-center">
+                          <span className="font-semibold text-foreground/90">{goal.player.name}</span>
+                          <span className="text-primary font-bold">{goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
+                          {goal.assist.name && <span className="opacity-60 text-[10px] hidden md:inline">({goal.assist.name})</span>}
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
+
               </div>
             </div>
           </div>
