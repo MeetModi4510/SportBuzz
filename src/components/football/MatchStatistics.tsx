@@ -31,96 +31,83 @@ export function MatchStatistics({ statistics, homeTeam, awayTeam }: MatchStatist
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-300">
+    <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-300 pb-10">
       
       {/* Header */}
-      <div className="flex justify-between items-center bg-secondary/20 p-4 rounded-xl border border-border/30 backdrop-blur-sm shadow-sm">
-        <div className="flex items-center gap-3 w-[120px]">
-          <TeamLogo logo={homeTeam.logo} name={homeTeam.name} size="sm" />
-          <span className="font-bold text-sm hidden sm:block truncate">{homeTeam.name}</span>
+      <div className="flex justify-between items-center bg-secondary/10 p-5 rounded-2xl border border-border/20 backdrop-blur-sm mb-8">
+        <div className="flex items-center gap-4 flex-1">
+          <div className="w-12 h-12 bg-background rounded-full p-2 border border-border/30 shadow-sm flex items-center justify-center shrink-0">
+            <TeamLogo logo={homeTeam.logo} name={homeTeam.name} size="md" className="w-full h-full object-contain" />
+          </div>
+          <span className="font-bold text-base md:text-lg hidden sm:block truncate">{homeTeam.name}</span>
         </div>
-        <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">Match Stats</span>
-        <div className="flex items-center justify-end gap-3 w-[120px]">
-          <span className="font-bold text-sm hidden sm:block truncate">{awayTeam.name}</span>
-          <TeamLogo logo={awayTeam.logo} name={awayTeam.name} size="sm" />
+        <span className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] px-4 shrink-0">
+          Match Stats
+        </span>
+        <div className="flex items-center justify-end gap-4 flex-1 text-right">
+          <span className="font-bold text-base md:text-lg hidden sm:block truncate">{awayTeam.name}</span>
+          <div className="w-12 h-12 bg-background rounded-full p-2 border border-border/30 shadow-sm flex items-center justify-center shrink-0">
+            <TeamLogo logo={awayTeam.logo} name={awayTeam.name} size="md" className="w-full h-full object-contain" />
+          </div>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {statTypes.map((type, idx) => {
-          const homeValRaw = homeStats.find(s => s.type === type)?.value ?? 0;
-          const awayValRaw = awayStats.find(s => s.type === type)?.value ?? 0;
-          
-          const homeNum = parseStatValue(homeValRaw);
-          const awayNum = parseStatValue(awayValRaw);
-          
-          const total = homeNum + awayNum;
-          // Avoid division by zero
-          const homePercent = total > 0 ? (homeNum / total) * 100 : 50;
-          
-          // Circular SVG calculations
-          const size = 64;
-          const strokeWidth = 5;
-          const radius = (size - strokeWidth) / 2;
-          const circumference = 2 * Math.PI * radius;
-          const homeStroke = (homePercent / 100) * circumference;
+      {/* Stats List */}
+      <div className="bg-background border border-border/20 rounded-3xl p-2 md:p-6 shadow-sm">
+        <div className="flex flex-col gap-6 w-full">
+          {statTypes.map((type, idx) => {
+            const homeValRaw = homeStats.find(s => s.type === type)?.value ?? 0;
+            const awayValRaw = awayStats.find(s => s.type === type)?.value ?? 0;
+            
+            const homeNum = parseStatValue(homeValRaw);
+            const awayNum = parseStatValue(awayValRaw);
+            
+            const maxVal = Math.max(homeNum, awayNum);
+            // Calculate widths relative to the max value to show clear dominance.
+            // If both are 0, we don't want to divide by zero, so default to 0 width.
+            const homeWidth = maxVal > 0 ? (homeNum / maxVal) * 100 : 0;
+            const awayWidth = maxVal > 0 ? (awayNum / maxVal) * 100 : 0;
 
-          return (
-            <div key={idx} className="flex flex-col items-center justify-between bg-background border border-border/30 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-border/60 transition-all duration-300 group relative overflow-hidden">
-              
-              {/* Stat Name */}
-              <span className="text-[10px] font-bold tracking-[0.1em] text-center text-muted-foreground uppercase mb-3 h-8 flex items-center justify-center w-full leading-tight">
-                {type}
-              </span>
-
-              {/* Center Visualization */}
-              <div className="relative flex items-center justify-center w-full mb-2">
-                {/* Home Stat */}
-                <div className="absolute left-0 flex items-center justify-center w-8">
-                  <span className={`text-lg md:text-xl font-black ${homeNum >= awayNum ? 'text-foreground' : 'text-muted-foreground/60'}`}>
+            return (
+              <div key={idx} className="flex flex-col gap-2 px-2 md:px-4 group">
+                
+                {/* Text Row */}
+                <div className="flex justify-between items-end">
+                  <span className={`text-lg md:text-xl font-bold w-12 text-left ${homeNum >= awayNum ? 'text-foreground' : 'text-muted-foreground/60'}`}>
                     {homeValRaw}
                   </span>
-                </div>
-
-                {/* Circular Dominance Ring */}
-                <div className="relative flex items-center justify-center group-hover:scale-105 transition-transform duration-500" style={{ width: size, height: size }}>
-                  <svg className="w-full h-full transform -rotate-90">
-                    {/* Away (Background) Track */}
-                    <circle 
-                      cx={size / 2} cy={size / 2} r={radius} 
-                      stroke="currentColor" strokeWidth={strokeWidth} fill="transparent" 
-                      className="text-secondary" 
-                    />
-                    {/* Home (Foreground) Track */}
-                    <circle 
-                      cx={size / 2} cy={size / 2} r={radius} 
-                      stroke="currentColor" strokeWidth={strokeWidth} fill="transparent" 
-                      className="text-foreground transition-all duration-1000 ease-out" 
-                      strokeDasharray={`${homeStroke} ${circumference}`}
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  {/* Subtle center indicator */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className={`w-1.5 h-1.5 rounded-full ${homeNum > awayNum ? 'bg-foreground' : (awayNum > homeNum ? 'bg-secondary-foreground/40' : 'bg-muted')}`} />
-                  </div>
-                </div>
-
-                {/* Away Stat */}
-                <div className="absolute right-0 flex items-center justify-center w-8">
-                  <span className={`text-lg md:text-xl font-black ${awayNum >= homeNum ? 'text-foreground' : 'text-muted-foreground/60'}`}>
+                  <span className="text-[10px] md:text-xs font-bold tracking-[0.15em] text-muted-foreground uppercase">
+                    {type}
+                  </span>
+                  <span className={`text-lg md:text-xl font-bold w-12 text-right ${awayNum >= homeNum ? 'text-foreground' : 'text-muted-foreground/60'}`}>
                     {awayValRaw}
                   </span>
                 </div>
+
+                {/* Opposing Bars */}
+                <div className="flex w-full h-2 gap-1.5 items-center justify-center">
+                  {/* Home Bar */}
+                  <div className="flex-1 h-full bg-secondary/40 rounded-l-full flex justify-end overflow-hidden">
+                    <div 
+                      className={`h-full rounded-l-full transition-all duration-1000 ease-out ${homeNum >= awayNum && homeNum > 0 ? 'bg-primary' : 'bg-muted-foreground/40'}`} 
+                      style={{ width: `${homeWidth}%` }} 
+                    />
+                  </div>
+                  {/* Center Divider */}
+                  <div className="w-[1px] h-3 bg-border/50 rounded-full" />
+                  {/* Away Bar */}
+                  <div className="flex-1 h-full bg-secondary/40 rounded-r-full flex justify-start overflow-hidden">
+                    <div 
+                      className={`h-full rounded-r-full transition-all duration-1000 ease-out ${awayNum >= homeNum && awayNum > 0 ? 'bg-primary' : 'bg-muted-foreground/40'}`} 
+                      style={{ width: `${awayWidth}%` }} 
+                    />
+                  </div>
+                </div>
+
               </div>
-              
-              {/* Subtle accent line at bottom based on dominance */}
-              <div className="absolute bottom-0 left-0 h-1 bg-foreground transition-all duration-500" style={{ width: `${homePercent}%` }} />
-              <div className="absolute bottom-0 right-0 h-1 bg-secondary transition-all duration-500" style={{ width: `${100 - homePercent}%` }} />
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

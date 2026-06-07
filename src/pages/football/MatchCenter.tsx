@@ -220,32 +220,68 @@ export default function MatchCenter() {
             ))}
           </div>
 
-          {/* Tab Content - Lazy Loading Data strategy applied implicitly by conditional rendering */}
-          {activeTab === "overview" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
-              <div className="bg-secondary/10 border border-border/50 rounded-xl p-6 space-y-4">
-                 <h3 className="text-lg font-bold">Match Information</h3>
-                 <div className="space-y-3 text-sm">
-                   <div className="flex justify-between border-b border-border/20 pb-2">
-                     <span className="text-muted-foreground">League</span>
-                     <span className="font-medium">{match.league.name} ({match.league.country})</span>
+          {/* Tab Content */}
+          {activeTab === "overview" && (() => {
+            // Calculate Man of the Match
+            let motm = null;
+            if (match.players && ['FT', 'AET', 'PEN'].includes(match.fixture.status.short)) {
+              let highestRating = -1;
+              match.players.forEach(teamStats => {
+                teamStats.players.forEach(p => {
+                  const ratingStr = p.statistics[0]?.games?.rating;
+                  if (ratingStr) {
+                    const rating = parseFloat(ratingStr);
+                    if (rating > highestRating) {
+                      highestRating = rating;
+                      motm = { ...p.player, rating, team: teamStats.team };
+                    }
+                  }
+                });
+              });
+            }
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
+                <div className="bg-secondary/10 border border-border/50 rounded-xl p-6 space-y-4">
+                   <h3 className="text-lg font-bold">Match Information</h3>
+                   <div className="space-y-3 text-sm">
+                     <div className="flex justify-between border-b border-border/20 pb-2">
+                       <span className="text-muted-foreground">League</span>
+                       <span className="font-medium">{match.league.name} ({match.league.country})</span>
+                     </div>
+                     <div className="flex justify-between border-b border-border/20 pb-2">
+                       <span className="text-muted-foreground">Venue</span>
+                       <span className="font-medium">{match.fixture.venue.name}, {match.fixture.venue.city}</span>
+                     </div>
+                     <div className="flex justify-between border-b border-border/20 pb-2">
+                       <span className="text-muted-foreground">Date</span>
+                       <span className="font-medium">{new Date(match.fixture.date).toLocaleString()}</span>
+                     </div>
+                     <div className={`flex justify-between ${motm ? 'border-b border-border/20 pb-2' : 'pb-2'}`}>
+                       <span className="text-muted-foreground">Referee</span>
+                       <span className="font-medium">{match.fixture.referee || "N/A"}</span>
+                     </div>
+                     {motm && (
+                       <div className="flex justify-between pt-1">
+                         <span className="text-muted-foreground flex items-center gap-1.5">
+                           <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-yellow-500">
+                             <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                           </svg>
+                           Man of the Match
+                         </span>
+                         <div className="flex items-center gap-2">
+                           <span className="font-bold text-foreground">{motm.name}</span>
+                           <span className="text-xs font-bold bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded border border-yellow-500/30">
+                             {motm.rating.toFixed(1)}
+                           </span>
+                         </div>
+                       </div>
+                     )}
                    </div>
-                   <div className="flex justify-between border-b border-border/20 pb-2">
-                     <span className="text-muted-foreground">Venue</span>
-                     <span className="font-medium">{match.fixture.venue.name}, {match.fixture.venue.city}</span>
-                   </div>
-                   <div className="flex justify-between border-b border-border/20 pb-2">
-                     <span className="text-muted-foreground">Date</span>
-                     <span className="font-medium">{new Date(match.fixture.date).toLocaleString()}</span>
-                   </div>
-                   <div className="flex justify-between pb-2">
-                     <span className="text-muted-foreground">Referee</span>
-                     <span className="font-medium">{match.fixture.referee || "N/A"}</span>
-                   </div>
-                 </div>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {activeTab === "events" && (
             <div className="animate-in fade-in duration-300">
