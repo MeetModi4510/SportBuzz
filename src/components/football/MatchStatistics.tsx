@@ -31,20 +31,23 @@ export function MatchStatistics({ statistics, homeTeam, awayTeam }: MatchStatist
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-300">
-      <div className="flex justify-between items-center bg-secondary/20 p-4 rounded-xl border border-border/40">
-        <div className="flex items-center gap-3">
+    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-300">
+      
+      {/* Header */}
+      <div className="flex justify-between items-center bg-secondary/20 p-4 rounded-xl border border-border/30 backdrop-blur-sm shadow-sm">
+        <div className="flex items-center gap-3 w-[120px]">
           <TeamLogo logo={homeTeam.logo} name={homeTeam.name} size="sm" />
-          <span className="font-bold">{homeTeam.name}</span>
+          <span className="font-bold text-sm hidden sm:block truncate">{homeTeam.name}</span>
         </div>
-        <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Team Stats</span>
-        <div className="flex items-center gap-3">
-          <span className="font-bold">{awayTeam.name}</span>
+        <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">Match Stats</span>
+        <div className="flex items-center justify-end gap-3 w-[120px]">
+          <span className="font-bold text-sm hidden sm:block truncate">{awayTeam.name}</span>
           <TeamLogo logo={awayTeam.logo} name={awayTeam.name} size="sm" />
         </div>
       </div>
 
-      <div className="space-y-6">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {statTypes.map((type, idx) => {
           const homeValRaw = homeStats.find(s => s.type === type)?.value ?? 0;
           const awayValRaw = awayStats.find(s => s.type === type)?.value ?? 0;
@@ -53,26 +56,68 @@ export function MatchStatistics({ statistics, homeTeam, awayTeam }: MatchStatist
           const awayNum = parseStatValue(awayValRaw);
           
           const total = homeNum + awayNum;
+          // Avoid division by zero
           const homePercent = total > 0 ? (homeNum / total) * 100 : 50;
-          const awayPercent = total > 0 ? (awayNum / total) * 100 : 50;
+          
+          // Circular SVG calculations
+          const size = 64;
+          const strokeWidth = 5;
+          const radius = (size - strokeWidth) / 2;
+          const circumference = 2 * Math.PI * radius;
+          const homeStroke = (homePercent / 100) * circumference;
 
           return (
-            <div key={idx} className="space-y-2">
-              <div className="flex justify-between text-sm font-medium">
-                <span className={homeNum >= awayNum ? 'text-primary' : 'text-muted-foreground'}>{homeValRaw}</span>
-                <span className="text-muted-foreground text-xs uppercase tracking-wider">{type}</span>
-                <span className={awayNum >= homeNum ? 'text-primary' : 'text-muted-foreground'}>{awayValRaw}</span>
+            <div key={idx} className="flex flex-col items-center justify-between bg-background border border-border/30 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-border/60 transition-all duration-300 group relative overflow-hidden">
+              
+              {/* Stat Name */}
+              <span className="text-[10px] font-bold tracking-[0.1em] text-center text-muted-foreground uppercase mb-3 h-8 flex items-center justify-center w-full leading-tight">
+                {type}
+              </span>
+
+              {/* Center Visualization */}
+              <div className="relative flex items-center justify-center w-full mb-2">
+                {/* Home Stat */}
+                <div className="absolute left-0 flex items-center justify-center w-8">
+                  <span className={`text-lg md:text-xl font-black ${homeNum >= awayNum ? 'text-foreground' : 'text-muted-foreground/60'}`}>
+                    {homeValRaw}
+                  </span>
+                </div>
+
+                {/* Circular Dominance Ring */}
+                <div className="relative flex items-center justify-center group-hover:scale-105 transition-transform duration-500" style={{ width: size, height: size }}>
+                  <svg className="w-full h-full transform -rotate-90">
+                    {/* Away (Background) Track */}
+                    <circle 
+                      cx={size / 2} cy={size / 2} r={radius} 
+                      stroke="currentColor" strokeWidth={strokeWidth} fill="transparent" 
+                      className="text-secondary" 
+                    />
+                    {/* Home (Foreground) Track */}
+                    <circle 
+                      cx={size / 2} cy={size / 2} r={radius} 
+                      stroke="currentColor" strokeWidth={strokeWidth} fill="transparent" 
+                      className="text-foreground transition-all duration-1000 ease-out" 
+                      strokeDasharray={`${homeStroke} ${circumference}`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  {/* Subtle center indicator */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className={`w-1.5 h-1.5 rounded-full ${homeNum > awayNum ? 'bg-foreground' : (awayNum > homeNum ? 'bg-secondary-foreground/40' : 'bg-muted')}`} />
+                  </div>
+                </div>
+
+                {/* Away Stat */}
+                <div className="absolute right-0 flex items-center justify-center w-8">
+                  <span className={`text-lg md:text-xl font-black ${awayNum >= homeNum ? 'text-foreground' : 'text-muted-foreground/60'}`}>
+                    {awayValRaw}
+                  </span>
+                </div>
               </div>
-              <div className="flex h-2 rounded-full overflow-hidden bg-secondary">
-                <div 
-                  className="bg-primary/80 transition-all duration-1000" 
-                  style={{ width: `${homePercent}%` }} 
-                />
-                <div 
-                  className="bg-primary/20 transition-all duration-1000" 
-                  style={{ width: `${awayPercent}%` }} 
-                />
-              </div>
+              
+              {/* Subtle accent line at bottom based on dominance */}
+              <div className="absolute bottom-0 left-0 h-1 bg-foreground transition-all duration-500" style={{ width: `${homePercent}%` }} />
+              <div className="absolute bottom-0 right-0 h-1 bg-secondary transition-all duration-500" style={{ width: `${100 - homePercent}%` }} />
             </div>
           );
         })}
