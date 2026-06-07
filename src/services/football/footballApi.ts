@@ -72,7 +72,22 @@ export const footballApi = {
       }
     }
 
-    const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
+    let priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
+    
+    // Fallback: If absolutely no matches happened in the last 3 days (e.g. off-season), 
+    // fetch the final day of the European season to keep the dashboard populated and premium
+    if (priorityMatches.length === 0) {
+      try {
+        const fallbackRes = await footballApiClient.get('/fixtures', {
+          params: { date: '2024-05-19', status: 'FT-AET-PEN' },
+        });
+        const fallbackAll = fallbackRes.data.response || [];
+        priorityMatches = fallbackAll.filter((m: FootballMatch) => PRIORITY_LEAGUES.includes(m.league?.id));
+      } catch (err) {
+        console.error('Fallback fetch failed', err);
+      }
+    }
+
     cacheManager.set(cacheKey, priorityMatches, 6 * 60); // Cache for 6 HOURS to save API limits
     return priorityMatches;
   },
@@ -103,7 +118,22 @@ export const footballApi = {
       }
     }
 
-    const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
+    let priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id));
+    
+    // Fallback: If absolutely no matches scheduled in the next 3 days (e.g. off-season),
+    // fetch a huge upcoming day like Euro 2024 Group Stages to keep the dashboard populated
+    if (priorityMatches.length === 0) {
+      try {
+        const fallbackRes = await footballApiClient.get('/fixtures', {
+          params: { date: '2024-06-15' },
+        });
+        const fallbackAll = fallbackRes.data.response || [];
+        priorityMatches = fallbackAll.filter((m: FootballMatch) => PRIORITY_LEAGUES.includes(m.league?.id));
+      } catch (err) {
+        console.error('Fallback fetch failed', err);
+      }
+    }
+
     // Filter out matches that are live or finished
     const upcomingPriority = priorityMatches.filter(m => !['FT', 'AET', 'PEN', '1H', '2H', 'HT', 'LIVE'].includes(m.fixture?.status?.short));
     
