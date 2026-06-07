@@ -77,8 +77,10 @@ function timeAgo(dateStr: string) {
 export function FootballNewsSidebar() {
   const { data: apiNews, isLoading } = useFootballNews();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
   const news = apiNews && apiNews.length > 0 ? apiNews : FALLBACK_NEWS;
+  const displayedNews = showAll ? news : news.slice(0, 6);
 
   if (isLoading) {
     return (
@@ -89,72 +91,112 @@ export function FootballNewsSidebar() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {news.slice(0, 6).map((item: any, idx: number) => {
-        const theme = CARD_THEMES[idx % CARD_THEMES.length];
-        const IconComponent = theme.icon;
-        const isHovered = hoveredIdx === idx;
-        const isFirst = idx === 0;
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {displayedNews.map((item: any, idx: number) => {
+          const theme = CARD_THEMES[idx % CARD_THEMES.length];
+          const IconComponent = theme.icon;
+          const isHovered = hoveredIdx === idx;
+          const isFirst = idx === 0 && !showAll; // Only make the first item large if we aren't showing all (or keep it, but let's keep it large only if it's the very first)
 
-        return (
-          <div
-            key={item.id || idx}
-            className={`
-              group relative overflow-hidden rounded-2xl border transition-all duration-500 cursor-pointer
-              ${isFirst ? "md:col-span-2 lg:col-span-2" : ""}
-              ${isHovered ? `${theme.border} bg-white/[0.03] scale-[1.01]` : "border-white/[0.05] bg-white/[0.015]"}
-            `}
-            onMouseEnter={() => setHoveredIdx(idx)}
-            onMouseLeave={() => setHoveredIdx(null)}
-          >
-            {/* Gradient background glow */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
-            
-            {/* Decorative icon */}
-            <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-700">
-              <IconComponent size={isFirst ? 140 : 100} strokeWidth={0.5} />
-            </div>
-
-            {/* Content */}
-            <div className={`relative z-10 ${isFirst ? "p-7" : "p-5"}`}>
-              {/* Top row: source + time */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2.5">
-                  <div className={`w-1.5 h-1.5 rounded-full ${theme.accent.replace("text-", "bg-")} group-hover:animate-pulse`} />
-                  <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${theme.accent} opacity-80`}>
-                    {item.source}
-                  </span>
+          return (
+            <div
+              key={item.id || idx}
+              onClick={() => {
+                if (item.page?.url) {
+                  const url = item.page.url.startsWith('/') 
+                    ? `https://www.fotmob.com${item.page.url}`
+                    : item.page.url;
+                  window.open(url, '_blank');
+                }
+              }}
+              className={`
+                group relative overflow-hidden rounded-2xl border transition-all duration-500 cursor-pointer
+                ${isFirst ? "md:col-span-2 lg:col-span-2" : ""}
+                ${isHovered ? `${theme.border} bg-white/[0.03] scale-[1.01]` : "border-white/[0.05] bg-white/[0.015]"}
+              `}
+              onMouseEnter={() => setHoveredIdx(idx)}
+              onMouseLeave={() => setHoveredIdx(null)}
+            >
+              {/* Background Image or Gradient */}
+              {item.imageUrl ? (
+                <>
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-all duration-700 group-hover:scale-105" 
+                    style={{ backgroundImage: `url(${item.imageUrl})` }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/10" />
+                </>
+              ) : (
+                <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+              )}
+              
+              {/* Decorative icon (only if no image) */}
+              {!item.imageUrl && (
+                <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-700">
+                  <IconComponent size={isFirst ? 140 : 100} strokeWidth={0.5} />
                 </div>
-                <span className="text-[10px] text-white/25 font-medium flex items-center gap-1">
-                  <Clock size={9} />
-                  {timeAgo(item.publishedAt)}
-                </span>
-              </div>
-
-              {/* Title */}
-              <h3 className={`
-                font-bold leading-tight text-white/90 group-hover:text-white transition-colors duration-300
-                ${isFirst ? "text-xl md:text-2xl" : "text-sm"}
-              `}>
-                {item.title}
-              </h3>
-
-              {/* Summary — only for larger cards */}
-              {(isFirst || idx < 3) && (
-                <p className={`
-                  text-white/35 leading-relaxed mt-3 group-hover:text-white/45 transition-colors duration-300
-                  ${isFirst ? "text-sm line-clamp-3" : "text-xs line-clamp-2"}
-                `}>
-                  {item.summary}
-                </p>
               )}
 
-              {/* Bottom accent line */}
-              <div className={`mt-4 h-px bg-gradient-to-r ${theme.gradient} opacity-0 group-hover:opacity-60 transition-opacity duration-500`} />
+              {/* Content */}
+              <div className={`relative z-10 flex flex-col h-full ${isFirst ? "p-7 min-h-[220px]" : "p-5 min-h-[160px]"}`}>
+                {/* Top row: source + time */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    {item.sourceIconUrl ? (
+                      <img src={item.sourceIconUrl} alt={item.source} className="w-4 h-4 object-contain rounded-sm" />
+                    ) : (
+                      <div className={`w-1.5 h-1.5 rounded-full ${theme.accent.replace("text-", "bg-")} group-hover:animate-pulse`} />
+                    )}
+                    <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${theme.accent} opacity-80`}>
+                      {item.source}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-white/40 font-medium flex items-center gap-1 bg-black/20 px-2 py-1 rounded-full backdrop-blur-md">
+                    <Clock size={9} />
+                    {timeAgo(item.publishedAt)}
+                  </span>
+                </div>
+
+                {/* Spacer to push title to bottom when there's an image */}
+                <div className="flex-1" />
+
+                {/* Title */}
+                <h3 className={`
+                  font-bold leading-tight text-white group-hover:text-white transition-colors duration-300 drop-shadow-md
+                  ${isFirst ? "text-xl md:text-2xl" : "text-sm"}
+                `}>
+                  {item.title}
+                </h3>
+
+                {/* Summary — only for larger cards */}
+                {(isFirst || idx < 3) && (
+                  <p className={`
+                    text-white/35 leading-relaxed mt-3 group-hover:text-white/45 transition-colors duration-300
+                    ${isFirst ? "text-sm line-clamp-3" : "text-xs line-clamp-2"}
+                  `}>
+                    {item.summary}
+                  </p>
+                )}
+
+                {/* Bottom accent line */}
+                <div className={`mt-4 h-px bg-gradient-to-r ${theme.gradient} opacity-0 group-hover:opacity-60 transition-opacity duration-500`} />
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      {news.length > 6 && (
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="px-6 py-2.5 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white transition-all text-sm font-medium backdrop-blur-md flex items-center gap-2 group"
+          >
+            {showAll ? "Show Less" : `View All News (${news.length})`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
