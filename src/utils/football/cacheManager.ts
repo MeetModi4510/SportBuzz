@@ -1,5 +1,5 @@
 // src/utils/football/cacheManager.ts
-export const CACHE_PREFIX = 'football_v3:';
+export const CACHE_PREFIX = 'football_v5:';
 
 export interface CacheItem<T> {
   data: T;
