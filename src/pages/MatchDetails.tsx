@@ -8,6 +8,7 @@ import { useCricketMatchDetails, useCricketMatchSquads } from "@/hooks/useCricke
 import { useCricketDataMatch } from "@/hooks/useCricketDataMatch";
 import { useMatchFieldData } from "@/hooks/useMatchFieldData";
 import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ArrowLeft,
   MapPin,
@@ -1237,20 +1238,29 @@ const MatchDetails = () => {
                         <div className="space-y-4">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-4 gap-4">
                             <div className="relative min-w-[250px]">
-                              <select 
-                                value={displayIndex} 
-                                onChange={(e) => setActiveInningsIndex(Number(e.target.value))}
-                                className="w-full bg-secondary border border-border text-foreground text-sm font-bold rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer appearance-none hover:bg-secondary/80 pr-10"
-                              >
-                                {inningsList.map((inning: any, idx: number) => (
-                                  <option key={idx} value={idx} className="bg-background text-foreground py-2">
-                                    {inning.teamName || `Innings ${idx + 1}`} {inning.isDeclared ? '(d)' : ''}
-                                  </option>
-                                ))}
-                              </select>
-                              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                              </div>
+                              <Select value={displayIndex.toString()} onValueChange={(val) => setActiveInningsIndex(Number(val))}>
+                                <SelectTrigger className="w-full bg-secondary/80 border-border/50 text-foreground text-[15px] font-bold rounded-xl px-4 py-6 outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer shadow-sm hover:bg-secondary">
+                                  <SelectValue placeholder="Select Inning" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-secondary border-border/50 rounded-xl shadow-lg">
+                                  {inningsList.map((inning: any, idx: number) => {
+                                    // Calculate which inning this is for the team (1st, 2nd, etc)
+                                    const teamOccurrences = inningsList.slice(0, idx + 1).filter((i: any) => i.teamName === inning.teamName).length;
+                                    const ordinal = teamOccurrences === 1 ? '1st' : teamOccurrences === 2 ? '2nd' : teamOccurrences === 3 ? '3rd' : `${teamOccurrences}th`;
+                                    const inningLabel = `${inning.teamName || `Team ${idx + 1}`} - ${ordinal} Inning`;
+                                    
+                                    return (
+                                      <SelectItem 
+                                        key={idx} 
+                                        value={idx.toString()} 
+                                        className="text-[15px] font-semibold cursor-pointer py-3 focus:bg-primary/20 focus:text-primary transition-colors"
+                                      >
+                                        {inningLabel} {inning.isDeclared ? '(d)' : ''}
+                                      </SelectItem>
+                                    );
+                                  })}
+                                </SelectContent>
+                              </Select>
                             </div>
                             <div className="flex flex-col sm:items-end">
                               <span className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Score</span>
