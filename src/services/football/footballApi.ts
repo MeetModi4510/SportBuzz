@@ -30,8 +30,8 @@ const isMensFootball = (match: FootballMatch) => {
   const homeName = (match.teams?.home?.name || '').toLowerCase();
   const awayName = (match.teams?.away?.name || '').toLowerCase();
   
-  // RegEx to check for U-17, U17, U 17, U20, U19, U21, etc.
-  const youthRegex = /\bu[- ]?(17|19|20|21)\b/i;
+  // RegEx to check for U-17, U17, U 17, U18, U19, U20, U21, U23, etc.
+  const youthRegex = /\bu[- ]?(17|18|19|20|21|23)\b/i;
   // RegEx to check for Women, (W), or ' W' at the end
   const womenRegex = /\bwomen\b|\(w\)| w$/i;
 
@@ -51,9 +51,10 @@ export const footballApi = {
       if (cached && cached.length > 0) return cached;
     }
 
-    // Only fetch matches for priority leagues to save payload size if possible, or fetch all live and filter
+    // Fetch live matches only for the priority leagues using the id-id-id format
+    const liveParam = PRIORITY_LEAGUES.join('-');
     const response = await footballApiClient.get('/fixtures', {
-      params: { live: 'all' }, // Fetching all live matches might be more efficient than multiple requests
+      params: { live: liveParam }, 
     });
 
     let matches: FootballMatch[] = response.data.response || [];
