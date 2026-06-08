@@ -92,17 +92,7 @@ export const MOCK_LIVE_MATCHES = [
   }
 ];
 
-export const MOCK_RECENT_MATCHES = [
-  {
-    fixture: { id: 9993, status: { short: 'FT' }, date: new Date(Date.now() - 86400000).toISOString(), venue: { name: "Allianz Arena", city: "Munich" } },
-    league: { id: 78, name: "Bundesliga", logo: "https://media.api-sports.io/football/leagues/78.png" },
-    teams: {
-      home: { id: 157, name: "Bayern Munich", logo: "https://media.api-sports.io/football/teams/157.png" },
-      away: { id: 165, name: "Borussia Dortmund", logo: "https://media.api-sports.io/football/teams/165.png" }
-    },
-    goals: { home: 3, away: 1 }
-  }
-];
+export const MOCK_RECENT_MATCHES = [];
 
 export const MOCK_UPCOMING_MATCHES = [
   {

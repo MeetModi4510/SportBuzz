@@ -72,7 +72,7 @@ const isMensFootball = (match: FootballMatch) => {
 
 export const footballApi = {
   async getLiveMatches(forceRefresh = false): Promise<FootballMatch[]> {
-    const cacheKey = 'live_matches';
+    const cacheKey = 'live_matches_v2';
     if (!forceRefresh) {
       const cached = cacheManager.get<FootballMatch[]>(cacheKey);
       // If we cached an empty array, bypass it so we don't get stuck with 0 live matches
@@ -105,7 +105,7 @@ export const footballApi = {
   },
 
   async getRecentMatches(forceRefresh = false): Promise<FootballMatch[]> {
-    const cacheKey = 'recent_matches';
+    const cacheKey = 'recent_matches_v2';
     if (!forceRefresh) {
       const cached = cacheManager.get<FootballMatch[]>(cacheKey);
       if (cached && cached.length > 0) return cached;
@@ -145,7 +145,7 @@ export const footballApi = {
   },
 
   async getUpcomingMatches(forceRefresh = false): Promise<FootballMatch[]> {
-    const cacheKey = 'upcoming_matches';
+    const cacheKey = 'upcoming_matches_v2';
     if (!forceRefresh) {
       const cached = cacheManager.get<FootballMatch[]>(cacheKey);
       if (cached && cached.length > 0) return cached;
