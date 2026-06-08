@@ -51,8 +51,8 @@ function PlayerAvatar({
 
   if (!faceImageId || err) {
     return (
-      <div className={cn(cls, 'rounded-2xl bg-secondary/30 flex items-center justify-center border border-border/30 flex-shrink-0')}>
-        <UserIcon className="text-muted-foreground w-1/2 h-1/2" />
+      <div className={cn(cls, 'rounded-full bg-secondary flex items-center justify-center border-2 border-border flex-shrink-0 overflow-hidden')}>
+        <UserIcon className="text-muted-foreground" size={28} />
       </div>
     );
   }
@@ -62,7 +62,7 @@ function PlayerAvatar({
       src={`https://static.cricbuzz.com/a/img/v1/192x192/i1/c${faceImageId}/i.jpg`}
       alt={name}
       onError={() => setErr(true)}
-      className={cn(cls, 'rounded-2xl object-cover border border-border/30 flex-shrink-0')}
+      className={cn(cls, 'rounded-full object-cover border-2 border-border flex-shrink-0 bg-secondary')}
     />
   );
 }
@@ -258,47 +258,33 @@ export function TrendingCard({
   index: number;
   onClick: () => void;
 }) {
-  const [hovered, setHovered] = useState(false);
-
   return (
-    <button
-      type="button"
+    <div
       onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       className={cn(
-        'group relative w-full h-full flex flex-col text-left overflow-hidden rounded-2xl transition-all duration-500 ease-out',
-        'bg-card/40 border border-border/30 backdrop-blur-sm',
-        'hover:bg-card/80 hover:border-primary/30 hover:shadow-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary'
+        "group relative overflow-hidden rounded-xl bg-card border border-border h-full flex flex-col",
+        "cursor-pointer transition-all duration-300 card-hover"
       )}
       style={{ animationDelay: `${index * 50}ms` }}
     >
-      {/* Subtle Rank Indicator */}
-      <span className="absolute top-3 right-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 group-hover:text-primary/60 transition-colors z-10">
-        #{player.rank}
-      </span>
-
-      {/* Avatar Container */}
-      <div className="relative pt-8 px-4 pb-3 flex justify-center items-center">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="relative z-10 transition-transform duration-500 ease-out group-hover:scale-[1.08] group-hover:-translate-y-1">
+      {/* Header with rating */}
+      <div className="relative h-24 bg-gradient-to-br from-secondary to-muted flex items-center justify-center">
+        <div className="relative">
           <PlayerAvatar faceImageId={player.faceImageId} name={player.name} size="sm" />
         </div>
       </div>
 
       {/* Content */}
-      <div className="px-4 pb-5 text-center space-y-1.5 flex-1 flex flex-col justify-end relative z-10">
-        <p className="text-[13px] font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
-          {player.name}
-        </p>
-        <div className="flex items-center justify-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity duration-500">
-          <PlayerFlag flagCode={player.flagCode} flagLocal={player.flagLocal} country={player.teamName} size="sm" />
-          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.2em] truncate max-w-[80px]">
-            {player.teamName}
-          </span>
+      <div className="p-4 space-y-3 flex-1 flex flex-col">
+        <div>
+          <h3 className="font-semibold text-foreground text-lg truncate" title={player.name}>{player.name}</h3>
+          <p className="text-sm text-muted-foreground">{player.teamName}</p>
         </div>
       </div>
-    </button>
+
+      {/* Hover overlay */}
+      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+    </div>
   );
 }
 
