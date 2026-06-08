@@ -184,7 +184,7 @@ export const CricketNewsSection = () => {
           ) : detailContent && detailContent.length > 0 ? (
             <div className="space-y-4">
               {detailContent.map((paragraph, idx) => (
-                <p key={idx} className="text-foreground/90 leading-relaxed text-base md:text-lg">
+                <p key={idx} className="text-foreground/90 leading-relaxed text-base md:text-lg text-justify font-serif">
                   {paragraph}
                 </p>
               ))}
