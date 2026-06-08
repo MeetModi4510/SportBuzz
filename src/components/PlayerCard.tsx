@@ -153,10 +153,6 @@ export const PlayerCard = ({ player, onClick, className, compact = false, hideSt
             )}
           </div>
         )}
-
-        <span className={cn("text-xs font-bold px-2 py-1 rounded-full", getRatingColor(player.rating))}>
-          {player.rating}
-        </span>
       </div>
     );
   }
@@ -170,17 +166,10 @@ export const PlayerCard = ({ player, onClick, className, compact = false, hideSt
         className
       )}
     >
-      {/* Header with rating */}
+      {/* Header */}
       <div className="relative h-24 bg-gradient-to-br from-secondary to-muted flex items-center justify-center">
         <div className="relative">
           {renderPlayerAvatar("lg")}
-        </div>
-        <div className={cn(
-          "absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold",
-          getRatingColor(player.rating)
-        )}>
-          <Star size={12} fill="currentColor" />
-          {player.rating}
         </div>
       </div>
 

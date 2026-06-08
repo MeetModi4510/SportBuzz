@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Clock } from 'lucide-react';
 import { mockNewsData, type NewsItem } from '@/data/mockNewsData';
 import { useCricketNews, type CricketNewsItem, useCricketNewsDetail } from '@/hooks/useCricketNews';
@@ -16,6 +17,7 @@ const getCricketImageUrl = (imageId: string | null) => {
 };
 
 export const NewsSection = () => {
+  const navigate = useNavigate();
   const [selectedArticle, setSelectedArticle] = useState<DisplayNewsItem | null>(null);
   
   const { news: liveNews, loading: cricketLoading } = useCricketNews();
@@ -74,7 +76,10 @@ export const NewsSection = () => {
                     </span>
                   )}
                 </div>
-            <button className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors">
+            <button 
+              onClick={() => navigate('/global-news')}
+              className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+            >
               View All <ChevronRight size={16} />
             </button>
           </div>
@@ -183,9 +188,6 @@ export const NewsSection = () => {
                 </div>
               ))}
             </div>
-          </div>
-          <div className="text-center mt-6 text-xs text-muted-foreground/60">
-            Last updated on {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
           </div>
         </div>
 

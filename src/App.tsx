@@ -17,6 +17,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import Preferences from "./pages/Preferences";
 import Favorites from "./pages/Favorites";
+import GlobalNews from "./pages/GlobalNews";
 import Leaderboard from "./pages/Leaderboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Achievements from "./pages/Achievements";
@@ -130,6 +131,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Favorites />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/global-news"
+                element={
+                  <ProtectedRoute>
+                    <GlobalNews />
                   </ProtectedRoute>
                 }
               />

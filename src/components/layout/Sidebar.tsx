@@ -16,7 +16,7 @@ const mainNavItems = [
 
 const discoverItems = [
   { title: "Trending Players", icon: TrendingUp, path: "/profile" },
-  { title: "Global News", icon: Newspaper, path: "/favorites" },
+  { title: "Global News", icon: Newspaper, path: "/global-news" },
   { title: "Auction Room", icon: Users, path: "/auctions" },
 ];
 
