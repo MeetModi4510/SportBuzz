@@ -640,8 +640,8 @@
     "semantic_hash": "61f1a12201876545b2461e5a3fefd2a2"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\cricbuzzService.js": {
-    "mtime": 1780910799.1332133,
-    "ast_hash": "065279452b8770efc8aa9d3b787ff829",
+    "mtime": 1780822012.2058723,
+    "ast_hash": "8306aa881567db9af62a6f9eb8601acf",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\cricketApiService.js": {
@@ -3080,8 +3080,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\NewsSection.tsx": {
-    "mtime": 1780910797.0740936,
-    "ast_hash": "899141d0991e1e3d6dcecc0f3e9cd5ce",
+    "mtime": 1780833934.3263104,
+    "ast_hash": "faff012eb6876f4e634009b596690f41",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\data\\mockNewsData.ts": {
@@ -3105,8 +3105,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useCricketNews.ts": {
-    "mtime": 1780910484.1354797,
-    "ast_hash": "65d6ec59f6110b9aa3071bb47bdd8c71",
+    "mtime": 1780753269.4359117,
+    "ast_hash": "e16fe10da3e461916f3992f34d7414de",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useTeamRankings.ts": {

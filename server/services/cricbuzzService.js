@@ -783,9 +783,9 @@ async function getCricketNewsDetail(storyId) {
         const paragraphs = contentArray
             .filter(item => item.content && item.content.contentType === 'text')
             .map(item => {
-                // Strip strange @L0$ tags from Cricbuzz text
+                // Strip strange tags from Cricbuzz text (e.g. @L0$, @Bo$)
                 let text = item.content.contentValue || '';
-                text = text.replace(/@L\d+\$/g, '');
+                text = text.replace(/@[A-Za-z0-9]+\$/g, '');
                 return text;
             });
 

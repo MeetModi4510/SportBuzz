@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { cacheManager } from '../utils/football/cacheManager'; // Reusing cacheManager
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
@@ -29,14 +30,26 @@ export function useCricketNews(): UseCricketNewsResult {
 
   useEffect(() => {
     let cancelled = false;
+    const cacheKey = 'cricketNewsList';
+
+    const cachedNews = cacheManager.get<CricketNewsItem[]>(cacheKey);
+    if (cachedNews && cachedNews.length > 0) {
+      setNews(cachedNews);
+      setLoading(false);
+      return;
+    }
 
     const fetchNews = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/cricket/news`);
         const json = await res.json();
         if (!cancelled) {
-          setNews(json.data || []);
+          const data = json.data || [];
+          setNews(data);
           setError(json.error || null);
+          if (!json.error && data.length > 0) {
+            cacheManager.set(cacheKey, data, 30); // 30 minutes cache
+          }
         }
       } catch (e: any) {
         if (!cancelled) setError('Failed to load news');
@@ -64,6 +77,14 @@ export function useCricketNewsDetail(articleId: string | null) {
     }
 
     let cancelled = false;
+    const cacheKey = `cricketNewsDetail:${articleId}`;
+
+    const cachedDetail = cacheManager.get<string[]>(cacheKey);
+    if (cachedDetail && cachedDetail.length > 0) {
+      setContent(cachedDetail);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -72,8 +93,12 @@ export function useCricketNewsDetail(articleId: string | null) {
         const res = await fetch(`${API_BASE}/api/cricket/news/${articleId}`);
         const json = await res.json();
         if (!cancelled) {
-          setContent(json.data || []);
+          const data = json.data || [];
+          setContent(data);
           setError(json.error || null);
+          if (!json.error && data.length > 0) {
+            cacheManager.set(cacheKey, data, 30); // 30 minutes cache
+          }
         }
       } catch (e: any) {
         if (!cancelled) setError('Failed to load article detail');

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronRight, Clock } from 'lucide-react';
 import { mockNewsData, type NewsItem } from '@/data/mockNewsData';
-import { useCricketNews, type CricketNewsItem } from '@/hooks/useCricketNews';
+import { useCricketNews, type CricketNewsItem, useCricketNewsDetail } from '@/hooks/useCricketNews';
 import { useFootballNews, type FootballNewsItem } from '@/hooks/useFootballNews';
 import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
@@ -10,11 +10,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 // Merge type: can be mock NewsItem OR live CricketNewsItem OR live FootballNewsItem
 type DisplayNewsItem = (NewsItem | CricketNewsItem | FootballNewsItem) & { isLive?: boolean; snippet?: string; title?: string };
 
+const getCricketImageUrl = (imageId: string | null) => {
+  if (!imageId) return null;
+  return `https://static.cricbuzz.com/a/img/v1/1080x720/i1/c${imageId}/i.jpg`;
+};
+
 export const NewsSection = () => {
   const [selectedArticle, setSelectedArticle] = useState<DisplayNewsItem | null>(null);
   
   const { news: liveNews, loading: cricketLoading } = useCricketNews();
   const { news: liveFootball, loading: footballLoading } = useFootballNews();
+  const { content: cricketContent, loading: cricketContentLoading } = useCricketNewsDetail(
+    selectedArticle?.sport === 'cricket' ? selectedArticle.id : null
+  );
 
   // Non-cricket/football mock news (tennis, basketball etc.)
   const otherMock = mockNewsData.filter(n => n.sport !== 'cricket' && n.sport !== 'football');
@@ -111,13 +119,17 @@ export const NewsSection = () => {
                     "bg-gradient-to-br from-yellow-500 to-amber-500"
                   )} />
 
-                  {/* Football Image Header */}
-                  {news.sport === 'football' && (news as any).imageUrl && (
+                  {/* Image Header */}
+                  {(news.sport === 'football' && (news as any).imageUrl) || (news.sport === 'cricket' && (news as CricketNewsItem).imageId) ? (
                     <div className="w-full h-32 overflow-hidden shrink-0 border-b border-border/10 relative">
-                      <img src={(news as any).imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                      <img 
+                        src={news.sport === 'football' ? (news as any).imageUrl : getCricketImageUrl((news as CricketNewsItem).imageId)!} 
+                        alt="" 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
                     </div>
-                  )}
+                  ) : null}
 
                   <div className="relative z-10 flex flex-col h-full justify-between gap-3 p-5 pointer-events-none">
                     <div className="space-y-2">
@@ -125,9 +137,14 @@ export const NewsSection = () => {
                         <SportIcon sport={news.sport} size={16} />
                         <div className="flex items-center gap-2">
                           {(news as any).isLive && news.sport !== 'football' && (
-                            <span className="text-[9px] font-bold text-green-400 bg-green-500/15 border border-green-500/25 px-1.5 py-0.5 rounded-full">
-                              LIVE
-                            </span>
+                            <div className="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full">
+                              <span className="text-[9px] font-bold text-blue-400">
+                                {(news as any).source || 'LIVE'}
+                              </span>
+                              <span className="text-[9px] font-bold text-blue-400/50 ml-0.5 animate-pulse">
+                                • NEW
+                              </span>
+                            </div>
                           )}
                           {(news as any).isLive && news.sport === 'football' && (
                             <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
@@ -154,7 +171,7 @@ export const NewsSection = () => {
                         {/* For live news use short headline (hline), else the title */}
                         {(news as CricketNewsItem).headline || news.title}
                       </h3>
-                      {!((news.sport === 'football' && (news as any).imageUrl)) && (
+                      {!((news.sport === 'football' && (news as any).imageUrl) || (news.sport === 'cricket' && (news as CricketNewsItem).imageId)) && (
                         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                           {news.snippet}
                         </p>
@@ -175,6 +192,9 @@ export const NewsSection = () => {
                 </div>
               ))}
             </div>
+          </div>
+          <div className="text-center mt-6 text-xs text-muted-foreground/60">
+            Last updated on {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
           </div>
         </div>
 
@@ -204,27 +224,61 @@ export const NewsSection = () => {
               {(selectedArticle as CricketNewsItem)?.headline || selectedArticle?.title}
             </DialogTitle>
           </DialogHeader>
-          <div className="pt-4 space-y-3">
+          <div className="pt-4 space-y-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
             {(selectedArticle as CricketNewsItem)?.context && (
-              <span className="inline-block text-xs text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 rounded-full">
+              <span className="inline-block text-xs text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 rounded-full mb-2">
                 {(selectedArticle as CricketNewsItem).context}
               </span>
             )}
-            <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-              {selectedArticle?.snippet}
-            </p>
+
+            {/* Modal Image Header for Cricket News */}
+            {(selectedArticle as any)?.isLive && selectedArticle?.sport === 'cricket' && (selectedArticle as CricketNewsItem).imageId && (
+              <div className="w-full h-48 md:h-56 overflow-hidden rounded-xl border border-border/10 mb-4">
+                <img 
+                  src={getCricketImageUrl((selectedArticle as CricketNewsItem).imageId)!} 
+                  alt="" 
+                  className="w-full h-full object-cover" 
+                />
+              </div>
+            )}
+
             {(selectedArticle as any)?.isLive && selectedArticle?.sport === 'cricket' ? (
-              <div className="mt-4 p-4 rounded-xl bg-blue-500/5 border border-blue-500/20 text-sm text-blue-400/80 text-center">
-                📰 Source: Cricbuzz — Full article available on Cricbuzz.com
-              </div>
+              cricketContentLoading ? (
+                <div className="py-8 flex justify-center">
+                  <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : cricketContent && cricketContent.length > 0 ? (
+                <div className="space-y-4 text-sm md:text-base text-foreground/90 leading-relaxed font-serif text-justify">
+                  {cricketContent.map((paragraph, idx) => (
+                    <p key={idx}>{paragraph}</p>
+                  ))}
+                  <div className="mt-6 pt-4 border-t border-border/50 text-xs text-muted-foreground">
+                    Source: {(selectedArticle as any).source || 'Cricbuzz'}
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 p-4 rounded-xl bg-blue-500/5 border border-blue-500/20 text-sm text-blue-400/80 text-center">
+                  📰 Source: Cricbuzz — Full article available on Cricbuzz.com
+                </div>
+              )
             ) : (selectedArticle as any)?.isLive && selectedArticle?.sport === 'football' ? (
-              <div className="mt-4 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-sm text-emerald-400/80 text-center">
-                📰 Source: RapidAPI — Read the latest updates
-              </div>
+              <>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
+                  {selectedArticle?.snippet}
+                </p>
+                <div className="mt-4 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-sm text-emerald-400/80 text-center">
+                  📰 Source: FotMob — Read the latest updates
+                </div>
+              </>
             ) : (
-              <div className="mt-4 p-4 rounded-xl bg-secondary/30 border border-border/50 text-sm text-muted-foreground text-center">
-                (Full article content would be fetched from a CMS and displayed here)
-              </div>
+              <>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
+                  {selectedArticle?.snippet}
+                </p>
+                <div className="mt-4 p-4 rounded-xl bg-secondary/30 border border-border/50 text-sm text-muted-foreground text-center">
+                  (Full article content would be fetched from a CMS and displayed here)
+                </div>
+              </>
             )}
           </div>
         </DialogContent>
