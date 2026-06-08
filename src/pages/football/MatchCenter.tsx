@@ -27,13 +27,13 @@ export default function MatchCenter() {
     queryFn: async () => {
       if (!id) return null;
       const cacheKey = `match_${id}`;
-      
+
       const cached = cacheManager.get<FootballMatch>(cacheKey);
-      
+
       // If cached match exists and is LIVE, we don't return it immediately so we can fetch fresh data
       // (Unless it was cached just a few seconds ago, which cacheManager handles via TTL, but let's be safe)
       const isCachedLive = cached && ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(cached.fixture.status.short);
-      
+
       if (cached && !isCachedLive) {
         return cached;
       }
@@ -50,11 +50,11 @@ export default function MatchCenter() {
     staleTime: 30 * 60 * 1000, // 30 minute stale time
   });
 
-  const isLive = match?.fixture?.status?.short === "1H" || 
-                 match?.fixture?.status?.short === "2H" || 
-                 match?.fixture?.status?.short === "HT" || 
-                 match?.fixture?.status?.short === "ET" ||
-                 match?.fixture?.status?.short === "P";
+  const isLive = match?.fixture?.status?.short === "1H" ||
+    match?.fixture?.status?.short === "2H" ||
+    match?.fixture?.status?.short === "HT" ||
+    match?.fixture?.status?.short === "ET" ||
+    match?.fixture?.status?.short === "P";
 
   // Polling for live matches
   useEffect(() => {
@@ -108,13 +108,13 @@ export default function MatchCenter() {
           {/* Premium Background Effects */}
           <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
           <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
-          <div 
+          <div
             className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"
-            style={{ maskImage: 'radial-gradient(ellipse at center, black 20%, transparent 80%)', WebkitMaskImage: 'radial-gradient(ellipse at center, black 20%, transparent 80%)' }} 
+            style={{ maskImage: 'radial-gradient(ellipse at center, black 20%, transparent 80%)', WebkitMaskImage: 'radial-gradient(ellipse at center, black 20%, transparent 80%)' }}
           />
 
           <div className="container mx-auto px-4 relative z-10">
-            <button 
+            <button
               onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors group w-max"
             >
@@ -130,7 +130,7 @@ export default function MatchCenter() {
             </div>
 
             <div className="flex items-center justify-center max-w-4xl mx-auto gap-4 md:gap-12">
-              
+
               {/* Home Team */}
               <div className="flex flex-col items-center flex-1 w-0">
                 <div className="w-24 h-24 md:w-36 md:h-36 flex items-center justify-center mb-4 relative group">
@@ -177,7 +177,7 @@ export default function MatchCenter() {
             {/* Unified Goalscorers Section */}
             {(homeGoals.length > 0 || awayGoals.length > 0) && (
               <div className="max-w-2xl mx-auto mt-10 grid grid-cols-2 gap-0 border-t border-border/20 pt-6">
-                
+
                 {/* Home Goals */}
                 <div className="flex flex-col items-end gap-2 pr-4 md:pr-8 border-r border-border/20">
                   {homeGoals.map((goal, idx) => (
@@ -189,21 +189,21 @@ export default function MatchCenter() {
                       <div className="flex items-center gap-1.5 opacity-80">
                         <span className="text-primary font-bold text-xs">{goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
                         <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-foreground/60">
-                          <circle cx="12" cy="12" r="10" fill="none" strokeWidth="2" stroke="currentColor"/>
+                          <circle cx="12" cy="12" r="10" fill="none" strokeWidth="2" stroke="currentColor" />
                           <path d="M12 12l2.5-2h-5z" stroke="currentColor" />
                         </svg>
                       </div>
                     </div>
                   ))}
                 </div>
-                
+
                 {/* Away Goals */}
                 <div className="flex flex-col items-start gap-2 pl-4 md:pl-8">
                   {awayGoals.map((goal, idx) => (
                     <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1.5 opacity-80">
                         <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-foreground/60">
-                          <circle cx="12" cy="12" r="10" fill="none" strokeWidth="2" stroke="currentColor"/>
+                          <circle cx="12" cy="12" r="10" fill="none" strokeWidth="2" stroke="currentColor" />
                           <path d="M12 12l2.5-2h-5z" stroke="currentColor" />
                         </svg>
                         <span className="text-primary font-bold text-xs">{goal.time.elapsed}'{goal.time.extra ? `+${goal.time.extra}` : ''}</span>
@@ -218,7 +218,7 @@ export default function MatchCenter() {
 
               </div>
             )}
-            
+
           </div>
         </div>
 
@@ -229,11 +229,10 @@ export default function MatchCenter() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2.5 rounded-t-lg text-sm font-semibold capitalize whitespace-nowrap transition-colors ${
-                  activeTab === tab 
-                    ? "bg-primary/10 text-primary border-b-2 border-primary" 
+                className={`px-5 py-2.5 rounded-t-lg text-sm font-semibold capitalize whitespace-nowrap transition-colors ${activeTab === tab
+                    ? "bg-primary/10 text-primary border-b-2 border-primary"
                     : "text-muted-foreground hover:bg-secondary/50"
-                }`}
+                  }`}
               >
                 {tab}
               </button>
@@ -263,41 +262,41 @@ export default function MatchCenter() {
             return (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
                 <div className="bg-secondary/10 border border-border/50 rounded-xl p-6 space-y-4">
-                   <h3 className="text-lg font-bold">Match Information</h3>
-                   <div className="space-y-3 text-sm">
-                     <div className="flex justify-between border-b border-border/20 pb-2">
-                       <span className="text-muted-foreground">League</span>
-                       <span className="font-medium">{match.league.name} ({match.league.country})</span>
-                     </div>
-                     <div className="flex justify-between border-b border-border/20 pb-2">
-                       <span className="text-muted-foreground">Venue</span>
-                       <span className="font-medium">{match.fixture.venue.name}, {match.fixture.venue.city}</span>
-                     </div>
-                     <div className="flex justify-between border-b border-border/20 pb-2">
-                       <span className="text-muted-foreground">Date</span>
-                       <span className="font-medium">{new Date(match.fixture.date).toLocaleString()}</span>
-                     </div>
-                     <div className={`flex justify-between ${motm ? 'border-b border-border/20 pb-2' : 'pb-2'}`}>
-                       <span className="text-muted-foreground">Referee</span>
-                       <span className="font-medium">{match.fixture.referee || "N/A"}</span>
-                     </div>
-                     {motm && (
-                       <div className="flex justify-between pt-1">
-                         <span className="text-muted-foreground flex items-center gap-1.5">
-                           <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-yellow-500">
-                             <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-                           </svg>
-                           Man of the Match
-                         </span>
-                         <div className="flex items-center gap-2">
-                           <span className="font-bold text-foreground">{motm.name}</span>
-                           <span className="text-xs font-bold bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded border border-yellow-500/30">
-                             {motm.rating.toFixed(1)}
-                           </span>
-                         </div>
-                       </div>
-                     )}
-                   </div>
+                  <h3 className="text-lg font-bold">Match Information</h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between border-b border-border/20 pb-2">
+                      <span className="text-muted-foreground">League</span>
+                      <span className="font-medium">{match.league.name} ({match.league.country})</span>
+                    </div>
+                    <div className="flex justify-between border-b border-border/20 pb-2">
+                      <span className="text-muted-foreground">Venue</span>
+                      <span className="font-medium">{match.fixture.venue.name}, {match.fixture.venue.city}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-border/20 pb-2">
+                      <span className="text-muted-foreground">Date</span>
+                      <span className="font-medium">{new Date(match.fixture.date).toLocaleString()}</span>
+                    </div>
+                    <div className={`flex justify-between ${motm ? 'border-b border-border/20 pb-2' : 'pb-2'}`}>
+                      <span className="text-muted-foreground">Referee</span>
+                      <span className="font-medium">{match.fixture.referee || "N/A"}</span>
+                    </div>
+                    {motm && (
+                      <div className="flex justify-between pt-1">
+                        <span className="text-muted-foreground flex items-center gap-1.5">
+                          <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-yellow-500">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                          </svg>
+                          Man of the Match
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-foreground">{motm.name}</span>
+                          <span className="text-xs font-bold bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded border border-yellow-500/30">
+                            {motm.rating.toFixed(1)}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -314,7 +313,7 @@ export default function MatchCenter() {
               <MatchStatistics statistics={match.statistics || []} homeTeam={match.teams.home} awayTeam={match.teams.away} />
             </div>
           )}
-          
+
           {activeTab === "lineups" && (
             <div className="animate-in fade-in duration-300">
               <MatchLineups lineups={match.lineups || []} homeTeam={match.teams.home} awayTeam={match.teams.away} events={match.events || []} playerStats={match.players || []} />
