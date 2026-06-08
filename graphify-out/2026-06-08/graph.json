@@ -279,7 +279,7 @@
       "source_file": "TM.tsx",
       "source_location": "L395",
       "id": "tm_tournamentmanager",
-      "community": 16,
+      "community": 29,
       "norm_label": "tournamentmanager()"
     },
     {
@@ -7227,7 +7227,7 @@
       "source_file": "src/components/ConfirmModal.tsx",
       "source_location": "L1",
       "id": "components_confirmmodal",
-      "community": 163,
+      "community": 27,
       "norm_label": "confirmmodal.tsx"
     },
     {
@@ -7236,7 +7236,7 @@
       "source_file": "src/components/ConfirmModal.tsx",
       "source_location": "L13",
       "id": "components_confirmmodal_confirmmodalprops",
-      "community": 163,
+      "community": 27,
       "norm_label": "confirmmodalprops"
     },
     {
@@ -7245,7 +7245,7 @@
       "source_file": "src/components/ConfirmModal.tsx",
       "source_location": "L24",
       "id": "components_confirmmodal_confirmmodal",
-      "community": 163,
+      "community": 27,
       "norm_label": "confirmmodal()"
     },
     {
@@ -7794,7 +7794,7 @@
       "source_file": "src/components/LiveBadge.tsx",
       "source_location": "L1",
       "id": "components_livebadge",
-      "community": 21,
+      "community": 18,
       "norm_label": "livebadge.tsx"
     },
     {
@@ -7803,7 +7803,7 @@
       "source_file": "src/components/LiveBadge.tsx",
       "source_location": "L3",
       "id": "components_livebadge_livebadgeprops",
-      "community": 21,
+      "community": 18,
       "norm_label": "livebadgeprops"
     },
     {
@@ -7812,7 +7812,7 @@
       "source_file": "src/components/LiveBadge.tsx",
       "source_location": "L8",
       "id": "components_livebadge_livebadge",
-      "community": 21,
+      "community": 18,
       "norm_label": "livebadge()"
     },
     {
@@ -7848,7 +7848,7 @@
       "source_file": "src/components/LiveTicker.tsx",
       "source_location": "L1",
       "id": "components_liveticker",
-      "community": 21,
+      "community": 72,
       "norm_label": "liveticker.tsx"
     },
     {
@@ -7857,7 +7857,7 @@
       "source_file": "src/components/LiveTicker.tsx",
       "source_location": "L13",
       "id": "components_liveticker_liveticker",
-      "community": 21,
+      "community": 72,
       "norm_label": "liveticker()"
     },
     {
@@ -7911,7 +7911,7 @@
       "source_file": "src/components/MatchCard.tsx",
       "source_location": "L8",
       "id": "components_matchcard_matchcardprops",
-      "community": 27,
+      "community": 25,
       "norm_label": "matchcardprops"
     },
     {
@@ -8010,7 +8010,7 @@
       "source_file": "src/components/MinimalCricketCard.tsx",
       "source_location": "L7",
       "id": "components_minimalcricketcard_minimalcricketcardprops",
-      "community": 27,
+      "community": 25,
       "norm_label": "minimalcricketcardprops"
     },
     {
@@ -8091,7 +8091,7 @@
       "source_file": "src/components/Navbar.tsx",
       "source_location": "L62",
       "id": "components_navbar_navbar",
-      "community": 16,
+      "community": 3,
       "norm_label": "navbar()"
     },
     {
@@ -8113,10 +8113,19 @@
       "norm_label": "displaynewsitem"
     },
     {
-      "label": "NewsSection()",
+      "label": "getCricketImageUrl()",
       "file_type": "code",
       "source_file": "src/components/NewsSection.tsx",
       "source_location": "L13",
+      "id": "components_newssection_getcricketimageurl",
+      "community": 42,
+      "norm_label": "getcricketimageurl()"
+    },
+    {
+      "label": "NewsSection()",
+      "file_type": "code",
+      "source_file": "src/components/NewsSection.tsx",
+      "source_location": "L18",
       "id": "components_newssection_newssection",
       "community": 42,
       "norm_label": "newssection()"
@@ -8154,7 +8163,7 @@
       "source_file": "src/components/Pagination.tsx",
       "source_location": "L1",
       "id": "components_pagination",
-      "community": 179,
+      "community": 173,
       "norm_label": "pagination.tsx"
     },
     {
@@ -8163,7 +8172,7 @@
       "source_file": "src/components/Pagination.tsx",
       "source_location": "L4",
       "id": "components_pagination_paginationprops",
-      "community": 179,
+      "community": 173,
       "norm_label": "paginationprops"
     },
     {
@@ -8172,7 +8181,7 @@
       "source_file": "src/components/Pagination.tsx",
       "source_location": "L12",
       "id": "components_pagination_pagination",
-      "community": 179,
+      "community": 173,
       "norm_label": "pagination()"
     },
     {
@@ -8352,7 +8361,7 @@
       "source_file": "src/components/PlayerCard.tsx",
       "source_location": "L1",
       "id": "components_playercard",
-      "community": 24,
+      "community": 1,
       "norm_label": "playercard.tsx"
     },
     {
@@ -8370,7 +8379,7 @@
       "source_file": "src/components/PlayerCard.tsx",
       "source_location": "L25",
       "id": "components_playercard_playercard",
-      "community": 24,
+      "community": 1,
       "norm_label": "playercard()"
     },
     {
@@ -8694,7 +8703,7 @@
       "source_file": "src/components/StatusFilter.tsx",
       "source_location": "L1",
       "id": "components_statusfilter",
-      "community": 72,
+      "community": 24,
       "norm_label": "statusfilter.tsx"
     },
     {
@@ -8703,7 +8712,7 @@
       "source_file": "src/components/StatusFilter.tsx",
       "source_location": "L4",
       "id": "components_statusfilter_statusfilterprops",
-      "community": 72,
+      "community": 24,
       "norm_label": "statusfilterprops"
     },
     {
@@ -8712,7 +8721,7 @@
       "source_file": "src/components/StatusFilter.tsx",
       "source_location": "L10",
       "id": "components_statusfilter_statuses",
-      "community": 72,
+      "community": 24,
       "norm_label": "statuses"
     },
     {
@@ -8721,7 +8730,7 @@
       "source_file": "src/components/StatusFilter.tsx",
       "source_location": "L16",
       "id": "components_statusfilter_statusfilter",
-      "community": 72,
+      "community": 24,
       "norm_label": "statusfilter()"
     },
     {
@@ -8874,7 +8883,7 @@
       "source_file": "src/components/TrendingPlayers.tsx",
       "source_location": "L1",
       "id": "components_trendingplayers",
-      "community": 24,
+      "community": 1,
       "norm_label": "trendingplayers.tsx"
     },
     {
@@ -8883,7 +8892,7 @@
       "source_file": "src/components/TrendingPlayers.tsx",
       "source_location": "L9",
       "id": "components_trendingplayers_trendingplayersprops",
-      "community": 24,
+      "community": 1,
       "norm_label": "trendingplayersprops"
     },
     {
@@ -8892,7 +8901,7 @@
       "source_file": "src/components/TrendingPlayers.tsx",
       "source_location": "L21",
       "id": "components_trendingplayers_trendingplayers",
-      "community": 24,
+      "community": 1,
       "norm_label": "trendingplayers()"
     },
     {
@@ -8991,7 +9000,7 @@
       "source_file": "src/components/VenueAnalysisPanel.tsx",
       "source_location": "L441",
       "id": "components_venueanalysispanel_venueanalysispanel",
-      "community": 24,
+      "community": 21,
       "norm_label": "venueanalysispanel()"
     },
     {
@@ -9315,7 +9324,7 @@
       "source_file": "src/components/admin/TournamentCricketLab.tsx",
       "source_location": "L24",
       "id": "admin_tournamentcricketlab_labprops",
-      "community": 183,
+      "community": 49,
       "norm_label": "labprops"
     },
     {
@@ -9531,7 +9540,7 @@
       "source_file": "src/components/admin/TournamentMatchDetail.tsx",
       "source_location": "L66",
       "id": "admin_tournamentmatchdetail_props",
-      "community": 178,
+      "community": 49,
       "norm_label": "props"
     },
     {
@@ -9747,7 +9756,7 @@
       "source_file": "src/components/admin/UserManager.tsx",
       "source_location": "L1",
       "id": "admin_usermanager",
-      "community": 163,
+      "community": 7,
       "norm_label": "usermanager.tsx"
     },
     {
@@ -9756,7 +9765,7 @@
       "source_file": "src/components/admin/UserManager.tsx",
       "source_location": "L33",
       "id": "admin_usermanager_userdata",
-      "community": 163,
+      "community": 7,
       "norm_label": "userdata"
     },
     {
@@ -9765,7 +9774,7 @@
       "source_file": "src/components/admin/UserManager.tsx",
       "source_location": "L42",
       "id": "admin_usermanager_usermanager",
-      "community": 163,
+      "community": 16,
       "norm_label": "usermanager()"
     },
     {
@@ -9837,7 +9846,7 @@
       "source_file": "src/components/cricket/CricketRankings.tsx",
       "source_location": "L8",
       "id": "cricket_cricketrankings_format",
-      "community": 22,
+      "community": 18,
       "norm_label": "format"
     },
     {
@@ -9936,7 +9945,7 @@
       "source_file": "src/components/cricket/CricketTrendingPlayers.tsx",
       "source_location": "L1",
       "id": "cricket_crickettrendingplayers",
-      "community": 72,
+      "community": 1,
       "norm_label": "crickettrendingplayers.tsx"
     },
     {
@@ -9945,7 +9954,7 @@
       "source_file": "src/components/cricket/CricketTrendingPlayers.tsx",
       "source_location": "L19",
       "id": "cricket_crickettrendingplayers_medal",
-      "community": 72,
+      "community": 1,
       "norm_label": "medal"
     },
     {
@@ -9954,7 +9963,7 @@
       "source_file": "src/components/cricket/CricketTrendingPlayers.tsx",
       "source_location": "L25",
       "id": "cricket_crickettrendingplayers_playerflag",
-      "community": 72,
+      "community": 1,
       "norm_label": "playerflag()"
     },
     {
@@ -9963,7 +9972,7 @@
       "source_file": "src/components/cricket/CricketTrendingPlayers.tsx",
       "source_location": "L42",
       "id": "cricket_crickettrendingplayers_playeravatar",
-      "community": 72,
+      "community": 1,
       "norm_label": "playeravatar()"
     },
     {
@@ -9972,7 +9981,7 @@
       "source_file": "src/components/cricket/CricketTrendingPlayers.tsx",
       "source_location": "L71",
       "id": "cricket_crickettrendingplayers_playerprofilemodal",
-      "community": 72,
+      "community": 1,
       "norm_label": "playerprofilemodal()"
     },
     {
@@ -9981,7 +9990,7 @@
       "source_file": "src/components/cricket/CricketTrendingPlayers.tsx",
       "source_location": "L252",
       "id": "cricket_crickettrendingplayers_trendingcard",
-      "community": 24,
+      "community": 1,
       "norm_label": "trendingcard()"
     },
     {
@@ -10350,7 +10359,7 @@
       "source_file": "src/components/ui/alert-dialog.tsx",
       "source_location": "L1",
       "id": "ui_alert_dialog",
-      "community": 163,
+      "community": 27,
       "norm_label": "alert-dialog.tsx"
     },
     {
@@ -10359,7 +10368,7 @@
       "source_file": "src/components/ui/alert-dialog.tsx",
       "source_location": "L13",
       "id": "ui_alert_dialog_alertdialogoverlay",
-      "community": 163,
+      "community": 27,
       "norm_label": "alertdialogoverlay"
     },
     {
@@ -10368,7 +10377,7 @@
       "source_file": "src/components/ui/alert-dialog.tsx",
       "source_location": "L28",
       "id": "ui_alert_dialog_alertdialogcontent",
-      "community": 163,
+      "community": 27,
       "norm_label": "alertdialogcontent"
     },
     {
@@ -10377,7 +10386,7 @@
       "source_file": "src/components/ui/alert-dialog.tsx",
       "source_location": "L46",
       "id": "ui_alert_dialog_alertdialogheader",
-      "community": 163,
+      "community": 27,
       "norm_label": "alertdialogheader()"
     },
     {
@@ -10386,7 +10395,7 @@
       "source_file": "src/components/ui/alert-dialog.tsx",
       "source_location": "L51",
       "id": "ui_alert_dialog_alertdialogfooter",
-      "community": 163,
+      "community": 27,
       "norm_label": "alertdialogfooter()"
     },
     {
@@ -10395,7 +10404,7 @@
       "source_file": "src/components/ui/alert-dialog.tsx",
       "source_location": "L56",
       "id": "ui_alert_dialog_alertdialogtitle",
-      "community": 163,
+      "community": 27,
       "norm_label": "alertdialogtitle"
     },
     {
@@ -10404,7 +10413,7 @@
       "source_file": "src/components/ui/alert-dialog.tsx",
       "source_location": "L64",
       "id": "ui_alert_dialog_alertdialogdescription",
-      "community": 163,
+      "community": 27,
       "norm_label": "alertdialogdescription"
     },
     {
@@ -10413,7 +10422,7 @@
       "source_file": "src/components/ui/alert-dialog.tsx",
       "source_location": "L72",
       "id": "ui_alert_dialog_alertdialogaction",
-      "community": 163,
+      "community": 27,
       "norm_label": "alertdialogaction"
     },
     {
@@ -10422,7 +10431,7 @@
       "source_file": "src/components/ui/alert-dialog.tsx",
       "source_location": "L80",
       "id": "ui_alert_dialog_alertdialogcancel",
-      "community": 163,
+      "community": 27,
       "norm_label": "alertdialogcancel"
     },
     {
@@ -10629,7 +10638,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L1",
       "id": "ui_button",
-      "community": 2,
+      "community": 173,
       "norm_label": "button.tsx"
     },
     {
@@ -10638,7 +10647,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L7",
       "id": "ui_button_buttonvariants",
-      "community": 1,
+      "community": 27,
       "norm_label": "buttonvariants"
     },
     {
@@ -10647,7 +10656,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L33",
       "id": "ui_button_buttonprops",
-      "community": 1,
+      "community": 27,
       "norm_label": "buttonprops"
     },
     {
@@ -10656,7 +10665,7 @@
       "source_file": "src/components/ui/button.tsx",
       "source_location": "L39",
       "id": "ui_button_button",
-      "community": 2,
+      "community": 173,
       "norm_label": "button"
     },
     {
@@ -10665,7 +10674,7 @@
       "source_file": "src/components/ui/calender.tsx",
       "source_location": "L1",
       "id": "ui_calender",
-      "community": 191,
+      "community": 1,
       "norm_label": "calender.tsx"
     },
     {
@@ -10674,7 +10683,7 @@
       "source_file": "src/components/ui/calender.tsx",
       "source_location": "L7",
       "id": "ui_calender_buttonvariants",
-      "community": 191,
+      "community": 1,
       "norm_label": "buttonvariants"
     },
     {
@@ -10683,7 +10692,7 @@
       "source_file": "src/components/ui/calender.tsx",
       "source_location": "L33",
       "id": "ui_calender_buttonprops",
-      "community": 191,
+      "community": 1,
       "norm_label": "buttonprops"
     },
     {
@@ -10692,7 +10701,7 @@
       "source_file": "src/components/ui/calender.tsx",
       "source_location": "L39",
       "id": "ui_calender_button",
-      "community": 191,
+      "community": 1,
       "norm_label": "button"
     },
     {
@@ -11556,7 +11565,7 @@
       "source_file": "src/components/ui/input-otp.tsx",
       "source_location": "L1",
       "id": "ui_input_otp",
-      "community": 190,
+      "community": 1,
       "norm_label": "input-otp.tsx"
     },
     {
@@ -11565,7 +11574,7 @@
       "source_file": "src/components/ui/input-otp.tsx",
       "source_location": "L7",
       "id": "ui_input_otp_inputotp",
-      "community": 190,
+      "community": 1,
       "norm_label": "inputotp"
     },
     {
@@ -11574,7 +11583,7 @@
       "source_file": "src/components/ui/input-otp.tsx",
       "source_location": "L19",
       "id": "ui_input_otp_inputotpgroup",
-      "community": 190,
+      "community": 1,
       "norm_label": "inputotpgroup"
     },
     {
@@ -11583,7 +11592,7 @@
       "source_file": "src/components/ui/input-otp.tsx",
       "source_location": "L24",
       "id": "ui_input_otp_inputotpslot",
-      "community": 190,
+      "community": 1,
       "norm_label": "inputotpslot"
     },
     {
@@ -11592,7 +11601,7 @@
       "source_file": "src/components/ui/input-otp.tsx",
       "source_location": "L52",
       "id": "ui_input_otp_inputotpseparator",
-      "community": 190,
+      "community": 1,
       "norm_label": "inputotpseparator"
     },
     {
@@ -11646,7 +11655,7 @@
       "source_file": "src/components/ui/menubar.tsx",
       "source_location": "L1",
       "id": "ui_menubar",
-      "community": 25,
+      "community": 1,
       "norm_label": "menubar.tsx"
     },
     {
@@ -11655,7 +11664,7 @@
       "source_file": "src/components/ui/menubar.tsx",
       "source_location": "L7",
       "id": "ui_menubar_labelvariants",
-      "community": 25,
+      "community": 1,
       "norm_label": "labelvariants"
     },
     {
@@ -11664,7 +11673,7 @@
       "source_file": "src/components/ui/menubar.tsx",
       "source_location": "L9",
       "id": "ui_menubar_label",
-      "community": 25,
+      "community": 1,
       "norm_label": "label"
     },
     {
@@ -11745,7 +11754,7 @@
       "source_file": "src/components/ui/pagination.tsx",
       "source_location": "L1",
       "id": "ui_pagination",
-      "community": 1,
+      "community": 27,
       "norm_label": "pagination.tsx"
     },
     {
@@ -11754,7 +11763,7 @@
       "source_file": "src/components/ui/pagination.tsx",
       "source_location": "L7",
       "id": "ui_pagination_pagination",
-      "community": 1,
+      "community": 27,
       "norm_label": "pagination()"
     },
     {
@@ -11763,7 +11772,7 @@
       "source_file": "src/components/ui/pagination.tsx",
       "source_location": "L17",
       "id": "ui_pagination_paginationcontent",
-      "community": 1,
+      "community": 27,
       "norm_label": "paginationcontent"
     },
     {
@@ -11772,7 +11781,7 @@
       "source_file": "src/components/ui/pagination.tsx",
       "source_location": "L24",
       "id": "ui_pagination_paginationitem",
-      "community": 1,
+      "community": 27,
       "norm_label": "paginationitem"
     },
     {
@@ -11781,7 +11790,7 @@
       "source_file": "src/components/ui/pagination.tsx",
       "source_location": "L29",
       "id": "ui_pagination_paginationlinkprops",
-      "community": 1,
+      "community": 27,
       "norm_label": "paginationlinkprops"
     },
     {
@@ -11790,7 +11799,7 @@
       "source_file": "src/components/ui/pagination.tsx",
       "source_location": "L34",
       "id": "ui_pagination_paginationlink",
-      "community": 1,
+      "community": 27,
       "norm_label": "paginationlink()"
     },
     {
@@ -11799,7 +11808,7 @@
       "source_file": "src/components/ui/pagination.tsx",
       "source_location": "L49",
       "id": "ui_pagination_paginationprevious",
-      "community": 1,
+      "community": 27,
       "norm_label": "paginationprevious()"
     },
     {
@@ -11808,7 +11817,7 @@
       "source_file": "src/components/ui/pagination.tsx",
       "source_location": "L57",
       "id": "ui_pagination_paginationnext",
-      "community": 1,
+      "community": 27,
       "norm_label": "paginationnext()"
     },
     {
@@ -11817,7 +11826,7 @@
       "source_file": "src/components/ui/pagination.tsx",
       "source_location": "L65",
       "id": "ui_pagination_paginationellipsis",
-      "community": 1,
+      "community": 27,
       "norm_label": "paginationellipsis()"
     },
     {
@@ -11826,7 +11835,7 @@
       "source_file": "src/components/ui/pop-over.tsx",
       "source_location": "L1",
       "id": "ui_pop_over",
-      "community": 173,
+      "community": 1,
       "norm_label": "pop-over.tsx"
     },
     {
@@ -11835,7 +11844,7 @@
       "source_file": "src/components/ui/pop-over.tsx",
       "source_location": "L10",
       "id": "ui_pop_over_popovercontent",
-      "community": 173,
+      "community": 1,
       "norm_label": "popovercontent"
     },
     {
@@ -12375,7 +12384,7 @@
       "source_file": "src/components/ui/slider.tsx",
       "source_location": "L1",
       "id": "ui_slider",
-      "community": 25,
+      "community": 1,
       "norm_label": "slider.tsx"
     },
     {
@@ -12384,7 +12393,7 @@
       "source_file": "src/components/ui/slider.tsx",
       "source_location": "L6",
       "id": "ui_slider_slider",
-      "community": 25,
+      "community": 1,
       "norm_label": "slider"
     },
     {
@@ -12987,7 +12996,7 @@
       "source_file": "src/data/mockData.ts",
       "source_location": "L61",
       "id": "data_mockdata_venues",
-      "community": 24,
+      "community": 21,
       "norm_label": "venues"
     },
     {
@@ -12996,7 +13005,7 @@
       "source_file": "src/data/mockData.ts",
       "source_location": "L73",
       "id": "data_mockdata_players",
-      "community": 24,
+      "community": 18,
       "norm_label": "players"
     },
     {
@@ -13023,7 +13032,7 @@
       "source_file": "src/data/mockData.ts",
       "source_location": "L269",
       "id": "data_mockdata_matches",
-      "community": 18,
+      "community": 24,
       "norm_label": "matches"
     },
     {
@@ -13041,7 +13050,7 @@
       "source_file": "src/data/mockData.ts",
       "source_location": "L474",
       "id": "data_mockdata_getlivematches",
-      "community": 21,
+      "community": 24,
       "norm_label": "getlivematches()"
     },
     {
@@ -13392,7 +13401,7 @@
       "source_file": "src/data/scoringTypes.ts",
       "source_location": "L32",
       "id": "data_scoringtypes_getplayerrole",
-      "community": 3,
+      "community": 32,
       "norm_label": "getplayerrole()"
     },
     {
@@ -13419,7 +13428,7 @@
       "source_file": "src/data/scoringTypes.ts",
       "source_location": "L71",
       "id": "data_scoringtypes_match",
-      "community": 3,
+      "community": 49,
       "norm_label": "match"
     },
     {
@@ -13455,7 +13464,7 @@
       "source_file": "src/data/types.ts",
       "source_location": "L2",
       "id": "data_types_matchstatus",
-      "community": 72,
+      "community": 24,
       "norm_label": "matchstatus"
     },
     {
@@ -13482,7 +13491,7 @@
       "source_file": "src/data/types.ts",
       "source_location": "L23",
       "id": "data_types_match",
-      "community": 27,
+      "community": 25,
       "norm_label": "match"
     },
     {
@@ -14137,7 +14146,7 @@
       "label": "CricketNewsItem",
       "file_type": "code",
       "source_file": "src/hooks/useCricketNews.ts",
-      "source_location": "L7",
+      "source_location": "L8",
       "id": "hooks_usecricketnews_cricketnewsitem",
       "community": 42,
       "norm_label": "cricketnewsitem"
@@ -14146,7 +14155,7 @@
       "label": "UseCricketNewsResult",
       "file_type": "code",
       "source_file": "src/hooks/useCricketNews.ts",
-      "source_location": "L19",
+      "source_location": "L20",
       "id": "hooks_usecricketnews_usecricketnewsresult",
       "community": 42,
       "norm_label": "usecricketnewsresult"
@@ -14155,7 +14164,7 @@
       "label": "useCricketNews()",
       "file_type": "code",
       "source_file": "src/hooks/useCricketNews.ts",
-      "source_location": "L25",
+      "source_location": "L26",
       "id": "hooks_usecricketnews_usecricketnews",
       "community": 42,
       "norm_label": "usecricketnews()"
@@ -14164,7 +14173,7 @@
       "label": "useCricketNewsDetail()",
       "file_type": "code",
       "source_file": "src/hooks/useCricketNews.ts",
-      "source_location": "L55",
+      "source_location": "L68",
       "id": "hooks_usecricketnews_usecricketnewsdetail",
       "community": 42,
       "norm_label": "usecricketnewsdetail()"
@@ -14175,7 +14184,7 @@
       "source_file": "src/hooks/useCricketTrending.ts",
       "source_location": "L1",
       "id": "hooks_usecrickettrending",
-      "community": 72,
+      "community": 1,
       "norm_label": "usecrickettrending.ts"
     },
     {
@@ -14184,7 +14193,7 @@
       "source_file": "src/hooks/useCricketTrending.ts",
       "source_location": "L7",
       "id": "hooks_usecrickettrending_trendingplayerentry",
-      "community": 24,
+      "community": 1,
       "norm_label": "trendingplayerentry"
     },
     {
@@ -14193,7 +14202,7 @@
       "source_file": "src/hooks/useCricketTrending.ts",
       "source_location": "L17",
       "id": "hooks_usecrickettrending_cricbuzzplayerinfo",
-      "community": 72,
+      "community": 1,
       "norm_label": "cricbuzzplayerinfo"
     },
     {
@@ -14202,7 +14211,7 @@
       "source_file": "src/hooks/useCricketTrending.ts",
       "source_location": "L37",
       "id": "hooks_usecrickettrending_trendingresult",
-      "community": 72,
+      "community": 1,
       "norm_label": "trendingresult"
     },
     {
@@ -14211,7 +14220,7 @@
       "source_file": "src/hooks/useCricketTrending.ts",
       "source_location": "L43",
       "id": "hooks_usecrickettrending_playerinforesult",
-      "community": 72,
+      "community": 1,
       "norm_label": "playerinforesult"
     },
     {
@@ -14220,7 +14229,7 @@
       "source_file": "src/hooks/useCricketTrending.ts",
       "source_location": "L50",
       "id": "hooks_usecrickettrending_playerinfocache",
-      "community": 72,
+      "community": 1,
       "norm_label": "playerinfocache"
     },
     {
@@ -14310,7 +14319,7 @@
       "source_file": "src/hooks/useFollowedTournamentMatches.ts",
       "source_location": "L1",
       "id": "hooks_usefollowedtournamentmatches",
-      "community": 16,
+      "community": 72,
       "norm_label": "usefollowedtournamentmatches.ts"
     },
     {
@@ -14319,7 +14328,7 @@
       "source_file": "src/hooks/useFollowedTournamentMatches.ts",
       "source_location": "L5",
       "id": "hooks_usefollowedtournamentmatches_tournamenttickermatch",
-      "community": 16,
+      "community": 72,
       "norm_label": "tournamenttickermatch"
     },
     {
@@ -14328,7 +14337,7 @@
       "source_file": "src/hooks/useFollowedTournamentMatches.ts",
       "source_location": "L22",
       "id": "hooks_usefollowedtournamentmatches_usefollowedtournamentmatches",
-      "community": 21,
+      "community": 72,
       "norm_label": "usefollowedtournamentmatches()"
     },
     {
@@ -14373,7 +14382,7 @@
       "source_file": "src/hooks/useFreeCricketMatch.ts",
       "source_location": "L1",
       "id": "hooks_usefreecricketmatch",
-      "community": 27,
+      "community": 24,
       "norm_label": "usefreecricketmatch.ts"
     },
     {
@@ -14382,7 +14391,7 @@
       "source_file": "src/hooks/useFreeCricketMatch.ts",
       "source_location": "L8",
       "id": "hooks_usefreecricketmatch_usefreecricketmatch",
-      "community": 27,
+      "community": 24,
       "norm_label": "usefreecricketmatch()"
     },
     {
@@ -14391,7 +14400,7 @@
       "source_file": "src/hooks/useFreeCricketMatches.ts",
       "source_location": "L1",
       "id": "hooks_usefreecricketmatches",
-      "community": 27,
+      "community": 24,
       "norm_label": "usefreecricketmatches.ts"
     },
     {
@@ -14400,7 +14409,7 @@
       "source_file": "src/hooks/useFreeCricketMatches.ts",
       "source_location": "L8",
       "id": "hooks_usefreecricketmatches_usefreecricketmatches",
-      "community": 27,
+      "community": 24,
       "norm_label": "usefreecricketmatches()"
     },
     {
@@ -14697,7 +14706,7 @@
       "source_file": "src/hooks/useTournamentFollow.ts",
       "source_location": "L1",
       "id": "hooks_usetournamentfollow",
-      "community": 16,
+      "community": 72,
       "norm_label": "usetournamentfollow.ts"
     },
     {
@@ -14706,7 +14715,7 @@
       "source_file": "src/hooks/useTournamentFollow.ts",
       "source_location": "L6",
       "id": "hooks_usetournamentfollow_load",
-      "community": 16,
+      "community": 72,
       "norm_label": "load()"
     },
     {
@@ -14715,7 +14724,7 @@
       "source_file": "src/hooks/useTournamentFollow.ts",
       "source_location": "L14",
       "id": "hooks_usetournamentfollow_usetournamentfollow",
-      "community": 16,
+      "community": 72,
       "norm_label": "usetournamentfollow()"
     },
     {
@@ -14850,7 +14859,7 @@
       "source_file": "src/lib/utils.ts",
       "source_location": "L1",
       "id": "lib_utils",
-      "community": 25,
+      "community": 1,
       "norm_label": "utils.ts"
     },
     {
@@ -14886,7 +14895,7 @@
       "source_file": "src/pages/Achievements.tsx",
       "source_location": "L1",
       "id": "pages_achievements",
-      "community": 2,
+      "community": 173,
       "norm_label": "achievements.tsx"
     },
     {
@@ -14895,7 +14904,7 @@
       "source_file": "src/pages/Achievements.tsx",
       "source_location": "L11",
       "id": "pages_achievements_achievements",
-      "community": 2,
+      "community": 173,
       "norm_label": "achievements()"
     },
     {
@@ -15345,7 +15354,7 @@
       "source_file": "src/pages/PerformanceLab.tsx",
       "source_location": "L1",
       "id": "pages_performancelab",
-      "community": 24,
+      "community": 21,
       "norm_label": "performancelab.tsx"
     },
     {
@@ -15354,7 +15363,7 @@
       "source_file": "src/pages/PerformanceLab.tsx",
       "source_location": "L49",
       "id": "pages_performancelab_performancelab",
-      "community": 24,
+      "community": 21,
       "norm_label": "performancelab()"
     },
     {
@@ -15651,7 +15660,7 @@
       "source_file": "src/pages/auction/AuctionAnalytics.tsx",
       "source_location": "L1",
       "id": "auction_auctionanalytics",
-      "community": 2,
+      "community": 7,
       "norm_label": "auctionanalytics.tsx"
     },
     {
@@ -15660,7 +15669,7 @@
       "source_file": "src/pages/auction/AuctionAnalytics.tsx",
       "source_location": "L23",
       "id": "auction_auctionanalytics_auctionanalytics",
-      "community": 2,
+      "community": 7,
       "norm_label": "auctionanalytics()"
     },
     {
@@ -15669,7 +15678,7 @@
       "source_file": "src/pages/auction/AuctionList.tsx",
       "source_location": "L1",
       "id": "auction_auctionlist",
-      "community": 2,
+      "community": 173,
       "norm_label": "auctionlist.tsx"
     },
     {
@@ -15678,7 +15687,7 @@
       "source_file": "src/pages/auction/AuctionList.tsx",
       "source_location": "L9",
       "id": "auction_auctionlist_auctionlist",
-      "community": 2,
+      "community": 173,
       "norm_label": "auctionlist()"
     },
     {
@@ -15741,7 +15750,7 @@
       "source_file": "src/pages/auction/OwnerPanel.tsx",
       "source_location": "L1",
       "id": "auction_ownerpanel",
-      "community": 7,
+      "community": 16,
       "norm_label": "ownerpanel.tsx"
     },
     {
@@ -15750,7 +15759,7 @@
       "source_file": "src/pages/auction/OwnerPanel.tsx",
       "source_location": "L42",
       "id": "auction_ownerpanel_ownerpanel",
-      "community": 7,
+      "community": 16,
       "norm_label": "ownerpanel()"
     },
     {
@@ -15822,7 +15831,7 @@
       "source_file": "src/pages/football/FootballMatchResult.tsx",
       "source_location": "L1",
       "id": "football_footballmatchresult",
-      "community": 2,
+      "community": 173,
       "norm_label": "footballmatchresult.tsx"
     },
     {
@@ -15831,7 +15840,7 @@
       "source_file": "src/pages/football/FootballMatchResult.tsx",
       "source_location": "L10",
       "id": "football_footballmatchresult_footballmatchresult",
-      "community": 2,
+      "community": 173,
       "norm_label": "footballmatchresult()"
     },
     {
@@ -15840,7 +15849,7 @@
       "source_file": "src/pages/football/FootballPlayerProfile.tsx",
       "source_location": "L1",
       "id": "football_footballplayerprofile",
-      "community": 2,
+      "community": 173,
       "norm_label": "footballplayerprofile.tsx"
     },
     {
@@ -15849,7 +15858,7 @@
       "source_file": "src/pages/football/FootballPlayerProfile.tsx",
       "source_location": "L15",
       "id": "football_footballplayerprofile_footballplayerprofile",
-      "community": 2,
+      "community": 173,
       "norm_label": "footballplayerprofile()"
     },
     {
@@ -15858,7 +15867,7 @@
       "source_file": "src/pages/football/FootballPointsTable.tsx",
       "source_location": "L1",
       "id": "football_footballpointstable",
-      "community": 16,
+      "community": 3,
       "norm_label": "footballpointstable.tsx"
     },
     {
@@ -15867,7 +15876,7 @@
       "source_file": "src/pages/football/FootballPointsTable.tsx",
       "source_location": "L9",
       "id": "football_footballpointstable_footballpointstable",
-      "community": 16,
+      "community": 3,
       "norm_label": "footballpointstable()"
     },
     {
@@ -15876,7 +15885,7 @@
       "source_file": "src/pages/football/FootballScoringPanel.tsx",
       "source_location": "L1",
       "id": "football_footballscoringpanel",
-      "community": 16,
+      "community": 3,
       "norm_label": "footballscoringpanel.tsx"
     },
     {
@@ -15885,7 +15894,7 @@
       "source_file": "src/pages/football/FootballScoringPanel.tsx",
       "source_location": "L86",
       "id": "football_footballscoringpanel_footballscoringpanel",
-      "community": 16,
+      "community": 3,
       "norm_label": "footballscoringpanel()"
     },
     {
@@ -15894,7 +15903,7 @@
       "source_file": "src/pages/football/FootballTeamProfile.tsx",
       "source_location": "L1",
       "id": "football_footballteamprofile",
-      "community": 16,
+      "community": 3,
       "norm_label": "footballteamprofile.tsx"
     },
     {
@@ -15903,7 +15912,7 @@
       "source_file": "src/pages/football/FootballTeamProfile.tsx",
       "source_location": "L20",
       "id": "football_footballteamprofile_footballteamprofile",
-      "community": 16,
+      "community": 3,
       "norm_label": "footballteamprofile()"
     },
     {
@@ -15912,7 +15921,7 @@
       "source_file": "src/pages/football/FootballTournamentCreate.tsx",
       "source_location": "L1",
       "id": "football_footballtournamentcreate",
-      "community": 2,
+      "community": 3,
       "norm_label": "footballtournamentcreate.tsx"
     },
     {
@@ -15921,7 +15930,7 @@
       "source_file": "src/pages/football/FootballTournamentCreate.tsx",
       "source_location": "L13",
       "id": "football_footballtournamentcreate_footballtournamentcreate",
-      "community": 2,
+      "community": 3,
       "norm_label": "footballtournamentcreate()"
     },
     {
@@ -16056,7 +16065,7 @@
       "source_file": "src/services/api.ts",
       "source_location": "L145",
       "id": "services_api_footballapi",
-      "community": 16,
+      "community": 3,
       "norm_label": "footballapi"
     },
     {
@@ -16065,7 +16074,7 @@
       "source_file": "src/services/api.ts",
       "source_location": "L173",
       "id": "services_api_tournamentapi",
-      "community": 16,
+      "community": 72,
       "norm_label": "tournamentapi"
     },
     {
@@ -22340,9 +22349,9 @@
       "source_file": "package.json",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_dev_local",
-      "confidence_score": 1.0
+      "target": "package_scripts_dev_local"
     },
     {
       "relation": "contains",
@@ -36798,6 +36807,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/NewsSection.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "components_newssection",
+      "target": "components_newssection_getcricketimageurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/NewsSection.tsx",
       "source_location": "L8",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -36891,6 +36910,17 @@
       "confidence_score": 1.0,
       "source": "components_newssection",
       "target": "hooks_usecricketnews_usecricketnews"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/NewsSection.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "components_newssection",
+      "target": "hooks_usecricketnews_usecricketnewsdetail",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -37017,12 +37047,34 @@
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
+      "source_file": "src/components/NewsSection.tsx",
+      "source_location": "L238",
+      "weight": 1.0,
+      "source": "components_newssection_newssection",
+      "target": "components_newssection_getcricketimageurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/NewsSection.tsx",
       "source_location": "L14",
       "weight": 1.0,
       "source": "components_newssection_newssection",
       "target": "hooks_usecricketnews_usecricketnews"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/NewsSection.tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "components_newssection_newssection",
+      "target": "hooks_usecricketnews_usecricketnewsdetail"
     },
     {
       "relation": "calls",
@@ -58248,6 +58300,28 @@
       "target": "hooks_usecricketmatches_usecricketmatchsquads"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useCricketNews.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "hooks_usecricketnews",
+      "target": "football_cachemanager",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useCricketNews.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "hooks_usecricketnews",
+      "target": "football_cachemanager_cachemanager",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/hooks/useCricketNews.ts",
@@ -61583,9 +61657,9 @@
       "source_file": "src/pages/football/FootballHome.tsx",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "football_footballhome",
-      "target": "football_footballhome_transferfilter",
-      "confidence_score": 1.0
+      "target": "football_footballhome_transferfilter"
     },
     {
       "relation": "contains",
@@ -61593,9 +61667,9 @@
       "source_file": "src/pages/football/FootballHome.tsx",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "football_footballhome",
-      "target": "football_footballhome_transfersort",
-      "confidence_score": 1.0
+      "target": "football_footballhome_transfersort"
     },
     {
       "relation": "contains",

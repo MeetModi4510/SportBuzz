@@ -105,8 +105,9 @@ export const footballApi = {
       if (cached && cached.length > 0) return cached;
     }
 
-    // Fetch last 3 days to guarantee we find *some* matches from priority leagues
-    const dates = [0, 1, 2].map(daysAgo => {
+    // Free plan only allows Yesterday, Today, and Tomorrow.
+    // Fetch last 2 days (Today = 0, Yesterday = 1)
+    const dates = [0, 1].map(daysAgo => {
       const d = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
       return d.toISOString().split('T')[0];
     });
@@ -127,8 +128,8 @@ export const footballApi = {
     const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id) && isMensFootball(m));
     const recentPriority = priorityMatches.filter(m => ['FT', 'AET', 'PEN'].includes(m.fixture?.status?.short));
     
-    // Fallback to mock data only if API returned nothing at all (e.g. suspended key)
-    if (recentPriority.length === 0 && allMatches.length === 0) {
+    // Fallback to mock data if there are no priority matches to display (keeps UI looking good)
+    if (recentPriority.length === 0) {
       cacheManager.set(cacheKey, MOCK_RECENT_MATCHES as any, 15);
       return MOCK_RECENT_MATCHES as any;
     }
@@ -144,8 +145,9 @@ export const footballApi = {
       if (cached && cached.length > 0) return cached;
     }
 
-    // Fetch next 3 days to guarantee we find *some* scheduled matches
-    const dates = [1, 2, 3].map(daysAhead => {
+    // Free plan only allows Yesterday, Today, and Tomorrow.
+    // Fetch next 1 day (Tomorrow = 1)
+    const dates = [1].map(daysAhead => {
       const d = new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000);
       return d.toISOString().split('T')[0];
     });
@@ -166,7 +168,8 @@ export const footballApi = {
     const priorityMatches = allMatches.filter(m => PRIORITY_LEAGUES.includes(m.league?.id) && isMensFootball(m));
     const upcomingPriority = priorityMatches.filter(m => !['FT', 'AET', 'PEN', '1H', '2H', 'HT', 'LIVE'].includes(m.fixture?.status?.short));
     
-    if (upcomingPriority.length === 0 && allMatches.length === 0) {
+    // Fallback to mock data if there are no upcoming priority matches to display
+    if (upcomingPriority.length === 0) {
       cacheManager.set(cacheKey, MOCK_UPCOMING_MATCHES as any, 15);
       return MOCK_UPCOMING_MATCHES as any;
     }
