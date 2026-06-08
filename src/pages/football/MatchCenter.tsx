@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { footballApi } from "../../services/football/footballApi";
 import { footballApiClient } from "../../services/football/apiClient";
 import { cacheManager } from "../../utils/football/cacheManager";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, Info, Zap, BarChart2, Users, Activity } from "lucide-react";
 import { FootballMatch } from "../../types/football/index";
 import { TeamLogo } from "../../components/TeamLogo";
 import { MatchEvents } from "../../components/football/MatchEvents";
@@ -225,18 +225,30 @@ export default function MatchCenter() {
         <main className="container mx-auto px-4 mt-8">
           {/* Tabs */}
           <div className="flex overflow-x-auto hide-scrollbar gap-2 mb-8 border-b border-border/40 pb-2">
-            {(["overview", "events", "statistics", "lineups", "performance lab"] as MatchTab[]).map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2.5 rounded-t-lg text-sm font-semibold capitalize whitespace-nowrap transition-colors ${activeTab === tab
-                    ? "bg-primary/10 text-primary border-b-2 border-primary"
-                    : "text-muted-foreground hover:bg-secondary/50"
-                  }`}
-              >
-                {tab}
-              </button>
-            ))}
+            {(["overview", "events", "statistics", "lineups", "performance lab"] as MatchTab[]).map(tab => {
+              const getTabIcon = (t: MatchTab) => {
+                switch (t) {
+                  case "overview": return <Info className="w-4 h-4 mr-2 inline-block" />;
+                  case "events": return <Zap className="w-4 h-4 mr-2 inline-block" />;
+                  case "statistics": return <BarChart2 className="w-4 h-4 mr-2 inline-block" />;
+                  case "lineups": return <Users className="w-4 h-4 mr-2 inline-block" />;
+                  case "performance lab": return <Activity className="w-4 h-4 mr-2 inline-block" />;
+                }
+              };
+              return (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-5 py-2.5 rounded-t-lg text-sm font-semibold capitalize whitespace-nowrap transition-colors flex items-center justify-center ${activeTab === tab
+                      ? "bg-primary/10 text-primary border-b-2 border-primary"
+                      : "text-muted-foreground hover:bg-secondary/50"
+                    }`}
+                >
+                  {getTabIcon(tab)}
+                  {tab}
+                </button>
+              );
+            })}
           </div>
 
           {/* Tab Content */}
