@@ -5,6 +5,7 @@ import { Navbar } from "../../components/Navbar";
 import { FootballMatchCard } from "../../components/football/FootballMatchCard";
 import { TransferCard } from "../../components/football/TransferCard";
 import { FootballNewsSidebar } from "../../components/football/FootballNewsSidebar";
+import { FootballStandings } from "../../components/football/FootballStandings";
 import { useLiveFootballMatches, useRecentFootballMatches, useUpcomingFootballMatches, useRecentTransfers } from "../../hooks/football/useFootballQueries";
 import { Loader2, RefreshCw, ArrowRightLeft } from "lucide-react";
 import { footballApi } from "../../services/football/footballApi";
@@ -243,6 +244,11 @@ export default function FootballHome() {
               </div>
             )}
           </section>
+
+          <hr className="border-white/5" />
+
+          {/* ─── Premier League Standings ─────────────────────── */}
+          <FootballStandings />
 
           <hr className="border-white/5" />
 

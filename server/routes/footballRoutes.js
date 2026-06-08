@@ -1,5 +1,6 @@
 import express from 'express';
 import axios from 'axios';
+import FootballStanding from '../models/FootballStanding.js';
 import { 
     createTournament,
     getTournaments,
@@ -156,4 +157,127 @@ router.post('/matches/:id/finalize', protect, finalizeMatch);
 router.post('/matches/:id/lineups', protect, updateMatchLineups);
 router.delete('/matches/:id', protect, deleteMatch);
 
+// ─── PREMIER LEAGUE STANDINGS ─────────────────────────────────────────────────
+// Serves standings from MongoDB cache (1-week TTL).
+// On first request (or after cache expires) it fetches live from the external API
+// and persists the result – every subsequent user gets instant DB reads.
+
+const STANDINGS_LEAGUE_ID = 47; // Premier League
+const STANDINGS_API_HOST  = 'free-api-live-football-data.p.rapidapi.com';
+const STANDINGS_CACHE_MS  = 7 * 24 * 60 * 60 * 1000; // 1 week in ms
+
+async function fetchAndStoreStandings() {
+    const apiKey = process.env.FOOTBALL_STANDINGS;
+    if (!apiKey) throw new Error('FOOTBALL_STANDINGS env key not set');
+
+    const res = await axios.get(
+        `https://${STANDINGS_API_HOST}/football-get-standing-all`,
+        {
+            params: { leagueid: STANDINGS_LEAGUE_ID },
+            headers: {
+                'x-rapidapi-key':  apiKey,
+                'x-rapidapi-host': STANDINGS_API_HOST,
+            },
+            timeout: 10000,
+        }
+    );
+
+    // API returns { response: { standing: [...] } }
+    const raw = res.data?.response?.standing || res.data?.response || res.data?.data || res.data || [];
+    const rows = Array.isArray(raw) ? raw : [];
+
+    if (rows.length === 0) throw new Error('Empty standings response from API');
+
+    // Map hex qual colours to readable labels (used by the UI for conditional styling)
+    const QUAL_COLOR_MAP = {
+        '#2AD572': 'Champions League',
+        '#0046A7': 'Europa League',
+        '#02CCF0': 'Conference League',
+        '#FF4646': 'Relegation',
+    };
+
+    const cacheExpiry = new Date(Date.now() + STANDINGS_CACHE_MS);
+    const now = new Date();
+
+    // Wipe stale records for this league, then bulk-insert fresh ones
+    await FootballStanding.deleteMany({ leagueId: STANDINGS_LEAGUE_ID });
+
+    const docs = rows.map((t) => {
+        const [gf, ga] = String(t.scoresStr || '0-0').split('-').map(Number);
+        return {
+            leagueId:     STANDINGS_LEAGUE_ID,
+            teamId:       String(t.id || ''),
+            teamName:     t.name || t.shortName || '',
+            shortName:    t.shortName || '',
+            logoUrl:      `https://images.fotmob.com/image_resources/logo/teamlogo/${t.id}_xsmall.png`,
+            position:     Number(t.idx || 0),
+            played:       Number(t.played || 0),
+            wins:         Number(t.wins || 0),
+            draws:        Number(t.draws || 0),
+            losses:       Number(t.losses || 0),
+            goalsFor:     gf || 0,
+            goalsAgainst: ga || 0,
+            goalDiff:     Number(t.goalConDiff || 0),
+            points:       Number(t.pts || 0),
+            qualColor:    QUAL_COLOR_MAP[t.qualColor] || null,
+            cacheExpiry,
+            lastFetched:  now,
+        };
+    });
+
+    await FootballStanding.insertMany(docs);
+    console.log(`[Standings] Stored ${docs.length} teams for league ${STANDINGS_LEAGUE_ID}.`);
+    return { rows: docs, lastFetched: now };
+}
+
+router.get('/standings', async (req, res) => {
+    try {
+        // 1. Check if we have valid cached data
+        const sample = await FootballStanding.findOne({
+            leagueId: STANDINGS_LEAGUE_ID,
+            cacheExpiry: { $gt: new Date() },
+        });
+
+        if (sample) {
+            // Cache hit – serve all rows from DB sorted by position
+            const standings = await FootballStanding
+                .find({ leagueId: STANDINGS_LEAGUE_ID })
+                .sort({ position: 1 })
+                .lean();
+
+            return res.json({
+                success: true,
+                fromCache: true,
+                lastFetched: standings[0]?.lastFetched || null,
+                data: standings,
+            });
+        }
+
+        // 2. Cache miss – fetch from API, persist, respond
+        console.log('[Standings] Cache expired or empty – fetching from API…');
+        const { rows, lastFetched } = await fetchAndStoreStandings();
+
+        return res.json({
+            success: true,
+            fromCache: false,
+            lastFetched,
+            data: rows,
+        });
+
+    } catch (err) {
+        console.error('[Standings] Error:', err.message);
+        // Fallback: try to serve stale data rather than returning nothing
+        const stale = await FootballStanding
+            .find({ leagueId: STANDINGS_LEAGUE_ID })
+            .sort({ position: 1 })
+            .lean();
+
+        if (stale.length > 0) {
+            return res.json({ success: true, fromCache: true, stale: true, lastFetched: stale[0]?.lastFetched || null, data: stale });
+        }
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 export default router;
+
