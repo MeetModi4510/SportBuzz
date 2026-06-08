@@ -59,7 +59,17 @@ export default function AuctionList() {
   if (loading) return <div className="flex items-center justify-center py-10"><Loader2 className="animate-spin" /></div>;
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen p-6 max-w-7xl mx-auto space-y-6">
+      <div className="flex items-center gap-4 mb-6">
+        <Button 
+          onClick={() => navigate(-1)} 
+          variant="outline" 
+          className="border-slate-700 hover:bg-slate-800 text-slate-300"
+        >
+          ← Back
+        </Button>
+        <h1 className="text-2xl font-bold text-foreground">Auction Room</h1>
+      </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {auctions.map(auction => {
           const currentUserId = currentUser?.id || currentUser?._id;
