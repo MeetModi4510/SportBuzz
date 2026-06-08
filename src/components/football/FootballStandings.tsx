@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Trophy, AlertTriangle } from "lucide-react";
+import { Loader2, Trophy, AlertTriangle, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
@@ -36,11 +42,11 @@ interface StandingsResponse {
 }
 
 const LEAGUES = [
-  { id: 47, name: "Premier League" },
-  { id: 87, name: "La Liga" },
-  { id: 54, name: "Bundesliga" },
-  { id: 55, name: "Serie A" },
-  { id: 53, name: "Ligue 1" },
+  { id: 47, name: "Premier League", flag: "https://flagcdn.com/w40/gb-eng.png" },
+  { id: 87, name: "La Liga", flag: "https://flagcdn.com/w40/es.png" },
+  { id: 54, name: "Bundesliga", flag: "https://flagcdn.com/w40/de.png" },
+  { id: 55, name: "Serie A", flag: "https://flagcdn.com/w40/it.png" },
+  { id: 53, name: "Ligue 1", flag: "https://flagcdn.com/w40/fr.png" },
 ];
 
 async function fetchStandings(leagueId: number): Promise<StandingsResponse> {
@@ -114,23 +120,33 @@ export function FootballStandings() {
           </div>
         </div>
 
-        {/* League Selector */}
-        <div className="flex items-center gap-1 p-1 bg-white/[0.02] border border-white/5 rounded-xl overflow-x-auto hide-scrollbar">
-          {LEAGUES.map(league => (
-            <button
-              key={league.id}
-              onClick={() => setSelectedLeagueId(league.id)}
-              className={cn(
-                "px-4 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap",
-                selectedLeagueId === league.id 
-                  ? "bg-white/10 text-white shadow-sm ring-1 ring-white/10" 
-                  : "text-white/40 hover:text-white/70 hover:bg-white/5"
+        {/* League Selector Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 rounded-xl transition-all shadow-sm">
+              {LEAGUES.find(l => l.id === selectedLeagueId)?.flag && (
+                <img src={LEAGUES.find(l => l.id === selectedLeagueId)?.flag} alt="" className="w-5 h-3.5 rounded-[2px] object-cover shadow-sm" />
               )}
-            >
-              {league.name}
+              <span className="text-sm font-medium text-white/90">{selectedLeagueName}</span>
+              <ChevronDown size={16} className="text-white/50 ml-1" />
             </button>
-          ))}
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-[#0f172a] border-white/10 min-w-[180px] p-1.5 rounded-xl shadow-2xl">
+            {LEAGUES.map(league => (
+              <DropdownMenuItem 
+                key={league.id} 
+                onClick={() => setSelectedLeagueId(league.id)}
+                className={cn(
+                  "flex items-center gap-3 cursor-pointer rounded-lg px-2 py-2 transition-colors",
+                  selectedLeagueId === league.id ? "bg-white/10 text-white" : "text-white/70 focus:bg-white/5 focus:text-white"
+                )}
+              >
+                <img src={league.flag} alt={league.name} className="w-5 h-3.5 rounded-[2px] object-cover shadow-sm" />
+                <span className="text-sm font-medium">{league.name}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Loading */}
