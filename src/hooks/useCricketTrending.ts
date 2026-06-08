@@ -31,7 +31,9 @@ export interface CricbuzzPlayerInfo {
     odi: string | null;
     t20: string | null;
   };
-  teams: string[];
+  teams: { id: string | null; name: string }[];
+  recentBatting: { headers: string[]; rows: { values: string[] }[] } | null;
+  recentBowling: { headers: string[]; rows: { values: string[] }[] } | null;
 }
 
 interface TrendingResult {
@@ -45,9 +47,20 @@ interface PlayerInfoResult {
   error: string | null;
 }
 
-// Session-level caches
+// Session-level caches (keyed by version so stale data is dropped after deployments)
+const CACHE_VERSION = 'v2-teams-objects';
 let trendingCacheData: TrendingResult | null = null;
 const playerInfoCache: Record<string, CricbuzzPlayerInfo> = {};
+
+// Wipe any stale cache from previous versions stored in sessionStorage
+if (typeof sessionStorage !== 'undefined') {
+  const storedVersion = sessionStorage.getItem('cricket_cache_version');
+  if (storedVersion !== CACHE_VERSION) {
+    sessionStorage.setItem('cricket_cache_version', CACHE_VERSION);
+    // Force a fresh fetch on next render
+    trendingCacheData = null;
+  }
+}
 
 export function useCricketTrendingPlayers() {
   const [trending, setTrending] = useState<TrendingResult | null>(null);
@@ -96,6 +109,15 @@ export function useCricbuzzPlayerInfo() {
       const res = await fetch(`${API_BASE}/api/cricket/player-info/${playerId}`);
       const json: PlayerInfoResult = await res.json();
       if (json.data) {
+        // Normalize teams to always be { id, name }[] regardless of server cache format
+        const rawTeams = (json.data as any).teams;
+        if (rawTeams && !Array.isArray(rawTeams)) {
+          json.data.teams = String(rawTeams).split(',').map((t: string) => ({ id: null, name: t.trim() }));
+        } else if (Array.isArray(rawTeams)) {
+          json.data.teams = rawTeams.map((t: any) =>
+            typeof t === 'string' ? { id: null, name: t.trim() } : { id: t.id ?? null, name: t.name ?? String(t) }
+          );
+        }
         playerInfoCache[playerId] = json.data;
       }
       setPlayerInfo(json);

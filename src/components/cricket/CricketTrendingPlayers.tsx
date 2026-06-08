@@ -151,86 +151,149 @@ export function PlayerProfileModal({
         )}
 
         {!loadingInfo && info && (
-          <div className="p-6 space-y-6">
-            {(info.battingStyle || info.bowlingStyle) && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-6 space-y-8">
+            
+            {/* Sleek Stats Grid Area */}
+            <div className="rounded-2xl overflow-hidden bg-card border border-border/50 shadow-sm">
+              <div className="p-4 border-b border-border/30 bg-secondary/20">
+                <h3 className="text-xs font-black text-foreground uppercase tracking-widest flex items-center gap-2">
+                  <Zap size={14} className="text-primary" /> Technical Profile
+                </h3>
+              </div>
+              <div className="grid grid-cols-2 divide-x divide-y divide-border/30">
+                
                 {info.battingStyle && (
-                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-secondary/10 border border-border/30">
-                    <div className="p-2 rounded-xl bg-primary/10 text-primary flex-shrink-0">
-                      <Zap size={14} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Batting Style</p>
-                      <p className="text-sm font-bold text-foreground mt-0.5">{info.battingStyle}</p>
-                    </div>
+                  <div className="p-5 flex flex-col justify-center items-center text-center">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Batting Style</span>
+                    <span className="text-lg font-bold text-foreground">{info.battingStyle}</span>
                   </div>
                 )}
+                
                 {info.bowlingStyle && (
-                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-secondary/10 border border-border/30">
-                    <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 flex-shrink-0">
-                      <Shield size={14} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Bowling Style</p>
-                      <p className="text-sm font-bold text-foreground mt-0.5">{info.bowlingStyle}</p>
+                  <div className="p-5 flex flex-col justify-center items-center text-center">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Bowling Style</span>
+                    <span className="text-lg font-bold text-foreground">{info.bowlingStyle}</span>
+                  </div>
+                )}
+
+                {(info?.rankings?.test || info?.rankings?.odi || info?.rankings?.t20) && (
+                  <div className="col-span-2 p-5">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 flex items-center justify-center gap-1.5">
+                      <Trophy size={12} className="text-amber-400" /> ICC Rankings
+                    </span>
+                    <div className="grid grid-cols-3 gap-4 mt-2">
+                      {(['test', 'odi', 't20'] as const).map((fmt) => {
+                        const rank = info?.rankings?.[fmt];
+                        return (
+                          <div key={fmt} className="flex flex-col items-center">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-1">{fmt}</span>
+                            {rank ? (
+                              <span className="text-2xl font-black text-primary">#{rank}</span>
+                            ) : (
+                              <span className="text-xl font-bold text-muted-foreground/30">—</span>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Recent Form Stats */}
+            {(info.recentBatting?.rows?.length > 0 || info.recentBowling?.rows?.length > 0) && (
+              <div className="rounded-2xl overflow-hidden bg-card border border-border/50 shadow-sm">
+                <div className="p-4 border-b border-border/30 bg-secondary/20">
+                  <h3 className="text-xs font-black text-foreground uppercase tracking-widest flex items-center gap-2">
+                    <Zap size={14} className="text-primary" /> Recent Form
+                  </h3>
+                </div>
+                <div className="p-0 overflow-x-auto scrollbar-thin">
+                  {info.recentBatting?.rows?.length > 0 && (
+                    <table className="w-full text-sm text-left whitespace-nowrap">
+                      <thead className="bg-secondary/10 border-b border-border/30 text-[10px] uppercase tracking-widest text-muted-foreground">
+                        <tr>
+                          <th className="px-4 py-2 font-black pl-6">Batting</th>
+                          {info.recentBatting.headers.map((h: string, i: number) => <th key={i} className="px-4 py-2 font-black">{h}</th>)}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/20">
+                        {info.recentBatting.rows.slice(0, 3).map((row: any, i: number) => (
+                          <tr key={i} className="hover:bg-secondary/5 transition-colors">
+                            <td className="px-4 py-3 font-semibold text-muted-foreground/40 text-xs pl-6">Match {i+1}</td>
+                            {row.values.map((v: string, j: number) => <td key={j} className={cn("px-4 py-3", j===0 ? "font-bold text-foreground" : "text-muted-foreground")}>{v}</td>)}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                  {info.recentBowling?.rows?.length > 0 && (
+                    <table className="w-full text-sm text-left whitespace-nowrap">
+                      <thead className={cn("bg-secondary/10 border-b border-border/30 text-[10px] uppercase tracking-widest text-muted-foreground", info.recentBatting?.rows?.length > 0 ? "border-t border-border/50" : "")}>
+                        <tr>
+                          <th className="px-4 py-2 font-black pl-6">Bowling</th>
+                          {info.recentBowling.headers.map((h: string, i: number) => <th key={i} className="px-4 py-2 font-black">{h}</th>)}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/20">
+                        {info.recentBowling.rows.slice(0, 3).map((row: any, i: number) => (
+                          <tr key={i} className="hover:bg-secondary/5 transition-colors">
+                            <td className="px-4 py-3 font-semibold text-muted-foreground/40 text-xs pl-6">Match {i+1}</td>
+                            {row.values.map((v: string, j: number) => <td key={j} className={cn("px-4 py-3", j===0 ? "font-bold text-foreground" : "text-muted-foreground")}>{v}</td>)}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </div>
             )}
 
-            {(info?.rankings?.test || info?.rankings?.odi || info?.rankings?.t20) && (
+            {info.teams && info.teams.length > 0 && (() => {
+              // Normalize: server may return string (old cache) or array of {id,name} objects (new)
+              const teamsArr: { id: string | null; name: string }[] = Array.isArray(info.teams)
+                ? info.teams.map((t: any) =>
+                    typeof t === 'string' ? { id: null, name: t.trim() } : { id: t.id ?? null, name: t.name ?? String(t) }
+                  )
+                : String(info.teams).split(',').map((t: string) => ({ id: null, name: t.trim() }));
+              return (
               <div>
                 <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <Trophy size={12} className="text-amber-400" /> ICC Rankings
+                  <Globe size={14} className="text-blue-400" /> Professional Teams
                 </h3>
-                <div className="grid grid-cols-3 gap-3">
-                  {(['test', 'odi', 't20'] as const).map((fmt) => {
-                    const rank = info?.rankings?.[fmt];
+                <div className="flex flex-wrap gap-2">
+                  {teamsArr.map((team, i) => {
+                    const tName = team.name;
+                    const tId = team.id;
+                    if (!tName) return null;
                     return (
-                      <div
-                        key={fmt}
-                        className={cn(
-                          'flex flex-col items-center gap-1 p-3 rounded-2xl border',
-                          rank ? 'bg-primary/5 border-primary/20' : 'bg-secondary/10 border-border/20 opacity-50'
-                        )}
+                      <span
+                        key={i}
+                        className="px-4 py-2 text-xs font-bold bg-secondary/30 border border-border/40 rounded-xl text-foreground hover:bg-secondary/50 transition-colors cursor-default"
                       >
-                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-                          {fmt.toUpperCase()}
-                        </span>
-                        {rank ? (
-                          <span className="text-xl font-black text-primary">#{rank}</span>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">—</span>
-                        )}
-                      </div>
+                        {tName}
+                      </span>
                     );
                   })}
                 </div>
               </div>
-            )}
-
-            {info.teams && info.teams.length > 0 && (
-              <div>
-                <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <Globe size={12} className="text-blue-400" /> Teams
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {info.teams.map((team, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1.5 text-[11px] font-semibold bg-secondary/20 border border-border/30 rounded-full text-foreground"
-                    >
-                      {typeof team === 'string' ? team : (team as any).name || String(team)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+              );
+            })()}
 
             {info.bio && (
-              <div className="p-4 rounded-2xl bg-secondary/10 border border-border/30">
-                <p className="text-xs text-muted-foreground leading-relaxed">{info.bio}</p>
+              <div>
+                <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <UserIcon size={14} className="text-primary" /> Biography
+                </h3>
+                <div className="p-6 rounded-2xl bg-secondary/10 border border-border/30">
+                  <div className="text-sm text-muted-foreground leading-relaxed text-justify space-y-4">
+                    {info.bio.split(/<br\s*\/?>/ig).map((paragraph: string, i: number) => {
+                      const cleanText = paragraph.replace(/&nbsp;/g, ' ').trim();
+                      return cleanText ? <p key={i}>{cleanText}</p> : null;
+                    })}
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -278,7 +341,10 @@ export function TrendingCard({
       <div className="p-4 space-y-3 flex-1 flex flex-col">
         <div>
           <h3 className="font-semibold text-foreground text-lg truncate" title={player.name}>{player.name}</h3>
-          <p className="text-sm text-muted-foreground">{player.teamName}</p>
+          <div className="flex items-center gap-1.5 mt-1">
+            <PlayerFlag flagCode={player.flagCode} flagLocal={player.flagLocal} country={player.teamName} size="sm" />
+            <p className="text-sm text-muted-foreground">{player.teamName}</p>
+          </div>
         </div>
       </div>
 

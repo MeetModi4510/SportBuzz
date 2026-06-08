@@ -1155,7 +1155,9 @@ async function getCricbuzzPlayerInfo(playerId) {
                     odi: d.rankings?.bat?.odi || d.rankings?.bowl?.odi || null,
                     t20: d.rankings?.bat?.t20i || d.rankings?.bowl?.t20i || null,
                 },
-                teams: d.teams || [],
+                teams: d.teamNameIds ? d.teamNameIds.map(t => ({ id: t.teamId, name: t.teamName })) : (d.teams ? d.teams.split(',').map(t => ({ id: null, name: t.trim() })) : []),
+                recentBatting: d.recentBatting || null,
+                recentBowling: d.recentBowling || null,
             },
             error: null,
         };
