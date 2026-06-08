@@ -222,7 +222,7 @@ export function PlayerProfileModal({
                         {info.recentBatting.rows.slice(0, 3).map((row: any, i: number) => (
                           <tr key={i} className="hover:bg-secondary/5 transition-colors">
                             <td className="px-4 py-3 font-semibold text-muted-foreground/40 text-xs pl-6">Match {i+1}</td>
-                            {row.values.map((v: string, j: number) => <td key={j} className={cn("px-4 py-3", j===0 ? "font-bold text-foreground" : "text-muted-foreground")}>{v}</td>)}
+                            {row.values.slice(1).map((v: string, j: number) => <td key={j} className={cn("px-4 py-3", j===0 ? "font-bold text-foreground" : "text-muted-foreground")}>{v}</td>)}
                           </tr>
                         ))}
                       </tbody>
@@ -240,7 +240,7 @@ export function PlayerProfileModal({
                         {info.recentBowling.rows.slice(0, 3).map((row: any, i: number) => (
                           <tr key={i} className="hover:bg-secondary/5 transition-colors">
                             <td className="px-4 py-3 font-semibold text-muted-foreground/40 text-xs pl-6">Match {i+1}</td>
-                            {row.values.map((v: string, j: number) => <td key={j} className={cn("px-4 py-3", j===0 ? "font-bold text-foreground" : "text-muted-foreground")}>{v}</td>)}
+                            {row.values.slice(1).map((v: string, j: number) => <td key={j} className={cn("px-4 py-3", j===0 ? "font-bold text-foreground" : "text-muted-foreground")}>{v}</td>)}
                           </tr>
                         ))}
                       </tbody>
