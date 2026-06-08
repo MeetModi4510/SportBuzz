@@ -1,6 +1,7 @@
 import { useFootballNews } from "../../hooks/football/useFootballQueries";
-import { Loader2, Clock, Zap, Trophy, ArrowRightLeft, Shield, Globe } from "lucide-react";
+import { Loader2, Clock, Zap, Trophy, ArrowRightLeft, Shield, Globe, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 // Curated fallback news when the API returns nothing
 const FALLBACK_NEWS = [
@@ -77,10 +78,16 @@ function timeAgo(dateStr: string) {
 export function FootballNewsSidebar() {
   const { data: apiNews, isLoading } = useFootballNews();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  const [showAll, setShowAll] = useState(false);
+  const [isViewAllOpen, setIsViewAllOpen] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState<any | null>(null);
 
-  const news = apiNews && apiNews.length > 0 ? apiNews : FALLBACK_NEWS;
-  const displayedNews = showAll ? news : news.slice(0, 6);
+  const rawNews = apiNews && apiNews.length > 0 ? apiNews : FALLBACK_NEWS;
+  const news = [...rawNews].sort((a, b) => {
+    const dateA = new Date(a.gmtTime || a.publishedAt || 0).getTime();
+    const dateB = new Date(b.gmtTime || b.publishedAt || 0).getTime();
+    return dateB - dateA;
+  });
+  const displayedNews = news.slice(0, 5);
 
   if (isLoading) {
     return (
@@ -92,22 +99,34 @@ export function FootballNewsSidebar() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between px-2">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-white/60" />
+          <h2 className="text-xl font-bold tracking-tight text-white/90">Latest News</h2>
+        </div>
+        {news.length > 0 && (
+          <button
+            onClick={() => setIsViewAllOpen(true)}
+            className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+          >
+            View All <ChevronRight size={16} />
+          </button>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {displayedNews.map((item: any, idx: number) => {
           const theme = CARD_THEMES[idx % CARD_THEMES.length];
           const IconComponent = theme.icon;
           const isHovered = hoveredIdx === idx;
-          const isFirst = idx === 0 && !showAll; // Only make the first item large if we aren't showing all (or keep it, but let's keep it large only if it's the very first)
+          const isFirst = idx === 0;
 
           return (
             <div
               key={item.id || idx}
               onClick={() => {
                 if (item.page?.url) {
-                  const url = item.page.url.startsWith('/') 
-                    ? `https://www.fotmob.com${item.page.url}`
-                    : item.page.url;
-                  window.open(url, '_blank');
+                  setSelectedArticle(item);
                 }
               }}
               className={`
@@ -187,16 +206,80 @@ export function FootballNewsSidebar() {
         })}
       </div>
 
-      {news.length > 6 && (
-        <div className="flex justify-center mt-8">
-          <button
-            onClick={() => setShowAll(!showAll)}
-            className="px-6 py-2.5 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white transition-all text-sm font-medium backdrop-blur-md flex items-center gap-2 group"
-          >
-            {showAll ? "Show Less" : `View All News (${news.length})`}
-          </button>
-        </div>
-      )}
+      {/* Modal for View All News */}
+      <Dialog open={isViewAllOpen} onOpenChange={setIsViewAllOpen}>
+        <DialogContent className="sm:max-w-[900px] border-border/50 bg-background/95 backdrop-blur-xl rounded-3xl max-h-[85vh] overflow-y-auto overflow-x-hidden p-6 md:p-8 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+          <DialogTitle className="sr-only">All Football News</DialogTitle>
+          <DialogDescription className="sr-only">View all the latest football news and updates.</DialogDescription>
+          <div className="mb-6 flex items-center gap-3">
+            <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg">
+              <Globe size={24} />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">All Football News</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {news.map((item: any, index: number) => {
+              const theme = CARD_THEMES[index % CARD_THEMES.length];
+              return (
+                <div 
+                  key={item.id || index}
+                  onClick={() => { setIsViewAllOpen(false); setSelectedArticle(item); }}
+                  className={`group flex flex-col justify-between p-5 rounded-3xl border border-white/[0.05] bg-white/[0.015] cursor-pointer hover:${theme.border} hover:bg-white/[0.03] transition-all duration-300 relative overflow-hidden`}
+                >
+                  {/* Background Image / Gradient */}
+                  {item.imageUrl ? (
+                    <>
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-40 transition-all duration-700 group-hover:scale-105" 
+                        style={{ backgroundImage: `url(${item.imageUrl})` }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/40" />
+                    </>
+                  ) : (
+                    <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+                  )}
+
+                  <div className="relative z-10 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-bold uppercase tracking-widest ${theme.accent} bg-white/5 px-2.5 py-1 rounded-full truncate max-w-[100px]`}>
+                        {item.source}
+                      </span>
+                      <div className="flex items-center gap-1 text-[11px] text-white/40 font-medium whitespace-nowrap">
+                        <Clock size={12} />
+                        {timeAgo(item.publishedAt || item.gmtTime)}
+                      </div>
+                    </div>
+                    <h4 className="text-base font-bold text-white leading-snug group-hover:text-white/90 transition-colors line-clamp-3">
+                      {item.title}
+                    </h4>
+                    <p className="text-sm text-white/35 leading-relaxed line-clamp-3">
+                      {item.summary}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal for Football News */}
+      <Dialog open={!!selectedArticle} onOpenChange={(open) => !open && setSelectedArticle(null)}>
+        <DialogContent className="sm:max-w-[800px] border-border/50 bg-background/95 backdrop-blur-xl rounded-xl p-0 overflow-hidden">
+          <DialogTitle className="sr-only">{selectedArticle?.title || 'Football Article'}</DialogTitle>
+          <DialogDescription className="sr-only">Full article content.</DialogDescription>
+          <div className="w-full h-[70vh] md:h-[80vh] bg-background">
+            {selectedArticle && (
+              <iframe 
+                src={selectedArticle.page?.url?.startsWith('/') ? `https://www.fotmob.com${selectedArticle.page.url}` : selectedArticle.page?.url} 
+                className="w-full h-full border-0 bg-background" 
+                title="Football News Article"
+                sandbox="allow-same-origin allow-scripts allow-popups"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

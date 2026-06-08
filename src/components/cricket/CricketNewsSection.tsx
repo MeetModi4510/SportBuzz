@@ -3,7 +3,7 @@ import { ChevronRight, Clock, Loader2, AlertCircle } from 'lucide-react';
 import { useCricketNews, useCricketNewsDetail, type CricketNewsItem } from '@/hooks/useCricketNews';
 import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
@@ -163,6 +163,7 @@ export const CricketNewsSection = () => {
             </div>
           </div>
           <DialogTitle className="text-2xl md:text-3xl leading-snug">{selectedArticle?.headline || selectedArticle?.title}</DialogTitle>
+          <DialogDescription className="sr-only">Full article content.</DialogDescription>
         </DialogHeader>
         <div className="pt-4 space-y-4">
           {selectedArticle?.imageId && (
@@ -209,6 +210,8 @@ export const CricketNewsSection = () => {
     {/* Modal for View All News */}
     <Dialog open={isViewAllOpen} onOpenChange={setIsViewAllOpen}>
       <DialogContent className="sm:max-w-[900px] border-border/50 bg-background/95 backdrop-blur-xl rounded-3xl max-h-[85vh] overflow-y-auto overflow-x-hidden p-6 md:p-8 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+        <DialogTitle className="sr-only">All Cricket News</DialogTitle>
+        <DialogDescription className="sr-only">View all the latest cricket news and updates.</DialogDescription>
         <DialogHeader className="mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 text-primary rounded-lg">

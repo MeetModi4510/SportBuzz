@@ -185,8 +185,8 @@ export const footballApi = {
     }
 
     try {
-      // Use the dedicated FotMob API endpoint for transfers
-      const response = await transfersApiClient.get('/api/v1/transfers');
+      // Use the dedicated backend proxy endpoint for transfers
+      const response = await transfersApiClient.get('/transfers');
       
       const rawTransfers = response.data?.transfers || [];
 

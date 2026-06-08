@@ -248,10 +248,6 @@ export default function FootballHome() {
 
           {/* Latest News */}
           <section className="space-y-6">
-            <div className="flex items-center gap-3 px-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              <h2 className="text-xl font-bold tracking-tight text-white/90">Latest News</h2>
-            </div>
             <FootballNewsSidebar />
           </section>
 

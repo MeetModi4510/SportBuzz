@@ -1,27 +1,14 @@
 import axios from 'axios';
 
-// Ensure you set VITE_API_FOOTBALL_KEY in your .env or hosting environment (e.g., Render)
-const API_KEY = import.meta.env.VITE_API_FOOTBALL_KEY;
-const API_HOST = 'v3.football.api-sports.io';
+// All requests are proxied through our backend to keep API keys secure.
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const footballApiClient = axios.create({
-  baseURL: `https://${API_HOST}`,
-  headers: {
-    'x-rapidapi-host': API_HOST,
-    'x-rapidapi-key': API_KEY,
-    'x-apisports-key': API_KEY, // Critical for direct api-sports.io domain
-  },
+  baseURL: `${BACKEND_URL}/football/proxy`,
 });
 
-const TRANSFERS_API_KEY = import.meta.env.VITE_API_TRANSFERS_KEY;
-const TRANSFERS_API_HOST = 'fotmob-api.p.rapidapi.com';
-
 export const transfersApiClient = axios.create({
-  baseURL: `https://${TRANSFERS_API_HOST}`,
-  headers: {
-    'x-rapidapi-host': TRANSFERS_API_HOST,
-    'x-rapidapi-key': TRANSFERS_API_KEY,
-  },
+  baseURL: `${BACKEND_URL}/football/proxy`,
 });
 
 // Interceptor to handle errors globally if needed

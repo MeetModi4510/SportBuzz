@@ -1,4 +1,5 @@
 import express from 'express';
+import axios from 'axios';
 import { 
     createTournament,
     getTournaments,
@@ -28,6 +29,42 @@ import { protect } from '../middleware/authMiddleware.js';
 import { getDashboardMatches, getCategorizedMatches, getMatchDetail, getGlobalFootballNews, getFootballLiveNews, clearCache } from '../services/footballDataService.js';
 
 const router = express.Router();
+
+// ─── PROXY ROUTES FOR FRONTEND ───
+// These proxies ensure API keys stay hidden on the backend while the frontend can still use the API-Sports schema
+
+router.get('/proxy/fixtures', async (req, res) => {
+    try {
+        const response = await axios.get('https://v3.football.api-sports.io/fixtures', {
+            params: req.query,
+            headers: {
+                'x-rapidapi-host': 'v3.football.api-sports.io',
+                'x-apisports-key': process.env.API_KEY, 
+                'x-rapidapi-key': process.env.API_KEY
+            }
+        });
+        res.json(response.data);
+    } catch (err) {
+        console.error('[Proxy] Fixtures Error:', err.message);
+        res.status(err.response?.status || 500).json(err.response?.data || { success: false, message: err.message });
+    }
+});
+
+router.get('/proxy/transfers', async (req, res) => {
+    try {
+        const response = await axios.get('https://fotmob-api.p.rapidapi.com/api/v1/transfers', {
+            params: req.query,
+            headers: {
+                'x-rapidapi-host': 'fotmob-api.p.rapidapi.com',
+                'x-rapidapi-key': process.env.TRANSFERS_API_KEY,
+            }
+        });
+        res.json(response.data);
+    } catch (err) {
+        console.error('[Proxy] Transfers Error:', err.message);
+        res.status(err.response?.status || 500).json(err.response?.data || { success: false, message: err.message });
+    }
+});
 
 // ─── Real Football Data (Hybrid: AllSportsApi2 + Football-Data.org) ───
 

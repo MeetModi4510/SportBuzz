@@ -5,7 +5,7 @@ import { useCricketNews, type CricketNewsItem, useCricketNewsDetail } from '@/ho
 import { useFootballNews, type FootballNewsItem } from '@/hooks/useFootballNews';
 import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 // Merge type: can be mock NewsItem OR live CricketNewsItem OR live FootballNewsItem
 type DisplayNewsItem = (NewsItem | CricketNewsItem | FootballNewsItem) & { isLive?: boolean; snippet?: string; title?: string };
@@ -90,16 +90,7 @@ export const NewsSection = () => {
               {marqueeData.map((news, index) => (
                 <div
                   key={`${news.id}-${index}`}
-                  onClick={() => {
-                    if (news.sport === 'football' && (news as any).pageUrl) {
-                      const url = (news as any).pageUrl.startsWith('/') 
-                        ? `https://www.fotmob.com${(news as any).pageUrl}`
-                        : (news as any).pageUrl;
-                      window.open(url, '_blank');
-                    } else {
-                      setSelectedArticle(news);
-                    }
-                  }}
+                  onClick={() => setSelectedArticle(news)}
                   className={cn(
                     "min-w-[280px] md:min-w-[320px] max-w-[320px] flex-shrink-0 cursor-pointer flex flex-col",
                     "group relative rounded-2xl border bg-card/40 backdrop-blur-sm overflow-hidden",
@@ -200,6 +191,8 @@ export const NewsSection = () => {
 
         {/* Modal for full article */}
         <DialogContent className="sm:max-w-[500px] border-border/50 bg-background/95 backdrop-blur-xl">
+          <DialogTitle className="sr-only">{selectedArticle?.title || 'News Article'}</DialogTitle>
+          <DialogDescription className="sr-only">Read the full sports news article.</DialogDescription>
           <DialogHeader className="space-y-4">
             <div className="flex items-center justify-between mt-2">
               <div className="flex items-center gap-2">
@@ -262,14 +255,14 @@ export const NewsSection = () => {
                 </div>
               )
             ) : (selectedArticle as any)?.isLive && selectedArticle?.sport === 'football' ? (
-              <>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                  {selectedArticle?.snippet}
-                </p>
-                <div className="mt-4 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-sm text-emerald-400/80 text-center">
-                  📰 Source: FotMob — Read the latest updates
-                </div>
-              </>
+              <div className="w-full h-[60vh] md:h-[70vh] rounded-xl overflow-hidden border border-border/20 bg-background">
+                <iframe 
+                  src={(selectedArticle as any).pageUrl?.startsWith('/') ? `https://www.fotmob.com${(selectedArticle as any).pageUrl}` : (selectedArticle as any).pageUrl} 
+                  className="w-full h-full border-0 bg-background" 
+                  title="Football News Article"
+                  sandbox="allow-same-origin allow-scripts allow-popups"
+                />
+              </div>
             ) : (
               <>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
