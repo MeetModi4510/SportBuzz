@@ -1,7 +1,13 @@
-import { footballApiClient, transfersApiClient } from './apiClient';
+import { footballApiClient, transfersApiClient, internalApiClient } from './apiClient';
 import api from '../api';
 import { cacheManager } from '../../utils/football/cacheManager';
 import { FootballMatch, FootballTransferData } from '../../types/football';
+
+export interface TransfersResponse {
+  data: FootballTransferData[];
+  lastFetched: string | null;
+}
+
 import { MOCK_LIVE_MATCHES, MOCK_RECENT_MATCHES, MOCK_UPCOMING_MATCHES, MOCK_TRANSFERS } from './mockFootballData';
 
 // Priority League IDs as requested
@@ -178,56 +184,56 @@ export const footballApi = {
     return upcomingPriority;
   },
 
-  async getRecentTransfers(forceRefresh = false): Promise<FootballTransferData[]> {
-    const cacheKey = 'recent_transfers_v3';
-    const CACHE_TTL_MINUTES = 24 * 60; // 24 hours
+  async getRecentTransfers(forceRefresh = false): Promise<TransfersResponse> {
+    const cacheKey = 'recent_transfers_v3_with_meta';
 
     if (!forceRefresh) {
-      const cached = cacheManager.get<FootballTransferData[]>(cacheKey);
-      if (cached && cached.length > 0) return cached;
+      const cached = cacheManager.get<TransfersResponse>(cacheKey);
+      if (cached && cached.data?.length > 0) return cached;
     }
 
     try {
-      // Use the dedicated backend proxy endpoint for transfers
-      const response = await transfersApiClient.get('/transfers');
+      // Use our internal backend endpoint which caches transfers in MongoDB
+      const response = await internalApiClient.get('/transfers');
       
-      const rawTransfers = response.data?.transfers || [];
+      const rawTransfers = response.data?.data || [];
+      const lastFetched = response.data?.lastFetched || null;
 
-      // Map FotMob response to our FootballTransferData interface
+      // Map our new MongoDB FootballTransfer schema to the frontend interface
       const allTransfers: FootballTransferData[] = rawTransfers.map((t: any) => {
         // Price formatting
-        let priceStr = t.fee?.feeText || t.transferType?.text || 'Transfer';
-        if (t.fee?.value && t.fee.value > 0) {
-          const valueInM = (t.fee.value / 1000000).toFixed(1);
+        let priceStr = t.feeText || t.transferType || 'Transfer';
+        if (t.feeValue && t.feeValue > 0) {
+          const valueInM = (t.feeValue / 1000000).toFixed(1);
           priceStr = `€${valueInM}M`;
-        } else if (t.fee?.localizedFeeText === 'on_loan' || t.transferType?.text === 'on loan') {
+        } else if (priceStr.toLowerCase().includes('loan')) {
           priceStr = 'LOAN';
-        } else if (t.fee?.localizedFeeText === 'free_transfer' || t.transferType?.text === 'free') {
+        } else if (priceStr.toLowerCase().includes('free')) {
           priceStr = 'FREE';
         }
 
         return {
           player: {
             id: t.playerId,
-            name: t.name,
+            name: t.playerName,
             photo: t.playerId ? `https://images.fotmob.com/image_resources/playerimages/${t.playerId}.png` : undefined
           },
           update: t.transferDate,
           transfers: [
             {
               date: t.transferDate,
-              type: t.transferType?.text || t.fee?.feeText || 'Transfer',
+              type: t.transferType || t.feeText || 'Transfer',
               price: priceStr,
               teams: {
                 out: {
-                  id: t.fromClubId,
-                  name: t.fromClub || t.fromClubFullName || 'Unknown',
-                  logo: t.fromClubId > 0 ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.fromClubId}.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
+                  id: t.fromClubId || 0,
+                  name: t.fromClub || 'Unknown',
+                  logo: t.fromClubId ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.fromClubId}_xsmall.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
                 },
                 in: {
-                  id: t.toClubId,
-                  name: t.toClub || t.toClubFullName || 'Unknown',
-                  logo: t.toClubId > 0 ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.toClubId}.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
+                  id: t.toClubId || 0,
+                  name: t.toClub || 'Unknown',
+                  logo: t.toClubId ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.toClubId}_xsmall.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
                 }
               }
             }
@@ -235,36 +241,17 @@ export const footballApi = {
         };
       });
 
-      // Filter using the PRIORITY_CLUBS list since FotMob lacks league info
-      const priorityTransfers = allTransfers.filter(t => {
-        const outName = t.transfers[0].teams.out.name.toLowerCase();
-        const inName = t.transfers[0].teams.in.name.toLowerCase();
-        
-        return PRIORITY_CLUBS.some(club => outName.includes(club) || inName.includes(club));
-      });
+      const result: TransfersResponse = {
+        data: allTransfers,
+        lastFetched
+      };
 
-      // Show transfers from the last 30 days
-      const pastDate = new Date();
-      pastDate.setDate(pastDate.getDate() - 30);
-      
-      const recentPriorityTransfers = priorityTransfers.filter(t => {
-        if (!t.transfers || t.transfers.length === 0) return false;
-        const transferDate = new Date(t.transfers[0].date);
-        return transferDate >= pastDate;
-      });
+      cacheManager.set(cacheKey, result, 15);
+      return result;
 
-      if (recentPriorityTransfers.length > 0) {
-        cacheManager.set(cacheKey, recentPriorityTransfers, CACHE_TTL_MINUTES);
-        return recentPriorityTransfers;
-      }
-      
-      // Fallback if empty (e.g., no transfers in the last week)
-      return MOCK_TRANSFERS as any;
-
-    } catch (err) {
-      console.error('Failed to fetch transfers', err);
-      // Ensure we don't crash the app if the rapidapi limit is reached
-      return MOCK_TRANSFERS as any;
+    } catch (error) {
+      console.error('Failed to fetch transfers', error);
+      return { data: [], lastFetched: null };
     }
   },
 

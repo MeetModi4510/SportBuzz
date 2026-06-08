@@ -1,6 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import FootballStanding from '../models/FootballStanding.js';
+import FootballTransfer from '../models/FootballTransfer.js';
 import { 
     createTournament,
     getTournaments,
@@ -51,19 +52,136 @@ router.get('/proxy/fixtures', async (req, res) => {
     }
 });
 
-router.get('/proxy/transfers', async (req, res) => {
-    try {
-        const response = await axios.get('https://fotmob-api.p.rapidapi.com/api/v1/transfers', {
-            params: req.query,
+// ─── LATEST TRANSFERS ─────────────────────────────────────────────────────────
+// Serves transfers from MongoDB cache (4-day TTL).
+
+const TRANSFERS_API_HOST = 'free-api-live-football-data.p.rapidapi.com';
+const TRANSFERS_CACHE_MS = 4 * 24 * 60 * 60 * 1000; // 4 days
+
+const PRIORITY_CLUBS = [
+    // Premier League
+    'arsenal', 'aston villa', 'bournemouth', 'brentford', 'brighton', 'chelsea', 'crystal palace', 'everton', 'fulham', 'liverpool', 'luton', 'man city', 'manchester city', 'man united', 'manchester united', 'newcastle', 'nottm forest', 'nottingham forest', 'sheff utd', 'sheffield united', 'tottenham', 'spurs', 'west ham', 'wolves',
+    // La Liga
+    'athletic club', 'atletico madrid', 'barcelona', 'real madrid', 'real sociedad', 'sevilla', 'valencia', 'villarreal', 'girona', 'betis',
+    // Serie A
+    'ac milan', 'inter', 'juventus', 'napoli', 'roma', 'lazio', 'atalanta', 'fiorentina', 'bologna',
+    // Bundesliga
+    'bayern munich', 'dortmund', 'bayer leverkusen', 'rb leipzig', 'eintracht frankfurt', 'stuttgart',
+    // Ligue 1
+    'psg', 'paris saint-germain', 'monaco', 'marseille', 'lyon', 'lille', 'lens',
+    // Others
+    'al nassr', 'al hilal', 'al ittihad', 'al ahli',
+    'inter miami', 'lafc', 'la galaxy',
+    'ajax', 'psv', 'feyenoord',
+    'porto', 'benfica', 'sporting cp', 'sporting lisbon',
+    'celtic', 'rangers', 'galatasaray', 'fenerbahce', 'besiktas'
+];
+
+async function fetchAndStoreTransfers() {
+    const apiKey = process.env.TRANSFERS_API_KEY;
+    if (!apiKey) throw new Error('TRANSFERS_API_KEY env key not set');
+
+    const res = await axios.get(
+        `https://${TRANSFERS_API_HOST}/football-get-all-transfers`,
+        {
+            params: { page: 1 },
             headers: {
-                'x-rapidapi-host': 'fotmob-api.p.rapidapi.com',
-                'x-rapidapi-key': process.env.TRANSFERS_API_KEY,
-            }
+                'x-rapidapi-key': apiKey,
+                'x-rapidapi-host': TRANSFERS_API_HOST,
+            },
+            timeout: 10000,
+        }
+    );
+
+    const raw = res.data?.response?.transfers || [];
+    const rows = Array.isArray(raw) ? raw : [];
+
+    if (rows.length === 0) throw new Error('Empty transfers response from API');
+
+    // Filter using the PRIORITY_CLUBS list
+    const priorityTransfers = rows.filter(t => {
+        const outName = (t.fromClub || t.fromClubFullName || '').toLowerCase();
+        const inName = (t.toClub || t.toClubFullName || '').toLowerCase();
+        
+        return PRIORITY_CLUBS.some(club => outName.includes(club) || inName.includes(club));
+    });
+
+    const cacheExpiry = new Date(Date.now() + TRANSFERS_CACHE_MS);
+    const now = new Date();
+
+    // Wipe stale records before bulk-inserting fresh ones
+    await FootballTransfer.deleteMany({});
+
+    const docs = priorityTransfers.map(t => ({
+        playerId:     t.playerId,
+        playerName:   t.name || '',
+        position:     t.position?.label || t.position?.key || '',
+        fromClub:     t.fromClub || t.fromClubFullName || '',
+        fromClubId:   t.fromClubId,
+        toClub:       t.toClub || t.toClubFullName || '',
+        toClubId:     t.toClubId,
+        transferDate: new Date(t.transferDate || t.fromDate || now),
+        feeText:      t.fee?.feeText || t.fee?.localizedFeeText || t.transferType?.text || '',
+        feeValue:     t.amountEuroEstimated || 0,
+        transferType: t.transferType?.text || t.transferType?.localizationKey || '',
+        marketValue:  t.marketValue || 0,
+        cacheExpiry,
+        lastFetched:  now,
+    }));
+
+    if (docs.length > 0) {
+        await FootballTransfer.insertMany(docs);
+        console.log(`[Transfers] Stored ${docs.length} filtered transfers.`);
+    }
+    
+    return { rows: docs, lastFetched: now };
+}
+
+router.get('/transfers', async (req, res) => {
+    try {
+        // 1. Check if we have valid cached data
+        const sample = await FootballTransfer.findOne({
+            cacheExpiry: { $gt: new Date() },
         });
-        res.json(response.data);
+
+        if (sample) {
+            // Cache hit
+            const transfers = await FootballTransfer
+                .find({})
+                .sort({ transferDate: -1 })
+                .lean();
+
+            return res.json({
+                success: true,
+                fromCache: true,
+                lastFetched: transfers[0]?.lastFetched || null,
+                data: transfers,
+            });
+        }
+
+        // 2. Cache miss – fetch, persist, respond
+        console.log('[Transfers] Cache expired or empty – fetching from API…');
+        const { rows, lastFetched } = await fetchAndStoreTransfers();
+
+        return res.json({
+            success: true,
+            fromCache: false,
+            lastFetched,
+            data: rows,
+        });
+
     } catch (err) {
-        console.error('[Proxy] Transfers Error:', err.message);
-        res.status(err.response?.status || 500).json(err.response?.data || { success: false, message: err.message });
+        console.error('[Transfers] Error:', err.message);
+        // Fallback: try to serve stale data
+        const stale = await FootballTransfer
+            .find({})
+            .sort({ transferDate: -1 })
+            .lean();
+
+        if (stale.length > 0) {
+            return res.json({ success: true, fromCache: true, stale: true, lastFetched: stale[0]?.lastFetched || null, data: stale });
+        }
+        res.status(500).json({ success: false, message: err.message });
     }
 });
 

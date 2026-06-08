@@ -72,8 +72,8 @@ export default function FootballHome() {
 
   // Process Transfers
   const processedTransfers = useMemo(() => {
-    if (!recentTransfers) return [];
-    let result = [...recentTransfers];
+    if (!recentTransfers?.data) return [];
+    let result = [...recentTransfers.data];
 
     // Filter
     if (transferFilter !== "all") {
@@ -195,9 +195,16 @@ export default function FootballHome() {
           {/* Transfers Market (Horizontal Scroll) */}
           <section className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
-              <div className="flex items-center gap-3">
-                <ArrowRightLeft size={18} className="text-white/80" />
-                <h2 className="text-xl font-bold tracking-tight text-white/90">Transfer Intel</h2>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-3">
+                  <ArrowRightLeft size={18} className="text-white/80" />
+                  <h2 className="text-xl font-bold tracking-tight text-white/90">Latest Transfers</h2>
+                </div>
+                {recentTransfers?.lastFetched && (
+                  <p className="text-xs text-white/40 font-medium ml-8">
+                    Last updated on {new Date(recentTransfers.lastFetched).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                )}
               </div>
               
               <div className="flex flex-wrap items-center gap-3">

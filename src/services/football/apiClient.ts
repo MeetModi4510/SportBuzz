@@ -11,6 +11,10 @@ export const transfersApiClient = axios.create({
   baseURL: `${BACKEND_URL}/football/proxy`,
 });
 
+export const internalApiClient = axios.create({
+  baseURL: `${BACKEND_URL}/football`,
+});
+
 // Interceptor to handle errors globally if needed
 footballApiClient.interceptors.response.use(
   (response) => {
