@@ -157,23 +157,22 @@ router.post('/matches/:id/finalize', protect, finalizeMatch);
 router.post('/matches/:id/lineups', protect, updateMatchLineups);
 router.delete('/matches/:id', protect, deleteMatch);
 
-// ─── PREMIER LEAGUE STANDINGS ─────────────────────────────────────────────────
+// ─── STANDINGS (MULTI-LEAGUE) ─────────────────────────────────────────────────
 // Serves standings from MongoDB cache (1-week TTL).
 // On first request (or after cache expires) it fetches live from the external API
 // and persists the result – every subsequent user gets instant DB reads.
 
-const STANDINGS_LEAGUE_ID = 47; // Premier League
 const STANDINGS_API_HOST  = 'free-api-live-football-data.p.rapidapi.com';
 const STANDINGS_CACHE_MS  = 7 * 24 * 60 * 60 * 1000; // 1 week in ms
 
-async function fetchAndStoreStandings() {
+async function fetchAndStoreStandings(leagueId) {
     const apiKey = process.env.FOOTBALL_STANDINGS;
     if (!apiKey) throw new Error('FOOTBALL_STANDINGS env key not set');
 
     const res = await axios.get(
         `https://${STANDINGS_API_HOST}/football-get-standing-all`,
         {
-            params: { leagueid: STANDINGS_LEAGUE_ID },
+            params: { leagueid: leagueId },
             headers: {
                 'x-rapidapi-key':  apiKey,
                 'x-rapidapi-host': STANDINGS_API_HOST,
@@ -200,12 +199,12 @@ async function fetchAndStoreStandings() {
     const now = new Date();
 
     // Wipe stale records for this league, then bulk-insert fresh ones
-    await FootballStanding.deleteMany({ leagueId: STANDINGS_LEAGUE_ID });
+    await FootballStanding.deleteMany({ leagueId });
 
     const docs = rows.map((t) => {
         const [gf, ga] = String(t.scoresStr || '0-0').split('-').map(Number);
         return {
-            leagueId:     STANDINGS_LEAGUE_ID,
+            leagueId:     leagueId,
             teamId:       String(t.id || ''),
             teamName:     t.name || t.shortName || '',
             shortName:    t.shortName || '',
@@ -226,22 +225,24 @@ async function fetchAndStoreStandings() {
     });
 
     await FootballStanding.insertMany(docs);
-    console.log(`[Standings] Stored ${docs.length} teams for league ${STANDINGS_LEAGUE_ID}.`);
+    console.log(`[Standings] Stored ${docs.length} teams for league ${leagueId}.`);
     return { rows: docs, lastFetched: now };
 }
 
 router.get('/standings', async (req, res) => {
     try {
+        const leagueId = Number(req.query.leagueId) || 47; // Default to Premier League
+
         // 1. Check if we have valid cached data
         const sample = await FootballStanding.findOne({
-            leagueId: STANDINGS_LEAGUE_ID,
+            leagueId: leagueId,
             cacheExpiry: { $gt: new Date() },
         });
 
         if (sample) {
             // Cache hit – serve all rows from DB sorted by position
             const standings = await FootballStanding
-                .find({ leagueId: STANDINGS_LEAGUE_ID })
+                .find({ leagueId: leagueId })
                 .sort({ position: 1 })
                 .lean();
 
@@ -254,8 +255,8 @@ router.get('/standings', async (req, res) => {
         }
 
         // 2. Cache miss – fetch from API, persist, respond
-        console.log('[Standings] Cache expired or empty – fetching from API…');
-        const { rows, lastFetched } = await fetchAndStoreStandings();
+        console.log(`[Standings] Cache expired or empty for league ${leagueId} – fetching from API…`);
+        const { rows, lastFetched } = await fetchAndStoreStandings(leagueId);
 
         return res.json({
             success: true,
@@ -266,9 +267,10 @@ router.get('/standings', async (req, res) => {
 
     } catch (err) {
         console.error('[Standings] Error:', err.message);
+        const leagueId = Number(req.query.leagueId) || 47;
         // Fallback: try to serve stale data rather than returning nothing
         const stale = await FootballStanding
-            .find({ leagueId: STANDINGS_LEAGUE_ID })
+            .find({ leagueId: leagueId })
             .sort({ position: 1 })
             .lean();
 
