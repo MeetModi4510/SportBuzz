@@ -12,33 +12,59 @@ import { TeamLogo } from "../../components/TeamLogo";
 import { MatchEvents } from "../../components/football/MatchEvents";
 import { MatchStatistics } from "../../components/football/MatchStatistics";
 import { MatchLineups } from "../../components/football/MatchLineups";
+import { MatchPerformanceLab } from "../../components/football/MatchPerformanceLab";
 
-type MatchTab = "overview" | "events" | "statistics" | "lineups" | "standings";
+type MatchTab = "overview" | "events" | "statistics" | "lineups" | "performance lab";
 
 export default function MatchCenter() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<MatchTab>("overview");
 
-  // Fetch match details. Caching 30 mins.
-  const { data: match, isLoading } = useQuery<FootballMatch | null>({
+  // Fetch match details. Caching 30 mins for finished, 1 min for live.
+  const { data: match, isLoading, refetch } = useQuery<FootballMatch | null>({
     queryKey: ['football', 'match', id],
     queryFn: async () => {
       if (!id) return null;
       const cacheKey = `match_${id}`;
+      
       const cached = cacheManager.get<FootballMatch>(cacheKey);
-      if (cached) return cached;
+      
+      // If cached match exists and is LIVE, we don't return it immediately so we can fetch fresh data
+      // (Unless it was cached just a few seconds ago, which cacheManager handles via TTL, but let's be safe)
+      const isCachedLive = cached && ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(cached.fixture.status.short);
+      
+      if (cached && !isCachedLive) {
+        return cached;
+      }
 
       const response = await footballApiClient.get('/fixtures', { params: { id } });
       const matchData = response.data.response?.[0];
       if (matchData) {
+        // Cache matches for 30 minutes as requested
         cacheManager.set(cacheKey, matchData, 30);
       }
       return matchData || null;
     },
     refetchOnWindowFocus: false,
-    staleTime: 30 * 60 * 1000,
+    staleTime: 30 * 60 * 1000, // 30 minute stale time
   });
+
+  const isLive = match?.fixture?.status?.short === "1H" || 
+                 match?.fixture?.status?.short === "2H" || 
+                 match?.fixture?.status?.short === "HT" || 
+                 match?.fixture?.status?.short === "ET" ||
+                 match?.fixture?.status?.short === "P";
+
+  // Polling for live matches
+  useEffect(() => {
+    if (isLive) {
+      const intervalId = setInterval(() => {
+        refetch();
+      }, 30 * 60 * 1000); // Poll every 30 minutes
+      return () => clearInterval(intervalId);
+    }
+  }, [isLive, refetch]);
 
   if (isLoading) {
     return (
@@ -64,12 +90,6 @@ export default function MatchCenter() {
       </div>
     );
   }
-
-  const isLive = match.fixture.status.short === "1H" || 
-                 match.fixture.status.short === "2H" || 
-                 match.fixture.status.short === "HT" || 
-                 match.fixture.status.short === "ET" ||
-                 match.fixture.status.short === "P";
 
   const homeGoals = match.events?.filter(e => e.type === "Goal" && e.team.id === match.teams.home.id) || [];
   const awayGoals = match.events?.filter(e => e.type === "Goal" && e.team.id === match.teams.away.id) || [];
@@ -205,7 +225,7 @@ export default function MatchCenter() {
         <main className="container mx-auto px-4 mt-8">
           {/* Tabs */}
           <div className="flex overflow-x-auto hide-scrollbar gap-2 mb-8 border-b border-border/40 pb-2">
-            {(["overview", "events", "statistics", "lineups", "standings"] as MatchTab[]).map(tab => (
+            {(["overview", "events", "statistics", "lineups", "performance lab"] as MatchTab[]).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -297,7 +317,13 @@ export default function MatchCenter() {
           
           {activeTab === "lineups" && (
             <div className="animate-in fade-in duration-300">
-              <MatchLineups lineups={match.details?.lineups || match.lineups || []} homeTeam={match.teams.home} awayTeam={match.teams.away} events={match.details?.incidents || match.events || []} playerStats={match.details?.playerStatistics || match.players || []} />
+              <MatchLineups lineups={match.lineups || []} homeTeam={match.teams.home} awayTeam={match.teams.away} events={match.events || []} playerStats={match.players || []} />
+            </div>
+          )}
+
+          {activeTab === "performance lab" && (
+            <div className="animate-in fade-in duration-300">
+              <MatchPerformanceLab playerStats={match.players || []} matchStatus={match.fixture.status.short} />
             </div>
           )}
 

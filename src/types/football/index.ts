@@ -90,8 +90,15 @@ export interface FootballMatchPlayerStat {
   players: {
     player: { id: number; name: string; photo: string };
     statistics: {
-      games: { rating: string | null; minutes: number | null };
-      goals: { total: number | null; assists: number | null };
+      games: { rating: string | null; minutes: number | null; number: number | null; position: string | null; captain: boolean };
+      goals: { total: number | null; assists: number | null; conceded: number | null; saves: number | null };
+      shots: { total: number | null; on: number | null };
+      passes: { total: number | null; key: number | null; accuracy: number | null };
+      tackles: { total: number | null; blocks: number | null; interceptions: number | null };
+      duels: { total: number | null; won: number | null };
+      dribbles: { attempts: number | null; success: number | null; past: number | null };
+      fouls: { drawn: number | null; committed: number | null };
+      cards: { yellow: number | null; red: number | null };
     }[];
   }[];
 }

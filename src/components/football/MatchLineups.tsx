@@ -27,6 +27,12 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
 
   if (!homeLineup || !awayLineup) return null;
 
+  // Determine if we have valid X,Y coordinates for the pitch graphic
+  const hasGridData = 
+    (homeLineup.startXI || []).length > 0 && (awayLineup.startXI || []).length > 0 &&
+    (homeLineup.startXI || []).every(item => item.player.grid) && 
+    (awayLineup.startXI || []).every(item => item.player.grid);
+
   // Helper to group players by row
   const getRows = (players: any[], reverse: boolean = false) => {
     const rows: { [key: number]: any[] } = {};
@@ -55,8 +61,8 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
   // Away Team: GK (1) at Top. So rows 1, 2, 3, 4. (reverse: false)
   // Home Team: GK (1) at Bottom. So rows 4, 3, 2, 1. (reverse: true)
   
-  const awayRowsSorted = getRows(awayLineup.startXI, false);
-  const homeRowsSorted = getRows(homeLineup.startXI, true);
+  const awayRowsSorted = getRows(awayLineup.startXI || [], false);
+  const homeRowsSorted = getRows(homeLineup.startXI || [], true);
 
   const getPlayerRating = (playerId: number) => {
     if (!playerStats || playerStats.length === 0) return null;
@@ -127,46 +133,75 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
           </span>
         </div>
 
-        {/* The Pitch */}
-        <div className="relative w-full aspect-[2/3] md:aspect-[3/4] bg-green-800 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] border-y-4 border-green-900/80 shadow-inner">
-          {/* Pitch Markings */}
-          <div className="absolute inset-0 border-[3px] border-white/30 m-4 md:m-6 rounded-sm" />
-          <div className="absolute top-1/2 left-4 right-4 md:left-6 md:right-6 h-0 border-t-[3px] border-white/30" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-[3px] border-white/30 rounded-full" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white/30 rounded-full" />
-          
-          {/* Penalty Areas */}
-          <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 w-48 md:w-64 h-24 border-[3px] border-white/30 border-t-0" />
-          <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-48 md:w-64 h-24 border-[3px] border-white/30 border-b-0" />
-          
-          {/* Goal Areas */}
-          <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 w-20 md:w-28 h-8 md:h-10 border-[3px] border-white/30 border-t-0" />
-          <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-20 md:w-28 h-8 md:h-10 border-[3px] border-white/30 border-b-0" />
+        {/* The Pitch (Only show if we have coordinate data) */}
+        {hasGridData ? (
+          <div className="relative w-full aspect-[2/3] md:aspect-[3/4] bg-green-800 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] border-y-4 border-green-900/80 shadow-inner">
+            {/* Pitch Markings */}
+            <div className="absolute inset-0 border-[3px] border-white/30 m-4 md:m-6 rounded-sm" />
+            <div className="absolute top-1/2 left-4 right-4 md:left-6 md:right-6 h-0 border-t-[3px] border-white/30" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-[3px] border-white/30 rounded-full" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white/30 rounded-full" />
+            
+            {/* Penalty Areas */}
+            <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 w-48 md:w-64 h-24 border-[3px] border-white/30 border-t-0" />
+            <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-48 md:w-64 h-24 border-[3px] border-white/30 border-b-0" />
+            
+            {/* Goal Areas */}
+            <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 w-20 md:w-28 h-8 md:h-10 border-[3px] border-white/30 border-t-0" />
+            <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-20 md:w-28 h-8 md:h-10 border-[3px] border-white/30 border-b-0" />
 
-          {/* Players Container */}
-          <div className="absolute inset-0 flex flex-col m-4 md:m-6 py-4 md:py-8">
-            {/* Away Team (Top Half) */}
-            <div className="flex-1 flex flex-col justify-between">
-              {awayRowsSorted.map((row, idx) => (
-                <div key={`away-row-${idx}`} className="flex justify-around items-center w-full">
-                  {row.map(item => renderPlayer(item, false))}
+            {/* Players Container */}
+            <div className="absolute inset-0 flex flex-col m-4 md:m-6 py-4 md:py-8">
+              {/* Away Team (Top Half) */}
+              <div className="flex-1 flex flex-col justify-between">
+                {awayRowsSorted.map((row, idx) => (
+                  <div key={`away-row-${idx}`} className="flex justify-around items-center w-full">
+                    {row.map(item => renderPlayer(item, false))}
+                  </div>
+                ))}
+              </div>
+
+              {/* Spacer between halves */}
+              <div className="h-16" />
+
+              {/* Home Team (Bottom Half) */}
+              <div className="flex-1 flex flex-col justify-between">
+                {homeRowsSorted.map((row, idx) => (
+                  <div key={`home-row-${idx}`} className="flex justify-around items-center w-full">
+                    {row.map(item => renderPlayer(item, true))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 bg-secondary/5">
+            <div className="space-y-2">
+              <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4 border-b border-border/40 pb-2">Starting XI</h4>
+              {(homeLineup.startXI || []).map(item => (
+                <div key={item.player.id} className="flex items-center gap-3 bg-background p-2 rounded-lg border border-border/40 shadow-sm">
+                  <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center font-bold text-xs border border-border overflow-hidden relative">
+                    <span className="absolute z-0">{item.player.number}</span>
+                    {item.player.id && <img src={`https://media.api-sports.io/football/players/${item.player.id}.png`} className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => e.currentTarget.style.display = 'none'} />}
+                  </div>
+                  <span className="font-medium text-sm">{item.player.name}</span>
                 </div>
               ))}
             </div>
-
-            {/* Spacer between halves */}
-            <div className="h-16" />
-
-            {/* Home Team (Bottom Half) */}
-            <div className="flex-1 flex flex-col justify-between">
-              {homeRowsSorted.map((row, idx) => (
-                <div key={`home-row-${idx}`} className="flex justify-around items-center w-full">
-                  {row.map(item => renderPlayer(item, true))}
+            <div className="space-y-2">
+              <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4 border-b border-border/40 pb-2 md:text-right">Starting XI</h4>
+              {(awayLineup.startXI || []).map(item => (
+                <div key={item.player.id} className="flex items-center gap-3 bg-background p-2 rounded-lg border border-border/40 shadow-sm md:flex-row-reverse md:text-right">
+                  <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center font-bold text-xs border border-border overflow-hidden relative">
+                    <span className="absolute z-0">{item.player.number}</span>
+                    {item.player.id && <img src={`https://media.api-sports.io/football/players/${item.player.id}.png`} className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => e.currentTarget.style.display = 'none'} />}
+                  </div>
+                  <span className="font-medium text-sm">{item.player.name}</span>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        )}
 
         {/* Home Team Header (Bottom) */}
         <div className="flex justify-between items-center bg-secondary/20 p-4 px-6 border-t border-border/40 backdrop-blur-md">
@@ -188,7 +223,7 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
           <div className="flex-1 space-y-4">
             <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-2">Substitutes</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {homeLineup.substitutes.map((item, idx) => {
+              {(homeLineup.substitutes || []).map((item, idx) => {
                 const isSubbedIn = events.some(e => e.type.toLowerCase() === "subst" && e.team.id === homeTeam.id && (e.player.id === item.player.id || e.assist.id === item.player.id));
                 return (
                   <div key={idx} className="flex items-center gap-3 bg-secondary/10 p-2 rounded-lg border border-border/20">
@@ -210,6 +245,9 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
                   </div>
                 );
               })}
+              {!(homeLineup.substitutes && homeLineup.substitutes.length > 0) && (
+                <p className="text-xs text-muted-foreground italic py-2">No substitute data available.</p>
+              )}
             </div>
           </div>
           <div className="bg-secondary/20 p-4 rounded-xl border border-border/40 flex items-center gap-4 mt-auto">
@@ -232,7 +270,7 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
           <div className="flex-1 space-y-4">
             <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-2 md:text-right">Substitutes</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {awayLineup.substitutes.map((item, idx) => {
+              {(awayLineup.substitutes || []).map((item, idx) => {
                 const isSubbedIn = events.some(e => e.type.toLowerCase() === "subst" && e.team.id === awayTeam.id && (e.player.id === item.player.id || e.assist.id === item.player.id));
                 return (
                   <div key={idx} className="flex items-center gap-3 bg-secondary/10 p-2 rounded-lg border border-border/20 md:flex-row-reverse md:text-right">
@@ -254,6 +292,9 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
                   </div>
                 );
               })}
+              {!(awayLineup.substitutes && awayLineup.substitutes.length > 0) && (
+                <p className="text-xs text-muted-foreground italic py-2 md:text-right">No substitute data available.</p>
+              )}
             </div>
           </div>
           <div className="bg-secondary/20 p-4 rounded-xl border border-border/40 flex items-center gap-4 md:flex-row-reverse md:text-right mt-auto">
