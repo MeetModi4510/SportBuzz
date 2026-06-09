@@ -6,13 +6,14 @@ import { FootballMatchCard } from "../../components/football/FootballMatchCard";
 import { TransferCard } from "../../components/football/TransferCard";
 import { FootballNewsSidebar } from "../../components/football/FootballNewsSidebar";
 import { FootballStandings } from "../../components/football/FootballStandings";
-import { useLiveFootballMatches, useRecentFootballMatches, useUpcomingFootballMatches, useRecentTransfers } from "../../hooks/football/useFootballQueries";
+import { useLiveFootballMatches, useRecentFootballMatches, useUpcomingFootballMatches } from "../../hooks/football/useFootballQueries";
+import { useTransfers } from "../../hooks/football/useTransfers";
 import { Loader2, RefreshCw, ArrowRightLeft } from "lucide-react";
-import { footballApi } from "../../services/football/footballApi";
+import { footballApi, PRIORITY_CLUBS } from "../../services/football/footballApi";
 import { useQueryClient } from "@tanstack/react-query";
 
 type Tab = "live" | "recent" | "upcoming";
-type TransferFilter = "all" | "paid" | "free" | "loan";
+type TransferFilter = "all" | "transfers" | "loans" | "free_transfers" | "free_agents" | "contracts" | "contract_extensions";
 type TransferSort = "newest" | "highest_fee";
 
 export default function FootballHome() {
@@ -27,7 +28,7 @@ export default function FootballHome() {
   const { data: liveMatches, isLoading: liveLoading, refetch: refetchLive } = useLiveFootballMatches();
   const { data: recentMatches, isLoading: recentLoading, refetch: refetchRecent } = useRecentFootballMatches();
   const { data: upcomingMatches, isLoading: upcomingLoading, refetch: refetchUpcoming } = useUpcomingFootballMatches();
-  const { data: recentTransfers, isLoading: transfersLoading } = useRecentTransfers();
+  const { data: recentTransfers, isLoading: transfersLoading } = useTransfers();
 
   const handleMatchClick = (matchId: number) => {
     navigate(`/football/match/${matchId}`);
@@ -40,7 +41,7 @@ export default function FootballHome() {
         footballApi.getLiveMatches(true).then(() => queryClient.invalidateQueries({ queryKey: ['football', 'live'] })),
         footballApi.getRecentMatches(true).then(() => queryClient.invalidateQueries({ queryKey: ['football', 'recent'] })),
         footballApi.getUpcomingMatches(true).then(() => queryClient.invalidateQueries({ queryKey: ['football', 'upcoming'] })),
-        footballApi.getRecentTransfers(true).then(() => queryClient.invalidateQueries({ queryKey: ['football', 'transfers'] }))
+        queryClient.invalidateQueries({ queryKey: ['football', 'latest-transfers'] })
       ]);
     } finally {
       setIsRefreshing(false);
@@ -72,40 +73,37 @@ export default function FootballHome() {
 
   // Process Transfers
   const processedTransfers = useMemo(() => {
-    if (!recentTransfers?.data) return [];
-    let result = [...recentTransfers.data];
+    if (!recentTransfers?.transfers) return [];
+    
+    // Filter by priority clubs
+    const priorityFiltered = recentTransfers.transfers.filter(t => {
+      const outName = (t.fromClub || t.fromClubFullName || '').toLowerCase();
+      const inName = (t.toClub || t.toClubFullName || '').toLowerCase();
+      return PRIORITY_CLUBS.some(club => outName.includes(club) || inName.includes(club));
+    });
+
+    let result = [...priorityFiltered];
 
     // Filter
     if (transferFilter !== "all") {
       result = result.filter(t => {
-        if (!t.transfers || t.transfers.length === 0) return false;
-        const priceDisplay = t.transfers[0].price || t.transfers[0].type || '';
-        const isFree = priceDisplay.toUpperCase().includes('FREE');
-        const isLoan = priceDisplay.toUpperCase().includes('LOAN');
-        
-        if (transferFilter === "free") return isFree;
-        if (transferFilter === "loan") return isLoan;
-        if (transferFilter === "paid") return !isFree && !isLoan;
+        if (transferFilter === "loans") return t.onLoan;
+        if (transferFilter === "free_transfers") return t.fee?.feeText?.toLowerCase() === "free transfer";
+        if (transferFilter === "free_agents") return t.fromClubId === 2 || t.toClubId === 2 || t.fromClub.toLowerCase().includes('free agent') || t.toClub.toLowerCase().includes('free agent');
+        if (transferFilter === "contracts") return t.transferType?.localizationKey === "contract";
+        if (transferFilter === "contract_extensions") return t.contractExtension;
+        if (transferFilter === "transfers") return !t.onLoan && t.fee?.feeText?.toLowerCase() !== "free transfer" && !t.contractExtension && t.transferType?.localizationKey !== "contract";
         return true;
       });
     }
 
     // Sort
     result.sort((a, b) => {
-      const tA = a.transfers[0];
-      const tB = b.transfers[0];
-      
       if (transferSort === "newest") {
-        return new Date(tB.date).getTime() - new Date(tA.date).getTime();
+        return new Date(b.transferDate).getTime() - new Date(a.transferDate).getTime();
       } else if (transferSort === "highest_fee") {
-        const getFee = (str: string) => {
-          if (!str) return 0;
-          if (str.toUpperCase().includes('FREE') || str.toUpperCase().includes('LOAN')) return 0;
-          const match = str.match(/[\d.]+/);
-          return match ? parseFloat(match[0]) : 0;
-        };
-        const feeA = getFee(tA.price || tA.type || '');
-        const feeB = getFee(tB.price || tB.type || '');
+        const feeA = a.fee?.value || 0;
+        const feeB = b.fee?.value || 0;
         return feeB - feeA;
       }
       return 0;
@@ -208,11 +206,14 @@ export default function FootballHome() {
               </div>
               
               <div className="flex flex-wrap items-center gap-3">
-                <div className="flex p-1 bg-white/5 backdrop-blur-3xl rounded-lg border border-white/10">
-                  <button onClick={() => setTransferFilter("all")} className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${transferFilter === 'all' ? 'bg-white text-black shadow-lg' : 'text-white/60 hover:text-white'}`}>All</button>
-                  <button onClick={() => setTransferFilter("paid")} className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${transferFilter === 'paid' ? 'bg-[#d4af37] text-black shadow-lg' : 'text-[#d4af37]/60 hover:text-[#d4af37]'}`}>Paid</button>
-                  <button onClick={() => setTransferFilter("free")} className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${transferFilter === 'free' ? 'bg-emerald-500 text-black shadow-lg' : 'text-emerald-500/60 hover:text-emerald-500'}`}>Free</button>
-                  <button onClick={() => setTransferFilter("loan")} className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${transferFilter === 'loan' ? 'bg-blue-500 text-black shadow-lg' : 'text-blue-500/60 hover:text-blue-500'}`}>Loan</button>
+                <div className="flex p-1 bg-white/5 backdrop-blur-3xl rounded-lg border border-white/10 overflow-x-auto max-w-[80vw] hide-scrollbar flex-nowrap">
+                  <button onClick={() => setTransferFilter("all")} className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${transferFilter === 'all' ? 'bg-white text-black shadow-lg' : 'text-white/60 hover:text-white'}`}>All</button>
+                  <button onClick={() => setTransferFilter("transfers")} className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${transferFilter === 'transfers' ? 'bg-[#d4af37] text-black shadow-lg' : 'text-[#d4af37]/60 hover:text-[#d4af37]'}`}>Transfers</button>
+                  <button onClick={() => setTransferFilter("loans")} className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${transferFilter === 'loans' ? 'bg-blue-500 text-black shadow-lg' : 'text-blue-500/60 hover:text-blue-500'}`}>Loans</button>
+                  <button onClick={() => setTransferFilter("free_transfers")} className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${transferFilter === 'free_transfers' ? 'bg-emerald-500 text-black shadow-lg' : 'text-emerald-500/60 hover:text-emerald-500'}`}>Free Transfers</button>
+                  <button onClick={() => setTransferFilter("free_agents")} className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${transferFilter === 'free_agents' ? 'bg-purple-500 text-black shadow-lg' : 'text-purple-500/60 hover:text-purple-500'}`}>Free Agents</button>
+                  <button onClick={() => setTransferFilter("contracts")} className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${transferFilter === 'contracts' ? 'bg-orange-500 text-black shadow-lg' : 'text-orange-500/60 hover:text-orange-500'}`}>Contracts</button>
+                  <button onClick={() => setTransferFilter("contract_extensions")} className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${transferFilter === 'contract_extensions' ? 'bg-pink-500 text-black shadow-lg' : 'text-pink-500/60 hover:text-pink-500'}`}>Contract Extensions</button>
                 </div>
                 
                 <div className="flex p-1 bg-white/5 backdrop-blur-3xl rounded-lg border border-white/10">
@@ -232,7 +233,7 @@ export default function FootballHome() {
               </div>
             ) : (
               <div className={isCustomTransferView ? "flex overflow-x-auto gap-6 pb-6 pt-4 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0" : "relative overflow-hidden w-full group py-4 -mx-4 px-4 md:mx-0 md:px-0"}>
-                <div className={isCustomTransferView ? "flex gap-6" : "flex w-max animate-[marquee_150s_linear_infinite] hover:[animation-play-state:paused] gap-6"}>
+                <div className={isCustomTransferView ? "flex gap-6" : "flex w-max animate-[marquee_300s_linear_infinite] hover:[animation-play-state:paused] gap-6"}>
                   {isCustomTransferView ? (
                     processedTransfers.map((transfer, idx) => (
                       <div key={idx} className="snap-start shrink-0">
