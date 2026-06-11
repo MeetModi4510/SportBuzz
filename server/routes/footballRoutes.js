@@ -136,7 +136,7 @@ async function fetchAndStoreTransfers() {
         fromClubId:        t.fromClubId,
         toClub:            t.toClub || t.toClubFullName || '',
         toClubId:          t.toClubId,
-        transferDate:      new Date(t.transferDate || t.fromDate || now),
+        transferDate:      new Date(t.fromDate || t.transferDate || now),
         fee:               t.fee?.feeText || t.fee?.localizedFeeText || t.transferType?.text || '',
         feeValue:          t.fee?.value || t.amountEuroEstimated || 0,
         transferType:      t.transferType?.localizationKey || t.transferType?.text || '',

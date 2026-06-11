@@ -95,23 +95,26 @@ export default function FootballHome() {
     // Filter
     if (transferFilter !== "all") {
       result = result.filter(t => {
+        const feeText = typeof t.fee === 'string' ? t.fee : t.fee?.feeText;
+        const typeText = typeof t.transferType === 'string' ? t.transferType : t.transferType?.localizationKey;
+
         if (transferFilter === "loans") return t.onLoan;
-        if (transferFilter === "free_transfers") return t.fee?.feeText?.toLowerCase() === "free transfer";
+        if (transferFilter === "free_transfers") return feeText?.toLowerCase() === "free transfer";
         if (transferFilter === "free_agents") return t.fromClubId === 2 || t.toClubId === 2 || t.fromClub.toLowerCase().includes('free agent') || t.toClub.toLowerCase().includes('free agent');
-        if (transferFilter === "contracts") return t.transferType?.localizationKey === "contract";
+        if (transferFilter === "contracts") return typeText === "contract";
         if (transferFilter === "contract_extensions") return t.contractExtension;
-        if (transferFilter === "transfers") return !t.onLoan && t.fee?.feeText?.toLowerCase() !== "free transfer" && !t.contractExtension && t.transferType?.localizationKey !== "contract";
+        if (transferFilter === "transfers") return !t.onLoan && feeText?.toLowerCase() !== "free transfer" && !t.contractExtension && typeText !== "contract";
         return true;
       });
     }
 
     // Sort
-    result.sort((a, b) => {
+    result.sort((t_a, t_b) => {
       if (transferSort === "newest") {
-        return new Date(b.transferDate).getTime() - new Date(a.transferDate).getTime();
+        return new Date(t_b.transferDate).getTime() - new Date(t_a.transferDate).getTime();
       } else if (transferSort === "highest_fee") {
-        const feeA = a.fee?.value || 0;
-        const feeB = b.fee?.value || 0;
+        const feeA = t_a.feeValue || (typeof t_a.fee === 'object' ? t_a.fee?.value : 0) || 0;
+        const feeB = t_b.feeValue || (typeof t_b.fee === 'object' ? t_b.fee?.value : 0) || 0;
         return feeB - feeA;
       }
       return 0;
@@ -214,7 +217,7 @@ export default function FootballHome() {
               </div>
               
               <div className="flex flex-wrap items-center gap-3">
-                <div className="flex p-1 bg-secondary/60 backdrop-blur-xl rounded-full border border-border/50 overflow-x-auto max-w-[80vw] md:max-w-[50vw] hide-scrollbar flex-nowrap shadow-inner">
+                <div className="flex p-1 bg-secondary/60 backdrop-blur-xl rounded-full border border-border/50 overflow-x-auto max-w-full hide-scrollbar flex-nowrap shadow-inner">
                   <button onClick={() => setTransferFilter("all")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'all' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>All</button>
                   <button onClick={() => setTransferFilter("transfers")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'transfers' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Transfers</button>
                   <button onClick={() => setTransferFilter("loans")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'loans' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Loans</button>

@@ -26,8 +26,9 @@ export interface NewTransferData {
   toClub: string;
   toClubFullName: string;
   toClubId: number;
-  fee: TransferFee | null;
-  transferType: TransferType;
+  fee: TransferFee | string | null;
+  feeValue?: number;
+  transferType: TransferType | string;
   contractExtension: boolean;
   onLoan: boolean;
   fromDate: string | null;

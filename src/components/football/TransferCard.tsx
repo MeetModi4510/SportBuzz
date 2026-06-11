@@ -11,7 +11,7 @@ export function TransferCard({ transferData }: TransferCardProps) {
 
   if (!transferData) return null;
 
-  const priceDisplay = transferData.fee?.feeText || transferData.transferType?.text || 'Transfer';
+  const priceDisplay = (typeof transferData.fee === 'string' ? transferData.fee : transferData.fee?.feeText) || (typeof transferData.transferType === 'string' ? transferData.transferType : transferData.transferType?.text) || 'Transfer';
   const isFree = priceDisplay.toUpperCase().includes('FREE');
   const isLoan = priceDisplay.toUpperCase().includes('LOAN') || transferData.onLoan;
 
@@ -56,7 +56,7 @@ export function TransferCard({ transferData }: TransferCardProps) {
     );
   };
 
-  const displayFee = transferData.fee?.value ? formatCurrency(transferData.fee.value) : priceDisplay;
+  const displayFee = transferData.feeValue ? formatCurrency(transferData.feeValue) : ((typeof transferData.fee === 'object' && transferData.fee?.value) ? formatCurrency(transferData.fee.value) : priceDisplay);
 
   return (
     <div className="group relative w-[420px] shrink-0 cursor-pointer rounded-2xl bg-gradient-to-br from-card to-muted/30 dark:from-[#1a1a1a] dark:to-[#0a0a0a] border border-border/50 hover:border-border hover:shadow-lg dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all duration-500 hover:-translate-y-2 overflow-hidden flex flex-col min-h-[190px]">
@@ -71,9 +71,9 @@ export function TransferCard({ transferData }: TransferCardProps) {
       <div className="p-5 flex flex-col h-full relative z-10">
         
         {/* Header section */}
-        <div className="flex justify-between items-start mb-6">
-          <div className="flex items-center gap-4">
-            <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gradient-to-b from-border/50 to-border/20 dark:from-[#222] dark:to-[#111] p-[2px] shadow-lg group-hover:scale-105 transition-transform duration-500">
+        <div className="flex justify-between items-start mb-6 gap-3">
+          <div className="flex items-center gap-4 min-w-0 flex-1">
+            <div className="relative w-14 h-14 shrink-0 rounded-full overflow-hidden bg-gradient-to-b from-border/50 to-border/20 dark:from-[#222] dark:to-[#111] p-[2px] shadow-lg group-hover:scale-105 transition-transform duration-500">
               <div className="w-full h-full rounded-full overflow-hidden bg-background dark:bg-[#111] flex items-center justify-center">
                 {!imgError && transferData.playerId ? (
                   <img 
@@ -87,27 +87,31 @@ export function TransferCard({ transferData }: TransferCardProps) {
                 )}
               </div>
             </div>
-            <div>
-              <h3 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/70 tracking-tight uppercase leading-none mb-1.5 line-clamp-1 flex items-center gap-2">
-                {transferData.name}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-1.5">
+                <h3 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/70 tracking-tight uppercase leading-none truncate">
+                  {transferData.name}
+                </h3>
                 {transferData.position?.label && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-foreground/10 text-foreground font-bold tracking-wider shadow-sm">{transferData.position.label}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-foreground/10 text-foreground font-bold tracking-wider shadow-sm shrink-0">
+                    {transferData.position.label}
+                  </span>
                 )}
-              </h3>
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/80 tracking-widest uppercase">
-                <CalendarDays size={12} className="opacity-70" />
-                <span>{formattedDate}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/80 tracking-widest uppercase truncate">
+                <CalendarDays size={12} className="opacity-70 shrink-0" />
+                <span className="shrink-0">{formattedDate}</span>
                 {marketValueDisplay && (
                   <>
-                    <span className="mx-1 opacity-50">•</span>
-                    <span>MV: <span className="text-foreground/70">{marketValueDisplay}</span></span>
+                    <span className="mx-1 opacity-50 shrink-0">•</span>
+                    <span className="truncate">MV: <span className="text-foreground/70">{marketValueDisplay}</span></span>
                   </>
                 )}
               </div>
             </div>
           </div>
           
-          <div className={`px-3 py-1.5 rounded-lg bg-foreground/5 backdrop-blur-md border border-border shadow-xl text-xs font-black tracking-widest uppercase ${textColor}`}>
+          <div className={`shrink-0 px-3 py-1.5 rounded-lg bg-foreground/5 backdrop-blur-md border border-border shadow-xl text-xs font-black tracking-widest uppercase ${textColor}`}>
             {displayFee}
           </div>
         </div>
