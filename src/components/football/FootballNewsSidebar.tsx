@@ -92,10 +92,14 @@ export function FootballNewsSidebar() {
     <div className="space-y-6">
       {/* Premium Header */}
       <div className="flex items-center justify-between px-2">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-foreground/80" />
-          Latest News
-        </h2>
+        <div className="flex items-center gap-3">
+          <Globe size={24} className="text-[#8b5cf6] drop-shadow-md" />
+          <div>
+            <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/50">
+              Latest News.
+            </h2>
+          </div>
+        </div>
         {news.length > 0 && (
           <button
             onClick={() => setIsViewAllOpen(true)}
