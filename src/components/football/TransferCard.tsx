@@ -1,5 +1,5 @@
 import { NewTransferData } from "../../types/football/transfers";
-import { ArrowRight, CalendarDays, User } from "lucide-react";
+import { ArrowRight, CalendarDays, User, CircleDashed } from "lucide-react";
 import { useState } from "react";
 
 interface TransferCardProps {
@@ -34,8 +34,11 @@ export function TransferCard({ transferData }: TransferCardProps) {
   const renderTeamLogo = (teamName: string, teamId: number) => {
     if (teamName.toLowerCase().includes('free agent') || teamId === 2) {
       return (
-        <div className="w-8 h-8 rounded bg-foreground/5 border border-border flex items-center justify-center shrink-0">
-          <span className="font-black text-[10px] text-muted-foreground">FA</span>
+        <div 
+          className="w-8 h-8 bg-secondary/10 flex items-center justify-center shrink-0 shadow-sm overflow-hidden p-[2px]"
+          style={{ clipPath: 'polygon(50% 0%, 100% 15%, 100% 70%, 50% 100%, 0% 70%, 0% 15%)' }}
+        >
+          <img src="/free_agent_player_ball.png" alt="Free Agent" className="w-full h-full object-cover" />
         </div>
       );
     }
