@@ -1,10 +1,13 @@
 import { cn } from "@/lib/utils";
 import { Player } from "@/data/types";
 import { PlayerCard } from "./PlayerCard";
-import { TrendingUp, Star } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { TrendingCard, PlayerProfileModal } from "@/components/cricket/CricketTrendingPlayers";
 import { TrendingPlayerEntry } from "@/hooks/useCricketTrending";
+import { TrendingPlayerData } from "@/hooks/football/useTrendingPlayers";
+import { TrendingPlayerCard } from "@/components/football/TrendingPlayerCard";
+import { TrendingPlayerModal as FootballTrendingPlayerModal } from "@/components/football/TrendingPlayerModal";
 
 interface TrendingPlayersProps {
   players: Player[];
@@ -16,6 +19,7 @@ interface TrendingPlayersProps {
   cricketPlayerLoading?: boolean;
   clearCricketPlayerInfo?: () => void;
   fetchCricketTrending?: () => void;
+  footballTrending?: TrendingPlayerData[];
 }
 
 export const TrendingPlayers = ({ 
@@ -27,10 +31,12 @@ export const TrendingPlayers = ({
   cricketPlayerInfo,
   cricketPlayerLoading,
   clearCricketPlayerInfo,
-  fetchCricketTrending
+  fetchCricketTrending,
+  footballTrending
 }: TrendingPlayersProps) => {
   const observerRef = useRef<HTMLDivElement>(null);
   const [selectedCricketPlayer, setSelectedCricketPlayer] = useState<TrendingPlayerEntry | null>(null);
+  const [selectedFootballPlayer, setSelectedFootballPlayer] = useState<TrendingPlayerData | null>(null);
 
   useEffect(() => {
     if (!fetchCricketTrending) return;
@@ -53,27 +59,30 @@ export const TrendingPlayers = ({
   // Deduplicate mock players by name and sort by rating
   const uniqueMockPlayers = Array.from(
     players.reduce((map, player) => {
-      if (player.sport !== 'cricket' && (!map.has(player.name) || (map.get(player.name)!.rating < player.rating))) {
+      if (player.sport !== 'cricket' && player.sport !== 'football' && (!map.has(player.name) || (map.get(player.name)!.rating < player.rating))) {
         map.set(player.name, player);
       }
       return map;
     }, new Map<string, Player>()).values()
   ).sort((a, b) => b.rating - a.rating);
 
-  // Combine lists: top 3 cricket API + top 3 mock (or adjust if one is missing)
-  const apiPlayers = (cricketTrending || []).slice(0, 3);
-  const mockLimit = 6 - apiPlayers.length;
-  const mockPlayers = uniqueMockPlayers.slice(0, mockLimit);
-
-  // We interleave them or just append
-  const combined = [...apiPlayers, ...mockPlayers];
+  // Combine lists: top cricket API + top football API + mock (if needed to fill)
+  const apiCricketPlayers = (cricketTrending || []).slice(0, 3);
+  const apiFootballPlayers = (footballTrending || []).slice(0, 3);
+  
+  // Mix them up: Cricket, then Football, then Mock
+  const combined: (TrendingPlayerEntry | TrendingPlayerData | Player)[] = [
+    ...apiCricketPlayers, 
+    ...apiFootballPlayers,
+    ...uniqueMockPlayers.slice(0, 4) // Always show top 4 mock players (Tennis, Basketball, etc)
+  ];
 
   const handleCricketClick = (p: TrendingPlayerEntry) => {
     setSelectedCricketPlayer(p);
     onCricketPlayerClick?.(p);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseCricketModal = () => {
     setSelectedCricketPlayer(null);
     clearCricketPlayerInfo?.();
   };
@@ -92,27 +101,40 @@ export const TrendingPlayers = ({
       </div>
 
       {/* Players Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div className="flex overflow-x-auto gap-4 pb-6 pt-2 snap-x snap-mandatory hide-scrollbar">
         {combined.map((item, index) => {
-          const isApi = 'faceImageId' in item;
+          const isCricketApi = 'faceImageId' in item;
+          const isFootballApi = 'playerId' in item && 'teamName' in item;
+          
           return (
             <div
-              key={isApi ? item.id : (item as Player).id}
-              className="animate-slide-up relative h-full"
+              key={isCricketApi ? (item as TrendingPlayerEntry).id : isFootballApi ? (item as TrendingPlayerData).playerId : (item as Player).id}
+              className="snap-start shrink-0 animate-slide-up"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              {isApi ? (
-                <TrendingCard 
-                  player={item as TrendingPlayerEntry} 
-                  index={index} 
-                  onClick={() => handleCricketClick(item as TrendingPlayerEntry)} 
-                />
+              {isCricketApi ? (
+                <div className="w-48 h-full">
+                  <TrendingCard 
+                    player={item as TrendingPlayerEntry} 
+                    index={index} 
+                    onClick={() => handleCricketClick(item as TrendingPlayerEntry)} 
+                  />
+                </div>
+              ) : isFootballApi ? (
+                <div className="w-48 h-full">
+                  <TrendingPlayerCard
+                    player={item as TrendingPlayerData}
+                    onClick={setSelectedFootballPlayer}
+                  />
+                </div>
               ) : (
-                <PlayerCard
-                  player={item as Player}
-                  onClick={() => onPlayerClick?.(item as Player)}
-                  hideStats={true}
-                />
+                <div className="w-48 h-full">
+                  <PlayerCard
+                    player={item as Player}
+                    onClick={() => onPlayerClick?.(item as Player)}
+                    hideStats={true}
+                  />
+                </div>
               )}
             </div>
           );
@@ -124,7 +146,14 @@ export const TrendingPlayers = ({
           player={selectedCricketPlayer}
           info={cricketPlayerInfo}
           loadingInfo={cricketPlayerLoading || false}
-          onClose={handleCloseModal}
+          onClose={handleCloseCricketModal}
+        />
+      )}
+
+      {selectedFootballPlayer && (
+        <FootballTrendingPlayerModal
+          player={selectedFootballPlayer}
+          onClose={() => setSelectedFootballPlayer(null)}
         />
       )}
     </section>

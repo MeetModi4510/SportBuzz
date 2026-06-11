@@ -22,6 +22,7 @@ import { useLiveCricketMatches } from "@/hooks/useCricketMatches";
 import { useFeaturedLiveCricketMatches, useFeaturedUpcomingCricketMatches, useFeaturedRecentCricketMatches } from "@/hooks/useFeaturedMatches";
 import { useFollowedTournamentMatches } from "@/hooks/useFollowedTournamentMatches";
 import { useLiveFootballMatches, useUpcomingFootballMatches, useRecentFootballMatches } from "@/hooks/football/useFootballQueries";
+import { useTrendingPlayers as useFootballTrendingPlayers } from "@/hooks/football/useTrendingPlayers";
 import { useCricketTrendingPlayers, useCricbuzzPlayerInfo } from "@/hooks/useCricketTrending";
 import { tournamentApi } from "@/services/api";
 import { Sport, MatchStatus, Match } from "@/data/types";
@@ -69,6 +70,8 @@ const Index = () => {
   const { data: liveFootballData, isLoading: footballLoading } = useLiveFootballMatches();
   const { data: upcomingFootballData, isLoading: upcomingFootballLoading } = useUpcomingFootballMatches();
   const { data: recentFootballData, isLoading: recentFootballLoading } = useRecentFootballMatches();
+  
+  const { data: footballTrendingPlayers } = useFootballTrendingPlayers();
   
   const categorizedFootballLoading = upcomingFootballLoading || recentFootballLoading;
 
@@ -403,6 +406,7 @@ const Index = () => {
                 clearCricketPlayerInfo={clearCricketPlayerInfo}
                 onPlayerClick={handlePlayerClick} 
                 fetchCricketTrending={activeSport === "all" ? fetchCricketTrending : undefined}
+                footballTrending={activeSport === "all" || activeSport === "football" ? footballTrendingPlayers?.data : undefined}
               />
             )}
           </div>

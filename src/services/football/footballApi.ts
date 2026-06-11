@@ -1,10 +1,11 @@
 import { footballApiClient, transfersApiClient, internalApiClient } from './apiClient';
 import api from '../api';
 import { cacheManager } from '../../utils/football/cacheManager';
-import { FootballMatch, FootballTransferData } from '../../types/football';
+import { FootballMatch } from '../../types/football';
+import { NewTransferData } from '../../types/football/transfers';
 
 export interface TransfersResponse {
-  data: FootballTransferData[];
+  data: NewTransferData[];
   lastFetched: string | null;
 }
 
@@ -204,7 +205,7 @@ export const footballApi = {
       const lastFetched = response.data?.lastFetched || null;
 
       // Map our new MongoDB FootballTransfer schema to the frontend interface
-      const allTransfers: FootballTransferData[] = rawTransfers.map((t: any) => {
+      const allTransfers: NewTransferData[] = rawTransfers.map((t: any) => {
         // Price formatting
         let priceStr = t.feeText || t.transferType || 'Transfer';
         if (t.feeValue && t.feeValue > 0) {

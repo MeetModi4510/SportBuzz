@@ -6,9 +6,13 @@ import { FootballMatchCard } from "../../components/football/FootballMatchCard";
 import { TransferCard } from "../../components/football/TransferCard";
 import { FootballNewsSidebar } from "../../components/football/FootballNewsSidebar";
 import { FootballStandings } from "../../components/football/FootballStandings";
+import { FootballTopStats } from "../../components/football/FootballTopStats";
 import { useLiveFootballMatches, useRecentFootballMatches, useUpcomingFootballMatches } from "../../hooks/football/useFootballQueries";
-import { useTransfers } from "../../hooks/football/useTransfers";
-import { Loader2, RefreshCw, ArrowRightLeft } from "lucide-react";
+import { useRecentTransfers } from "../../hooks/football/useFootballQueries";
+import { useTrendingPlayers, TrendingPlayerData } from "../../hooks/football/useTrendingPlayers";
+import { TrendingPlayerCard } from "../../components/football/TrendingPlayerCard";
+import { TrendingPlayerModal } from "../../components/football/TrendingPlayerModal";
+import { Loader2, RefreshCw, ArrowRightLeft, TrendingUp } from "lucide-react";
 import { footballApi, PRIORITY_CLUBS } from "../../services/football/footballApi";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -28,7 +32,11 @@ export default function FootballHome() {
   const { data: liveMatches, isLoading: liveLoading, refetch: refetchLive } = useLiveFootballMatches();
   const { data: recentMatches, isLoading: recentLoading, refetch: refetchRecent } = useRecentFootballMatches();
   const { data: upcomingMatches, isLoading: upcomingLoading, refetch: refetchUpcoming } = useUpcomingFootballMatches();
-  const { data: recentTransfers, isLoading: transfersLoading } = useTransfers();
+  const { data: recentTransfers, isLoading: transfersLoading } = useRecentTransfers();
+  const { data: trendingPlayersData, isLoading: trendingLoading } = useTrendingPlayers();
+
+  const [selectedTrendingPlayer, setSelectedTrendingPlayer] = useState<TrendingPlayerData | null>(null);
+
 
   const handleMatchClick = (matchId: number) => {
     navigate(`/football/match/${matchId}`);
@@ -73,10 +81,10 @@ export default function FootballHome() {
 
   // Process Transfers
   const processedTransfers = useMemo(() => {
-    if (!recentTransfers?.transfers) return [];
+    if (!recentTransfers?.data) return [];
     
     // Filter by priority clubs
-    const priorityFiltered = recentTransfers.transfers.filter(t => {
+    const priorityFiltered = recentTransfers.data.filter(t => {
       const outName = (t.fromClub || t.fromClubFullName || '').toLowerCase();
       const inName = (t.toClub || t.toClubFullName || '').toLowerCase();
       return PRIORITY_CLUBS.some(club => outName.includes(club) || inName.includes(club));
@@ -260,13 +268,61 @@ export default function FootballHome() {
 
           <hr className="border-white/5" />
 
+          {/* ─── Top Stats ─────────────────────────────────────── */}
+          <FootballTopStats />
+
+          <hr className="border-white/5" />
+
           {/* Latest News */}
           <section className="space-y-6">
             <FootballNewsSidebar />
           </section>
 
+          <hr className="border-white/5" />
+
+          {/* ─── Trending Players ─────────────────────────────── */}
+          <section className="space-y-6">
+            <div className="flex flex-col gap-1 px-2">
+              <div className="flex items-center gap-3">
+                <TrendingUp size={18} className="text-[#d4af37]" />
+                <h2 className="text-xl font-bold tracking-tight text-white/90">Trending Players</h2>
+              </div>
+              <p className="text-xs text-[#d4af37]/60 font-medium ml-8">Top performers of the moment</p>
+              {trendingPlayersData?.lastFetched && (
+                <p className="text-xs text-white/30 font-medium ml-8">
+                  Last updated on {new Date(trendingPlayersData.lastFetched).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </p>
+              )}
+            </div>
+
+            {trendingLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 className="w-6 h-6 animate-spin text-white/40" />
+              </div>
+            ) : !trendingPlayersData?.data || trendingPlayersData.data.length === 0 ? (
+              <div className="py-16 text-center">
+                <TrendingUp size={32} className="mx-auto text-white/10 mb-3" />
+                <p className="text-white/40 font-medium text-sm">Trending players will appear once the API key is configured.</p>
+                <p className="text-white/20 text-xs mt-1">Set ALLSPORTS_API_FOOTBALL_TRENDING_PLAYERS in server/.env</p>
+              </div>
+            ) : (
+              <div className="flex overflow-x-auto gap-5 pb-6 pt-2 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+                {trendingPlayersData.data.map((player) => (
+                  <div key={player.playerId} className="snap-start shrink-0 w-48 h-full">
+                    <TrendingPlayerCard player={player} onClick={setSelectedTrendingPlayer} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
         </main>
       </div>
+
+      <TrendingPlayerModal
+        player={selectedTrendingPlayer}
+        onClose={() => setSelectedTrendingPlayer(null)}
+      />
     </>
   );
 }
