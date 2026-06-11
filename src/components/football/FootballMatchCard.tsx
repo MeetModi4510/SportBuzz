@@ -45,9 +45,7 @@ export const FootballMatchCard = ({ match, onClick, className }: FootballMatchCa
       {/* Header */}
       <div className="flex items-center justify-between pb-4 mb-4 border-b border-border/50 relative z-10">
         <div className="flex items-center gap-2.5">
-           <div className="bg-foreground/10 p-1.5 rounded-lg border border-border/50">
-             <img src={match.league.logo} alt={match.league.name} className="w-4 h-4 object-contain opacity-80" />
-           </div>
+           <img src={match.league.logo} alt={match.league.name} className="w-6 h-6 object-contain" />
            <span className="text-[10px] text-muted-foreground tracking-widest font-semibold uppercase truncate max-w-[150px]">
              {match.league.name}
            </span>
