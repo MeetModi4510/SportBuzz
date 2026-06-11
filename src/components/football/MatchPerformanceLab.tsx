@@ -149,7 +149,7 @@ export function MatchPerformanceLab({ playerStats, matchStatus }: MatchPerforman
           <div className="flex flex-col md:flex-row gap-6 items-center md:items-start relative z-10">
             <div className="relative">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-yellow-500/50 overflow-hidden shadow-[0_0_30px_rgba(234,179,8,0.3)] bg-background">
-                <img src={mvp.photo} alt={mvp.name} className="w-full h-full object-cover" />
+                <img src={mvp.photo} alt={mvp.name} className="w-full h-full object-cover object-top" />
               </div>
               <div className="absolute -bottom-3 -right-3 w-10 h-10 bg-background rounded-full p-1.5 border border-border">
                 <img src={mvp.teamLogo} alt={mvp.teamName} className="w-full h-full object-contain" />
@@ -207,7 +207,7 @@ export function MatchPerformanceLab({ playerStats, matchStatus }: MatchPerforman
               <div className="flex items-center gap-3">
                 {playerA && (
                   <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-blue-500/50 shrink-0 bg-background">
-                    <img src={playerA.photo} alt={playerA.name} className="w-full h-full object-cover" />
+                    <img src={playerA.photo} alt={playerA.name} className="w-full h-full object-cover object-top" />
                   </div>
                 )}
                 <Select value={playerAId.toString()} onValueChange={(v) => setPlayerAId(Number(v))}>
@@ -234,7 +234,7 @@ export function MatchPerformanceLab({ playerStats, matchStatus }: MatchPerforman
               <div className="flex items-center gap-3">
                 {playerB && (
                   <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-rose-500/50 shrink-0 bg-background">
-                    <img src={playerB.photo} alt={playerB.name} className="w-full h-full object-cover" />
+                    <img src={playerB.photo} alt={playerB.name} className="w-full h-full object-cover object-top" />
                   </div>
                 )}
                 <Select value={playerBId.toString()} onValueChange={(v) => setPlayerBId(Number(v))}>
@@ -363,7 +363,7 @@ function LeaderboardCard({ title, icon, data, valueKey, suffix }: { title: strin
             <div className="flex items-center gap-3">
               <div className="w-6 font-bold text-muted-foreground text-xs">{idx + 1}</div>
               <div className="w-8 h-8 rounded-full overflow-hidden border border-border/50">
-                <img src={p.photo} alt={p.name} className="w-full h-full object-cover" />
+                <img src={p.photo} alt={p.name} className="w-full h-full object-cover object-top" />
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-semibold truncate max-w-[120px]">{p.name}</span>

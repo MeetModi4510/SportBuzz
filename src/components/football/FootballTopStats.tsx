@@ -112,7 +112,7 @@ function PlayerStatList({ rows }: { rows: PlayerStat[] }) {
               {/* Grayscale Squared Avatar */}
               <div className="shrink-0 overflow-hidden rounded-lg w-12 h-12 md:w-14 md:h-14 shadow-lg shadow-black/40 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 bg-foreground/5">
                 {p.photoBase64 ? (
-                  <img src={p.photoBase64} alt={p.playerName} className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700" />
+                  <img src={p.photoBase64} alt={p.playerName} className="w-full h-full object-cover object-top transition-transform duration-700" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground/40"><Users size={18} /></div>
                 )}

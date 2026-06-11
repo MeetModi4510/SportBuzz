@@ -40,7 +40,7 @@ export function TrendingPlayerCard({ player, onClick }: TrendingPlayerCardProps)
               <img 
                 src={`${BACKEND_URL}/football/trending-players/${player.playerId}/image`} 
                 alt={player.playerName}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
                 onError={() => setImgError(true)}
                 loading="lazy"
               />

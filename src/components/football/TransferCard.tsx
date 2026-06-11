@@ -72,21 +72,21 @@ export function TransferCard({ transferData }: TransferCardProps) {
         {/* Header section */}
         <div className="flex justify-between items-start mb-6 gap-3">
           <div className="flex items-start gap-4 min-w-0 flex-1">
-            <div className="relative w-12 h-12 shrink-0 rounded-full overflow-hidden border border-border/40 shadow-sm bg-secondary/20 group-hover:scale-105 transition-transform duration-500">
+            <div className="relative w-[56px] h-[56px] shrink-0 rounded-full overflow-hidden border border-border/40 shadow-sm bg-secondary/20 group-hover:scale-105 transition-transform duration-500">
               <div className="w-full h-full flex items-center justify-center">
                 {!imgError && transferData.playerId ? (
                   <img 
                     src={`https://images.fotmob.com/image_resources/playerimages/${transferData.playerId}.png`} 
                     alt={transferData.name}
-                    className="w-full h-full object-cover scale-110"
+                    className="w-full h-full object-cover object-top"
                     onError={() => setImgError(true)}
                   />
                 ) : (
-                  <User size={16} className="text-muted-foreground/60" />
+                  <User size={20} className="text-muted-foreground/60" />
                 )}
               </div>
             </div>
-            <div className="min-w-0 flex-1 pt-0.5">
+            <div className="min-w-0 flex-1 pt-1.5">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="text-[17px] font-extrabold text-foreground tracking-tight leading-none truncate">
                   {transferData.name}
