@@ -159,8 +159,13 @@ export default function FootballHome() {
           {/* Match Center (Horizontal Scroll) */}
           <section className="space-y-6">
             <div className="flex items-center gap-3 px-2">
-              <div className="w-2 h-2 rounded-full bg-foreground animate-pulse" />
-              <h2 className="text-xl font-bold tracking-tight text-foreground/90">Matches</h2>
+              <div className="flex items-center justify-center relative w-6 h-6">
+                <div className="absolute w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping opacity-75" />
+                <div className="relative w-2.5 h-2.5 rounded-full bg-rose-500" />
+              </div>
+              <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/50">
+                Match Center.
+              </h2>
             </div>
             
             {isLoading ? (
@@ -201,16 +206,11 @@ export default function FootballHome() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
-                  <ArrowRightLeft size={24} className="text-[#00c6ff]" />
+                  <ArrowRightLeft size={24} className="text-[#00c6ff] drop-shadow-md" />
                   <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-[#00c6ff] to-blue-400">
-                    Latest Transfers
+                    Transfer Center.
                   </h2>
                 </div>
-                {recentTransfers?.lastFetched && (
-                  <p className="text-xs text-muted-foreground/60 font-medium ml-9 uppercase tracking-widest">
-                    Last updated on {new Date(recentTransfers.lastFetched).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                )}
               </div>
               
               <div className="flex flex-wrap items-center gap-3">

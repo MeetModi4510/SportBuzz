@@ -47,6 +47,7 @@ const LEAGUES = [
   { id: 54, name: "Bundesliga", logo: "https://images.fotmob.com/image_resources/logo/leaguelogo/54.png" },
   { id: 55, name: "Serie A", logo: "https://images.fotmob.com/image_resources/logo/leaguelogo/55.png" },
   { id: 53, name: "Ligue 1", logo: "https://images.fotmob.com/image_resources/logo/leaguelogo/53.png" },
+  { id: 77, name: "World Cup", logo: "https://images.fotmob.com/image_resources/logo/leaguelogo/77.png" },
 ];
 
 async function fetchStandings(leagueId: number): Promise<StandingsResponse> {

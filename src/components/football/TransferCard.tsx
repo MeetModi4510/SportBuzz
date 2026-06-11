@@ -41,7 +41,7 @@ export function TransferCard({ transferData }: TransferCardProps) {
     }
     const logoUrl = teamId > 0 ? `https://images.fotmob.com/image_resources/logo/teamlogo/${teamId}.png` : '';
     return (
-      <div className="w-8 h-8 rounded bg-foreground flex items-center justify-center shrink-0 p-1">
+      <div className="w-8 h-8 rounded bg-white border border-border/20 flex items-center justify-center shrink-0 p-1 shadow-sm">
         {logoUrl ? (
           <img 
             src={logoUrl} 
@@ -59,7 +59,7 @@ export function TransferCard({ transferData }: TransferCardProps) {
   const displayFee = transferData.fee?.value ? formatCurrency(transferData.fee.value) : priceDisplay;
 
   return (
-    <div className="group relative w-[420px] shrink-0 cursor-pointer rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border border-border/50 hover:border-border hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all duration-500 hover:-translate-y-2 overflow-hidden flex flex-col min-h-[190px]">
+    <div className="group relative w-[420px] shrink-0 cursor-pointer rounded-2xl bg-gradient-to-br from-card to-muted/30 dark:from-[#1a1a1a] dark:to-[#0a0a0a] border border-border/50 hover:border-border hover:shadow-lg dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all duration-500 hover:-translate-y-2 overflow-hidden flex flex-col min-h-[190px]">
       
       {/* Dynamic Glow Background */}
       <div className={`absolute -top-20 -right-20 w-48 h-48 ${accentColor} opacity-[0.07] rounded-full blur-3xl group-hover:opacity-[0.15] transition-all duration-700`} />
@@ -73,8 +73,8 @@ export function TransferCard({ transferData }: TransferCardProps) {
         {/* Header section */}
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center gap-4">
-            <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gradient-to-b from-[#222] to-[#111] p-[2px] shadow-lg group-hover:scale-105 transition-transform duration-500">
-              <div className="w-full h-full rounded-full overflow-hidden bg-[#111] flex items-center justify-center">
+            <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gradient-to-b from-border/50 to-border/20 dark:from-[#222] dark:to-[#111] p-[2px] shadow-lg group-hover:scale-105 transition-transform duration-500">
+              <div className="w-full h-full rounded-full overflow-hidden bg-background dark:bg-[#111] flex items-center justify-center">
                 {!imgError && transferData.playerId ? (
                   <img 
                     src={`https://images.fotmob.com/image_resources/playerimages/${transferData.playerId}.png`} 
