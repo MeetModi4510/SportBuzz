@@ -190,7 +190,7 @@ export const footballApi = {
   },
 
   async getRecentTransfers(forceRefresh = false): Promise<TransfersResponse> {
-    const cacheKey = 'recent_transfers_v3_with_meta';
+    const cacheKey = 'recent_transfers_v4';
 
     if (!forceRefresh) {
       const cached = cacheManager.get<TransfersResponse>(cacheKey);
@@ -204,45 +204,31 @@ export const footballApi = {
       const rawTransfers = response.data?.data || [];
       const lastFetched = response.data?.lastFetched || null;
 
-      // Map our new MongoDB FootballTransfer schema to the frontend interface
+      // Map our new MongoDB FootballTransfer schema to the frontend interface (NewTransferData)
       const allTransfers: NewTransferData[] = rawTransfers.map((t: any) => {
-        // Price formatting
-        let priceStr = t.feeText || t.transferType || 'Transfer';
-        if (t.feeValue && t.feeValue > 0) {
-          const valueInM = (t.feeValue / 1000000).toFixed(1);
-          priceStr = `€${valueInM}M`;
-        } else if (priceStr.toLowerCase().includes('loan')) {
-          priceStr = 'LOAN';
-        } else if (priceStr.toLowerCase().includes('free')) {
-          priceStr = 'FREE';
-        }
-
         return {
-          player: {
-            id: t.playerId,
-            name: t.playerName,
-            photo: t.playerId ? `https://images.fotmob.com/image_resources/playerimages/${t.playerId}.png` : undefined
+          name: t.playerName,
+          playerId: t.playerId,
+          position: t.position ? { label: t.position, key: t.position.toLowerCase() } : null,
+          transferDate: t.transferDate,
+          fromClub: t.fromClub,
+          fromClubFullName: t.fromClub,
+          fromClubId: t.fromClubId || 0,
+          toClub: t.toClub,
+          toClubFullName: t.toClub,
+          toClubId: t.toClubId || 0,
+          fee: {
+            feeText: t.fee,
+            value: t.feeValue
           },
-          update: t.transferDate,
-          transfers: [
-            {
-              date: t.transferDate,
-              type: t.transferType || t.feeText || 'Transfer',
-              price: priceStr,
-              teams: {
-                out: {
-                  id: t.fromClubId || 0,
-                  name: t.fromClub || 'Unknown',
-                  logo: t.fromClubId ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.fromClubId}_xsmall.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
-                },
-                in: {
-                  id: t.toClubId || 0,
-                  name: t.toClub || 'Unknown',
-                  logo: t.toClubId ? `https://images.fotmob.com/image_resources/logo/teamlogo/${t.toClubId}_xsmall.png` : 'https://images.fotmob.com/image_resources/logo/teamlogo/default.png'
-                }
-              }
-            }
-          ]
+          transferType: {
+            text: t.transferType
+          },
+          contractExtension: t.contractExtension,
+          onLoan: t.onLoan,
+          fromDate: t.transferDate,
+          toDate: null,
+          marketValue: t.marketValue
         };
       });
 

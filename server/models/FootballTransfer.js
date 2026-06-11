@@ -1,26 +1,31 @@
 import mongoose from 'mongoose';
 
 const footballTransferSchema = new mongoose.Schema({
-    playerId:     { type: Number, required: true },
-    playerName:   { type: String, required: true },
-    position:     { type: String }, // e.g., "LW", "CB", "GK"
-    fromClub:     { type: String },
-    fromClubId:   { type: Number },
-    toClub:       { type: String },
-    toClubId:     { type: Number },
-    transferDate: { type: Date, required: true },
-    feeText:      { type: String }, // e.g., "undisclosed", "free transfer", "loan"
-    feeValue:     { type: Number }, // e.g., 8500000 (amountEuroEstimated)
-    transferType: { type: String }, // e.g., "contract", "loan"
-    marketValue:  { type: Number },
-    cacheExpiry:  { type: Date, required: true },
-    lastFetched:  { type: Date, default: Date.now },
+    transferId:        { type: String, required: true, unique: true }, // playerId + transferDate
+    playerId:          { type: Number, required: true },
+    playerName:        { type: String, required: true },
+    position:          { type: String }, 
+    fromClub:          { type: String },
+    fromClubId:        { type: Number },
+    toClub:            { type: String },
+    toClubId:          { type: Number },
+    transferDate:      { type: Date, required: true },
+    fee:               { type: String }, // localizedFeeText or feeText
+    feeValue:          { type: Number }, // amountEuroEstimated or fee value
+    transferType:      { type: String }, // localizationKey
+    marketValue:       { type: Number },
+    leagueId:          { type: String }, // Used to mark "Priority" or left empty
+    onLoan:            { type: Boolean, default: false },
+    contractExtension: { type: Boolean, default: false },
+    cacheExpiry:       { type: Date, required: true },
+    lastFetched:       { type: Date, default: Date.now },
 }, { timestamps: true });
 
 // We want fast queries when retrieving the latest transfers
 footballTransferSchema.index({ transferDate: -1 });
+footballTransferSchema.index({ feeValue: -1 });
 
-// Auto-expire documents using MongoDB TTL (4 days = 96 hours)
+// Auto-expire documents using MongoDB TTL
 // We set expireAfterSeconds to 3600 (1 hour buffer) after cacheExpiry
 footballTransferSchema.index({ cacheExpiry: 1 }, { expireAfterSeconds: 3600 });
 

@@ -202,37 +202,43 @@ export default function FootballHome() {
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
                   <ArrowRightLeft size={24} className="text-[#00c6ff]" />
-                  <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/50">
-                    Transfer Center.
+                  <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-[#00c6ff] to-blue-400">
+                    Latest Transfers
                   </h2>
                 </div>
+                {recentTransfers?.lastFetched && (
+                  <p className="text-xs text-muted-foreground/60 font-medium ml-9 uppercase tracking-widest">
+                    Last updated on {new Date(recentTransfers.lastFetched).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                )}
               </div>
               
               <div className="flex flex-wrap items-center gap-3">
-                <div className="flex p-1 bg-secondary/60 backdrop-blur-xl rounded-full border border-border/50 overflow-x-auto max-w-[80vw] hide-scrollbar flex-nowrap shadow-inner">
-                  <button onClick={() => setTransferFilter("all")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'all' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>All</button>
-                  <button onClick={() => setTransferFilter("transfers")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'transfers' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Transfers</button>
-                  <button onClick={() => setTransferFilter("loans")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'loans' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Loans</button>
-                  <button onClick={() => setTransferFilter("free_transfers")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'free_transfers' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Free Transfers</button>
-                  <button onClick={() => setTransferFilter("free_agents")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'free_agents' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Free Agents</button>
-                  <button onClick={() => setTransferFilter("contracts")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'contracts' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Contracts</button>
-                  <button onClick={() => setTransferFilter("contract_extensions")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'contract_extensions' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Contract Extensions</button>
+                <div className="flex p-1 bg-secondary/60 backdrop-blur-xl rounded-full border border-border/50 overflow-x-auto max-w-[80vw] md:max-w-[50vw] hide-scrollbar flex-nowrap shadow-inner">
+                  <button onClick={() => setTransferFilter("all")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'all' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>All</button>
+                  <button onClick={() => setTransferFilter("transfers")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'transfers' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Transfers</button>
+                  <button onClick={() => setTransferFilter("loans")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'loans' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Loans</button>
+                  <button onClick={() => setTransferFilter("free_transfers")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'free_transfers' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Free Transfers</button>
+                  <button onClick={() => setTransferFilter("free_agents")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'free_agents' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Free Agents</button>
+                  <button onClick={() => setTransferFilter("contracts")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'contracts' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Contracts</button>
+                  <button onClick={() => setTransferFilter("contract_extensions")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'contract_extensions' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Contract Extensions</button>
                 </div>
                 
                 <div className="flex p-1 bg-secondary/60 backdrop-blur-xl rounded-full border border-border/50 shadow-inner">
                   <button onClick={() => setTransferSort("newest")} className={`px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferSort === 'newest' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Newest First</button>
-                  <button onClick={() => setTransferSort("highest_fee")} className={`px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferSort === 'highest_fee' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Highest Fee</button>
+                  <button onClick={() => setTransferSort("highest_fee")} className={`px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferSort === 'highest_fee' ? 'bg-[#d4af37] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Highest Fee</button>
                 </div>
               </div>
             </div>
             
             {transfersLoading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-6 h-6 animate-spin text-white/40" />
+                <Loader2 className="w-6 h-6 animate-spin text-[#00c6ff]" />
               </div>
             ) : !processedTransfers || processedTransfers.length === 0 ? (
-              <div className="py-20 text-center">
-                <p className="text-muted-foreground font-medium">No transfers match your filters.</p>
+              <div className="py-20 text-center flex flex-col items-center justify-center bg-foreground/5 rounded-2xl border border-border">
+                <ArrowRightLeft size={32} className="mx-auto text-muted-foreground/20 mb-3" />
+                <p className="text-muted-foreground font-medium text-sm">No transfers match your current filters.</p>
               </div>
             ) : (
               <div className={isCustomTransferView ? "flex overflow-x-auto gap-6 pb-6 pt-4 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0" : "relative overflow-hidden w-full group py-4 -mx-4 px-4 md:mx-0 md:px-0"}>
@@ -245,7 +251,7 @@ export default function FootballHome() {
                     ))
                   ) : (
                     /* Duplicate the array twice to ensure a seamless infinite scroll loop */
-                    [...processedTransfers, ...processedTransfers, ...processedTransfers, ...processedTransfers].map((transfer, idx) => (
+                    [...processedTransfers, ...processedTransfers].map((transfer, idx) => (
                       <div key={idx} className="shrink-0">
                         <TransferCard transferData={transfer} />
                       </div>

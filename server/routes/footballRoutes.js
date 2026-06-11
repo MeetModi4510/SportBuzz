@@ -55,14 +55,14 @@ router.get('/proxy/fixtures', async (req, res) => {
 });
 
 // ─── LATEST TRANSFERS ─────────────────────────────────────────────────────────
-// Serves transfers from MongoDB cache (4-day TTL).
+// Serves transfers from MongoDB cache (2-day TTL).
 
 const TRANSFERS_API_HOST = 'free-api-live-football-data.p.rapidapi.com';
-const TRANSFERS_CACHE_MS = 4 * 24 * 60 * 60 * 1000; // 4 days
+const TRANSFERS_CACHE_MS = 2 * 24 * 60 * 60 * 1000; // 2 days
 
 const PRIORITY_CLUBS = [
     // Premier League
-    'arsenal', 'aston villa', 'bournemouth', 'brentford', 'brighton', 'chelsea', 'crystal palace', 'everton', 'fulham', 'liverpool', 'luton', 'man city', 'manchester city', 'man united', 'manchester united', 'newcastle', 'nottm forest', 'nottingham forest', 'sheff utd', 'sheffield united', 'tottenham', 'spurs', 'west ham', 'wolves',
+    'arsenal', 'aston villa', 'bournemouth', 'brentford', 'brighton', 'chelsea', 'crystal palace', 'everton', 'fulham', 'liverpool', 'man city', 'manchester city', 'man united', 'manchester united', 'newcastle', 'nottm forest', 'nottingham forest', 'tottenham', 'spurs', 'west ham', 'wolves',
     // La Liga
     'athletic club', 'atletico madrid', 'barcelona', 'real madrid', 'real sociedad', 'sevilla', 'valencia', 'villarreal', 'girona', 'betis',
     // Serie A
@@ -83,25 +83,38 @@ async function fetchAndStoreTransfers() {
     const apiKey = process.env.TRANSFERS_API_KEY;
     if (!apiKey) throw new Error('TRANSFERS_API_KEY env key not set');
 
-    const res = await axios.get(
-        `https://${TRANSFERS_API_HOST}/football-get-all-transfers`,
-        {
-            params: { page: 1 },
-            headers: {
-                'x-rapidapi-key': apiKey,
-                'x-rapidapi-host': TRANSFERS_API_HOST,
-            },
-            timeout: 10000,
+    const headers = {
+        'x-rapidapi-key': apiKey,
+        'x-rapidapi-host': TRANSFERS_API_HOST,
+    };
+
+    // Fetch from both endpoints
+    const [allRes, mvRes] = await Promise.all([
+        axios.get(`https://${TRANSFERS_API_HOST}/football-get-all-transfers`, { params: { page: 1 }, headers, timeout: 10000 }).catch(e => { console.error('All transfers error:', e.message); return { data: null }; }),
+        axios.get(`https://${TRANSFERS_API_HOST}/football-get-market-value-transfers`, { params: { page: 1 }, headers, timeout: 10000 }).catch(e => { console.error('MV transfers error:', e.message); return { data: null }; })
+    ]);
+
+    const allRaw = allRes.data?.response?.transfers || [];
+    const mvRaw = mvRes.data?.response?.transfers || [];
+
+    const combined = [...(Array.isArray(allRaw) ? allRaw : []), ...(Array.isArray(mvRaw) ? mvRaw : [])];
+
+    if (combined.length === 0) throw new Error('Empty transfers response from API');
+
+    // Deduplicate based on playerId + transferDate
+    const uniqueTransfers = [];
+    const seen = new Set();
+    for (const t of combined) {
+        if (!t || !t.playerId || !t.transferDate) continue;
+        const key = `${t.playerId}_${t.transferDate}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            uniqueTransfers.push(t);
         }
-    );
-
-    const raw = res.data?.response?.transfers || [];
-    const rows = Array.isArray(raw) ? raw : [];
-
-    if (rows.length === 0) throw new Error('Empty transfers response from API');
+    }
 
     // Filter using the PRIORITY_CLUBS list
-    const priorityTransfers = rows.filter(t => {
+    const priorityTransfers = uniqueTransfers.filter(t => {
         const outName = (t.fromClub || t.fromClubFullName || '').toLowerCase();
         const inName = (t.toClub || t.toClubFullName || '').toLowerCase();
         
@@ -115,25 +128,29 @@ async function fetchAndStoreTransfers() {
     await FootballTransfer.deleteMany({});
 
     const docs = priorityTransfers.map(t => ({
-        playerId:     t.playerId,
-        playerName:   t.name || '',
-        position:     t.position?.label || t.position?.key || '',
-        fromClub:     t.fromClub || t.fromClubFullName || '',
-        fromClubId:   t.fromClubId,
-        toClub:       t.toClub || t.toClubFullName || '',
-        toClubId:     t.toClubId,
-        transferDate: new Date(t.transferDate || t.fromDate || now),
-        feeText:      t.fee?.feeText || t.fee?.localizedFeeText || t.transferType?.text || '',
-        feeValue:     t.amountEuroEstimated || 0,
-        transferType: t.transferType?.text || t.transferType?.localizationKey || '',
-        marketValue:  t.marketValue || 0,
+        transferId:        `${t.playerId}_${t.transferDate}`,
+        playerId:          t.playerId,
+        playerName:        t.name || '',
+        position:          t.position?.label || t.position?.key || '',
+        fromClub:          t.fromClub || t.fromClubFullName || '',
+        fromClubId:        t.fromClubId,
+        toClub:            t.toClub || t.toClubFullName || '',
+        toClubId:          t.toClubId,
+        transferDate:      new Date(t.transferDate || t.fromDate || now),
+        fee:               t.fee?.feeText || t.fee?.localizedFeeText || t.transferType?.text || '',
+        feeValue:          t.fee?.value || t.amountEuroEstimated || 0,
+        transferType:      t.transferType?.localizationKey || t.transferType?.text || '',
+        marketValue:       t.marketValue || 0,
+        leagueId:          'Priority',
+        onLoan:            t.onLoan || false,
+        contractExtension: t.contractExtension || false,
         cacheExpiry,
-        lastFetched:  now,
+        lastFetched:       now,
     }));
 
     if (docs.length > 0) {
         await FootballTransfer.insertMany(docs);
-        console.log(`[Transfers] Stored ${docs.length} filtered transfers.`);
+        console.log(`[Transfers] Stored ${docs.length} filtered transfers from both endpoints.`);
     }
     
     return { rows: docs, lastFetched: now };
