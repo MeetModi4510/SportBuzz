@@ -206,14 +206,14 @@ export const Navbar = () => {
   const showDropdown = searchOpen && searchQuery.trim().length > 0;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-lg">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+    <header className="sticky top-4 z-50 w-full px-4 transition-all duration-300">
+      <div className="container mx-auto max-w-7xl">
+        <div className="flex h-16 items-center justify-between px-6 bg-background/70 backdrop-blur-xl border border-border/50 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
           {/* Drawer & Logo */}
           <div className="flex items-center gap-3">
             <Sheet>
               <SheetTrigger asChild>
-                <button className="p-2 -ml-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors" aria-label="Open Sidebar">
+                <button className="p-2 -ml-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors" aria-label="Open Sidebar">
                   <Menu size={24} />
                 </button>
               </SheetTrigger>

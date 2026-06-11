@@ -29,66 +29,97 @@ const topLeagues = [
 
 const Sidebar = ({ className }: SidebarProps) => {
   return (
-    <aside className={cn("h-screen sticky top-0 flex-shrink-0 w-64 bg-card/50 backdrop-blur-sm border-r border-border/50 py-6 flex flex-col gap-8 overflow-y-auto hidden lg:flex", className)}>
-      <div className="px-6 flex flex-col gap-2">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Main Navigation</h3>
+    <aside className={cn("h-screen sticky top-0 flex-shrink-0 w-64 bg-background/60 backdrop-blur-xl border-r border-border/40 py-8 flex flex-col gap-10 overflow-y-auto hidden lg:flex", className)}>
+      
+      <div className="px-6 flex flex-col gap-1.5">
+        <h3 className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mb-3 px-2">Main Navigation</h3>
         {mainNavItems.map((item) => (
           <NavLink
             key={item.title}
             to={item.path}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                "group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300",
                 isActive 
-                  ? "bg-primary/10 text-primary" 
-                  : "text-muted-foreground hover:bg-white/5 hover:text-white"
+                  ? "bg-primary/10 text-primary shadow-sm" 
+                  : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
               )
             }
           >
-            <item.icon className="h-4 w-4" />
-            {item.title}
+            {({ isActive }) => (
+              <>
+                <item.icon 
+                  size={18} 
+                  strokeWidth={isActive ? 2.5 : 2} 
+                  className={cn("transition-colors", isActive ? "text-primary" : "text-muted-foreground/70 group-hover:text-foreground")} 
+                />
+                <span>{item.title}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </div>
 
-      <div className="px-6 flex flex-col gap-2">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Top Leagues</h3>
+      <div className="px-6 flex flex-col gap-1.5">
+        <h3 className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mb-3 px-2">Top Leagues</h3>
         {topLeagues.map((league) => (
           <NavLink
             key={league.name}
             to={league.path}
-            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-white/5 hover:text-white transition-colors"
+            className="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-foreground/5 hover:text-foreground transition-all duration-300"
           >
-            <span>{league.icon}</span>
-            {league.name}
+            <span className="text-base grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all">{league.icon}</span>
+            <span>{league.name}</span>
           </NavLink>
         ))}
       </div>
 
-      <div className="px-6 flex flex-col gap-2">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Discover</h3>
+      <div className="px-6 flex flex-col gap-1.5">
+        <h3 className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mb-3 px-2">Discover</h3>
         {discoverItems.map((item) => (
           <NavLink
             key={item.title}
             to={item.path}
-            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-white/5 hover:text-white transition-colors"
+            className={({ isActive }) =>
+              cn(
+                "group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300",
+                isActive 
+                  ? "bg-foreground/10 text-foreground shadow-sm" 
+                  : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
+              )
+            }
           >
-            <item.icon className="h-4 w-4" />
-            {item.title}
+            {({ isActive }) => (
+              <>
+                <item.icon 
+                  size={18} 
+                  strokeWidth={isActive ? 2.5 : 2} 
+                  className={cn("transition-colors", isActive ? "text-foreground" : "text-muted-foreground/70 group-hover:text-foreground")} 
+                />
+                <span>{item.title}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </div>
       
-      <div className="px-6 mt-auto">
-        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Star className="h-4 w-4 text-primary fill-primary" />
-            <h4 className="text-sm font-semibold text-white">Go Premium</h4>
+      <div className="px-6 mt-auto pb-4">
+        <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-5 backdrop-blur-md group hover:border-primary/40 transition-colors">
+          <div className="absolute -right-4 -top-4 w-20 h-20 bg-primary/20 blur-2xl rounded-full group-hover:bg-primary/30 transition-colors" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-2.5 mb-2.5">
+              <div className="p-1.5 rounded-lg bg-primary/20 text-primary">
+                <Star size={14} className="fill-primary" />
+              </div>
+              <h4 className="text-sm font-bold text-foreground tracking-tight">Go Premium</h4>
+            </div>
+            <p className="text-[11px] font-medium text-muted-foreground mb-4 leading-relaxed">
+              Unlock ad-free experience, advanced stats & deep insights.
+            </p>
+            <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98]">
+              Upgrade Now
+            </button>
           </div>
-          <p className="text-xs text-muted-foreground mb-3">Unlock ad-free experience and advanced stats.</p>
-          <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold py-2 rounded transition-colors">
-            Upgrade Now
-          </button>
         </div>
       </div>
     </aside>

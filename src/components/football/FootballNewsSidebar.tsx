@@ -83,7 +83,7 @@ export function FootballNewsSidebar() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Loader2 className="w-6 h-6 animate-spin text-white/30" />
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground/60" />
       </div>
     );
   }
@@ -92,14 +92,14 @@ export function FootballNewsSidebar() {
     <div className="space-y-6">
       {/* Premium Header */}
       <div className="flex items-center justify-between px-2">
-        <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-white/80" />
+        <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-foreground/80" />
           Latest News
         </h2>
         {news.length > 0 && (
           <button
             onClick={() => setIsViewAllOpen(true)}
-            className="group flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-white/50 hover:text-white transition-colors"
+            className="group flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
           >
             View All 
             <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
@@ -123,8 +123,8 @@ export function FootballNewsSidebar() {
                 }
               }}
               className={`
-                group relative flex flex-col justify-between overflow-hidden rounded-[24px] bg-[#0c0c0c] border border-white/[0.08] 
-                transition-all duration-500 cursor-pointer hover:border-white/[0.15] hover:shadow-2xl hover:shadow-black/50 hover:-translate-y-0.5
+                group relative flex flex-col justify-between overflow-hidden rounded-[24px] bg-[#0c0c0c] border border-border/[0.08] 
+                transition-all duration-500 cursor-pointer hover:border-border/[0.15] hover:shadow-2xl hover:shadow-black/50 hover:-translate-y-0.5
                 ${isFeatured ? "md:col-span-2 lg:col-span-2 min-h-[340px]" : "min-h-[260px]"}
               `}
             >
@@ -140,18 +140,18 @@ export function FootballNewsSidebar() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0c0c0c] via-[#0c0c0c]/80 to-[#0c0c0c]/10" />
                 </div>
               ) : (
-                <div className="absolute inset-0 z-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-50" />
+                <div className="absolute inset-0 z-0 bg-gradient-to-br from-foreground/[0.03] to-transparent opacity-50" />
               )}
 
               {/* Content Container */}
               <div className="relative z-10 flex flex-col h-full p-6 md:p-8">
                 {/* Header (Source) */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/5">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/10 backdrop-blur-md border border-border/50">
                     {item.sourceIconUrl ? (
                       <img src={item.sourceIconUrl} alt={item.source} className="w-3.5 h-3.5 object-contain" />
                     ) : (
-                      <Globe size={12} className="text-white/60" />
+                      <Globe size={12} className="text-muted-foreground" />
                     )}
                     <span className="text-[10px] font-bold tracking-widest uppercase text-white/90">
                       {item.source}
@@ -159,7 +159,7 @@ export function FootballNewsSidebar() {
                   </div>
                   
                   {/* Subtle top-right icon appearing on hover */}
-                  <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0 border border-white/5">
+                  <div className="w-8 h-8 rounded-full bg-foreground/10 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0 border border-border/50">
                     <ArrowUpRight size={14} className="text-white" />
                   </div>
                 </div>
@@ -183,8 +183,8 @@ export function FootballNewsSidebar() {
 
                   {/* Footer (Time) */}
                   <div className="flex items-center gap-1.5 pt-3">
-                    <Clock size={12} className="text-white/30" />
-                    <span className="text-xs text-white/40 font-medium tracking-wide">
+                    <Clock size={12} className="text-white/60" />
+                    <span className="text-xs text-white/80 font-medium tracking-wide">
                       {timeAgo(item.publishedAt || item.gmtTime)}
                     </span>
                   </div>
@@ -197,15 +197,15 @@ export function FootballNewsSidebar() {
 
       {/* View All Modal */}
       <Dialog open={isViewAllOpen} onOpenChange={setIsViewAllOpen}>
-        <DialogContent className="sm:max-w-[1000px] border-white/10 bg-[#0a0a0a]/95 backdrop-blur-3xl rounded-[32px] max-h-[85vh] overflow-y-auto p-6 md:p-10 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent shadow-2xl">
+        <DialogContent className="sm:max-w-[1000px] border-border bg-[#0a0a0a]/95 backdrop-blur-3xl rounded-[32px] max-h-[85vh] overflow-y-auto p-6 md:p-10 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent shadow-2xl">
           <DialogTitle className="sr-only">All Football News</DialogTitle>
           <DialogDescription className="sr-only">View all the latest football news and updates.</DialogDescription>
           
-          <div className="mb-8 pb-6 border-b border-white/[0.08] flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
-              <Globe size={24} className="text-white/80" />
+          <div className="mb-8 pb-6 border-b border-border/[0.08] flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-foreground/5 flex items-center justify-center border border-border">
+              <Globe size={24} className="text-foreground/80" />
             </div>
-            <h2 className="text-3xl font-bold tracking-tight text-white">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground">
               All News
             </h2>
           </div>
@@ -216,7 +216,7 @@ export function FootballNewsSidebar() {
                 <div 
                   key={item.id || index}
                   onClick={() => { setIsViewAllOpen(false); setSelectedArticle(item); }}
-                  className="group relative flex flex-col justify-between overflow-hidden rounded-[24px] bg-[#111] border border-white/[0.05] cursor-pointer hover:border-white/[0.15] transition-all duration-300 hover:-translate-y-1 min-h-[280px]"
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-[24px] bg-[#111] border border-border/[0.05] cursor-pointer hover:border-border/[0.15] transition-all duration-300 hover:-translate-y-1 min-h-[280px]"
                 >
                   {/* Image & Gradient */}
                   {item.imageUrl ? (
@@ -229,17 +229,17 @@ export function FootballNewsSidebar() {
                       <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-[#111]/80 to-[#111]/10" />
                     </div>
                   ) : (
-                    <div className="absolute inset-0 z-0 bg-gradient-to-br from-white/[0.02] to-transparent" />
+                    <div className="absolute inset-0 z-0 bg-gradient-to-br from-foreground/[0.02] to-transparent" />
                   )}
 
                   <div className="relative z-10 flex flex-col h-full p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/5 backdrop-blur-md border border-white/5">
+                      <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-foreground/5 backdrop-blur-md border border-border/50">
                         <span className="text-[9px] font-bold tracking-widest uppercase text-white/80">
                           {item.source}
                         </span>
                       </div>
-                      <ArrowUpRight size={14} className="text-white/20 group-hover:text-white/80 transition-colors" />
+                      <ArrowUpRight size={14} className="text-white/40 group-hover:text-white/80 transition-colors" />
                     </div>
                     
                     <div className="flex-1" />
@@ -249,8 +249,8 @@ export function FootballNewsSidebar() {
                         {item.title}
                       </h4>
                       <div className="flex items-center gap-1.5 pt-2">
-                        <Clock size={12} className="text-white/30" />
-                        <span className="text-[11px] text-white/40 font-medium">
+                        <Clock size={12} className="text-white/60" />
+                        <span className="text-[11px] text-white/80 font-medium">
                           {timeAgo(item.publishedAt || item.gmtTime)}
                         </span>
                       </div>
@@ -265,7 +265,7 @@ export function FootballNewsSidebar() {
 
       {/* Article Iframe Modal */}
       <Dialog open={!!selectedArticle} onOpenChange={(open) => !open && setSelectedArticle(null)}>
-        <DialogContent className="sm:max-w-[800px] border-white/10 bg-[#050505] rounded-2xl p-0 overflow-hidden shadow-2xl">
+        <DialogContent className="sm:max-w-[800px] border-border bg-[#050505] rounded-2xl p-0 overflow-hidden shadow-2xl">
           <DialogTitle className="sr-only">{selectedArticle?.title || 'Football Article'}</DialogTitle>
           <DialogDescription className="sr-only">Full article content.</DialogDescription>
           <div className="w-full h-[70vh] md:h-[80vh] bg-[#050505]">

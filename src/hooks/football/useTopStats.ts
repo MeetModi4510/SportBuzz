@@ -74,11 +74,11 @@ export const TEAM_STAT_LABELS: Record<number, string> = {
 };
 
 export const TOPSTATS_LEAGUES = [
-  { id: 65, name: 'Premier League', flag: 'https://flagcdn.com/w40/gb-eng.png' },
-  { id: 75, name: 'La Liga',        flag: 'https://flagcdn.com/w40/es.png'     },
-  { id: 67, name: 'Bundesliga',     flag: 'https://flagcdn.com/w40/de.png'     },
-  { id: 77, name: 'Serie A',        flag: 'https://flagcdn.com/w40/it.png'     },
-  { id: 68, name: 'Ligue 1',        flag: 'https://flagcdn.com/w40/fr.png'     },
+  { id: 65, name: 'Premier League', logo: 'https://images.fotmob.com/image_resources/logo/leaguelogo/47.png' },
+  { id: 75, name: 'La Liga',        logo: 'https://images.fotmob.com/image_resources/logo/leaguelogo/87.png' },
+  { id: 67, name: 'Bundesliga',     logo: 'https://images.fotmob.com/image_resources/logo/leaguelogo/54.png' },
+  { id: 77, name: 'Serie A',        logo: 'https://images.fotmob.com/image_resources/logo/leaguelogo/55.png' },
+  { id: 68, name: 'Ligue 1',        logo: 'https://images.fotmob.com/image_resources/logo/leaguelogo/53.png' },
 ];
 
 /** Build player photo URL using the numeric player ID (Pid from API) */

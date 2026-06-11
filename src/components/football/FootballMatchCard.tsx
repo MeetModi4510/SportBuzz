@@ -27,28 +27,28 @@ export const FootballMatchCard = ({ match, onClick, className }: FootballMatchCa
 
   const getStatusColor = () => {
     if (isLive) return "text-red-500 font-bold bg-red-500/10 px-2 py-0.5 rounded-full";
-    if (isUpcoming) return "text-white/40 font-medium";
-    return "text-white/40 font-medium";
+    if (isUpcoming) return "text-muted-foreground/80 font-medium";
+    return "text-muted-foreground/80 font-medium";
   };
 
   return (
     <div
       onClick={() => onClick?.(match)}
       className={cn(
-        "group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02] p-6 backdrop-blur-xl transition-all duration-300",
-        "hover:bg-white/[0.04] hover:border-white/10 cursor-pointer flex flex-col h-full",
+        "group relative overflow-hidden rounded-[2rem] border border-border/50 bg-foreground/[0.02] p-6 backdrop-blur-xl transition-all duration-300",
+        "hover:bg-foreground/[0.04] hover:border-border cursor-pointer flex flex-col h-full",
         className
       )}
     >
-      <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl pointer-events-none group-hover:bg-white/10 transition-colors" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-foreground/5 rounded-full blur-3xl pointer-events-none group-hover:bg-foreground/10 transition-colors" />
 
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/5 relative z-10">
+      <div className="flex items-center justify-between pb-4 mb-4 border-b border-border/50 relative z-10">
         <div className="flex items-center gap-2.5">
-           <div className="bg-white/10 p-1.5 rounded-lg border border-white/5">
+           <div className="bg-foreground/10 p-1.5 rounded-lg border border-border/50">
              <img src={match.league.logo} alt={match.league.name} className="w-4 h-4 object-contain opacity-80" />
            </div>
-           <span className="text-[10px] text-white/50 tracking-widest font-semibold uppercase truncate max-w-[150px]">
+           <span className="text-[10px] text-muted-foreground tracking-widest font-semibold uppercase truncate max-w-[150px]">
              {match.league.name}
            </span>
         </div>
@@ -66,12 +66,12 @@ export const FootballMatchCard = ({ match, onClick, className }: FootballMatchCa
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <TeamLogo logo={match.teams.home.logo} name={match.teams.home.name} size="md" className="w-12 h-12" />
-            <span className={cn("font-bold text-[17px] tracking-tight", match.teams.home.winner ? "text-white" : "text-white/70")}>
+            <span className={cn("font-bold text-[17px] tracking-tight", match.teams.home.winner ? "text-foreground" : "text-foreground/70")}>
               {match.teams.home.name}
             </span>
           </div>
           <div className="flex flex-col items-end">
-             <span className="font-black text-[22px] tracking-tight text-white">
+             <span className="font-black text-[22px] tracking-tight text-foreground">
                {isUpcoming ? '-' : match.goals.home ?? 0}
              </span>
           </div>
@@ -81,12 +81,12 @@ export const FootballMatchCard = ({ match, onClick, className }: FootballMatchCa
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <TeamLogo logo={match.teams.away.logo} name={match.teams.away.name} size="md" className="w-12 h-12" />
-            <span className={cn("font-bold text-[17px] tracking-tight", match.teams.away.winner ? "text-white" : "text-white/70")}>
+            <span className={cn("font-bold text-[17px] tracking-tight", match.teams.away.winner ? "text-foreground" : "text-foreground/70")}>
               {match.teams.away.name}
             </span>
           </div>
           <div className="flex flex-col items-end">
-             <span className="font-black text-[22px] tracking-tight text-white">
+             <span className="font-black text-[22px] tracking-tight text-foreground">
                {isUpcoming ? '-' : match.goals.away ?? 0}
              </span>
           </div>
@@ -94,8 +94,8 @@ export const FootballMatchCard = ({ match, onClick, className }: FootballMatchCa
       </div>
 
       {/* Footer / Match Status Summary */}
-      <div className="mt-6 pt-4 border-t border-white/5 flex flex-col gap-2 relative z-10">
-        <div className="flex items-center gap-4 text-[10px] text-white/30 uppercase tracking-widest font-semibold">
+      <div className="mt-6 pt-4 border-t border-border/50 flex flex-col gap-2 relative z-10">
+        <div className="flex items-center gap-4 text-[10px] text-muted-foreground/60 uppercase tracking-widest font-semibold">
           <div className="flex items-center gap-1.5 truncate">
             <MapPin size={12} className="flex-shrink-0" />
             <span className="truncate">{match.fixture.venue.name || "Venue"}</span>
