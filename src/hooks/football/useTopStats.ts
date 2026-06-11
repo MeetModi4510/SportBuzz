@@ -15,8 +15,13 @@ export interface PlayerStat {
   teamName: string;
   teamId: string;
   statValue: string;
-  imageUrl: string;       // partial, e.g. "29179241.png"
-  teamBadgeUrl: string;   // partial, e.g. "enet/8456.png"
+  imageUrl: string;
+  teamBadgeUrl: string;
+  sofascoreId?: string;
+  photoBase64?: string;
+  position?: string;
+  jerseyNumber?: string;
+  country?: string;
   lastFetched: string;
 }
 
@@ -98,5 +103,11 @@ export function useTopStats(leagueId: number) {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     retry: 1,
+    refetchInterval: (query) => {
+      const players = query?.state?.data?.players;
+      if (!players) return false;
+      const needsEnrichment = players.some((p: PlayerStat) => p.sofascoreId === undefined);
+      return needsEnrichment ? 2000 : false;
+    },
   });
 }

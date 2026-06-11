@@ -46,10 +46,20 @@ function RankBadge({ rank }: { rank: number }) {
   );
 }
 
-function PlayerAvatar({ imageUrl, name }: { imageUrl: string; name: string }) {
+function PlayerAvatar({ photoBase64, name, sofascoreId }: { photoBase64?: string; name: string; sofascoreId?: string }) {
   const [err, setErr] = useState(false);
-  const src = playerPhotoUrl(imageUrl);
-  if (!src || err) {
+
+  // If sofascoreId is completely undefined, the backend is still enriching this player
+  if (sofascoreId === undefined) {
+    return (
+      <div className="w-9 h-9 rounded-full bg-white/5 border border-white/5 flex items-center justify-center flex-shrink-0">
+        <Loader2 className="w-3.5 h-3.5 animate-spin text-white/30" />
+      </div>
+    );
+  }
+
+  // If we checked Sofascore but they have no photo, show initials
+  if (!photoBase64 || err) {
     return (
       <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
         <span className="text-[10px] font-black text-white/50">
@@ -58,9 +68,10 @@ function PlayerAvatar({ imageUrl, name }: { imageUrl: string; name: string }) {
       </div>
     );
   }
+
   return (
     <img
-      src={src}
+      src={photoBase64}
       alt={name}
       onError={() => setErr(true)}
       loading="lazy"
@@ -102,7 +113,9 @@ function PlayerStatTable({ rows }: { rows: PlayerStat[] }) {
           <tr className="text-[10px] font-black text-white/25 uppercase tracking-widest border-b border-white/5">
             <th className="pl-4 pr-2 py-3 text-left w-10">#</th>
             <th className="px-3 py-3 text-left min-w-[160px]">Player</th>
-            <th className="px-3 py-3 text-left hidden sm:table-cell">Club</th>
+            <th className="px-3 py-3 text-left hidden sm:table-cell">Pos</th>
+            <th className="px-3 py-3 text-left hidden lg:table-cell">Country</th>
+            <th className="px-3 py-3 text-left hidden md:table-cell">Club</th>
             <th className="pr-4 pl-3 py-3 text-center font-black text-white/50">Value</th>
           </tr>
         </thead>
@@ -125,21 +138,45 @@ function PlayerStatTable({ rows }: { rows: PlayerStat[] }) {
               {/* Player */}
               <td className="px-3 py-3">
                 <div className="flex items-center gap-2.5">
-                  <PlayerAvatar imageUrl={p.playerId} name={p.playerName} />
+                  <PlayerAvatar photoBase64={p.photoBase64} name={p.playerName} sofascoreId={p.sofascoreId} />
                   <div>
                     <p className={cn("font-semibold leading-tight whitespace-nowrap", p.rank === 1 ? "text-amber-400" : "text-white/90")}>
                       {p.playerName}
                     </p>
-                    <p className="text-[10px] text-white/30 sm:hidden">{p.teamName}</p>
+                    <p className="text-[10px] text-white/30 sm:hidden">
+                      {p.teamName} {p.jerseyNumber && `• #${p.jerseyNumber}`}
+                    </p>
                   </div>
                 </div>
               </td>
 
-              {/* Club */}
+              {/* Pos */}
               <td className="px-3 py-3 hidden sm:table-cell">
+                {p.sofascoreId === undefined ? (
+                  <div className="w-6 h-5 rounded-md bg-white/5 animate-pulse" />
+                ) : (
+                  <span className="text-xs text-white/40 font-medium bg-white/5 px-2 py-1 rounded-md">
+                    {p.position || '-'}
+                  </span>
+                )}
+              </td>
+
+              {/* Country */}
+              <td className="px-3 py-3 hidden lg:table-cell">
+                {p.sofascoreId === undefined ? (
+                  <div className="w-12 h-3 rounded-md bg-white/5 animate-pulse" />
+                ) : (
+                  <span className="text-xs text-white/50">{p.country || '-'}</span>
+                )}
+              </td>
+
+              {/* Club */}
+              <td className="px-3 py-3 hidden md:table-cell">
                 <div className="flex items-center gap-2">
                   <TeamBadge img={p.teamBadgeUrl} name={p.teamName} />
-                  <span className="text-xs text-white/50">{p.teamName}</span>
+                  <span className="text-xs text-white/50">
+                    {p.teamName} {p.jerseyNumber && <span className="text-white/20">#{p.jerseyNumber}</span>}
+                  </span>
                 </div>
               </td>
 

@@ -12,6 +12,11 @@ const playerTopStatSchema = new mongoose.Schema({
     statValue:    { type: String },                    // raw Scrs value
     imageUrl:     { type: String },                    // partial path e.g. "29179241.png"
     teamBadgeUrl: { type: String },                    // partial path e.g. "enet/8456.png"
+    sofascoreId:  { type: String },
+    photoBase64:  { type: String },
+    position:     { type: String },
+    jerseyNumber: { type: String },
+    country:      { type: String },
     cacheExpiry:  { type: Date, required: true },
     lastFetched:  { type: Date, default: Date.now },
 }, { timestamps: true });

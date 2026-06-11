@@ -666,7 +666,6 @@ async function fetchAndStoreTopStatsForLeague(league, apiKey) {
     await sleep(350);
 
     const playerStats = playerRes.data?.Stat || [];
-    await PlayerTopStat.deleteMany({ leagueId: league.id });
     const playerDocs = [];
 
     for (const stat of playerStats) {
@@ -676,24 +675,28 @@ async function fetchAndStoreTopStatsForLeague(league, apiKey) {
         for (const p of plrs) {
             // Scrs is an object like { "1": "27" } — take the first value
             const statVal = p.Scrs ? Object.values(p.Scrs)[0] : '0';
+            
             playerDocs.push({
                 leagueId:     league.id,
                 leagueName:   league.name,
                 statTyp:      stat.Typ,
                 rank:         p.Rnk || 0,
                 playerName:   p.Pnm || '',
-                playerId:     p.Pid || p.Aid || '',  // used for photo: media.api-sports.io/football/players/{id}.png
+                playerId:     p.Pid || p.Aid || '',
                 teamName:     p.Tnm || '',
                 teamId:       p.Tid || '',
                 statValue:    statVal,
-                imageUrl:     p.imageUrl || '',      // stored but not used for display (CDN blocks it)
+                imageUrl:     p.imageUrl || '',
                 teamBadgeUrl: p.Img || '',
                 cacheExpiry,
                 lastFetched:  now,
             });
         }
     }
-    if (playerDocs.length > 0) await PlayerTopStat.insertMany(playerDocs);
+    if (playerDocs.length > 0) {
+        await PlayerTopStat.deleteMany({ leagueId: league.id });
+        await PlayerTopStat.insertMany(playerDocs);
+    }
 
     // ── Team stats ────────────────────────────────────────────────────────────
     const teamRes = await axios.get(`https://${LIVESCORE_HOST}/competitions/get-team-stats`, {
@@ -704,7 +707,6 @@ async function fetchAndStoreTopStatsForLeague(league, apiKey) {
     await sleep(350);
 
     const teamStats = teamRes.data?.Stat || [];
-    await TeamTopStat.deleteMany({ leagueId: league.id });
     const teamDocs = [];
 
     for (const stat of teamStats) {
@@ -734,7 +736,10 @@ async function fetchAndStoreTopStatsForLeague(league, apiKey) {
             rank++;
         }
     }
-    if (teamDocs.length > 0) await TeamTopStat.insertMany(teamDocs);
+    if (teamDocs.length > 0) {
+        await TeamTopStat.deleteMany({ leagueId: league.id });
+        await TeamTopStat.insertMany(teamDocs);
+    }
 
     console.log(`[TopStats] ${league.name}: ${playerDocs.length} player rows, ${teamDocs.length} team rows stored.`);
     return { leagueId: league.id, playerCount: playerDocs.length, teamCount: teamDocs.length, lastFetched: now };
@@ -749,6 +754,73 @@ router.delete('/top-stats/cache', async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 });
+
+// Global lock to prevent concurrent API fetches for the same league
+const activeFetches = new Map();
+
+// Background worker to enrich player stats with Sofascore data sequentially
+async function enrichPlayersBackground(leagueId) {
+    const apiKey = process.env.sofascore_api_footballtopstats_playerimages;
+    if (!apiKey) return;
+
+    try {
+        // Find players missing sofascoreId
+        const playersToEnrich = await PlayerTopStat.find({ leagueId, sofascoreId: { $exists: false } }).lean();
+        if (!playersToEnrich.length) return;
+
+        console.log(`[TopStats] Starting background enrichment for ${playersToEnrich.length} players in league ${leagueId}`);
+
+        for (const p of playersToEnrich) {
+            if (!p.playerName) continue;
+
+            let photoBase64 = '';
+            let sofascoreId = 'NOT_FOUND';
+            let position = '';
+            let jerseyNumber = '';
+            let country = '';
+
+            try {
+                const searchRes = await axios.get(`https://sofascore.p.rapidapi.com/players/search?name=${encodeURIComponent(p.playerName)}`, {
+                    headers: { 'x-rapidapi-host': 'sofascore.p.rapidapi.com', 'x-rapidapi-key': apiKey },
+                    timeout: 8000
+                });
+                
+                const sofaPlayer = searchRes.data?.players?.[0];
+                if (sofaPlayer) {
+                    sofascoreId = sofaPlayer.id?.toString() || 'NOT_FOUND';
+                    position = sofaPlayer.position || '';
+                    jerseyNumber = sofaPlayer.jerseyNumber?.toString() || '';
+                    country = sofaPlayer.country?.name || sofaPlayer.country?.alpha2 || '';
+
+                    if (sofascoreId !== 'NOT_FOUND') {
+                        await sleep(250);
+                        const imgRes = await axios.get(`https://sofascore.p.rapidapi.com/players/get-image?playerId=${sofascoreId}`, {
+                            headers: { 'x-rapidapi-host': 'sofascore.p.rapidapi.com', 'x-rapidapi-key': apiKey },
+                            responseType: 'arraybuffer',
+                            timeout: 8000
+                        });
+                        
+                        if (imgRes.headers['content-type']?.includes('image') && imgRes.data) {
+                            photoBase64 = `data:${imgRes.headers['content-type']};base64,${Buffer.from(imgRes.data).toString('base64')}`;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.log(`[TopStats] Background Sofascore fetch failed for ${p.playerName}:`, err.message);
+            }
+
+            await PlayerTopStat.updateOne(
+                { _id: p._id },
+                { $set: { sofascoreId, photoBase64, position, jerseyNumber, country } }
+            );
+
+            await sleep(350); // Be gentle with the API rate limits to avoid 5000ms timeout stalls
+        }
+        console.log(`[TopStats] Background enrichment finished for league ${leagueId}`);
+    } catch (err) {
+        console.error(`[TopStats] Background enrichment error for league ${leagueId}:`, err.message);
+    }
+}
 
 // GET /api/football/top-stats?leagueId=65
 router.get('/top-stats', async (req, res) => {
@@ -777,13 +849,35 @@ router.get('/top-stats', async (req, res) => {
             return res.status(503).json({ success: false, message: 'livescore_api_footballtopstats env key not set.' });
         }
 
+        // Concurrency lock: If another request is already fetching this league, wait for it instead of duplicating
+        if (activeFetches.has(leagueId)) {
+            console.log(`[TopStats] Concurrent request waiting for existing fetch for league ${leagueId}...`);
+            await activeFetches.get(leagueId);
+            const [players, teams] = await Promise.all([
+                PlayerTopStat.find({ leagueId }).sort({ statTyp: 1, rank: 1 }).lean(),
+                TeamTopStat.find({ leagueId }).sort({ statTyp: 1, rank: 1 }).lean(),
+            ]);
+            return res.json({ success: true, fromCache: false, leagueId, lastFetched: new Date(), players, teams });
+        }
+
         console.log(`[TopStats] Cache miss for league ${leagueId} — fetching from Livescore API…`);
-        const result = await fetchAndStoreTopStatsForLeague(league, apiKey);
+        const fetchPromise = fetchAndStoreTopStatsForLeague(league, apiKey);
+        activeFetches.set(leagueId, fetchPromise);
+        
+        let result;
+        try {
+            result = await fetchPromise;
+        } finally {
+            activeFetches.delete(leagueId);
+        }
 
         const [players, teams] = await Promise.all([
             PlayerTopStat.find({ leagueId }).sort({ statTyp: 1, rank: 1 }).lean(),
             TeamTopStat.find({ leagueId }).sort({ statTyp: 1, rank: 1 }).lean(),
         ]);
+
+        // Kick off background image fetching so the client can render the table instantly
+        enrichPlayersBackground(leagueId).catch(console.error);
 
         return res.json({ success: true, fromCache: false, leagueId, lastFetched: result.lastFetched, players, teams });
 
