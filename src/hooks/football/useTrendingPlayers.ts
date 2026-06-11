@@ -30,8 +30,43 @@ interface TrendingPlayersResponse {
   data: TrendingPlayerData[];
 }
 
+import { PRIORITY_CLUBS } from '../../services/football/footballApi';
+
+const NATIONAL_TEAMS = [
+  'argentina', 'france', 'england', 'belgium', 'brazil', 'netherlands', 'portugal', 'spain', 'italy', 'croatia',
+  'uruguay', 'colombia', 'usa', 'united states', 'mexico', 'germany', 'senegal', 'japan', 'switzerland', 'morocco',
+  'iran', 'denmark', 'korea republic', 'south korea', 'australia', 'ukraine', 'austria', 'sweden', 'poland', 'wales',
+  'hungary', 'serbia', 'peru', 'ecuador', 'chile', 'turkey', 'scotland', 'nigeria', 'romania', 'costa rica',
+  'cameroon', 'algeria', 'canada', 'egypt', 'norway', 'czech republic', 'slovakia', 'paraguay', 'venezuela', 'bolivia'
+];
+
 const fetchTrendingPlayers = async (): Promise<TrendingPlayersResponse> => {
   const response = await internalApiClient.get<TrendingPlayersResponse>('/trending-players');
+  
+  if (response.data?.data) {
+    response.data.data = response.data.data.filter(p => {
+      const teamName = (p.teamName || '').toLowerCase();
+      
+      const youthRegex = /\bu[- ]?(17|18|19|20|21|23)\b/i;
+      const womenRegex = /\bwomen\b|\(w\)| w$/i;
+
+      if (youthRegex.test(teamName) || womenRegex.test(teamName)) return false;
+
+      // Check for exact word matches to prevent substring bugs (e.g. "como" in "locomotive")
+      const matchesPriorityClub = PRIORITY_CLUBS.some(club => {
+        const regex = new RegExp(`\\b${club}\\b`, 'i');
+        return regex.test(teamName);
+      });
+
+      const matchesNationalTeam = NATIONAL_TEAMS.some(team => {
+         const regex = new RegExp(`\\b${team}\\b`, 'i');
+         return regex.test(teamName);
+      });
+
+      return matchesPriorityClub || matchesNationalTeam;
+    });
+  }
+  
   return response.data;
 };
 

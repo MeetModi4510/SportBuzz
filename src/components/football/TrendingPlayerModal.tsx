@@ -104,6 +104,21 @@ export function TrendingPlayerModal({ player, onClose }: TrendingPlayerModalProp
                     </span>
                   </div>
                 )}
+                {rawData.player?.country && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 border border-white/10">
+                    {rawData.player.country.alpha2 && (
+                      <img 
+                        src={`https://flagcdn.com/w20/${rawData.player.country.alpha2.toLowerCase()}.png`} 
+                        alt={rawData.player.country.name} 
+                        className="w-4 h-3 object-cover rounded-sm" 
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    )}
+                    <span className="text-xs font-medium text-white/80">
+                      {rawData.player.country.name}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 

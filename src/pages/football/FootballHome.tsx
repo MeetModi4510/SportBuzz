@@ -274,15 +274,14 @@ export default function FootballHome() {
           <section className="space-y-6">
             <div className="flex flex-col gap-1 px-2">
               <div className="flex items-center gap-3">
-                <TrendingUp size={18} className="text-[#d4af37]" />
-                <h2 className="text-xl font-bold tracking-tight text-white/90">Trending Players</h2>
+                <div className="p-2 bg-[#d4af37]/10 rounded-lg backdrop-blur-sm border border-[#d4af37]/20 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                  <TrendingUp size={22} className="text-[#d4af37]" />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black tracking-tight bg-gradient-to-r from-[#d4af37] via-amber-200 to-[#d4af37] bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] text-transparent bg-clip-text">
+                  Trending Players
+                </h2>
               </div>
-              <p className="text-xs text-[#d4af37]/60 font-medium ml-8">Top performers of the moment</p>
-              {trendingPlayersData?.lastFetched && (
-                <p className="text-xs text-white/30 font-medium ml-8">
-                  Last updated on {new Date(trendingPlayersData.lastFetched).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                </p>
-              )}
+              <p className="text-sm text-[#d4af37]/70 font-medium ml-14">Top performers of the moment</p>
             </div>
 
             {trendingLoading ? (

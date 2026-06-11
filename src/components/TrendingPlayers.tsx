@@ -90,13 +90,13 @@ export const TrendingPlayers = ({
   return (
     <section ref={observerRef} className={cn("space-y-4", className)}>
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-primary/10">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="p-2 bg-primary/10 rounded-lg backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/20">
           <TrendingUp className="text-primary" size={24} />
         </div>
-        <div>
-          <h2 className="text-xl font-bold text-foreground font-display">Trending Players</h2>
-          <p className="text-sm text-muted-foreground">Top performers of the moment</p>
+        <div className="flex flex-col">
+          <h2 className="text-2xl md:text-3xl font-black text-foreground font-display tracking-tight bg-gradient-to-r from-primary via-primary/60 to-primary bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] text-transparent bg-clip-text">Trending Players</h2>
+          <p className="text-sm text-muted-foreground font-medium">Top performers of the moment</p>
         </div>
       </div>
 
