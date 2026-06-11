@@ -196,8 +196,6 @@ export default function FootballHome() {
             )}
           </section>
 
-          <hr className="border-white/5" />
-
           {/* Transfers Market (Horizontal Scroll) */}
           <section className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
@@ -261,24 +259,16 @@ export default function FootballHome() {
             )}
           </section>
 
-          <hr className="border-white/5" />
-
           {/* ─── Premier League Standings ─────────────────────── */}
           <FootballStandings />
 
-          <hr className="border-white/5" />
-
           {/* ─── Top Stats ─────────────────────────────────────── */}
           <FootballTopStats />
-
-          <hr className="border-white/5" />
 
           {/* Latest News */}
           <section className="space-y-6">
             <FootballNewsSidebar />
           </section>
-
-          <hr className="border-white/5" />
 
           {/* ─── Trending Players ─────────────────────────────── */}
           <section className="space-y-6">

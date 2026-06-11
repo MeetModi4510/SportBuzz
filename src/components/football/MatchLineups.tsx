@@ -75,18 +75,95 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
     return null;
   };
 
-  const renderPlayer = (item: any, isHome: boolean) => {
-    const rating = getPlayerRating(item.player.id);
-    const getRatingColor = (r: string) => {
-      const val = parseFloat(r);
-      if (val >= 8.0) return 'bg-green-500 text-white border-green-700';
-      if (val >= 7.0) return 'bg-emerald-500 text-white border-emerald-700';
-      if (val >= 6.0) return 'bg-yellow-500 text-white border-yellow-700';
-      return 'bg-red-500 text-white border-red-700';
-    };
+  const getRatingColor = (r: string) => {
+    const val = parseFloat(r);
+    if (val >= 8.0) return 'bg-green-500 text-white border-green-700';
+    if (val >= 7.0) return 'bg-emerald-500 text-white border-emerald-700';
+    if (val >= 6.0) return 'bg-yellow-500 text-white border-yellow-700';
+    return 'bg-red-500 text-white border-red-700';
+  };
+
+  const renderEventIcons = (playerId: number, teamId: number) => {
+    const playerEvents = events.filter(e => e.team.id === teamId && (e.player.id === playerId || (e.assist && e.assist.id === playerId)));
+    
+    if (playerEvents.length === 0) return null;
 
     return (
-      <div key={item.player.id} className="flex flex-col items-center justify-center w-16 md:w-20 group z-10 transition-transform hover:scale-110">
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {playerEvents.map((e, idx) => {
+          if (e.type === "Goal") {
+            if (e.player.id === playerId) {
+              return <span key={idx} title="Goal" className="text-xs leading-none drop-shadow-md">⚽</span>;
+            } else if (e.assist && e.assist.id === playerId) {
+              return <span key={idx} title="Assist" className="text-[9px] bg-primary/20 text-primary border border-primary/30 px-1 py-0.5 rounded font-bold shadow-sm">A</span>;
+            }
+          }
+          if (e.type === "Card") {
+            if (e.detail === "Yellow Card") return <div key={idx} className="w-2.5 h-3.5 bg-[#FFCC00] shadow-sm" title="Yellow Card" />;
+            if (e.detail === "Red Card") return <div key={idx} className="w-2.5 h-3.5 bg-[#FF3333] shadow-sm" title="Red Card" />;
+          }
+          if (e.type === "subst") {
+            if (e.player.id === playerId) return <ArrowDown key={idx} className="w-3.5 h-3.5 text-red-500 drop-shadow-sm" title="Subbed Out" />;
+            if (e.assist && e.assist.id === playerId) return <ArrowUp key={idx} className="w-3.5 h-3.5 text-green-500 drop-shadow-sm" title="Subbed In" />;
+          }
+          return null;
+        })}
+      </div>
+    );
+  };
+
+
+  const renderPlayerListRow = (item: any, teamId: number, isSub: boolean = false) => {
+    const rating = getPlayerRating(item.player.id);
+    const eventIcons = renderEventIcons(item.player.id, teamId);
+    
+    const posMap: Record<string, string> = { "G": "GK", "D": "DEF", "M": "MID", "F": "FWD" };
+    const posLabel = item.player.pos ? (posMap[item.player.pos] || item.player.pos) : "";
+    
+    return (
+      <div key={item.player.id} className="flex items-center gap-3 py-2 border-b border-border/10 last:border-0 hover:bg-white/5 transition-colors px-2 -mx-2 rounded-md">
+        
+        <div className="w-5 text-right shrink-0">
+          <span className="text-xs font-mono font-semibold text-white/40">{item.player.number}</span>
+        </div>
+
+        <div className={`relative ${isSub ? 'w-8 h-8' : 'w-10 h-10'} rounded-full bg-secondary/30 flex items-center justify-center font-bold text-xs border border-border/50 overflow-hidden shrink-0 shadow-sm`}>
+          {item.player.id ? (
+            <img src={`https://media.api-sports.io/football/players/${item.player.id}.png`} className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => e.currentTarget.style.display = 'none'} />
+          ) : (
+            <span className="opacity-40">{item.player.number}</span>
+          )}
+        </div>
+        
+        <div className="flex flex-col flex-1 min-w-0 justify-center">
+          <span className="font-semibold text-[13px] md:text-sm tracking-tight text-white/90 truncate leading-tight">{item.player.name}</span>
+          {posLabel && <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 mt-0.5">{posLabel}</span>}
+        </div>
+        
+        <div className="flex items-center gap-3 shrink-0">
+          {eventIcons && <div>{eventIcons}</div>}
+          {rating && (
+            <div className={`text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded shadow-sm min-w-[28px] text-center ${getRatingColor(rating)}`}>
+              {rating}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderPlayer = (item: any, isHome: boolean) => {
+    const rating = getPlayerRating(item.player.id);
+    const teamId = isHome ? homeTeam.id : awayTeam.id;
+    const eventIcons = renderEventIcons(item.player.id, teamId);
+
+    return (
+      <div key={item.player.id} className="flex flex-col items-center justify-center w-16 md:w-20 group z-10 transition-transform hover:scale-110 relative">
+        {eventIcons && (
+          <div className="mb-0.5 bg-black/60 backdrop-blur-md rounded-full px-1.5 py-0.5 border border-white/10 scale-90 z-30">
+            {eventIcons}
+          </div>
+        )}
         <div className="relative">
           <div className={`relative w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xs md:text-sm font-bold font-display shadow-xl border-[3px] overflow-hidden ${isHome ? 'bg-blue-600 text-white border-blue-400/80' : 'bg-red-600 text-white border-red-400/80'}`}>
             <span className="absolute z-0">{item.player.number}</span>
@@ -177,28 +254,16 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 bg-secondary/5">
             <div className="space-y-2">
-              <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4 border-b border-border/40 pb-2">Starting XI</h4>
-              {(homeLineup.startXI || []).map(item => (
-                <div key={item.player.id} className="flex items-center gap-3 bg-background p-2 rounded-lg border border-border/40 shadow-sm">
-                  <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center font-bold text-xs border border-border overflow-hidden relative">
-                    <span className="absolute z-0">{item.player.number}</span>
-                    {item.player.id && <img src={`https://media.api-sports.io/football/players/${item.player.id}.png`} className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => e.currentTarget.style.display = 'none'} />}
-                  </div>
-                  <span className="font-medium text-sm">{item.player.name}</span>
-                </div>
-              ))}
+              <h4 className="text-xs font-bold uppercase tracking-widest text-white/50 mb-4 border-b border-white/10 pb-2">Starting XI</h4>
+              <div className="flex flex-col">
+                {(homeLineup.startXI || []).map(item => renderPlayerListRow(item, homeTeam.id, false))}
+              </div>
             </div>
             <div className="space-y-2">
-              <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4 border-b border-border/40 pb-2 md:text-right">Starting XI</h4>
-              {(awayLineup.startXI || []).map(item => (
-                <div key={item.player.id} className="flex items-center gap-3 bg-background p-2 rounded-lg border border-border/40 shadow-sm md:flex-row-reverse md:text-right">
-                  <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center font-bold text-xs border border-border overflow-hidden relative">
-                    <span className="absolute z-0">{item.player.number}</span>
-                    {item.player.id && <img src={`https://media.api-sports.io/football/players/${item.player.id}.png`} className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => e.currentTarget.style.display = 'none'} />}
-                  </div>
-                  <span className="font-medium text-sm">{item.player.name}</span>
-                </div>
-              ))}
+              <h4 className="text-xs font-bold uppercase tracking-widest text-white/50 mb-4 border-b border-white/10 pb-2 md:text-right">Starting XI</h4>
+              <div className="flex flex-col">
+                {(awayLineup.startXI || []).map(item => renderPlayerListRow(item, awayTeam.id, false))}
+              </div>
             </div>
           </div>
         )}
@@ -221,30 +286,9 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
         {/* Home Subs */}
         <div className="flex flex-col h-full space-y-6">
           <div className="flex-1 space-y-4">
-            <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-2">Substitutes</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {(homeLineup.substitutes || []).map((item, idx) => {
-                const isSubbedIn = events.some(e => e.type.toLowerCase() === "subst" && e.team.id === homeTeam.id && (e.player.id === item.player.id || e.assist.id === item.player.id));
-                return (
-                  <div key={idx} className="flex items-center gap-3 bg-secondary/10 p-2 rounded-lg border border-border/20">
-                    <div className="relative w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 overflow-hidden">
-                      <span className="text-[10px] font-bold opacity-70 absolute z-0">{item.player.number}</span>
-                      {item.player.id && (
-                        <img 
-                          src={`https://media.api-sports.io/football/players/${item.player.id}.png`} 
-                          alt={item.player.name}
-                          className="absolute inset-0 w-full h-full object-cover z-10"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                      )}
-                    </div>
-                    <p className="font-medium text-xs flex-1 opacity-90 truncate">{item.player.name}</p>
-                    {isSubbedIn && <ArrowUp className="w-4 h-4 text-green-500 shrink-0" />}
-                  </div>
-                );
-              })}
+            <h4 className="font-bold text-xs uppercase tracking-widest text-white/50 border-b border-white/10 pb-2">Substitutes</h4>
+            <div className="flex flex-col">
+              {(homeLineup.substitutes || []).map(item => renderPlayerListRow(item, homeTeam.id, true))}
               {!(homeLineup.substitutes && homeLineup.substitutes.length > 0) && (
                 <p className="text-xs text-muted-foreground italic py-2">No substitute data available.</p>
               )}
@@ -268,30 +312,9 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
         {/* Away Subs */}
         <div className="flex flex-col h-full space-y-6">
           <div className="flex-1 space-y-4">
-            <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-2 md:text-right">Substitutes</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {(awayLineup.substitutes || []).map((item, idx) => {
-                const isSubbedIn = events.some(e => e.type.toLowerCase() === "subst" && e.team.id === awayTeam.id && (e.player.id === item.player.id || e.assist.id === item.player.id));
-                return (
-                  <div key={idx} className="flex items-center gap-3 bg-secondary/10 p-2 rounded-lg border border-border/20 md:flex-row-reverse md:text-right">
-                    <div className="relative w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 overflow-hidden">
-                      <span className="text-[10px] font-bold opacity-70 absolute z-0">{item.player.number}</span>
-                      {item.player.id && (
-                        <img 
-                          src={`https://media.api-sports.io/football/players/${item.player.id}.png`} 
-                          alt={item.player.name}
-                          className="absolute inset-0 w-full h-full object-cover z-10"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                      )}
-                    </div>
-                    <p className="font-medium text-xs flex-1 opacity-90 truncate">{item.player.name}</p>
-                    {isSubbedIn && <ArrowUp className="w-4 h-4 text-green-500 shrink-0" />}
-                  </div>
-                );
-              })}
+            <h4 className="font-bold text-xs uppercase tracking-widest text-white/50 border-b border-white/10 pb-2 md:text-right">Substitutes</h4>
+            <div className="flex flex-col">
+              {(awayLineup.substitutes || []).map(item => renderPlayerListRow(item, awayTeam.id, true))}
               {!(awayLineup.substitutes && awayLineup.substitutes.length > 0) && (
                 <p className="text-xs text-muted-foreground italic py-2 md:text-right">No substitute data available.</p>
               )}

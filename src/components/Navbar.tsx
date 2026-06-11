@@ -46,14 +46,16 @@ const NavItem = ({ to, icon, label, isActive }: NavItemProps) => (
   <Link
     to={to}
     className={cn(
-      "flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200",
+      "flex items-center gap-2.5 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 group",
       isActive
-        ? "bg-primary/10 text-primary"
-        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+        ? "bg-foreground/10 text-foreground shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]"
+        : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
     )}
   >
-    {icon}
-    <span className="hidden md:inline">{label}</span>
+    <div className={cn("transition-transform duration-300", isActive ? "scale-110" : "group-hover:scale-110")}>
+      {icon}
+    </div>
+    <span className="hidden md:inline tracking-wide">{label}</span>
   </Link>
 );
 
@@ -230,11 +232,10 @@ export const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            <NavItem to="/" icon={<Home size={18} />} label="Dashboard" isActive={location.pathname === "/"} />
-
-            <NavItem to="/performance-lab" icon={<BarChart3 size={18} />} label="Performance Lab" isActive={location.pathname === "/performance-lab"} />
-            <NavItem to="/create" icon={<PlusCircle size={18} />} label="Create" isActive={location.pathname === "/create"} />
+          <nav className="hidden md:flex items-center gap-1.5 p-1 bg-secondary/30 rounded-full border border-border/40 backdrop-blur-md">
+            <NavItem to="/" icon={<Home size={18} strokeWidth={1.5} />} label="Dashboard" isActive={location.pathname === "/"} />
+            <NavItem to="/performance-lab" icon={<BarChart3 size={18} strokeWidth={1.5} />} label="Performance Lab" isActive={location.pathname === "/performance-lab"} />
+            <NavItem to="/create" icon={<PlusCircle size={18} strokeWidth={1.5} />} label="Create" isActive={location.pathname === "/create"} />
           </nav>
 
           {/* Sport Quick Access */}

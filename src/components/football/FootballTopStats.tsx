@@ -18,42 +18,30 @@ import {
   TeamStat,
 } from "../../hooks/football/useTopStats";
 
+const COUNTRY_CODES: Record<string, string> = {
+  "England": "gb-eng", "Norway": "no", "Brazil": "br", "Ghana": "gh",
+  "France": "fr", "Spain": "es", "Germany": "de", "Italy": "it",
+  "Portugal": "pt", "Netherlands": "nl", "Argentina": "ar", "Belgium": "be",
+  "Senegal": "sn", "Egypt": "eg", "South Korea": "kr", "Japan": "jp",
+  "Uruguay": "uy", "Colombia": "co", "Croatia": "hr", "Morocco": "ma",
+  "Switzerland": "ch", "Denmark": "dk", "Serbia": "rs", "Poland": "pl",
+  "Sweden": "se", "Wales": "gb-wls", "Scotland": "gb-sct", "USA": "us",
+  "Ivory Coast": "ci", "Nigeria": "ng", "Algeria": "dz", "Cameroon": "cm",
+  "Chile": "cl", "Mexico": "mx", "Canada": "ca", "Australia": "au"
+};
+
 // ── Small helpers ──────────────────────────────────────────────────────────────
 
-function RankBadge({ rank }: { rank: number }) {
-  if (rank === 1)
-    return (
-      <span className="flex items-center justify-center w-7 h-7 rounded-full bg-amber-500/20 border border-amber-400/30">
-        <Trophy size={13} className="text-amber-400" />
-      </span>
-    );
-  if (rank === 2)
-    return (
-      <span className="w-7 h-7 flex items-center justify-center rounded-full bg-white/5 text-[11px] font-black text-slate-300">
-        2
-      </span>
-    );
-  if (rank === 3)
-    return (
-      <span className="w-7 h-7 flex items-center justify-center rounded-full bg-white/5 text-[11px] font-black text-amber-700/90">
-        3
-      </span>
-    );
-  return (
-    <span className="w-7 h-7 flex items-center justify-center text-[11px] font-semibold text-white/30">
-      {rank}
-    </span>
-  );
-}
-
-function PlayerAvatar({ photoBase64, name, sofascoreId }: { photoBase64?: string; name: string; sofascoreId?: string }) {
+function PlayerAvatar({ photoBase64, name, sofascoreId, className }: { photoBase64?: string; name: string; sofascoreId?: string; className?: string }) {
   const [err, setErr] = useState(false);
+
+  const cx = className || "w-9 h-9";
 
   // If sofascoreId is completely undefined, the backend is still enriching this player
   if (sofascoreId === undefined) {
     return (
-      <div className="w-9 h-9 rounded-full bg-white/5 border border-white/5 flex items-center justify-center flex-shrink-0">
-        <Loader2 className="w-3.5 h-3.5 animate-spin text-white/30" />
+      <div className={cn("rounded-full bg-white/5 border border-white/5 flex items-center justify-center flex-shrink-0", cx)}>
+        <Loader2 className="w-1/3 h-1/3 animate-spin text-white/30" />
       </div>
     );
   }
@@ -61,7 +49,7 @@ function PlayerAvatar({ photoBase64, name, sofascoreId }: { photoBase64?: string
   // If we checked Sofascore but they have no photo, show initials
   if (!photoBase64 || err) {
     return (
-      <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+      <div className={cn("rounded-full bg-white/10 flex items-center justify-center flex-shrink-0", cx)}>
         <span className="text-[10px] font-black text-white/50">
           {name.slice(0, 2).toUpperCase()}
         </span>
@@ -75,17 +63,19 @@ function PlayerAvatar({ photoBase64, name, sofascoreId }: { photoBase64?: string
       alt={name}
       onError={() => setErr(true)}
       loading="lazy"
-      className="w-9 h-9 rounded-full object-cover flex-shrink-0 bg-white/5 border border-white/10"
+      className={cn("rounded-full object-cover flex-shrink-0 bg-white/5 border border-white/10", cx)}
     />
   );
 }
 
-function TeamBadge({ img, name }: { img: string; name: string }) {
+function TeamBadge({ img, name, className }: { img: string; name: string; className?: string }) {
   const [err, setErr] = useState(false);
   const src = teamBadgeUrl(img);
+  const cx = className || "w-6 h-6";
+
   if (!src || err) {
     return (
-      <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+      <div className={cn("rounded-full bg-white/10 flex items-center justify-center flex-shrink-0", cx)}>
         <span className="text-[8px] font-black text-white/50">{name.slice(0, 2).toUpperCase()}</span>
       </div>
     );
@@ -96,173 +86,149 @@ function TeamBadge({ img, name }: { img: string; name: string }) {
       alt={name}
       onError={() => setErr(true)}
       loading="lazy"
-      className="w-6 h-6 rounded-full object-contain flex-shrink-0 bg-white/5"
+      className={cn("rounded-full object-contain flex-shrink-0 bg-white/5", cx)}
     />
   );
 }
 
-// ── Player rows table ──────────────────────────────────────────────────────────
-function PlayerStatTable({ rows }: { rows: PlayerStat[] }) {
+// ── Player Card List ──────────────────────────────────────────────────────────
+function PlayerStatList({ rows }: { rows: PlayerStat[] }) {
   if (!rows.length)
-    return <p className="text-center text-white/30 text-sm py-8">No data available.</p>;
+    return <p className="text-center text-white/30 text-sm py-8 font-light">No data available.</p>;
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-[10px] font-black text-white/25 uppercase tracking-widest border-b border-white/5">
-            <th className="pl-4 pr-2 py-3 text-left w-10">#</th>
-            <th className="px-3 py-3 text-left min-w-[160px]">Player</th>
-            <th className="px-3 py-3 text-left hidden sm:table-cell">Pos</th>
-            <th className="px-3 py-3 text-left hidden lg:table-cell">Country</th>
-            <th className="px-3 py-3 text-left hidden md:table-cell">Club</th>
-            <th className="pr-4 pl-3 py-3 text-center font-black text-white/50">Value</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white/[0.04]">
-          {rows.map((p) => (
-            <tr
-              key={p._id}
-              className={cn(
-                "transition-colors group",
-                p.rank === 1
-                  ? "bg-gradient-to-r from-amber-500/10 to-transparent"
-                  : "hover:bg-white/5"
-              )}
-            >
-              {/* Rank */}
-              <td className="pl-4 pr-2 py-3">
-                <RankBadge rank={p.rank} />
-              </td>
+    <div className="flex flex-col gap-2">
+      {rows.map((p) => {
+        return (
+          <div key={p._id} className="group relative flex items-center py-1 transition-transform duration-500 hover:translate-x-3 cursor-default">
+            {/* Giant Watermark Rank */}
+            <div className="absolute left-0 -translate-x-3 top-1/2 -translate-y-1/2 text-[80px] md:text-[100px] font-black text-white/[0.03] z-0 select-none pointer-events-none tracking-tighter leading-none group-hover:text-white/[0.05] group-hover:-translate-y-[55%] transition-all duration-500">
+              {p.rank}
+            </div>
 
-              {/* Player */}
-              <td className="px-3 py-3">
-                <div className="flex items-center gap-2.5">
-                  <PlayerAvatar photoBase64={p.photoBase64} name={p.playerName} sofascoreId={p.sofascoreId} />
-                  <div>
-                    <p className={cn("font-semibold leading-tight whitespace-nowrap", p.rank === 1 ? "text-amber-400" : "text-white/90")}>
-                      {p.playerName}
-                    </p>
-                    <p className="text-[10px] text-white/30 sm:hidden">
-                      {p.teamName} {p.jerseyNumber && `• #${p.jerseyNumber}`}
-                    </p>
-                  </div>
-                </div>
-              </td>
-
-              {/* Pos */}
-              <td className="px-3 py-3 hidden sm:table-cell">
-                {p.sofascoreId === undefined ? (
-                  <div className="w-6 h-5 rounded-md bg-white/5 animate-pulse" />
+            {/* Content Layer */}
+            <div className="flex items-center gap-4 z-10 w-full border-b border-white/[0.08] pb-3 group-hover:border-white/[0.15] transition-colors">
+              
+              {/* Grayscale Squared Avatar */}
+              <div className="shrink-0 overflow-hidden rounded-lg w-12 h-12 md:w-14 md:h-14 shadow-lg shadow-black/40 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 bg-white/5">
+                {p.photoBase64 ? (
+                  <img src={p.photoBase64} alt={p.playerName} className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700" />
                 ) : (
-                  <span className="text-xs text-white/40 font-medium bg-white/5 px-2 py-1 rounded-md">
-                    {p.position || '-'}
-                  </span>
+                  <div className="w-full h-full flex items-center justify-center text-white/20"><Users size={18} /></div>
                 )}
-              </td>
+              </div>
 
-              {/* Country */}
-              <td className="px-3 py-3 hidden lg:table-cell">
-                {p.sofascoreId === undefined ? (
-                  <div className="w-12 h-3 rounded-md bg-white/5 animate-pulse" />
-                ) : (
-                  <span className="text-xs text-white/50">{p.country || '-'}</span>
-                )}
-              </td>
-
-              {/* Club */}
-              <td className="px-3 py-3 hidden md:table-cell">
-                <div className="flex items-center gap-2">
-                  <TeamBadge img={p.teamBadgeUrl} name={p.teamName} />
-                  <span className="text-xs text-white/50">
-                    {p.teamName} {p.jerseyNumber && <span className="text-white/20">#{p.jerseyNumber}</span>}
-                  </span>
-                </div>
-              </td>
-
-              {/* Stat Value */}
-              <td className="pr-4 pl-3 py-3 text-center">
-                <span className={cn(
-                  "inline-flex items-center justify-center min-w-[2.25rem] h-7 rounded-lg font-black text-sm tabular-nums",
-                  p.rank === 1 ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
-                  p.rank === 2 ? "bg-white/8 text-slate-300" :
-                  p.rank === 3 ? "bg-white/8 text-amber-700/90" :
-                  "bg-white/5 text-white/70"
-                )}>
-                  {p.statValue}
+              {/* Player Info */}
+              <div className="flex flex-col flex-1 min-w-0">
+                <span className="text-lg md:text-xl font-bold tracking-tight text-white/90 group-hover:text-white transition-colors truncate">
+                  {p.playerName}
                 </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                
+                <div className="flex items-center gap-2 mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
+                  <TeamBadge img={p.teamBadgeUrl} name={p.teamName} className="w-3.5 h-3.5 grayscale group-hover:grayscale-0" />
+                  <span className="text-[10px] uppercase tracking-widest text-white/80 font-semibold truncate">
+                    {p.teamName}
+                  </span>
+                  
+                  {p.jerseyNumber && (
+                    <>
+                      <span className="text-white/20">•</span>
+                      <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">
+                        #{p.jerseyNumber}
+                      </span>
+                    </>
+                  )}
+
+                  {p.position && (
+                    <>
+                      <span className="text-white/20">•</span>
+                      <span className="text-[9px] text-amber-400 font-bold uppercase tracking-[0.2em]">
+                        {p.position}
+                      </span>
+                    </>
+                  )}
+
+                  {p.country && (
+                    <>
+                      <span className="text-white/20">•</span>
+                      <div className="flex items-center gap-1">
+                        {COUNTRY_CODES[p.country] && (
+                          <img 
+                            src={`https://flagcdn.com/w20/${COUNTRY_CODES[p.country]}.png`} 
+                            alt={p.country} 
+                            className="w-3.5 h-auto rounded-[1px] opacity-80 group-hover:opacity-100" 
+                          />
+                        )}
+                        <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">
+                          {p.country}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Ultra Thin Huge Stat */}
+              <div className="font-thin text-4xl md:text-5xl tabular-nums tracking-tighter text-amber-400/50 group-hover:text-amber-400 transition-colors duration-500 shrink-0 pr-2">
+                {p.statValue}
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-// ── Team rows table ────────────────────────────────────────────────────────────
-function TeamStatTable({ rows }: { rows: TeamStat[] }) {
+// ── Team Card List ────────────────────────────────────────────────────────────
+function TeamStatList({ rows }: { rows: TeamStat[] }) {
   if (!rows.length)
-    return <p className="text-center text-white/30 text-sm py-8">No data available.</p>;
-
-  const hasPrGm = rows.some(r => r.statPerGame);
+    return <p className="text-center text-white/30 text-sm py-8 font-light">No data available.</p>;
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-[10px] font-black text-white/25 uppercase tracking-widest border-b border-white/5">
-            <th className="pl-4 pr-2 py-3 text-left w-10">#</th>
-            <th className="px-3 py-3 text-left min-w-[160px]">Club</th>
-            {hasPrGm && <th className="px-3 py-3 text-center hidden sm:table-cell text-white/30">Per Game</th>}
-            <th className="pr-4 pl-3 py-3 text-center font-black text-white/50">Total</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white/[0.04]">
-          {rows.map((t) => (
-            <tr
-              key={t._id}
-              className={cn(
-                "transition-colors group",
-                t.rank === 1
-                  ? "bg-gradient-to-r from-amber-500/10 to-transparent"
-                  : "hover:bg-white/5"
-              )}
-            >
-              <td className="pl-4 pr-2 py-3">
-                <RankBadge rank={t.rank} />
-              </td>
+    <div className="flex flex-col gap-2">
+      {rows.map((t) => {
+        return (
+          <div key={t._id} className="group relative flex items-center py-1 transition-transform duration-500 hover:translate-x-3 cursor-default">
+            {/* Giant Watermark Rank */}
+            <div className="absolute left-0 -translate-x-3 top-1/2 -translate-y-1/2 text-[80px] md:text-[100px] font-black text-white/[0.03] z-0 select-none pointer-events-none tracking-tighter leading-none group-hover:text-white/[0.05] group-hover:-translate-y-[55%] transition-all duration-500">
+              {t.rank}
+            </div>
 
-              <td className="px-3 py-3">
-                <div className="flex items-center gap-2.5">
-                  <TeamBadge img={t.teamBadgeUrl} name={t.teamName} />
-                  <span className={cn("font-semibold leading-tight whitespace-nowrap", t.rank === 1 ? "text-amber-400" : "text-white/90")}>
-                    {t.teamName}
-                  </span>
-                </div>
-              </td>
+            {/* Content Layer */}
+            <div className="flex items-center gap-4 z-10 w-full border-b border-white/[0.08] pb-3 group-hover:border-white/[0.15] transition-colors">
+              
+              {/* Grayscale Squared Avatar */}
+              <div className="shrink-0 flex items-center justify-center rounded-lg w-12 h-12 md:w-14 md:h-14 shadow-lg shadow-black/40 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 bg-white/5 p-1.5 border border-white/5">
+                {t.teamBadgeUrl ? (
+                  <img src={teamBadgeUrl(t.teamBadgeUrl)} alt={t.teamName} className="w-full h-full object-contain scale-110 group-hover:scale-100 transition-transform duration-700 drop-shadow-lg" />
+                ) : (
+                  <Shield size={20} className="text-white/20" />
+                )}
+              </div>
 
-              {hasPrGm && (
-                <td className="px-3 py-3 text-center hidden sm:table-cell">
-                  <span className="text-xs text-white/40 tabular-nums">{t.statPerGame}</span>
-                </td>
-              )}
-
-              <td className="pr-4 pl-3 py-3 text-center">
-                <span className={cn(
-                  "inline-flex items-center justify-center min-w-[2.25rem] h-7 rounded-lg font-black text-sm tabular-nums",
-                  t.rank === 1 ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
-                  t.rank === 2 ? "bg-white/8 text-slate-300" :
-                  t.rank === 3 ? "bg-white/8 text-amber-700/90" :
-                  "bg-white/5 text-white/70"
-                )}>
-                  {t.statValue}
+              {/* Team Info */}
+              <div className="flex flex-col flex-1 min-w-0">
+                <span className="text-lg md:text-xl font-bold tracking-tight text-white/90 group-hover:text-white transition-colors truncate">
+                  {t.teamName}
                 </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                {t.statPerGame && (
+                   <div className="flex items-center gap-2 mt-1 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
+                     <span className="text-[9px] text-amber-400 font-bold uppercase tracking-[0.2em] bg-amber-400/10 px-1.5 py-0.5 rounded">
+                       {t.statPerGame} per game
+                     </span>
+                   </div>
+                )}
+              </div>
+
+              {/* Ultra Thin Huge Stat */}
+              <div className="font-thin text-4xl md:text-5xl tabular-nums tracking-tighter text-amber-400/50 group-hover:text-amber-400 transition-colors duration-500 shrink-0 pr-2">
+                {t.statValue}
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -291,20 +257,11 @@ export function FootballTopStats() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
         <div>
           <div className="flex items-center gap-3">
-            <BarChart3 size={18} className="text-amber-400" />
-            <h2 className="text-xl font-bold tracking-tight text-white/90">Top Stats</h2>
+            <BarChart3 size={24} className="text-[#d4af37]" />
+            <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">
+              Top Stats.
+            </h2>
           </div>
-          {data?.lastFetched && (
-            <p className="text-[10px] text-white/30 mt-1 ml-9">
-              Last updated on{" "}
-              {new Date(data.lastFetched).toLocaleDateString("en-US", {
-                month: "short",
-                day:   "numeric",
-                hour:  "2-digit",
-                minute:"2-digit",
-              })}
-            </p>
-          )}
         </div>
 
         {/* League Dropdown — same design as FootballStandings */}
@@ -351,37 +308,47 @@ export function FootballTopStats() {
 
       {/* ── Content ─────────────────────────────────────────────────────── */}
       {data && !isLoading && (
-        <div className="rounded-2xl border border-white/8 bg-white/[0.03] backdrop-blur-sm overflow-hidden">
-          {/* ── Player / Team toggle ─ */}
-          <div className="flex items-center gap-1 p-3 border-b border-white/5">
-            <button
-              onClick={() => setView("players")}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all",
-                view === "players"
-                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                  : "text-white/50 hover:text-white hover:bg-white/5"
-              )}
-            >
-              <Users size={14} />
-              Players
-            </button>
-            <button
-              onClick={() => setView("teams")}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all",
-                view === "teams"
-                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                  : "text-white/50 hover:text-white hover:bg-white/5"
-              )}
-            >
-              <Shield size={14} />
-              Teams
-            </button>
+        <div className="flex flex-col mt-6">
+          {/* ── Header Toggles ─ */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+            <div className="flex items-center gap-6">
+              <button
+                onClick={() => setView("players")}
+                className={cn(
+                  "text-sm tracking-widest uppercase transition-all duration-300 relative",
+                  view === "players"
+                    ? "text-white font-medium"
+                    : "text-white/40 hover:text-white/70"
+                )}
+              >
+                Players
+                {view === "players" && (
+                  <span className="absolute -bottom-[17px] left-0 w-full h-[2px] bg-amber-400" />
+                )}
+              </button>
+              <button
+                onClick={() => setView("teams")}
+                className={cn(
+                  "text-sm tracking-widest uppercase transition-all duration-300 relative",
+                  view === "teams"
+                    ? "text-white font-medium"
+                    : "text-white/40 hover:text-white/70"
+                )}
+              >
+                Teams
+                {view === "teams" && (
+                  <span className="absolute -bottom-[17px] left-0 w-full h-[2px] bg-amber-400" />
+                )}
+              </button>
+            </div>
+            
+            <div className="text-[10px] text-white/30 uppercase tracking-widest text-right hidden sm:block">
+               {selectedLeague.name} / Top Stats
+            </div>
           </div>
 
           {/* ── Category chips ─────── */}
-          <div className="flex overflow-x-auto gap-2 px-3 py-3 border-b border-white/5 hide-scrollbar">
+          <div className="flex flex-wrap gap-x-6 gap-y-3 mb-6">
             {view === "players"
               ? playerTypes.map(([typ, label]) => {
                   const t = Number(typ);
@@ -390,10 +357,10 @@ export function FootballTopStats() {
                       key={t}
                       onClick={() => setPlayerTyp(t)}
                       className={cn(
-                        "shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
+                        "text-xs tracking-widest uppercase transition-colors",
                         playerTyp === t
-                          ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
-                          : "border-white/8 text-white/50 hover:text-white hover:border-white/20 hover:bg-white/5"
+                          ? "text-amber-400 font-semibold"
+                          : "text-white/30 hover:text-white/70"
                       )}
                     >
                       {label}
@@ -407,10 +374,10 @@ export function FootballTopStats() {
                       key={t}
                       onClick={() => setTeamTyp(t)}
                       className={cn(
-                        "shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
+                        "text-xs tracking-widest uppercase transition-colors",
                         teamTyp === t
-                          ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
-                          : "border-white/8 text-white/50 hover:text-white hover:border-white/20 hover:bg-white/5"
+                          ? "text-amber-400 font-semibold"
+                          : "text-white/30 hover:text-white/70"
                       )}
                     >
                       {label}
@@ -419,20 +386,13 @@ export function FootballTopStats() {
                 })}
           </div>
 
-          {/* ── Table ──────────────── */}
+          {/* ── List ──────────────── */}
           {view === "players" ? (
-            <PlayerStatTable rows={playerRows} />
+            <PlayerStatList rows={playerRows} />
           ) : (
-            <TeamStatTable rows={teamRows} />
+            <TeamStatList rows={teamRows} />
           )}
 
-          {/* ── Footer ─────────────── */}
-          <div className="px-5 py-3 border-t border-white/5 flex justify-between items-center">
-            <p className="text-[10px] text-white/20">
-              {data.stale ? "⚠ Showing cached data" : data.fromCache ? "Served from cache" : "Live data"}
-            </p>
-            <span className="text-[10px] text-white/20 font-semibold">{selectedLeague.name} · Top Stats</span>
-          </div>
         </div>
       )}
     </section>
