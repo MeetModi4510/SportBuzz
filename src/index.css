@@ -7,7 +7,7 @@
 @layer base {
   :root {
     /* Light Mode Colors (Pristine & Colorful Mesh) */
-    --background: 0 0% 98%; /* Pristine light background */
+    --background: 210 20% 95%; /* Pristine light gray-blue background for contrast */
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%; /* Pure white for cards */
