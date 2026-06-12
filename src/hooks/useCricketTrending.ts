@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
@@ -67,27 +67,40 @@ export function useCricketTrendingPlayers() {
   const [loading, setLoading] = useState(false);
   const fetchedRef = useRef(false);
 
-  const fetchTrending = useCallback(async () => {
+  const fetchTrending = useCallback(async (forceFetch = false) => {
     // Don't re-fetch if already loaded in this session
-    if (trendingCacheData) {
+    if (!forceFetch && trendingCacheData) {
       setTrending(trendingCacheData);
       return;
     }
-    if (fetchedRef.current) return;
+    if (!forceFetch && fetchedRef.current) return;
     fetchedRef.current = true;
 
-    setLoading(true);
+    if (!forceFetch) setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/api/cricket/trending-players`);
       const json: TrendingResult = await res.json();
       trendingCacheData = json;
       setTrending(json);
     } catch {
-      setTrending({ data: [], lastUpdatedOn: null, error: 'Failed to load trending players' });
+      if (!forceFetch) setTrending({ data: [], lastUpdatedOn: null, error: 'Failed to load trending players' });
     } finally {
-      setLoading(false);
+      if (!forceFetch) setLoading(false);
     }
   }, []);
+
+  // Poll automatically if background enrichment is in progress (faceImageId missing)
+  useEffect(() => {
+    if (!trending?.data) return;
+    const needsImages = trending.data.some(p => p.faceImageId === null || p.faceImageId === undefined);
+    if (!needsImages) return;
+
+    const intervalId = setInterval(() => {
+      fetchTrending(true);
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, [trending, fetchTrending]);
 
   return { trending, loading, fetchTrending };
 }
