@@ -1,16 +1,16 @@
-# Graph Report - dev_scripts  (2026-06-12)
+# Graph Report - dev_scripts  (2026-06-11)
 
 ## Corpus Check
-- 429 files · ~1,244,337 words
+- 429 files · ~1,210,656 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2454 nodes · 4633 edges · 212 communities (183 shown, 29 thin omitted)
+- 2454 nodes · 4633 edges · 211 communities (182 shown, 29 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 13 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `be312a65`
+- Built from commit: `f00a56b7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -149,7 +149,6 @@
 - [[_COMMUNITY_Community 207|Community 207]]
 - [[_COMMUNITY_Community 208|Community 208]]
 - [[_COMMUNITY_Community 209|Community 209]]
-- [[_COMMUNITY_Community 210|Community 210]]
 - [[_COMMUNITY_Community 213|Community 213]]
 
 ## God Nodes (most connected - your core abstractions)
@@ -171,15 +170,15 @@
   TM.tsx → src/components/FootballPitchLineup.tsx
 - `updatePointsTable()` --calls--> `oversToDecimal()`  [INFERRED]
   server/controllers/matchController.js → src/lib/cricketUtils.ts
-- `MatchDetails()` --calls--> `Format`  [INFERRED]
-  src/pages/MatchDetails.tsx → src/components/cricket/CricketRankings.tsx
 - `exportToCSV()` --calls--> `Alert`  [INFERRED]
   src/lib/export.ts → src/components/ui/alert.tsx
+- `TournamentManager()` --calls--> `useTournamentFollow()`  [EXTRACTED]
+  TM.tsx → src/hooks/useTournamentFollow.ts
 
 ## Import Cycles
 - 1-file cycle: `src/data/achievements.ts -> src/data/achievements.ts`
 
-## Communities (212 total, 29 thin omitted)
+## Communities (211 total, 29 thin omitted)
 
 ### Community 0 - "Football Match Controller"
 Cohesion: 0.11
@@ -270,16 +269,16 @@ Cohesion: 0.04
 Nodes (56): NavItem(), NavLink, NavLinkCompatProps, cn(), Badge(), BadgeProps, badgeVariants, Breadcrumb (+48 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.09
-Nodes (23): Category, CATEGORY_API_MAP, COUNTRY_SHORT_NAMES, CricketRankings(), Format, FORMAT_API_MAP, formatLastUpdated(), MEDAL_STYLES (+15 more)
+Cohesion: 0.10
+Nodes (22): Category, CATEGORY_API_MAP, COUNTRY_SHORT_NAMES, CricketRankings(), FORMAT_API_MAP, formatLastUpdated(), MEDAL_STYLES, mockPlayerRankings (+14 more)
 
 ### Community 23 - "Community 23"
 Cohesion: 0.09
 Nodes (21): compilerOptions, allowImportingTsExtensions, baseUrl, isolatedModules, jsx, lib, module, moduleDetection (+13 more)
 
 ### Community 24 - "Community 24"
-Cohesion: 0.12
-Nodes (9): PlayerProfileDialog(), PlayerProfileDialogProps, VenueAnalysisPanel(), matches, players, teams, venues, Team (+1 more)
+Cohesion: 0.11
+Nodes (19): MatchCard(), MatchSectionProps, PlayerProfileDialog(), PlayerProfileDialogProps, SportFilter(), SportFilterProps, sports, getSportBorderColor() (+11 more)
 
 ### Community 25 - "Community 25"
 Cohesion: 0.19
@@ -374,8 +373,8 @@ Cohesion: 0.15
 Nodes (12): compilerOptions, allowJs, baseUrl, noImplicitAny, noUnusedLocals, noUnusedParameters, paths, skipLibCheck (+4 more)
 
 ### Community 48 - "Community 48"
-Cohesion: 0.14
-Nodes (11): MatchCardProps, MatchPerformanceLabProps, MinimalCricketCardProps, statuses, StatusFilter(), StatusFilterProps, HeadToHead, Match (+3 more)
+Cohesion: 0.11
+Nodes (13): MatchCardProps, MatchPerformanceLabProps, MinimalCricketCardProps, PreMatchForecast(), PreMatchForecastProps, statuses, StatusFilter(), StatusFilterProps (+5 more)
 
 ### Community 49 - "Community 49"
 Cohesion: 0.18
@@ -523,7 +522,7 @@ Nodes (10): createEventNews(), createMatchReportNews(), getTournamentNews, Footb
 
 ### Community 176 - "Community 176"
 Cohesion: 0.16
-Nodes (16): Player, PlayerManager(), SortConfig, SortField, SortOrder, Avatar, AvatarFallback, AvatarImage (+8 more)
+Nodes (18): Player, PlayerManager(), SortConfig, SortField, SortOrder, UserData, UserManager(), Avatar (+10 more)
 
 ### Community 178 - "Community 178"
 Cohesion: 0.20
@@ -567,7 +566,7 @@ Nodes (12): TransfersResponse, FootballTransferData, TransferCard(), TransferCar
 
 ### Community 197 - "Community 197"
 Cohesion: 0.27
-Nodes (11): UserData, UserManager(), ConfirmModalProps, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter() (+3 more)
+Nodes (9): ConfirmModalProps, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter(), AlertDialogHeader(), AlertDialogOverlay (+1 more)
 
 ### Community 198 - "Community 198"
 Cohesion: 0.15
@@ -575,7 +574,7 @@ Nodes (16): PlayerCard(), PlayerCardProps, TrendingPlayers(), TrendingPlayersPro
 
 ### Community 199 - "Community 199"
 Cohesion: 0.10
-Nodes (19): CricketPlayerImage(), CricketPlayerImageProps, memoryCache, persistCache(), processQueue(), QueueItem, resolveQueue, FootballPitchLineup() (+11 more)
+Nodes (20): CricketPlayerImage(), CricketPlayerImageProps, memoryCache, persistCache(), processQueue(), QueueItem, resolveQueue, FootballPitchLineup() (+12 more)
 
 ### Community 200 - "Community 200"
 Cohesion: 0.25
@@ -605,10 +604,6 @@ Nodes (4): BowlerDetailPopup(), BowlerStat, PlayerInfo, Props
 Cohesion: 0.40
 Nodes (4): TrendingPlayerCardProps, TrendingPlayerModal(), TrendingPlayerModalProps, TrendingPlayerData
 
-### Community 210 - "Community 210"
-Cohesion: 0.24
-Nodes (12): LiveBadge(), LiveBadgeProps, MatchCard(), MatchSectionProps, SportFilter(), SportFilterProps, sports, getSportBorderColor() (+4 more)
-
 ## Knowledge Gaps
 - **1017 isolated node(s):** `branch`, `path`, `parentBranch`, `createdAt`, `remote` (+1012 more)
   These have ≤1 connection - possible missing edges or undocumented components.
@@ -621,7 +616,7 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.116) - this node is a cross-community bridge._
 - **Why does `hasMeaningfulScores()` connect `Community 35` to `Community 25`?**
   _High betweenness centrality (0.116) - this node is a cross-community bridge._
-- **Why does `cn()` connect `Community 21` to `Admin Audit & Settings`, `Admin Edit Team Dialog`, `Player Analysis Panel`, `Loading Skeletons`, `Admin Player Manager`, `Venue Analysis Panel`, `Community 15`, `Community 16`, `Community 17`, `Community 18`, `Community 22`, `Community 24`, `Community 25`, `Community 27`, `Community 34`, `Community 42`, `Community 44`, `Community 173`, `Community 48`, `Community 176`, `Community 50`, `Community 51`, `Community 180`, `Community 181`, `Community 52`, `Community 197`, `Community 198`, `Community 199`, `Community 72`, `Community 200`, `Community 203`, `Community 210`?**
+- **Why does `cn()` connect `Community 21` to `Admin Audit & Settings`, `Admin Edit Team Dialog`, `Player Analysis Panel`, `Loading Skeletons`, `Admin Player Manager`, `Venue Analysis Panel`, `Community 15`, `Community 16`, `Community 17`, `Community 18`, `Community 22`, `Community 24`, `Community 25`, `Community 27`, `Community 34`, `Community 42`, `Community 44`, `Community 173`, `Community 48`, `Community 176`, `Community 50`, `Community 51`, `Community 180`, `Community 181`, `Community 52`, `Community 197`, `Community 198`, `Community 199`, `Community 72`, `Community 200`, `Community 203`?**
   _High betweenness centrality (0.084) - this node is a cross-community bridge._
 - **What connects `branch`, `path`, `parentBranch` to the rest of the system?**
   _1017 weakly-connected nodes found - possible documentation gaps or missing edges._

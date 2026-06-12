@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, AlertTriangle, ChevronDown, BarChart3, Trophy, Users, Shield } from "lucide-react";
 import {
   DropdownMenu,
@@ -9,6 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import {
   useTopStats,
+  API_BASE,
   PLAYER_STAT_LABELS,
   TEAM_STAT_LABELS,
   TOPSTATS_LEAGUES,
@@ -240,7 +241,18 @@ export function FootballTopStats() {
   const [playerTyp, setPlayerTyp] = useState(1);
   const [teamTyp, setTeamTyp]     = useState(10);
 
-  const { data, isLoading, isError } = useTopStats(leagueId);
+  const { data, isLoading, isError } = useTopStats(leagueId, playerTyp, view);
+
+  // Trigger on-demand background enrichment whenever tab changes
+  useEffect(() => {
+    if (view === "players") {
+      fetch(`${API_BASE}/api/football/top-stats/enrich`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ leagueId, statTyp: playerTyp }),
+      }).catch(console.error);
+    }
+  }, [leagueId, playerTyp, view]);
 
   const selectedLeague = TOPSTATS_LEAGUES.find((l) => l.id === leagueId) || TOPSTATS_LEAGUES[0];
 

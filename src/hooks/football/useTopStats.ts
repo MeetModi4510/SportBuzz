@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-const API_BASE = import.meta.env.PROD
+export const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
   : 'http://localhost:5000';
 
@@ -95,7 +95,7 @@ export function teamBadgeUrl(img: string): string {
   return `https://lsm-static-prod.livescore.com/medium/${img}`;
 }
 
-export function useTopStats(leagueId: number) {
+export function useTopStats(leagueId: number, activePlayerTyp: number, view: "players" | "teams") {
   return useQuery<TopStatsResponse>({
     queryKey: ['football', 'top-stats', leagueId],
     queryFn: () => fetchTopStats(leagueId),
@@ -105,9 +105,16 @@ export function useTopStats(leagueId: number) {
     refetchOnMount: false,
     retry: 1,
     refetchInterval: (query) => {
+      // Only poll for updates if we are actively looking at players
+      if (view !== "players") return false;
+      
       const players = query?.state?.data?.players;
       if (!players) return false;
-      const needsEnrichment = players.some((p: PlayerStat) => p.sofascoreId === undefined);
+      
+      // Only poll if players IN THE CURRENT TAB are missing images
+      const activePlayers = players.filter(p => p.statTyp === activePlayerTyp);
+      const needsEnrichment = activePlayers.some((p: PlayerStat) => p.sofascoreId === undefined);
+      
       return needsEnrichment ? 2000 : false;
     },
   });

@@ -774,15 +774,21 @@ router.delete('/top-stats/cache', async (req, res) => {
 
 // Global lock to prevent concurrent API fetches for the same league
 const activeFetches = new Map();
+const activeEnrichments = new Set();
 
 // Background worker to enrich player stats with Sofascore data sequentially
-async function enrichPlayersBackground(leagueId) {
+async function enrichPlayersBackground(leagueId, statTyp) {
     const apiKey = process.env.sofascore_api_footballtopstats_playerimages;
-    if (!apiKey) return;
+    if (!apiKey || !statTyp) return;
+
+    // Prevent concurrent background loops for the same league and stat type
+    const lockKey = `${leagueId}_${statTyp}`;
+    if (activeEnrichments.has(lockKey)) return;
+    activeEnrichments.add(lockKey);
 
     try {
-        // Find players missing sofascoreId
-        const playersToEnrich = await PlayerTopStat.find({ leagueId, sofascoreId: { $exists: false } }).lean();
+        // Find players missing sofascoreId ONLY in the specific requested tab
+        const playersToEnrich = await PlayerTopStat.find({ leagueId, statTyp, sofascoreId: { $exists: false } }).lean();
         if (!playersToEnrich.length) return;
 
         console.log(`[TopStats] Starting background enrichment for ${playersToEnrich.length} players in league ${leagueId}`);
@@ -791,7 +797,7 @@ async function enrichPlayersBackground(leagueId) {
             if (!p.playerName) continue;
 
             let photoBase64 = '';
-            let sofascoreId = 'NOT_FOUND';
+            let sofascoreId = undefined; // Don't default to NOT_FOUND, so errors allow retries
             let position = '';
             let jerseyNumber = '';
             let country = '';
@@ -810,7 +816,7 @@ async function enrichPlayersBackground(leagueId) {
                     country = sofaPlayer.country?.name || sofaPlayer.country?.alpha2 || '';
 
                     if (sofascoreId !== 'NOT_FOUND') {
-                        await sleep(250);
+                        await sleep(400); // 400ms pause to respect rate limits
                         const imgRes = await axios.get(`https://sofascore.p.rapidapi.com/players/get-image?playerId=${sofascoreId}`, {
                             headers: { 'x-rapidapi-host': 'sofascore.p.rapidapi.com', 'x-rapidapi-key': apiKey },
                             responseType: 'arraybuffer',
@@ -821,23 +827,44 @@ async function enrichPlayersBackground(leagueId) {
                             photoBase64 = `data:${imgRes.headers['content-type']};base64,${Buffer.from(imgRes.data).toString('base64')}`;
                         }
                     }
+                } else {
+                    sofascoreId = 'NOT_FOUND'; // Search succeeded, but no player found
                 }
+
+                // Only update the database if the API sequence succeeded without throwing
+                await PlayerTopStat.updateOne(
+                    { _id: p._id },
+                    { $set: { sofascoreId, photoBase64, position, jerseyNumber, country } }
+                );
+
             } catch (err) {
                 console.log(`[TopStats] Background Sofascore fetch failed for ${p.playerName}:`, err.message);
+                // We do NOT update the database here.
+                // This guarantees the player is picked up again on the next enrichment cycle.
             }
 
-            await PlayerTopStat.updateOne(
-                { _id: p._id },
-                { $set: { sofascoreId, photoBase64, position, jerseyNumber, country } }
-            );
-
-            await sleep(350); // Be gentle with the API rate limits to avoid 5000ms timeout stalls
+            await sleep(600); // 600ms delay between players to absolutely avoid 429 errors
         }
         console.log(`[TopStats] Background enrichment finished for league ${leagueId}`);
     } catch (err) {
-        console.error(`[TopStats] Background enrichment error for league ${leagueId}:`, err.message);
+        console.error(`[TopStats] Background enrichment error for league ${leagueId} tab ${statTyp}:`, err.message);
+    } finally {
+        activeEnrichments.delete(`${leagueId}_${statTyp}`);
     }
 }
+
+// POST /api/football/top-stats/enrich
+// On-demand endpoint to trigger enrichment for a specific league and tab
+router.post('/top-stats/enrich', async (req, res) => {
+    const { leagueId, statTyp } = req.body;
+    if (!leagueId || !statTyp) {
+        return res.status(400).json({ success: false, message: 'leagueId and statTyp required' });
+    }
+    
+    // Kick off the background worker safely without blocking the response
+    enrichPlayersBackground(leagueId, statTyp).catch(console.error);
+    res.json({ success: true, message: 'Enrichment triggered' });
+});
 
 // GET /api/football/top-stats?leagueId=65
 router.get('/top-stats', async (req, res) => {
@@ -857,6 +884,10 @@ router.get('/top-stats', async (req, res) => {
                 TeamTopStat.find({ leagueId }).sort({ statTyp: 1, rank: 1 }).lean(),
             ]);
             const lastFetched = (cachedPlayer || cachedTeam)?.lastFetched || null;
+
+            // We no longer trigger enrichment automatically here.
+            // The frontend must explicitly hit POST /top-stats/enrich for the active tab.
+
             return res.json({ success: true, fromCache: true, leagueId, lastFetched, players, teams });
         }
 
@@ -893,8 +924,7 @@ router.get('/top-stats', async (req, res) => {
             TeamTopStat.find({ leagueId }).sort({ statTyp: 1, rank: 1 }).lean(),
         ]);
 
-        // Kick off background image fetching so the client can render the table instantly
-        enrichPlayersBackground(leagueId).catch(console.error);
+        // We no longer trigger enrichment automatically here.
 
         return res.json({ success: true, fromCache: false, leagueId, lastFetched: result.lastFetched, players, teams });
 
