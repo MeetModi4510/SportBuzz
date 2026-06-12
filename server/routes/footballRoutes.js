@@ -1,5 +1,8 @@
 import express from 'express';
 import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import FootballStanding from '../models/FootballStanding.js';
 import FootballTransfer from '../models/FootballTransfer.js';
 import TrendingPlayer from '../models/TrendingPlayer.js';
@@ -853,6 +856,100 @@ async function enrichPlayersBackground(leagueId, statTyp) {
         activeEnrichments.delete(`${leagueId}_${statTyp}`);
     }
 }
+
+// Ensure local cache directory for player images exists
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const IMAGE_CACHE_DIR = path.join(__dirname, '..', 'cache', 'player-images');
+if (!fs.existsSync(IMAGE_CACHE_DIR)) {
+    fs.mkdirSync(IMAGE_CACHE_DIR, { recursive: true });
+}
+
+// GET /api/football/player-image/:playerName
+// Fetches player image sequentially, caches it locally for 30 minutes
+router.get('/player-image/:playerName', async (req, res) => {
+    const { playerName } = req.params;
+    const { team } = req.query;
+    if (!playerName) return res.status(400).json({ success: false, message: 'Player name required' });
+
+    const safeName = playerName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const safeTeam = team ? team.toString().replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'unk';
+    const imagePath = path.join(IMAGE_CACHE_DIR, `${safeName}_${safeTeam}.png`);
+    const apiKey = process.env.sofascore_api_footballtopstats_playerimages;
+
+    try {
+        // Check local cache
+        if (fs.existsSync(imagePath)) {
+            const stats = fs.statSync(imagePath);
+            const ageMinutes = (Date.now() - stats.mtimeMs) / (1000 * 60);
+            
+            // If less than 30 minutes old, serve from cache
+            if (ageMinutes < 30) {
+                return res.sendFile(imagePath);
+            }
+        }
+
+        if (!apiKey) {
+            // Serve placeholder if no API key and no valid cache
+            return res.status(404).send('No API key');
+        }
+
+        // Cache miss or expired: fetch from Sofascore
+        const searchRes = await axios.get(`https://sofascore.p.rapidapi.com/players/search?name=${encodeURIComponent(playerName)}`, {
+            headers: { 'x-rapidapi-host': 'sofascore.p.rapidapi.com', 'x-rapidapi-key': apiKey },
+            timeout: 8000
+        });
+
+        const reqTeam = team ? team.toString().toLowerCase() : '';
+        const allPlayers = searchRes.data?.players || [];
+        
+        // 1. Filter out non-football players
+        const footballPlayers = allPlayers.filter(p => p.sport?.slug === 'football');
+
+        let sofaPlayer = null;
+        
+        if (footballPlayers.length > 0) {
+            // 2. Try to match team name
+            if (reqTeam) {
+                sofaPlayer = footballPlayers.find(p => p.team?.name?.toLowerCase().includes(reqTeam) || reqTeam.includes(p.team?.name?.toLowerCase() || 'impossible_match'));
+            }
+            // 3. Fallback to first football player
+            if (!sofaPlayer) {
+                sofaPlayer = footballPlayers[0];
+            }
+        } else {
+            // 4. Edge case: no football players found
+            sofaPlayer = allPlayers[0];
+        }
+
+        if (sofaPlayer && sofaPlayer.id) {
+            const sofascoreId = sofaPlayer.id;
+
+            const imgRes = await axios.get(`https://sofascore.p.rapidapi.com/players/get-image?playerId=${sofascoreId}`, {
+                headers: { 'x-rapidapi-host': 'sofascore.p.rapidapi.com', 'x-rapidapi-key': apiKey },
+                responseType: 'arraybuffer',
+                timeout: 8000
+            });
+
+            if (imgRes.headers['content-type']?.includes('image') && imgRes.data) {
+                // Save locally
+                fs.writeFileSync(imagePath, Buffer.from(imgRes.data));
+                return res.sendFile(imagePath);
+            }
+        }
+        
+        // No player or image found
+        res.status(404).send('Not found');
+
+    } catch (err) {
+        console.error(`[Football Player Image] Error for ${playerName}:`, err.message);
+        // If error but we have a stale cache, serve the stale cache as fallback
+        if (fs.existsSync(imagePath)) {
+            return res.sendFile(imagePath);
+        }
+        res.status(500).send('Error');
+    }
+});
 
 // POST /api/football/top-stats/enrich
 // On-demand endpoint to trigger enrichment for a specific league and tab

@@ -570,7 +570,6 @@ const MatchCenter = () => {
             </TabsContent>
 
             {/* ──────────── LINEUPS ──────────── */}
-            {/* ──────────── LINEUPS ──────────── */}
             <TabsContent value="lineups" className="space-y-8 animate-fade-in">
               {luLoading ? (
                 <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>
@@ -783,7 +782,7 @@ const MatchCenter = () => {
                                     <div className="relative shrink-0">
                                       {p.imageUrl ? (
                                         <img
-                                          src={playerImgUrl(p.imageUrl)}
+                                          src={p.imageUrl}
                                           alt={`${p.Fn || ''} ${p.Ln || ''}`}
                                           className="w-10 h-10 rounded-full object-cover border-2 border-border/40 bg-secondary"
                                           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -821,8 +820,8 @@ const MatchCenter = () => {
                                   <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-3">Manager</p>
                                   {t.coaches.map((c: any, cIdx: number) => (
                                     <div key={cIdx} className="flex items-center gap-3">
-                                      <div className="w-10 h-10 rounded-full bg-secondary/80 flex items-center justify-center text-muted-foreground border border-border/30 shadow-sm">
-                                        <User size={18} />
+                                      <div className="w-8 h-8 rounded-full border border-border/50 text-xs font-bold flex items-center justify-center relative bg-cover bg-center" style={{ backgroundColor: getTeamColor(t.teamInfo.Nm, t.teamInfo.Nm === home.Nm), color: 'white' }}>
+                                        <User size={16} />
                                       </div>
                                       <div>
                                         <p className="font-bold text-sm text-foreground">{c.Fn || ""} {c.Ln || c.Pn || c.CoNm || "Unknown"}</p>

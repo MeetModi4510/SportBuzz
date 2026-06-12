@@ -545,8 +545,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\footballRoutes.js": {
-    "mtime": 1781257412.76135,
-    "ast_hash": "c403e8b9ec4705664e6e46c17250b642",
+    "mtime": 1781263549.0297556,
+    "ast_hash": "35582f91fd8050666e5c534bd2c334a2",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\leaderboardRoutes.js": {
@@ -840,8 +840,8 @@
     "semantic_hash": "cb49df0f83a76c8978c53eaef8a35043"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\PlayerAnalysisPanel.tsx": {
-    "mtime": 1781166141.3663633,
-    "ast_hash": "5c5ac413cd9a378e61022a5f94fd7855",
+    "mtime": 1781283867.347335,
+    "ast_hash": "c15372a2a07274dab3ca84ea58723a89",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\PlayerCard.tsx": {
@@ -870,9 +870,9 @@
     "semantic_hash": "22389b4cd8acc9a986c635ff9c27aaac"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\SportFilter.tsx": {
-    "mtime": 1781166141.499819,
-    "ast_hash": "0156b5758c571782881d466c38655746",
-    "semantic_hash": "0156b5758c571782881d466c38655746"
+    "mtime": 1781283867.349576,
+    "ast_hash": "51195936c9b034c41f2eb9162464dea7",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\SportIcon.tsx": {
     "mtime": 1781166141.509334,
@@ -1310,8 +1310,8 @@
     "semantic_hash": "08411e4dfb5d0973d1b631848463ad5d"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useFeaturedMatches.ts": {
-    "mtime": 1781166143.3777423,
-    "ast_hash": "4374a69f8894e8e160f037eeacc79bed",
+    "mtime": 1781266303.129031,
+    "ast_hash": "9f554c9e1610f2bbcd8b1aaeaf82950b",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useFollowedTournamentMatches.ts": {
@@ -1400,8 +1400,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Index.tsx": {
-    "mtime": 1781169582.2819908,
-    "ast_hash": "a43d7361093a85575773fd633fcd9357",
+    "mtime": 1781283867.3568802,
+    "ast_hash": "7722783817f185632eb11e33eaa40ef1",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Leaderboard.tsx": {
@@ -1435,8 +1435,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\PerformanceLab.tsx": {
-    "mtime": 1781166143.8453064,
-    "ast_hash": "bbaf81b49686a2289bb1309130e29da6",
+    "mtime": 1781283867.3598921,
+    "ast_hash": "d5d3a9ad38061d241ceac120b723fddd",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\PlayerProfilePage.tsx": {
@@ -1550,8 +1550,8 @@
     "semantic_hash": "34f82a26d33116b74005083b1eb00dda"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\api.ts": {
-    "mtime": 1781166144.489786,
-    "ast_hash": "5bbaf10bcd1ed78cbbf4ba2874565e2d",
+    "mtime": 1781266288.6467698,
+    "ast_hash": "e49bc68304b3fcd0b6d9e23a1e7a8eab",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\cricketApi.ts": {
@@ -3145,8 +3145,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\cricket\\CricketTrendingPlayers.tsx": {
-    "mtime": 1781166142.0456312,
-    "ast_hash": "f7e6b053e049f811a7f30728c442ce95",
+    "mtime": 1781283867.3515759,
+    "ast_hash": "5403d409f684492c0f2c14c691804758",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballMatchCard.tsx": {
@@ -3195,13 +3195,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\FootballHome.tsx": {
-    "mtime": 1781263364.0424316,
-    "ast_hash": "0e3bbb53933fd8dff2278297013d5cda",
+    "mtime": 1781283867.3634305,
+    "ast_hash": "42e81c0cd7041344f1ddbbdb330fac18",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\MatchCenter.tsx": {
-    "mtime": 1781166144.4655964,
-    "ast_hash": "9ae43d33b8bbac36df9bbd100feaf286",
+    "mtime": 1781283867.3672943,
+    "ast_hash": "b068662f49bd55c3b5663b7e23cb7fa1",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\PlayerProfile.tsx": {
@@ -3375,8 +3375,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\TrendingPlayerCard.tsx": {
-    "mtime": 1781254873.3324409,
-    "ast_hash": "35a0fbaf5add9ce37871fa93d76a1e15",
+    "mtime": 1781268456.4804533,
+    "ast_hash": "94d85a9d2673d698b28356fc6134ca4c",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\TrendingPlayerModal.tsx": {
@@ -3452,6 +3452,31 @@
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\world-cup-trophy.png": {
     "mtime": 1781263364.013333,
     "ast_hash": "5e3ee607b6726d4d2f4058cac399bf90",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\livescore6Service.js": {
+    "mtime": 1781268456.4680169,
+    "ast_hash": "3a87868193d9776315ea3995a32ea8b0",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballMatchesLivescore.tsx": {
+    "mtime": 1781283867.3543906,
+    "ast_hash": "c90c10359ccb27a88487df683c88b79f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\LivescoreMatchCard.tsx": {
+    "mtime": 1781268456.4764047,
+    "ast_hash": "a23b09b31bdde6d61f98b652cfdfd518",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\football\\useLivescore6Queries.ts": {
+    "mtime": 1781263561.0739567,
+    "ast_hash": "a9402be4a476390c1d37ea98a54cb54e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\debug.json": {
+    "mtime": 1781283867.3435886,
+    "ast_hash": "2ba458be4bb41a87082481eb332d73f3",
     "semantic_hash": ""
   }
 }
