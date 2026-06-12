@@ -4,6 +4,8 @@ import { formatToIST } from "@/lib/dateUtils";
 import { MapPin, Clock } from "lucide-react";
 import { TeamLogo } from "./TeamLogo";
 import { getSportBorderColor } from "./SportIcon";
+import { useState, useEffect } from "react";
+import { io } from "socket.io-client";
 
 interface MatchCardProps {
   match: Match;
@@ -12,7 +14,50 @@ interface MatchCardProps {
   showSeriesName?: boolean;
 }
 
-export const MatchCard = ({ match, onClick, className, showSeriesName }: MatchCardProps) => {
+export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesName }: MatchCardProps) => {
+  const [match, setMatch] = useState<Match>(initialMatch);
+
+  // Sync prop changes
+  useEffect(() => {
+    setMatch(initialMatch);
+  }, [initialMatch]);
+
+  // Socket listener for live updates
+  useEffect(() => {
+    if (match.sport === 'cricket' && match.status === 'live') {
+      const socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const newSocket = io(socketUrl, {
+        path: '/socket.io/',
+        transports: ['websocket', 'polling'],
+      });
+
+      const handleUpdate = (data: any) => {
+        if (data.matchId === match.id) {
+          setMatch(prev => {
+            const updated = { ...prev };
+            if (data.cricketLiveDetails) {
+              updated.cricketLiveDetails = data.cricketLiveDetails;
+            }
+            if (data.score && data.score.team1) {
+              updated.homeScore = `${data.score.team1.runs}/${data.score.team1.wickets} (${data.score.team1.overs})`;
+            }
+            if (data.score && data.score.team2) {
+              updated.awayScore = `${data.score.team2.runs}/${data.score.team2.wickets} (${data.score.team2.overs})`;
+            }
+            return updated;
+          });
+        }
+      };
+
+      newSocket.on('live_matches_update', handleUpdate);
+      newSocket.on('score_updated', handleUpdate);
+
+      return () => {
+        newSocket.disconnect();
+      };
+    }
+  }, [match.id, match.sport, match.status]);
+
   const isLive = match.status === "live";
   const isUpcoming = match.status === "upcoming";
 
@@ -121,6 +166,71 @@ export const MatchCard = ({ match, onClick, className, showSeriesName }: MatchCa
           </div>
         </div>
       </div>
+
+      {/* Live Cricket Stats */}
+      {match.sport === 'cricket' && isLive && match.cricketLiveDetails && (
+        <div className={cn("pt-3 border-t flex flex-col gap-1 text-[11px]", themeBorder)}>
+          {/* Batters */}
+          <div className="flex justify-between text-muted-foreground font-medium mb-0.5">
+            <span className="w-[45%]">Batter</span>
+            <div className="flex w-[55%] justify-between">
+              <span className="w-8 text-right">R</span>
+              <span className="w-8 text-right">B</span>
+              <span className="w-6 text-right">4s</span>
+              <span className="w-6 text-right">6s</span>
+              <span className="w-10 text-right">SR</span>
+            </div>
+          </div>
+          {match.cricketLiveDetails.batsmanStriker && (
+            <div className="flex justify-between text-foreground">
+              <span className="w-[45%] truncate font-semibold">{match.cricketLiveDetails.batsmanStriker.batName}*</span>
+              <div className="flex w-[55%] justify-between">
+                <span className="w-8 text-right font-semibold">{match.cricketLiveDetails.batsmanStriker.runs}</span>
+                <span className="w-8 text-right">{match.cricketLiveDetails.batsmanStriker.balls}</span>
+                <span className="w-6 text-right">{match.cricketLiveDetails.batsmanStriker.fours}</span>
+                <span className="w-6 text-right">{match.cricketLiveDetails.batsmanStriker.sixes}</span>
+                <span className="w-10 text-right">{match.cricketLiveDetails.batsmanStriker.strikeRate}</span>
+              </div>
+            </div>
+          )}
+          {match.cricketLiveDetails.batsmanNonStriker && (
+            <div className="flex justify-between text-muted-foreground">
+              <span className="w-[45%] truncate">{match.cricketLiveDetails.batsmanNonStriker.batName}</span>
+              <div className="flex w-[55%] justify-between">
+                <span className="w-8 text-right font-medium">{match.cricketLiveDetails.batsmanNonStriker.runs}</span>
+                <span className="w-8 text-right">{match.cricketLiveDetails.batsmanNonStriker.balls}</span>
+                <span className="w-6 text-right">{match.cricketLiveDetails.batsmanNonStriker.fours}</span>
+                <span className="w-6 text-right">{match.cricketLiveDetails.batsmanNonStriker.sixes}</span>
+                <span className="w-10 text-right">{match.cricketLiveDetails.batsmanNonStriker.strikeRate}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Bowler */}
+          <div className="flex justify-between text-muted-foreground font-medium mt-1 mb-0.5 pt-1.5 border-t border-border/40">
+            <span className="w-[45%]">Bowler</span>
+            <div className="flex w-[55%] justify-between">
+              <span className="w-8 text-right">O</span>
+              <span className="w-8 text-right">M</span>
+              <span className="w-8 text-right">R</span>
+              <span className="w-8 text-right">W</span>
+              <span className="w-10 text-right">ECO</span>
+            </div>
+          </div>
+          {match.cricketLiveDetails.bowlerStriker && (
+            <div className="flex justify-between text-foreground">
+              <span className="w-[45%] truncate">{match.cricketLiveDetails.bowlerStriker.bowlName}</span>
+              <div className="flex w-[55%] justify-between">
+                <span className="w-8 text-right">{match.cricketLiveDetails.bowlerStriker.overs}</span>
+                <span className="w-8 text-right">{match.cricketLiveDetails.bowlerStriker.maidens}</span>
+                <span className="w-8 text-right">{match.cricketLiveDetails.bowlerStriker.runs}</span>
+                <span className="w-8 text-right font-semibold">{match.cricketLiveDetails.bowlerStriker.wickets}</span>
+                <span className="w-10 text-right">{match.cricketLiveDetails.bowlerStriker.economy}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Footer / Match Status Summary */}
       <div className={cn("pt-3.5 border-t flex flex-col gap-2.5", themeBorder)}>

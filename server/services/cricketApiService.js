@@ -62,7 +62,7 @@ export const cricketService = {
 
     // Get live matches
     getCurrentMatches: async () => {
-        const matches = await cricbuzzService.getLiveMatches();
+        const matches = await cricketService.getLiveMatches();
         return { status: 'success', data: enrichMatches(matches) };
     },
 
@@ -79,11 +79,14 @@ export const cricketService = {
             try {
                 const { default: mongoose } = await import('mongoose');
                 const { default: Match } = await import('../models/Match.js');
+                const { computeCricketLiveDetails } = await import('../utils/cricketLiveDetails.js');
 
                 if (mongoose.Types.ObjectId.isValid(id)) {
                     const localMatch = await Match.findById(id).populate('homeTeam awayTeam tournament');
                     if (localMatch) {
                         const obj = localMatch.toObject();
+                        const liveDetails = await computeCricketLiveDetails(localMatch);
+
                         const data = {
                             id: obj._id.toString(),
                             status: obj.status,
@@ -102,7 +105,8 @@ export const cricketService = {
                             score: [
                                 { inning: 'Innings 1', r: obj.score?.team1?.runs, w: obj.score?.team1?.wickets, o: obj.score?.team1?.overs },
                                 { inning: 'Innings 2', r: obj.score?.team2?.runs, w: obj.score?.team2?.wickets, o: obj.score?.team2?.overs }
-                            ]
+                            ],
+                            cricketLiveDetails: liveDetails
                         };
                         return { status: 'success', data: enrichMatch(data) };
                     }
@@ -173,7 +177,51 @@ export const cricketService = {
 
     // Legacy Controller methods
     getLiveMatches: async () => {
-        return await cricbuzzService.getLiveMatches();
+        const cricbuzzLive = await cricbuzzService.getLiveMatches();
+        let localLive = [];
+        try {
+            const { default: Match } = await import('../models/Match.js');
+            const { computeCricketLiveDetails } = await import('../utils/cricketLiveDetails.js');
+            
+            const localLiveMatches = await Match.find({ status: 'Live', matchType: { $ne: 'Football' } })
+                .populate('homeTeam awayTeam tournament');
+                
+            localLive = await Promise.all(localLiveMatches.map(async (m) => {
+                const obj = m.toObject();
+                const liveDetails = await computeCricketLiveDetails(m);
+                const team1Name = obj.homeTeam?.name || 'Home';
+                const team2Name = obj.awayTeam?.name || 'Away';
+                const tName = obj.tournament?.name || 'Local Tournament T20';
+
+                return {
+                    id: obj._id.toString(),
+                    name: `${team1Name} vs ${team2Name}, ${tName}`,
+                    series: tName,
+                    seriesName: tName,
+                    status: obj.status,
+                    matchType: obj.matchType || 'Cricket',
+                    venue: obj.venue,
+                    dateTimeGMT: obj.date,
+                    teams: [team1Name, team2Name],
+                    teamInfo: [
+                        { name: team1Name, shortname: obj.homeTeam?.acronym },
+                        { name: team2Name, shortname: obj.awayTeam?.acronym }
+                    ],
+                    matchStarted: obj.status !== 'Upcoming',
+                    matchEnded: obj.status === 'Completed',
+                    homeLineup: obj.homeLineup,
+                    awayLineup: obj.awayLineup,
+                    score: [
+                        { inning: 'Innings 1', r: obj.score?.team1?.runs, w: obj.score?.team1?.wickets, o: obj.score?.team1?.overs },
+                        { inning: 'Innings 2', r: obj.score?.team2?.runs, w: obj.score?.team2?.wickets, o: obj.score?.team2?.overs }
+                    ],
+                    cricketLiveDetails: liveDetails
+                };
+            }));
+        } catch (err) {
+            console.error('Failed to fetch local live matches:', err);
+        }
+        return [...cricbuzzLive, ...localLive];
     },
 
     getUpcomingMatches: async () => {

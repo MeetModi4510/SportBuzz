@@ -86,6 +86,11 @@ export interface Match {
       home?: { starters?: any[]; substitutes?: any[]; formation?: string; startXI?: any[]; startingXI?: any[]; players?: any[] };
       away?: { starters?: any[]; substitutes?: any[]; formation?: string; startXI?: any[]; startingXI?: any[]; players?: any[] };
     };
+    cricketLiveDetails?: {
+      batsmanStriker?: any;
+      batsmanNonStriker?: any;
+      bowlerStriker?: any;
+    };
   }
 
 export interface PlayerStats {

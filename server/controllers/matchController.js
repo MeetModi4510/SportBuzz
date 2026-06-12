@@ -11,6 +11,7 @@ import Notification from '../models/Notification.js';
 import User from '../models/User.js';
 import Team from '../models/Team.js';
 import { emitScoreUpdate, getIO } from '../config/socket.js';
+import { computeCricketLiveDetails } from '../utils/cricketLiveDetails.js';
 
 // Helper to broadcast notifications to tournament followers
 async function triggerFollowerNotifications(match, { title, message, type }) {
@@ -562,7 +563,7 @@ export const recordBall = asyncHandler(async (req, res) => {
         // ── MATCH INTELLIGENCE TRIGGER ──────────────────────────────
         // We run this after saving the ball so it has history to look at
         try {
-            const insight = await generateMatchIntelligence(match._id, {
+            const insight = await generateMatchIntelligenceData(match._id, {
                 inning, over, ball, batsman, bowler, runs, totalBallRuns
             });
 
@@ -731,11 +732,14 @@ export const recordBall = asyncHandler(async (req, res) => {
         }
     }
 
+    const liveDetails = await computeCricketLiveDetails(match);
+
     // Emit live update
     emitScoreUpdate(match._id.toString(), {
         score: match.score,
         lastBall: newBall,
-        currentInnings: match.currentInnings
+        currentInnings: match.currentInnings,
+        cricketLiveDetails: liveDetails
     });
 
     res.status(201).json({
@@ -814,10 +818,13 @@ export const undoLastBall = asyncHandler(async (req, res) => {
 
     await match.save();
 
+    const liveDetails = await computeCricketLiveDetails(match);
+
     // Emit undo event so viewer refreshes
     emitScoreUpdate(match._id.toString(), {
         score: match.score,
-        currentInnings: match.currentInnings
+        currentInnings: match.currentInnings,
+        cricketLiveDetails: liveDetails
     });
 
     // Also emit specific undo event
@@ -1298,7 +1305,7 @@ export const getMatchForecast = asyncHandler(async (req, res) => {
  * Helper to generate Match Intelligence insights during a live match.
  * Scans recent ball history to identify trends, streaks, and matchups.
  */
-async function generateMatchIntelligence(matchId, current) {
+async function generateMatchIntelligenceData(matchId, current) {
     // 1. Fetch recent history
     const recentBalls = await Ball.find({
         match: matchId,

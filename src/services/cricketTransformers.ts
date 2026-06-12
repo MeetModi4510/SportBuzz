@@ -206,6 +206,15 @@ export function enhanceMatchWithScorecard(match: Match, scorecard: CricbuzzScore
         if (mini.requiredRunRate) {
             enhanced.requiredRunRate = mini.requiredRunRate.toFixed(2);
         }
+
+        // Add live player details
+        if (enhanced.status === 'live' && mini.batsmanStriker && mini.bowlerStriker) {
+            enhanced.cricketLiveDetails = {
+                batsmanStriker: mini.batsmanStriker,
+                batsmanNonStriker: mini.batsmanNonStriker,
+                bowlerStriker: mini.bowlerStriker
+            };
+        }
     }
 
     return enhanced;
