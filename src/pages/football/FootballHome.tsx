@@ -3,84 +3,32 @@ import { cn } from "../../lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Navbar } from "../../components/Navbar";
-import { FootballMatchCard } from "../../components/football/FootballMatchCard";
+import { FootballMatchesLivescore } from "../../components/football/FootballMatchesLivescore";
 import { TransferCard } from "../../components/football/TransferCard";
 import { FootballNewsSidebar } from "../../components/football/FootballNewsSidebar";
 import { FootballStandings } from "../../components/football/FootballStandings";
 import { FootballTopStats } from "../../components/football/FootballTopStats";
-import { useLiveFootballMatches, useRecentFootballMatches, useUpcomingFootballMatches } from "../../hooks/football/useFootballQueries";
 import { useRecentTransfers } from "../../hooks/football/useFootballQueries";
 import { useTrendingPlayers, TrendingPlayerData } from "../../hooks/football/useTrendingPlayers";
 import { TrendingPlayerCard } from "../../components/football/TrendingPlayerCard";
 import { TrendingPlayerModal } from "../../components/football/TrendingPlayerModal";
-import { Loader2, RefreshCw, ArrowRightLeft, TrendingUp, Trophy } from "lucide-react";
-import { footballApi, PRIORITY_CLUBS } from "../../services/football/footballApi";
-import { useQueryClient } from "@tanstack/react-query";
+import { Loader2, ArrowRightLeft, TrendingUp } from "lucide-react";
+import { PRIORITY_CLUBS } from "../../services/football/footballApi";
 import { useWorldCupTheme } from "../../hooks/football/useWorldCupTheme";
 
-type Tab = "live" | "recent" | "upcoming";
 type TransferFilter = "all" | "transfers" | "loans" | "free_transfers" | "free_agents" | "contracts" | "contract_extensions";
 type TransferSort = "newest" | "highest_fee";
 
 export default function FootballHome() {
-  const [activeTab, setActiveTab] = useState<Tab>("live");
   const [transferFilter, setTransferFilter] = useState<TransferFilter>("all");
   const [transferSort, setTransferSort] = useState<TransferSort>("newest");
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const isWorldCup = useWorldCupTheme();
 
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const { data: liveMatches, isLoading: liveLoading, refetch: refetchLive } = useLiveFootballMatches();
-  const { data: recentMatches, isLoading: recentLoading, refetch: refetchRecent } = useRecentFootballMatches();
-  const { data: upcomingMatches, isLoading: upcomingLoading, refetch: refetchUpcoming } = useUpcomingFootballMatches();
   const { data: recentTransfers, isLoading: transfersLoading } = useRecentTransfers();
   const { data: trendingPlayersData, isLoading: trendingLoading } = useTrendingPlayers();
 
   const [selectedTrendingPlayer, setSelectedTrendingPlayer] = useState<TrendingPlayerData | null>(null);
-
-
-  const handleMatchClick = (matchId: number) => {
-    navigate(`/football/match/${matchId}`);
-  };
-
-  const handleManualRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([
-        footballApi.getLiveMatches(true).then(() => queryClient.invalidateQueries({ queryKey: ['football', 'live'] })),
-        footballApi.getRecentMatches(true).then(() => queryClient.invalidateQueries({ queryKey: ['football', 'recent'] })),
-        footballApi.getUpcomingMatches(true).then(() => queryClient.invalidateQueries({ queryKey: ['football', 'upcoming'] })),
-        queryClient.invalidateQueries({ queryKey: ['football', 'latest-transfers'] })
-      ]);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  const isLoading = 
-    (activeTab === "live" && liveLoading) ||
-    (activeTab === "recent" && recentLoading) ||
-    (activeTab === "upcoming" && upcomingLoading);
-
-  const currentMatches = useMemo(() => {
-    if (activeTab === "live") return liveMatches || [];
-    if (activeTab === "recent") return recentMatches || [];
-    if (activeTab === "upcoming") return upcomingMatches || [];
-    return [];
-  }, [activeTab, liveMatches, recentMatches, upcomingMatches]);
-
-  // Group by league
-  const groupedMatches = useMemo(() => {
-    const groups: Record<string, typeof currentMatches> = {};
-    currentMatches.forEach(match => {
-      const leagueName = match.league.name;
-      if (!groups[leagueName]) groups[leagueName] = [];
-      groups[leagueName].push(match);
-    });
-    return groups;
-  }, [currentMatches]);
 
   // Process Transfers
   const processedTransfers = useMemo(() => {
@@ -177,71 +125,8 @@ export default function FootballHome() {
             )}
           </div>
           
-          <div className="flex flex-col md:flex-row items-baseline justify-between gap-4 mb-4">
-            <div className="flex items-center gap-4">
-              {/* Tabs and sync button container */}
-              {/* Sleek pill-shaped tabs */}
-              <div className={cn("flex p-1 backdrop-blur-3xl rounded-full border", isWorldCup ? "bg-emerald-950/20 border-emerald-500/20 shadow-inner" : "bg-secondary/50 border-border")}>
-                <button onClick={() => setActiveTab("live")} className={cn("px-5 py-2 rounded-full text-sm font-semibold transition-all", activeTab === 'live' ? (isWorldCup ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg scale-105 border-transparent' : 'bg-background text-foreground shadow-lg scale-105 border border-border/50') : 'text-muted-foreground hover:text-foreground')}>Live</button>
-                <button onClick={() => setActiveTab("recent")} className={cn("px-5 py-2 rounded-full text-sm font-semibold transition-all", activeTab === 'recent' ? (isWorldCup ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg scale-105 border-transparent' : 'bg-background text-foreground shadow-lg scale-105 border border-border/50') : 'text-muted-foreground hover:text-foreground')}>Recent</button>
-                <button onClick={() => setActiveTab("upcoming")} className={cn("px-5 py-2 rounded-full text-sm font-semibold transition-all", activeTab === 'upcoming' ? (isWorldCup ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg scale-105 border-transparent' : 'bg-background text-foreground shadow-lg scale-105 border border-border/50') : 'text-muted-foreground hover:text-foreground')}>Upcoming</button>
-              </div>
-
-              <button
-                onClick={handleManualRefresh}
-                disabled={isRefreshing}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold border border-border rounded-full hover:bg-secondary transition-colors text-foreground disabled:opacity-50 backdrop-blur-md"
-              >
-                <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
-                Sync
-              </button>
-            </div>
-          </div>
-
-          {/* Match Center (Horizontal Scroll) */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-3 px-2">
-              <div className="flex items-center justify-center relative w-6 h-6">
-                <div className={cn("absolute w-2.5 h-2.5 rounded-full animate-ping opacity-75", isWorldCup ? "bg-amber-500" : "bg-rose-500")} />
-                <div className={cn("relative w-2.5 h-2.5 rounded-full", isWorldCup ? "bg-amber-400" : "bg-rose-500")} />
-              </div>
-              <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/50">
-                Match Center.
-              </h2>
-            </div>
-            
-            {isLoading ? (
-              <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : currentMatches.length === 0 ? (
-              <div className="py-20 text-center">
-                <p className="text-muted-foreground font-medium">No matches to display.</p>
-              </div>
-            ) : (
-              <div className="space-y-10">
-                {Object.entries(groupedMatches).map(([leagueName, matches]) => (
-                  <div key={leagueName} className="space-y-4">
-                    <div className="flex items-center gap-3 px-2">
-                      <img src={matches[0].league.logo} alt={leagueName} className="w-5 h-5 object-contain opacity-80" />
-                      <h3 className="text-sm font-semibold tracking-wider uppercase text-muted-foreground">{leagueName}</h3>
-                    </div>
-                    {/* Horizontal scroll container */}
-                    <div className="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
-                      {matches.map(match => (
-                        <div key={match.fixture.id} className="snap-start shrink-0 w-[300px] md:w-[350px]">
-                          <FootballMatchCard 
-                            match={match} 
-                            onClick={() => handleMatchClick(match.fixture.id)} 
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+          {/* Match Center - Replaced with New Livescore6 Component */}
+          <FootballMatchesLivescore />
 
           {/* Transfers Market (Horizontal Scroll) */}
           <section className="space-y-6">

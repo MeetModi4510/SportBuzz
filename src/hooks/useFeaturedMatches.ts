@@ -18,6 +18,7 @@ export function useFeaturedLiveCricketMatches() {
         },
         refetchInterval: 900_000,   // 15 min
         staleTime:       870_000,   // 14.5 min
+        refetchOnMount: true,       // always re-fetch to bypass stale empty cache
         retry: 1,
     });
 }
@@ -34,7 +35,8 @@ export function useFeaturedUpcomingCricketMatches(enabled: boolean) {
             }
         },
         enabled,
-        staleTime: 1_800_000,  // 30 min — upstream cache is 30 min
+        staleTime: 1_800_000,  // 30 min
+        refetchOnMount: true,  // always refetch to get fresh data after cache fix
         retry: 1,
     });
 }
@@ -52,6 +54,7 @@ export function useFeaturedRecentCricketMatches(enabled: boolean) {
         },
         enabled,
         staleTime: 1_800_000,  // 30 min
+        refetchOnMount: true,  // always refetch to get fresh data after cache fix
         retry: 1,
     });
 }

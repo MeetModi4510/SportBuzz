@@ -31,6 +31,7 @@ import {
 } from '../controllers/footballMatchController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { getDashboardMatches, getCategorizedMatches, getMatchDetail, getGlobalFootballNews, getFootballLiveNews, clearCache } from '../services/footballDataService.js';
+import livescore6Service from '../services/livescore6Service.js';
 
 const router = express.Router();
 
@@ -940,6 +941,36 @@ router.get('/top-stats', async (req, res) => {
             return res.json({ success: true, fromCache: true, stale: true, leagueId, lastFetched: players[0]?.lastFetched || null, players, teams });
         }
         res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// ─── LIVESCORE6 API ENDPOINTS (V2) ──────────────────────────────────────────
+
+router.get('/v2/matches/live', async (req, res) => {
+    try {
+        const result = await livescore6Service.getLiveMatches();
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Failed to fetch live matches' });
+    }
+});
+
+router.get('/v2/matches/date/:date', async (req, res) => {
+    try {
+        const result = await livescore6Service.getMatchesByDate(req.params.date);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Failed to fetch matches by date' });
+    }
+});
+
+router.get('/v2/matches/detail/:endpoint/:matchId', async (req, res) => {
+    try {
+        const { endpoint, matchId } = req.params;
+        const result = await livescore6Service.getMatchDetail(endpoint, matchId);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Failed to fetch match details' });
     }
 });
 

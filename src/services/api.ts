@@ -75,32 +75,31 @@ export const cricketApi = {
     getFeaturedMatches: async () => {
         try {
             const res = await api.get('featured/matches');
-            
-            if (res.data?.cricket) {
-                const { test, odi, t20 } = res.data.cricket;
+            // axios interceptor returns response.data
+            // so res = { success, data: { test, odi, t20 }, cacheTTL }
+            const payload = (res as any)?.data ?? res;
+            const cricket = payload?.cricket ?? payload; // handle both shapes
 
-                const processFormat = (formatData: any): Match[] => {
-                    if (!Array.isArray(formatData)) return [];
-                    return formatData
-                        .map(m => {
-                            try {
-                                return mapApiMatchToModel(m);
-                            } catch (e) {
-                                console.error("[MAPPER ERROR] Failed to map match:", m?.id, e);
-                                return null;
-                            }
-                        })
-                        .filter(Boolean) as Match[];
-                };
+            const processFormat = (formatData: any): Match[] => {
+                if (!Array.isArray(formatData)) return [];
+                return formatData
+                    .map(m => {
+                        try {
+                            return mapApiMatchToModel(m);
+                        } catch (e) {
+                            console.error("[MAPPER ERROR] Failed to map match:", (m as any)?.id, e);
+                            return null;
+                        }
+                    })
+                    .filter(Boolean) as Match[];
+            };
 
-                return {
-                    test: processFormat(test),
-                    odi: processFormat(odi),
-                    t20: processFormat(t20)
-                };
-            }
-
-            return { test: [], odi: [], t20: [] };
+            const { test, odi, t20 } = cricket || {};
+            return {
+                test: processFormat(test),
+                odi:  processFormat(odi),
+                t20:  processFormat(t20)
+            };
         } catch (error) {
             console.error("getFeaturedMatches failed:", error);
             return { test: [], odi: [], t20: [] };
@@ -111,7 +110,9 @@ export const cricketApi = {
     _fetchFeaturedSlice: async (endpoint: string): Promise<{ test: Match[], odi: Match[], t20: Match[] }> => {
         try {
             const res = await api.get(endpoint);
-            const data = res?.data ?? res;
+            // Server returns: { success, data: { test, odi, t20 }, cacheTTL }
+            // axios interceptor returns response.data, so res = { success, data: { test, odi, t20 }, cacheTTL }
+            const payload = (res as any)?.data ?? res;
             const processFormat = (formatData: any): Match[] => {
                 if (!Array.isArray(formatData)) return [];
                 return formatData
@@ -119,9 +120,9 @@ export const cricketApi = {
                     .filter(Boolean) as Match[];
             };
             return {
-                test: processFormat(data?.test),
-                odi:  processFormat(data?.odi),
-                t20:  processFormat(data?.t20),
+                test: processFormat(payload?.test),
+                odi:  processFormat(payload?.odi),
+                t20:  processFormat(payload?.t20),
             };
         } catch (error) {
             console.error(`[cricketApi] ${endpoint} failed:`, error);

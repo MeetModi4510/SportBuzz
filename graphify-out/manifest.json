@@ -265,9 +265,9 @@
     "semantic_hash": "cd39bd73f18ebd95e47b3dada0c43c32"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\controllers\\matchController.js": {
-    "mtime": 1781166066.8680627,
-    "ast_hash": "d9a426681bba8233bb97ced20cdb83da",
-    "semantic_hash": "d9a426681bba8233bb97ced20cdb83da"
+    "mtime": 1781263364.0188513,
+    "ast_hash": "76484c85207106984141e1e9b50b85cb",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\controllers\\notificationController.js": {
     "mtime": 1781166066.8955956,
@@ -545,8 +545,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\footballRoutes.js": {
-    "mtime": 1781205467.1705995,
-    "ast_hash": "15598eef8d7c8cdfa19ba6822922e9a8",
+    "mtime": 1781257412.76135,
+    "ast_hash": "c403e8b9ec4705664e6e46c17250b642",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\leaderboardRoutes.js": {
@@ -645,9 +645,9 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\cricketApiService.js": {
-    "mtime": 1781166140.6841738,
-    "ast_hash": "5f274083638d3f0e8fb40c9ab7a05fcb",
-    "semantic_hash": "5f274083638d3f0e8fb40c9ab7a05fcb"
+    "mtime": 1781263364.0233707,
+    "ast_hash": "f1447728da9360ff5aa3ed33b3e0938f",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\flagService.js": {
     "mtime": 1781166140.7200544,
@@ -805,8 +805,8 @@
     "semantic_hash": "7021298d563800a78a80c05cd3f9d842"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\MatchCard.tsx": {
-    "mtime": 1781166141.2523363,
-    "ast_hash": "267dcfe969d4c72a23b7da8b3b113ad7",
+    "mtime": 1781263364.0263684,
+    "ast_hash": "7b9319d7a04f9ad938e3574f0783e764",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\MatchPerformanceLab.tsx": {
@@ -1270,8 +1270,8 @@
     "semantic_hash": "d51523cad9db6c32d10a5e69e5fa98ad"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\data\\types.ts": {
-    "mtime": 1781166143.2906606,
-    "ast_hash": "df55be3f3782558c9a51017a62415b8e",
+    "mtime": 1781263364.0354016,
+    "ast_hash": "71eda3a03864abd555ccdece6fa0d01c",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\data\\venueAnalysisData.ts": {
@@ -1565,9 +1565,9 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\cricketTransformers.ts": {
-    "mtime": 1781166144.6151483,
-    "ast_hash": "db050aef4a03d00ac64504a879570f72",
-    "semantic_hash": "db050aef4a03d00ac64504a879570f72"
+    "mtime": 1781263364.0464306,
+    "ast_hash": "8214c2bb2e5de972cf1ca7f68f1075e8",
+    "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\cricketTypes.ts": {
     "mtime": 1781166144.6295242,
@@ -3150,8 +3150,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballMatchCard.tsx": {
-    "mtime": 1781202877.6183853,
-    "ast_hash": "248a242eb1d585af4eff756cf31a7929",
+    "mtime": 1781263364.031391,
+    "ast_hash": "029d4a08447180d0fd9d5bf55e8e2685",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\MatchEvents.tsx": {
@@ -3185,8 +3185,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useCricketTrending.ts": {
-    "mtime": 1781166143.3678882,
-    "ast_hash": "e126bf1e85b041910ee0a5624cce5c92",
+    "mtime": 1781257966.3812168,
+    "ast_hash": "85eb366252e5af713aaa51418cb7efbc",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\cricket\\CricketHome.tsx": {
@@ -3195,8 +3195,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\FootballHome.tsx": {
-    "mtime": 1781205467.1843712,
-    "ast_hash": "466e784220a842c86b274c6b658eabc7",
+    "mtime": 1781263364.0424316,
+    "ast_hash": "0e3bbb53933fd8dff2278297013d5cda",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\MatchCenter.tsx": {
@@ -3395,13 +3395,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballTopStats.tsx": {
-    "mtime": 1781254873.3256733,
-    "ast_hash": "f5bdb3e4ea75e343289df02499410ecf",
+    "mtime": 1781257459.4736156,
+    "ast_hash": "f2356ac143d5cb75c357f45fa271f049",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\football\\useTopStats.ts": {
-    "mtime": 1781205467.1778564,
-    "ast_hash": "92104b6fdc311a8735e2c0247418e8e6",
+    "mtime": 1781257439.3574533,
+    "ast_hash": "c035dd14a987eee5d841f0040ddf8e27",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\find_img_cdn.mjs": {
@@ -3417,6 +3417,41 @@
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\free_agent_player_ball.png": {
     "mtime": 1781206014.6835783,
     "ast_hash": "9cbbf740d1f4b9706c227e280750820d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\utils\\cricketLiveDetails.js": {
+    "mtime": 1781263364.0243707,
+    "ast_hash": "73660829ff8c72a65fa9a3244bb48d06",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\WorldCupHero.tsx": {
+    "mtime": 1781263364.032403,
+    "ast_hash": "891828cb41b08ab1e784377d19bc838a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\football\\useWorldCupTheme.ts": {
+    "mtime": 1781263364.0364044,
+    "ast_hash": "77fb2af633b7324fd34009ba05c6c270",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\fifa-world-cup-trophy-on-a-white-background-fifa-world-cup-trophy-F8AR6K.jpg": {
+    "mtime": 1781263363.981355,
+    "ast_hash": "e042f94b3a9ee78a707ca97864b8a034",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\world-cup-trophy-real.png": {
+    "mtime": 1781263363.9892576,
+    "ast_hash": "9a18e477fb95e435bd5cc198e893955c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\world-cup-trophy-transparent.png": {
+    "mtime": 1781263364.010326,
+    "ast_hash": "1b7787f7977367e681f0a2b7dfd627cc",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\world-cup-trophy.png": {
+    "mtime": 1781263364.013333,
+    "ast_hash": "5e3ee607b6726d4d2f4058cac399bf90",
     "semantic_hash": ""
   }
 }
