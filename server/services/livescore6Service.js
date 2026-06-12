@@ -87,7 +87,7 @@ export async function getLiveMatches() {
 
     try {
         const response = await axios.get(`${BASE_URL}/matches/v2/list-live`, {
-            params: { Category: 'soccer' },
+            params: { Category: 'soccer', Timezone: '0' },
             headers: getHeaders(),
             timeout: 10000
         });
@@ -159,7 +159,7 @@ export async function getMatchesByDate(dateYYYYMMDD) {
 
     try {
         const response = await axios.get(`${BASE_URL}/matches/v2/list-by-date`, {
-            params: { Category: 'soccer', Date: dateYYYYMMDD, Timezone: '5.5' },
+            params: { Category: 'soccer', Date: dateYYYYMMDD, Timezone: '0' },
             headers: getHeaders(),
             timeout: 15000
         });

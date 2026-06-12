@@ -33,8 +33,45 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
     (homeLineup.startXI || []).every(item => item.player.grid) && 
     (awayLineup.startXI || []).every(item => item.player.grid);
 
-  // Helper to group players by row
-  const getRows = (players: any[], reverse: boolean = false) => {
+  const getRows = (players: any[], reverse: boolean = false, formationStr?: string) => {
+    if (formationStr) {
+      const counts = formationStr.match(/\d+/g)?.map(Number) || [];
+      const sum = counts.reduce((a, b) => a + b, 0);
+      if (sum > 0) {
+         const sortedPlayers = [...players].sort((a, b) => {
+           const yA = a.player.grid ? parseInt(a.player.grid.split(':')[0]) : 1;
+           const yB = b.player.grid ? parseInt(b.player.grid.split(':')[0]) : 1;
+           if (yA !== yB) return yA - yB;
+           const xA = a.player.grid ? parseInt(a.player.grid.split(':')[1]) : 1;
+           const xB = b.player.grid ? parseInt(b.player.grid.split(':')[1]) : 1;
+           return xA - xB;
+         });
+
+         // Fix internal ordering for 3-4-2-1 misclassifications by API
+         const formDigits = formationStr.replace(/[^\d]/g, '');
+         if (formDigits === "3421" && sortedPlayers.length >= 10) {
+             // ensure we have at least 10 players, mid6 is index 4 to 9
+             const mid6 = sortedPlayers.slice(4, 10);
+             if (mid6.length === 6) {
+                 const orderedMid6 = [
+                     mid6[0], mid6[2], mid6[3], mid6[5], // 4 MIDs (Wide + Central)
+                     mid6[1], mid6[4] // 2 AMs (Inner)
+                 ];
+                 sortedPlayers.splice(4, 6, ...orderedMid6);
+             }
+         }
+
+         const rows = [];
+         rows.push([sortedPlayers[0]]);
+         let currentIdx = 1;
+         for (const count of counts) {
+           rows.push(sortedPlayers.slice(currentIdx, currentIdx + count));
+           currentIdx += count;
+         }
+         return reverse ? rows.reverse() : rows;
+      }
+    }
+
     const rows: { [key: number]: any[] } = {};
     players.forEach(item => {
       const row = item.player.grid ? parseInt(item.player.grid.split(':')[0]) : 1;
@@ -42,7 +79,6 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
       rows[row].push(item);
     });
     
-    // Sort players in each row by column
     Object.keys(rows).forEach(row => {
       rows[parseInt(row)].sort((a, b) => {
         const colA = a.player.grid ? parseInt(a.player.grid.split(':')[1]) : 1;
@@ -55,14 +91,8 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
     return sortedRowKeys.map(key => rows[key]);
   };
 
-  const awayRows = getRows(awayLineup.startXI, true); // Goalkeeper at the top
-  const homeRows = getRows(homeLineup.startXI, false); // Goalkeeper at the bottom (Wait, if reverse is false, row 1 is first. So row 1 is top? We want away row 1 at top, home row 1 at bottom. So away is false (1,2,3,4) -> GK at top. Home is true (4,3,2,1) -> GK at bottom.)
-  // Let's adjust:
-  // Away Team: GK (1) at Top. So rows 1, 2, 3, 4. (reverse: false)
-  // Home Team: GK (1) at Bottom. So rows 4, 3, 2, 1. (reverse: true)
-  
-  const awayRowsSorted = getRows(awayLineup.startXI || [], false);
-  const homeRowsSorted = getRows(homeLineup.startXI || [], true);
+  const awayRowsSorted = getRows(awayLineup.startXI || [], false, awayLineup.formation);
+  const homeRowsSorted = getRows(homeLineup.startXI || [], true, homeLineup.formation);
 
   const getPlayerRating = (playerId: number) => {
     if (!playerStats || playerStats.length === 0) return null;

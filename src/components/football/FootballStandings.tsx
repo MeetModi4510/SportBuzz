@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Trophy, AlertTriangle, ChevronDown } from "lucide-react";
 import {
@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useWorldCupTheme } from "@/hooks/football/useWorldCupTheme";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
@@ -41,6 +42,14 @@ interface StandingsResponse {
   data: StandingRow[];
 }
 
+interface WorldCupStandingsResponse {
+  success: boolean;
+  fromCache: boolean;
+  stale?: boolean;
+  lastFetched: string | null;
+  data: Record<string, (StandingRow & { teamLogo?: string })[]>;
+}
+
 const LEAGUES = [
   { id: 47, name: "Premier League", logo: "https://images.fotmob.com/image_resources/logo/leaguelogo/47.png" },
   { id: 87, name: "La Liga", logo: "https://images.fotmob.com/image_resources/logo/leaguelogo/87.png" },
@@ -50,10 +59,16 @@ const LEAGUES = [
   { id: 77, name: "World Cup", logo: "https://images.fotmob.com/image_resources/logo/leaguelogo/77.png" },
 ];
 
-async function fetchStandings(leagueId: number): Promise<StandingsResponse> {
-  const res = await fetch(`${API_BASE}/api/football/standings?leagueId=${leagueId}`);
-  if (!res.ok) throw new Error("Failed to fetch standings");
-  return res.json();
+async function fetchStandings(leagueId: number): Promise<StandingsResponse | WorldCupStandingsResponse> {
+  if (leagueId === 77) {
+    const res = await fetch(`${API_BASE}/api/football/world-cup-standings`);
+    if (!res.ok) throw new Error("Failed to fetch world cup standings");
+    return res.json();
+  } else {
+    const res = await fetch(`${API_BASE}/api/football/standings?leagueId=${leagueId}`);
+    if (!res.ok) throw new Error("Failed to fetch standings");
+    return res.json();
+  }
 }
 
 /** Maps the raw qualColor string to a Tailwind colour set */
@@ -76,12 +91,12 @@ function getQualStyle(qualColor: string | null): {
   return { bar: "bg-transparent", row: "hover:bg-foreground/5", badge: "", label: "" };
 }
 
-function TeamLogo({ src, name }: { src: string; name: string }) {
+function TeamLogo({ src, name, size = "w-6 h-6" }: { src?: string; name: string; size?: string }) {
   const [err, setErr] = useState(false);
-  if (err) {
+  if (err || !src) {
     return (
-      <div className="w-6 h-6 rounded-full bg-foreground/10 flex items-center justify-center flex-shrink-0">
-        <span className="text-[9px] font-black text-muted-foreground leading-none">
+      <div className={cn(size, "rounded-full bg-foreground/10 flex items-center justify-center flex-shrink-0")}>
+        <span className="text-[10px] font-black text-muted-foreground leading-none">
           {name.slice(0, 2).toUpperCase()}
         </span>
       </div>
@@ -92,15 +107,34 @@ function TeamLogo({ src, name }: { src: string; name: string }) {
       src={src}
       alt={name}
       onError={() => setErr(true)}
-      className="w-6 h-6 rounded-full object-contain flex-shrink-0 bg-foreground/5"
+      className={cn(size, "rounded-full object-contain flex-shrink-0 bg-foreground/5")}
     />
   );
 }
 
 export function FootballStandings() {
-  const [selectedLeagueId, setSelectedLeagueId] = useState<number>(47);
+  const isWorldCup = useWorldCupTheme();
+  
+  // Initialize with World Cup if theme is active, otherwise Premier League
+  const [selectedLeagueId, setSelectedLeagueId] = useState<number>(() => {
+    // We cannot reliably use the hook in the useState callback if the hook result changes after mount, 
+    // but the hook returns the initial state synchronously based on Date.now().
+    // For safer updates if it changes during runtime, we'll also use useEffect below.
+    return 47; // Default to 47 initially, useEffect will sync it
+  });
+  
+  const [selectedGroup, setSelectedGroup] = useState<string>("Group A");
 
-  const { data, isLoading, isError, isFetching } = useQuery<StandingsResponse>({
+  useEffect(() => {
+    // On mount or when theme changes, set default to World Cup if active
+    if (isWorldCup) {
+      setSelectedLeagueId(77);
+    } else {
+      setSelectedLeagueId(47);
+    }
+  }, [isWorldCup]);
+
+  const { data, isLoading, isError, isFetching } = useQuery<StandingsResponse | WorldCupStandingsResponse>({
     queryKey: ["football", "standings", selectedLeagueId],
     queryFn: () => fetchStandings(selectedLeagueId),
     staleTime: 30 * 60 * 1000,   // consider fresh for 30 min in the client
@@ -171,112 +205,262 @@ export function FootballStandings() {
         </div>
       )}
 
-      {/* Table */}
-      {data?.data && data.data.length > 0 && (
-        <div className="rounded-2xl border border-border bg-foreground/[0.03] backdrop-blur-sm overflow-hidden">
-
-          {/* Legend */}
-          <div className="flex items-center gap-5 px-5 py-3 border-b border-border/50 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-widest">
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Champions League</span>
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-400 inline-block" /> Europa / Conference</span>
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500 inline-block" /> Relegation</span>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              {/* Column Headers */}
-              <thead>
-                <tr className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest border-b border-border/50">
-                  <th className="pl-5 pr-3 py-3 text-left w-10">#</th>
-                  <th className="px-3 py-3 text-left min-w-[160px]">Club</th>
-                  <th className="px-3 py-3 text-center">MP</th>
-                  <th className="px-3 py-3 text-center">W</th>
-                  <th className="px-3 py-3 text-center">D</th>
-                  <th className="px-3 py-3 text-center">L</th>
-                  <th className="px-3 py-3 text-center hidden sm:table-cell">GF</th>
-                  <th className="px-3 py-3 text-center hidden sm:table-cell">GA</th>
-                  <th className="px-3 py-3 text-center">GD</th>
-                  <th className="pr-5 pl-3 py-3 text-center font-black text-muted-foreground">Pts</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-border/50">
-                {data.data.map((row) => {
-                  const q = getQualStyle(row.qualColor);
-                  return (
-                    <tr
-                      key={row._id}
+      {/* Table Content */}
+      {selectedLeagueId === 77 ? (
+        /* World Cup Single Group Layout */
+        data?.data && Object.keys(data.data).length > 0 && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center bg-foreground/[0.03] p-3 rounded-2xl border border-border">
+              <span className="text-sm font-semibold text-foreground/80 pl-2">Select Group</span>
+              
+              {/* Group Selector Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 px-4 py-2 bg-background hover:bg-foreground/[0.02] border border-border rounded-xl transition-all shadow-sm">
+                    <span className="text-sm font-bold text-foreground/90">{selectedGroup || Object.keys(data.data)[0]}</span>
+                    <ChevronDown size={16} className="text-muted-foreground ml-1" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-popover text-popover-foreground border-border min-w-[150px] p-1.5 rounded-xl shadow-2xl max-h-[300px] overflow-y-auto">
+                  {Object.keys(data.data).map(groupName => (
+                    <DropdownMenuItem 
+                      key={groupName} 
+                      onClick={() => setSelectedGroup(groupName)}
                       className={cn(
-                        "transition-colors group cursor-default",
-                        row.position === 1 ? "bg-gradient-to-r from-amber-500/10 to-transparent" : (q.row || "hover:bg-foreground/5")
+                        "flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2 transition-colors",
+                        (selectedGroup || Object.keys(data.data)[0]) === groupName ? "bg-accent text-accent-foreground font-bold" : "text-foreground/70 hover:bg-accent/50 hover:text-accent-foreground"
                       )}
                     >
-                      {/* Qualification colour bar + Position */}
-                      <td className="pl-0 pr-3 py-3">
-                        <div className="flex items-center gap-0">
-                          <span className={cn("w-1 h-8 rounded-r-full flex-shrink-0", row.position === 1 ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" : q.bar)} />
-                          <div className="pl-3 w-6 flex justify-end">
-                            {row.position === 1 ? (
-                              <Trophy size={14} className="text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.6)]" />
-                            ) : (
-                              <span className="text-muted-foreground/80 font-bold text-xs">{row.position}</span>
-                            )}
-                          </div>
-                        </div>
-                      </td>
+                      <span className="text-sm">{groupName}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
-                      {/* Club */}
-                      <td className="px-3 py-3">
-                        <div className="flex items-center gap-2.5">
-                          <TeamLogo src={row.logoUrl} name={row.teamName} />
-                          <div>
-                            <p className={cn("font-semibold leading-tight whitespace-nowrap", row.position === 1 ? "text-amber-400 font-bold" : "text-foreground/90")}>
-                              {row.teamName}
-                            </p>
-                            {row.shortName && row.shortName !== row.teamName && (
-                              <p className="text-[10px] text-muted-foreground/60 leading-tight sm:hidden">
-                                {row.shortName}
+            <div className="grid grid-cols-1">
+              {(() => {
+                const groups = data.data as Record<string, StandingRow[]>;
+                const activeGroup = groups[selectedGroup] ? selectedGroup : Object.keys(groups)[0];
+                const teams = groups[activeGroup];
+                if (!teams) return null;
+
+                return (
+                  <div key={activeGroup} className="rounded-2xl border border-border bg-foreground/[0.03] backdrop-blur-sm overflow-hidden flex flex-col shadow-sm">
+                    {/* Group Header */}
+                    <div className="px-5 py-4 border-b border-border/50 bg-foreground/5 flex items-center justify-between">
+                      <span className="font-black text-foreground tracking-tight text-lg">{activeGroup}</span>
+                      <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md">
+                        Top 2 Advance
+                      </span>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="text-xs font-black text-muted-foreground/60 uppercase tracking-widest border-b border-border/50 bg-background/30">
+                            <th className="pl-4 pr-3 py-3 text-left w-10">#</th>
+                            <th className="px-3 py-3 text-left min-w-[150px]">Team</th>
+                            <th className="px-3 py-3 text-center">MP</th>
+                            <th className="px-3 py-3 text-center">W</th>
+                            <th className="px-3 py-3 text-center">D</th>
+                            <th className="px-3 py-3 text-center">L</th>
+                            <th className="px-3 py-3 text-center hidden sm:table-cell">GF</th>
+                            <th className="px-3 py-3 text-center hidden sm:table-cell">GA</th>
+                            <th className="px-3 py-3 text-center">GD</th>
+                            <th className="pr-4 pl-3 py-3 text-center font-black text-muted-foreground">Pts</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/50">
+                          {teams.map((row) => (
+                            <tr
+                              key={row._id || row.teamId}
+                              className={cn(
+                                "transition-colors group cursor-default",
+                                row.position <= 2 ? "bg-emerald-500/5 hover:bg-emerald-500/10" : "hover:bg-foreground/5"
+                              )}
+                            >
+                              <td className="pl-0 pr-3 py-3">
+                                <div className="flex items-center gap-0">
+                                  <span className={cn("w-1 h-8 rounded-r-full flex-shrink-0", row.position <= 2 ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-transparent")} />
+                                  <div className="pl-3 w-6 flex justify-end">
+                                    <span className={cn("font-bold text-xs", row.position <= 2 ? "text-emerald-500" : "text-muted-foreground/80")}>
+                                      {row.position}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-3 py-3">
+                                <div className="flex items-center gap-3">
+                                  <TeamLogo src={row.logoUrl || (row as any).teamLogo} name={row.teamName} size="w-8 h-8" />
+                                  <span className={cn("font-bold leading-tight whitespace-nowrap text-base sm:text-lg tracking-tight", row.position <= 2 ? "text-foreground" : "text-foreground/80")}>
+                                    {row.teamName}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-3 py-3 text-center text-muted-foreground tabular-nums text-base">{row.played}</td>
+                              <td className="px-3 py-3 text-center text-emerald-400 font-semibold tabular-nums text-base">{row.wins}</td>
+                              <td className="px-3 py-3 text-center text-amber-400/80 font-semibold tabular-nums text-base">{row.draws}</td>
+                              <td className="px-3 py-3 text-center text-rose-400 font-semibold tabular-nums text-base">{row.losses}</td>
+                              <td className="px-3 py-3 text-center text-muted-foreground/80 tabular-nums hidden sm:table-cell text-base">{row.goalsFor}</td>
+                              <td className="px-3 py-3 text-center text-muted-foreground/80 tabular-nums hidden sm:table-cell text-base">{row.goalsAgainst}</td>
+                              <td className={cn(
+                                "px-3 py-3 text-center font-semibold tabular-nums text-base",
+                                row.goalDiff > 0 ? "text-emerald-400" : row.goalDiff < 0 ? "text-rose-400" : "text-muted-foreground/80"
+                              )}>
+                                {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
+                              </td>
+                              <td className="pr-4 pl-3 py-3 text-center">
+                                <span className="inline-flex items-center justify-center min-w-[2.5rem] h-9 rounded-lg bg-foreground/5 font-black text-foreground text-base tabular-nums">
+                                  {row.points}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+            
+            {/* World Cup Footer */}
+            <div className="px-5 py-4 rounded-2xl border border-border/50 bg-foreground/[0.02] flex flex-col xl:flex-row justify-between items-center gap-4">
+              <div className="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-2 text-[10px] text-muted-foreground/60 uppercase tracking-widest">
+                <span><strong className="text-foreground/70 font-bold pr-1">MP</strong>Matches Played</span>
+                <span><strong className="text-foreground/70 font-bold pr-1">W</strong>Wins</span>
+                <span><strong className="text-foreground/70 font-bold pr-1">D</strong>Draws</span>
+                <span><strong className="text-foreground/70 font-bold pr-1">L</strong>Losses</span>
+                <span className="hidden sm:inline"><strong className="text-foreground/70 font-bold pr-1">GF</strong>Goals For</span>
+                <span className="hidden sm:inline"><strong className="text-foreground/70 font-bold pr-1">GA</strong>Goals Against</span>
+                <span><strong className="text-foreground/70 font-bold pr-1">GD</strong>Goal Diff</span>
+                <span><strong className="text-foreground/70 font-bold pr-1">PTS</strong>Points</span>
+              </div>
+              <div className="flex items-center gap-4 shrink-0">
+                <span className="flex items-center gap-2 text-[10px] sm:text-xs font-medium text-muted-foreground/80">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Advances to Knockout Stage
+                </span>
+                <span className="text-[10px] sm:text-xs font-bold text-foreground/40 hidden sm:inline-block">FIFA World Cup 2026</span>
+              </div>
+            </div>
+          </div>
+        )
+      ) : (
+        /* Standard League Table Layout */
+        data?.data && Array.isArray(data.data) && data.data.length > 0 && (
+          <div className="rounded-2xl border border-border bg-foreground/[0.03] backdrop-blur-sm overflow-hidden">
+  
+            {/* Legend */}
+            <div className="flex items-center gap-5 px-5 py-3 border-b border-border/50 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-widest">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Champions League</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-400 inline-block" /> Europa / Conference</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500 inline-block" /> Relegation</span>
+            </div>
+  
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                {/* Column Headers */}
+                <thead>
+                  <tr className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest border-b border-border/50">
+                    <th className="pl-5 pr-3 py-3 text-left w-10">#</th>
+                    <th className="px-3 py-3 text-left min-w-[160px]">Club</th>
+                    <th className="px-3 py-3 text-center">MP</th>
+                    <th className="px-3 py-3 text-center">W</th>
+                    <th className="px-3 py-3 text-center">D</th>
+                    <th className="px-3 py-3 text-center">L</th>
+                    <th className="px-3 py-3 text-center hidden sm:table-cell">GF</th>
+                    <th className="px-3 py-3 text-center hidden sm:table-cell">GA</th>
+                    <th className="px-3 py-3 text-center">GD</th>
+                    <th className="pr-5 pl-3 py-3 text-center font-black text-muted-foreground">Pts</th>
+                  </tr>
+                </thead>
+  
+                <tbody className="divide-y divide-border/50">
+                  {(data.data as StandingRow[]).map((row) => {
+                    const q = getQualStyle(row.qualColor);
+                    return (
+                      <tr
+                        key={row._id}
+                        className={cn(
+                          "transition-colors group cursor-default",
+                          row.position === 1 ? "bg-gradient-to-r from-amber-500/10 to-transparent" : (q.row || "hover:bg-foreground/5")
+                        )}
+                      >
+                        {/* Qualification colour bar + Position */}
+                        <td className="pl-0 pr-3 py-3">
+                          <div className="flex items-center gap-0">
+                            <span className={cn("w-1 h-8 rounded-r-full flex-shrink-0", row.position === 1 ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" : q.bar)} />
+                            <div className="pl-3 w-6 flex justify-end">
+                              {row.position === 1 ? (
+                                <Trophy size={14} className="text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.6)]" />
+                              ) : (
+                                <span className="text-muted-foreground/80 font-bold text-xs">{row.position}</span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+  
+                        {/* Club */}
+                        <td className="px-3 py-3">
+                          <div className="flex items-center gap-2.5">
+                            <TeamLogo src={row.logoUrl} name={row.teamName} />
+                            <div>
+                              <p className={cn("font-semibold leading-tight whitespace-nowrap", row.position === 1 ? "text-amber-400 font-bold" : "text-foreground/90")}>
+                                {row.teamName}
                               </p>
-                            )}
+                              {row.shortName && row.shortName !== row.teamName && (
+                                <p className="text-[10px] text-muted-foreground/60 leading-tight sm:hidden">
+                                  {row.shortName}
+                                </p>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </td>
-
-                      {/* Stats */}
-                      <td className="px-3 py-3 text-center text-muted-foreground tabular-nums">{row.played}</td>
-                      <td className="px-3 py-3 text-center text-emerald-400 font-semibold tabular-nums">{row.wins}</td>
-                      <td className="px-3 py-3 text-center text-amber-400/80 font-semibold tabular-nums">{row.draws}</td>
-                      <td className="px-3 py-3 text-center text-rose-400 font-semibold tabular-nums">{row.losses}</td>
-                      <td className="px-3 py-3 text-center text-muted-foreground/80 tabular-nums hidden sm:table-cell">{row.goalsFor}</td>
-                      <td className="px-3 py-3 text-center text-muted-foreground/80 tabular-nums hidden sm:table-cell">{row.goalsAgainst}</td>
-                      <td className={cn(
-                        "px-3 py-3 text-center font-semibold tabular-nums",
-                        row.goalDiff > 0 ? "text-emerald-400" : row.goalDiff < 0 ? "text-rose-400" : "text-muted-foreground/80"
-                      )}>
-                        {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
-                      </td>
-
-                      {/* Points – highlighted */}
-                      <td className="pr-5 pl-3 py-3 text-center">
-                        <span className="inline-flex items-center justify-center min-w-[2rem] h-7 rounded-lg bg-foreground/5 font-black text-foreground text-sm tabular-nums">
-                          {row.points}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </td>
+  
+                        {/* Stats */}
+                        <td className="px-3 py-3 text-center text-muted-foreground tabular-nums">{row.played}</td>
+                        <td className="px-3 py-3 text-center text-emerald-400 font-semibold tabular-nums">{row.wins}</td>
+                        <td className="px-3 py-3 text-center text-amber-400/80 font-semibold tabular-nums">{row.draws}</td>
+                        <td className="px-3 py-3 text-center text-rose-400 font-semibold tabular-nums">{row.losses}</td>
+                        <td className="px-3 py-3 text-center text-muted-foreground/80 tabular-nums hidden sm:table-cell">{row.goalsFor}</td>
+                        <td className="px-3 py-3 text-center text-muted-foreground/80 tabular-nums hidden sm:table-cell">{row.goalsAgainst}</td>
+                        <td className={cn(
+                          "px-3 py-3 text-center font-semibold tabular-nums",
+                          row.goalDiff > 0 ? "text-emerald-400" : row.goalDiff < 0 ? "text-rose-400" : "text-muted-foreground/80"
+                        )}>
+                          {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
+                        </td>
+  
+                        {/* Points – highlighted */}
+                        <td className="pr-5 pl-3 py-3 text-center">
+                          <span className="inline-flex items-center justify-center min-w-[2rem] h-7 rounded-lg bg-foreground/5 font-black text-foreground text-sm tabular-nums">
+                            {row.points}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+  
+            {/* Footer */}
+            <div className="px-5 py-4 border-t border-border/50 bg-foreground/[0.01] flex flex-col xl:flex-row justify-between items-center gap-4">
+              <div className="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-2 text-[10px] text-muted-foreground/60 uppercase tracking-widest">
+                <span><strong className="text-foreground/70 font-bold pr-1">MP</strong>Matches Played</span>
+                <span><strong className="text-foreground/70 font-bold pr-1">W</strong>Wins</span>
+                <span><strong className="text-foreground/70 font-bold pr-1">D</strong>Draws</span>
+                <span><strong className="text-foreground/70 font-bold pr-1">L</strong>Losses</span>
+                <span className="hidden sm:inline"><strong className="text-foreground/70 font-bold pr-1">GF</strong>Goals For</span>
+                <span className="hidden sm:inline"><strong className="text-foreground/70 font-bold pr-1">GA</strong>Goals Against</span>
+                <span><strong className="text-foreground/70 font-bold pr-1">GD</strong>Goal Diff</span>
+                <span><strong className="text-foreground/70 font-bold pr-1">PTS</strong>Points</span>
+              </div>
+              <span className="text-[10px] sm:text-xs text-muted-foreground/40 font-semibold shrink-0">{selectedLeagueName} 2025/26</span>
+            </div>
           </div>
-
-          {/* Footer */}
-          <div className="px-5 py-3 border-t border-border/50 flex justify-between items-center">
-            <p className="text-[10px] text-muted-foreground/40">
-              {data.stale ? "⚠ Showing cached data (API temporarily unavailable)" : `${data.fromCache ? "Served from cache" : "Live data"} · ${data.data.length} teams`}
-            </p>
-            <span className="text-[10px] text-muted-foreground/40 font-semibold">{selectedLeagueName} 2025/26</span>
-          </div>
-        </div>
+        )
       )}
     </section>
   );

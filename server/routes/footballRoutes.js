@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import FootballStanding from '../models/FootballStanding.js';
+import WorldCupStanding from '../models/WorldCupStanding.js';
 import FootballTransfer from '../models/FootballTransfer.js';
 import TrendingPlayer from '../models/TrendingPlayer.js';
 import { PlayerTopStat, TeamTopStat } from '../models/FootballTopStat.js';
@@ -423,6 +424,163 @@ router.get('/standings', async (req, res) => {
 });
 
 
+
+// ─── WORLD CUP STANDINGS (LIVESCORE6 API) ────────────────────────────────────
+
+const WC_STANDINGS_API_HOST = 'livescore6.p.rapidapi.com';
+
+async function fetchAndStoreWorldCupStandings(competitionCode) {
+    const apiKey = process.env.livescore_football_worldcupstandings;
+    if (!apiKey) throw new Error('livescore_football_worldcupstandings env key not set');
+
+    const compIdMap = {
+        'world-cup': '54',
+        'world-cup-2026': '734'
+    };
+    const compId = compIdMap[competitionCode] || '734';
+
+    const res = await axios.get(
+        `https://${WC_STANDINGS_API_HOST}/competitions/get-table`,
+        {
+            params: { CompId: compId },
+            headers: {
+                'x-rapidapi-key':  apiKey,
+                'x-rapidapi-host': WC_STANDINGS_API_HOST,
+            },
+            timeout: 10000,
+        }
+    );
+
+    const stages = res.data?.Stages || [];
+    if (stages.length === 0) throw new Error('Empty or invalid response from API');
+
+    // getNextTopStatsRefresh() returns Sat/Sun/Mon 09:30 IST
+    const cacheExpiry = getNextTopStatsRefresh();
+    const now = new Date();
+
+    // Wipe stale records for this competition
+    await WorldCupStanding.deleteMany({ competition: competitionCode });
+
+    const docs = [];
+
+    for (const stage of stages) {
+        // e.g. "Group A"
+        const groupName = stage.Snm || stage.CompN || 'Group';
+        // Extract letter, e.g. "A" from "Group A"
+        const groupLetterMatch = groupName.match(/(?:Group\s+)([A-Z])/i);
+        const groupLetter = groupLetterMatch ? groupLetterMatch[1].toUpperCase() : '';
+
+        const tables = stage.LeagueTable?.L?.[0]?.Tables;
+        if (!tables) continue;
+
+        for (const tbl of tables) {
+            const teams = tbl.team || [];
+            for (const t of teams) {
+                docs.push({
+                    competition:  competitionCode,
+                    groupName:    groupName,
+                    groupLetter:  groupLetter,
+                    position:     Number(t.rnk || 0),
+                    teamId:       String(t.Tid || ''),
+                    teamName:     t.Tnm || '',
+                    teamLogo:     t.Img ? `https://lsm-static-prod.livescore.com/medium/${t.Img}` : '',
+                    played:       Number(t.pld || 0),
+                    wins:         Number(t.win || 0),
+                    draws:        Number(t.drw || 0),
+                    losses:       Number(t.lst || 0),
+                    goalsFor:     Number(t.gf || 0),
+                    goalsAgainst: Number(t.ga || 0),
+                    goalDiff:     Number(t.gd || 0),
+                    points:       Number(t.pts || 0),
+                    cacheExpiry,
+                    lastFetched:  now,
+                });
+            }
+        }
+    }
+
+    if (docs.length > 0) {
+        await WorldCupStanding.insertMany(docs);
+        console.log(`[WorldCupStandings] Stored ${docs.length} teams for ${competitionCode}.`);
+    }
+
+    return { rows: docs, lastFetched: now };
+}
+
+router.get('/world-cup-standings', async (req, res) => {
+    try {
+        const competitionCode = req.query.competition || 'world-cup-2026';
+
+        // 1. Check if we have valid cached data
+        const sample = await WorldCupStanding.findOne({
+            competition: competitionCode,
+            cacheExpiry: { $gt: new Date() },
+        });
+
+        if (sample) {
+            // Cache hit – serve from DB sorted by group letter then position
+            const standings = await WorldCupStanding
+                .find({ competition: competitionCode })
+                .sort({ groupLetter: 1, position: 1 })
+                .lean();
+
+            // Group by groupName for the frontend
+            const grouped = standings.reduce((acc, row) => {
+                const grp = row.groupName || 'Group';
+                if (!acc[grp]) acc[grp] = [];
+                acc[grp].push(row);
+                return acc;
+            }, {});
+
+            return res.json({
+                success: true,
+                fromCache: true,
+                lastFetched: standings[0]?.lastFetched || null,
+                data: grouped,
+            });
+        }
+
+        // 2. Cache miss – fetch from API, persist, respond
+        console.log(`[WorldCupStandings] Cache expired or empty for ${competitionCode} – fetching from API…`);
+        const { rows, lastFetched } = await fetchAndStoreWorldCupStandings(competitionCode);
+
+        const grouped = rows.reduce((acc, row) => {
+            const grp = row.groupName || 'Group';
+            if (!acc[grp]) acc[grp] = [];
+            acc[grp].push(row);
+            return acc;
+        }, {});
+
+        return res.json({
+            success: true,
+            fromCache: false,
+            lastFetched,
+            data: grouped,
+        });
+
+    } catch (err) {
+        console.error('[WorldCupStandings] Error:', err.message);
+        const competitionCode = req.query.competition || 'world-cup-2026';
+        
+        // Fallback: try to serve stale data
+        const stale = await WorldCupStanding
+            .find({ competition: competitionCode })
+            .sort({ groupLetter: 1, position: 1 })
+            .lean();
+
+        if (stale.length > 0) {
+            const grouped = stale.reduce((acc, row) => {
+                const grp = row.groupName || 'Group';
+                if (!acc[grp]) acc[grp] = [];
+                acc[grp].push(row);
+                return acc;
+            }, {});
+            return res.json({ success: true, fromCache: true, stale: true, lastFetched: stale[0]?.lastFetched || null, data: grouped });
+        }
+        
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 
 // ─── TRENDING PLAYERS (AllSports API, 3-hour cache) ──────────────────────────
 

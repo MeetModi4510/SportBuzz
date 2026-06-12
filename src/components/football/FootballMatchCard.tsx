@@ -211,7 +211,7 @@ export const FootballMatchCard = ({ match, onClick, className }: FootballMatchCa
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <Clock size={14} className={isWorldCup ? "text-amber-400" : ""} />
-            <span>{formatToIST(new Date(match.fixture.date), 'short')}</span>
+            <span>{formatToIST(new Date(match.fixture.date), 'full')}</span>
           </div>
         </div>
       </div>

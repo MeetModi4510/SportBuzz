@@ -3,6 +3,7 @@ import { cn } from "../../lib/utils";
 import { LivescoreMatch } from "../../hooks/football/useLivescore6Queries";
 import { Clock, MapPin } from "lucide-react";
 import { TeamLogo } from "../TeamLogo";
+import { formatToIST } from "../../lib/dateUtils";
 
 interface LivescoreMatchCardProps {
   match: LivescoreMatch;
@@ -195,10 +196,7 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
           <div className="flex items-center gap-1.5 drop-shadow-md">
             <Clock size={12} className="text-yellow-400" />
             <span>
-                {new Date(match.startTime).toLocaleString('en-IN', { 
-                    timeZone: 'Asia/Kolkata', 
-                    day: 'numeric', month: 'numeric', year: 'numeric'
-                })} IST
+                {formatToIST(new Date(match.startTime), 'full')}
             </span>
           </div>
         </div>
