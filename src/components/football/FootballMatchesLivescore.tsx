@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { cn } from "../../lib/utils";
 import { 
@@ -11,7 +11,6 @@ import { LivescoreMatchCard } from "./LivescoreMatchCard";
 
 export const FootballMatchesLivescore = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'live' | 'upcoming' | 'recent'>('live');
 
   // Generate Date Strings YYYYMMDD
   const today = new Date();
@@ -29,55 +28,55 @@ export const FootballMatchesLivescore = () => {
   // Queries
   const { data: liveData, isLoading: liveLoading, refetch: refetchLive, isFetching: liveFetching } = useLivescoreLiveMatches(true);
   
-  // Lazy load Upcoming/Recent
-  const { data: todayData, isLoading: todayLoading, refetch: refetchToday, isFetching: todayFetching } = useLivescoreMatchesByDate(todayStr, activeTab === 'upcoming' || activeTab === 'recent');
-  const { data: tomorrowData, isLoading: tomorrowLoading, refetch: refetchTomorrow, isFetching: tomorrowFetching } = useLivescoreMatchesByDate(tomorrowStr, activeTab === 'upcoming');
-  
-  const { data: yesterdayData, isLoading: yesterdayLoading, refetch: refetchYesterday, isFetching: yesterdayFetching } = useLivescoreMatchesByDate(yesterdayStr, activeTab === 'recent');
+  const hasLiveMatches = liveData && liveData.data && liveData.data.length > 0;
+  const loadOthers = !liveLoading && !hasLiveMatches;
+
+  // Lazy load Upcoming/Recent only if no live matches
+  const { data: todayData, isLoading: todayLoading, refetch: refetchToday, isFetching: todayFetching } = useLivescoreMatchesByDate(todayStr, loadOthers);
+  const { data: tomorrowData, isLoading: tomorrowLoading, refetch: refetchTomorrow, isFetching: tomorrowFetching } = useLivescoreMatchesByDate(tomorrowStr, loadOthers);
+  const { data: yesterdayData, isLoading: yesterdayLoading, refetch: refetchYesterday, isFetching: yesterdayFetching } = useLivescoreMatchesByDate(yesterdayStr, loadOthers);
 
   const handleManualRefresh = () => {
-    if (activeTab === 'live') refetchLive();
-    if (activeTab === 'upcoming') { refetchToday(); refetchTomorrow(); }
-    if (activeTab === 'recent') refetchYesterday();
+    refetchLive();
+    if (loadOthers) {
+      refetchToday();
+      refetchTomorrow();
+      refetchYesterday();
+    }
   };
 
   const isRefreshing = liveFetching || todayFetching || tomorrowFetching || yesterdayFetching;
-  const isLoading = (activeTab === 'live' && liveLoading) || 
-                    (activeTab === 'upcoming' && (todayLoading || tomorrowLoading)) || 
-                    (activeTab === 'recent' && (todayLoading || yesterdayLoading));
+  const isLoading = liveLoading || (loadOthers && (todayLoading || tomorrowLoading || yesterdayLoading));
 
   // Grouping logic for rendering
   let sections: { title: string, matches: LivescoreMatch[] }[] = [];
 
-  if (activeTab === 'live') {
-    sections = [{ title: 'All Live Matches', matches: liveData?.data || [] }];
-  } else if (activeTab === 'upcoming') {
-    // Filter out live/completed from today
+  if (hasLiveMatches) {
+    sections = [{ title: 'Live Matches', matches: liveData.data }];
+  } else if (!isLoading) {
     const upcomingToday = (todayData?.data || []).filter(m => m.status === 'upcoming');
     const upcomingTomorrow = (tomorrowData?.data || []).filter(m => m.status === 'upcoming');
-    if (upcomingToday.length > 0) sections.push({ title: 'Today', matches: upcomingToday });
-    if (upcomingTomorrow.length > 0) sections.push({ title: 'Tomorrow', matches: upcomingTomorrow });
-  } else if (activeTab === 'recent') {
-    // Show completed matches from today and yesterday
+    const allUpcoming = [...upcomingToday, ...upcomingTomorrow].slice(0, 2);
+    
     const completedToday = (todayData?.data || []).filter(m => m.status === 'completed');
     const completedYesterday = (yesterdayData?.data || []).filter(m => m.status === 'completed');
-    if (completedToday.length > 0) sections.push({ title: 'Today', matches: completedToday });
-    if (completedYesterday.length > 0) sections.push({ title: 'Yesterday', matches: completedYesterday });
+    const allRecent = [...completedToday, ...completedYesterday].slice(0, 2);
+    
+    const combinedMatches = [...allUpcoming, ...allRecent];
+    
+    if (combinedMatches.length > 0) {
+      sections.push({ title: 'Featured Matches', matches: combinedMatches });
+    }
   }
 
   // Get Last Updated timestamp
-  const getLastUpdated = () => {
-    if (activeTab === 'live') return liveData?.lastFetched;
-    if (activeTab === 'upcoming') return todayData?.lastFetched || tomorrowData?.lastFetched;
-    if (activeTab === 'recent') return yesterdayData?.lastFetched;
-    return null;
-  };
-
-  const lastUpdated = getLastUpdated();
+  const lastUpdated = hasLiveMatches 
+    ? liveData?.lastFetched 
+    : (todayData?.lastFetched || tomorrowData?.lastFetched || yesterdayData?.lastFetched);
 
   return (
     <section className="space-y-6">
-      {/* Header and Tabs */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row items-baseline justify-between gap-4 mb-4">
         <div className="flex items-center gap-3 px-2">
           <div className="flex items-center justify-center relative w-6 h-6">
@@ -88,25 +87,15 @@ export const FootballMatchesLivescore = () => {
             Football Matches.
           </h2>
         </div>
-      </div>
-
-      <div className="flex flex-col md:flex-row items-baseline justify-between gap-4 mb-4">
-        <div className="flex items-center gap-4 px-2">
-          <div className="flex p-1 backdrop-blur-3xl rounded-full border bg-secondary/50 border-border">
-            <button onClick={() => setActiveTab("live")} className={cn("px-5 py-2 rounded-full text-sm font-semibold transition-all", activeTab === 'live' ? 'bg-background text-emerald-500 shadow-lg scale-105 border border-border/50' : 'text-muted-foreground hover:text-foreground')}>Live</button>
-            <button onClick={() => setActiveTab("upcoming")} className={cn("px-5 py-2 rounded-full text-sm font-semibold transition-all", activeTab === 'upcoming' ? 'bg-background text-foreground shadow-lg scale-105 border border-border/50' : 'text-muted-foreground hover:text-foreground')}>Upcoming</button>
-            <button onClick={() => setActiveTab("recent")} className={cn("px-5 py-2 rounded-full text-sm font-semibold transition-all", activeTab === 'recent' ? 'bg-background text-foreground shadow-lg scale-105 border border-border/50' : 'text-muted-foreground hover:text-foreground')}>Recent</button>
-          </div>
-
-          <button
-            onClick={handleManualRefresh}
-            disabled={isRefreshing}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold border border-border rounded-full hover:bg-secondary transition-colors text-foreground disabled:opacity-50 backdrop-blur-md"
-          >
-            <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
-            Sync
-          </button>
-        </div>
+        
+        <button
+          onClick={handleManualRefresh}
+          disabled={isRefreshing}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold border border-border rounded-full hover:bg-secondary transition-colors text-foreground disabled:opacity-50 backdrop-blur-md"
+        >
+          <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
+          Sync
+        </button>
       </div>
 
       {/* Content */}
@@ -116,7 +105,7 @@ export const FootballMatchesLivescore = () => {
         </div>
       ) : sections.length === 0 || sections.every(s => s.matches.length === 0) ? (
         <div className="py-20 text-center">
-          <p className="text-muted-foreground font-medium">No matches to display in this category.</p>
+          <p className="text-muted-foreground font-medium">No matches available right now.</p>
         </div>
       ) : (
         <div className="space-y-10">

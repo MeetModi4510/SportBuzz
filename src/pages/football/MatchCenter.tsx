@@ -5,8 +5,8 @@ import { TeamLogo } from "../../components/TeamLogo";
 import { useLivescoreMatchDetail } from "../../hooks/football/useLivescore6Queries";
 import {
   Loader2, ArrowLeft, Clock, MapPin, Activity, ListOrdered,
-  Users, MessageSquare, BarChart3, Info, Trophy, ArrowLeftRight,
-  CircleDot, ShieldAlert, Timer
+  Users, User, MessageSquare, BarChart3, Info, Trophy, ArrowLeftRight,
+  CircleDot, ShieldAlert, Timer, ArrowDown, ArrowUp
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import { cn } from "../../lib/utils";
@@ -25,16 +25,51 @@ import { Helmet } from "react-helmet-async";
 const PLAYER_IMG_BASE = "https://lsm-static-prod.livescore.com/medium/";
 const TEAM_IMG_BASE   = "https://lsm-static-prod.livescore.com/medium/";
 
+const TEAM_COLORS: Record<string, string> = {
+  "portugal": "#7f1d1d",
+  "mexico": "#14532d",
+  "south africa": "#eab308",
+  "england": "#1e3a8a",
+  "brazil": "#eab308",
+  "argentina": "#38bdf8",
+  "france": "#1d4ed8",
+  "germany": "#000000",
+  "spain": "#dc2626",
+  "italy": "#1e3a8a",
+  "netherlands": "#f97316",
+  "belgium": "#dc2626",
+  "croatia": "#dc2626",
+  "uruguay": "#38bdf8",
+  "usa": "#1e3a8a",
+  "colombia": "#eab308",
+  "chile": "#dc2626",
+  "sweden": "#eab308",
+  "poland": "#dc2626",
+  "senegal": "#14532d",
+  "morocco": "#dc2626",
+  "japan": "#1d4ed8",
+  "south korea": "#dc2626",
+  "canada": "#dc2626"
+};
+
+const getTeamColor = (teamName: string, isHome: boolean) => {
+  if (!teamName) return isHome ? "#081a3d" : "#474b54";
+  const color = TEAM_COLORS[teamName.toLowerCase()];
+  return color || (isHome ? "#081a3d" : "#474b54");
+};
+
 // Incident-type to label & icon colour
-const incidentMeta: Record<number, { label: string; color: string; icon: string }> = {
+const incidentMeta: Record<number, { label: string; color: string; icon: React.ReactNode }> = {
   36: { label: "Goal", color: "text-emerald-400", icon: "⚽" },
   37: { label: "Penalty / VAR Goal", color: "text-emerald-400", icon: "⚽" },
   39: { label: "Own Goal", color: "text-red-400", icon: "⚽" },
-  43: { label: "Yellow Card", color: "text-yellow-400", icon: "🟡" },
-  45: { label: "Red Card", color: "text-red-500", icon: "🔴" },
-  46: { label: "Second Yellow / Red", color: "text-red-500", icon: "🔴" },
-  4:  { label: "Substituted Off", color: "text-orange-400", icon: "🔄" },
-  5:  { label: "Substituted On", color: "text-sky-400", icon: "🔄" },
+  43: { label: "Yellow Card", color: "text-yellow-400", icon: <div className="w-3.5 h-5 bg-yellow-400 rounded-[2px] shadow-sm" /> },
+  45: { label: "Red Card", color: "text-red-500", icon: <div className="w-3.5 h-5 bg-red-500 rounded-[2px] shadow-sm" /> },
+  46: { label: "Second Yellow / Red", color: "text-red-500", icon: <div className="relative w-4 h-5"><div className="w-3.5 h-4.5 bg-yellow-400 rounded-[2px] shadow-sm absolute -top-0.5 -left-0.5" /><div className="w-3.5 h-4.5 bg-red-500 rounded-[2px] shadow-sm relative z-10 top-0.5 left-0.5" /></div> },
+  4:  { label: "Substituted Off", color: "text-red-400", icon: <ArrowDown className="text-red-500 w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={3} /> },
+  5:  { label: "Substituted On", color: "text-emerald-400", icon: <ArrowUp className="text-emerald-500 w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={3} /> },
+  60: { label: "Substitution", color: "text-blue-400", icon: <ArrowLeftRight className="text-blue-500 w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={3} /> },
+  61: { label: "Substitution", color: "text-blue-400", icon: <ArrowLeftRight className="text-blue-500 w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={3} /> },
   63: { label: "Assist", color: "text-blue-400", icon: "👟" },
 };
 
@@ -79,8 +114,23 @@ function flattenIncidents(incs: any): any[] {
     for (const evt of periodEvents) {
       // Some events have nested Incs (e.g. goals with assists)
       if (evt.Incs && Array.isArray(evt.Incs)) {
-        for (const sub of evt.Incs) {
-          result.push({ ...sub, _period: periodKey, _parentSc: evt.Sc });
+        const assistEvent = evt.Incs.find((s: any) => s.IT === 63);
+        if (assistEvent) {
+          const mainEvents = evt.Incs.filter((s: any) => s.IT !== 63);
+          for (const main of mainEvents) {
+            result.push({ 
+              ...main, 
+              _period: periodKey, 
+              _parentSc: evt.Sc, 
+              Min: main.Min || evt.Min,
+              _assist: assistEvent.Pn || (assistEvent.Fn ? `${assistEvent.Fn} ${assistEvent.Ln}` : undefined) 
+            });
+          }
+        } else {
+          result.push({ ...evt, _period: periodKey });
+          for (const sub of evt.Incs) {
+            result.push({ ...sub, _period: periodKey, _parentSc: evt.Sc, Min: sub.Min || evt.Min });
+          }
         }
       } else {
         result.push({ ...evt, _period: periodKey });
@@ -100,7 +150,7 @@ const MatchCenter = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<
-    "summary" | "lineups" | "statistics" | "commentary" | "scoreboard"
+    "summary" | "events" | "lineups" | "statistics"
   >("summary");
 
   // ── Data hooks ──────────────────────────────────────────
@@ -109,19 +159,35 @@ const MatchCenter = () => {
   const { data: infoRes } =
     useLivescoreMatchDetail("get-info", id || "", !!id);
   const { data: incidentsRes } =
-    useLivescoreMatchDetail("get-incidents", id || "", activeTab === "summary" || activeTab === "scoreboard");
+    useLivescoreMatchDetail("get-incidents", id || "", activeTab === "summary" || activeTab === "events");
   const { data: lineupsRes, isLoading: luLoading } =
-    useLivescoreMatchDetail("get-lineups", id || "", activeTab === "lineups");
+    useLivescoreMatchDetail("get-lineups", id || "", !!id);
   const { data: statsRes, isLoading: stLoading } =
     useLivescoreMatchDetail("get-statistics", id || "", activeTab === "statistics");
-  const { data: commRes, isLoading: cmLoading } =
-    useLivescoreMatchDetail("get-commentary", id || "", activeTab === "commentary");
 
-  // ── Incidents memo (MUST be before any early returns — React hooks rule) ──
-  const allIncidents = useMemo(
-    () => flattenIncidents(incidentsRes?.data?.Incs || scoreboardRes?.data?.["Incs-s"]),
-    [incidentsRes?.data, scoreboardRes?.data]
-  );
+  const allIncidents = useMemo(() => {
+    const incs = flattenIncidents(incidentsRes?.data?.Incs || scoreboardRes?.data?.["Incs-s"]);
+    
+    // Explicitly add substitutions from lineups to ensure they appear in Key Events
+    const subsArray = Array.isArray(lineupsRes?.data?.Subs) ? lineupsRes.data.Subs : [];
+    subsArray.forEach((sub: any) => {
+      let teamNm = 1;
+      const homePl = lineupsRes?.data?.T1?.[0]?.Pl || [];
+      if (homePl.length > 0 && !homePl.some((p: any) => p.Pn === sub.PnO || `${p.Fn} ${p.Ln}` === sub.PnO || p.Fn === sub.PnO || p.Ln === sub.PnO)) {
+         teamNm = 2;
+      }
+      incs.push({
+        IT: 60,
+        Min: sub.Min,
+        Nm: teamNm,
+        Pn: `${sub.Pn || sub.Fn} (In), ${sub.PnO} (Out)`,
+        _period: 'Sub'
+      });
+    });
+
+    incs.sort((a, b) => (a.Min || 0) - (b.Min || 0));
+    return incs;
+  }, [incidentsRes?.data, scoreboardRes?.data, lineupsRes?.data]);
 
   // ── Loading / Error states ──────────────────────────────
   if (sbLoading) {
@@ -185,6 +251,10 @@ const MatchCenter = () => {
   if (isLive) statusText = `${eps}'`;
   else if (isCompleted) statusText = eps === "AP" ? "After Penalties" : eps === "AET" ? "After Extra Time" : "Full Time";
 
+  // Compute Goals for header
+  const homeGoals = allIncidents.filter((e: any) => [36, 37, 39].includes(e.IT) && e.Nm === 1);
+  const awayGoals = allIncidents.filter((e: any) => [36, 37, 39].includes(e.IT) && e.Nm === 2);
+
   return (
     <>
       <Helmet>
@@ -233,48 +303,114 @@ const MatchCenter = () => {
               </div>
 
               {/* Score area */}
-              <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-10 md:py-14 gap-8 relative">
-                {/* Home */}
-                <div className="flex-1 flex flex-col-reverse md:flex-row items-center justify-end gap-5 w-full z-10">
-                  <div className="text-center md:text-right">
-                    <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{home.Nm}</h2>
-                    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{home.Abr}</p>
+              {/* Score area */}
+              <div className="flex flex-col px-6 md:px-10 py-10 md:py-14 relative z-10">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-8 w-full">
+                  {/* Home Team */}
+                  <div className="flex-1 flex flex-col-reverse md:flex-row items-center justify-end gap-5 w-full">
+                    <div className="text-center md:text-right">
+                      <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{home.Nm}</h2>
+                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{home.Abr}</p>
+                    </div>
+                    <TeamLogo logo={logoUrl(home.Img)} name={home.Nm} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
                   </div>
-                  <TeamLogo logo={logoUrl(home.Img)} name={home.Nm} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
+
+                  {/* Score */}
+                  <div className="flex flex-col items-center justify-center shrink-0 min-w-[200px]">
+                    {isUpcoming ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">– : –</span>
+                        <span className="text-sm font-semibold text-emerald-500 uppercase tracking-widest mt-2 bg-emerald-500/10 px-4 py-1.5 rounded-full">
+                          {matchDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="flex items-center gap-6 md:gap-10">
+                          <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground">{homeScore}</span>
+                          <span className="text-border text-4xl font-light mb-1">-</span>
+                          <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground">{awayScore}</span>
+                        </div>
+                        {htHome !== undefined && htAway !== undefined && (
+                          <span className="text-xs text-muted-foreground font-medium bg-secondary/30 px-3 py-1 rounded-full">
+                            HT: {htHome} - {htAway}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Away Team */}
+                  <div className="flex-1 flex flex-col md:flex-row items-center justify-start gap-5 w-full">
+                    <TeamLogo logo={logoUrl(away.Img)} name={away.Nm} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
+                    <div className="text-center md:text-left">
+                      <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{away.Nm}</h2>
+                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{away.Abr}</p>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Score */}
-                <div className="flex flex-col items-center justify-center shrink-0 z-10 min-w-[200px]">
-                  {isUpcoming ? (
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">– : –</span>
-                      <span className="text-sm font-semibold text-emerald-500 uppercase tracking-widest mt-2 bg-emerald-500/10 px-4 py-1.5 rounded-full">
-                        {matchDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                {/* Goals Area (Desktop) */}
+                <div className="hidden md:flex flex-row justify-between w-full mt-6">
+                  {/* Home Goals */}
+                  <div className="flex-1 flex flex-col items-end gap-1.5 text-xs text-muted-foreground">
+                    {homeGoals.map((g: any, i: number) => (
+                      <span key={i} className="flex items-center gap-1.5">
+                        <span className="font-semibold text-foreground">{g.Pn || g.Fn && `${g.Fn} ${g.Ln}`}</span>
+                        {g._assist && <span className="text-muted-foreground/60 text-[10px] tracking-wide">(Ast: {g._assist})</span>}
+                        {g.IT === 37 && <span className="text-[9px] font-bold text-muted-foreground/80 uppercase">(P)</span>}
+                        {g.IT === 39 && <span className="text-[9px] font-bold text-red-400/80 uppercase">(OG)</span>}
+                        <span className="font-mono text-[10px] text-emerald-500 font-black">{g.Min}'</span>
+                        <CircleDot size={10} className="text-emerald-500 ml-0.5" />
                       </span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="flex items-center gap-6 md:gap-10">
-                        <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground">{homeScore}</span>
-                        <span className="text-border text-4xl font-light mb-1">-</span>
-                        <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground">{awayScore}</span>
-                      </div>
-                      {htHome !== undefined && htAway !== undefined && (
-                        <span className="text-xs text-muted-foreground font-medium bg-secondary/30 px-3 py-1 rounded-full">
-                          HT: {htHome} - {htAway}
+                    ))}
+                  </div>
+                  <div className="shrink-0 min-w-[200px] flex justify-center items-start" /> {/* spacer */}
+                  {/* Away Goals */}
+                  <div className="flex-1 flex flex-col items-start gap-1.5 text-xs text-muted-foreground">
+                    {awayGoals.map((g: any, i: number) => (
+                      <span key={i} className="flex items-center gap-1.5">
+                        <CircleDot size={10} className="text-emerald-500 mr-0.5" />
+                        <span className="font-mono text-[10px] text-emerald-500 font-black">{g.Min}'</span>
+                        <span className="font-semibold text-foreground">{g.Pn || g.Fn && `${g.Fn} ${g.Ln}`}</span>
+                        {g._assist && <span className="text-muted-foreground/60 text-[10px] tracking-wide">(Ast: {g._assist})</span>}
+                        {g.IT === 37 && <span className="text-[9px] font-bold text-muted-foreground/80 uppercase">(P)</span>}
+                        {g.IT === 39 && <span className="text-[9px] font-bold text-red-400/80 uppercase">(OG)</span>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Goals Area (Mobile) */}
+                <div className="md:hidden flex flex-col items-center gap-4 mt-6 w-full">
+                  {homeGoals.length > 0 && (
+                    <div className="flex flex-col items-center gap-1.5 text-xs text-muted-foreground">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/50 border-b border-border/40 pb-1 mb-1">{home.Nm} Goals</span>
+                      {homeGoals.map((g: any, i: number) => (
+                        <span key={i} className="flex items-center gap-1.5">
+                          <span className="font-mono text-[10px] text-emerald-500 font-black">{g.Min}'</span>
+                          <span className="font-semibold text-foreground">{g.Pn || g.Fn && `${g.Fn} ${g.Ln}`}</span>
+                          {g._assist && <span className="text-muted-foreground/60 text-[10px] tracking-wide">(Ast: {g._assist})</span>}
+                          {g.IT === 37 && <span className="text-[9px] font-bold text-muted-foreground/80 uppercase">(P)</span>}
+                          {g.IT === 39 && <span className="text-[9px] font-bold text-red-400/80 uppercase">(OG)</span>}
                         </span>
-                      )}
+                      ))}
                     </div>
                   )}
-                </div>
-
-                {/* Away */}
-                <div className="flex-1 flex flex-col md:flex-row items-center justify-start gap-5 w-full z-10">
-                  <TeamLogo logo={logoUrl(away.Img)} name={away.Nm} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
-                  <div className="text-center md:text-left">
-                    <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{away.Nm}</h2>
-                    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{away.Abr}</p>
-                  </div>
+                  {awayGoals.length > 0 && (
+                    <div className="flex flex-col items-center gap-1.5 text-xs text-muted-foreground">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/50 border-b border-border/40 pb-1 mb-1">{away.Nm} Goals</span>
+                      {awayGoals.map((g: any, i: number) => (
+                        <span key={i} className="flex items-center gap-1.5">
+                          <span className="font-mono text-[10px] text-emerald-500 font-black">{g.Min}'</span>
+                          <span className="font-semibold text-foreground">{g.Pn || g.Fn && `${g.Fn} ${g.Ln}`}</span>
+                          {g._assist && <span className="text-muted-foreground/60 text-[10px] tracking-wide">(Ast: {g._assist})</span>}
+                          {g.IT === 37 && <span className="text-[9px] font-bold text-muted-foreground/80 uppercase">(P)</span>}
+                          {g.IT === 39 && <span className="text-[9px] font-bold text-red-400/80 uppercase">(OG)</span>}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -302,10 +438,9 @@ const MatchCenter = () => {
             <TabsList className="w-full justify-start bg-transparent border-b border-border/30 rounded-none h-auto p-0 space-x-6 overflow-x-auto pb-px hide-scrollbar">
               {[
                 { v: "summary",     icon: <BarChart3 size={16} />,     label: "Summary" },
+                { v: "events",      icon: <CircleDot size={16} />,     label: "Key Events" },
                 { v: "lineups",     icon: <Users size={16} />,         label: "Lineups" },
                 { v: "statistics",  icon: <Activity size={16} />,      label: "Statistics" },
-                { v: "scoreboard",  icon: <ListOrdered size={16} />,   label: "Scoreboard" },
-                { v: "commentary",  icon: <MessageSquare size={16} />, label: "Commentary" },
               ].map(t => (
                 <TabsTrigger key={t.v} value={t.v}
                   className="flex items-center gap-2 px-1 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-emerald-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-emerald-500 rounded-none transition-all">
@@ -316,163 +451,396 @@ const MatchCenter = () => {
 
             {/* ──────────── SUMMARY ──────────── */}
             <TabsContent value="summary" className="space-y-6 animate-fade-in">
-              {/* Match Info Card */}
-              <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
-                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/40">
-                  {/* Col 1: Core info */}
-                  <div className="p-6 md:p-8 space-y-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Info className="w-4 h-4 text-emerald-500" />
-                      <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Match Information</h3>
-                    </div>
-                    {[
-                      { label: "Competition", value: `${country ? country + " · " : ""}${stage}` },
-                      { label: "Venue", value: venue + (venueCity ? `, ${venueCity}` : "") },
-                      { label: "Date & Time", value: matchDate.toLocaleString(undefined, { dateStyle: "long", timeStyle: "short" }) },
-                      { label: "Status", value: statusText },
-                      ...(referee ? [{ label: "Referee", value: referee }] : []),
-                    ].map((r, i) => (
-                      <div key={i} className="flex items-start gap-4">
-                        <div className="p-3 bg-secondary/60 rounded-2xl text-foreground shrink-0">
-                          {i === 0 ? <Trophy size={16} /> : i === 1 ? <MapPin size={16} /> : i === 2 ? <Clock size={16} /> : i === 3 ? <Activity size={16} /> : <ShieldAlert size={16} />}
+              <div className="bg-card border border-border/30 rounded-2xl shadow-sm overflow-hidden">
+                <div className="flex items-center gap-2 px-6 md:px-8 py-5 border-b border-border/30 bg-muted/5">
+                  <Info className="w-4 h-4 text-emerald-500" />
+                  <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Match Information</h3>
+                </div>
+                <div className="flex flex-col divide-y divide-border/20 px-6 md:px-8">
+                  {[
+                    { label: "Competition", value: `${country ? country + " · " : ""}${stage}`, icon: <Trophy size={16} /> },
+                    { label: "Venue", value: venue + (venueCity ? `, ${venueCity}` : ""), icon: <MapPin size={16} /> },
+                    { label: "Date & Time", value: matchDate.toLocaleString(undefined, { dateStyle: "long", timeStyle: "short" }), icon: <Clock size={16} /> },
+                    { label: "Status", value: statusText, icon: <Activity size={16} /> },
+                    ...(referee ? [{ label: "Referee", value: referee, icon: <ShieldAlert size={16} /> }] : []),
+                  ].map((r, i) => (
+                    <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between py-4 group hover:bg-muted/5 transition-colors -mx-6 md:-mx-8 px-6 md:px-8">
+                      <div className="flex items-center gap-3 text-muted-foreground mb-1.5 sm:mb-0">
+                        <div className="text-emerald-500/70 group-hover:text-emerald-500 transition-colors">
+                          {r.icon}
                         </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-0.5">{r.label}</p>
-                          <p className="font-semibold text-sm text-foreground">{r.value}</p>
-                        </div>
+                        <span className="text-sm font-medium">{r.label}</span>
                       </div>
-                    ))}
-                  </div>
-
-                  {/* Col 2: Key events timeline */}
-                  <div className="p-6 md:p-8 bg-muted/5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <CircleDot className="w-4 h-4 text-emerald-500" />
-                      <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Key Events</h3>
+                      <span className="text-sm font-semibold text-foreground">{r.value}</span>
                     </div>
-                    {allIncidents.length === 0 ? (
-                      <p className="text-sm text-muted-foreground italic">No events recorded yet.</p>
-                    ) : (
-                      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-                        {allIncidents
-                          .filter(e => [36, 37, 39, 43, 45, 46].includes(e.IT))
-                          .map((evt, i) => {
-                            const meta = incidentMeta[evt.IT] || { label: "Event", color: "text-foreground", icon: "•" };
-                            return (
-                              <div key={i} className="flex items-start gap-3 group">
-                                <div className="flex flex-col items-center shrink-0 w-10">
-                                  <span className="text-xs font-mono font-bold text-muted-foreground">{evt.Min}'</span>
-                                </div>
-                                <div className="flex-1 flex items-center gap-3 p-3 rounded-xl bg-card border border-border/30 group-hover:border-border/60 transition-colors">
-                                  <span className="text-lg">{meta.icon}</span>
-                                  <div className="flex-1 min-w-0">
-                                    <p className={cn("font-bold text-sm", meta.color)}>{evt.Pn || evt.Fn && `${evt.Fn} ${evt.Ln}` || "Unknown"}</p>
-                                    <p className="text-[11px] text-muted-foreground font-medium">{meta.label}{evt.IR ? ` (${evt.IR})` : ""}</p>
-                                  </div>
-                                  {evt.Sc && (
-                                    <span className="text-xs font-bold text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md shrink-0">
-                                      {evt.Sc[0]} - {evt.Sc[1]}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    )}
-                  </div>
+                  ))}
                 </div>
               </div>
             </TabsContent>
 
+            {/* ──────────── KEY EVENTS ──────────── */}
+            <TabsContent value="events" className="space-y-6 animate-fade-in">
+              <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden p-6 md:p-8">
+                <div className="flex items-center gap-2 mb-6">
+                  <CircleDot className="w-5 h-5 text-emerald-500" />
+                  <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Key Events</h3>
+                </div>
+                {allIncidents.length === 0 ? (
+                  <p className="text-sm text-muted-foreground italic">No events recorded yet.</p>
+                ) : (
+                  <div className="relative max-w-4xl mx-auto pt-6 pb-6">
+                    <div className="text-white text-xs mb-4">Debug ITs: {allIncidents.map(e => e.IT).join(', ')}</div>
+                    {/* Vertical line */}
+                    <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-border/40" />
+
+                    <div className="space-y-6">
+                      {allIncidents
+                        .filter(e => [36, 37, 39, 43, 45, 46, 4, 5, 60, 61].includes(e.IT))
+                        .map((evt, i) => {
+                          const meta = incidentMeta[evt.IT] || { label: "Event", color: "text-foreground", icon: "•" };
+                          const isTeam1 = evt.Nm === 1;
+
+                          return (
+                            <div key={i} className={cn("flex w-full items-center relative group", isTeam1 ? "justify-start" : "justify-end")}>
+                              {/* Center Minute & Dot */}
+                              <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center z-20 w-12 bg-background py-1.5 rounded-full border border-border/30 shadow-md">
+                                <span className="text-[10px] md:text-xs font-mono font-black text-muted-foreground">{evt.Min}'</span>
+                                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 mt-1 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                              </div>
+
+                              {/* Horizontal connector line */}
+                              <div className={cn(
+                                "absolute top-1/2 -translate-y-1/2 w-[2.5rem] h-[2px] bg-gradient-to-r hidden md:block z-0 opacity-50",
+                                isTeam1 ? "right-[-2.5rem] from-border/50 to-transparent" : "left-[-2.5rem] from-transparent to-border/50"
+                              )} />
+
+                              {/* Content */}
+                              <div className={cn(
+                                "w-[calc(50%-2.5rem)] flex items-center gap-3 md:gap-4 p-3 md:p-5 rounded-3xl border transition-all duration-300 shadow-md relative overflow-hidden group z-10",
+                                isTeam1 
+                                  ? "bg-gradient-to-r from-card to-card/40 hover:from-card hover:to-emerald-950/20 border-border/30 hover:border-emerald-500/40 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] flex-row" 
+                                  : "bg-gradient-to-l from-card to-card/40 hover:from-card hover:to-emerald-950/20 border-border/30 hover:border-emerald-500/40 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] flex-row-reverse text-right"
+                              )}>
+                                {/* Background subtle glow for icon */}
+                                <div className={cn(
+                                  "absolute top-1/2 -translate-y-1/2 w-20 h-20 rounded-full blur-3xl opacity-20 transition-opacity duration-300 group-hover:opacity-50 pointer-events-none",
+                                  isTeam1 ? "left-0 bg-emerald-500" : "right-0 bg-emerald-500"
+                                )} />
+
+                                {/* Icon Box */}
+                                <div className={cn(
+                                  "relative flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full shrink-0 shadow-inner border border-white/5",
+                                  isTeam1 ? "bg-gradient-to-br from-background to-muted" : "bg-gradient-to-bl from-background to-muted"
+                                )}>
+                                  <span className="text-xl md:text-2xl drop-shadow-md relative z-10">{meta.icon}</span>
+                                </div>
+
+                                {/* Text content */}
+                                <div className="flex-1 min-w-0 z-10 mx-1">
+                                  <p className={cn("font-black text-sm md:text-lg truncate drop-shadow-sm tracking-tight", meta.color)}>{evt.Pn || evt.Fn && `${evt.Fn} ${evt.Ln}` || "Unknown"}</p>
+                                  <div className={cn("flex flex-wrap items-center gap-x-2 gap-y-1 mt-1", isTeam1 ? "justify-start" : "justify-end")}>
+                                    <span className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                                      {meta.label}{evt.IR ? ` (${evt.IR})` : ""}
+                                    </span>
+                                    {evt._assist && (
+                                      <span className="text-[10px] md:text-xs font-semibold text-emerald-400 truncate max-w-[140px] flex items-center gap-1">
+                                        <span className="text-muted-foreground/40">•</span>
+                                        Ast: {evt._assist}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Score Badge */}
+                                {evt.Sc && (
+                                  <div className="z-10 shrink-0">
+                                    <span className="text-xs md:text-sm font-black text-white bg-black/80 backdrop-blur-md px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-white/10 shadow-[inset_0_1px_2px_rgba(255,255,255,0.1),0_4px_6px_rgba(0,0,0,0.2)]">
+                                      {evt.Sc[0]} - {evt.Sc[1]}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
             {/* ──────────── LINEUPS ──────────── */}
-            <TabsContent value="lineups" className="space-y-6 animate-fade-in">
+            {/* ──────────── LINEUPS ──────────── */}
+            <TabsContent value="lineups" className="space-y-8 animate-fade-in">
               {luLoading ? (
                 <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>
               ) : !lineupsRes?.data?.Lu ? (
                 <div className="py-20 text-center"><p className="text-muted-foreground font-medium">Lineup data not available for this match.</p></div>
               ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {lineupsRes.data.Lu.map((team: any, tIdx: number) => {
-                    const teamInfo = tIdx === 0 ? home : away;
-                    const players: any[] = team.Ps || [];
-                    const formation = team.Fo || "N/A";
+                <div className="flex flex-col space-y-8">
+                  {(() => {
+                    const homeTeamInfo = lineupsRes.data.Lu[0];
+                    const awayTeamInfo = lineupsRes.data.Lu[1];
+                    const homePlayers = homeTeamInfo?.Ps || [];
+                    const awayPlayers = awayTeamInfo?.Ps || [];
 
-                    // Group by position
-                    const groups: Record<string, any[]> = {};
-                    for (const p of players) {
-                      const pos = p.Pon || "Unknown";
-                      if (!groups[pos]) groups[pos] = [];
-                      groups[pos].push(p);
-                    }
-                    const posOrder = ["Goalkeeper", "Defender", "Midfielder", "Forward", "Substitute"];
-                    const sortedGroups = Object.entries(groups).sort(([a], [b]) => {
-                      const ai = posOrder.findIndex(x => a.toLowerCase().includes(x.toLowerCase()));
-                      const bi = posOrder.findIndex(x => b.toLowerCase().includes(x.toLowerCase()));
-                      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-                    });
+                    const isCoach = (p: any) => {
+                      const pos = p.Pon?.toLowerCase() || "";
+                      return pos === "coach" || pos === "manager" || pos === "head coach";
+                    };
+
+                    const extractLineups = (players: any[]) => {
+                      const validPlayers = players.filter(p => !isCoach(p));
+                      const startingXI = [];
+                      const subs = [];
+                      
+                      // First 11 players are starters, the rest are substitutes (unless explicitly marked)
+                      let startersCount = 0;
+                      for (const p of validPlayers) {
+                        if (p.Pon?.toLowerCase() === "substitute" || startersCount >= 11) {
+                          subs.push(p);
+                        } else {
+                          startingXI.push(p);
+                          startersCount++;
+                        }
+                      }
+                      
+                      return {
+                        startingRows: [
+                          startingXI.filter(p => p.Pon === "Goalkeeper"),
+                          startingXI.filter(p => p.Pon === "Defender"),
+                          startingXI.filter(p => p.Pon === "Midfielder"),
+                          startingXI.filter(p => p.Pon === "Forward")
+                        ],
+                        subs
+                      };
+                    };
+
+                    const homeData = extractLineups(homePlayers);
+                    const awayData = extractLineups(awayPlayers);
+                    
+                    const homeRows = homeData.startingRows;
+                    const awayRows = awayData.startingRows;
+                    
+                    const homeSubs = homeData.subs;
+                    const awaySubs = awayData.subs;
+
+                    // Coaches may be in team.Coaches or inside players array
+                    const extractCoaches = (teamInfo: any, players: any[]) => {
+                       if (teamInfo.Coaches && teamInfo.Coaches.length > 0) return teamInfo.Coaches;
+                       return players.filter(p => isCoach(p));
+                    };
+                    const homeCoaches = extractCoaches(homeTeamInfo, homePlayers);
+                    const awayCoaches = extractCoaches(awayTeamInfo, awayPlayers);
+
+                    const getPlayerEvents = (p: any) => {
+                      const evts = allIncidents.filter((e: any) => 
+                        (e.Pn === p.Pn || e.Pn === p.Ln || e.Ln === p.Ln || (e.Fn === p.Fn && e.Ln === p.Ln) || e.Pn === `${p.Fn} ${p.Ln}`) && 
+                        [36, 37, 39, 43, 45, 46, 63].includes(e.IT)
+                      );
+                      
+                      const subsArray = Array.isArray(lineupsRes?.data?.Subs) ? lineupsRes.data.Subs : [];
+                      
+                      const isSubIn = subsArray.find(s => s.Pn === p.Pn || s.Pn === p.Ln || s.Ln === p.Ln || (s.Fn === p.Fn && s.Ln === p.Ln) || s.Pn === `${p.Fn} ${p.Ln}`);
+                      if (isSubIn) evts.push({ IT: 5, Min: isSubIn.Min });
+
+                      const isSubOut = subsArray.find(s => s.PnO === p.Pn || s.PnO === p.Ln || s.PnO === `${p.Fn} ${p.Ln}` || s.PnO === p.Fn);
+                      if (isSubOut) evts.push({ IT: 4, Min: isSubOut.Min });
+
+                      return evts;
+                    };
+
+                    const renderPlayerEventsBadges = (p: any, inPitch = false) => {
+                      const pEvents = getPlayerEvents(p);
+                      if (pEvents.length === 0) return null;
+                      return (
+                        <div className={cn("flex flex-wrap gap-0.5 z-20 pointer-events-none", inPitch ? "absolute -top-2 -right-3 flex-col" : "flex-row items-center ml-2")}>
+                          {pEvents.map((e: any, i: number) => {
+                            const meta = incidentMeta[e.IT];
+                            if (!meta) return null;
+                            return (
+                              <span key={i} className="text-[10px] md:text-xs bg-black/70 backdrop-blur-sm rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center shadow-md border border-white/10" title={meta.label}>
+                                {meta.icon}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      );
+                    };
+
+                    const renderPlayer = (p: any, teamColor: string) => {
+                      const hasRedCard = getPlayerEvents(p).some((e: any) => [45, 46].includes(e.IT));
+                      return (
+                        <div key={p.Pid || p.Fn} className={cn("flex flex-col items-center justify-center w-16 md:w-20 group z-10 transition-opacity", hasRedCard ? "opacity-40 grayscale-[50%]" : "")}>
+                          <div className="relative">
+                            <div 
+                              className="w-10 h-10 md:w-12 md:h-12 rounded-full border-[3px] border-white shadow-[0_4px_8px_rgba(0,0,0,0.5)] flex items-center justify-center text-xs md:text-sm font-black text-white transition-transform group-hover:scale-110 relative"
+                              style={{ backgroundColor: teamColor }}
+                            >
+                              {p.Snu || ""}
+                            </div>
+                            {renderPlayerEventsBadges(p, true)}
+                          </div>
+                          <div className="mt-1.5 px-2 py-0.5 bg-black/80 backdrop-blur-md rounded-md md:rounded-lg text-[10px] md:text-xs font-bold text-white/95 text-center leading-tight truncate w-full max-w-[76px] md:max-w-[90px] shadow-md">
+                            {p.Ln || p.Fn || p.Pn || "Player"}
+                          </div>
+                        </div>
+                      );
+                    };
+
+                    const formatFormation = (fo?: any) => {
+                      if (!fo) return "Formation N/A";
+                      const str = String(fo).trim();
+                      if (/^\d+$/.test(str)) {
+                        return str.split("").join("-");
+                      }
+                      return str;
+                    };
 
                     return (
-                      <div key={tIdx} className="bg-card border border-border/40 rounded-3xl overflow-hidden shadow-sm">
-                        {/* Team header */}
-                        <div className="flex items-center gap-4 p-5 border-b border-border/30 bg-muted/10">
-                          <TeamLogo logo={logoUrl(teamInfo.Img)} name={teamInfo.Nm} size="md" className="w-10 h-10 object-contain" />
-                          <div className="flex-1">
-                            <h3 className="font-bold text-lg text-foreground">{teamInfo.Nm}</h3>
-                            <p className="text-xs text-muted-foreground font-medium">Formation: <span className="text-foreground font-bold">{formation}</span></p>
+                      <>
+                        {/* PITCH VISUALIZATION CONTAINER */}
+                        <div className="w-full max-w-3xl mx-auto rounded-xl overflow-hidden shadow-2xl border-[6px] border-emerald-900 bg-emerald-950 flex flex-col">
+                          
+                          {/* Away Team Header (Top Half) */}
+                          <div className="flex items-center justify-between px-6 py-3 bg-emerald-950 text-emerald-50 border-b-4 border-emerald-900">
+                            <div className="flex items-center gap-3">
+                              <TeamLogo logo={logoUrl(away.Img)} name={away.Nm} size="sm" className="w-6 h-6 object-contain" />
+                              <span className="font-bold text-sm uppercase tracking-wider">{away.Nm}</span>
+                            </div>
+                            <span className="text-xs font-bold text-emerald-400 bg-emerald-900/50 px-3 py-1 rounded-full border border-emerald-800">{formatFormation(awayTeamInfo?.Fo)}</span>
+                          </div>
+
+                          {/* PITCH GRASS */}
+                          <div className="relative w-full flex flex-col" 
+                               style={{ background: 'repeating-linear-gradient(0deg, #2b7a3b, #2b7a3b 40px, #266b33 40px, #266b33 80px)' }}>
+                            
+                            {/* Pitch markings */}
+                            <div className="absolute inset-4 border-2 border-white/40 pointer-events-none" />
+                            <div className="absolute top-1/2 left-4 right-4 h-[2px] bg-white/40 pointer-events-none" />
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full border-2 border-white/40 pointer-events-none" />
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white/40 pointer-events-none" />
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 w-56 h-28 border-2 border-white/40 border-t-0 pointer-events-none" />
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-56 h-28 border-2 border-white/40 border-b-0 pointer-events-none" />
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 w-24 h-10 border-2 border-white/40 border-t-0 pointer-events-none" />
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-24 h-10 border-2 border-white/40 border-b-0 pointer-events-none" />
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 w-32 h-0 border-t-[4px] border-white/70 pointer-events-none" />
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-32 h-0 border-b-[4px] border-white/70 pointer-events-none" />
+                            <div className="absolute top-[80px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white/40 pointer-events-none" />
+                            <div className="absolute bottom-[80px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white/40 pointer-events-none" />
+
+                            <div className="relative z-10 w-full flex flex-col justify-between py-8 md:py-10" style={{ minHeight: '850px' }}>
+                              {/* Away Team (Top) */}
+                              <div className="flex flex-col flex-1 pb-4 gap-6 md:gap-8 justify-between">
+                                {awayRows.map((row, rIdx) => (
+                                  <div key={`away-${rIdx}`} className="flex justify-around items-center w-full px-6">
+                                    {row.map(p => renderPlayer(p, getTeamColor(away.Nm, false)))}
+                                  </div>
+                                ))}
+                              </div>
+                              
+                              {/* Home Team (Bottom) */}
+                              <div className="flex flex-col-reverse flex-1 pt-4 gap-6 md:gap-8 justify-between">
+                                {homeRows.map((row, rIdx) => (
+                                  <div key={`home-${rIdx}`} className="flex justify-around items-center w-full px-6">
+                                    {row.map(p => renderPlayer(p, getTeamColor(home.Nm, true)))}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Home Team Footer (Bottom Half) */}
+                          <div className="flex items-center justify-between px-6 py-3 bg-emerald-950 text-emerald-50 border-t-4 border-emerald-900">
+                            <div className="flex items-center gap-3">
+                              <TeamLogo logo={logoUrl(home.Img)} name={home.Nm} size="sm" className="w-6 h-6 object-contain" />
+                              <span className="font-bold text-sm uppercase tracking-wider">{home.Nm}</span>
+                            </div>
+                            <span className="text-xs font-bold text-emerald-400 bg-emerald-900/50 px-3 py-1 rounded-full border border-emerald-800">{formatFormation(homeTeamInfo?.Fo)}</span>
                           </div>
                         </div>
 
-                        {/* Players by position */}
-                        <div className="divide-y divide-border/20">
-                          {sortedGroups.map(([posName, posPlayers]) => (
-                            <div key={posName}>
-                              <div className="px-5 py-2 bg-muted/5">
-                                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">{posName}s</span>
-                              </div>
-                              {posPlayers.map((p: any, pIdx: number) => (
-                                <div key={pIdx} className="flex items-center gap-4 px-5 py-3 hover:bg-muted/10 transition-colors">
-                                  {/* Player image */}
-                                  <div className="relative shrink-0">
-                                    {p.imageUrl ? (
-                                      <img
-                                        src={playerImgUrl(p.imageUrl)}
-                                        alt={`${p.Fn || ''} ${p.Ln || ''}`}
-                                        className="w-10 h-10 rounded-full object-cover border-2 border-border/40 bg-secondary"
-                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                      />
-                                    ) : (
-                                      <div className="w-10 h-10 rounded-full bg-secondary/60 flex items-center justify-center text-xs font-bold text-muted-foreground border-2 border-border/40">
-                                        {(p.Fn || "?")[0]}{(p.Ln || "?")[0]}
-                                      </div>
-                                    )}
-                                  </div>
-                                  {/* Name & number */}
-                                  <div className="flex-1 min-w-0">
-                                    <p className="font-semibold text-sm text-foreground truncate">
-                                      {p.Fn || ""} {p.Ln || p.Pn || "Unknown"}
-                                    </p>
-                                    <p className="text-[11px] text-muted-foreground">
-                                      {p.Pon || "Player"}
-                                      {p.Mo ? ` · ${p.Mo} min` : ""}
-                                    </p>
-                                  </div>
-                                  {/* Shirt number */}
-                                  <div className="flex items-center gap-2 shrink-0">
-                                    <span className="text-xs font-bold text-muted-foreground bg-secondary/50 w-8 h-8 rounded-full flex items-center justify-center border border-border/30">
-                                      {p.Snu || "–"}
-                                    </span>
-                                  </div>
+                        {/* SUBSTITUTES & MANAGER */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl mx-auto mt-4">
+                          {[
+                            { teamInfo: home, subs: homeSubs, coaches: homeCoaches },
+                            { teamInfo: away, subs: awaySubs, coaches: awayCoaches }
+                          ].map((t, idx) => (
+                            <div key={idx} className="bg-card border border-border/40 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+                              {/* Team header */}
+                              <div className="flex items-center gap-4 p-5 border-b border-border/30 bg-muted/10">
+                                <TeamLogo logo={logoUrl(t.teamInfo.Img)} name={t.teamInfo.Nm} size="md" className="w-10 h-10 object-contain" />
+                                <div className="flex-1">
+                                  <h3 className="font-bold text-lg text-foreground">{t.teamInfo.Nm}</h3>
+                                  <p className="text-xs text-muted-foreground font-medium">Substitutes</p>
                                 </div>
-                              ))}
+                              </div>
+
+                              {/* Subs List */}
+                              <div className="divide-y divide-border/20 flex-1">
+                                {t.subs.map((p: any, pIdx: number) => (
+                                  <div key={pIdx} className="flex items-center gap-4 px-5 py-3 hover:bg-muted/10 transition-colors">
+                                    <div className="relative shrink-0">
+                                      {p.imageUrl ? (
+                                        <img
+                                          src={playerImgUrl(p.imageUrl)}
+                                          alt={`${p.Fn || ''} ${p.Ln || ''}`}
+                                          className="w-10 h-10 rounded-full object-cover border-2 border-border/40 bg-secondary"
+                                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                        />
+                                      ) : (
+                                        <div className="w-10 h-10 rounded-full bg-secondary/60 flex items-center justify-center text-xs font-bold text-muted-foreground border-2 border-border/40">
+                                          {(p.Fn || "?")[0]}{(p.Ln || "?")[0]}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="font-semibold text-sm text-foreground flex items-center gap-1 truncate">
+                                        {p.Fn || ""} {p.Ln || p.Pn || "Unknown"}
+                                        {renderPlayerEventsBadges(p, false)}
+                                      </p>
+                                      <p className="text-[11px] text-muted-foreground">
+                                        {p.Pon || "Substitute"}
+                                      </p>
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      <span className="text-xs font-bold text-muted-foreground bg-secondary/50 w-8 h-8 rounded-full flex items-center justify-center border border-border/30">
+                                        {p.Snu || "–"}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                                {t.subs.length === 0 && (
+                                  <div className="p-5 text-center text-sm text-muted-foreground italic">No substitutes listed</div>
+                                )}
+                              </div>
+
+                              {/* Manager Section */}
+                              {t.coaches && t.coaches.length > 0 && (
+                                <div className="border-t border-border/30 p-5 bg-muted/5 mt-auto">
+                                  <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-3">Manager</p>
+                                  {t.coaches.map((c: any, cIdx: number) => (
+                                    <div key={cIdx} className="flex items-center gap-3">
+                                      <div className="w-10 h-10 rounded-full bg-secondary/80 flex items-center justify-center text-muted-foreground border border-border/30 shadow-sm">
+                                        <User size={18} />
+                                      </div>
+                                      <div>
+                                        <p className="font-bold text-sm text-foreground">{c.Fn || ""} {c.Ln || c.Pn || c.CoNm || "Unknown"}</p>
+                                        <p className="text-[11px] text-muted-foreground">Head Coach</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>
-                      </div>
+                      </>
                     );
-                  })}
+                  })()}
                 </div>
               )}
+
 
               {/* Substitutions */}
               {lineupsRes?.data?.Subs && (
@@ -588,143 +956,7 @@ const MatchCenter = () => {
               })()}
             </TabsContent>
 
-            {/* ──────────── SCOREBOARD / INCIDENTS ──────────── */}
-            <TabsContent value="scoreboard" className="space-y-6 animate-fade-in">
-              <div className="bg-card border border-border/40 rounded-3xl overflow-hidden shadow-sm">
-                {/* Score summary */}
-                <div className="flex items-center justify-between px-6 py-5 border-b border-border/30 bg-muted/10">
-                  <div className="flex items-center gap-3">
-                    <TeamLogo logo={logoUrl(home.Img)} name={home.Nm} size="sm" className="w-8 h-8 object-contain" />
-                    <span className="font-bold text-lg text-foreground">{homeScore}</span>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">{statusText}</p>
-                    {htHome !== undefined && <p className="text-[10px] text-muted-foreground mt-0.5">HT: {htHome} - {htAway}</p>}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-lg text-foreground">{awayScore}</span>
-                    <TeamLogo logo={logoUrl(away.Img)} name={away.Nm} size="sm" className="w-8 h-8 object-contain" />
-                  </div>
-                </div>
 
-                {/* All incidents timeline */}
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-5">
-                    <Timer className="w-4 h-4 text-emerald-500" />
-                    <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Match Timeline</h3>
-                  </div>
-
-                  {allIncidents.length === 0 ? (
-                    <p className="text-sm text-muted-foreground italic text-center py-8">No incidents recorded.</p>
-                  ) : (
-                    <div className="relative">
-                      {/* Vertical line */}
-                      <div className="absolute left-[39px] top-0 bottom-0 w-px bg-border/40" />
-
-                      <div className="space-y-2">
-                        {allIncidents.map((evt, i) => {
-                          const meta = incidentMeta[evt.IT] || { label: `Event (${evt.IT || '?'})`, color: "text-foreground", icon: "•" };
-                          const isTeam1 = evt.Nm === 1;
-
-                          return (
-                            <div key={i} className="flex items-center gap-3 relative group">
-                              {/* Minute */}
-                              <span className="text-xs font-mono font-bold text-muted-foreground w-8 text-right shrink-0">{evt.Min}'</span>
-                              {/* Dot on timeline */}
-                              <div className="w-2 h-2 rounded-full bg-emerald-500 border-2 border-background z-10 shrink-0" />
-                              {/* Card */}
-                              <div className={cn(
-                                "flex-1 flex items-center gap-3 p-3 rounded-xl border transition-colors",
-                                isTeam1
-                                  ? "bg-card border-border/30 group-hover:border-emerald-500/30"
-                                  : "bg-muted/10 border-border/20 group-hover:border-emerald-500/30"
-                              )}>
-                                <span className="text-base shrink-0">{meta.icon}</span>
-                                <div className="flex-1 min-w-0">
-                                  <p className={cn("font-bold text-sm truncate", meta.color)}>
-                                    {evt.Pn || (evt.Fn ? `${evt.Fn} ${evt.Ln}` : "Unknown")}
-                                  </p>
-                                  <p className="text-[10px] text-muted-foreground font-medium">
-                                    {meta.label}
-                                    {evt.IR ? ` (${evt.IR})` : ""}
-                                    {" · "}
-                                    {isTeam1 ? home.Nm : away.Nm}
-                                  </p>
-                                </div>
-                                {evt.Sc && (
-                                  <span className="text-xs font-bold text-muted-foreground bg-secondary/50 px-2.5 py-1 rounded-lg shrink-0">
-                                    {evt.Sc[0]} - {evt.Sc[1]}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* ──────────── COMMENTARY ──────────── */}
-            <TabsContent value="commentary" className="space-y-6 animate-fade-in">
-              {cmLoading ? (
-                <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>
-              ) : !commRes?.data?.Com ? (
-                <div className="py-20 text-center"><p className="text-muted-foreground font-medium">Commentary not available for this match.</p></div>
-              ) : (
-                <div className="bg-card border border-border/40 rounded-3xl overflow-hidden shadow-sm">
-                  <div className="flex items-center gap-2 px-6 py-4 border-b border-border/30 bg-muted/10">
-                    <MessageSquare className="w-4 h-4 text-emerald-500" />
-                    <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Live Commentary</h3>
-                    <span className="ml-auto text-[10px] text-muted-foreground font-medium">
-                      {commRes.data.Com.length} entries
-                    </span>
-                  </div>
-
-                  <div className="divide-y divide-border/20 max-h-[700px] overflow-y-auto">
-                    {commRes.data.Com.map((c: any, i: number) => {
-                      const hasIncident = c.IT !== undefined;
-                      const meta = hasIncident ? incidentMeta[c.IT] : null;
-
-                      return (
-                        <div key={i} className={cn(
-                          "flex gap-4 px-6 py-4 transition-colors hover:bg-muted/5",
-                          hasIncident && "bg-emerald-500/5"
-                        )}>
-                          {/* Minute */}
-                          <div className="shrink-0 w-14 text-right">
-                            <span className={cn(
-                              "text-xs font-mono font-bold",
-                              hasIncident ? "text-emerald-500" : "text-muted-foreground"
-                            )}>
-                              {c.Min}'
-                              {c.MinEx ? `+${c.MinEx}` : ""}
-                            </span>
-                          </div>
-                          {/* Icon */}
-                          <div className="shrink-0 w-6 flex items-start justify-center pt-0.5">
-                            {meta ? (
-                              <span className="text-sm">{meta.icon}</span>
-                            ) : (
-                              <div className="w-1.5 h-1.5 rounded-full bg-border/60 mt-1.5" />
-                            )}
-                          </div>
-                          {/* Text */}
-                          <p className={cn(
-                            "text-sm leading-relaxed flex-1",
-                            hasIncident ? "font-semibold text-foreground" : "text-muted-foreground"
-                          )}>
-                            {c.Txt}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </TabsContent>
           </Tabs>
         </section>
       </div>
