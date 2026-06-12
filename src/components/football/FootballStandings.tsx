@@ -107,7 +107,7 @@ function TeamLogo({ src, name, size = "w-6 h-6" }: { src?: string; name: string;
       src={src}
       alt={name}
       onError={() => setErr(true)}
-      className={cn(size, "rounded-full object-contain flex-shrink-0 bg-foreground/5")}
+      className={cn(size, "rounded-full object-contain flex-shrink-0")}
     />
   );
 }
