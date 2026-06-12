@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { cn } from "../../lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Navbar } from "../../components/Navbar";
@@ -12,9 +13,10 @@ import { useRecentTransfers } from "../../hooks/football/useFootballQueries";
 import { useTrendingPlayers, TrendingPlayerData } from "../../hooks/football/useTrendingPlayers";
 import { TrendingPlayerCard } from "../../components/football/TrendingPlayerCard";
 import { TrendingPlayerModal } from "../../components/football/TrendingPlayerModal";
-import { Loader2, RefreshCw, ArrowRightLeft, TrendingUp } from "lucide-react";
+import { Loader2, RefreshCw, ArrowRightLeft, TrendingUp, Trophy } from "lucide-react";
 import { footballApi, PRIORITY_CLUBS } from "../../services/football/footballApi";
 import { useQueryClient } from "@tanstack/react-query";
+import { useWorldCupTheme } from "../../hooks/football/useWorldCupTheme";
 
 type Tab = "live" | "recent" | "upcoming";
 type TransferFilter = "all" | "transfers" | "loans" | "free_transfers" | "free_agents" | "contracts" | "contract_extensions";
@@ -26,6 +28,7 @@ export default function FootballHome() {
   const [transferSort, setTransferSort] = useState<TransferSort>("newest");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const isWorldCup = useWorldCupTheme();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -132,20 +135,56 @@ export default function FootballHome() {
         <meta name="description" content="Live football scores, recent results, upcoming fixtures, and transfers from top global leagues." />
       </Helmet>
 
-      <div className="min-h-screen bg-background text-foreground pb-24 selection:bg-primary/20">
+      <div className={cn("min-h-screen pb-24 transition-colors duration-1000", isWorldCup ? "bg-background text-foreground" : "bg-background text-foreground selection:bg-primary/20")}>
+        {/* Thematic full page background element for World Cup */}
+        {isWorldCup && (
+          <div className="fixed inset-0 pointer-events-none -z-20 opacity-[0.03] dark:opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+        )}
         <Navbar />
 
         <main className="container mx-auto px-4 py-12 max-w-7xl space-y-16">
           
           {/* Minimalist Header */}
-          <div className="flex flex-col md:flex-row items-baseline justify-between gap-4">
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-foreground">Football.</h1>
+          <div className="flex items-center justify-between gap-4 mb-8">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-foreground">
+                Football.
+              </h1>
+              {isWorldCup && (
+                <div className="text-emerald-500 font-bold tracking-[0.2em] text-sm md:text-base uppercase flex items-center gap-3">
+                  <span className="w-8 h-[2px] bg-emerald-500 rounded-full"></span>
+                  Tournament Hub
+                </div>
+              )}
+            </div>
+            {isWorldCup && (
+              <div className="hidden sm:flex relative items-center justify-center w-32 h-40 shrink-0 mr-4 group cursor-default">
+                {/* Glowing Aura */}
+                <div className="absolute inset-0 bg-amber-500/10 dark:bg-amber-500/20 blur-[30px] rounded-full group-hover:bg-amber-500/20 dark:group-hover:bg-amber-500/30 transition-colors duration-700" />
+                
+                {/* Background 26 (Official Logo Style) */}
+                <span className="absolute text-[90px] font-black text-slate-900/5 dark:text-white/5 tracking-tighter select-none z-0">
+                  26
+                </span>
+                
+                {/* Trophy Image (True Transparent PNG) */}
+                <img 
+                  src="/world-cup-trophy-transparent.png" 
+                  alt="World Cup 2026 Logo" 
+                  className="w-full h-full object-contain relative z-10 drop-shadow-[0_10px_20px_rgba(245,158,11,0.4)] brightness-90 dark:brightness-100 group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+            )}
+          </div>
+          
+          <div className="flex flex-col md:flex-row items-baseline justify-between gap-4 mb-4">
             <div className="flex items-center gap-4">
+              {/* Tabs and sync button container */}
               {/* Sleek pill-shaped tabs */}
-              <div className="flex p-1 bg-secondary/50 backdrop-blur-3xl rounded-full border border-border">
-                <button onClick={() => setActiveTab("live")} className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'live' ? 'bg-background text-foreground shadow-lg scale-105 border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}>Live</button>
-                <button onClick={() => setActiveTab("recent")} className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'recent' ? 'bg-background text-foreground shadow-lg scale-105 border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}>Recent</button>
-                <button onClick={() => setActiveTab("upcoming")} className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'upcoming' ? 'bg-background text-foreground shadow-lg scale-105 border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}>Upcoming</button>
+              <div className={cn("flex p-1 backdrop-blur-3xl rounded-full border", isWorldCup ? "bg-emerald-950/20 border-emerald-500/20 shadow-inner" : "bg-secondary/50 border-border")}>
+                <button onClick={() => setActiveTab("live")} className={cn("px-5 py-2 rounded-full text-sm font-semibold transition-all", activeTab === 'live' ? (isWorldCup ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg scale-105 border-transparent' : 'bg-background text-foreground shadow-lg scale-105 border border-border/50') : 'text-muted-foreground hover:text-foreground')}>Live</button>
+                <button onClick={() => setActiveTab("recent")} className={cn("px-5 py-2 rounded-full text-sm font-semibold transition-all", activeTab === 'recent' ? (isWorldCup ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg scale-105 border-transparent' : 'bg-background text-foreground shadow-lg scale-105 border border-border/50') : 'text-muted-foreground hover:text-foreground')}>Recent</button>
+                <button onClick={() => setActiveTab("upcoming")} className={cn("px-5 py-2 rounded-full text-sm font-semibold transition-all", activeTab === 'upcoming' ? (isWorldCup ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg scale-105 border-transparent' : 'bg-background text-foreground shadow-lg scale-105 border border-border/50') : 'text-muted-foreground hover:text-foreground')}>Upcoming</button>
               </div>
 
               <button
@@ -163,8 +202,8 @@ export default function FootballHome() {
           <section className="space-y-6">
             <div className="flex items-center gap-3 px-2">
               <div className="flex items-center justify-center relative w-6 h-6">
-                <div className="absolute w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping opacity-75" />
-                <div className="relative w-2.5 h-2.5 rounded-full bg-rose-500" />
+                <div className={cn("absolute w-2.5 h-2.5 rounded-full animate-ping opacity-75", isWorldCup ? "bg-amber-500" : "bg-rose-500")} />
+                <div className={cn("relative w-2.5 h-2.5 rounded-full", isWorldCup ? "bg-amber-400" : "bg-rose-500")} />
               </div>
               <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/50">
                 Match Center.
