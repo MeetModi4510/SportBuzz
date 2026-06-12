@@ -1029,24 +1029,31 @@ export const PlayerAnalysisPanel = () => {
 
     return (
         <div className="space-y-6">
-            {/* ── Sport Selector ── */}
-            <div className="flex items-center gap-2 flex-wrap">
-                {(Object.keys(SPORT_LABELS) as AnalysisSport[]).map(sport => (
-                    <button
-                        key={sport}
-                        onClick={() => handleSportChange(sport)}
-                        className={cn(
-                            "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2.5 border",
-                            activeSport === sport
-                                ? "text-white shadow-lg scale-105 border-transparent"
-                                : "bg-card text-muted-foreground hover:bg-secondary hover:text-foreground border-border/50"
-                        )}
-                        style={activeSport === sport ? { background: `linear-gradient(135deg, ${SPORT_LABELS[sport].color}, ${SPORT_LABELS[sport].color}bb)` } : undefined}
-                    >
-                        <span className="text-lg">{SPORT_LABELS[sport].icon}</span>
-                        {SPORT_LABELS[sport].label}
-                    </button>
-                ))}
+            {/* ── Premium Minimalist Sport Selector ── */}
+            <div className="inline-flex items-center gap-1.5 p-1.5 rounded-[18px] bg-secondary/30 border border-border/40 shadow-inner backdrop-blur-md">
+                {(Object.keys(SPORT_LABELS) as AnalysisSport[]).map(sport => {
+                    const isActive = activeSport === sport;
+                    return (
+                        <button
+                            key={sport}
+                            onClick={() => handleSportChange(sport)}
+                            className={cn(
+                                "relative px-6 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-300 flex items-center gap-2 outline-none",
+                                isActive
+                                    ? "text-foreground shadow-md bg-background border border-border/50 scale-[1.02]"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 border border-transparent"
+                            )}
+                        >
+                            <span className={cn(
+                                "text-base transition-all duration-300",
+                                isActive ? "scale-110" : "grayscale-[50%] opacity-70"
+                            )}>
+                                {SPORT_LABELS[sport].icon}
+                            </span>
+                            <span className="tracking-wide">{SPORT_LABELS[sport].label}</span>
+                        </button>
+                    );
+                })}
             </div>
 
             <div className="grid lg:grid-cols-3 gap-6">

@@ -9,6 +9,7 @@ interface SportFilterProps {
 }
 
 const sports: { id: Sport | "all"; label: string }[] = [
+  { id: "all", label: "All Sports" },
   { id: "cricket", label: "Cricket" },
   { id: "football", label: "Football" },
   { id: "basketball", label: "Basketball" },
