@@ -9,7 +9,6 @@ interface SportFilterProps {
 }
 
 const sports: { id: Sport | "all"; label: string }[] = [
-  { id: "all", label: "All Sports" },
   { id: "cricket", label: "Cricket" },
   { id: "football", label: "Football" },
   { id: "basketball", label: "Basketball" },
@@ -18,29 +17,20 @@ const sports: { id: Sport | "all"; label: string }[] = [
 
 export const SportFilter = ({ activeSport, onSportChange, className }: SportFilterProps) => {
   return (
-    <div className={cn("flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide", className)}>
+    <div className={cn("inline-flex items-center gap-1 bg-secondary/40 p-1.5 rounded-2xl border border-border/50 shadow-sm backdrop-blur-sm overflow-x-auto scrollbar-hide max-w-full", className)}>
       {sports.map((sport) => (
         <button
           key={sport.id}
           onClick={() => onSportChange(sport.id)}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm",
+            "flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm",
             "transition-all duration-300 whitespace-nowrap",
-            "border",
             activeSport === sport.id
-              ? sport.id === "all"
-                ? "bg-primary text-primary-foreground border-primary"
-                : sport.id === "cricket"
-                ? "bg-cricket/20 text-cricket border-cricket/50"
-                : sport.id === "football"
-                ? "bg-football/20 text-football border-football/50"
-                : sport.id === "basketball"
-                ? "bg-basketball/20 text-basketball border-basketball/50"
-                : "bg-tennis/20 text-tennis border-tennis/50"
-              : "bg-secondary/50 text-muted-foreground border-border hover:bg-secondary hover:text-foreground"
+              ? "bg-background text-foreground shadow-sm ring-1 ring-border/50"
+              : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
           )}
         >
-          {sport.id !== "all" && <SportIcon sport={sport.id as Sport} size={16} />}
+          {sport.id !== "all" && <SportIcon sport={sport.id as Sport} size={18} />}
           {sport.label}
         </button>
       ))}

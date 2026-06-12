@@ -706,48 +706,7 @@ const CricketPanels = ({ player, teamColor, apiBattingFormat, setApiBattingForma
                 </div>
             </Section>
 
-            <Section icon={<BarChart3 size={16} style={{ color: teamColor }} />} title="Format Breakdown"
-                subtitle="Performance across Test, ODI, and T20 formats">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {formatData.map((f, i) => (
-                        <div key={i} className="p-4 bg-secondary/20 rounded-xl border border-border/50 transition-all"
-                            style={{ borderColor: `${teamColor}20` }}>
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="font-bold text-sm text-foreground">{f.format}</span>
-                                <span className="text-[11px] px-2 py-0.5 rounded-full font-medium"
-                                    style={{ backgroundColor: `${teamColor}15`, color: teamColor }}>
-                                    {f.matches} matches
-                                </span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                                {"runs" in f ? (
-                                    <>
-                                        <div>
-                                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Runs</p>
-                                            <p className="text-xl font-bold font-mono text-foreground">{f.runs}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Average</p>
-                                            <p className="text-xl font-bold font-mono" style={{ color: teamColor }}>{f.avg}</p>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div>
-                                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Wickets</p>
-                                            <p className="text-xl font-bold font-mono text-foreground">{(f as any).wickets}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Average</p>
-                                            <p className="text-xl font-bold font-mono" style={{ color: teamColor }}>{f.avg}</p>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </Section>
+
 
             <Section icon={<Swords size={16} style={{ color: teamColor }} />} title="vs Opposition"
                 subtitle="Batting/bowling average against top teams">
@@ -991,6 +950,7 @@ export const PlayerAnalysisPanel = () => {
     const [selectedCountry, setSelectedCountry] = useState<string>("All");
     const [apiBattingFormat, setApiBattingFormat] = useState<BattingFormatKey>('odi');
     const [statsView, setStatsView] = useState<StatsView>('batting');
+    const [showCountrySelect, setShowCountrySelect] = useState(false);
 
     const allPlayers = ANALYSIS_PLAYERS[activeSport];
 
@@ -1091,107 +1051,172 @@ export const PlayerAnalysisPanel = () => {
 
             <div className="grid lg:grid-cols-3 gap-6">
                 {/* ── Player List ── */}
-                <div className="space-y-3">
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-1 flex items-center gap-2">
-                        <span className="text-lg">{sportConfig.icon}</span> {sportConfig.label} Players
+                <div className="space-y-4">
+                    <h3 className="text-xs font-bold text-muted-foreground/70 uppercase tracking-widest px-1 flex items-center gap-2">
+                        {sportConfig.label} Players
                     </h3>
 
-                    {/* Country Filter */}
-                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
-                        <button
-                            onClick={() => setSelectedCountry("All")}
-                            className={cn(
-                                "shrink-0 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition-all flex items-center gap-2",
-                                selectedCountry === "All"
-                                    ? "text-white border-transparent shadow-md"
-                                    : "bg-secondary/30 text-muted-foreground border-border hover:bg-secondary/60"
-                            )}
-                            style={selectedCountry === "All" ? { background: sportConfig.color } : undefined}
+                    {/* Unique Country Selector Dropdown */}
+                    <div className="relative">
+                        <button 
+                            onClick={() => setShowCountrySelect(!showCountrySelect)}
+                            className="w-full flex items-center justify-between p-3.5 bg-secondary/40 hover:bg-secondary/60 border border-border/50 rounded-2xl transition-all duration-300 backdrop-blur-sm group"
                         >
-                            <span className="text-base leading-none">🌍</span>
-                            <span className="leading-none mt-[1px]">All</span>
+                            <div className="flex items-center gap-3">
+                                {selectedCountry === "All" ? (
+                                    <div className="w-9 h-9 rounded-full bg-background flex items-center justify-center text-xl shadow-sm border border-border/50">🌍</div>
+                                ) : (
+                                    <div className="w-9 h-9 rounded-full overflow-hidden bg-background border border-border shadow-sm p-[2px]">
+                                        <div className="w-full h-full rounded-full overflow-hidden bg-secondary">
+                                            {getCountryFlagImg(selectedCountry, "w-full h-full object-cover")}
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="flex flex-col items-start">
+                                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground/80 font-bold mb-0.5">Filter by Region</span>
+                                    <span className="text-sm font-black text-foreground tracking-wide">{selectedCountry === "All" ? "All Regions" : selectedCountry}</span>
+                                </div>
+                            </div>
+                            <Compass className={cn(
+                                "text-muted-foreground transition-transform duration-500",
+                                showCountrySelect ? "rotate-180 text-foreground" : "group-hover:text-foreground group-hover:rotate-45"
+                            )} size={22} />
                         </button>
-                        {countries.map(c => {
-                            const tc = getTeamColor(c.name);
+
+                        {/* Dropdown Grid Menu */}
+                        {showCountrySelect && (
+                            <div className="absolute top-[calc(100%+8px)] left-0 right-0 p-3 bg-card/95 backdrop-blur-xl border border-border/60 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-4 zoom-in-95 duration-300">
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        onClick={() => { setSelectedCountry("All"); setShowCountrySelect(false); }}
+                                        className={cn(
+                                            "flex items-center gap-3 p-2.5 rounded-xl transition-all duration-300 border",
+                                            selectedCountry === "All" 
+                                                ? "bg-foreground text-background shadow-md border-transparent scale-[1.02]" 
+                                                : "hover:bg-secondary text-muted-foreground hover:text-foreground border-transparent hover:border-border/50"
+                                        )}
+                                    >
+                                        <div className="w-7 h-7 rounded-full bg-background/20 flex items-center justify-center text-sm shadow-sm">🌍</div>
+                                        <span className="text-[11px] font-black uppercase tracking-widest">All Regions</span>
+                                    </button>
+                                    
+                                    {countries.map(c => {
+                                        const tc = getTeamColor(c.name);
+                                        const isActive = selectedCountry === c.name;
+                                        return (
+                                            <button
+                                                key={c.name}
+                                                onClick={() => { setSelectedCountry(c.name); setShowCountrySelect(false); }}
+                                                className={cn(
+                                                    "flex items-center gap-3 p-2.5 rounded-xl transition-all duration-300 border overflow-hidden",
+                                                    isActive 
+                                                        ? "text-white shadow-lg border-transparent scale-[1.02]" 
+                                                        : "hover:bg-secondary text-muted-foreground hover:text-foreground border-transparent hover:border-border/50"
+                                                )}
+                                                style={isActive ? { 
+                                                    background: `linear-gradient(135deg, ${tc.primary}, ${tc.primary}dd)`,
+                                                    boxShadow: `0 4px 15px -3px ${tc.primary}66`
+                                                } : undefined}
+                                            >
+                                                <div className={cn(
+                                                    "w-7 h-7 rounded-full overflow-hidden p-[2px] shrink-0",
+                                                    isActive ? "bg-white/30 shadow-inner" : "bg-border/50"
+                                                )}>
+                                                    <div className="w-full h-full rounded-full overflow-hidden bg-secondary">
+                                                        {getCountryFlagImg(c.name, "w-full h-full object-cover")}
+                                                    </div>
+                                                </div>
+                                                <span className="text-[11px] font-black uppercase tracking-widest truncate">{c.name}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                        {filteredPlayers.map(player => {
+                            const tc = getTeamColor(player.country);
+                            const isActive = selectedPlayer.id === player.id;
                             return (
                                 <button
-                                    key={c.name}
-                                    onClick={() => setSelectedCountry(c.name)}
+                                    key={player.id}
+                                    onClick={() => setSelectedPlayerId(player.id)}
                                     className={cn(
-                                        "shrink-0 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition-all flex items-center gap-2",
-                                        selectedCountry === c.name
-                                            ? "text-white border-transparent shadow-md"
-                                            : "bg-secondary/30 text-muted-foreground border-border hover:bg-secondary/60"
+                                        "relative w-full overflow-hidden p-0 rounded-2xl transition-all duration-500 group text-left border",
+                                        isActive
+                                            ? "bg-card shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-border/80 scale-[1.02]"
+                                            : "bg-secondary/20 border-transparent hover:bg-secondary/50 hover:border-border/30"
                                     )}
-                                    style={selectedCountry === c.name ? { background: tc.primary } : undefined}
                                 >
-                                    {getCountryFlagImg(c.name, "w-[22px] h-[15px] object-cover rounded-[2px] shadow-sm")}
-                                    <span className="leading-none mt-[1px]">{c.name}</span>
+                                    {/* Accent Line */}
+                                    <div 
+                                        className={cn(
+                                            "absolute left-0 top-0 bottom-0 transition-all duration-500",
+                                            isActive ? "w-1.5" : "w-1 opacity-0 group-hover:opacity-100"
+                                        )}
+                                        style={{ backgroundColor: tc.primary, boxShadow: isActive ? `0 0 10px ${tc.primary}88` : undefined }} 
+                                    />
+
+                                    {/* Watermark Rating */}
+                                    <div className="absolute right-3 -bottom-4 text-[72px] font-black italic tracking-tighter opacity-[0.03] pointer-events-none transition-transform duration-500 group-hover:scale-110">
+                                        {player.overallRating}
+                                    </div>
+
+                                    <div className="relative p-3.5 pl-6 flex items-center gap-4">
+                                        {/* Player Photo with Glow */}
+                                        <div className="relative shrink-0">
+                                            {isActive && (
+                                                <div className="absolute inset-0 blur-md opacity-40 scale-110 rounded-xl transition-opacity duration-500" style={{ backgroundColor: tc.primary }} />
+                                            )}
+                                            <div className="relative w-[60px] h-[60px] rounded-[14px] overflow-hidden bg-secondary border border-border/50 shadow-sm z-10">
+                                                {PLAYER_PHOTOS[player.id] ? (
+                                                    <img src={PLAYER_PHOTOS[player.id]} alt={player.name}
+                                                        className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
+                                                        onError={(e) => { const el = e.target as HTMLImageElement; el.style.display = 'none'; const span = el.parentElement?.querySelector('span'); if (span) span.style.display = ''; }}
+                                                    />
+                                                ) : null}
+                                                <span style={PLAYER_PHOTOS[player.id] ? { display: 'none' } : undefined} className="absolute inset-0 flex items-center justify-center text-2xl">{player.image}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Content */}
+                                        <div className="flex-1 min-w-0 z-10">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-0.5">
+                                                        {getCountryFlagImg(player.country, "w-4 h-3 object-cover rounded-[2px] shadow-sm")}
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{player.country}</span>
+                                                    </div>
+                                                    <span className={cn(
+                                                        "block font-bold text-base truncate transition-colors",
+                                                        isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                                                    )}>{player.name}</span>
+                                                </div>
+                                                
+                                                {/* Rating Pill */}
+                                                <div className={cn(
+                                                    "flex flex-col items-center justify-center px-2 py-1 rounded-lg border shadow-sm transition-all duration-300",
+                                                    isActive ? "bg-background border-border text-foreground" : "bg-background/40 border-transparent text-muted-foreground group-hover:border-border/50"
+                                                )}>
+                                                    <span className="text-[9px] font-bold uppercase tracking-widest opacity-50 mb-[1px]">OVR</span>
+                                                    <span className="text-sm font-black leading-none">{player.overallRating}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-[10px] font-bold text-muted-foreground bg-secondary/80 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                                                    {player.role}
+                                                </span>
+                                                <span className="text-[11px] font-medium text-muted-foreground/60">
+                                                    {player.age} yrs
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </button>
                             );
                         })}
-                    </div>
-
-                    <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
-                        {filteredPlayers.map(player => (
-                            <button
-                                key={player.id}
-                                onClick={() => setSelectedPlayerId(player.id)}
-                                className={cn(
-                                    "relative w-full text-left p-3 rounded-2xl transition-all duration-300 group overflow-hidden border border-transparent",
-                                    selectedPlayer.id === player.id
-                                        ? "bg-secondary/50 shadow-sm border-border/50"
-                                        : "hover:bg-secondary/20 hover:border-border/30 hover:-translate-y-0.5"
-                                )}
-                            >
-                                {selectedPlayer.id === player.id && (
-                                    <div 
-                                        className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 rounded-r-full transition-all duration-500 shadow-[0_0_10px_rgba(0,0,0,0.2)]" 
-                                        style={{ backgroundColor: getTeamColor(player.country).primary }}
-                                    />
-                                )}
-                                <div className="flex items-center gap-4 pl-1">
-                                    <div className={cn(
-                                        "w-12 h-12 flex items-center justify-center text-sm font-bold text-white shrink-0 overflow-hidden ring-2 shadow-sm transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3",
-                                        selectedPlayer.id === player.id ? "rounded-[1rem]" : "rounded-full ring-background"
-                                    )}
-                                        style={{ 
-                                            background: `linear-gradient(135deg, ${getTeamColor(player.country).primary}, ${getTeamColor(player.country).primary}88)`,
-                                            ...(selectedPlayer.id === player.id ? { ringColor: `${getTeamColor(player.country).primary}40` } : {})
-                                        }}>
-                                        {PLAYER_PHOTOS[player.id] ? (
-                                            <img src={PLAYER_PHOTOS[player.id]} alt={player.name}
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => { const el = e.target as HTMLImageElement; el.style.display = 'none'; const span = el.parentElement?.querySelector('span'); if (span) span.style.display = ''; }}
-                                            />
-                                        ) : null}
-                                        <span style={PLAYER_PHOTOS[player.id] ? { display: 'none' } : undefined}>{player.image}</span>
-                                    </div>
-                                    <div className="flex-1 min-w-0 py-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className={cn(
-                                                "font-bold text-sm truncate transition-colors",
-                                                selectedPlayer.id === player.id ? "text-foreground" : "text-foreground/80 group-hover:text-foreground"
-                                            )}>{player.name}</span>
-                                            <div className="flex-shrink-0 flex items-center justify-center">
-                                                {getCountryFlagImg(player.country, "w-4 h-3 object-cover rounded-[2px] shadow-sm opacity-90")}
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-[9px] uppercase tracking-widest font-black text-muted-foreground/70">{player.role}</span>
-                                            <span className="w-1 h-1 rounded-full bg-border" />
-                                            <span className="text-[10px] font-medium text-muted-foreground/70">{player.age} yrs</span>
-                                        </div>
-                                    </div>
-                                    <div className={cn(
-                                        "transition-transform duration-500",
-                                        selectedPlayer.id === player.id ? "scale-110" : "opacity-80 group-hover:scale-105 group-hover:opacity-100"
-                                    )}>
-                                        <RatingRing value={player.overallRating} size={40} color={getTeamColor(player.country).primary} />
-                                    </div>
-                                </div>
-                            </button>
-                        ))}
                     </div>
                 </div>
 

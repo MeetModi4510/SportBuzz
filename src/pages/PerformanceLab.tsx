@@ -47,7 +47,7 @@ import {
 } from "lucide-react";
 
 const PerformanceLab = () => {
-  const [activeSport, setActiveSport] = useState<Sport | "all">("all");
+  const [activeSport, setActiveSport] = useState<Sport | "all">("cricket");
   const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
   const [playerAnalysis, setPlayerAnalysis] = useState<any>(null);
   const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
@@ -113,38 +113,37 @@ const PerformanceLab = () => {
             </p>
           </section>
 
-          {/* Sport Filter */}
-          <SportFilter activeSport={activeSport} onSportChange={setActiveSport} />
+          {/* Sport Filter removed per user request */}
 
           {/* Main Tabs */}
           <Tabs defaultValue="players" className="space-y-8">
-            <TabsList className="w-full justify-start bg-secondary/50 p-1.5 rounded-xl overflow-x-auto">
+            <TabsList className="w-full justify-start bg-transparent border-b border-border/40 p-0 rounded-none h-12 gap-6 overflow-x-auto hide-scrollbar">
               <TabsTrigger
                 value="players"
-                className="flex items-center gap-2 px-6"
+                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
               >
-                <        Users size={18} />
+                <Users size={16} />
                 Player Analysis
               </TabsTrigger>
               <TabsTrigger
                 value="comparison"
-                className="flex items-center gap-2 px-6"
+                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
               >
-                <GitCompare size={18} />
+                <GitCompare size={16} />
                 Player VS Player
               </TabsTrigger>
               <TabsTrigger
                 value="teams"
-                className="flex items-center gap-2 px-6"
+                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
               >
-                <Target size={18} />
+                <Target size={16} />
                 Team Comparison
               </TabsTrigger>
               <TabsTrigger
                 value="venues"
-                className="flex items-center gap-2 px-6"
+                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
               >
-                <MapPin size={18} />
+                <MapPin size={16} />
                 Venue Analysis
               </TabsTrigger>
             </TabsList>

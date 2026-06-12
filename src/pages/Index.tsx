@@ -34,7 +34,7 @@ const Index = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
-  const initialSport = (searchParams.get("sport") as Sport | null) || "all";
+  const initialSport = (searchParams.get("sport") as Sport | null) || "cricket";
   const [activeSport, setActiveSport] = useState<Sport | "all">(initialSport);
   const [activeStatus, setActiveStatus] = useState<MatchStatus | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -228,10 +228,8 @@ const Index = () => {
           <LiveTicker />
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <SportFilter
-              activeSport={activeSport}
-              onSportChange={setActiveSport}
-            />
+            {/* Sport Filter removed per user request */}
+            <div className="hidden"></div>
 
             <div className="flex items-center gap-3 flex-1 md:flex-initial">
               {/* Search Bar & Category Select */}
