@@ -102,7 +102,46 @@ export async function getLiveMatches() {
             }
         }
 
-        const transformed = allMatches.map(transformEvent).filter(Boolean);
+        const isPriority = (m) => {
+            if (!m) return false;
+            const league = m.leagueName.toLowerCase();
+            const category = m.category.toLowerCase();
+            const home = m.homeTeam?.name?.toLowerCase() || '';
+            const away = m.awayTeam?.name?.toLowerCase() || '';
+
+            // Exclude Youth and Women
+            const excludeKeywords = ['u20', 'u21', 'u19', 'u18', 'u17', 'women', '(w)', 'wfc'];
+            for (const word of excludeKeywords) {
+                if (league.includes(word) || category.includes(word) || home.includes(word) || away.includes(word)) {
+                    return false;
+                }
+            }
+
+            // Strict checks for priority leagues
+            if (league === 'premier league' && category === 'england') return true;
+            if ((league.includes('laliga') || league === 'la liga') && category === 'spain') return true;
+            if (league === 'ligue 1' && category === 'france') return true;
+            if (league === 'bundesliga' && category === 'germany') return true;
+            if (league === 'serie a' && category === 'italy') return true;
+            if ((league.includes('mls') || league.includes('major league soccer')) && (category === 'usa' || category === 'canada')) return true;
+            if (league.includes('saudi pro league')) return true;
+            if ((league.includes('pro league') || league.includes('first division a')) && category === 'belgium') return true;
+            if (league === 'eredivisie' && category === 'netherlands') return true;
+            if (league.includes('indian super league') || league === 'isl') return true;
+            
+            // International / UEFA
+            if (league.includes('champions league')) return true;
+            if (league.includes('europa league')) return true;
+            if (league.includes('conference league')) return true;
+            if (league.includes('world cup') || category.includes('world cup')) return true;
+            if (league.includes('euro ') || league === 'euro') return true;
+            if (league.includes('copa america')) return true;
+            if (league.includes('friendly') || league.includes('friendlies')) return true;
+
+            return false;
+        };
+
+        const transformed = allMatches.map(transformEvent).filter(isPriority);
         
         const result = { success: true, fromCache: false, data: transformed, lastFetched: new Date().toISOString() };
         setCache(cacheKey, result);
@@ -135,7 +174,46 @@ export async function getMatchesByDate(dateYYYYMMDD) {
             }
         }
 
-        const transformed = allMatches.map(transformEvent).filter(Boolean);
+        const isPriority = (m) => {
+            if (!m) return false;
+            const league = m.leagueName.toLowerCase();
+            const category = m.category.toLowerCase();
+            const home = m.homeTeam?.name?.toLowerCase() || '';
+            const away = m.awayTeam?.name?.toLowerCase() || '';
+
+            // Exclude Youth and Women
+            const excludeKeywords = ['u20', 'u21', 'u19', 'u18', 'u17', 'women', '(w)', 'wfc'];
+            for (const word of excludeKeywords) {
+                if (league.includes(word) || category.includes(word) || home.includes(word) || away.includes(word)) {
+                    return false;
+                }
+            }
+
+            // Strict checks for priority leagues
+            if (league === 'premier league' && category === 'england') return true;
+            if ((league.includes('laliga') || league === 'la liga') && category === 'spain') return true;
+            if (league === 'ligue 1' && category === 'france') return true;
+            if (league === 'bundesliga' && category === 'germany') return true;
+            if (league === 'serie a' && category === 'italy') return true;
+            if ((league.includes('mls') || league.includes('major league soccer')) && (category === 'usa' || category === 'canada')) return true;
+            if (league.includes('saudi pro league')) return true;
+            if ((league.includes('pro league') || league.includes('first division a')) && category === 'belgium') return true;
+            if (league === 'eredivisie' && category === 'netherlands') return true;
+            if (league.includes('indian super league') || league === 'isl') return true;
+            
+            // International / UEFA
+            if (league.includes('champions league')) return true;
+            if (league.includes('europa league')) return true;
+            if (league.includes('conference league')) return true;
+            if (league.includes('world cup') || category.includes('world cup')) return true;
+            if (league.includes('euro ') || league === 'euro') return true;
+            if (league.includes('copa america')) return true;
+            if (league.includes('friendly') || league.includes('friendlies')) return true;
+
+            return false;
+        };
+
+        const transformed = allMatches.map(transformEvent).filter(isPriority);
         
         const result = { success: true, fromCache: false, data: transformed, lastFetched: new Date().toISOString() };
         setCache(cacheKey, result);

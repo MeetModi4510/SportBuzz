@@ -30,7 +30,7 @@ export const FootballMatchesLivescore = () => {
   const { data: liveData, isLoading: liveLoading, refetch: refetchLive, isFetching: liveFetching } = useLivescoreLiveMatches(true);
   
   // Lazy load Upcoming/Recent
-  const { data: todayData, isLoading: todayLoading, refetch: refetchToday, isFetching: todayFetching } = useLivescoreMatchesByDate(todayStr, activeTab === 'upcoming');
+  const { data: todayData, isLoading: todayLoading, refetch: refetchToday, isFetching: todayFetching } = useLivescoreMatchesByDate(todayStr, activeTab === 'upcoming' || activeTab === 'recent');
   const { data: tomorrowData, isLoading: tomorrowLoading, refetch: refetchTomorrow, isFetching: tomorrowFetching } = useLivescoreMatchesByDate(tomorrowStr, activeTab === 'upcoming');
   
   const { data: yesterdayData, isLoading: yesterdayLoading, refetch: refetchYesterday, isFetching: yesterdayFetching } = useLivescoreMatchesByDate(yesterdayStr, activeTab === 'recent');
@@ -44,7 +44,7 @@ export const FootballMatchesLivescore = () => {
   const isRefreshing = liveFetching || todayFetching || tomorrowFetching || yesterdayFetching;
   const isLoading = (activeTab === 'live' && liveLoading) || 
                     (activeTab === 'upcoming' && (todayLoading || tomorrowLoading)) || 
-                    (activeTab === 'recent' && yesterdayLoading);
+                    (activeTab === 'recent' && (todayLoading || yesterdayLoading));
 
   // Grouping logic for rendering
   let sections: { title: string, matches: LivescoreMatch[] }[] = [];
@@ -58,8 +58,10 @@ export const FootballMatchesLivescore = () => {
     if (upcomingToday.length > 0) sections.push({ title: 'Today', matches: upcomingToday });
     if (upcomingTomorrow.length > 0) sections.push({ title: 'Tomorrow', matches: upcomingTomorrow });
   } else if (activeTab === 'recent') {
-    // Show only completed matches from yesterday
+    // Show completed matches from today and yesterday
+    const completedToday = (todayData?.data || []).filter(m => m.status === 'completed');
     const completedYesterday = (yesterdayData?.data || []).filter(m => m.status === 'completed');
+    if (completedToday.length > 0) sections.push({ title: 'Today', matches: completedToday });
     if (completedYesterday.length > 0) sections.push({ title: 'Yesterday', matches: completedYesterday });
   }
 

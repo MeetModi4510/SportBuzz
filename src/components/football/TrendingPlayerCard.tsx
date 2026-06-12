@@ -32,32 +32,44 @@ export function TrendingPlayerCard({ player, onClick }: TrendingPlayerCardProps)
       )}
     >
       {/* Header */}
-      <div className="relative h-24 bg-gradient-to-br from-secondary to-muted flex items-center justify-center">
-        <div className="relative">
-          {/* Profile Image Container */}
-          <div className="w-16 h-16 rounded-full border-2 border-border bg-secondary flex items-center justify-center overflow-hidden flex-shrink-0">
-            {!imgError ? (
-              <img 
-                src={`${BACKEND_URL}/football/trending-players/${player.playerId}/image`} 
-                alt={player.playerName}
-                className="w-full h-full object-cover object-top"
-                onError={() => setImgError(true)}
-                loading="lazy"
-              />
-            ) : (
-              <User size={28} className="text-muted-foreground" />
-            )}
-          </div>
+      <div className="relative h-28 bg-slate-900 overflow-hidden">
+        {/* Flag Background */}
+        {(player.teamId || player.teamFlag) && (
+          <div 
+            className="absolute inset-0 bg-cover bg-center opacity-40 scale-150 transition-transform duration-700 group-hover:scale-[1.7]"
+            style={{ 
+              backgroundImage: `url(${player.teamId ? `${BACKEND_URL}/football/trending-players/team/${player.teamId}/image` : player.teamFlag!})` 
+            }}
+          />
+        )}
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent/10" />
+      </div>
+
+      {/* Profile Image Container (Overlapping) */}
+      <div className="relative -mt-10 flex justify-center z-10">
+        <div className="w-20 h-20 rounded-full border-4 border-card bg-secondary flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md group-hover:-translate-y-1 transition-transform duration-300">
+          {!imgError ? (
+            <img 
+              src={`${BACKEND_URL}/football/trending-players/${player.playerId}/image`} 
+              alt={player.playerName}
+              className="w-full h-full object-cover object-top"
+              onError={() => setImgError(true)}
+              loading="lazy"
+            />
+          ) : (
+            <User size={32} className="text-muted-foreground" />
+          )}
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-3 flex-1 flex flex-col">
+      <div className="p-4 pt-3 space-y-3 flex-1 flex flex-col text-center">
         <div>
           <h3 className="font-semibold text-foreground text-lg truncate" title={player.playerName}>
             {player.playerName}
           </h3>
-          <div className="flex items-center gap-1.5 mt-1">
+          <div className="flex items-center justify-center gap-1.5 mt-1">
             {(player.teamId || player.teamFlag) && (
               <img 
                 src={player.teamId ? `${BACKEND_URL}/football/trending-players/team/${player.teamId}/image` : player.teamFlag!} 
