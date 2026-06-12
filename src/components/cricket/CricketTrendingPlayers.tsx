@@ -321,6 +321,8 @@ export function TrendingCard({
   index: number;
   onClick: () => void;
 }) {
+  const flagSrc = player.flagLocal || (player.flagCode ? `https://flagcdn.com/w320/${player.flagCode}.png` : undefined);
+
   return (
     <div
       onClick={onClick}
@@ -330,20 +332,33 @@ export function TrendingCard({
       )}
       style={{ animationDelay: `${index * 50}ms` }}
     >
-      {/* Header with rating */}
-      <div className="relative h-24 bg-gradient-to-br from-secondary to-muted flex items-center justify-center">
-        <div className="relative">
+      {/* Header */}
+      <div className="relative h-28 bg-slate-900 overflow-hidden">
+        {/* Flag Background */}
+        {flagSrc && (
+          <div 
+            className="absolute inset-0 bg-cover bg-center opacity-40 scale-150 transition-transform duration-700 group-hover:scale-[1.7]"
+            style={{ backgroundImage: `url(${flagSrc})` }}
+          />
+        )}
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent/10" />
+      </div>
+
+      {/* Profile Image Container (Overlapping) */}
+      <div className="relative -mt-10 flex justify-center z-10">
+        <div className="rounded-full border-4 border-card bg-secondary flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md group-hover:-translate-y-1 transition-transform duration-300">
           <PlayerAvatar faceImageId={player.faceImageId} name={player.name} size="sm" />
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-3 flex-1 flex flex-col">
+      <div className="p-4 pt-3 space-y-3 flex-1 flex flex-col text-center">
         <div>
           <h3 className="font-semibold text-foreground text-lg truncate" title={player.name}>{player.name}</h3>
-          <div className="flex items-center gap-1.5 mt-1">
+          <div className="flex items-center justify-center gap-1.5 mt-1">
             <PlayerFlag flagCode={player.flagCode} flagLocal={player.flagLocal} country={player.teamName} size="sm" />
-            <p className="text-sm text-muted-foreground">{player.teamName}</p>
+            <p className="text-sm text-muted-foreground truncate">{player.teamName}</p>
           </div>
         </div>
       </div>

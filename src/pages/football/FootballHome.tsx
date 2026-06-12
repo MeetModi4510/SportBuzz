@@ -126,7 +126,7 @@ export default function FootballHome() {
           </div>
           
           {/* Match Center - Replaced with New Livescore6 Component */}
-          <FootballMatchesLivescore />
+          <FootballMatchesLivescore variant="hub" />
 
           {/* Transfers Market (Horizontal Scroll) */}
           <section className="space-y-6">
