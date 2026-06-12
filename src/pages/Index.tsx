@@ -228,7 +228,18 @@ const Index = () => {
           <LiveTicker />
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <SportFilter activeSport={activeSport} onSportChange={setActiveSport} />
+            <SportFilter 
+              activeSport={activeSport} 
+              onSportChange={(sport) => {
+                if (sport === "cricket") {
+                  navigate("/cricket");
+                } else if (sport === "football") {
+                  navigate("/football");
+                } else {
+                  setActiveSport(sport);
+                }
+              }} 
+            />
 
             <div className="flex items-center gap-3 flex-1 md:flex-initial">
               {/* Search Bar & Category Select */}
