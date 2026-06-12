@@ -792,6 +792,7 @@ const TOPSTATS_LEAGUES = [
     { id: 67, name: 'Bundesliga',      flag: 'https://flagcdn.com/w40/de.png'    },
     { id: 77, name: 'Serie A',         flag: 'https://flagcdn.com/w40/it.png'    },
     { id: 68, name: 'Ligue 1',         flag: 'https://flagcdn.com/w40/fr.png'    },
+    { id: 734, name: 'World Cup',      flag: 'https://flagcdn.com/w40/us.png'    },
 ];
 
 const LIVESCORE_HOST = 'livescore6.p.rapidapi.com';

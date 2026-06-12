@@ -18,6 +18,7 @@ import {
   PlayerStat,
   TeamStat,
 } from "../../hooks/football/useTopStats";
+import { useWorldCupTheme } from "../../hooks/football/useWorldCupTheme";
 
 const COUNTRY_CODES: Record<string, string> = {
   "England": "gb-eng", "Norway": "no", "Brazil": "br", "Ghana": "gh",
@@ -236,10 +237,18 @@ function TeamStatList({ rows }: { rows: TeamStat[] }) {
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 export function FootballTopStats() {
-  const [leagueId, setLeagueId]   = useState(65);
+  const isWorldCupTheme = useWorldCupTheme();
+  
+  // Set initial league: 734 (World Cup) if theme is active, else 65 (Premier League)
+  const [leagueId, setLeagueId]   = useState(isWorldCupTheme ? 734 : 65);
   const [view, setView]           = useState<"players" | "teams">("players");
   const [playerTyp, setPlayerTyp] = useState(1);
   const [teamTyp, setTeamTyp]     = useState(10);
+
+  // Sync leagueId if theme toggles
+  useEffect(() => {
+    setLeagueId(isWorldCupTheme ? 734 : 65);
+  }, [isWorldCupTheme]);
 
   const { data, isLoading, isError } = useTopStats(leagueId, playerTyp, view);
 
