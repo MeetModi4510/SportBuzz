@@ -1230,4 +1230,58 @@ router.get('/v2/matches/detail/:endpoint/:matchId', async (req, res) => {
     }
 });
 
+// ─── PERFORMANCE LAB (AGGREGATED MATCH DATA, SEQUENTIAL FETCH) ──────────────
+// In-memory cache for performance data (keyed by matchId)
+const performanceCache = new Map();
+const PERFORMANCE_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+router.get('/v2/matches/performance/:matchId', async (req, res) => {
+    const { matchId } = req.params;
+    const cacheKey = `match_${matchId}_performance`;
+
+    // Check cache first
+    const cached = performanceCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp < PERFORMANCE_CACHE_TTL)) {
+        console.log(`[PerformanceLab] Cache hit for match ${matchId}`);
+        return res.json({ success: true, fromCache: true, data: cached.data });
+    }
+
+    try {
+        console.log(`[PerformanceLab] Fetching data sequentially for match ${matchId}...`);
+
+        // Fetch sequentially with delays to protect API rate limits
+        const scoreboard = await livescore6Service.getMatchDetail('get-scoreboard', matchId);
+        await sleep(500);
+
+        const incidents = await livescore6Service.getMatchDetail('get-incidents', matchId);
+        await sleep(500);
+
+        const lineups = await livescore6Service.getMatchDetail('get-lineups', matchId);
+        await sleep(500);
+
+        const statistics = await livescore6Service.getMatchDetail('get-statistics', matchId);
+
+        const performanceData = {
+            scoreboard: scoreboard?.data || null,
+            incidents: incidents?.data || null,
+            lineups: lineups?.data || null,
+            statistics: statistics?.data || null,
+        };
+
+        // Cache the aggregated data
+        performanceCache.set(cacheKey, { data: performanceData, timestamp: Date.now() });
+        console.log(`[PerformanceLab] Data cached for match ${matchId}`);
+
+        return res.json({ success: true, fromCache: false, data: performanceData });
+    } catch (err) {
+        console.error(`[PerformanceLab] Error for match ${matchId}:`, err.message);
+
+        // Try to serve stale cache if available
+        if (cached) {
+            return res.json({ success: true, fromCache: true, stale: true, data: cached.data });
+        }
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 export default router;

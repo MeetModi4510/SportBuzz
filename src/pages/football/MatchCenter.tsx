@@ -6,7 +6,7 @@ import { useLivescoreMatchDetail } from "../../hooks/football/useLivescore6Queri
 import {
   Loader2, ArrowLeft, Clock, MapPin, Activity, ListOrdered,
   Users, User, MessageSquare, BarChart3, Info, Trophy, ArrowLeftRight,
-  CircleDot, ShieldAlert, Timer, ArrowDown, ArrowUp
+  CircleDot, ShieldAlert, Timer, ArrowDown, ArrowUp, Zap
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import { cn } from "../../lib/utils";
@@ -224,7 +224,7 @@ const MatchCenter = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<
-    "summary" | "events" | "lineups" | "statistics"
+    "summary" | "events" | "lineups" | "statistics" | "performance"
   >("summary");
 
   // ── Data hooks ──────────────────────────────────────────
@@ -262,6 +262,28 @@ const MatchCenter = () => {
     incs.sort((a, b) => (a.Min || 0) - (b.Min || 0));
     return incs;
   }, [incidentsRes?.data, scoreboardRes?.data, lineupsRes?.data]);
+
+  // ── Performance Lab state ──────────────────────────────
+  const [perfData, setPerfData] = useState<any>(null);
+  const [perfLoading, setPerfLoading] = useState(false);
+  const [perfError, setPerfError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (activeTab !== 'performance' || !id || perfData) return;
+    setPerfLoading(true);
+    setPerfError(null);
+    fetch(`${API_BASE}/football/v2/matches/performance/${id}`)
+      .then(r => r.json())
+      .then(json => {
+        if (json.success) {
+          setPerfData(json.data);
+        } else {
+          setPerfError(json.message || 'Failed to load performance data');
+        }
+      })
+      .catch(err => setPerfError(err.message))
+      .finally(() => setPerfLoading(false));
+  }, [activeTab, id, perfData]);
 
   // ── Loading / Error states ──────────────────────────────
   if (sbLoading) {
@@ -515,6 +537,7 @@ const MatchCenter = () => {
                 { v: "events",      icon: <CircleDot size={16} />,     label: "Key Events" },
                 { v: "lineups",     icon: <Users size={16} />,         label: "Lineups" },
                 { v: "statistics",  icon: <Activity size={16} />,      label: "Statistics" },
+                { v: "performance", icon: <Zap size={16} />,           label: "Performance Lab" },
               ].map(t => (
                 <TabsTrigger key={t.v} value={t.v}
                   className="flex items-center gap-2 px-1 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-emerald-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-emerald-500 rounded-none transition-all">
@@ -1024,6 +1047,463 @@ const MatchCenter = () => {
                   </div>
                 );
               })()}
+            </TabsContent>
+
+            {/* ──────────── PERFORMANCE LAB ──────────── */}
+            <TabsContent value="performance" className="space-y-8 animate-fade-in">
+              {perfLoading ? (
+                <div className="flex flex-col items-center justify-center py-24 gap-4">
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin" />
+                    <Zap className="w-6 h-6 text-emerald-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                  </div>
+                  <p className="text-muted-foreground animate-pulse font-semibold text-sm mt-2">Analyzing match performance…</p>
+                  <p className="text-muted-foreground/50 text-xs">Fetching data sequentially to protect API limits</p>
+                </div>
+              ) : perfError ? (
+                <div className="py-20 text-center">
+                  <p className="text-red-400 font-medium text-sm">{perfError}</p>
+                </div>
+              ) : !perfData ? (
+                <div className="py-20 text-center">
+                  <p className="text-muted-foreground font-medium">Performance data not available.</p>
+                </div>
+              ) : (() => {
+                // ── Extract performance data ────────────────────────
+                const pStatArr = perfData.statistics?.Stat || [];
+                const t1 = pStatArr.find((s: any) => s.Tnb === 1) || pStatArr[0] || {};
+                const t2 = pStatArr.find((s: any) => s.Tnb === 2) || pStatArr[1] || {};
+                const perfIncidents = flattenIncidents(perfData.incidents?.Incs || {});
+                const luArr = perfData.lineups?.Lu || [];
+                const homeLu = luArr[0] || {};
+                const awayLu = luArr[1] || {};
+
+                const homePoss = Number(t1.Pss) || 50;
+                const awayPoss = Number(t2.Pss) || 50;
+                const ftH = Number(homeScore) || 0;
+                const ftA = Number(awayScore) || 0;
+                const result = ftH > ftA ? 'HOME WIN' : ftH < ftA ? 'AWAY WIN' : 'DRAW';
+                const resultClr = ftH > ftA ? 'text-emerald-400' : ftH < ftA ? 'text-amber-400' : 'text-muted-foreground';
+
+                const CIRC = 2 * Math.PI * 58;
+                const homeArc = CIRC * homePoss / 100;
+
+                const formatFo = (fo: any) => {
+                  if (!fo) return 'N/A';
+                  const s = String(fo).trim();
+                  if (/^\d+$/.test(s)) return s.split('').join('-');
+                  return s;
+                };
+
+                const countPositions = (ps: any[]) => {
+                  if (!ps || !Array.isArray(ps)) return { gk: 0, def: 0, mid: 0, fwd: 0 };
+                  const st = ps.filter((p: any) => p.Pon !== 'Substitute' && p.Pon?.toLowerCase() !== 'coach').slice(0, 11);
+                  return {
+                    gk: st.filter((p: any) => p.Pon === 'Goalkeeper').length,
+                    def: st.filter((p: any) => p.Pon === 'Defender').length,
+                    mid: st.filter((p: any) => p.Pon === 'Midfielder').length,
+                    fwd: st.filter((p: any) => p.Pon === 'Forward').length,
+                  };
+                };
+                const homePos = countPositions(homeLu.Ps || []);
+                const awayPos = countPositions(awayLu.Ps || []);
+
+                const goalLog = perfIncidents.filter((e: any) => [36, 37, 39].includes(e.IT));
+                const timelineEvts = perfIncidents.filter((e: any) => [36, 37, 39, 43, 45, 46, 60, 61, 4, 5].includes(e.IT) && e.Min);
+
+                const shon1 = Number(t1.Shon) || 0, shon2 = Number(t2.Shon) || 0;
+                const shof1 = Number(t1.Shof) || 0, shof2 = Number(t2.Shof) || 0;
+                const shbl1 = Number(t1.Shbl) || 0, shbl2 = Number(t2.Shbl) || 0;
+                const goa1 = Number(t1.Goa) || 0, goa2 = Number(t2.Goa) || 0;
+                const acc1 = goa1 > 0 ? Math.round((shon1 / goa1) * 100) : 0;
+                const acc2 = goa2 > 0 ? Math.round((shon2 / goa2) * 100) : 0;
+
+                const renderBar = (label: string, v1: number, v2: number) => {
+                  const tot = v1 + v2 || 1;
+                  const p1 = Math.round((v1 / tot) * 100);
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className={cn('font-bold tabular-nums w-12 text-left', v1 > v2 ? 'text-emerald-400' : 'text-foreground')}>{v1}</span>
+                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{label}</span>
+                        <span className={cn('font-bold tabular-nums w-12 text-right', v2 > v1 ? 'text-amber-400' : 'text-foreground')}>{v2}</span>
+                      </div>
+                      <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden">
+                        <div className="bg-emerald-500/80 rounded-l-full transition-all duration-700 ease-out" style={{ width: `${p1}%`, minWidth: v1 > 0 ? '4px' : '0' }} />
+                        <div className="bg-amber-500/80 rounded-r-full transition-all duration-700 ease-out" style={{ width: `${100 - p1}%`, minWidth: v2 > 0 ? '4px' : '0' }} />
+                      </div>
+                    </div>
+                  );
+                };
+
+                const minToX = (m: number) => 50 + (Math.min(m, 95) / 90) * 792;
+
+                return (
+                  <>
+                    {/* ─── SECTION 1: MATCH OVERVIEW ─── */}
+                    <div className="bg-card border border-border/30 rounded-3xl overflow-hidden shadow-lg">
+                      <div className="flex items-center gap-3 px-6 py-5 border-b border-border/30 bg-gradient-to-r from-emerald-500/5 via-transparent to-amber-500/5">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <span className="text-base">📊</span>
+                        </div>
+                        <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Match Overview</h3>
+                      </div>
+                      <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {/* FT */}
+                          <div className="bg-gradient-to-br from-muted/20 to-muted/5 rounded-2xl p-5 border border-border/20 text-center">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Full Time</p>
+                            <div className="flex items-center justify-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <TeamLogo logo={logoUrl(home.Img)} name={home.Nm} size="sm" className="w-6 h-6 object-contain" />
+                                <span className="text-3xl font-black text-foreground">{ftH}</span>
+                              </div>
+                              <span className="text-lg text-border font-light">–</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-3xl font-black text-foreground">{ftA}</span>
+                                <TeamLogo logo={logoUrl(away.Img)} name={away.Nm} size="sm" className="w-6 h-6 object-contain" />
+                              </div>
+                            </div>
+                          </div>
+                          {/* HT */}
+                          <div className="bg-gradient-to-br from-muted/20 to-muted/5 rounded-2xl p-5 border border-border/20 text-center">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Half Time</p>
+                            <div className="flex items-center justify-center gap-4">
+                              <span className="text-2xl font-black text-foreground/70">{htHome ?? '–'}</span>
+                              <span className="text-lg text-border font-light">–</span>
+                              <span className="text-2xl font-black text-foreground/70">{htAway ?? '–'}</span>
+                            </div>
+                          </div>
+                          {/* Result */}
+                          <div className="bg-gradient-to-br from-muted/20 to-muted/5 rounded-2xl p-5 border border-border/20 flex flex-col items-center justify-center">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Result</p>
+                            <span className={cn('text-lg font-black uppercase tracking-wider', resultClr)}>{result}</span>
+                          </div>
+                        </div>
+                        {/* Meta */}
+                        <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {venue && (
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/10 rounded-xl px-3 py-2.5 border border-border/10">
+                              <MapPin size={13} className="text-emerald-500/60 shrink-0" />
+                              <span className="truncate">{venue}</span>
+                            </div>
+                          )}
+                          {referee && (
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/10 rounded-xl px-3 py-2.5 border border-border/10">
+                              <ShieldAlert size={13} className="text-emerald-500/60 shrink-0" />
+                              <span className="truncate">{referee}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/10 rounded-xl px-3 py-2.5 border border-border/10">
+                            <Trophy size={13} className="text-emerald-500/60 shrink-0" />
+                            <span className="truncate">{stage}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/10 rounded-xl px-3 py-2.5 border border-border/10">
+                            <Clock size={13} className="text-emerald-500/60 shrink-0" />
+                            <span className="truncate">{matchDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ─── SECTION 2: MATCH MOMENTUM TIMELINE ─── */}
+                    <div className="bg-card border border-border/30 rounded-3xl overflow-hidden shadow-lg">
+                      <div className="flex items-center gap-3 px-6 py-5 border-b border-border/30 bg-gradient-to-r from-emerald-500/5 via-transparent to-amber-500/5">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <Timer size={16} className="text-emerald-500" />
+                        </div>
+                        <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Match Momentum Timeline</h3>
+                      </div>
+                      <div className="p-6 overflow-x-auto">
+                        <div className="min-w-[600px]">
+                          <svg width="100%" height="120" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet">
+                            {/* Minute markers */}
+                            {[0, 15, 30, 45, 60, 75, 90].map(m => {
+                              const mx = minToX(m);
+                              return (
+                                <g key={m}>
+                                  <line x1={mx} y1={52} x2={mx} y2={68} stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+                                  <text x={mx} y={110} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="10" fontWeight="600">{m}'</text>
+                                </g>
+                              );
+                            })}
+                            {/* Main bar */}
+                            <rect x="50" y="54" width="792" height="12" rx="6" fill="rgba(255,255,255,0.06)" />
+                            {/* HT marker */}
+                            <line x1={minToX(45)} y1={42} x2={minToX(45)} y2={78} stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeDasharray="3,3" />
+                            <text x={minToX(45)} y={38} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="9" fontWeight="700">HT</text>
+                            {/* Events */}
+                            {timelineEvts.map((evt: any, i: number) => {
+                              const x = minToX(evt.Min);
+                              const isGoal = [36, 37, 39].includes(evt.IT);
+                              const isCard = [43, 45, 46].includes(evt.IT);
+                              const isSub = [4, 5, 60, 61].includes(evt.IT);
+                              const isT1 = evt.Nm === 1;
+                              const y = isT1 ? 32 : 88;
+                              if (isGoal) {
+                                return (
+                                  <g key={i}>
+                                    <line x1={x} y1={54} x2={x} y2={y + (isT1 ? 10 : -10)} stroke={isT1 ? '#10b981' : '#f59e0b'} strokeWidth="1.5" opacity="0.5" />
+                                    <text x={x} y={y + (isT1 ? 0 : 5)} textAnchor="middle" fontSize="14">⚽</text>
+                                  </g>
+                                );
+                              }
+                              if (isCard) {
+                                const cc = evt.IT === 43 ? '#facc15' : '#ef4444';
+                                return (
+                                  <g key={i}>
+                                    <line x1={x} y1={54} x2={x} y2={y + (isT1 ? 12 : -6)} stroke={cc} strokeWidth="1" opacity="0.4" />
+                                    <rect x={x - 3.5} y={y} width="7" height="10" rx="1.5" fill={cc} />
+                                  </g>
+                                );
+                              }
+                              if (isSub) {
+                                return (
+                                  <g key={i}>
+                                    <circle cx={x} cy={y + (isT1 ? 5 : 0)} r="4.5" fill="rgba(59,130,246,0.3)" stroke="#3b82f6" strokeWidth="1.5" />
+                                  </g>
+                                );
+                              }
+                              return null;
+                            })}
+                          </svg>
+                          {/* Legend */}
+                          <div className="flex items-center justify-center gap-6 mt-2 text-[10px] text-muted-foreground font-medium">
+                            <span className="flex items-center gap-1.5"><span>⚽</span> Goal</span>
+                            <span className="flex items-center gap-1.5"><span className="w-2.5 h-3.5 bg-yellow-400 rounded-[1px] inline-block" /> Yellow</span>
+                            <span className="flex items-center gap-1.5"><span className="w-2.5 h-3.5 bg-red-500 rounded-[1px] inline-block" /> Red</span>
+                            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full border-2 border-blue-500 inline-block" /> Sub</span>
+                            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-emerald-500 inline-block" /> {home.Abr || 'Home'}</span>
+                            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-amber-500 inline-block" /> {away.Abr || 'Away'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ─── SECTION 3: POSSESSION & ATTACKS ─── */}
+                    <div className="bg-card border border-border/30 rounded-3xl overflow-hidden shadow-lg">
+                      <div className="flex items-center gap-3 px-6 py-5 border-b border-border/30 bg-gradient-to-r from-emerald-500/5 via-transparent to-amber-500/5">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <Activity size={16} className="text-emerald-500" />
+                        </div>
+                        <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Possession & Attacks</h3>
+                      </div>
+                      <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                          {/* Donut */}
+                          <div className="flex flex-col items-center justify-center">
+                            <div className="relative">
+                              <svg width="180" height="180" viewBox="0 0 180 180">
+                                <circle cx="90" cy="90" r="58" fill="none" stroke="#f59e0b" strokeWidth="16" opacity="0.25" />
+                                <circle cx="90" cy="90" r="58" fill="none" stroke="#f59e0b" strokeWidth="16"
+                                  strokeDasharray={`${CIRC}`}
+                                  transform="rotate(-90 90 90)" />
+                                <circle cx="90" cy="90" r="58" fill="none" stroke="#10b981" strokeWidth="16"
+                                  strokeDasharray={`${homeArc} ${CIRC - homeArc}`}
+                                  strokeLinecap="round"
+                                  transform="rotate(-90 90 90)"
+                                  style={{ transition: 'stroke-dasharray 1.2s ease-out' }} />
+                              </svg>
+                              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="text-2xl font-black text-foreground">{homePoss}%</span>
+                                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">vs {awayPoss}%</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-6 mt-4 text-xs font-semibold">
+                              <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-emerald-500" />{home.Abr || home.Nm}</span>
+                              <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-amber-500" />{away.Abr || away.Nm}</span>
+                            </div>
+                          </div>
+                          {/* Metric bars */}
+                          <div className="space-y-4">
+                            {renderBar('Attacks', Number(t1.Att) || 0, Number(t2.Att) || 0)}
+                            {renderBar('Corners', Number(t1.Cos) || 0, Number(t2.Cos) || 0)}
+                            {renderBar('Crosses', Number(t1.Crs) || 0, Number(t2.Crs) || 0)}
+                            {renderBar('Throw-ins', Number(t1.Ths) || 0, Number(t2.Ths) || 0)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ─── SECTION 4: SHOOTING ANALYSIS ─── */}
+                    <div className="bg-card border border-border/30 rounded-3xl overflow-hidden shadow-lg">
+                      <div className="flex items-center gap-3 px-6 py-5 border-b border-border/30 bg-gradient-to-r from-emerald-500/5 via-transparent to-amber-500/5">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <span className="text-base">🎯</span>
+                        </div>
+                        <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Shooting Analysis</h3>
+                      </div>
+                      <div className="p-6 space-y-6">
+                        <div className="space-y-4">
+                          {renderBar('Shots On Target', shon1, shon2)}
+                          {renderBar('Shots Off Target', shof1, shof2)}
+                          {renderBar('Shots Blocked', shbl1, shbl2)}
+                          {renderBar('Goal Attempts', goa1, goa2)}
+                          {renderBar('GK Saves', Number(t1.Gks) || 0, Number(t2.Gks) || 0)}
+                        </div>
+                        {/* Accuracy */}
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                          <div className="bg-gradient-to-br from-emerald-500/10 to-transparent rounded-2xl p-4 border border-emerald-500/10 text-center">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">{home.Abr} Accuracy</p>
+                            <span className="text-3xl font-black text-emerald-400">{acc1}%</span>
+                          </div>
+                          <div className="bg-gradient-to-bl from-amber-500/10 to-transparent rounded-2xl p-4 border border-amber-500/10 text-center">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">{away.Abr} Accuracy</p>
+                            <span className="text-3xl font-black text-amber-400">{acc2}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ─── SECTION 5: DISCIPLINE & DUELS ─── */}
+                    <div className="bg-card border border-border/30 rounded-3xl overflow-hidden shadow-lg">
+                      <div className="flex items-center gap-3 px-6 py-5 border-b border-border/30 bg-gradient-to-r from-emerald-500/5 via-transparent to-amber-500/5">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <ShieldAlert size={16} className="text-emerald-500" />
+                        </div>
+                        <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Discipline & Duels</h3>
+                      </div>
+                      <div className="p-6">
+                        {/* Cards */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                          {[
+                            { team: home.Abr, color: 'bg-yellow-400', val: Number(t1.Ycs) || 0 },
+                            { team: away.Abr, color: 'bg-yellow-400', val: Number(t2.Ycs) || 0 },
+                            { team: home.Abr, color: 'bg-red-500', val: Number(t1.Rcs) || 0 },
+                            { team: away.Abr, color: 'bg-red-500', val: Number(t2.Rcs) || 0 },
+                          ].map((c, ci) => (
+                            <div key={ci} className="bg-muted/10 rounded-2xl p-4 border border-border/20 text-center">
+                              <div className="flex items-center justify-center gap-2 mb-2">
+                                <div className={cn('w-4 h-5 rounded-[2px]', c.color)} />
+                                <span className="text-[10px] font-bold text-muted-foreground uppercase">{c.team}</span>
+                              </div>
+                              <span className="text-2xl font-black text-foreground">{c.val}</span>
+                            </div>
+                          ))}
+                        </div>
+                        {/* Fouls & Offsides */}
+                        <div className="space-y-4">
+                          {renderBar('Fouls', Number(t1.Fls) || 0, Number(t2.Fls) || 0)}
+                          {renderBar('Offsides', Number(t1.Ofs) || 0, Number(t2.Ofs) || 0)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ─── SECTION 6: TACTICAL BREAKDOWN ─── */}
+                    <div className="bg-card border border-border/30 rounded-3xl overflow-hidden shadow-lg">
+                      <div className="flex items-center gap-3 px-6 py-5 border-b border-border/30 bg-gradient-to-r from-emerald-500/5 via-transparent to-amber-500/5">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <Users size={16} className="text-emerald-500" />
+                        </div>
+                        <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Tactical Breakdown</h3>
+                      </div>
+                      <div className="p-6">
+                        {/* Formations */}
+                        <div className="flex items-center justify-center gap-6 mb-8">
+                          <div className="text-center">
+                            <TeamLogo logo={logoUrl(home.Img)} name={home.Nm} size="sm" className="w-8 h-8 object-contain mx-auto mb-2" />
+                            <p className="text-3xl font-black text-emerald-400 tracking-wider">{formatFo(homeLu.Fo)}</p>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">{home.Abr}</p>
+                          </div>
+                          <span className="text-2xl font-light text-border">vs</span>
+                          <div className="text-center">
+                            <TeamLogo logo={logoUrl(away.Img)} name={away.Nm} size="sm" className="w-8 h-8 object-contain mx-auto mb-2" />
+                            <p className="text-3xl font-black text-amber-400 tracking-wider">{formatFo(awayLu.Fo)}</p>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">{away.Abr}</p>
+                          </div>
+                        </div>
+                        {/* Position breakdown */}
+                        <div className="grid grid-cols-2 gap-6">
+                          {[
+                            { label: home.Abr || home.Nm, pos: homePos, ti: 0 },
+                            { label: away.Abr || away.Nm, pos: awayPos, ti: 1 }
+                          ].map(team => (
+                            <div key={team.ti} className="space-y-3">
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">{team.label} Starting XI</p>
+                              <div className="grid grid-cols-4 gap-2">
+                                {[
+                                  { k: 'gk', l: 'GK', v: team.pos.gk },
+                                  { k: 'def', l: 'DEF', v: team.pos.def },
+                                  { k: 'mid', l: 'MID', v: team.pos.mid },
+                                  { k: 'fwd', l: 'FWD', v: team.pos.fwd },
+                                ].map(p => (
+                                  <div key={p.k} className={cn('rounded-xl p-3 text-center border', team.ti === 0 ? 'bg-emerald-500/5 border-emerald-500/10' : 'bg-amber-500/5 border-amber-500/10')}>
+                                    <span className={cn('text-xl font-black', team.ti === 0 ? 'text-emerald-400' : 'text-amber-400')}>{p.v}</span>
+                                    <p className="text-[9px] font-bold text-muted-foreground uppercase mt-0.5">{p.l}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ─── SECTION 7: GOAL & ASSIST LOG ─── */}
+                    <div className="bg-card border border-border/30 rounded-3xl overflow-hidden shadow-lg">
+                      <div className="flex items-center gap-3 px-6 py-5 border-b border-border/30 bg-gradient-to-r from-emerald-500/5 via-transparent to-amber-500/5">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <span className="text-base">⚽</span>
+                        </div>
+                        <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Goal & Assist Log</h3>
+                      </div>
+                      {goalLog.length > 0 ? (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-border/30 bg-muted/5">
+                                <th className="text-left px-6 py-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Min</th>
+                                <th className="text-left px-6 py-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Player</th>
+                                <th className="text-left px-6 py-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Type</th>
+                                <th className="text-left px-6 py-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Assist</th>
+                                <th className="text-left px-6 py-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Score</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border/20">
+                              {goalLog.map((g: any, gi: number) => {
+                                const isT1 = g.Nm === 1;
+                                const gType = g.IT === 37 ? 'Penalty' : g.IT === 39 ? 'Own Goal' : 'Goal';
+                                const pName = g.Pn || (g.Fn ? `${g.Fn} ${g.Ln}` : 'Unknown');
+                                return (
+                                  <tr key={gi} className={cn('transition-colors hover:bg-muted/10', isT1 ? 'border-l-2 border-l-emerald-500/50' : 'border-l-2 border-l-amber-500/50')}>
+                                    <td className="px-6 py-3">
+                                      <span className="font-mono font-black text-emerald-500 text-xs">{g.Min}'</span>
+                                    </td>
+                                    <td className="px-6 py-3">
+                                      <div className="flex items-center gap-2">
+                                        <span className={cn('w-2 h-2 rounded-full shrink-0', isT1 ? 'bg-emerald-500' : 'bg-amber-500')} />
+                                        <span className="font-semibold text-foreground">{pName}</span>
+                                      </div>
+                                    </td>
+                                    <td className="px-6 py-3">
+                                      <span className={cn('text-xs font-bold uppercase px-2 py-0.5 rounded-full',
+                                        gType === 'Penalty' ? 'bg-blue-500/10 text-blue-400' :
+                                        gType === 'Own Goal' ? 'bg-red-500/10 text-red-400' :
+                                        'bg-emerald-500/10 text-emerald-400'
+                                      )}>{gType}</span>
+                                    </td>
+                                    <td className="px-6 py-3 text-muted-foreground text-xs">{g._assist || '—'}</td>
+                                    <td className="px-6 py-3">
+                                      {(g.Sc || g._parentSc) ? (
+                                        <span className="font-mono font-bold text-xs bg-muted/20 px-2 py-1 rounded-md">
+                                          {(g.Sc || g._parentSc)?.[0]} – {(g.Sc || g._parentSc)?.[1]}
+                                        </span>
+                                      ) : '—'}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="p-8 text-center text-sm text-muted-foreground italic">No goals recorded in this match.</div>
+                      )}
+                    </div>
+                  </>
+                );
+              })()}
+            </TabsContent>
           </Tabs>
         </section>
       </div>
