@@ -125,7 +125,7 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
             if (e.player.id === playerId) {
               return <span key={idx} title="Goal" className="text-xs leading-none drop-shadow-md">⚽</span>;
             } else if (e.assist && e.assist.id === playerId) {
-              return <span key={idx} title="Assist" className="text-[9px] bg-primary/20 text-primary border border-primary/30 px-1 py-0.5 rounded font-bold shadow-sm">A</span>;
+              return <span key={idx} title="Assist" className="text-xs leading-none drop-shadow-md">👟</span>;
             }
           }
           if (e.type === "Card") {
@@ -209,12 +209,12 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
             )}
           </div>
           {rating && (
-            <div className={`absolute -top-1 -right-2 text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded-sm border shadow-lg z-20 ${getRatingColor(rating)}`}>
+            <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded-sm border shadow-lg z-20 ${getRatingColor(rating)}`}>
               {rating}
             </div>
           )}
         </div>
-        <div className="mt-1 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] md:text-xs text-white font-medium text-center truncate w-full shadow-md z-20">
+        <div className="mt-3 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] md:text-xs text-white font-medium text-center truncate w-full shadow-md z-20">
           {item.player.name.split(' ').pop()}
         </div>
       </div>

@@ -72,6 +72,11 @@ const isMensFootball = (match: FootballMatch) => {
   if (youthRegex.test(homeName) || womenRegex.test(homeName)) return false;
   if (youthRegex.test(awayName) || womenRegex.test(awayName)) return false;
   
+  // Exclude MLS Next Pro matches
+  if (leagueName.includes('mls next pro')) return false;
+  if (homeName.includes(' ii ') || awayName.includes(' ii ') || homeName.endsWith(' ii') || awayName.endsWith(' ii')) return false;
+  if (homeName.includes(' 2') || awayName.includes(' 2') || homeName.endsWith(' 2') || awayName.endsWith(' 2')) return false;
+  
   return true;
 };
 

@@ -117,6 +117,10 @@ export async function getLiveMatches() {
                 }
             }
 
+            if (league.includes('mls next pro')) return false;
+            if (home.includes(' ii ') || away.includes(' ii ') || home.endsWith(' ii') || away.endsWith(' ii')) return false;
+            if (home.includes(' 2') || away.includes(' 2') || home.endsWith(' 2') || away.endsWith(' 2')) return false;
+
             // Strict checks for priority leagues
             if (league === 'premier league' && category === 'england') return true;
             if ((league.includes('laliga') || league === 'la liga') && category === 'spain') return true;
@@ -188,6 +192,10 @@ export async function getMatchesByDate(dateYYYYMMDD) {
                     return false;
                 }
             }
+
+            if (league.includes('mls next pro')) return false;
+            if (home.includes(' ii ') || away.includes(' ii ') || home.endsWith(' ii') || away.endsWith(' ii')) return false;
+            if (home.includes(' 2') || away.includes(' 2') || home.endsWith(' 2') || away.endsWith(' 2')) return false;
 
             // Strict checks for priority leagues
             if (league === 'premier league' && category === 'england') return true;

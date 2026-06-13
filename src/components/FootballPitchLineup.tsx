@@ -110,15 +110,18 @@ function getPlayerXPositions(count: number): number[] {
 }
 
 // ─── Performance Logic ────────────────────────────────────────────────────────
-const getRatingColor = (rating: number) => {
-    if (rating >= 8.0) return '#22c55e'; // Exceptional
-    if (rating >= 7.0) return '#eab308'; // Good
-    if (rating >= 6.0) return '#f97316'; // Average
+const getRatingColor = (rating: number | string | undefined) => {
+    if (!rating) return '#64748b'; // Slate gray for missing
+    const num = Number(rating);
+    if (isNaN(num)) return '#64748b';
+    if (num >= 8.0) return '#22c55e'; // Exceptional
+    if (num >= 7.0) return '#eab308'; // Good
+    if (num >= 6.0) return '#f97316'; // Average
     return '#ef4444'; // Struggling
 };
 
 const derivePlayerPerformance = (p: SquadPlayer, currentMinute: number = 90) => {
-    if (p.matchStats && Object.keys(p.matchStats).length > 0) return p.matchStats;
+    if (p.matchStats && Object.keys(p.matchStats).length > 0 && p.matchStats.rating) return p.matchStats;
 
     const events = p.events || { 
         goals: 0, 
@@ -509,32 +512,69 @@ function PlayerNode({
             onClick={onClick}
         >
             <div className="pitch-player-avatar relative" style={{ '--team-color': teamColor } as React.CSSProperties}>
-                {hasImage ? (
-                    <img
-                        src={player.image}
-                        alt={player.name}
-                        className="pitch-player-img"
-                        style={{ borderColor: teamColor }}
-                        onError={() => setImgError(true)}
-                    />
-                ) : (
-                    <div className="pitch-player-number" style={{ borderColor: teamColor }}>
-                        {player.number || '?'}
+                <div 
+                    className="pitch-player-number w-full h-full rounded-full flex items-center justify-center font-black text-white shadow-inner"
+                    style={{ 
+                        borderColor: teamColor, 
+                        borderWidth: '3px'
+                    }}
+                >
+                    {player.number || '?'}
+                </div>
+                
+                {/* Rating Badge (Overlapping Bottom Center) */}
+                {stats.rating && (
+                    <div 
+                        className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-sm text-[9px] font-black shadow-md border border-black/20 z-20"
+                        style={{
+                            backgroundColor: getRatingColor(stats.rating),
+                            color: 'white'
+                        }}
+                    >
+                        {stats.rating}
                     </div>
                 )}
                 
                 {/* Status Badges */}
-                <div className="absolute -top-1 -left-1 flex flex-col gap-0.5 z-10 pointer-events-none">
-                    {/* Goals - Unified White/Black HUD */}
+                <div className="absolute -top-2 -right-2 flex flex-col gap-1 z-10 pointer-events-none">
+                    {/* Goals - Overlapping soccer balls */}
                     {(player.events?.goals || 0) > 0 && (
-                        <div className="w-5 h-5 rounded-full bg-white border border-black/20 flex items-center justify-center shadow-lg transform -rotate-12 scale-110 animate-pulse">
-                            <span className="text-[10px] leading-none text-black font-black">⚽</span>
+                        <div className="relative w-4 h-4">
+                            {Array.from({ length: Math.min(3, player.events!.goals) }).map((_, i) => (
+                                <div 
+                                    key={i}
+                                    className="absolute bg-white rounded-full flex items-center justify-center shadow-md"
+                                    style={{ 
+                                        top: i * 4, 
+                                        right: i * 4,
+                                        width: '16px',
+                                        height: '16px',
+                                        zIndex: 10 - i
+                                    }}
+                                >
+                                    <span className="text-[10px] leading-none">⚽</span>
+                                </div>
+                            ))}
                         </div>
                     )}
-                    {/* Assists - Unified White/Black HUD */}
+                    {/* Assists - Overlapping shoes */}
                     {(player.events?.assists || 0) > 0 && (
-                        <div className="w-5 h-5 rounded-full bg-white border border-black/20 flex items-center justify-center shadow-lg transform rotate-12 scale-110">
-                            <Footprints size={10} className="text-black" />
+                        <div className="relative w-4 h-4 mt-1">
+                            {Array.from({ length: Math.min(3, player.events!.assists) }).map((_, i) => (
+                                <div 
+                                    key={i}
+                                    className="absolute bg-white rounded-full flex items-center justify-center shadow-md border border-black/10"
+                                    style={{ 
+                                        top: i * 4, 
+                                        right: i * 4,
+                                        width: '16px',
+                                        height: '16px',
+                                        zIndex: 10 - i
+                                    }}
+                                >
+                                    <span className="text-[10px] leading-none" style={{ transform: 'scaleX(-1)' }}>👟</span>
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
@@ -565,16 +605,6 @@ function PlayerNode({
                             <ArrowDownLeft size={10} className="text-white" strokeWidth={3} />
                         </div>
                     )}
-                </div>
-
-                {/* Rating Badge (Bottom-Left) */}
-                <div className="absolute -bottom-1 -left-1 z-20 pointer-events-none">
-                    <div 
-                        className="h-5 px-1.5 rounded-md flex items-center justify-center text-[9px] font-black text-white shadow-xl border border-white/20 scale-110"
-                        style={{ backgroundColor: getRatingColor(stats.rating) }}
-                    >
-                        {stats.rating}
-                    </div>
                 </div>
             </div>
             <span className="pitch-player-name">{displayName}</span>
