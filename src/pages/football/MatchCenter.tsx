@@ -1048,7 +1048,6 @@ const MatchCenter = () => {
                 );
               })()}
             </TabsContent>
-
             {/* ──────────── PERFORMANCE LAB ──────────── */}
             <TabsContent value="performance" className="space-y-8 animate-fade-in">
               {perfLoading ? (
