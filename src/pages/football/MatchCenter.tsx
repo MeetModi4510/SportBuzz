@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar } from "../../components/Navbar";
 import { TeamLogo } from "../../components/TeamLogo";
@@ -11,6 +11,80 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import { cn } from "../../lib/utils";
 import { Helmet } from "react-helmet-async";
+
+// Use empty string in dev so Vite proxy handles /api → port 5000 (avoids CORS)
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
+// ─── Sequential player image queue ────────────────────────────────────────────
+// One request fires at a time: search → get ID → fetch image → show → next
+const _imgCache: Record<string, string> = {}; // cacheKey → objectURL | 'ERROR'
+const _imgQueue: { key: string; name: string; team: string }[] = [];
+const _imgListeners: Record<string, Array<(url: string) => void>> = {};
+let _isFetching = false;
+
+function _enqueue(name: string, team: string, cb: (url: string) => void) {
+  const key = `${name}||${team}`;
+  if (_imgCache[key]) { cb(_imgCache[key] === 'ERROR' ? '' : _imgCache[key]); return; }
+  if (!_imgListeners[key]) { _imgListeners[key] = []; _imgQueue.push({ key, name, team }); }
+  _imgListeners[key].push(cb);
+  _processQueue();
+}
+
+async function _processQueue() {
+  if (_isFetching || _imgQueue.length === 0) return;
+  _isFetching = true;
+  const { key, name, team } = _imgQueue.shift()!;
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/football/player-image/${encodeURIComponent(name)}?team=${encodeURIComponent(team)}`
+    );
+    if (res.ok) {
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      _imgCache[key] = url;
+      _imgListeners[key]?.forEach(fn => fn(url));
+    } else {
+      _imgCache[key] = 'ERROR';
+      _imgListeners[key]?.forEach(fn => fn(''));
+    }
+  } catch {
+    _imgCache[key] = 'ERROR';
+    _imgListeners[key]?.forEach(fn => fn(''));
+  } finally {
+    delete _imgListeners[key];
+    _isFetching = false;
+    _processQueue();
+  }
+}
+
+/** Avatar circle shown on the pitch / in the subs list */
+const PlayerLineupAvatar = ({
+  playerName, teamName, teamColor, number, className
+}: {
+  playerName: string; teamName: string; teamColor: string;
+  number: string | number; className?: string;
+}) => {
+  const [imgUrl, setImgUrl] = useState('');
+  useEffect(() => {
+    if (!playerName) return;
+    let alive = true;
+    _enqueue(playerName, teamName, url => { if (alive) setImgUrl(url); });
+    return () => { alive = false; };
+  }, [playerName, teamName]);
+
+  return (
+    <div
+      className={cn(
+        'rounded-full border border-white/50 flex items-center justify-center font-black text-white bg-cover bg-center overflow-hidden',
+        className
+      )}
+      style={{ backgroundColor: imgUrl ? 'transparent' : teamColor, backgroundImage: imgUrl ? `url(${imgUrl})` : 'none' }}
+    >
+      {!imgUrl && (number ?? '')}
+    </div>
+  );
+};
+// ──────────────────────────────────────────────────────────────────────────────
 
 /* ─────────────────────────────────────────────
    Livescore6 field map
@@ -667,17 +741,19 @@ const MatchCenter = () => {
                       );
                     };
 
-                    const renderPlayer = (p: any, teamColor: string) => {
+                    const renderPlayer = (p: any, teamColor: string, teamName: string) => {
                       const hasRedCard = getPlayerEvents(p).some((e: any) => [45, 46].includes(e.IT));
+                      const displayName = p.Pn || `${p.Fn || ''} ${p.Ln || ''}`.trim();
                       return (
                         <div key={p.Pid || p.Fn} className={cn("flex flex-col items-center justify-center w-16 md:w-20 group z-10 transition-opacity", hasRedCard ? "opacity-40 grayscale-[50%]" : "")}>
                           <div className="relative">
-                            <div 
-                              className="w-10 h-10 md:w-12 md:h-12 rounded-full border-[3px] border-white shadow-[0_4px_8px_rgba(0,0,0,0.5)] flex items-center justify-center text-xs md:text-sm font-black text-white transition-transform group-hover:scale-110 relative"
-                              style={{ backgroundColor: teamColor }}
-                            >
-                              {p.Snu || ""}
-                            </div>
+                            <PlayerLineupAvatar
+                              playerName={displayName}
+                              teamName={teamName}
+                              teamColor={teamColor}
+                              number={p.Snu}
+                              className="w-10 h-10 md:w-12 md:h-12 text-xs md:text-sm border-[3px] border-white shadow-[0_4px_8px_rgba(0,0,0,0.5)] transition-transform group-hover:scale-110"
+                            />
                             {renderPlayerEventsBadges(p, true)}
                           </div>
                           <div className="mt-1.5 px-2 py-0.5 bg-black/80 backdrop-blur-md rounded-md md:rounded-lg text-[10px] md:text-xs font-bold text-white/95 text-center leading-tight truncate w-full max-w-[76px] md:max-w-[90px] shadow-md">
@@ -733,7 +809,7 @@ const MatchCenter = () => {
                               <div className="flex flex-col flex-1 pb-4 gap-6 md:gap-8 justify-between">
                                 {awayRows.map((row, rIdx) => (
                                   <div key={`away-${rIdx}`} className="flex justify-around items-center w-full px-6">
-                                    {row.map(p => renderPlayer(p, getTeamColor(away.Nm, false)))}
+                                    {row.map(p => renderPlayer(p, getTeamColor(away.Nm, false), away.Nm))}
                                   </div>
                                 ))}
                               </div>
@@ -742,7 +818,7 @@ const MatchCenter = () => {
                               <div className="flex flex-col-reverse flex-1 pt-4 gap-6 md:gap-8 justify-between">
                                 {homeRows.map((row, rIdx) => (
                                   <div key={`home-${rIdx}`} className="flex justify-around items-center w-full px-6">
-                                    {row.map(p => renderPlayer(p, getTeamColor(home.Nm, true)))}
+                                    {row.map(p => renderPlayer(p, getTeamColor(home.Nm, true), home.Nm))}
                                   </div>
                                 ))}
                               </div>
@@ -780,18 +856,13 @@ const MatchCenter = () => {
                                 {t.subs.map((p: any, pIdx: number) => (
                                   <div key={pIdx} className="flex items-center gap-4 px-5 py-3 hover:bg-muted/10 transition-colors">
                                     <div className="relative shrink-0">
-                                      {p.imageUrl ? (
-                                        <img
-                                          src={p.imageUrl}
-                                          alt={`${p.Fn || ''} ${p.Ln || ''}`}
-                                          className="w-10 h-10 rounded-full object-cover border-2 border-border/40 bg-secondary"
-                                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                        />
-                                      ) : (
-                                        <div className="w-10 h-10 rounded-full bg-secondary/60 flex items-center justify-center text-xs font-bold text-muted-foreground border-2 border-border/40">
-                                          {(p.Fn || "?")[0]}{(p.Ln || "?")[0]}
-                                        </div>
-                                      )}
+                                      <PlayerLineupAvatar
+                                        playerName={p.Pn || `${p.Fn || ''} ${p.Ln || ''}`.trim()}
+                                        teamName={t.teamInfo.Nm}
+                                        teamColor={getTeamColor(t.teamInfo.Nm, t.teamInfo.Nm === home.Nm)}
+                                        number={p.Snu}
+                                        className="w-10 h-10 text-xs border-2 border-border/40 shadow-sm"
+                                      />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="font-semibold text-sm text-foreground flex items-center gap-1 truncate">
@@ -953,9 +1024,6 @@ const MatchCenter = () => {
                   </div>
                 );
               })()}
-            </TabsContent>
-
-
           </Tabs>
         </section>
       </div>
