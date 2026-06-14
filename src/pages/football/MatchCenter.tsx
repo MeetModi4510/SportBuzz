@@ -299,7 +299,26 @@ const MatchCenter = () => {
     let subs = Array.isArray(lineupsRes?.data?.Subs) ? [...lineupsRes.data.Subs] : [];
     if (subs.length === 0 && incidentsRes?.data?.Incs) {
       const flat = flattenIncidents(incidentsRes.data.Incs);
-      const subEvents = flat.filter((e: any) => e.IT === 60 || e.IT === 63 || e._period === 'Sub');
+      let subEvents = flat.filter((e: any) => e.IT === 60 || e.IT === 63 || e._period === 'Sub');
+      
+      if (subEvents.length === 0) {
+        // Fallback: Pair IT: 5 (In) and IT: 4 (Out)
+        const inEvents = flat.filter((e: any) => e.IT === 5);
+        const outEvents = flat.filter((e: any) => e.IT === 4);
+        inEvents.forEach((inE: any) => {
+          const outE = outEvents.find((o: any) => o.Min === inE.Min && o.Nm === inE.Nm);
+          if (outE) {
+             subEvents.push({
+               Min: inE.Min,
+               Pn: inE.Pn || inE.Fn,
+               PnO: outE.Pn || outE.Fn,
+               Fn: inE.Fn,
+               Ln: inE.Ln
+             });
+          }
+        });
+      }
+
       subs = subEvents.map((e: any) => {
         let inPlayer = e.Pn || "Unknown";
         let outPlayer = e.PnO || "Unknown";
@@ -780,8 +799,14 @@ const MatchCenter = () => {
                       
                       let startingRows: any[][] = [];
                       if (foString && startingXI.length >= 10) {
-                        // Parse formation like "3-4-2-1" -> [3, 4, 2, 1]
-                        const parts = foString.split('-').map(Number).filter(n => !isNaN(n));
+                        // Parse formation like "3-4-2-1" or 433
+                        const str = String(foString).trim();
+                        let parts: number[] = [];
+                        if (/^\d+$/.test(str)) {
+                          parts = str.split('').map(Number);
+                        } else {
+                          parts = str.split('-').map(Number).filter(n => !isNaN(n));
+                        }
                         const sum = parts.reduce((a,b)=>a+b, 0);
                         if (sum > 0 && sum <= 10) {
                           // First row is GK
@@ -1057,29 +1082,33 @@ const MatchCenter = () => {
 
 
               {/* Substitutions Timeline */}
-              {parsedSubs.length > 0 && (
+              {(parsedSubs.length > 0 || lineupsRes?.data?.Subs) && (
                 <div className="bg-card border border-border/40 rounded-3xl overflow-hidden shadow-sm mt-6">
                   <div className="flex items-center gap-2 px-6 py-4 border-b border-border/30 bg-muted/10">
                     <ArrowLeftRight className="w-4 h-4 text-emerald-500" />
                     <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Substitutions</h3>
                   </div>
                   <div className="p-6 space-y-3">
-                    {parsedSubs.map((sub: any, i: number) => (
-                      <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 rounded-xl bg-muted/10 border border-border/20">
-                        <span className="text-xs font-mono font-bold text-muted-foreground w-8 shrink-0">{sub.Min}'</span>
-                        <div className="flex items-center gap-2 flex-1">
-                          <span className="text-emerald-500 font-bold text-lg leading-none">↑</span>
-                          <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-500/80">IN:</span>
-                          <span className="font-semibold text-sm text-foreground">{sub.Pn || sub.Fn && `${sub.Fn} ${sub.Ln}` || "Unknown"}</span>
+                    {parsedSubs.length > 0 ? (
+                      parsedSubs.map((sub: any, i: number) => (
+                        <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 rounded-xl bg-muted/10 border border-border/20">
+                          <span className="text-xs font-mono font-bold text-muted-foreground w-8 shrink-0">{sub.Min}'</span>
+                          <div className="flex items-center gap-2 flex-1">
+                            <span className="text-emerald-500 font-bold text-lg leading-none">↑</span>
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-500/80">IN:</span>
+                            <span className="font-semibold text-sm text-foreground">{sub.Pn || sub.Fn && `${sub.Fn} ${sub.Ln}` || "Unknown"}</span>
+                          </div>
+                          <div className="hidden sm:block text-muted-foreground/30 px-2">|</div>
+                          <div className="flex items-center gap-2 flex-1">
+                            <span className="text-red-400 font-bold text-lg leading-none">↓</span>
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-red-400/80">OUT:</span>
+                            <span className="text-sm text-muted-foreground font-medium">{sub.PnO || "Unknown"}</span>
+                          </div>
                         </div>
-                        <div className="hidden sm:block text-muted-foreground/30 px-2">|</div>
-                        <div className="flex items-center gap-2 flex-1">
-                          <span className="text-red-400 font-bold text-lg leading-none">↓</span>
-                          <span className="text-[10px] uppercase font-bold tracking-wider text-red-400/80">OUT:</span>
-                          <span className="text-sm text-muted-foreground font-medium">{sub.PnO || "Unknown"}</span>
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <div className="p-5 text-center text-sm text-muted-foreground italic">No substitutions recorded</div>
+                    )}
                   </div>
                 </div>
               )}
