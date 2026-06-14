@@ -239,29 +239,51 @@ const MatchCenter = () => {
   const { data: statsRes, isLoading: stLoading } =
     useLivescoreMatchDetail("get-statistics", id || "", activeTab === "statistics");
 
+  const parsedSubs = useMemo(() => {
+    let subs = Array.isArray(lineupsRes?.data?.Subs) ? [...lineupsRes.data.Subs] : [];
+    if (subs.length === 0 && incidentsRes?.data?.Incs) {
+      const flat = flattenIncidents(incidentsRes.data.Incs);
+      const subEvents = flat.filter((e: any) => e.IT === 60 || e.IT === 63 || e._period === 'Sub');
+      subs = subEvents.map((e: any) => {
+        let inPlayer = e.Pn || "Unknown";
+        let outPlayer = e.PnO || "Unknown";
+        if (typeof inPlayer === 'string' && inPlayer.includes('(In)')) {
+          const parts = inPlayer.split(',');
+          inPlayer = parts[0]?.replace('(In)', '')?.trim() || inPlayer;
+          outPlayer = parts[1]?.replace('(Out)', '')?.trim() || outPlayer;
+        }
+        return { Min: e.Min, Pn: inPlayer, PnO: outPlayer, Fn: e.Fn, Ln: e.Ln };
+      });
+    }
+    return subs;
+  }, [lineupsRes?.data?.Subs, incidentsRes?.data?.Incs]);
+
   const allIncidents = useMemo(() => {
     const incs = flattenIncidents(incidentsRes?.data?.Incs || scoreboardRes?.data?.["Incs-s"]);
     
-    // Explicitly add substitutions from lineups to ensure they appear in Key Events
-    const subsArray = Array.isArray(lineupsRes?.data?.Subs) ? lineupsRes.data.Subs : [];
-    subsArray.forEach((sub: any) => {
-      let teamNm = 1;
-      const homePl = lineupsRes?.data?.T1?.[0]?.Pl || [];
-      if (homePl.length > 0 && !homePl.some((p: any) => p.Pn === sub.PnO || `${p.Fn} ${p.Ln}` === sub.PnO || p.Fn === sub.PnO || p.Ln === sub.PnO)) {
-         teamNm = 2;
-      }
-      incs.push({
-        IT: 60,
-        Min: sub.Min,
-        Nm: teamNm,
-        Pn: `${sub.Pn || sub.Fn} (In), ${sub.PnO} (Out)`,
-        _period: 'Sub'
+    // Explicitly add substitutions to ensure they appear in Key Events
+    // Check if incidents already have subs (IT 60 or 63)
+    const hasSubs = incs.some((e: any) => e.IT === 60 || e.IT === 63);
+    if (!hasSubs && parsedSubs.length > 0) {
+      parsedSubs.forEach((sub: any) => {
+        let teamNm = 1;
+        const homePl = lineupsRes?.data?.Lu?.[0]?.Ps || [];
+        if (homePl.length > 0 && !homePl.some((p: any) => p.Pn === sub.PnO || `${p.Fn} ${p.Ln}` === sub.PnO || p.Fn === sub.PnO || p.Ln === sub.PnO)) {
+           teamNm = 2;
+        }
+        incs.push({
+          IT: 60,
+          Min: sub.Min,
+          Nm: teamNm,
+          Pn: `${sub.Pn || sub.Fn} (In), ${sub.PnO} (Out)`,
+          _period: 'Sub'
+        });
       });
-    });
+    }
 
     incs.sort((a, b) => (a.Min || 0) - (b.Min || 0));
     return incs;
-  }, [incidentsRes?.data, scoreboardRes?.data, lineupsRes?.data]);
+  }, [incidentsRes?.data, scoreboardRes?.data, parsedSubs, lineupsRes?.data?.Lu]);
 
   // ── Performance Lab state ──────────────────────────────
   const [perfData, setPerfData] = useState<any>(null);
@@ -685,12 +707,11 @@ const MatchCenter = () => {
                       return pos === "coach" || pos === "manager" || pos === "head coach";
                     };
 
-                    const extractLineups = (players: any[]) => {
+                    const extractLineups = (players: any[], foString?: string) => {
                       const validPlayers = players.filter(p => !isCoach(p));
                       const startingXI = [];
                       const subs = [];
                       
-                      // First 11 players are starters, the rest are substitutes (unless explicitly marked)
                       let startersCount = 0;
                       for (const p of validPlayers) {
                         if (p.Pon?.toLowerCase() === "substitute" || startersCount >= 11) {
@@ -701,19 +722,45 @@ const MatchCenter = () => {
                         }
                       }
                       
-                      return {
-                        startingRows: [
-                          startingXI.filter(p => p.Pon === "Goalkeeper"),
-                          startingXI.filter(p => p.Pon === "Defender"),
-                          startingXI.filter(p => p.Pon === "Midfielder"),
-                          startingXI.filter(p => p.Pon === "Forward")
-                        ],
-                        subs
-                      };
+                      let startingRows: any[][] = [];
+                      if (foString && startingXI.length >= 10) {
+                        // Parse formation like "3-4-2-1" -> [3, 4, 2, 1]
+                        const parts = foString.split('-').map(Number).filter(n => !isNaN(n));
+                        const sum = parts.reduce((a,b)=>a+b, 0);
+                        if (sum > 0 && sum <= 10) {
+                          // First row is GK
+                          startingRows.push([startingXI[0]]);
+                          let idx = 1;
+                          for (const count of parts) {
+                            startingRows.push(startingXI.slice(idx, idx + count));
+                            idx += count;
+                          }
+                          // Catch any remaining
+                          if (idx < startingXI.length) {
+                             startingRows.push(startingXI.slice(idx));
+                          }
+                        }
+                      }
+
+                      if (startingRows.length === 0) {
+                        startingRows = [
+                          startingXI.filter(p => p.Pon === "Goalkeeper" || p.Pon === "GK"),
+                          startingXI.filter(p => p.Pon === "Defender" || p.Pon === "DEF"),
+                          startingXI.filter(p => p.Pon === "Midfielder" || p.Pon === "MID"),
+                          startingXI.filter(p => p.Pon === "Forward" || p.Pon === "FWD" || p.Pon === "Attacker")
+                        ].filter(row => row.length > 0);
+                      }
+                      
+                      // Fallback if all filters missed
+                      if (startingRows.length === 0 || startingRows.flat().length === 0) {
+                        startingRows = [[...startingXI]];
+                      }
+
+                      return { startingRows, subs };
                     };
 
-                    const homeData = extractLineups(homePlayers);
-                    const awayData = extractLineups(awayPlayers);
+                    const homeData = extractLineups(homePlayers, homeTeamInfo?.Fo);
+                    const awayData = extractLineups(awayPlayers, awayTeamInfo?.Fo);
                     
                     const homeRows = homeData.startingRows;
                     const awayRows = awayData.startingRows;
@@ -730,20 +777,34 @@ const MatchCenter = () => {
                     const awayCoaches = extractCoaches(awayTeamInfo, awayPlayers);
 
                     const getPlayerEvents = (p: any) => {
+                      const pNameTokens = [p.Pn, p.Ln, p.Fn, `${p.Fn} ${p.Ln}`].filter(Boolean).map(s => String(s).toLowerCase().trim());
+                      
+                      const fuzzyMatch = (eName: string) => {
+                        if (!eName) return false;
+                        const en = String(eName).toLowerCase().trim();
+                        // Either exact token match, or one string is heavily included in the other (at least 4 chars if short, or direct includes)
+                        return pNameTokens.some(pt => {
+                          if (pt === en) return true;
+                          if (pt.length > 3 && en.includes(pt)) return true;
+                          if (en.length > 3 && pt.includes(en)) return true;
+                          return false;
+                        });
+                      };
+
                       const evts = allIncidents.filter((e: any) => 
-                        (e.Pn === p.Pn || e.Pn === p.Ln || e.Ln === p.Ln || (e.Fn === p.Fn && e.Ln === p.Ln) || e.Pn === `${p.Fn} ${p.Ln}`) && 
-                        [36, 37, 39, 43, 45, 46, 63].includes(e.IT)
+                        fuzzyMatch(e.Pn || e.Fn || e.Ln || "") && 
+                        [36, 37, 39, 43, 44, 45, 46, 63, 60].includes(e.IT)
                       );
                       
-                      const subsArray = Array.isArray(lineupsRes?.data?.Subs) ? lineupsRes.data.Subs : [];
-                      
-                      const isSubIn = subsArray.find(s => s.Pn === p.Pn || s.Pn === p.Ln || s.Ln === p.Ln || (s.Fn === p.Fn && s.Ln === p.Ln) || s.Pn === `${p.Fn} ${p.Ln}`);
+                      const isSubIn = parsedSubs.find(s => fuzzyMatch(s.Pn || s.Fn || ""));
                       if (isSubIn) evts.push({ IT: 5, Min: isSubIn.Min });
 
-                      const isSubOut = subsArray.find(s => s.PnO === p.Pn || s.PnO === p.Ln || s.PnO === `${p.Fn} ${p.Ln}` || s.PnO === p.Fn);
+                      const isSubOut = parsedSubs.find(s => fuzzyMatch(s.PnO || ""));
                       if (isSubOut) evts.push({ IT: 4, Min: isSubOut.Min });
 
-                      return evts;
+                      // Deduplicate by IT and Min to avoid double badges
+                      const uniqueEvts = evts.filter((v: any, i: number, a: any) => a.findIndex((t: any) => t.IT === v.IT && t.Min === v.Min) === i);
+                      return uniqueEvts;
                     };
 
                     const renderPlayerEventsBadges = (p: any, inPitch = false) => {
@@ -940,21 +1001,27 @@ const MatchCenter = () => {
 
 
               {/* Substitutions Timeline */}
-              {lineupsRes?.data?.Subs && (
+              {parsedSubs.length > 0 && (
                 <div className="bg-card border border-border/40 rounded-3xl overflow-hidden shadow-sm mt-6">
                   <div className="flex items-center gap-2 px-6 py-4 border-b border-border/30 bg-muted/10">
                     <ArrowLeftRight className="w-4 h-4 text-emerald-500" />
                     <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Substitutions</h3>
                   </div>
                   <div className="p-6 space-y-3">
-                    {(Array.isArray(lineupsRes.data.Subs) ? lineupsRes.data.Subs : []).map((sub: any, i: number) => (
-                      <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-muted/10 border border-border/20">
-                        <span className="text-xs font-mono font-bold text-muted-foreground w-10 text-center">{sub.Min}'</span>
-                        <span className="text-emerald-500">↑</span>
-                        <span className="font-semibold text-sm text-foreground">{sub.Pn || `${sub.Fn} ${sub.Ln}`}</span>
-                        <span className="text-muted-foreground">↔</span>
-                        <span className="text-red-400">↓</span>
-                        <span className="text-sm text-muted-foreground">{sub.PnO || ""}</span>
+                    {parsedSubs.map((sub: any, i: number) => (
+                      <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 rounded-xl bg-muted/10 border border-border/20">
+                        <span className="text-xs font-mono font-bold text-muted-foreground w-8 shrink-0">{sub.Min}'</span>
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="text-emerald-500 font-bold text-lg leading-none">↑</span>
+                          <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-500/80">IN:</span>
+                          <span className="font-semibold text-sm text-foreground">{sub.Pn || sub.Fn && `${sub.Fn} ${sub.Ln}` || "Unknown"}</span>
+                        </div>
+                        <div className="hidden sm:block text-muted-foreground/30 px-2">|</div>
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="text-red-400 font-bold text-lg leading-none">↓</span>
+                          <span className="text-[10px] uppercase font-bold tracking-wider text-red-400/80">OUT:</span>
+                          <span className="text-sm text-muted-foreground font-medium">{sub.PnO || "Unknown"}</span>
+                        </div>
                       </div>
                     ))}
                   </div>
