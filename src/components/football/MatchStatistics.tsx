@@ -1,5 +1,5 @@
 import { FootballTeamStatistics, FootballTeam } from "../../types/football";
-import { TeamLogo } from "../TeamLogo";
+import { FootballTeamLogo } from "./FootballTeamLogo";
 import { BarChart3 } from "lucide-react";
 
 interface MatchStatisticsProps {
@@ -37,7 +37,7 @@ export function MatchStatistics({ statistics, homeTeam, awayTeam }: MatchStatist
       <div className="flex justify-between items-center bg-secondary/10 p-5 rounded-2xl border border-border/20 backdrop-blur-sm mb-8">
         <div className="flex items-center gap-4 flex-1">
           <div className="w-12 h-12 bg-background rounded-full p-2 border border-border/30 shadow-sm flex items-center justify-center shrink-0">
-            <TeamLogo logo={homeTeam.logo} name={homeTeam.name} size="md" className="w-full h-full object-contain" />
+            <FootballTeamLogo logo={homeTeam.logo} name={homeTeam.name} size="md" className="w-full h-full object-contain" />
           </div>
           <span className="font-bold text-base md:text-lg hidden sm:block truncate">{homeTeam.name}</span>
         </div>
@@ -47,7 +47,7 @@ export function MatchStatistics({ statistics, homeTeam, awayTeam }: MatchStatist
         <div className="flex items-center justify-end gap-4 flex-1 text-right">
           <span className="font-bold text-base md:text-lg hidden sm:block truncate">{awayTeam.name}</span>
           <div className="w-12 h-12 bg-background rounded-full p-2 border border-border/30 shadow-sm flex items-center justify-center shrink-0">
-            <TeamLogo logo={awayTeam.logo} name={awayTeam.name} size="md" className="w-full h-full object-contain" />
+            <FootballTeamLogo logo={awayTeam.logo} name={awayTeam.name} size="md" className="w-full h-full object-contain" />
           </div>
         </div>
       </div>

@@ -290,7 +290,7 @@
   font-size: 16px;
   font-weight: 800;
   color: white;
-  background: #1a1a2e;
+  background: transparent;
   border: 3px solid var(--team-color, #ffffff);
 }
 

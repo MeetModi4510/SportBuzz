@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar } from "../../components/Navbar";
-import { TeamLogo } from "../../components/TeamLogo";
+import { FootballTeamLogo as TeamLogo } from "../../components/football/FootballTeamLogo";
 import { useEspnMatchDetail } from "../../hooks/football/useEspnQueries";
 import {
   Loader2, ArrowLeft, Clock, Activity, ListOrdered,
@@ -669,7 +669,7 @@ export default function MatchCenter() {
                                return (
                                  <div key={i} className="flex items-center justify-between p-2 rounded-2xl hover:bg-secondary/30 transition-colors">
                                     <div className="flex items-center gap-3">
-                                       <TeamLogo logo={t.logo || `https://a.espncdn.com/i/teamlogos/soccer/500/${t.id}.png`} name={t.abbreviation || t.name} className="w-8 h-8 drop-shadow-md" />
+                                       <TeamLogo logo={t.logo || `https://a.espncdn.com/i/teamlogos/soccer/500/${t.id}.png`} name={t.name || t.abbreviation} className="w-8 h-8 drop-shadow-md" />
                                        <span className="font-bold text-sm truncate max-w-[80px]">{t.abbreviation || t.name}</span>
                                     </div>
                                     <div className="flex gap-1.5">
@@ -767,16 +767,18 @@ export default function MatchCenter() {
                                   const dateStr = new Date(h2h.gameDate).getFullYear();
                                   const h2hHomeScore = h2h.homeTeamScore;
                                   const h2hAwayScore = h2h.awayTeamScore;
-                                  const h2hHomeLogo = `https://a.espncdn.com/i/teamlogos/soccer/500/${h2h.homeTeamId}.png`;
-                                  const h2hAwayLogo = `https://a.espncdn.com/i/teamlogos/soccer/500/${h2h.awayTeamId}.png`;
+                                  
+                                  const isH2hHomeCurrentHome = h2h.homeTeamId === homeTeam.id;
+                                  const h2hHomeObj = isH2hHomeCurrentHome ? homeTeam : awayTeam;
+                                  const h2hAwayObj = isH2hHomeCurrentHome ? awayTeam : homeTeam;
                                   
                                   return (
                                      <div key={i} className="flex items-center justify-between p-2 rounded-2xl bg-secondary/30 border border-border/30 hover:border-blue-500/20 transition-colors">
                                         <div className="text-xs font-bold text-muted-foreground w-10 text-center">{dateStr}</div>
                                         <div className="flex items-center gap-2 flex-1 justify-center">
-                                           <img src={h2hHomeLogo} className="w-5 h-5 object-contain" alt="Home" />
+                                           <TeamLogo logo={h2hHomeObj.logo || `https://a.espncdn.com/i/teamlogos/soccer/500/${h2hHomeObj.id}.png`} name={h2hHomeObj.name} size="xs" className="w-5 h-5 object-contain" />
                                            <span className="font-black text-sm w-12 text-center">{h2hHomeScore} - {h2hAwayScore}</span>
-                                           <img src={h2hAwayLogo} className="w-5 h-5 object-contain" alt="Away" />
+                                           <TeamLogo logo={h2hAwayObj.logo || `https://a.espncdn.com/i/teamlogos/soccer/500/${h2hAwayObj.id}.png`} name={h2hAwayObj.name} size="xs" className="w-5 h-5 object-contain" />
                                         </div>
                                      </div>
                                   );

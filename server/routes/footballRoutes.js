@@ -1376,5 +1376,36 @@ router.get('/v3/tournament-logo/:tournamentId', async (req, res) => {
         res.status(404).json({ success: false, message: 'Tournament logo not found' });
     }
 });
+import * as thesportsdbService from '../services/thesportsdbService.js';
+
+// TheSportsDB Team Crest
+router.get('/v3/image/team', async (req, res) => {
+    try {
+        const { name } = req.query;
+        const imageUrl = await thesportsdbService.getTeamBadge(name);
+        if (imageUrl) {
+            res.json({ success: true, url: imageUrl });
+        } else {
+            res.status(404).json({ success: false, message: 'Team badge not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Image fetch error' });
+    }
+});
+
+// TheSportsDB Player Cutout
+router.get('/v3/image/player', async (req, res) => {
+    try {
+        const { name } = req.query;
+        const imageUrl = await thesportsdbService.getPlayerCutout(name);
+        if (imageUrl) {
+            res.json({ success: true, url: imageUrl });
+        } else {
+            res.status(404).json({ success: false, message: 'Player image not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Image fetch error' });
+    }
+});
 
 export default router;

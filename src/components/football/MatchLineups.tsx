@@ -1,6 +1,7 @@
 import { FootballLineup, FootballTeam, FootballEvent } from "../../types/football";
-import { TeamLogo } from "../TeamLogo";
+import { FootballTeamLogo } from "./FootballTeamLogo";
 import { Users, ArrowUp, ArrowDown } from "lucide-react";
+import { LineupPlayerImage } from "./LineupPlayerImage";
 
 import { FootballMatchPlayerStat } from "../../types/football";
 
@@ -133,8 +134,8 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
             if (e.detail === "Red Card") return <div key={idx} className="w-2.5 h-3.5 bg-[#FF3333] shadow-sm" title="Red Card" />;
           }
           if (e.type === "subst") {
-            if (e.player.id === playerId) return <ArrowDown key={idx} className="w-3.5 h-3.5 text-red-500 drop-shadow-sm" title="Subbed Out" />;
-            if (e.assist && e.assist.id === playerId) return <ArrowUp key={idx} className="w-3.5 h-3.5 text-green-500 drop-shadow-sm" title="Subbed In" />;
+            if (e.player.id === playerId) return <span key={idx} title="Subbed Out"><ArrowDown className="w-3.5 h-3.5 text-red-500 drop-shadow-sm" /></span>;
+            if (e.assist && e.assist.id === playerId) return <span key={idx} title="Subbed In"><ArrowUp className="w-3.5 h-3.5 text-green-500 drop-shadow-sm" /></span>;
           }
           return null;
         })}
@@ -158,11 +159,7 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
         </div>
 
         <div className={`relative ${isSub ? 'w-8 h-8' : 'w-10 h-10'} rounded-full bg-secondary/30 flex items-center justify-center font-bold text-xs border border-border/50 overflow-hidden shrink-0 shadow-sm`}>
-          {item.player.id ? (
-            <img src={`https://media.api-sports.io/football/players/${item.player.id}.png`} className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => e.currentTarget.style.display = 'none'} />
-          ) : (
-            <span className="opacity-40">{item.player.number}</span>
-          )}
+          <LineupPlayerImage playerId={item.player.id} playerName={item.player.name} fallbackInitials={item.player.number?.toString()} className="absolute inset-0 z-10" />
         </div>
         
         <div className="flex flex-col flex-1 min-w-0 justify-center">
@@ -197,16 +194,7 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
         <div className="relative">
           <div className={`relative w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xs md:text-sm font-bold font-display shadow-xl border-[3px] overflow-hidden ${isHome ? 'bg-blue-600 text-white border-blue-400/80' : 'bg-red-600 text-white border-red-400/80'}`}>
             <span className="absolute z-0">{item.player.number}</span>
-            {item.player.id && (
-              <img 
-                src={`https://media.api-sports.io/football/players/${item.player.id}.png`} 
-                alt={item.player.name}
-                className="absolute inset-0 w-full h-full object-cover z-10"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            )}
+            <LineupPlayerImage playerId={item.player.id} playerName={item.player.name} className="absolute inset-0 z-10" />
           </div>
           {rating && (
             <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded-sm border shadow-lg z-20 ${getRatingColor(rating)}`}>
@@ -231,7 +219,7 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
         <div className="flex justify-between items-center bg-secondary/20 p-4 px-6 border-b border-border/40 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center p-1 border border-border/30 shadow-sm">
-              <TeamLogo logo={awayTeam.logo} name={awayTeam.name} size="sm" />
+              <FootballTeamLogo logo={awayTeam.logo} name={awayTeam.name} size="sm" />
             </div>
             <h3 className="font-bold text-sm md:text-base leading-tight text-foreground">{awayTeam.name}</h3>
           </div>
@@ -302,7 +290,7 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
         <div className="flex justify-between items-center bg-secondary/20 p-4 px-6 border-t border-border/40 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center p-1 border border-border/30 shadow-sm">
-              <TeamLogo logo={homeTeam.logo} name={homeTeam.name} size="sm" />
+              <FootballTeamLogo logo={homeTeam.logo} name={homeTeam.name} size="sm" />
             </div>
             <h3 className="font-bold text-sm md:text-base leading-tight text-foreground">{homeTeam.name}</h3>
           </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from "../../lib/utils";
 import { Clock, MapPin } from "lucide-react";
-import { TeamLogo } from "../TeamLogo";
+import { FootballTeamLogo } from "./FootballTeamLogo";
 import { formatToIST } from "../../lib/dateUtils";
 
 // Keep backward-compatible with LivescoreMatch type but also accept Sofascore matches
@@ -238,10 +238,10 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
           <div className="flex flex-col items-center gap-2 w-[40%]">
             {match.homeTeam.name.toLowerCase() === 'switzerland' ? (
               <div className="p-2 rounded-full bg-white shadow-lg">
-                <TeamLogo logo={resolveLogo(match.homeTeam.logo)} name={match.homeTeam.name} size="lg" className="w-10 h-10 object-contain drop-shadow-sm" />
+                <FootballTeamLogo logo={resolveLogo(match.homeTeam.logo)} name={match.homeTeam.name} size="lg" className="w-10 h-10 object-contain drop-shadow-sm" />
               </div>
             ) : (
-              <TeamLogo logo={resolveLogo(match.homeTeam.logo)} name={match.homeTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
+              <FootballTeamLogo logo={resolveLogo(match.homeTeam.logo)} name={match.homeTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
             )}
             <span className="font-extrabold text-[13px] tracking-wider uppercase text-center line-clamp-2 drop-shadow-md mt-1">
               {match.homeTeam.name}
@@ -261,13 +261,13 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
           </div>
 
           {/* Away Team */}
-          <div className="flex flex-col items-center gap-2 w-[40%]">
+          <div className="flex flex-col items-center gap-2 w-[40%] z-10">
             {match.awayTeam.name.toLowerCase() === 'switzerland' ? (
               <div className="p-2 rounded-full bg-white shadow-lg">
-                <TeamLogo logo={resolveLogo(match.awayTeam.logo)} name={match.awayTeam.name} size="lg" className="w-10 h-10 object-contain drop-shadow-sm" />
+                <FootballTeamLogo logo={resolveLogo(match.awayTeam.logo)} name={match.awayTeam.name} size="lg" className="w-10 h-10 object-contain drop-shadow-sm" />
               </div>
             ) : (
-              <TeamLogo logo={resolveLogo(match.awayTeam.logo)} name={match.awayTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
+              <FootballTeamLogo logo={resolveLogo(match.awayTeam.logo)} name={match.awayTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
             )}
             <span className="font-extrabold text-[13px] tracking-wider uppercase text-center line-clamp-2 drop-shadow-md mt-1">
               {match.awayTeam.name}

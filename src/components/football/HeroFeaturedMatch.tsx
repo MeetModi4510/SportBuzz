@@ -1,6 +1,6 @@
 import { FootballMatch } from "../../types/football";
 import { PlayCircle, CalendarDays, MapPin } from "lucide-react";
-import { TeamLogo } from "../TeamLogo";
+import { FootballTeamLogo } from "./FootballTeamLogo";
 import { useNavigate } from "react-router-dom";
 
 interface HeroFeaturedMatchProps {
@@ -53,7 +53,7 @@ export function HeroFeaturedMatch({ match }: HeroFeaturedMatchProps) {
           {/* Home Team */}
           <div className="flex flex-col items-center gap-5 flex-1 max-w-[200px]">
             <div className="w-20 h-20 md:w-28 md:h-28 bg-background/40 backdrop-blur-md rounded-full p-4 border border-border/30 shadow-xl group-hover:scale-110 transition-transform duration-700">
-              <TeamLogo logo={match.teams.home.logo} name={match.teams.home.name} size="lg" className="w-full h-full object-contain" />
+              <FootballTeamLogo logo={match.teams.home.logo} name={match.teams.home.name} size="lg" className="w-full h-full object-contain" />
             </div>
             <h2 className="text-xl md:text-2xl font-black tracking-tight text-center drop-shadow-md leading-tight">
               {match.teams.home.name}
@@ -83,7 +83,7 @@ export function HeroFeaturedMatch({ match }: HeroFeaturedMatchProps) {
           {/* Away Team */}
           <div className="flex flex-col items-center gap-5 flex-1 max-w-[200px]">
             <div className="w-20 h-20 md:w-28 md:h-28 bg-background/40 backdrop-blur-md rounded-full p-4 border border-border/30 shadow-xl group-hover:scale-110 transition-transform duration-700">
-              <TeamLogo logo={match.teams.away.logo} name={match.teams.away.name} size="lg" className="w-full h-full object-contain" />
+              <FootballTeamLogo logo={match.teams.away.logo} name={match.teams.away.name} size="lg" className="w-full h-full object-contain" />
             </div>
             <h2 className="text-xl md:text-2xl font-black tracking-tight text-center drop-shadow-md leading-tight">
               {match.teams.away.name}

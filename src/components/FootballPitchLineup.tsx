@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Clock, Target, Footprints, Shield, AlertTriangle, ArrowDownLeft, ArrowUpRight, Star, Activity, Trophy, Zap, Sparkles, Award, ArrowRightLeft } from 'lucide-react';
 import '@/styles/football-pitch.css';
+import { LineupPlayerImage } from './football/LineupPlayerImage';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface SquadPlayer {
@@ -512,14 +513,21 @@ function PlayerNode({
             onClick={onClick}
         >
             <div className="pitch-player-avatar relative" style={{ '--team-color': teamColor } as React.CSSProperties}>
+                <div className="absolute inset-0 z-0 bg-[#1a1a2e] rounded-full overflow-hidden">
+                    <LineupPlayerImage 
+                        playerId={player.id}
+                        playerName={player.name}
+                        fallbackInitials={player.number?.toString() || '?'}
+                        className="w-full h-full object-cover"
+                    />
+                </div>
                 <div 
-                    className="pitch-player-number w-full h-full rounded-full flex items-center justify-center font-black text-white shadow-inner"
+                    className="pitch-player-number absolute inset-0 rounded-full border-[3px] pointer-events-none z-10"
                     style={{ 
-                        borderColor: teamColor, 
-                        borderWidth: '3px'
+                        borderColor: teamColor,
+                        background: 'transparent'
                     }}
                 >
-                    {player.number || '?'}
                 </div>
                 
                 {/* Rating Badge (Overlapping Bottom Center) */}
@@ -759,19 +767,14 @@ function SubstitutesPanel({
                         style={{ '--team-color': teamColor } as React.CSSProperties}
                         onClick={() => onPlayerClick(p)}
                     >
-                        {p.image && !imgErrors.has(p.id) ? (
-                            <img
-                                src={p.image}
-                                alt={p.name}
-                                className="football-sub-avatar"
-                                style={{ borderColor: teamColor }}
-                                onError={() => setImgErrors(prev => new Set(prev).add(p.id))}
+                        <div className="football-sub-avatar-container relative w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style={{ borderColor: teamColor }}>
+                            <LineupPlayerImage 
+                                playerId={p.id}
+                                playerName={p.name}
+                                fallbackInitials={p.number?.toString() || '?'}
+                                className="absolute inset-0 z-10"
                             />
-                        ) : (
-                            <div className="football-sub-number" style={{ borderColor: teamColor }}>
-                                {p.number || '?'}
-                            </div>
-                        )}
+                        </div>
                         <div className="flex flex-col min-w-0 flex-1">
                             <div className="flex items-center gap-1.5 min-w-0">
                                 <span className="text-xs font-semibold text-white/90 truncate">
