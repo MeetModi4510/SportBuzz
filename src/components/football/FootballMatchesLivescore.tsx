@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { cn } from "../../lib/utils";
 import { 
-  useLivescoreLiveMatches, 
-  useLivescoreMatchesByDate,
-  LivescoreMatch 
-} from "../../hooks/football/useLivescore6Queries";
+  useEspnLiveMatches,
+  useEspnUpcomingMatches,
+  useEspnRecentMatches,
+} from "../../hooks/football/useEspnQueries";
 import { useNavigate } from 'react-router-dom';
 import { LivescoreMatchCard } from "./LivescoreMatchCard";
 
@@ -17,89 +17,62 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
   const navigate = useNavigate();
   const [filter, setFilter] = useState<'live' | 'recent' | 'upcoming'>('live');
 
-  // Generate Date Strings YYYYMMDD
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
+  // ─── Queries ─────────────────────────────────────────────────────────
+  // Live: always enabled (loads on page mount)
+  const { data: liveData, isLoading: liveLoading, refetch: refetchLive, isFetching: liveFetching } =
+    useEspnLiveMatches(true);
 
-  const formatDate = (d: Date) => d.toISOString().split('T')[0].replace(/-/g, '');
+  // Upcoming: only enabled when user clicks "Upcoming"
+  const { data: upcomingData, isLoading: upcomingLoading, refetch: refetchUpcoming, isFetching: upcomingFetching } =
+    useEspnUpcomingMatches(filter === 'upcoming');
 
-  const todayStr = formatDate(today);
-  const tomorrowStr = formatDate(tomorrow);
-  const yesterdayStr = formatDate(yesterday);
+  // Recent: only enabled when user clicks "Recent"
+  const { data: recentData, isLoading: recentLoading, refetch: refetchRecent, isFetching: recentFetching } =
+    useEspnRecentMatches(filter === 'recent');
 
-  // Queries
-  const { data: liveData, isLoading: liveLoading, refetch: refetchLive, isFetching: liveFetching } = useLivescoreLiveMatches(true);
-  
-  const hasLiveMatches = liveData && liveData.data && liveData.data.length > 0;
-  const loadOthers = variant === 'hub' 
-    ? (filter === 'recent' || filter === 'upcoming') 
-    : (!liveLoading && !hasLiveMatches);
-
-  // Lazy load Upcoming/Recent only if needed
-  const { data: todayData, isLoading: todayLoading, refetch: refetchToday, isFetching: todayFetching } = useLivescoreMatchesByDate(todayStr, loadOthers);
-  const { data: tomorrowData, isLoading: tomorrowLoading, refetch: refetchTomorrow, isFetching: tomorrowFetching } = useLivescoreMatchesByDate(tomorrowStr, loadOthers);
-  const { data: yesterdayData, isLoading: yesterdayLoading, refetch: refetchYesterday, isFetching: yesterdayFetching } = useLivescoreMatchesByDate(yesterdayStr, loadOthers);
+  // ─── Derived state ────────────────────────────────────────────────────
+  const liveMatches  = liveData?.data     || [];
+  const hasLive      = liveMatches.length > 0;
 
   const handleManualRefresh = () => {
     refetchLive();
-    if (loadOthers) {
-      refetchToday();
-      refetchTomorrow();
-      refetchYesterday();
-    }
+    if (filter === 'upcoming') refetchUpcoming();
+    if (filter === 'recent')   refetchRecent();
   };
 
-  const isRefreshing = liveFetching || todayFetching || tomorrowFetching || yesterdayFetching;
-  const isLoading = liveLoading || (loadOthers && (todayLoading || tomorrowLoading || yesterdayLoading));
+  const isRefreshing = liveFetching || upcomingFetching || recentFetching;
+  const isLoading =
+    (filter === 'live'     && liveLoading) ||
+    (filter === 'upcoming' && upcomingLoading) ||
+    (filter === 'recent'   && recentLoading);
 
-  // Grouping logic for rendering
-  let sections: { title: string, matches: LivescoreMatch[] }[] = [];
+  // ─── Build sections ───────────────────────────────────────────────────
+  let sections: { title: string; matches: any[] }[] = [];
 
   if (variant === 'dashboard') {
-    if (hasLiveMatches) {
-      sections = [{ title: 'Live Matches', matches: liveData.data }];
-    } else if (!isLoading) {
-      const upcomingToday = (todayData?.data || []).filter(m => m.status === 'upcoming');
-      const upcomingTomorrow = (tomorrowData?.data || []).filter(m => m.status === 'upcoming');
-      const allUpcoming = [...upcomingToday, ...upcomingTomorrow].slice(0, 2);
-      
-      const completedToday = (todayData?.data || []).filter(m => m.status === 'completed');
-      const completedYesterday = (yesterdayData?.data || []).filter(m => m.status === 'completed');
-      const allRecent = [...completedToday, ...completedYesterday].slice(0, 2);
-      
-      const combinedMatches = [...allUpcoming, ...allRecent];
-      
-      if (combinedMatches.length > 0) {
-        sections.push({ title: 'Featured Matches', matches: combinedMatches });
+    if (hasLive) {
+      sections = [{ title: 'Live Matches', matches: liveMatches }];
+    } else if (!liveLoading) {
+      // Fall back to showing a mix of recent + upcoming when nothing is live
+      const upcoming = (upcomingData?.data || []).slice(0, 2);
+      const recent   = (recentData?.data   || []).slice(0, 2);
+      const combined = [...upcoming, ...recent];
+      if (combined.length > 0) {
+        sections = [{ title: 'Featured Matches', matches: combined }];
       }
     }
   } else {
-    // variant === 'hub'
+    // Hub variant
     if (filter === 'live') {
-      if (hasLiveMatches) {
-        sections = [{ title: 'Live Matches', matches: liveData.data }];
-      }
+      if (hasLive) sections = [{ title: 'Live Matches', matches: liveMatches }];
     } else if (filter === 'upcoming') {
-      const upcomingToday = (todayData?.data || []).filter(m => m.status === 'upcoming');
-      const upcomingTomorrow = (tomorrowData?.data || []).filter(m => m.status === 'upcoming');
-      const allUpcoming = [...upcomingToday, ...upcomingTomorrow];
-      if (allUpcoming.length > 0) {
-        sections = [{ title: 'Upcoming Matches', matches: allUpcoming }];
-      }
+      const matches = upcomingData?.data || [];
+      if (matches.length > 0) sections = [{ title: 'Upcoming Matches', matches }];
     } else if (filter === 'recent') {
-      const completedToday = (todayData?.data || []).filter(m => m.status === 'completed');
-      const completedYesterday = (yesterdayData?.data || []).filter(m => m.status === 'completed');
-      const allRecent = [...completedToday, ...completedYesterday];
-      if (allRecent.length > 0) {
-        sections = [{ title: 'Recent Matches', matches: allRecent }];
-      }
+      const matches = recentData?.data || [];
+      if (matches.length > 0) sections = [{ title: 'Recent Matches', matches }];
     }
   }
-
-
 
   return (
     <section className="space-y-6">
@@ -120,19 +93,28 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
             <div className="flex p-1 bg-secondary/60 backdrop-blur-xl rounded-full border border-border/50 overflow-x-auto max-w-full hide-scrollbar shadow-inner">
               <button 
                 onClick={() => setFilter("live")} 
-                className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${filter === 'live' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}
+                className={cn(
+                  "shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300",
+                  filter === 'live' ? 'bg-emerald-500 text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
+                )}
               >
-                Live
+                🔴 Live
               </button>
               <button 
                 onClick={() => setFilter("recent")} 
-                className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${filter === 'recent' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}
+                className={cn(
+                  "shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300",
+                  filter === 'recent' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
+                )}
               >
                 Recent
               </button>
               <button 
                 onClick={() => setFilter("upcoming")} 
-                className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${filter === 'upcoming' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}
+                className={cn(
+                  "shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300",
+                  filter === 'upcoming' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
+                )}
               >
                 Upcoming
               </button>
@@ -157,7 +139,11 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
         </div>
       ) : sections.length === 0 || sections.every(s => s.matches.length === 0) ? (
         <div className="py-20 text-center flex flex-col items-center justify-center bg-foreground/5 rounded-2xl border border-border">
-          <p className="text-muted-foreground font-medium text-sm">No matches available right now.</p>
+          <p className="text-muted-foreground font-medium text-sm">
+            {filter === 'live'
+              ? 'No live matches right now. Try "Recent" or "Upcoming".'
+              : `No ${filter} matches available.`}
+          </p>
         </div>
       ) : (
         <div className="space-y-10">
@@ -165,13 +151,14 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
             <div key={idx} className="space-y-4">
               <div className="flex items-center gap-3 px-2">
                 <h3 className="text-sm font-semibold tracking-wider uppercase text-muted-foreground">{section.title}</h3>
+                <span className="text-xs text-muted-foreground/50 font-medium">({section.matches.length})</span>
               </div>
               <div className="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
                 {section.matches.map(match => (
                   <div key={match.id} className="snap-start shrink-0 w-[300px] md:w-[350px]">
                     <LivescoreMatchCard 
                       match={match} 
-                      onClick={(m) => navigate(`/football/match/${m.apiId}`)} 
+                      onClick={(m) => navigate(`/football/match/${m.id}`)} 
                     />
                   </div>
                 ))}
@@ -180,10 +167,6 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
           ))}
         </div>
       )}
-
-
-
     </section>
   );
 };
-

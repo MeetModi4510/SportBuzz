@@ -36,6 +36,7 @@ import {
 import { protect } from '../middleware/authMiddleware.js';
 import { getDashboardMatches, getCategorizedMatches, getMatchDetail, getGlobalFootballNews, getFootballLiveNews, clearCache } from '../services/footballDataService.js';
 import livescore6Service from '../services/livescore6Service.js';
+import * as espnService from '../services/espnService.js';
 
 const router = express.Router();
 
@@ -1281,6 +1282,98 @@ router.get('/v2/matches/performance/:matchId', async (req, res) => {
             return res.json({ success: true, fromCache: true, stale: true, data: cached.data });
         }
         res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+
+// ─── SOFASCORE API ENDPOINTS (V3) ────────────────────────────────────────────
+
+// Live matches — called on page load, cached 30 min
+router.get('/v3/matches/live', async (req, res) => {
+    try {
+        const result = await espnService.getLiveMatches();
+        res.json({ success: true, data: result });
+    } catch (err) {
+        console.error('[Sofascore] Live error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch live matches', error: err.message });
+    }
+});
+
+// Upcoming matches — all top leagues in parallel
+router.get('/v3/matches/upcoming', async (req, res) => {
+    try {
+        const result = await espnService.getUpcomingMatches();
+        res.json({ success: true, data: result });
+    } catch (err) {
+        console.error('[Sofascore] Upcoming error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch upcoming matches', error: err.message });
+    }
+});
+
+// Match detail
+router.get('/v3/matches/detail/:matchId', async (req, res) => {
+    try {
+        const { matchId } = req.params;
+        const result = await espnService.getMatchDetail(matchId);
+        res.json(result);
+    } catch (err) {
+        console.error('[Sofascore] Detail error:', err.message);
+        res.status(500).json({ success: false, message: 'Detail API failed' });
+    }
+});
+
+// Recent (completed) matches — all top leagues in parallel
+router.get('/v3/matches/recent', async (req, res) => {
+    try {
+        const result = await espnService.getRecentMatches();
+        res.json({ success: true, data: result });
+    } catch (err) {
+        console.error('[Sofascore] Recent error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch recent matches', error: err.message });
+    }
+});
+
+// Detail handled by /v3/matches/detail/:matchId above
+
+// Player image — sequential fetch proxied through backend (caches 30 min)
+router.get('/v3/player-image/:playerId', async (req, res) => {
+    try {
+        const { playerId } = req.params;
+        const result = await espnService.getPlayerImage(playerId);
+        res.set('Content-Type', result.contentType);
+        res.set('Cache-Control', 'public, max-age=1800');
+        res.send(result.buffer);
+    } catch (err) {
+        console.error('[Sofascore] Player image error:', err.message);
+        res.status(404).json({ success: false, message: 'Player image not found' });
+    }
+});
+
+// Team logo — sequential fetch proxied through backend (caches 30 min)
+router.get('/v3/team-logo/:teamId', async (req, res) => {
+    try {
+        const { teamId } = req.params;
+        const result = await espnService.getTeamLogo(teamId);
+        res.set('Content-Type', result.contentType);
+        res.set('Cache-Control', 'public, max-age=1800');
+        res.send(result.buffer);
+    } catch (err) {
+        console.error('[Sofascore] Team logo error:', err.message);
+        res.status(404).json({ success: false, message: 'Team logo not found' });
+    }
+});
+
+// Tournament logo — sequential fetch proxied through backend (caches 30 min)
+router.get('/v3/tournament-logo/:tournamentId', async (req, res) => {
+    try {
+        const { tournamentId } = req.params;
+        const result = await espnService.getTournamentLogo(tournamentId);
+        res.set('Content-Type', result.contentType);
+        res.set('Cache-Control', 'public, max-age=1800');
+        res.send(result.buffer);
+    } catch (err) {
+        console.error('[Sofascore] Tournament logo error:', err.message);
+        res.status(404).json({ success: false, message: 'Tournament logo not found' });
     }
 });
 

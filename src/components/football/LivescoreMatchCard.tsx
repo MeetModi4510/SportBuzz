@@ -1,13 +1,45 @@
 import React from 'react';
 import { cn } from "../../lib/utils";
-import { LivescoreMatch } from "../../hooks/football/useLivescore6Queries";
 import { Clock, MapPin } from "lucide-react";
 import { TeamLogo } from "../TeamLogo";
 import { formatToIST } from "../../lib/dateUtils";
 
+// Keep backward-compatible with LivescoreMatch type but also accept Sofascore matches
+type MatchLike = {
+  id: string;
+  apiId: string;
+  status: 'live' | 'upcoming' | 'completed';
+  leagueName: string;
+  homeTeam: { id: string; name: string; logo: string | null };
+  awayTeam: { id: string; name: string; logo: string | null };
+  homeScore: string;
+  awayScore: string;
+  startTime: string;
+  displayTime: string;
+  category?: string;
+  venue?: string;
+  [key: string]: any;
+};
+
+const API_BASE = import.meta.env.PROD
+  ? 'https://sportbuzz-backend.onrender.com'
+  : 'http://localhost:5000';
+
+/** Resolve any logo string to an actual URL */
+function resolveLogo(logo: string | null | undefined): string {
+  if (!logo) return '';
+  if (logo.startsWith('sofascore:team:')) {
+    return `${API_BASE}/api/football/v3/team-logo/${logo.replace('sofascore:team:', '')}`;
+  }
+  if (logo.startsWith('sofascore:tournament:')) {
+    return `${API_BASE}/api/football/v3/tournament-logo/${logo.replace('sofascore:tournament:', '')}`;
+  }
+  return logo;
+}
+
 interface LivescoreMatchCardProps {
-  match: LivescoreMatch;
-  onClick?: (match: LivescoreMatch) => void;
+  match: MatchLike;
+  onClick?: (match: MatchLike) => void;
   className?: string;
 }
 
@@ -169,7 +201,7 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
           
           {/* Home Team */}
           <div className="flex flex-col items-center gap-2 w-[40%]">
-            <TeamLogo logo={match.homeTeam.logo || ''} name={match.homeTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
+            <TeamLogo logo={resolveLogo(match.homeTeam.logo)} name={match.homeTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
             <span className="font-extrabold text-[13px] tracking-wider uppercase text-center line-clamp-2 drop-shadow-md mt-1">
               {match.homeTeam.name}
             </span>
@@ -189,7 +221,7 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
 
           {/* Away Team */}
           <div className="flex flex-col items-center gap-2 w-[40%]">
-            <TeamLogo logo={match.awayTeam.logo || ''} name={match.awayTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
+            <TeamLogo logo={resolveLogo(match.awayTeam.logo)} name={match.awayTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
             <span className="font-extrabold text-[13px] tracking-wider uppercase text-center line-clamp-2 drop-shadow-md mt-1">
               {match.awayTeam.name}
             </span>
