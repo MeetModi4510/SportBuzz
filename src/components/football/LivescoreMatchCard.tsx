@@ -46,6 +46,8 @@ const TEAM_COLORS: Record<string, string> = {
   'sweden': '#ca8a04', // Yellow
   'wales': '#991b1b', // Red
   'scotland': '#1e3a8a', // Navy
+  'saudi arabia': '#14532d', // Green
+  'bahrain': '#dc2626', // Red
 
   // Clubs
   'arsenal': '#7f1d1d',
@@ -83,8 +85,21 @@ const getTeamColor = (teamName: string, isHome: boolean) => {
     }
   }
 
-  // Fallbacks
-  return isHome ? '#081a3d' : '#474b54'; // Default to Navy (Home) and Slate Gray (Away)
+  // Generate a consistent color based on team name hash if not found
+  const hash = name.split("").reduce((acc, char) => {
+      return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+  const colors = [
+      "#7f1d1d", // Red
+      "#1e3a8a", // Blue
+      "#14532d", // Green
+      "#ca8a04", // Yellow/Gold
+      "#4c1d95", // Purple
+      "#9d174d", // Pink
+      "#0f766e", // Teal
+      "#b45309", // Orange
+  ];
+  return colors[Math.abs(hash) % colors.length];
 };
 
 export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatchCardProps) => {

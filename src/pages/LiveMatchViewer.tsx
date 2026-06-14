@@ -1461,7 +1461,66 @@ const LiveMatchViewer = () => {
                                                                 <div className="bg-slate-800/80 flex flex-col sm:flex-row">
                                                                     <div className="flex-1 p-3 pl-5 bg-gradient-to-r from-slate-800 to-slate-800/40 flex flex-col justify-center min-w-[200px]">
                                                                         <span className="text-white font-bold text-[15px]">{outBatsmanStat.name}</span>
-                                                                        <span className="text-red-400 text-xs font-semibold mt-0.5">{outBatsmanStat.dismissalText}</span>
+                                                                        {(() => {
+                                                                            const text = outBatsmanStat.dismissalText;
+                                                                            if (!text) return null;
+                                                                            
+                                                                            const cAndB = text.match(/^c\\s+(.+?)\\s+b\\s+(.+)$/);
+                                                                            if (cAndB) {
+                                                                                return (
+                                                                                    <span className="text-slate-400 text-sm mt-1">
+                                                                                        c <span className="font-bold text-amber-500">{cAndB[1]}</span> b <span className="font-bold text-amber-500">{cAndB[2]}</span>
+                                                                                    </span>
+                                                                                );
+                                                                            }
+                                                                            
+                                                                            const justB = text.match(/^b\\s+(.+)$/);
+                                                                            if (justB) {
+                                                                                return (
+                                                                                    <span className="text-slate-400 text-sm mt-1">
+                                                                                        b <span className="font-bold text-amber-500">{justB[1]}</span>
+                                                                                    </span>
+                                                                                );
+                                                                            }
+
+                                                                            const lbwB = text.match(/^lbw\\s+b\\s+(.+)$/);
+                                                                            if (lbwB) {
+                                                                                return (
+                                                                                    <span className="text-slate-400 text-sm mt-1">
+                                                                                        lbw b <span className="font-bold text-amber-500">{lbwB[1]}</span>
+                                                                                    </span>
+                                                                                );
+                                                                            }
+
+                                                                            const runOut = text.match(/^run out\\s+\\((.*?)\\)$/);
+                                                                            if (runOut) {
+                                                                                return (
+                                                                                    <span className="text-slate-400 text-sm mt-1">
+                                                                                        run out (<span className="font-bold text-amber-500">{runOut[1]}</span>)
+                                                                                    </span>
+                                                                                );
+                                                                            }
+                                                                            
+                                                                            const stAndB = text.match(/^st\\s+(.+?)\\s+b\\s+(.+)$/);
+                                                                            if (stAndB) {
+                                                                                return (
+                                                                                    <span className="text-slate-400 text-sm mt-1">
+                                                                                        st <span className="font-bold text-amber-500">{stAndB[1]}</span> b <span className="font-bold text-amber-500">{stAndB[2]}</span>
+                                                                                    </span>
+                                                                                );
+                                                                            }
+
+                                                                            const candB = text.match(/^c\\s+&\\s+b\\s+(.+)$/);
+                                                                            if (candB) {
+                                                                                return (
+                                                                                    <span className="text-slate-400 text-sm mt-1">
+                                                                                        c & b <span className="font-bold text-amber-500">{candB[1]}</span>
+                                                                                    </span>
+                                                                                );
+                                                                            }
+
+                                                                            return <span className="text-red-400 text-sm font-semibold mt-1 block">{text}</span>;
+                                                                        })()}
                                                                     </div>
                                                                     <div className="flex items-center justify-around gap-2 sm:gap-6 p-3 px-5 bg-slate-800 border-t sm:border-t-0 sm:border-l border-slate-700/60">
                                                                         <div className="text-center min-w-[3rem]">
@@ -1758,7 +1817,34 @@ const InningsScorecard = ({ inning, teamName, teamLogo, score, batStats, bowlSta
                                                 {!b.isOut && <span className="text-[10px] text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded">*</span>}
                                             </div>
                                         </div>
-                                        <p className="text-slate-500 text-[11px] ml-[52px]">{b.isOut ? b.dismissalText : "batting"}</p>
+                                        <div className="text-slate-500 text-[11px] ml-[52px]">
+                                            {b.isOut && b.dismissalText ? (
+                                                (() => {
+                                                    const text = b.dismissalText;
+                                                    const cAndB = text.match(/^c\\s+(.+?)\\s+b\\s+(.+)$/);
+                                                    if (cAndB) return <span>c <span className="font-bold text-slate-300">{cAndB[1]}</span> b <span className="font-bold text-slate-300">{cAndB[2]}</span></span>;
+                                                    
+                                                    const justB = text.match(/^b\\s+(.+)$/);
+                                                    if (justB) return <span>b <span className="font-bold text-slate-300">{justB[1]}</span></span>;
+
+                                                    const lbwB = text.match(/^lbw\\s+b\\s+(.+)$/);
+                                                    if (lbwB) return <span>lbw b <span className="font-bold text-slate-300">{lbwB[1]}</span></span>;
+
+                                                    const runOut = text.match(/^run out\\s+\\((.*?)\\)$/);
+                                                    if (runOut) return <span>run out (<span className="font-bold text-slate-300">{runOut[1]}</span>)</span>;
+                                                    
+                                                    const stAndB = text.match(/^st\\s+(.+?)\\s+b\\s+(.+)$/);
+                                                    if (stAndB) return <span>st <span className="font-bold text-slate-300">{stAndB[1]}</span> b <span className="font-bold text-slate-300">{stAndB[2]}</span></span>;
+
+                                                    const candB = text.match(/^c\\s+&\\s+b\\s+(.+)$/);
+                                                    if (candB) return <span>c & b <span className="font-bold text-slate-300">{candB[1]}</span></span>;
+
+                                                    return <span>{text}</span>;
+                                                })()
+                                            ) : (
+                                                <span className="text-emerald-500/70 font-medium">batting</span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="text-center text-white font-bold">{b.runs}</td>
                                     <td className="text-center text-slate-400">{b.balls}</td>

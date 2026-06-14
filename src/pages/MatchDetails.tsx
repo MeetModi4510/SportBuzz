@@ -1324,10 +1324,76 @@ const MatchDetails = () => {
                                       </div>
                                     </div>
                                     
-                                    <div className={cn("text-[10px] italic mt-3 mb-4 line-clamp-2 h-7 relative z-10 font-medium", 
-                                      isYetToBat ? "text-muted-foreground/40" : "text-muted-foreground/70"
+                                    <div className={cn("mt-3 mb-4 relative z-10", 
+                                      isYetToBat ? "opacity-50" : "opacity-100"
                                     )}>
-                                      {displayDismissal}
+                                      {(() => {
+                                        const text = typeof displayDismissal === 'string' ? displayDismissal.trim() : String(displayDismissal);
+                                        if (text === "Batting" || text === "Yet to bat" || text === "Not Out") {
+                                            return <span className={cn("text-xs font-semibold px-2 py-1 rounded-md", 
+                                                text === "Not Out" ? "bg-green-500/10 text-green-400" : "bg-primary/10 text-primary"
+                                            )}>{text}</span>;
+                                        }
+                                        
+                                        const cAndB = text.match(/^c\\s+(.+?)\\s+b\\s+(.+)$/i);
+                                        if (cAndB) return (
+                                            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                                                <span className="text-muted-foreground/60 font-medium">c</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{cAndB[1]}</span>
+                                                <span className="text-muted-foreground/60 font-medium">b</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{cAndB[2]}</span>
+                                            </div>
+                                        );
+                                        
+                                        const justB = text.match(/^b\\s+(.+)$/i);
+                                        if (justB) return (
+                                            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                                                <span className="text-muted-foreground/60 font-medium">b</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{justB[1]}</span>
+                                            </div>
+                                        );
+
+                                        const lbwB = text.match(/^[Il]bw\\s+b\\s+(.+)$/i);
+                                        if (lbwB) return (
+                                            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                                                <span className="text-muted-foreground/60 font-medium">lbw b</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{lbwB[1]}</span>
+                                            </div>
+                                        );
+
+                                        const runOut = text.match(/^run out\\s+\\((.*?)\\)$/i);
+                                        if (runOut) return (
+                                            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                                                <span className="text-muted-foreground/60 font-medium">run out</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{runOut[1]}</span>
+                                            </div>
+                                        );
+                                        
+                                        const stAndB = text.match(/^st\\s+(.+?)\\s+b\\s+(.+)$/i);
+                                        if (stAndB) return (
+                                            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                                                <span className="text-muted-foreground/60 font-medium">st</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{stAndB[1]}</span>
+                                                <span className="text-muted-foreground/60 font-medium">b</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{stAndB[2]}</span>
+                                            </div>
+                                        );
+
+                                        const candB = text.match(/^c\\s+&\\s+b\\s+(.+)$/i);
+                                        if (candB) return (
+                                            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                                                <span className="text-muted-foreground/60 font-medium">c & b</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{candB[1]}</span>
+                                            </div>
+                                        );
+
+                                        // Fallback
+                                        return (
+                                            <div className="flex flex-wrap items-center text-[11px]">
+                                                <span className="bg-white/5 border border-white/10 text-foreground/80 px-2 py-0.5 rounded-md font-medium">{text}</span>
+                                            </div>
+                                        );
+                                      })()}
                                     </div>
                                     
                                     <div className="grid grid-cols-4 gap-1 text-center border-t border-border/20 pt-3 relative z-10">

@@ -39,12 +39,38 @@ export const LiveStatCard = ({ atCrease, currentBowler, onBatsmanClick, onBowler
                                                 onClick={() => onBatsmanClick?.(b.name)}
                                             >
                                                 {b.name}
-                                                {i === 0 && (
+                                                {i === 0 && !b.isOut && (
                                                     <span className="inline-block animate-pulse">
                                                         <Zap size={10} className="text-blue-400 fill-blue-400" />
                                                     </span>
                                                 )}
                                             </p>
+                                            {b.isOut && b.dismissalText && (
+                                                <div className="text-slate-400 text-[11px] italic mt-0.5 truncate">
+                                                    {(() => {
+                                                        const text = b.dismissalText;
+                                                        const cAndB = text.match(/^c\\s+(.+?)\\s+b\\s+(.+)$/);
+                                                        if (cAndB) return <span>c <span className="font-bold text-amber-500 not-italic">{cAndB[1]}</span> b <span className="font-bold text-amber-500 not-italic">{cAndB[2]}</span></span>;
+                                                        
+                                                        const justB = text.match(/^b\\s+(.+)$/);
+                                                        if (justB) return <span>b <span className="font-bold text-amber-500 not-italic">{justB[1]}</span></span>;
+
+                                                        const lbwB = text.match(/^lbw\\s+b\\s+(.+)$/);
+                                                        if (lbwB) return <span>lbw b <span className="font-bold text-amber-500 not-italic">{lbwB[1]}</span></span>;
+
+                                                        const runOut = text.match(/^run out\\s+\\((.*?)\\)$/);
+                                                        if (runOut) return <span>run out (<span className="font-bold text-amber-500 not-italic">{runOut[1]}</span>)</span>;
+                                                        
+                                                        const stAndB = text.match(/^st\\s+(.+?)\\s+b\\s+(.+)$/);
+                                                        if (stAndB) return <span>st <span className="font-bold text-amber-500 not-italic">{stAndB[1]}</span> b <span className="font-bold text-amber-500 not-italic">{stAndB[2]}</span></span>;
+
+                                                        const candB = text.match(/^c\\s+&\\s+b\\s+(.+)$/);
+                                                        if (candB) return <span>c & b <span className="font-bold text-amber-500 not-italic">{candB[1]}</span></span>;
+
+                                                        return <span>{text}</span>;
+                                                    })()}
+                                                </div>
+                                            )}
                                             <div className="flex items-center gap-2 mt-0.5">
                                                 <span className="text-[10px] text-slate-500 bg-slate-800/50 px-1.5 py-0.5 rounded border border-slate-700/30">4s: <span className="text-blue-400 font-bold">{b.fours || 0}</span></span>
                                                 <span className="text-[10px] text-slate-500 bg-slate-800/50 px-1.5 py-0.5 rounded border border-slate-700/30">6s: <span className="text-purple-400 font-bold">{b.sixes || 0}</span></span>

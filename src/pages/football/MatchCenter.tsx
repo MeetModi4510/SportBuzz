@@ -100,36 +100,92 @@ const PLAYER_IMG_BASE = "https://lsm-static-prod.livescore.com/medium/";
 const TEAM_IMG_BASE   = "https://lsm-static-prod.livescore.com/medium/";
 
 const TEAM_COLORS: Record<string, string> = {
-  "portugal": "#7f1d1d",
-  "mexico": "#14532d",
-  "south africa": "#eab308",
-  "england": "#1e3a8a",
-  "brazil": "#eab308",
-  "argentina": "#38bdf8",
-  "france": "#1d4ed8",
-  "germany": "#000000",
-  "spain": "#dc2626",
-  "italy": "#1e3a8a",
-  "netherlands": "#f97316",
-  "belgium": "#dc2626",
-  "croatia": "#dc2626",
-  "uruguay": "#38bdf8",
-  "usa": "#1e3a8a",
-  "colombia": "#eab308",
-  "chile": "#dc2626",
-  "sweden": "#eab308",
-  "poland": "#dc2626",
-  "senegal": "#14532d",
-  "morocco": "#dc2626",
-  "japan": "#1d4ed8",
-  "south korea": "#dc2626",
-  "canada": "#dc2626"
+  // International
+  'portugal': '#7f1d1d', // Red
+  'argentina': '#0284c7', // Sky Blue
+  'brazil': '#ca8a04', // Yellow
+  'france': '#172554', // Navy
+  'england': '#1e3a8a', // Navy (Secondary)
+  'spain': '#991b1b', // Red
+  'italy': '#1e3a8a', // Blue
+  'germany': '#1c1917', // Black
+  'netherlands': '#c2410c', // Orange
+  'belgium': '#7f1d1d', // Red
+  'croatia': '#991b1b', // Red
+  'mexico': '#14532d', // Green
+  'south africa': '#064e3b', // Green/Gold
+  'south korea': '#7f1d1d', // Red
+  'czechia': '#991b1b', // Red
+  'nigeria': '#14532d', // Green
+  'costa rica': '#991b1b', // Red
+  'bolivia': '#14532d', // Green
+  'algeria': '#14532d', // Green
+  'usa': '#1e3a8a', // Navy
+  'canada': '#991b1b', // Red
+  'morocco': '#991b1b', // Red
+  'senegal': '#14532d', // Green
+  'japan': '#1e3a8a', // Blue
+  'uruguay': '#0284c7', // Sky Blue
+  'colombia': '#ca8a04', // Yellow
+  'chile': '#991b1b', // Red
+  'switzerland': '#991b1b', // Red
+  'denmark': '#991b1b', // Red
+  'poland': '#991b1b', // Red
+  'sweden': '#ca8a04', // Yellow
+  'wales': '#991b1b', // Red
+  'scotland': '#1e3a8a', // Navy
+  'saudi arabia': '#14532d', // Green
+  'bahrain': '#dc2626', // Red
+
+  // Clubs
+  'arsenal': '#7f1d1d',
+  'chelsea': '#1e3a8a',
+  'liverpool': '#7f1d1d',
+  'manchester city': '#0284c7',
+  'manchester united': '#7f1d1d',
+  'tottenham hotspur': '#1e293b',
+  'real madrid': '#1e293b',
+  'barcelona': '#7f1d1d',
+  'atletico madrid': '#7f1d1d',
+  'bayern munich': '#7f1d1d',
+  'borussia dortmund': '#ca8a04',
+  'paris saint-germain': '#172554',
+  'juventus': '#1c1917',
+  'inter': '#1e3a8a',
+  'ac milan': '#7f1d1d',
+  'napoli': '#0284c7',
+  'malaga': '#0284c7',
+  'las palmas': '#ca8a04',
 };
 
 const getTeamColor = (teamName: string, isHome: boolean) => {
   if (!teamName) return isHome ? "#081a3d" : "#474b54";
-  const color = TEAM_COLORS[teamName.toLowerCase()];
-  return color || (isHome ? "#081a3d" : "#474b54");
+  const name = teamName.toLowerCase().trim();
+  
+  if (TEAM_COLORS[name]) return TEAM_COLORS[name];
+  
+  // Try partial match
+  for (const [key, color] of Object.entries(TEAM_COLORS)) {
+    if (name.includes(key)) {
+      return color;
+    }
+  }
+  
+  // Generate a consistent color based on team name hash if not found
+  const hash = name.split("").reduce((acc, char) => {
+      return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+  const colors = [
+      "#7f1d1d", // Red
+      "#1e3a8a", // Blue
+      "#14532d", // Green
+      "#ca8a04", // Yellow/Gold
+      "#4c1d95", // Purple
+      "#9d174d", // Pink
+      "#0f766e", // Teal
+      "#b45309", // Orange
+  ];
+  return colors[Math.abs(hash) % colors.length];
 };
 
 // Incident-type to label & icon colour
