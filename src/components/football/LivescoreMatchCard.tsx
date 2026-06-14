@@ -170,8 +170,9 @@ const getTeamColor = (teamName: string, isHome: boolean) => {
 };
 
 export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatchCardProps) => {
-  const isLive = match.status === 'live';
-  const isUpcoming = match.status === 'upcoming';
+  const isLive = ['live', 'in', 'inprogress'].includes(match.status?.toLowerCase());
+  const isUpcoming = ['upcoming', 'pre'].includes(match.status?.toLowerCase());
+  const displayTime = match.displayTime || match.statusDetail;
 
   const homeColor = getTeamColor(match.homeTeam.name, true);
   const awayColor = getTeamColor(match.awayTeam.name, false);
@@ -226,7 +227,7 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
               "text-[10px] tracking-widest font-bold uppercase drop-shadow-md",
               isLive ? "text-emerald-500" : "text-white/70"
             )}>
-              {isLive ? match.displayTime : (isUpcoming ? 'Upcoming' : match.displayTime || 'FT')}
+              {isLive ? displayTime : (isUpcoming ? 'Upcoming' : displayTime || 'FT')}
             </span>
           </div>
         </div>
