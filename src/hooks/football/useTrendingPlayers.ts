@@ -37,7 +37,11 @@ const NATIONAL_TEAMS = [
   'uruguay', 'colombia', 'usa', 'united states', 'mexico', 'germany', 'senegal', 'japan', 'switzerland', 'morocco',
   'iran', 'denmark', 'korea republic', 'south korea', 'australia', 'ukraine', 'austria', 'sweden', 'poland', 'wales',
   'hungary', 'serbia', 'peru', 'ecuador', 'chile', 'turkey', 'scotland', 'nigeria', 'romania', 'costa rica',
-  'cameroon', 'algeria', 'canada', 'egypt', 'norway', 'czech republic', 'slovakia', 'paraguay', 'venezuela', 'bolivia'
+  'cameroon', 'algeria', 'canada', 'egypt', 'norway', 'czech republic', 'slovakia', 'paraguay', 'venezuela', 'bolivia',
+  'saudi arabia', 'qatar', 'ghana', 'ivory coast', "cote d'ivoire", 'tunisia', 'mali', 'south africa', 'dr congo', 'burkina faso',
+  'ireland', 'republic of ireland', 'northern ireland', 'iceland', 'greece', 'bosnia', 'bosnia and herzegovina', 'slovenia', 'finland', 'georgia',
+  'albania', 'jamaica', 'panama', 'honduras', 'el salvador', 'new zealand', 'uzbekistan', 'iraq', 'uae', 'united arab emirates',
+  'oman', 'china', 'china pr', 'syria', 'bahrain', 'jordan', 'palestine', 'indonesia', 'vietnam', 'thailand'
 ];
 
 const fetchTrendingPlayers = async (): Promise<TrendingPlayersResponse> => {

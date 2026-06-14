@@ -45,15 +45,14 @@ interface LivescoreMatchCardProps {
 
 const TEAM_COLORS: Record<string, string> = {
   // International
-  'portugal': '#7f1d1d', // Red
   'argentina': '#0284c7', // Sky Blue
   'brazil': '#ca8a04', // Yellow
-  'france': '#172554', // Navy
+  'france': '#002654', // Navy
   'england': '#1e3a8a', // Navy (Secondary)
-  'spain': '#991b1b', // Red
+  'spain': '#C60B1E', // Red
   'italy': '#1e3a8a', // Blue
   'germany': '#1c1917', // Black
-  'netherlands': '#c2410c', // Orange
+  'netherlands': '#FF6F00', // Orange
   'belgium': '#7f1d1d', // Red
   'croatia': '#991b1b', // Red
   'mexico': '#14532d', // Green
@@ -66,20 +65,48 @@ const TEAM_COLORS: Record<string, string> = {
   'algeria': '#14532d', // Green
   'usa': '#1e3a8a', // Navy
   'canada': '#991b1b', // Red
-  'morocco': '#991b1b', // Red
-  'senegal': '#14532d', // Green
-  'japan': '#1e3a8a', // Blue
-  'uruguay': '#0284c7', // Sky Blue
+  'morocco': '#C1272D', // Red
+  'senegal': '#00853F', // Green
+  'japan': '#0033A0', // Blue
+  'uruguay': '#6EC6FF', // Sky Blue
   'colombia': '#ca8a04', // Yellow
   'chile': '#991b1b', // Red
-  'switzerland': '#991b1b', // Red
+  'switzerland': '#D52B1E', // Red
   'denmark': '#991b1b', // Red
   'poland': '#991b1b', // Red
-  'sweden': '#ca8a04', // Yellow
+  'sweden': '#FFCD00', // Yellow
   'wales': '#991b1b', // Red
   'scotland': '#1e3a8a', // Navy
-  'saudi arabia': '#14532d', // Green
+  'saudi arabia': '#006C35', // Green
   'bahrain': '#dc2626', // Red
+  'haiti': '#0057B8',
+  'bosnia and herzegovina': '#0057B8',
+  'australia': '#ca8a04',
+  'turkiye': '#E30A17',
+  'paraguay': '#D52B1E',
+  'qatar': '#8A1538',
+  'tunisia': '#E70013',
+  'cape verde': '#003893',
+  'egypt': '#CE1126',
+  'iran': '#239F40',
+  'curacao': '#0055A4',
+  'ivory coast': '#F77F00',
+  'ecuador': '#FFD100',
+  'new zealand': '#000000',
+  'iraq': '#007A3D',
+  'norway': '#BA0C2F',
+  'austria': '#ED2939',
+  'jordan': '#CE1126',
+  'portugal': '#D00027',
+  'dr congo': '#007FFF',
+  'uzbekistan': '#0099B5',
+  'ghana': '#FCD116',
+  'panama': '#D21034',
+  'india': '#0033A0',
+
+
+
+
 
   // Clubs
   'arsenal': '#7f1d1d',
@@ -89,8 +116,8 @@ const TEAM_COLORS: Record<string, string> = {
   'manchester united': '#7f1d1d',
   'tottenham hotspur': '#1e293b',
   'real madrid': '#1e293b',
-  'barcelona': '#7f1d1d',
-  'atletico madrid': '#7f1d1d',
+  'barcelona': '#A50044',
+  'atletico madrid': '#CE3524',
   'bayern munich': '#7f1d1d',
   'borussia dortmund': '#ca8a04',
   'paris saint-germain': '#172554',
@@ -100,16 +127,19 @@ const TEAM_COLORS: Record<string, string> = {
   'napoli': '#0284c7',
   'malaga': '#0284c7',
   'las palmas': '#ca8a04',
+  'inter miami': '#F7B5CD',
+  'sevilla': '#D71920',
+  'villareal': '#FFF200',
 };
 
 const getTeamColor = (teamName: string, isHome: boolean) => {
   const name = teamName.toLowerCase().trim();
-  
+
   // Try exact match
   if (TEAM_COLORS[name]) {
     return TEAM_COLORS[name];
   }
-  
+
   // Try partial match
   for (const [key, color] of Object.entries(TEAM_COLORS)) {
     if (name.includes(key)) {
@@ -119,17 +149,17 @@ const getTeamColor = (teamName: string, isHome: boolean) => {
 
   // Generate a consistent color based on team name hash if not found
   const hash = name.split("").reduce((acc, char) => {
-      return char.charCodeAt(0) + ((acc << 5) - acc);
+    return char.charCodeAt(0) + ((acc << 5) - acc);
   }, 0);
   const colors = [
-      "#7f1d1d", // Red
-      "#1e3a8a", // Blue
-      "#14532d", // Green
-      "#ca8a04", // Yellow/Gold
-      "#4c1d95", // Purple
-      "#9d174d", // Pink
-      "#0f766e", // Teal
-      "#b45309", // Orange
+    "#7f1d1d", // Red
+    "#1e3a8a", // Blue
+    "#14532d", // Green
+    "#ca8a04", // Yellow/Gold
+    "#4c1d95", // Purple
+    "#9d174d", // Pink
+    "#0f766e", // Teal
+    "#b45309", // Orange
   ];
   return colors[Math.abs(hash) % colors.length];
 };
@@ -152,24 +182,24 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
     >
       {/* Right Background Layer */}
       <div className="absolute inset-0 z-0" style={{ backgroundColor: awayColor }} />
-      
+
       {/* Skewed Left Background */}
-      <div 
-        className="absolute inset-y-0 w-[65%] z-0" 
-        style={{ 
-          left: '-15%', 
+      <div
+        className="absolute inset-y-0 w-[65%] z-0"
+        style={{
+          left: '-15%',
           backgroundColor: homeColor,
-          transform: 'skewX(-15deg)', 
-          transformOrigin: 'center' 
-        }} 
+          transform: 'skewX(-15deg)',
+          transformOrigin: 'center'
+        }}
       />
 
       {/* Gold Separator Line */}
-      <div 
+      <div
         className="absolute inset-y-0 w-[3px] bg-yellow-500 z-0"
-        style={{ 
-          left: '50%', 
-          transform: 'skewX(-15deg) translateX(-50%)', 
+        style={{
+          left: '50%',
+          transform: 'skewX(-15deg) translateX(-50%)',
           transformOrigin: 'center',
           boxShadow: '0 0 10px rgba(234,179,8,0.5)'
         }}
@@ -177,7 +207,7 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
 
       {/* Content Layer */}
       <div className="relative z-10 p-5 flex flex-col h-full text-white">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -188,8 +218,8 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
           <div className="flex items-center gap-2">
             {isLive && <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />}
             <span className={cn(
-                "text-[10px] tracking-widest font-bold uppercase drop-shadow-md", 
-                isLive ? "text-emerald-500" : "text-white/70"
+              "text-[10px] tracking-widest font-bold uppercase drop-shadow-md",
+              isLive ? "text-emerald-500" : "text-white/70"
             )}>
               {isLive ? match.displayTime : (isUpcoming ? 'Upcoming' : match.displayTime || 'FT')}
             </span>
@@ -198,10 +228,16 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
 
         {/* Teams & VS */}
         <div className="flex items-center justify-between flex-1 relative px-1 py-2">
-          
+
           {/* Home Team */}
           <div className="flex flex-col items-center gap-2 w-[40%]">
-            <TeamLogo logo={resolveLogo(match.homeTeam.logo)} name={match.homeTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
+            {match.homeTeam.name.toLowerCase() === 'switzerland' ? (
+              <div className="p-2 rounded-full bg-white shadow-lg">
+                <TeamLogo logo={resolveLogo(match.homeTeam.logo)} name={match.homeTeam.name} size="lg" className="w-10 h-10 object-contain drop-shadow-sm" />
+              </div>
+            ) : (
+              <TeamLogo logo={resolveLogo(match.homeTeam.logo)} name={match.homeTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
+            )}
             <span className="font-extrabold text-[13px] tracking-wider uppercase text-center line-clamp-2 drop-shadow-md mt-1">
               {match.homeTeam.name}
             </span>
@@ -221,7 +257,13 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
 
           {/* Away Team */}
           <div className="flex flex-col items-center gap-2 w-[40%]">
-            <TeamLogo logo={resolveLogo(match.awayTeam.logo)} name={match.awayTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
+            {match.awayTeam.name.toLowerCase() === 'switzerland' ? (
+              <div className="p-2 rounded-full bg-white shadow-lg">
+                <TeamLogo logo={resolveLogo(match.awayTeam.logo)} name={match.awayTeam.name} size="lg" className="w-10 h-10 object-contain drop-shadow-sm" />
+              </div>
+            ) : (
+              <TeamLogo logo={resolveLogo(match.awayTeam.logo)} name={match.awayTeam.name} size="lg" className="w-14 h-14 object-contain drop-shadow-xl" />
+            )}
             <span className="font-extrabold text-[13px] tracking-wider uppercase text-center line-clamp-2 drop-shadow-md mt-1">
               {match.awayTeam.name}
             </span>
@@ -243,7 +285,7 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
           <div className="flex items-center gap-1.5 drop-shadow-md">
             <Clock size={12} className="text-yellow-400" />
             <span>
-                {formatToIST(new Date(match.startTime), 'full')}
+              {formatToIST(new Date(match.startTime), 'full')}
             </span>
           </div>
         </div>
