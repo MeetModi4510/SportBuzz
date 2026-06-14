@@ -67,6 +67,8 @@ export const useEspnMatchDetail = (
       return res.data;
     },
     ...STALE_30_MIN,
+    staleTime: 1 * 60 * 1000, // Reduce stale time to 1 min for live updates
+    refetchInterval: 310 * 1000, // Auto-fetch every 310 seconds (slightly longer than backend cache)
     enabled: enabled && !!matchId,
   });
 };

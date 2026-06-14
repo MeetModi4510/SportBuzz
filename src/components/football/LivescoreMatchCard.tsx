@@ -98,7 +98,7 @@ const TEAM_COLORS: Record<string, string> = {
   'austria': '#ED2939',
   'jordan': '#CE1126',
   'portugal': '#D00027',
-  'dr congo': '#007FFF',
+  'congo dr': '#007FFF',
   'uzbekistan': '#0099B5',
   'ghana': '#FCD116',
   'panama': '#D21034',
@@ -133,7 +133,12 @@ const TEAM_COLORS: Record<string, string> = {
 };
 
 const getTeamColor = (teamName: string, isHome: boolean) => {
-  const name = teamName.toLowerCase().trim();
+  // Normalize string to remove diacritics (e.g., Curaçao -> curacao, Türkiye -> turkiye)
+  const name = teamName
+    .toLowerCase()
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
   // Try exact match
   if (TEAM_COLORS[name]) {

@@ -114,9 +114,11 @@ export async function getUpcomingMatches() {
     if (cache.has(cacheKey)) return cache.get(cacheKey);
 
     const now = new Date();
+    // Use a 1-day buffer backwards to ensure we don't miss matches that are "Upcoming" in IST but still "Yesterday" in ESPN's timezone (EST)
+    const yesterday = new Date(now.getTime() - (1 * 24 * 60 * 60 * 1000));
     const twoDaysFromNow = new Date(now.getTime() + (2 * 24 * 60 * 60 * 1000));
     
-    const datesStr = `${formatDateParam(now)}-${formatDateParam(twoDaysFromNow)}`;
+    const datesStr = `${formatDateParam(yesterday)}-${formatDateParam(twoDaysFromNow)}`;
 
     const promises = TOP_LEAGUES.map(league => fetchLeagueMatches(league.id, datesStr));
     const results = await Promise.allSettled(promises);
@@ -140,9 +142,11 @@ export async function getRecentMatches() {
     if (cache.has(cacheKey)) return cache.get(cacheKey);
 
     const now = new Date();
-    const twoDaysAgo = new Date(now.getTime() - (2 * 24 * 60 * 60 * 1000));
+    // Use a 3-day window back and 1-day window forward to cover timezone differences
+    const threeDaysAgo = new Date(now.getTime() - (3 * 24 * 60 * 60 * 1000));
+    const tomorrow = new Date(now.getTime() + (1 * 24 * 60 * 60 * 1000));
     
-    const datesStr = `${formatDateParam(twoDaysAgo)}-${formatDateParam(now)}`;
+    const datesStr = `${formatDateParam(threeDaysAgo)}-${formatDateParam(tomorrow)}`;
 
     const promises = TOP_LEAGUES.map(league => fetchLeagueMatches(league.id, datesStr));
     const results = await Promise.allSettled(promises);
@@ -154,7 +158,7 @@ export async function getRecentMatches() {
         
     const recentMatches = allMatches
         .filter(m => m.status === 'finished')
-        .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
+        .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()) // sort desc
         .slice(0, 60);
         
     cache.set(cacheKey, recentMatches, 300);
@@ -174,7 +178,7 @@ export async function getMatchDetail(matchId) {
         }
         
         const data = res.data;
-        cache.set(cacheKey, data, 300);
+        cache.set(cacheKey, data, 300); // Reverted back to 300 seconds as requested
         return data;
     } catch (error) {
         console.error(`Error fetching ESPN summary for ${matchId}:`, error.message);

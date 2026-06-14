@@ -143,7 +143,7 @@ const Favorites = () => {
                 {filteredMatches.map((match) => (
                   <Card
                     key={match._id}
-                    onClick={() => navigate(`/match/${match.matchId}`)}
+                    onClick={() => navigate(match.sport === 'football' ? `/football/match/${match.matchId}` : `/match/${match.matchId}`)}
                     className="bg-slate-900 border-slate-700 hover:border-slate-500 transition cursor-pointer"
                   >
                     <CardContent className="pt-6">
