@@ -391,9 +391,8 @@ export default function MatchCenter() {
                      <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground">{homeTeam.name}</h2>
                      <span className="text-sm md:text-base text-muted-foreground tracking-widest mt-1 uppercase">{homeTeam.abbreviation}</span>
                   </div>
-                  <div className="shrink-0 hidden md:block relative rounded-full shadow-[0_0_30px_rgba(0,0,0,0.5)] border-2 border-white/10 overflow-hidden">
-                     <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/20 z-10 mix-blend-overlay"></div>
-                     <TeamLogo logo={getFlagUrl(homeTeam)} name={homeTeam.name} className="w-16 h-16 md:w-24 md:h-24 object-cover scale-110" />
+                  <div className="shrink-0 hidden md:block relative">
+                     <TeamLogo logo={getFlagUrl(homeTeam)} name={homeTeam.name} className="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" />
                   </div>
                </div>
                <div className="w-full text-right pr-2 mt-2">
@@ -415,9 +414,8 @@ export default function MatchCenter() {
             {/* Away Team */}
             <div className="flex flex-col flex-1 items-start w-full md:w-auto mt-4 md:mt-0">
                <div className="flex items-center gap-5 md:gap-6 justify-start w-full flex-row-reverse md:flex-row">
-                  <div className="shrink-0 hidden md:block relative rounded-full shadow-[0_0_30px_rgba(0,0,0,0.5)] border-2 border-white/10 overflow-hidden">
-                     <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/20 z-10 mix-blend-overlay"></div>
-                     <TeamLogo logo={getFlagUrl(awayTeam)} name={awayTeam.name} className="w-16 h-16 md:w-24 md:h-24 object-cover scale-110" />
+                  <div className="shrink-0 hidden md:block relative">
+                     <TeamLogo logo={getFlagUrl(awayTeam)} name={awayTeam.name} className="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" />
                   </div>
                   <div className="flex flex-col items-start text-left">
                      <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground">{awayTeam.name}</h2>
@@ -431,13 +429,11 @@ export default function MatchCenter() {
 
             {/* Mobile Logos (hidden on desktop, replaces the side logos) */}
             <div className="flex items-center justify-center gap-12 w-full md:hidden mt-6 mb-4">
-               <div className="shrink-0 relative rounded-full shadow-[0_0_20px_rgba(0,0,0,0.5)] border-2 border-white/10 overflow-hidden">
-                  <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/20 z-10 mix-blend-overlay"></div>
-                  <TeamLogo logo={getFlagUrl(homeTeam)} name={homeTeam.name} className="w-16 h-16 object-cover scale-110" />
+               <div className="shrink-0 relative">
+                  <TeamLogo logo={getFlagUrl(homeTeam)} name={homeTeam.name} className="w-16 h-16 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" />
                </div>
-               <div className="shrink-0 relative rounded-full shadow-[0_0_20px_rgba(0,0,0,0.5)] border-2 border-white/10 overflow-hidden">
-                  <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/20 z-10 mix-blend-overlay"></div>
-                  <TeamLogo logo={getFlagUrl(awayTeam)} name={awayTeam.name} className="w-16 h-16 object-cover scale-110" />
+               <div className="shrink-0 relative">
+                  <TeamLogo logo={getFlagUrl(awayTeam)} name={awayTeam.name} className="w-16 h-16 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" />
                </div>
             </div>
 
