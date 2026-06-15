@@ -12,40 +12,38 @@ interface LineupPlayerImageProps {
 const imageCache = new Map<string, string | null>();
 const pendingRequests = new Map<string, Promise<string | null>>();
 
-const TSDB_BASE = 'https://www.thesportsdb.com/api/v1/json/3';
+const API_BASE = import.meta.env.PROD
+  ? 'https://sportbuzz-backend.onrender.com'
+  : 'http://localhost:5000';
 
 async function fetchPlayerImage(playerName: string): Promise<string | null> {
     const key = playerName.toLowerCase().trim();
 
-    // Return from cache immediately
-    if (imageCache.has(key)) return imageCache.get(key)!;
+    // Return from cache immediately, BUT ONLY if it's a valid URL.
+    if (imageCache.has(key) && imageCache.get(key) !== null) {
+        return imageCache.get(key)!;
+    }
 
     // If there's already a pending request for this player, reuse it
     if (pendingRequests.has(key)) return pendingRequests.get(key)!;
 
     const promise = (async () => {
         try {
+            // Hit our backend proxy instead of TheSportsDB directly!
             const res = await axios.get(
-                `${TSDB_BASE}/searchplayers.php?p=${encodeURIComponent(playerName)}`,
+                `${API_BASE}/api/football/v3/image/player?name=${encodeURIComponent(playerName)}`,
                 { timeout: 8000 }
             );
 
-            if (res.data?.player?.length > 0) {
-                // Find the first soccer player
-                const player = res.data.player.find((p: any) => p.strSport === 'Soccer');
-                if (player) {
-                    const imgUrl = player.strCutout || player.strThumb || player.strRender;
-                    if (imgUrl) {
-                        imageCache.set(key, imgUrl);
-                        return imgUrl;
-                    }
-                }
+            // Our proxy returns { url: "..." } or { url: null }
+            if (res.data && res.data.url) {
+                imageCache.set(key, res.data.url);
+                return res.data.url;
             }
 
-            imageCache.set(key, null);
+            // Don't permanently cache null to allow future retries
             return null;
         } catch {
-            imageCache.set(key, null);
             return null;
         } finally {
             pendingRequests.delete(key);
@@ -56,40 +54,6 @@ async function fetchPlayerImage(playerName: string): Promise<string | null> {
     return promise;
 }
 
-// ─── Throttled queue to avoid hammering the API ─────────────────────────────
-// Processes one request every 150ms so a lineup of 22 players takes ~3.3s
-const queue: Array<{ name: string; resolve: (v: string | null) => void }> = [];
-let isProcessing = false;
-
-async function processQueue() {
-    if (isProcessing) return;
-    isProcessing = true;
-
-    while (queue.length > 0) {
-        const item = queue.shift()!;
-        const result = await fetchPlayerImage(item.name);
-        item.resolve(result);
-        // Small delay between requests to be nice to the free API
-        if (queue.length > 0) {
-            await new Promise(r => setTimeout(r, 150));
-        }
-    }
-
-    isProcessing = false;
-}
-
-function queueFetch(playerName: string): Promise<string | null> {
-    const key = playerName.toLowerCase().trim();
-
-    // If already cached, return immediately
-    if (imageCache.has(key)) return Promise.resolve(imageCache.get(key)!);
-
-    return new Promise(resolve => {
-        queue.push({ name: playerName, resolve });
-        processQueue();
-    });
-}
-
 // ─── Component ──────────────────────────────────────────────────────────────
 export const LineupPlayerImage = ({ playerId, playerName, className, fallbackInitials }: LineupPlayerImageProps) => {
     const [imgUrl, setImgUrl] = useState<string | null>(() => {
@@ -98,29 +62,26 @@ export const LineupPlayerImage = ({ playerId, playerName, className, fallbackIni
         return cached || null;
     });
     const [hasError, setHasError] = useState(false);
-    const [loading, setLoading] = useState(() => {
-        return !imageCache.has(playerName.toLowerCase().trim());
-    });
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         let isMounted = true;
         const key = playerName.toLowerCase().trim();
 
-        // Already cached
-        if (imageCache.has(key)) {
+        // Already cached successfully
+        if (imageCache.has(key) && imageCache.get(key) !== null) {
             const cached = imageCache.get(key);
-            if (cached) {
-                setImgUrl(cached);
-                setLoading(false);
-            } else {
-                setHasError(true);
-                setLoading(false);
-            }
+            setImgUrl(cached!);
+            setLoading(false);
             return;
         }
 
-        // Queue the fetch
-        queueFetch(playerName).then(url => {
+        // Reset error state on new fetch
+        setHasError(false);
+        setLoading(true);
+
+        // Fetch immediately without artificial queue delay
+        fetchPlayerImage(playerName).then(url => {
             if (!isMounted) return;
             if (url) {
                 setImgUrl(url);
@@ -133,22 +94,17 @@ export const LineupPlayerImage = ({ playerId, playerName, className, fallbackIni
         return () => { isMounted = false; };
     }, [playerName]);
 
-    // Generate Initials
-    const initials = fallbackInitials || playerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-
+    // If it's loading, or no image found, render absolutely nothing!
+    // This perfectly allows the parent component's background (like the blue/red circle AND the jersey number) to show through naturally without any overlapping divs!
     if (!imgUrl || hasError) {
-        return (
-            <div className={`w-full h-full bg-[#1a1a2e] flex items-center justify-center font-black text-white ${className || ''}`}>
-                <span className="opacity-90 text-sm">{initials}</span>
-            </div>
-        );
+        return null;
     }
 
     return (
         <img 
             src={imgUrl} 
             alt={playerName}
-            className={`w-full h-full object-cover ${className || ''}`}
+            className={`w-full h-full object-cover object-top scale-[1.15] translate-y-1 ${className || ''}`}
             onError={() => setHasError(true)}
         />
     );
