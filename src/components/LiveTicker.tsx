@@ -9,10 +9,18 @@ import { ChevronLeft, ChevronRight, Loader2, Bell } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import type { Match } from "@/data/types";
 import { TeamLogo } from "./TeamLogo";
+import { FootballTeamLogo } from "./football/FootballTeamLogo";
+
+import { useEspnLiveMatches } from "@/hooks/football/useEspnQueries";
 
 export const LiveTicker = () => {
-  const mockLiveMatches = getLiveMatches().filter((m: Match) => m.sport !== "cricket");
-  const { data: cricketFeatured, isLoading } = useFeaturedCricketMatches();
+  // Remove both cricket AND football from mock matches (since we fetch them dynamically)
+  const mockLiveMatches = getLiveMatches().filter((m: Match) => m.sport !== "cricket" && m.sport !== "football");
+  const { data: cricketFeatured, isLoading: isCricketLoading } = useFeaturedCricketMatches();
+  
+  // Pass `false` to prevent direct API fetches! This will purely read from the shared cache.
+  // When other components (like the Match Center) fetch/update the data, this ticker will instantly sync!
+  const { data: espnLiveMatches } = useEspnLiveMatches(false);
 
   // Followed tournament live matches
   const [tournamentList, setTournamentList] = useState<{ _id: string; name: string; isFootball?: boolean }[]>([]);
@@ -70,12 +78,38 @@ export const LiveTicker = () => {
         ...(cricketFeatured.t20 || []),
       ];
     }
-    const allPotential = [...followedAsTicker, ...cricket, ...mockLiveMatches] as any[];
+    
+    let football: any[] = [];
+    const actualFootballMatches = espnLiveMatches?.data || (Array.isArray(espnLiveMatches) ? espnLiveMatches : []);
+    
+    if (actualFootballMatches && actualFootballMatches.length > 0) {
+      football = actualFootballMatches.map((m: any) => ({
+        _id: m.id,
+        sport: "football",
+        matchType: m.leagueName || "Football Match",
+        status: "live",
+        homeTeam: {
+          name: m.homeTeam?.name || "Team 1",
+          shortName: getTeamAcronym(m.homeTeam?.name || ""),
+          logo: m.homeTeam?.logo || "",
+        },
+        awayTeam: {
+          name: m.awayTeam?.name || "Team 2",
+          shortName: getTeamAcronym(m.awayTeam?.name || ""),
+          logo: m.awayTeam?.logo || "",
+        },
+        homeScore: m.homeScore,
+        awayScore: m.awayScore,
+      }));
+    }
+
+    const allPotential = [...followedAsTicker, ...football, ...cricket, ...mockLiveMatches] as any[];
     const liveOnly = allPotential.filter(m => m.status === "live");
     return liveOnly.length > 0 ? liveOnly : allPotential;
-  }, [cricketFeatured, mockLiveMatches, followedAsTicker]);
+  }, [cricketFeatured, espnLiveMatches, mockLiveMatches, followedAsTicker]);
 
-  if (isLoading) {
+  // Only check cricket loading so we don't hang if football is just waiting for cache
+  if (isCricketLoading) {
     return (
       <div className="relative overflow-hidden border-b bg-card/40 border-border/30 backdrop-blur-sm h-10 flex items-center transition-all duration-200">
         <div className="relative flex items-center justify-center p-4 gap-3 w-full">
@@ -144,7 +178,11 @@ export const LiveTicker = () => {
                        {/* Match Teams and Scores */}
                        <div className="flex items-center">
                          <div className="flex items-center justify-end gap-2 md:gap-3 pr-4 md:pr-5 border-r border-transparent">
-                           <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="sm" className="w-5 h-5 md:w-6 md:h-6 drop-shadow-md" />
+                           {match.sport === 'football' ? (
+                             <FootballTeamLogo logo={match.homeTeam?.logo || null} name={match.homeTeam?.name || "Team 1"} size="md" className="w-7 h-7 md:w-8 md:h-8 drop-shadow-md" />
+                           ) : (
+                             <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="md" className="w-7 h-7 md:w-8 md:h-8 drop-shadow-md" />
+                           )}
                            <span className="font-bold text-sm md:text-base text-foreground uppercase tracking-wider">{match.homeTeam?.shortName}</span>
                            <span className="font-extrabold text-base md:text-lg text-foreground ml-1">{homeScore}</span>
                          </div>
@@ -153,10 +191,14 @@ export const LiveTicker = () => {
                            <span className="text-muted-foreground/40 font-medium text-xs tracking-wider uppercase">vs</span>
                          </div>
                          
-                         <div className="flex items-center justify-start gap-2 md:gap-3 pl-4 md:pl-5 border-l border-transparent">
+                         <div className="flex items-center justify-start gap-2 md:gap-3 pl-4 md:pl-5 pr-2 md:pr-3 border-l border-transparent">
                            <span className="font-extrabold text-base md:text-lg text-foreground mr-1">{awayScore}</span>
                            <span className="font-bold text-sm md:text-base text-foreground uppercase tracking-wider">{match.awayTeam?.shortName}</span>
-                           <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="sm" className="w-5 h-5 md:w-6 md:h-6 drop-shadow-md" />
+                           {match.sport === 'football' ? (
+                             <FootballTeamLogo logo={match.awayTeam?.logo || null} name={match.awayTeam?.name || "Team 2"} size="md" className="w-7 h-7 md:w-8 md:h-8 drop-shadow-md shrink-0" />
+                           ) : (
+                             <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="md" className="w-7 h-7 md:w-8 md:h-8 drop-shadow-md shrink-0" />
+                           )}
                          </div>
                        </div>
 
