@@ -301,8 +301,8 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
             text = text.toLowerCase();
             teamName = teamName.toLowerCase();
 
-            const isHome = teamId === homeTeamObj.id || teamName === homeTeamObj.name?.toLowerCase() || text.includes(homeTeamName.toLowerCase());
-            const isAway = teamId === awayTeamObj.id || teamName === awayTeamObj.name?.toLowerCase() || text.includes(awayTeamName.toLowerCase());
+            const isHome = teamId === homeTeamObj.id || (teamName && teamName === homeTeamObj.name?.toLowerCase());
+            const isAway = teamId === awayTeamObj.id || (teamName && teamName === awayTeamObj.name?.toLowerCase());
 
             let pts = 0;
             const isActualGoal = typeText === 'goal' || typeText === 'penalty - scored' || typeText === 'own goal';
@@ -310,8 +310,7 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
             if (isActualGoal) {
                 pts = 50;
                 let goalForTeam = isHome ? 'home' : (isAway ? 'away' : '');
-                if (!goalForTeam && text.includes(homeTeamName.toLowerCase())) goalForTeam = 'home';
-                if (!goalForTeam && text.includes(awayTeamName.toLowerCase())) goalForTeam = 'away';
+                // Do not fallback to text.includes for goals, it causes wrong team assignment!
                 if (goalForTeam) goalMinutes[min] = goalForTeam;
             }
             else if (typeText.includes('missed') || typeText.includes('saved') || typeText.includes('shot') || typeText.includes('attempt') || text.includes('attempt') || text.includes('shot')) {
@@ -342,8 +341,10 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
 
         if (matchData.keyEvents) {
             matchData.keyEvents.forEach((e: any) => {
-                const minText = e.clock?.time || e.time || '0';
-                const min = parseInt(minText.toString().split("'")[0] || '0');
+                const minText = (e.clock?.time || e.time || '').toString();
+                const minMatch = minText.match(/\d+/);
+                if (!minMatch && minText !== '0') return; // Skip if no valid number is found
+                const min = minMatch ? parseInt(minMatch[0]) : 0;
                 const teamId = e.team?.id;
                 const teamName = e.team?.displayName || '';
                 processEvent(min, teamId, teamName, e.type?.text || '', e.text || '');
@@ -352,8 +353,10 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
         
         if (matchData.commentary) {
             matchData.commentary.forEach((c: any) => {
-                const minText = c.time?.displayValue || '0';
-                const min = parseInt(minText.toString().split("'")[0] || '0');
+                const minText = (c.time?.displayValue || '').toString();
+                const minMatch = minText.match(/\d+/);
+                if (!minMatch && minText !== '0') return; // Skip if no valid number is found
+                const min = minMatch ? parseInt(minMatch[0]) : 0;
                 const teamId = c.play?.team?.id || c.team?.id;
                 const teamName = c.play?.team?.displayName || c.team?.displayName || '';
                 processEvent(min, teamId, teamName, c.play?.type?.text || '', c.text || c.play?.text || '');

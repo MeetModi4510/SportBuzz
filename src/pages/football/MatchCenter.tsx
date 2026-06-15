@@ -343,7 +343,7 @@ export default function MatchCenter() {
       >
         <div className="relative mt-0.5">
           <div className="relative w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-sm font-bold shadow-[0_4px_12px_rgba(0,0,0,0.6)] border-[3px] overflow-hidden bg-secondary" style={{ borderColor: teamColor }}>
-            <span className="absolute inset-0 flex items-center justify-center text-white/50 font-black text-xl z-0 drop-shadow-md">{p.jersey}</span>
+            <span className="absolute inset-0 flex items-center justify-center text-muted-foreground font-black text-xl z-0 drop-shadow-md">{p.jersey}</span>
             <LineupPlayerImage playerId={p.athlete.id} playerName={p.athlete.displayName} className="absolute inset-0 w-full h-full object-cover z-10 bg-secondary" />
           </div>
 
@@ -401,21 +401,21 @@ export default function MatchCenter() {
         className="flex items-center gap-3 py-2 border-b border-border/10 last:border-0 hover:bg-white/5 transition-colors px-2 -mx-2 rounded-md cursor-pointer"
       >
         <div className="w-5 text-right shrink-0">
-          <span className="text-xs font-mono font-semibold text-white/40">{p.jersey}</span>
+          <span className="text-xs font-mono font-semibold text-muted-foreground">{p.jersey}</span>
         </div>
         <div className="relative w-8 h-8 rounded-full bg-secondary/30 flex items-center justify-center font-bold text-xs border-[2px] overflow-hidden shrink-0 shadow-sm" style={{ borderColor: teamColor }}>
           <span className="absolute z-0">{p.jersey}</span>
           <LineupPlayerImage playerId={p.athlete.id} playerName={p.athlete.displayName} className="absolute inset-0 w-full h-full object-cover z-10 bg-background" />
         </div>
         <div className="flex flex-col flex-1 min-w-0 justify-center">
-          <span className="font-semibold text-sm tracking-tight text-white/90 truncate leading-tight">
+          <span className="font-semibold text-sm tracking-tight text-foreground truncate leading-tight">
             {(() => {
               const parts = p.athlete.displayName.trim().split(/\s+/);
               if (parts.length <= 1) return p.athlete.displayName;
               return `${parts[0][0].toUpperCase()}.${parts.slice(1).join(' ')}`;
             })()}
           </span>
-          <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 mt-0.5">{p.position?.name || "Sub"}</span>
+          <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground mt-0.5">{p.position?.name || "Sub"}</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {goals > 0 && <span title="Goal" className="text-xs drop-shadow-md">⚽</span>}
@@ -983,7 +983,12 @@ export default function MatchCenter() {
 
                           const renderCard = (align: "left" | "right" | "center") => (
                             <div className={cn(
-                              "relative p-4 md:p-6 rounded-3xl bg-white/[0.02] border border-white/[0.05] transition-all hover:bg-white/[0.04] w-full md:max-w-[85%]",
+                              "relative p-4 md:p-6 rounded-3xl transition-all w-full md:max-w-[85%]",
+                              isGoal 
+                                ? (align === "left" ? "bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.15)]" 
+                                   : align === "right" ? "bg-gradient-to-bl from-blue-500/10 to-transparent border border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.15)]" 
+                                   : "bg-white/[0.05] border border-white/20")
+                                : "bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04]",
                               align === "left" ? "md:ml-auto md:mr-0 text-left md:text-right" : 
                               align === "right" ? "md:mr-auto md:ml-0 text-left" : 
                               "mx-auto text-center md:max-w-lg"
