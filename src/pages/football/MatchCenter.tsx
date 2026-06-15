@@ -124,8 +124,24 @@ export default function MatchCenter() {
       <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center">
-          <Loader2 className="w-10 h-10 animate-spin text-emerald-500 mb-4" />
-          <p className="text-muted-foreground animate-pulse font-medium">Loading ESPN match details…</p>
+          <svg 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            className="w-10 h-10 animate-spin text-emerald-500 mb-4"
+          >
+            <circle cx="12" cy="12" r="10"/>
+            <polygon points="12 6 8.5 9.5 10 14.5 14 14.5 15.5 9.5"/>
+            <line x1="12" y1="6" x2="12" y2="2"/>
+            <line x1="8.5" y1="9.5" x2="2.5" y2="9"/>
+            <line x1="10" y1="14.5" x2="6.5" y2="19"/>
+            <line x1="14" y1="14.5" x2="17.5" y2="19"/>
+            <line x1="15.5" y1="9.5" x2="21.5" y2="9"/>
+          </svg>
+          <p className="text-muted-foreground animate-pulse font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -1163,8 +1179,8 @@ export default function MatchCenter() {
                  <PerformanceLabTab 
                     espnMatchId={id || ""}
                     matchDate={matchData.header?.competitions?.[0]?.date || ""}
-                    homeTeamName={matchData.teams?.home?.name || ""}
-                    awayTeamName={matchData.teams?.away?.name || ""}
+                    homeTeamName={homeTeam.name || homeTeam.displayName || homeTeam.shortDisplayName || "Home"}
+                    awayTeamName={awayTeam.name || awayTeam.displayName || awayTeam.shortDisplayName || "Away"}
                     matchStatus={
                        ['live', 'in-progress', '1h', '2h', 'ht'].includes(matchData.header?.competitions?.[0]?.status?.type?.state?.toLowerCase()) ? 'live' :
                        ['post', 'finished', 'ft'].includes(matchData.header?.competitions?.[0]?.status?.type?.state?.toLowerCase()) ? 'finished' : 'upcoming'
