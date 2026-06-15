@@ -78,8 +78,17 @@ function normalizeEspnMatch(event, leagueName) {
 
 async function fetchLeagueMatches(leagueId, datesStr) {
     try {
+        let finalDatesStr = datesStr;
+        let limit = 100; // ESPN default limit
+
+        // Special handling for World Cup 2026 to get ALL 104 matches in a single request
+        if (leagueId === 'fifa.world') {
+            finalDatesStr = '20260611-20260719';
+            limit = 200; // Need more than 100 to get all 104 matches
+        }
+
         const res = await axios.get(`${BASE_URL}/${leagueId}/scoreboard`, {
-            params: datesStr ? { dates: datesStr } : {}
+            params: finalDatesStr ? { dates: finalDatesStr, limit } : { limit }
         });
         const events = res.data?.events || [];
         const leagueName = res.data?.leagues?.[0]?.name || 'Unknown';
@@ -130,8 +139,8 @@ export async function getUpcomingMatches() {
         
     const upcomingMatches = allMatches
         .filter(m => m.status === 'upcoming')
-        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
-        .slice(0, 60);
+        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+        // Removed .slice(0, 60) to ensure we get ALL World Cup matches
         
     cache.set(cacheKey, upcomingMatches, 300);
     return upcomingMatches;
@@ -158,8 +167,8 @@ export async function getRecentMatches() {
         
     const recentMatches = allMatches
         .filter(m => m.status === 'finished')
-        .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()) // sort desc
-        .slice(0, 60);
+        .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()); // sort desc
+        // Removed .slice(0, 60) to ensure we get ALL World Cup matches
         
     cache.set(cacheKey, recentMatches, 300);
     return recentMatches;
