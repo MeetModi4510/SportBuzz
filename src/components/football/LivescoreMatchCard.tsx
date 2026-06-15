@@ -63,7 +63,7 @@ const TEAM_COLORS: Record<string, string> = {
   'costa rica': '#991b1b', // Red
   'bolivia': '#14532d', // Green
   'algeria': '#14532d', // Green
-  'usa': '#1e3a8a', // Navy
+  'united states': '#1e3a8a', // Navy
   'canada': '#991b1b', // Red
   'morocco': '#C1272D', // Red
   'senegal': '#00853F', // Green
@@ -80,7 +80,7 @@ const TEAM_COLORS: Record<string, string> = {
   'saudi arabia': '#006C35', // Green
   'bahrain': '#dc2626', // Red
   'haiti': '#0057B8',
-  'bosnia and herzegovina': '#0057B8',
+  'bosnia-herzegovina': '#0057B8',
   'australia': '#ca8a04',
   'turkiye': '#E30A17',
   'paraguay': '#D52B1E',
