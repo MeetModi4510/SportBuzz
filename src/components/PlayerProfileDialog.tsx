@@ -83,7 +83,8 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
 
     const isDataLoading = isLoading || (isFootballPlayer && espnLoading);
 
-    const team = teams.find(t => t.id === player.teamId);
+    const mockTeam = teams.find(t => t.id === player.teamId);
+    const team = mockTeam || apiData?.team;
 
     const getRatingColor = (rating: number) => {
         // Handle both 0-10 and 0-100 scales
@@ -119,12 +120,25 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
         }
 
         // Use API image if available
-        if (apiData?.playerImg && !imgError) {
+        const apiUrl = apiData?.playerImg || apiData?.headshot;
+        if (apiUrl && !imgError) {
             return (
                 <img
-                    src={apiData.playerImg}
+                    src={apiUrl}
                     alt={player.name}
                     className="w-full h-full object-cover"
+                    onError={() => setImgError(true)}
+                />
+            );
+        }
+
+        // Fallback to proxying through TrendingPlayers API which supports SofaScore
+        if (player.sport === 'football' && player.id && !imgError) {
+            return (
+                <img 
+                    src={`http://localhost:5000/api/football/trending-players/${player.id}/image`} 
+                    alt={player.name}
+                    className="w-full h-full object-cover" 
                     onError={() => setImgError(true)}
                 />
             );
@@ -151,7 +165,7 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden bg-[#0a0a0c] border border-white/10 shadow-2xl rounded-2xl">
+            <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden bg-[#111214] border border-white/10 shadow-2xl rounded-2xl flex flex-col max-h-[90vh]">
                 {isDataLoading ? (
                     <div className="h-64 flex flex-col items-center justify-center gap-4">
                         <Loader2 className="h-8 w-8 animate-spin text-white/40" />
@@ -160,21 +174,25 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
                 ) : (
                     <div className="relative max-h-[85vh] overflow-y-auto overflow-x-hidden">
                         {/* Header Banner */}
-                        <div className="h-28 relative bg-gradient-to-br from-white/10 to-transparent">
+                        <div className="h-32 relative bg-gradient-to-br from-[#2a2b2e] to-[#111214]">
+                            <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
                             {team && (
-                                <div className="absolute inset-0 flex items-center justify-center opacity-5 overflow-hidden">
-                                    <img src={team.logo} alt="team" className="w-48 h-48 object-contain blur-[2px]" />
+                                <div className="absolute inset-0 flex items-center justify-center opacity-10 overflow-hidden">
+                                    <img src={team.logo} alt="team" className="w-56 h-56 object-contain blur-[1px]" />
                                 </div>
                             )}
                         </div>
 
                         {/* Profile Info */}
-                        <div className="px-6 pb-6 relative -mt-14">
+                        <div className="px-6 pb-6 relative -mt-16">
                             <div className="flex flex-col items-center text-center">
                                 {/* Avatar */}
-                                <div className="w-28 h-28 rounded-full border-4 border-[#0a0a0c] overflow-hidden bg-[#0a0a0c] shadow-2xl relative z-10 flex items-center justify-center">
-                                    {team && (
-                                        <img src={team.logo} className="absolute inset-0 w-full h-full object-cover opacity-60 z-0" alt="" />
+                                <div className="w-32 h-32 rounded-full border-4 border-[#111214] bg-[#1a1b1e] shadow-2xl relative z-10 flex items-center justify-center overflow-hidden shrink-0 group">
+                                    {apiData?.flag && (
+                                        <div 
+                                            className="absolute inset-0 bg-cover bg-center opacity-50 blur-[2px] scale-[2.5] transition-transform duration-700 z-0 group-hover:scale-[2.8]"
+                                            style={{ backgroundImage: `url(${apiData.flag})` }}
+                                        />
                                     )}
                                     <div className="relative z-10 w-full h-full">
                                         {renderPlayerImage()}
@@ -183,23 +201,26 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
 
                                 {/* Name & Titles */}
                                 <div className="mt-3 w-full">
-                                    <DialogTitle className="text-2xl font-black text-white tracking-tight">
+                                    <DialogTitle className="text-3xl font-black text-white tracking-tight drop-shadow-md">
                                         {apiData?.name || player.name}
                                     </DialogTitle>
-                                    <div className="flex items-center justify-center gap-2 mt-1.5 flex-wrap">
+                                    <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
                                         {team && (
-                                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 border border-white/10">
-                                                <img src={team.logo} className="w-3.5 h-3.5 object-contain" alt="" />
-                                                <span className="text-[11px] font-bold text-white/80">{team.name}</span>
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#d4af37]/10 border border-[#d4af37]/20">
+                                                <img src={team.logo} className="w-4 h-4 object-contain rounded-full" alt="" />
+                                                <span className="text-[11px] font-semibold text-[#d4af37]">{team.name}</span>
                                             </div>
                                         )}
-                                        <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] font-bold text-white/60 uppercase tracking-wider">
+                                        <span className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-medium text-white/80 tracking-wider uppercase">
                                             {apiData?.role || player.position}
                                         </span>
-                                        {apiData?.country && (
-                                            <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] font-bold text-white/60">
-                                                {apiData.country}
-                                            </span>
+                                        {(apiData?.country || apiData?.citizenship) && (
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 border border-white/10">
+                                                {apiData?.flag && (
+                                                    <img src={apiData.flag} alt="flag" className="w-4 h-3 object-cover rounded-[1px]" />
+                                                )}
+                                                <span className="text-xs font-medium text-white/80">{apiData.country || apiData.citizenship}</span>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -214,7 +235,7 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
                             {player.matchStats && (
                                 <div className="space-y-4">
                                     <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] text-center">Match Performance</h4>
-                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden p-2">
+                                    <div className="bg-[#1a1b1e] border border-white/5 rounded-xl overflow-hidden p-2">
                                         {player.sport === 'football' && player.rawMatchStats && (
                                             <div className="grid grid-cols-2 gap-x-6">
                                                 {Object.entries(player.rawMatchStats)
@@ -236,9 +257,9 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
                                                         }
                                                         
                                                         return (
-                                                            <div key={key} className="flex justify-between items-center py-2.5 px-2 border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                                                                <span className={`text-[11px] font-semibold capitalize ${labelColor}`}>{label}</span>
-                                                                <span className={`text-xs font-black tabular-nums ${valColor}`}>{String(value)}</span>
+                                                            <div key={key} className="flex justify-between items-center py-2.5 px-3 border-b border-white/5 hover:bg-white/[0.02] transition-colors last:border-0">
+                                                                <span className={`text-xs font-semibold capitalize ${labelColor}`}>{label}</span>
+                                                                <span className={`text-sm font-black tabular-nums ${valColor}`}>{String(value)}</span>
                                                             </div>
                                                         );
                                                     })}
@@ -321,9 +342,13 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
                             {/* Football Detailed Career Profile */}
                             {apiData && player.sport === 'football' && (
                                 <>
-                                    <div className="mt-6 space-y-4">
-                                        <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] text-center">Personal Profile</h4>
-                                        <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden divide-y divide-white/5">
+                                    <div className="mt-8 space-y-4">
+                                        <div className="flex items-center justify-center gap-2">
+                                            <div className="w-8 h-px bg-gradient-to-r from-transparent to-white/20" />
+                                            <h4 className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] text-center">Personal Profile</h4>
+                                            <div className="w-8 h-px bg-gradient-to-l from-transparent to-white/20" />
+                                        </div>
+                                        <div className="bg-[#1a1b1e] border border-white/5 rounded-2xl p-1.5 shadow-lg">
                                             {[
                                                 ['Age', apiData.age],
                                                 ['Date of Birth', apiData.dob],
@@ -332,22 +357,32 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
                                                 ['Birth Place', apiData.birthPlace],
                                                 ['Citizenship', apiData.citizenship]
                                             ].map(([label, val]) => val && (
-                                                <div key={label} className="flex justify-between items-center px-4 py-3 hover:bg-white/[0.02] transition-colors">
-                                                    <span className="text-xs font-semibold text-white/60 capitalize">{label}</span>
-                                                    <span className="text-sm font-black text-white text-right">{String(val)}</span>
+                                                <div key={label} className="group flex justify-between items-center px-4 py-3 hover:bg-white/[0.04] rounded-xl transition-all border-b border-white/[0.02] last:border-0">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-1 h-3 rounded-full bg-blue-500/30 group-hover:bg-blue-500 transition-colors" />
+                                                        <span className="text-xs font-bold text-white/50 group-hover:text-white/70 capitalize transition-colors">{label}</span>
+                                                    </div>
+                                                    <span className="text-sm font-black text-white/90 text-right drop-shadow-sm">{String(val)}</span>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
                                     
                                     {apiData.statsSummary && apiData.statsSummary.length > 0 && (
-                                        <div className="mt-6 space-y-4">
-                                            <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] text-center">Season Statistics</h4>
-                                            <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden divide-y divide-white/5">
+                                        <div className="mt-8 space-y-4">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <div className="w-8 h-px bg-gradient-to-r from-transparent to-white/20" />
+                                                <h4 className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] text-center">Season Statistics</h4>
+                                                <div className="w-8 h-px bg-gradient-to-l from-transparent to-white/20" />
+                                            </div>
+                                            <div className="bg-[#1a1b1e] border border-white/5 rounded-2xl p-1.5 shadow-lg">
                                                 {apiData.statsSummary.map((stat: any, idx: number) => (
-                                                    <div key={idx} className="flex justify-between items-center px-4 py-3 hover:bg-white/[0.02] transition-colors">
-                                                        <span className="text-xs font-semibold text-white/60 capitalize">{stat.displayName || stat.name}</span>
-                                                        <span className="text-sm font-black text-white text-right">{String(stat.displayValue || stat.value)}</span>
+                                                    <div key={idx} className="group flex justify-between items-center px-4 py-3 hover:bg-white/[0.04] rounded-xl transition-all border-b border-white/[0.02] last:border-0">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-1 h-3 rounded-full bg-emerald-500/30 group-hover:bg-emerald-500 transition-colors" />
+                                                            <span className="text-xs font-bold text-white/50 group-hover:text-white/70 capitalize transition-colors">{stat.displayName || stat.name}</span>
+                                                        </div>
+                                                        <span className="text-sm font-black text-emerald-400 text-right tabular-nums drop-shadow-sm">{String(stat.displayValue || stat.value)}</span>
                                                     </div>
                                                 ))}
                                             </div>

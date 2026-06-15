@@ -377,7 +377,11 @@ export default function MatchCenter() {
         </div>
         
         <div className="mt-1.5 text-[11px] md:text-xs text-white/90 font-bold tracking-wide text-center truncate w-full z-20 drop-shadow-[0_2px_2px_rgba(0,0,0,1)] px-1">
-          {p.athlete.displayName.split(' ').pop()}
+          {(() => {
+            const parts = p.athlete.displayName.trim().split(/\s+/);
+            if (parts.length <= 1) return p.athlete.displayName;
+            return `${parts[0][0].toUpperCase()}.${parts.slice(1).join(' ')}`;
+          })()}
         </div>
       </div>
     );
@@ -404,7 +408,13 @@ export default function MatchCenter() {
           <LineupPlayerImage playerId={p.athlete.id} playerName={p.athlete.displayName} className="absolute inset-0 w-full h-full object-cover z-10 bg-background" />
         </div>
         <div className="flex flex-col flex-1 min-w-0 justify-center">
-          <span className="font-semibold text-sm tracking-tight text-white/90 truncate leading-tight">{p.athlete.displayName}</span>
+          <span className="font-semibold text-sm tracking-tight text-white/90 truncate leading-tight">
+            {(() => {
+              const parts = p.athlete.displayName.trim().split(/\s+/);
+              if (parts.length <= 1) return p.athlete.displayName;
+              return `${parts[0][0].toUpperCase()}.${parts.slice(1).join(' ')}`;
+            })()}
+          </span>
           <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 mt-0.5">{p.position?.name || "Sub"}</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -1239,7 +1249,10 @@ export default function MatchCenter() {
                   {/* Home Subs */}
                   <div className="flex flex-col h-full space-y-6 bg-secondary/10 border border-border/20 p-6 rounded-[2rem]">
                     <div className="flex-1 space-y-4">
-                      <h4 className="font-bold text-xs uppercase tracking-widest text-emerald-500 border-b border-white/10 pb-2">Substitutes</h4>
+                      <h4 className="font-bold text-xs uppercase tracking-widest text-emerald-500 border-b border-white/10 pb-2 flex items-center gap-2">
+                        <img src={homeTeam.logo || `https://a.espncdn.com/i/teamlogos/soccer/500/${homeTeam.id}.png`} alt={homeTeam.name} className="w-4 h-4 object-contain" />
+                        Substitutes
+                      </h4>
                       <div className="flex flex-col">
                         {homeSubs.map((item: any) => renderSubstituteRow(item, homeTeamColor))}
                         {homeSubs.length === 0 && <p className="text-xs text-muted-foreground py-2">No substitutes.</p>}
@@ -1261,7 +1274,10 @@ export default function MatchCenter() {
                   {/* Away Subs */}
                   <div className="flex flex-col h-full space-y-6 bg-secondary/10 border border-border/20 p-6 rounded-[2rem]">
                     <div className="flex-1 space-y-4">
-                      <h4 className="font-bold text-xs uppercase tracking-widest text-blue-500 border-b border-white/10 pb-2 md:text-right">Substitutes</h4>
+                      <h4 className="font-bold text-xs uppercase tracking-widest text-blue-500 border-b border-white/10 pb-2 md:text-right flex items-center md:justify-end gap-2">
+                        Substitutes
+                        <img src={awayTeam.logo || `https://a.espncdn.com/i/teamlogos/soccer/500/${awayTeam.id}.png`} alt={awayTeam.name} className="w-4 h-4 object-contain" />
+                      </h4>
                       <div className="flex flex-col">
                         {awaySubs.map((item: any) => renderSubstituteRow(item, awayTeamColor))}
                         {awaySubs.length === 0 && <p className="text-xs text-muted-foreground py-2 md:text-right">No substitutes.</p>}

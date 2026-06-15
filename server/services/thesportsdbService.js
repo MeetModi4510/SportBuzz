@@ -14,7 +14,7 @@ export async function getTeamBadge(teamName) {
 
     try {
         const url = `${BASE_URL}/searchteams.php?t=${encodeURIComponent(teamName)}`;
-        const res = await axios.get(url, { timeout: 5000 });
+        const res = await axios.get(url, { timeout: 15000 });
         
         if (res.data && res.data.teams && res.data.teams.length > 0) {
             // Find the soccer team, prioritizing exact matches
@@ -46,7 +46,7 @@ export async function getPlayerCutout(playerName) {
 
     try {
         const url = `${BASE_URL}/searchplayers.php?p=${encodeURIComponent(playerName)}`;
-        const res = await axios.get(url, { timeout: 5000 });
+        const res = await axios.get(url, { timeout: 15000 });
         
         if (res.data && res.data.player && res.data.player.length > 0) {
             // Find the first soccer player

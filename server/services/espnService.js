@@ -201,7 +201,7 @@ export async function getPlayerProfile(playerId, leagueId = 'eng.1') {
 
     try {
         const url = `https://site.web.api.espn.com/apis/common/v3/sports/soccer/${leagueId}/athletes/${playerId}`;
-        const res = await axios.get(url, { timeout: 5000 });
+        const res = await axios.get(url, { timeout: 15000 });
         
         // Extract and map useful properties
         const athlete = res.data?.athlete || {};
@@ -217,6 +217,12 @@ export async function getPlayerProfile(playerId, leagueId = 'eng.1') {
             birthPlace: athlete.displayBirthPlace,
             citizenship: athlete.citizenship,
             headshot: athlete.headshot?.href,
+            flag: athlete.flag?.href,
+            team: athlete.team ? {
+                id: athlete.team.id,
+                name: athlete.team.name,
+                logo: athlete.team.logos?.[0]?.href
+            } : null,
             statsSummary: athlete.statsSummary?.statistics || [],
         };
 

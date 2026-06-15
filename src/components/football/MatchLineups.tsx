@@ -163,7 +163,32 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
         </div>
         
         <div className="flex flex-col flex-1 min-w-0 justify-center">
-          <span className="font-semibold text-[13px] md:text-sm tracking-tight text-white/90 truncate leading-tight">{item.player.name}</span>
+          <span className="font-semibold text-[13px] md:text-sm tracking-tight text-white/90 truncate leading-tight">
+            {(() => {
+              let fullName = item.player.name;
+              if (playerStats && playerStats.length > 0) {
+                for (const ts of playerStats) {
+                  const p = ts.players.find(p => p.player.id === item.player.id);
+                  if (p && p.player.name && p.player.name.trim().split(/\s+/).length > 1) {
+                    fullName = p.player.name;
+                    break;
+                  }
+                }
+              }
+              if (fullName.trim().split(/\s+/).length <= 1 && events && events.length > 0) {
+                const event = events.find(e => e.player.id === item.player.id || (e.assist && e.assist.id === item.player.id));
+                if (event) {
+                   const evName = event.player.id === item.player.id ? event.player.name : event.assist?.name;
+                   if (evName && evName.trim().split(/\s+/).length > 1) {
+                      fullName = evName;
+                   }
+                }
+              }
+              const parts = fullName.trim().split(/\s+/);
+              if (parts.length <= 1) return fullName;
+              return `${parts[0][0].toUpperCase()}.${parts.slice(1).join(' ')}`;
+            })()}
+          </span>
           {posLabel && <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 mt-0.5">{posLabel}</span>}
         </div>
         
@@ -203,7 +228,30 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
           )}
         </div>
         <div className="mt-3 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] md:text-xs text-white font-medium text-center truncate w-full shadow-md z-20">
-          {item.player.name.split(' ').pop()}
+          {(() => {
+            let fullName = item.player.name;
+            if (playerStats && playerStats.length > 0) {
+              for (const ts of playerStats) {
+                const p = ts.players.find(p => p.player.id === item.player.id);
+                if (p && p.player.name && p.player.name.trim().split(/\s+/).length > 1) {
+                  fullName = p.player.name;
+                  break;
+                }
+              }
+            }
+            if (fullName.trim().split(/\s+/).length <= 1 && events && events.length > 0) {
+              const event = events.find(e => e.player.id === item.player.id || (e.assist && e.assist.id === item.player.id));
+              if (event) {
+                 const evName = event.player.id === item.player.id ? event.player.name : event.assist?.name;
+                 if (evName && evName.trim().split(/\s+/).length > 1) {
+                    fullName = evName;
+                 }
+              }
+            }
+            const parts = fullName.trim().split(/\s+/);
+            if (parts.length <= 1) return fullName;
+            return `${parts[0][0].toUpperCase()}.${parts.slice(1).join(' ')}`;
+          })()}
         </div>
       </div>
     );
