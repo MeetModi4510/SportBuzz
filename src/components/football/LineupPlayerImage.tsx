@@ -109,6 +109,7 @@ export const LineupPlayerImage = ({ playerId, playerName, className, fallbackIni
         // 2. Already cached successfully
         if (imageCache.has(key) && imageCache.get(key) !== null) {
             const cached = imageCache.get(key);
+            console.log(`⚡ [CACHED SportsDB] ${playerName}`);
             setImgUrl(cached!);
             setLoading(false);
             return;
@@ -118,18 +119,23 @@ export const LineupPlayerImage = ({ playerId, playerName, className, fallbackIni
         setHasError(false);
         setLoading(true);
 
-        // Fetch immediately without artificial queue delay
+        // Fetch with our built-in throttler
         fetchPlayerImage(playerName).then(url => {
             if (!isMounted) return;
             if (url) {
+                console.log(`✅ [SportsDB API] ${playerName}`);
                 setImgUrl(url);
             } else {
-                setImgUrl(`https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${playerId}.png`);
+                const fallback = `https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${playerId}.png`;
+                console.log(`🔄 [ESPN API Fallback] ${playerName}`);
+                setImgUrl(fallback);
             }
             setLoading(false);
         }).catch(() => {
             if (!isMounted) return;
-            setImgUrl(`https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${playerId}.png`);
+            const fallback = `https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${playerId}.png`;
+            console.log(`🔄 [ESPN API Fallback] ${playerName}`);
+            setImgUrl(fallback);
             setLoading(false);
         });
 

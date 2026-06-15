@@ -66,6 +66,11 @@ export async function getPlayerCutout(playerName) {
         cache.set(cacheKey, null);
         return null;
     } catch (error) {
+        if (error.response && error.response.status === 429) {
+            // Rate limit hit - gracefully return null without logging a scary error, 
+            // the frontend will instantly fallback to the ESPN headshot.
+            return null;
+        }
         console.error(`Error fetching TheSportsDB player for ${playerName}:`, error.message);
         return null;
     }

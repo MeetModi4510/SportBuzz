@@ -89,12 +89,6 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
     const homeLogo = homeTeamObj.logo || `https://a.espncdn.com/i/teamlogos/soccer/500/${homeTeamObj.id}.png`;
     const awayLogo = awayTeamObj.logo || `https://a.espncdn.com/i/teamlogos/soccer/500/${awayTeamObj.id}.png`;
 
-    // --- PREDICTIONS & PRE-MATCH ANALYSIS ---
-    let homeWinPct = predictor?.homeTeam?.gameProjection ?? 45.5;
-    let awayWinPct = predictor?.awayTeam?.gameProjection ?? 25.5;
-    let drawPct = 100 - homeWinPct - awayWinPct;
-    if (drawPct < 0) drawPct = Math.abs(drawPct);
-
     // --- ADVANCED TEAM STATISTICS ---
     let statistics: any = null;
     if (boxscore?.teams && boxscore.teams.length === 2) {
@@ -117,6 +111,82 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
         const statObj = statistics[teamIdx].stats.find((s: any) => s.label.toLowerCase().includes(labelToMatch.toLowerCase()));
         return statObj ? parseVal(statObj.displayValue) : 0;
     };
+
+    // --- DYNAMIC STRENGTH & PREDICTIONS ALGORITHM ---
+    const generateHash = (str: string) => {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return Math.abs(hash);
+    };
+
+    const getTeamStrength = (teamObj: any, statIdx: number) => {
+        // Pseudo-random but consistent strength 50-95 based on team ID
+        const base = (generateHash(String(teamObj.id)) % 45) + 50; 
+        
+        // If we have actual match stats, influence it heavily
+        if (statistics) {
+            if (statIdx === 0) { // Form -> Use Possession + Pass Accuracy
+                const poss = getStat(teamObj.id === homeTeamObj.id ? 0 : 1, 'possession');
+                if (poss > 0) return Math.min(95, Math.max(30, poss + 10));
+            }
+            if (statIdx === 1) { // Attack -> Use Shots
+                const shots = getStat(teamObj.id === homeTeamObj.id ? 0 : 1, 'shots');
+                if (shots > 0) return Math.min(95, Math.max(30, 40 + (shots * 3)));
+            }
+            if (statIdx === 2) { // Defense -> Use Saves / Clearances
+                const def = (getStat(teamObj.id === homeTeamObj.id ? 0 : 1, 'saves') * 5) + getStat(teamObj.id === homeTeamObj.id ? 0 : 1, 'clearance');
+                if (def > 0) return Math.min(95, Math.max(30, 40 + def));
+            }
+        }
+        
+        // Vary it slightly for different stats if no live stats available
+        return Math.min(95, Math.max(30, base + ((statIdx * 7) % 15) - 7));
+    };
+
+    const compFormHome = Math.round(getTeamStrength(homeTeamObj, 0));
+    const compFormAway = Math.round(getTeamStrength(awayTeamObj, 0));
+    const compAttackHome = Math.round(getTeamStrength(homeTeamObj, 1));
+    const compAttackAway = Math.round(getTeamStrength(awayTeamObj, 1));
+    const compDefenseHome = Math.round(getTeamStrength(homeTeamObj, 2));
+    const compDefenseAway = Math.round(getTeamStrength(awayTeamObj, 2));
+
+    const comparativeData = [
+        { name: 'Form', home: compFormHome, away: compFormAway },
+        { name: 'Attack', home: compAttackHome, away: compAttackAway },
+        { name: 'Defense', home: compDefenseHome, away: compDefenseAway }
+    ];
+
+    let homeWinPct = predictor?.homeTeam?.gameProjection;
+    let awayWinPct = predictor?.awayTeam?.gameProjection;
+
+    if (!homeWinPct || !awayWinPct) {
+        // Calculate dynamically based on overall comparative strength
+        const homeTotal = compFormHome + compAttackHome + compDefenseHome;
+        const awayTotal = compFormAway + compAttackAway + compDefenseAway;
+        
+        const totalStrength = homeTotal + awayTotal;
+        const baseHomePct = (homeTotal / totalStrength) * 100;
+        const baseAwayPct = (awayTotal / totalStrength) * 100;
+        
+        // Introduce a realistic draw probability (typically 20-30% in soccer)
+        const diff = Math.abs(baseHomePct - baseAwayPct);
+        const drawChance = Math.max(10, 35 - diff); // Max 35% draw, Min 10% draw
+        
+        // Allocate remainder
+        const remaining = 100 - drawChance;
+        homeWinPct = (baseHomePct / 100) * remaining;
+        awayWinPct = (baseAwayPct / 100) * remaining;
+        
+        // Add +2% home advantage bump
+        homeWinPct += 2;
+        awayWinPct -= 2;
+        if (awayWinPct < 0) awayWinPct = 0;
+    }
+
+    let drawPct = 100 - homeWinPct - awayWinPct;
+    if (drawPct < 0) drawPct = Math.abs(drawPct);
 
     // --- RADAR DATA ---
     const radarData = [
@@ -582,12 +652,12 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
                 </div>
                 <div className="flex justify-between items-center px-4 mb-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-zinc-700 rounded-sm"></div>
+                        <div className="w-3 h-3 rounded-sm shadow-[0_0_8px_rgba(14,165,233,0.5)]" style={{ backgroundColor: '#0ea5e9' }}></div>
                         <span className="text-xs font-bold uppercase text-zinc-100 ">{homeTeamName} Pressure</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <span className="text-xs font-bold uppercase text-zinc-100 ">{awayTeamName} Pressure</span>
-                        <div className="w-3 h-3 bg-zinc-800 rounded-sm"></div>
+                        <div className="w-3 h-3 rounded-sm shadow-[0_0_8px_rgba(244,63,94,0.5)]" style={{ backgroundColor: '#f43f5e' }}></div>
                     </div>
                 </div>
                 <div className="w-full h-[250px]">
@@ -703,11 +773,7 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
                         </h4>
                         <div className="w-full h-48">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={[
-                                    { name: 'Form', home: 65, away: 45 },
-                                    { name: 'Attack', home: 72, away: 58 },
-                                    { name: 'Defense', home: 50, away: 80 }
-                                ]} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                                <BarChart data={comparativeData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                                     <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(255,255,255,0.05)" />
                                     <XAxis type="number" hide={true} />
                                     <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10, fontWeight: 'bold' }} width={60} />
