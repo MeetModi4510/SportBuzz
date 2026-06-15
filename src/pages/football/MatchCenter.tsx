@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar } from "../../components/Navbar";
 import { FootballTeamLogo as TeamLogo } from "../../components/football/FootballTeamLogo";
+import { LineupPlayerImage } from "../../components/football/LineupPlayerImage";
 import { useEspnMatchDetail } from "../../hooks/football/useEspnQueries";
 import { PerformanceLabTab } from "../../components/football/PerformanceLabTab";
 import {
@@ -245,27 +246,27 @@ export default function MatchCenter() {
         <div className="relative mt-0.5">
           <div className="relative w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-sm font-bold shadow-[0_4px_12px_rgba(0,0,0,0.6)] border-[3px] overflow-hidden bg-secondary" style={{ borderColor: teamColor }}>
             <span className="absolute inset-0 flex items-center justify-center text-white/50 font-black text-xl z-0 drop-shadow-md">{p.jersey}</span>
-            <img src={`https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${p.athlete.id}.png`} alt={p.athlete.displayName} className="absolute inset-0 w-full h-full object-cover z-10 bg-secondary" onError={(e) => (e.currentTarget.style.display = 'none')} />
+            <LineupPlayerImage playerId={p.athlete.id} playerName={p.athlete.displayName} className="absolute inset-0 w-full h-full object-cover z-10 bg-secondary" />
           </div>
 
           {goals > 0 && (
-            <div className="absolute -top-1.5 -left-1.5 z-30 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] flex items-center" title="Goal">
-              <span className="text-sm md:text-base">⚽</span>
-              {goals > 1 && <span className="text-[9px] font-black text-white ml-0.5 drop-shadow-md">x{goals}</span>}
+            <div className="absolute -top-1.5 -left-1.5 z-30 flex items-center justify-center w-6 h-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" title={`Goal (${goals})`}>
+              <span className="text-lg md:text-xl absolute">⚽</span>
+              {goals > 1 && <span className="absolute -bottom-0.5 -right-0.5 z-10 text-[9px] leading-none font-black text-white bg-[#e11d48] rounded-full w-[14px] h-[14px] flex items-center justify-center border border-white shadow-sm">{goals}</span>}
             </div>
           )}
 
           {assists > 0 && (
-            <div className="absolute -top-1.5 -right-1.5 z-30 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] flex items-center" title="Assist">
-              <span className="text-sm md:text-base">👟</span>
-              {assists > 1 && <span className="text-[9px] font-black text-white ml-0.5 drop-shadow-md">x{assists}</span>}
+            <div className="absolute -top-1.5 -right-1.5 z-30 flex items-center justify-center w-6 h-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" title={`Assist (${assists})`}>
+              <span className="text-lg md:text-xl absolute">👟</span>
+              {assists > 1 && <span className="absolute -bottom-0.5 -right-0.5 z-10 text-[9px] leading-none font-black text-white bg-[#e11d48] rounded-full w-[14px] h-[14px] flex items-center justify-center border border-white shadow-sm">{assists}</span>}
             </div>
           )}
 
           {(yellowCards > 0 || redCards > 0) && (
             <div className="absolute top-1/2 -translate-y-1/2 -right-2 flex flex-col gap-0.5 z-30 drop-shadow-[0_2px_3px_rgba(0,0,0,0.8)]">
-               {yellowCards > 0 && <div className="w-2.5 h-3.5 bg-[#FFCC00] shadow-sm rounded-sm" title="Yellow Card" />}
-               {redCards > 0 && <div className="w-2.5 h-3.5 bg-[#FF3333] shadow-sm rounded-sm" title="Red Card" />}
+               {yellowCards > 0 && <div className="w-2.5 h-3.5 bg-[#FFCC00] shadow-sm rounded-none border border-black/20" title="Yellow Card" />}
+               {redCards > 0 && <div className="w-2.5 h-3.5 bg-[#FF3333] shadow-sm rounded-none border border-black/20" title="Red Card" />}
             </div>
           )}
 
@@ -297,7 +298,8 @@ export default function MatchCenter() {
           <span className="text-xs font-mono font-semibold text-white/40">{p.jersey}</span>
         </div>
         <div className="relative w-8 h-8 rounded-full bg-secondary/30 flex items-center justify-center font-bold text-xs border-[2px] overflow-hidden shrink-0 shadow-sm" style={{ borderColor: teamColor }}>
-          <img src={`https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${p.athlete.id}.png`} className="absolute inset-0 w-full h-full object-cover z-10 bg-background" onError={(e) => e.currentTarget.style.display = 'none'} />
+          <span className="absolute z-0">{p.jersey}</span>
+          <LineupPlayerImage playerId={p.athlete.id} playerName={p.athlete.displayName} className="absolute inset-0 w-full h-full object-cover z-10 bg-background" />
         </div>
         <div className="flex flex-col flex-1 min-w-0 justify-center">
           <span className="font-semibold text-sm tracking-tight text-white/90 truncate leading-tight">{p.athlete.displayName}</span>

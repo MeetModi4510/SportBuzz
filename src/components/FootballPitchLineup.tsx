@@ -513,12 +513,12 @@ function PlayerNode({
             onClick={onClick}
         >
             <div className="pitch-player-avatar relative" style={{ '--team-color': teamColor } as React.CSSProperties}>
-                <div className="absolute inset-0 z-0 bg-[#1a1a2e] rounded-full overflow-hidden">
+                <div className="absolute inset-0 z-0 bg-[#1a1a2e] rounded-full overflow-hidden flex items-center justify-center font-black text-white text-base">
+                    <span className="opacity-90">{player.number || '?'}</span>
                     <LineupPlayerImage 
                         playerId={player.id}
                         playerName={player.name}
-                        fallbackInitials={player.number?.toString() || '?'}
-                        className="w-full h-full object-cover"
+                        className="absolute inset-0 z-10 w-full h-full object-cover"
                     />
                 </div>
                 <div 
@@ -590,10 +590,10 @@ function PlayerNode({
                 <div className="absolute -bottom-1 -right-1 flex flex-col-reverse gap-0.5 z-10 pointer-events-none">
                     {/* Disciplinary */}
                     {isRedCarded && (
-                        <div className="w-4 h-5 bg-red-600 rounded-sm border border-black/20 shadow-lg" title="Red Card" />
+                        <div className="w-4 h-5 bg-red-600 rounded-none border border-black/20 shadow-lg" title="Red Card" />
                     )}
                     {(player.events?.yellowCards || 0) > 0 && (
-                        <div className="w-4 h-5 bg-yellow-400 rounded-sm border border-black/20 shadow-lg" title="Yellow Card" />
+                        <div className="w-4 h-5 bg-yellow-400 rounded-none border border-black/20 shadow-lg" title="Yellow Card" />
                     )}
                 </div>
 
@@ -767,12 +767,12 @@ function SubstitutesPanel({
                         style={{ '--team-color': teamColor } as React.CSSProperties}
                         onClick={() => onPlayerClick(p)}
                     >
-                        <div className="football-sub-avatar-container relative w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style={{ borderColor: teamColor }}>
+                        <div className="football-sub-avatar-container relative w-10 h-10 rounded-full bg-[#1a1a2e] flex items-center justify-center font-bold text-white overflow-hidden shrink-0 border-2" style={{ borderColor: teamColor }}>
+                            <span className="opacity-90 text-sm">{p.number || '?'}</span>
                             <LineupPlayerImage 
                                 playerId={p.id}
                                 playerName={p.name}
-                                fallbackInitials={p.number?.toString() || '?'}
-                                className="absolute inset-0 z-10"
+                                className="absolute inset-0 z-10 w-full h-full object-cover"
                             />
                         </div>
                         <div className="flex flex-col min-w-0 flex-1">

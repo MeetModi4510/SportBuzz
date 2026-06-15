@@ -495,8 +495,9 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {topPerformers.map((p: any, idx: number) => (
                             <div key={p.id} className="flex items-center gap-5 bg-black/20 p-4 rounded-2xl border border-white/[0.08] transition-all hover:bg-[#0f0f11]  shadow-none">
-                                <div className="w-16 h-16 rounded-full bg-[#18181b]/50 border-2 border-white/[0.05] flex items-center justify-center overflow-hidden shrink-0 relative shadow-sm">
-                                    <LineupPlayerImage playerId={p.id} playerName={p.name} fallbackInitials={p.position} className="absolute inset-0" />
+                                <div className="w-16 h-16 rounded-full bg-[#18181b]/50 border-2 border-white/[0.05] flex items-center justify-center overflow-hidden shrink-0 relative shadow-sm text-zinc-500">
+                                    <img src={idx === 0 ? homeLogo : awayLogo} className="absolute inset-0 w-full h-full object-contain opacity-20 blur-[2px] scale-75" />
+                                    <LineupPlayerImage playerId={p.id} playerName={p.name} className="absolute inset-0 z-10 w-full h-full object-cover" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
@@ -558,8 +559,9 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
                                         <div className="w-5 font-black text-xs text-zinc-600 opacity-60 text-right shrink-0">
                                             #{pIdx + 1}
                                         </div>
-                                        <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-black shrink-0">
-                                            <LineupPlayerImage playerId={player.id} playerName={player.name} fallbackInitials={player.position} className="w-full h-full object-cover" />
+                                        <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-black shrink-0 relative flex items-center justify-center text-zinc-500">
+                                            <img src={isHome ? homeLogo : awayLogo} className="absolute inset-0 w-full h-full object-contain opacity-20 blur-[1px] scale-75" />
+                                            <LineupPlayerImage playerId={player.id} playerName={player.name} className="absolute inset-0 z-10 w-full h-full object-cover" />
                                         </div>
                                         <div className="flex flex-col flex-1 min-w-0">
                                             <div className="flex justify-between items-baseline mb-1.5">

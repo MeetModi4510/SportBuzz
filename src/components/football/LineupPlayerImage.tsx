@@ -16,6 +16,33 @@ const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
   : 'http://localhost:5000';
 
+// ─── Concurrency Limiter to prevent 429 Rate Limits from API ──────────────
+const CONCURRENCY_LIMIT = 1;
+let activeRequests = 0;
+const requestQueue: (() => void)[] = [];
+
+async function acquireToken() {
+    if (activeRequests < CONCURRENCY_LIMIT) {
+        activeRequests++;
+        return;
+    }
+    return new Promise<void>(resolve => {
+        requestQueue.push(resolve);
+    });
+}
+
+function releaseToken() {
+    // Add a small delay between tokens to strictly respect API rate limits (e.g. max 3 requests per second)
+    setTimeout(() => {
+        if (requestQueue.length > 0) {
+            const next = requestQueue.shift()!;
+            next();
+        } else {
+            activeRequests--;
+        }
+    }, 350);
+}
+
 async function fetchPlayerImage(playerName: string): Promise<string | null> {
     const key = playerName.toLowerCase().trim();
 
@@ -28,6 +55,7 @@ async function fetchPlayerImage(playerName: string): Promise<string | null> {
     if (pendingRequests.has(key)) return pendingRequests.get(key)!;
 
     const promise = (async () => {
+        await acquireToken();
         try {
             // Hit our backend proxy instead of TheSportsDB directly!
             const res = await axios.get(
@@ -46,6 +74,7 @@ async function fetchPlayerImage(playerName: string): Promise<string | null> {
         } catch {
             return null;
         } finally {
+            releaseToken();
             pendingRequests.delete(key);
         }
     })();
@@ -86,8 +115,12 @@ export const LineupPlayerImage = ({ playerId, playerName, className, fallbackIni
             if (url) {
                 setImgUrl(url);
             } else {
-                setHasError(true);
+                setImgUrl(`https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${playerId}.png`);
             }
+            setLoading(false);
+        }).catch(() => {
+            if (!isMounted) return;
+            setImgUrl(`https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${playerId}.png`);
             setLoading(false);
         });
 
