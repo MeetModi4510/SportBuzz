@@ -134,8 +134,8 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
             if (e.detail === "Red Card") return <div key={idx} className="w-2.5 h-3.5 bg-[#FF3333] shadow-sm" title="Red Card" />;
           }
           if (e.type === "subst") {
-            if (e.player.id === playerId) return <span key={idx} title="Subbed Out"><ArrowDown className="w-3.5 h-3.5 text-red-500 drop-shadow-sm" /></span>;
-            if (e.assist && e.assist.id === playerId) return <span key={idx} title="Subbed In"><ArrowUp className="w-3.5 h-3.5 text-green-500 drop-shadow-sm" /></span>;
+            if (e.player.id === playerId) return <span key={idx} title="Subbed Out" className="flex items-center justify-center w-4 h-4 rounded-full bg-red-500 shadow-sm"><ArrowDown className="w-3 h-3 text-black stroke-[3]" /></span>;
+            if (e.assist && e.assist.id === playerId) return <span key={idx} title="Subbed In" className="flex items-center justify-center w-4 h-4 rounded-full bg-green-500 shadow-sm"><ArrowUp className="w-3 h-3 text-black stroke-[3]" /></span>;
           }
           return null;
         })}
