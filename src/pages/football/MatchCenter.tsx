@@ -922,8 +922,30 @@ export default function MatchCenter() {
                           const isHomeByRoster = participantName && homeRoster.some((r: any) => r.athlete?.displayName === participantName);
                           const isAwayByRoster = participantName && awayRoster.some((r: any) => r.athlete?.displayName === participantName);
                           
-                          const isHome = evt.team?.id === homeTeam.id || (evtTeamName && (homeName.includes(evtTeamName) || evtTeamName.includes(homeName))) || isHomeByRoster;
-                          const isAway = evt.team?.id === awayTeam.id || (evtTeamName && (awayName.includes(evtTeamName) || evtTeamName.includes(awayName))) || isAwayByRoster;
+                          let isHome = evt.team?.id === homeTeam.id || (evtTeamName && (homeName.includes(evtTeamName) || evtTeamName.includes(homeName)));
+                          let isAway = evt.team?.id === awayTeam.id || (evtTeamName && (awayName.includes(evtTeamName) || evtTeamName.includes(awayName)));
+                          
+                          // 1. Prioritize explicit text mention like "(Egypt)"
+                          const textMatch = (evt.text || "").match(/\(([A-Za-z\s]+)\)/);
+                          if (textMatch) {
+                              const textTeam = textMatch[1].trim().toLowerCase();
+                              if (homeName.toLowerCase().includes(textTeam) || textTeam.includes(homeName.toLowerCase())) {
+                                  isHome = true;
+                                  isAway = false;
+                              } else if (awayName.toLowerCase().includes(textTeam) || textTeam.includes(awayName.toLowerCase())) {
+                                  isAway = true;
+                                  isHome = false;
+                              }
+                          } 
+                          // 2. Prioritize roster match over evt.team (which may be the fouling team)
+                          else if (isHomeByRoster && !isAwayByRoster) {
+                              isHome = true;
+                              isAway = false;
+                          } else if (isAwayByRoster && !isHomeByRoster) {
+                              isAway = true;
+                              isHome = false;
+                          }
+
                           const isNeutral = !isHome && !isAway;
                           
                           const isGoal = evt.type?.text?.toLowerCase().includes("goal");
