@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Navbar } from "../../components/Navbar";
 import { FootballTeamLogo as TeamLogo } from "../../components/football/FootballTeamLogo";
 import { useEspnMatchDetail } from "../../hooks/football/useEspnQueries";
+import { PerformanceLabTab } from "../../components/football/PerformanceLabTab";
 import {
   Loader2, ArrowLeft, Clock, Activity, ListOrdered,
   Users, User, BarChart3, Info, Heart, CircleDot, ArrowDown, ArrowUp, ArrowLeftRight, PlayCircle,
@@ -97,11 +98,6 @@ export default function MatchCenter() {
 
   const { data: matchData, isLoading, error } = useEspnMatchDetail(id || "", !!id);
 
-  // Performance Lab state
-  const [perfData, setPerfData] = useState<any>(null);
-  const [perfLoading, setPerfLoading] = useState(false);
-  const [perfError, setPerfError] = useState<string | null>(null);
-
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteId, setFavoriteId] = useState<string | null>(null);
@@ -122,20 +118,6 @@ export default function MatchCenter() {
     };
     checkFav();
   }, [id]);
-
-  useEffect(() => {
-    if (activeTab !== 'performance' || !id || perfData) return;
-    setPerfLoading(true);
-    setPerfError(null);
-    fetch(`${API_BASE}/api/football/v2/matches/performance/${id}`)
-      .then(r => r.json())
-      .then(json => {
-        if (json.success) setPerfData(json.data);
-        else setPerfError(json.message || 'Failed to load performance data');
-      })
-      .catch(err => setPerfError(err.message))
-      .finally(() => setPerfLoading(false));
-  }, [activeTab, id, perfData]);
 
   if (isLoading) {
     return (
@@ -517,7 +499,7 @@ export default function MatchCenter() {
               <TabsTrigger value="events" className="rounded-none py-3 px-1 text-sm font-bold border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"><ListOrdered className="w-4 h-4 mr-2" />Key Events</TabsTrigger>
               <TabsTrigger value="statistics" className="rounded-none py-3 px-1 text-sm font-bold border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"><BarChart3 className="w-4 h-4 mr-2" />Stats</TabsTrigger>
               <TabsTrigger value="lineups" className="rounded-none py-3 px-1 text-sm font-bold border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"><Users className="w-4 h-4 mr-2" />Lineups</TabsTrigger>
-              <TabsTrigger value="performance" className="rounded-none py-3 px-1 text-sm font-bold border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-500 text-emerald-500/60 hover:text-emerald-500 transition-colors"><Activity className="w-4 h-4 mr-2" />Lab</TabsTrigger>
+              <TabsTrigger value="performance" className="rounded-none py-3 px-1 text-sm font-bold border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-500 text-emerald-500/60 hover:text-emerald-500 transition-colors"><Activity className="w-4 h-4 mr-2" />Performance Lab</TabsTrigger>
             </TabsList>
 
             {/* SUMMARY TAB */}
@@ -1175,36 +1157,21 @@ export default function MatchCenter() {
               </div>
             </TabsContent>
 
-            {/* PERFORMANCE LAB TAB (Kept original logic) */}
+            {/* PERFORMANCE LAB TAB */}
             <TabsContent value="performance" className="mt-6 animate-in fade-in-50 slide-in-from-bottom-4 duration-500">
-              <div className="bg-secondary/20 border border-border/50 rounded-3xl p-6 min-h-[400px]">
-                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/50">
-                    <Activity className="w-6 h-6 text-emerald-500" />
-                    <h3 className="text-xl font-black">Performance Lab</h3>
-                 </div>
-                 
-                 {perfLoading ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                       <Loader2 className="w-8 h-8 animate-spin mb-4 text-emerald-500" />
-                       <p>Analyzing match performance data...</p>
-                    </div>
-                 ) : perfError ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground text-center max-w-md mx-auto">
-                       <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
-                         <Activity className="w-8 h-8 opacity-50" />
-                       </div>
-                       <p className="font-medium text-foreground mb-2">Performance Data Unavailable</p>
-                       <p className="text-sm">Advanced metrics are currently being generated or are not available for this specific fixture.</p>
-                    </div>
-                 ) : perfData ? (
-                    <div className="space-y-8">
-                       {/* Render advanced performance data here */}
-                       <pre className="p-4 bg-black/50 rounded-xl text-xs overflow-auto max-h-96">
-                         {JSON.stringify(perfData, null, 2)}
-                       </pre>
-                    </div>
-                 ) : null}
-              </div>
+              {activeTab === 'performance' && matchData && (
+                 <PerformanceLabTab 
+                    espnMatchId={id || ""}
+                    matchDate={matchData.header?.competitions?.[0]?.date || ""}
+                    homeTeamName={matchData.teams?.home?.name || ""}
+                    awayTeamName={matchData.teams?.away?.name || ""}
+                    matchStatus={
+                       ['live', 'in-progress', '1h', '2h', 'ht'].includes(matchData.header?.competitions?.[0]?.status?.type?.state?.toLowerCase()) ? 'live' :
+                       ['post', 'finished', 'ft'].includes(matchData.header?.competitions?.[0]?.status?.type?.state?.toLowerCase()) ? 'finished' : 'upcoming'
+                    }
+                    matchData={matchData}
+                 />
+              )}
             </TabsContent>
 
           </Tabs>

@@ -43,9 +43,10 @@ const router = express.Router();
 // ─── PROXY ROUTES FOR FRONTEND ───
 // These proxies ensure API keys stay hidden on the backend while the frontend can still use the API-Sports schema
 
-router.get('/proxy/fixtures', async (req, res) => {
+router.get('/proxy/*', async (req, res) => {
     try {
-        const response = await axios.get('https://v3.football.api-sports.io/fixtures', {
+        const endpoint = req.params[0];
+        const response = await axios.get(`https://v3.football.api-sports.io/${endpoint}`, {
             params: req.query,
             headers: {
                 'x-rapidapi-host': 'v3.football.api-sports.io',
@@ -55,7 +56,7 @@ router.get('/proxy/fixtures', async (req, res) => {
         });
         res.json(response.data);
     } catch (err) {
-        console.error('[Proxy] Fixtures Error:', err.message);
+        console.error(`[Proxy] /${req.params[0]} Error:`, err.message);
         res.status(err.response?.status || 500).json(err.response?.data || { success: false, message: err.message });
     }
 });
