@@ -1377,6 +1377,19 @@ router.get('/v3/tournament-logo/:tournamentId', async (req, res) => {
         res.status(404).json({ success: false, message: 'Tournament logo not found' });
     }
 });
+// ESPN Player Profile
+router.get('/v3/player-profile/:playerId', async (req, res) => {
+    try {
+        const { playerId } = req.params;
+        const leagueId = req.query.leagueId || 'eng.1';
+        const profile = await espnService.getPlayerProfile(playerId, leagueId);
+        res.json({ success: true, data: profile });
+    } catch (err) {
+        console.error('[ESPN] Player profile error:', err.message);
+        res.status(404).json({ success: false, message: 'Player profile not found' });
+    }
+});
+
 import * as thesportsdbService from '../services/thesportsdbService.js';
 
 // TheSportsDB Team Crest

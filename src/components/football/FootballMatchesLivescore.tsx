@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from "../../lib/utils";
 import { 
   useEspnLiveMatches,
@@ -16,6 +16,8 @@ interface FootballMatchesLivescoreProps {
 export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatchesLivescoreProps) => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<'live' | 'recent' | 'upcoming'>('live');
+  const [selectedDateIndex, setSelectedDateIndex] = useState(0);
+  const [recentSelectedDateIndex, setRecentSelectedDateIndex] = useState(0);
 
   // ─── Queries ─────────────────────────────────────────────────────────
   // Live: always enabled (loads on page mount)
@@ -46,6 +48,61 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
     (filter === 'upcoming' && upcomingLoading) ||
     (filter === 'recent'   && recentLoading);
 
+  // ─── Date grouping logic ──────────────────────────────────────────────
+  const formatDateLabel = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    if (
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth() &&
+      date.getDate() === today.getDate()
+    ) {
+      return 'Today';
+    }
+    if (
+      date.getFullYear() === tomorrow.getFullYear() &&
+      date.getMonth() === tomorrow.getMonth() &&
+      date.getDate() === tomorrow.getDate()
+    ) {
+      return 'Tomorrow';
+    }
+    
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  };
+
+  const getUpcomingDates = () => {
+    if (!upcomingData?.data) return [];
+    const dates = new Set<string>();
+    upcomingData.data.forEach((match: any) => {
+      // Assuming match.startTime holds the date
+      if (match.startTime) {
+        const d = new Date(match.startTime);
+        dates.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`);
+      }
+    });
+    return Array.from(dates);
+  };
+
+  const uniqueDates = getUpcomingDates();
+
+  const getRecentDates = () => {
+    if (!recentData?.data) return [];
+    const dates = new Set<string>();
+    recentData.data.forEach((match: any) => {
+      // Assuming match.startTime holds the date
+      if (match.startTime) {
+        const d = new Date(match.startTime);
+        dates.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`);
+      }
+    });
+    return Array.from(dates);
+  };
+
+  const uniqueRecentDates = getRecentDates();
+
   // ─── Build sections ───────────────────────────────────────────────────
   let sections: { title: string; matches: any[] }[] = [];
 
@@ -66,11 +123,41 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
     if (filter === 'live') {
       if (hasLive) sections = [{ title: 'Live Matches', matches: liveMatches }];
     } else if (filter === 'upcoming') {
-      const matches = upcomingData?.data || [];
-      if (matches.length > 0) sections = [{ title: 'Upcoming Matches', matches }];
+      const allMatches = upcomingData?.data || [];
+      
+      if (uniqueDates.length > 0) {
+        // Ensure index is within bounds
+        const safeIndex = Math.min(Math.max(selectedDateIndex, 0), uniqueDates.length - 1);
+        const selectedDateStr = uniqueDates[safeIndex];
+        
+        const matches = allMatches.filter((m: any) => {
+          if (!m.startTime) return false;
+          const d = new Date(m.startTime);
+          return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}` === selectedDateStr;
+        });
+
+        if (matches.length > 0) sections = [{ title: 'Upcoming Matches', matches }];
+      } else {
+         if (allMatches.length > 0) sections = [{ title: 'Upcoming Matches', matches: allMatches }];
+      }
     } else if (filter === 'recent') {
-      const matches = recentData?.data || [];
-      if (matches.length > 0) sections = [{ title: 'Recent Matches', matches }];
+      const allMatches = recentData?.data || [];
+      
+      if (uniqueRecentDates.length > 0) {
+        // Ensure index is within bounds
+        const safeIndex = Math.min(Math.max(recentSelectedDateIndex, 0), uniqueRecentDates.length - 1);
+        const selectedDateStr = uniqueRecentDates[safeIndex];
+        
+        const matches = allMatches.filter((m: any) => {
+          if (!m.startTime) return false;
+          const d = new Date(m.startTime);
+          return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}` === selectedDateStr;
+        });
+
+        if (matches.length > 0) sections = [{ title: 'Recent Matches', matches }];
+      } else {
+         if (allMatches.length > 0) sections = [{ title: 'Recent Matches', matches: allMatches }];
+      }
     }
   }
 
@@ -131,6 +218,74 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
           </button>
         </div>
       </div>
+
+      {/* Date Navigation Bar for Upcoming Matches */}
+      {variant === 'hub' && filter === 'upcoming' && uniqueDates.length > 0 && (
+        <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center justify-between bg-secondary/30 backdrop-blur-md border border-border/50 rounded-full px-6 py-2.5 w-full max-w-full">
+            <button 
+              onClick={() => setSelectedDateIndex(prev => Math.max(0, prev - 1))}
+              disabled={selectedDateIndex === 0}
+              className="p-1 rounded-full hover:bg-foreground/5 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            >
+              <ChevronLeft size={18} className="text-foreground" />
+            </button>
+            
+            <div className="flex-1 text-center">
+              <span className="text-sm font-bold tracking-wide uppercase text-foreground">
+                {formatDateLabel(
+                  upcomingData?.data?.find((m: any) => {
+                    const d = new Date(m.startTime);
+                    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}` === uniqueDates[selectedDateIndex];
+                  })?.startTime || new Date().toISOString()
+                )}
+              </span>
+            </div>
+
+            <button 
+              onClick={() => setSelectedDateIndex(prev => Math.min(uniqueDates.length - 1, prev + 1))}
+              disabled={selectedDateIndex === uniqueDates.length - 1}
+              className="p-1 rounded-full hover:bg-foreground/5 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            >
+              <ChevronRight size={18} className="text-foreground" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Date Navigation Bar for Recent Matches */}
+      {variant === 'hub' && filter === 'recent' && uniqueRecentDates.length > 0 && (
+        <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center justify-between bg-secondary/30 backdrop-blur-md border border-border/50 rounded-full px-6 py-2.5 w-full max-w-full">
+            <button 
+              onClick={() => setRecentSelectedDateIndex(prev => Math.max(0, prev - 1))}
+              disabled={recentSelectedDateIndex === 0}
+              className="p-1 rounded-full hover:bg-foreground/5 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            >
+              <ChevronLeft size={18} className="text-foreground" />
+            </button>
+            
+            <div className="flex-1 text-center">
+              <span className="text-sm font-bold tracking-wide uppercase text-foreground">
+                {formatDateLabel(
+                  recentData?.data?.find((m: any) => {
+                    const d = new Date(m.startTime);
+                    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}` === uniqueRecentDates[recentSelectedDateIndex];
+                  })?.startTime || new Date().toISOString()
+                )}
+              </span>
+            </div>
+
+            <button 
+              onClick={() => setRecentSelectedDateIndex(prev => Math.min(uniqueRecentDates.length - 1, prev + 1))}
+              disabled={recentSelectedDateIndex === uniqueRecentDates.length - 1}
+              className="p-1 rounded-full hover:bg-foreground/5 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            >
+              <ChevronRight size={18} className="text-foreground" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       {isLoading ? (

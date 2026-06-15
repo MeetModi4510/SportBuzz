@@ -12,6 +12,8 @@ interface LineupPlayerImageProps {
 const imageCache = new Map<string, string | null>();
 const pendingRequests = new Map<string, Promise<string | null>>();
 
+const FORCE_ESPN_NAMES = ['gavi', 'pedri', 'rodri'];
+
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
   : 'http://localhost:5000';
@@ -97,7 +99,14 @@ export const LineupPlayerImage = ({ playerId, playerName, className, fallbackIni
         let isMounted = true;
         const key = playerName.toLowerCase().trim();
 
-        // Already cached successfully
+        // 1. Force ESPN for known problematic names from TheSportsDB
+        if (FORCE_ESPN_NAMES.includes(key)) {
+            setImgUrl(`https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${playerId}.png`);
+            setLoading(false);
+            return;
+        }
+
+        // 2. Already cached successfully
         if (imageCache.has(key) && imageCache.get(key) !== null) {
             const cached = imageCache.get(key);
             setImgUrl(cached!);

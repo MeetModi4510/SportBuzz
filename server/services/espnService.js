@@ -194,3 +194,37 @@ export async function getMatchDetail(matchId) {
         throw error;
     }
 }
+
+export async function getPlayerProfile(playerId, leagueId = 'eng.1') {
+    const cacheKey = `espn_player_v3_${playerId}_${leagueId}`;
+    if (cache.has(cacheKey)) return cache.get(cacheKey);
+
+    try {
+        const url = `https://site.web.api.espn.com/apis/common/v3/sports/soccer/${leagueId}/athletes/${playerId}`;
+        const res = await axios.get(url, { timeout: 5000 });
+        
+        // Extract and map useful properties
+        const athlete = res.data?.athlete || {};
+        const profile = {
+            id: athlete.id,
+            name: athlete.displayName,
+            position: athlete.position?.name,
+            jersey: athlete.displayJersey || athlete.jersey,
+            height: athlete.displayHeight,
+            weight: athlete.displayWeight,
+            dob: athlete.displayDOB,
+            age: athlete.age,
+            birthPlace: athlete.displayBirthPlace,
+            citizenship: athlete.citizenship,
+            headshot: athlete.headshot?.href,
+            statsSummary: athlete.statsSummary?.statistics || [],
+        };
+
+        // Cache for 24 hours (86400 seconds) since player profiles rarely change
+        cache.set(cacheKey, profile, 86400); 
+        return profile;
+    } catch (error) {
+        console.error(`Error fetching ESPN player profile for ${playerId} in ${leagueId}:`, error.message);
+        throw error;
+    }
+}

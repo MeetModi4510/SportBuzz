@@ -24,6 +24,11 @@ export const useEspnLiveMatches = (enabled: boolean = true) => {
       return res.data;
     },
     ...STALE_30_MIN,
+    staleTime: 1 * 60 * 1000,
+    refetchInterval: 310 * 1000,
+    refetchIntervalInBackground: true,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
     enabled,
   });
 };
@@ -36,6 +41,11 @@ export const useEspnUpcomingMatches = (enabled: boolean = false) => {
       return res.data;
     },
     ...STALE_30_MIN,
+    staleTime: 1 * 60 * 1000,
+    refetchInterval: 310 * 1000,
+    refetchIntervalInBackground: true,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
     enabled,
   });
 };
@@ -48,6 +58,11 @@ export const useEspnRecentMatches = (enabled: boolean = false) => {
       return res.data;
     },
     ...STALE_30_MIN,
+    staleTime: 1 * 60 * 1000,
+    refetchInterval: 310 * 1000,
+    refetchIntervalInBackground: true,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
     enabled,
   });
 };
@@ -69,6 +84,31 @@ export const useEspnMatchDetail = (
     ...STALE_30_MIN,
     staleTime: 1 * 60 * 1000, // Reduce stale time to 1 min for live updates
     refetchInterval: 310 * 1000, // Auto-fetch every 310 seconds (slightly longer than backend cache)
+    refetchIntervalInBackground: true,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
     enabled: enabled && !!matchId,
+  });
+};
+
+// ─── Player Profile Hook ───────────────────────────────────────────────────────
+
+export const useEspnPlayerProfile = (
+  playerId: string,
+  leagueId: string | undefined,
+  enabled: boolean = false
+) => {
+  return useQuery<any>({
+    queryKey: ['espn', 'v3', 'player', playerId, leagueId],
+    queryFn: async () => {
+      const url = leagueId 
+        ? `${API_BASE}/api/football/v3/player-profile/${playerId}?leagueId=${leagueId}`
+        : `${API_BASE}/api/football/v3/player-profile/${playerId}`;
+      const res = await axios.get(url);
+      return res.data;
+    },
+    ...STALE_30_MIN,
+    staleTime: 60 * 60 * 1000, // 1 hour stale time since profile rarely changes
+    enabled: enabled && !!playerId,
   });
 };

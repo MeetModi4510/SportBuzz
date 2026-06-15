@@ -15,6 +15,8 @@ import { useToast } from "../../hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import { cn } from "../../lib/utils";
 import { Helmet } from "react-helmet-async";
+import { PlayerProfileDialog } from "../../components/PlayerProfileDialog";
+import { Player } from "../../data/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
@@ -96,6 +98,55 @@ export default function MatchCenter() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"summary" | "events" | "lineups" | "statistics" | "performance">("summary");
   const [activeStatCategory, setActiveStatCategory] = useState("all");
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+
+  const handlePlayerClick = (p: any, teamId: string) => {
+    const goals = getStatValue(p.stats, "totalGoals");
+    const assists = getStatValue(p.stats, "goalAssists");
+    const yellowCards = getStatValue(p.stats, "yellowCards");
+    const redCards = getStatValue(p.stats, "redCards");
+    const saves = getStatValue(p.stats, "saves");
+    
+    const mappedPlayer: Player = {
+      id: p.athlete.id,
+      name: p.athlete.displayName,
+      teamId: teamId,
+      sport: "football",
+      position: p.position?.name || "Unknown",
+      rating: parseFloat(generateRating(p.athlete.id)),
+      leagueId: matchData?.header?.league?.slug || "eng.1",
+      stats: {
+        Goals: goals,
+        Assists: assists,
+        "Yellow Cards": yellowCards,
+        "Red Cards": redCards,
+        Saves: saves,
+      },
+      matchStats: {
+        goals,
+        assists,
+        yellowCards,
+        redCards,
+        saves,
+        rating: parseFloat(generateRating(p.athlete.id)),
+        substitutedIn: p.subbedIn ? "Yes" : undefined,
+        substitutedOut: p.subbedOut ? "Yes" : undefined,
+      },
+      rawMatchStats: p.stats?.reduce((acc: any, s: any) => {
+        acc[s.name] = s.value;
+        return acc;
+      }, {}),
+      personalInfo: {
+        height: p.athlete.height,
+        weight: p.athlete.weight,
+        age: p.athlete.age,
+        jersey: p.athlete.jersey,
+        country: p.athlete.flag?.alt,
+      },
+      image: `https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${p.athlete.id}.png`,
+    };
+    setSelectedPlayer(mappedPlayer);
+  };
 
   const { data: matchData, isLoading, error } = useEspnMatchDetail(id || "", !!id);
 
@@ -179,7 +230,50 @@ export default function MatchCenter() {
   const statusState = comp.status?.type?.state || "pre"; // pre, in, post
   const date = comp.date || "";
   
-  const keyEvents = matchData.keyEvents || [];
+  // Merge keyEvents with important commentary events
+  const rawKeyEvents = matchData.keyEvents || [];
+  const commentaries = matchData.commentary || [];
+  
+  const importantPlayTypes = ['Shot On Target', 'VAR', 'Missed Penalty', 'Penalty', 'Shot Hit Woodwork', 'Shot Off Target', 'Corner', 'Save', 'Foul', 'Offside'];
+  const additionalEvents = commentaries
+    .map((c: any) => c.play)
+    .filter((play: any) => play && importantPlayTypes.some(t => play.type?.text?.toLowerCase().includes(t.toLowerCase())));
+    
+  const allEventsMap = new Map();
+  [...rawKeyEvents, ...additionalEvents].forEach((evt: any) => {
+      if (evt && evt.id) {
+          allEventsMap.set(evt.id, evt);
+      }
+  });
+  
+  let keyEvents = Array.from(allEventsMap.values());
+  keyEvents = keyEvents.filter((evt: any) => {
+      const typeText = (evt.type?.text || "").toLowerCase();
+      const text = (evt.text || "").toLowerCase();
+      
+      const isStartEnd = typeText.includes('end regular time') || 
+                         typeText.includes('start of') || 
+                         typeText.includes('end of') ||
+                         typeText.includes('match ends') ||
+                         text.includes('match ends') ||
+                         text.includes('first half begins') ||
+                         text.includes('second half begins') ||
+                         text.includes('match starts') ||
+                         text.includes('end regular time');
+      const isDelay = typeText.includes('delay') || text.includes('delay');
+      
+      return !isStartEnd && !isDelay;
+  });
+  
+  // Sort events by period and clock (ascending, same as ESPN default for summary)
+  keyEvents.sort((a: any, b: any) => {
+      const pA = a.period?.number || Math.floor((a.clock?.value || 0) / 2700) + 1;
+      const pB = b.period?.number || Math.floor((b.clock?.value || 0) / 2700) + 1;
+      if (pA !== pB) return pA - pB;
+      const timeA = a.clock?.value || 0;
+      const timeB = b.clock?.value || 0;
+      return timeA - timeB;
+  });
   const homeStats = matchData.boxscore?.teams?.find((t: any) => t.team.id === homeTeam.id)?.statistics || [];
   const awayStats = matchData.boxscore?.teams?.find((t: any) => t.team.id === awayTeam.id)?.statistics || [];
   
@@ -233,7 +327,7 @@ export default function MatchCenter() {
     );
   };
 
-  const renderPitchPlayer = (p: any, teamColor: string) => {
+  const renderPitchPlayer = (p: any, teamColor: string, teamId: string) => {
     const rating = generateRating(p.athlete.id);
     const goals = getStatValue(p.stats, "totalGoals");
     const assists = getStatValue(p.stats, "goalAssists");
@@ -242,7 +336,11 @@ export default function MatchCenter() {
     const isRedCarded = redCards > 0;
     
     return (
-      <div key={p.athlete.id} className={cn("flex flex-col items-center justify-center w-20 md:w-24 group z-10 transition-transform hover:scale-110 relative", isRedCarded && "opacity-50 grayscale")}>
+      <div 
+        key={p.athlete.id} 
+        onClick={() => handlePlayerClick(p, teamId)}
+        className={cn("flex flex-col items-center justify-center w-20 md:w-24 group z-10 transition-transform hover:scale-110 relative cursor-pointer", isRedCarded && "opacity-50 grayscale")}
+      >
         <div className="relative mt-0.5">
           <div className="relative w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-sm font-bold shadow-[0_4px_12px_rgba(0,0,0,0.6)] border-[3px] overflow-hidden bg-secondary" style={{ borderColor: teamColor }}>
             <span className="absolute inset-0 flex items-center justify-center text-white/50 font-black text-xl z-0 drop-shadow-md">{p.jersey}</span>
@@ -285,7 +383,7 @@ export default function MatchCenter() {
     );
   };
 
-  const renderSubstituteRow = (p: any, teamColor: string) => {
+  const renderSubstituteRow = (p: any, teamColor: string, teamId: string) => {
     const rating = generateRating(p.athlete.id);
     const goals = getStatValue(p.stats, "totalGoals");
     const assists = getStatValue(p.stats, "goalAssists");
@@ -293,7 +391,11 @@ export default function MatchCenter() {
     const redCards = getStatValue(p.stats, "redCards");
     
     return (
-      <div key={p.athlete.id} className="flex items-center gap-3 py-2 border-b border-border/10 last:border-0 hover:bg-white/5 transition-colors px-2 -mx-2 rounded-md">
+      <div 
+        key={p.athlete.id} 
+        onClick={() => handlePlayerClick(p, teamId)}
+        className="flex items-center gap-3 py-2 border-b border-border/10 last:border-0 hover:bg-white/5 transition-colors px-2 -mx-2 rounded-md cursor-pointer"
+      >
         <div className="w-5 text-right shrink-0">
           <span className="text-xs font-mono font-semibold text-white/40">{p.jersey}</span>
         </div>
@@ -803,8 +905,15 @@ export default function MatchCenter() {
                       
                       <div className="space-y-8">
                         {keyEvents.map((evt: any, i: number) => {
-                          const isHome = evt.team?.id === homeTeam.id;
-                          const isAway = evt.team?.id === awayTeam.id;
+                          const homeName = homeTeam.name || "";
+                          const awayName = awayTeam.name || "";
+                          const evtTeamName = evt.team?.displayName || "";
+                          const participantName = evt.participants?.[0]?.athlete?.displayName || "";
+                          const isHomeByRoster = participantName && homeRoster.some((r: any) => r.athlete?.displayName === participantName);
+                          const isAwayByRoster = participantName && awayRoster.some((r: any) => r.athlete?.displayName === participantName);
+                          
+                          const isHome = evt.team?.id === homeTeam.id || (evtTeamName && (homeName.includes(evtTeamName) || evtTeamName.includes(homeName))) || isHomeByRoster;
+                          const isAway = evt.team?.id === awayTeam.id || (evtTeamName && (awayName.includes(evtTeamName) || evtTeamName.includes(awayName))) || isAwayByRoster;
                           const isNeutral = !isHome && !isAway;
                           
                           const isGoal = evt.type?.text?.toLowerCase().includes("goal");
@@ -1196,6 +1305,12 @@ export default function MatchCenter() {
         </div>
 
       </main>
+      
+      <PlayerProfileDialog
+        player={selectedPlayer}
+        isOpen={!!selectedPlayer}
+        onClose={() => setSelectedPlayer(null)}
+      />
     </div>
   );
 }

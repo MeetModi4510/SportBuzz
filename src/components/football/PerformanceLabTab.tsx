@@ -218,120 +218,107 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
     // --- REAL MOMENTUM GRAPH GENERATOR ---
     const momentumData = React.useMemo(() => {
         const data = [];
-        const rawPoints: Record<number, number> = {};
+        const rawPoints: Record<number, { home: number; away: number }> = {};
         const goalMinutes: Record<number, string> = {};
         let maxMinuteFound = 0;
 
-        // Extract real minute-by-minute pressure from ESPN commentary
+        const processEvent = (min: number, teamId: string, teamName: string, typeText: string, text: string) => {
+            if (min < 0 || min > 120) return;
+            if (min > maxMinuteFound) maxMinuteFound = min;
+            if (!rawPoints[min]) rawPoints[min] = { home: 0, away: 0 };
+
+            typeText = typeText.toLowerCase();
+            text = text.toLowerCase();
+            teamName = teamName.toLowerCase();
+
+            const isHome = teamId === homeTeamObj.id || teamName === homeTeamObj.name?.toLowerCase() || text.includes(homeTeamName.toLowerCase());
+            const isAway = teamId === awayTeamObj.id || teamName === awayTeamObj.name?.toLowerCase() || text.includes(awayTeamName.toLowerCase());
+
+            let pts = 0;
+            const isActualGoal = typeText === 'goal' || typeText === 'penalty - scored' || typeText === 'own goal';
+
+            if (isActualGoal) {
+                pts = 50;
+                let goalForTeam = isHome ? 'home' : (isAway ? 'away' : '');
+                if (!goalForTeam && text.includes(homeTeamName.toLowerCase())) goalForTeam = 'home';
+                if (!goalForTeam && text.includes(awayTeamName.toLowerCase())) goalForTeam = 'away';
+                if (goalForTeam) goalMinutes[min] = goalForTeam;
+            }
+            else if (typeText.includes('missed') || typeText.includes('saved') || typeText.includes('shot') || typeText.includes('attempt') || text.includes('attempt') || text.includes('shot')) {
+                pts = 20;
+            }
+            else if (typeText.includes('corner') || text.includes('corner')) {
+                pts = 10;
+            }
+            else if (typeText.includes('foul') || text.includes('foul') || typeText.includes('offside') || text.includes('offside')) {
+                pts = -5; // Negative momentum for the team committing it
+            }
+            else if (typeText.includes('yellow') || text.includes('yellow card')) {
+                pts = -15;
+            }
+            else if (typeText.includes('red') || text.includes('red card')) {
+                pts = -40;
+            }
+            else {
+                pts = 5; // generic attacking event / free kick won
+            }
+
+            if (isHome) {
+                rawPoints[min].home += pts;
+            } else if (isAway) {
+                rawPoints[min].away += pts;
+            }
+        };
+
+        if (matchData.keyEvents) {
+            matchData.keyEvents.forEach((e: any) => {
+                const minText = e.clock?.time || e.time || '0';
+                const min = parseInt(minText.toString().split("'")[0] || '0');
+                const teamId = e.team?.id;
+                const teamName = e.team?.displayName || '';
+                processEvent(min, teamId, teamName, e.type?.text || '', e.text || '');
+            });
+        }
+        
         if (matchData.commentary) {
             matchData.commentary.forEach((c: any) => {
                 const minText = c.time?.displayValue || '0';
                 const min = parseInt(minText.toString().split("'")[0] || '0');
-                if (min >= 0 && min <= 120) {
-                    if (min > maxMinuteFound) maxMinuteFound = min;
-                    if (!rawPoints[min]) rawPoints[min] = 0;
-
-                    const txt = (c.play?.text || c.text || '').toLowerCase();
-                    const playTeamName = c.play?.team?.displayName || c.team?.displayName || '';
-                    const isHome = (c.play?.team?.id && c.play.team.id === homeTeamObj.id) || 
-                                   (playTeamName && (playTeamName === homeTeamObj.name || playTeamName === homeTeamName)) ||
-                                   (homeTeamName && txt.includes(homeTeamName.toLowerCase()));
-                    const isAway = (c.play?.team?.id && c.play.team.id === awayTeamObj.id) || 
-                                   (playTeamName && (playTeamName === awayTeamObj.name || playTeamName === awayTeamName)) ||
-                                   (awayTeamName && txt.includes(awayTeamName.toLowerCase()));
-
-                    let pts = 0;
-                    if (txt.includes('goal')) {
-                        pts = 50; // Natural pressure, not max 100
-                        let goalForTeam = 'home';
-                        if (c.play?.team?.id === awayTeamObj.id || c.team?.id === awayTeamObj.id || (playTeamName && (playTeamName === awayTeamObj.name || playTeamName === awayTeamName))) {
-                            goalForTeam = 'away';
-                        } else if (c.play?.team?.id === homeTeamObj.id || c.team?.id === homeTeamObj.id || (playTeamName && (playTeamName === homeTeamObj.name || playTeamName === homeTeamName))) {
-                            goalForTeam = 'home';
-                        } else if (txt.includes(awayTeamName.toLowerCase())) {
-                            goalForTeam = 'away';
-                        }
-                        goalMinutes[min] = goalForTeam;
-                    }
-                    else if (txt.includes('attempt') || txt.includes('shot')) pts = 20;
-                    else if (txt.includes('corner')) pts = 10;
-                    else if (txt.includes('free kick won')) pts = 5;
-                    else if (txt.includes('red card')) pts = -40;
-                    else if (txt.includes('yellow card')) pts = -10;
-                    else pts = 2; // base point for recorded attacking play
-
-                    if (isHome) rawPoints[min] += pts;
-                    else if (isAway) rawPoints[min] -= pts;
-                }
-            });
-        }
-
-        // Fallback to key events if no commentary
-        if (maxMinuteFound === 0 && matchData.keyEvents) {
-            matchData.keyEvents.forEach((e: any) => {
-                const minText = e.clock?.time || e.time || '0';
-                const min = parseInt(minText.toString().split("'")[0] || '0');
-                if (min >= 0 && min <= 120) {
-                    if (min > maxMinuteFound) maxMinuteFound = min;
-                    if (!rawPoints[min]) rawPoints[min] = 0;
-
-                    const txt = (e.text || e.type?.text || '').toLowerCase();
-                    const playTeamName = e.team?.displayName || '';
-                    const isHome = (e.team?.id && e.team.id === homeTeamObj.id) || 
-                                   (playTeamName && (playTeamName === homeTeamObj.name || playTeamName === homeTeamName)) ||
-                                   (homeTeamName && txt.includes(homeTeamName.toLowerCase()));
-                    const isAway = (e.team?.id && e.team.id === awayTeamObj.id) || 
-                                   (playTeamName && (playTeamName === awayTeamObj.name || playTeamName === awayTeamName)) ||
-                                   (awayTeamName && txt.includes(awayTeamName.toLowerCase()));
-
-                    let pts = 0;
-                    if (txt.includes('goal')) {
-                        pts = 50;
-                        let goalForTeam = 'home';
-                        if (e.team?.id === awayTeamObj.id || (playTeamName && (playTeamName === awayTeamObj.name || playTeamName === awayTeamName))) {
-                            goalForTeam = 'away';
-                        } else if (e.team?.id === homeTeamObj.id || (playTeamName && (playTeamName === homeTeamObj.name || playTeamName === homeTeamName))) {
-                            goalForTeam = 'home';
-                        } else if (txt.includes(awayTeamName.toLowerCase())) {
-                            goalForTeam = 'away';
-                        }
-                        goalMinutes[min] = goalForTeam;
-                    }
-                    else if (txt.includes('red card')) pts = -40;
-                    else if (txt.includes('yellow card')) pts = -10;
-                    else if (txt.includes('shot')) pts = 20;
-
-                    if (isHome) rawPoints[min] += pts;
-                    else if (isAway) rawPoints[min] -= pts;
-                }
+                const teamId = c.play?.team?.id || c.team?.id;
+                const teamName = c.play?.team?.displayName || c.team?.displayName || '';
+                processEvent(min, teamId, teamName, c.play?.type?.text || '', c.text || c.play?.text || '');
             });
         }
 
         const maxMinute = Math.max(90, maxMinuteFound);
+        let runningMomentum = 0;
 
-        // Apply minimal smoothing to create a realistic, jagged momentum chart
         for (let i = 0; i <= maxMinute; i++) {
-            let pts = rawPoints[i] || 0;
+            let pts = 0;
+            if (rawPoints[i]) {
+                pts = rawPoints[i].home - rawPoints[i].away;
+            }
             
-            // Add slight surrounding pressure for visual weight
-            let pressure = pts * 1.5; 
-            if (rawPoints[i-1]) pressure += rawPoints[i-1] * 0.8;
-            if (rawPoints[i-2]) pressure += rawPoints[i-2] * 0.4;
+            // Add current minute's points
+            runningMomentum += pts;
             
-            // Limit to +/- 100
-            pressure = Math.max(-100, Math.min(100, pressure));
+            // Decay by 20% each minute to simulate momentum fading (smoothing)
+            runningMomentum *= 0.8;
+            
+            // Clamp to [-100, 100]
+            let displayPressure = Math.max(-100, Math.min(100, runningMomentum));
             
             data.push({
                 minute: i,
-                home: pressure, // Home reacts positively to home events, negatively to away events
-                away: -pressure, // Away reacts exactly inversely to home
-                value: pressure, // keep for tooltips or other calculations
+                home: displayPressure,
+                away: -displayPressure,
+                value: displayPressure,
                 isGoal: !!goalMinutes[i],
                 goalTeam: goalMinutes[i]
             });
         }
         return data;
-    }, [matchData, homeTeamObj.id, awayTeamObj.id]);
+    }, [matchData, homeTeamObj.id, awayTeamObj.id, homeTeamName, awayTeamName]);
 
     // --- MATCH LEADERS ---
     let matchLeadersTabs: Record<string, any[]> = {

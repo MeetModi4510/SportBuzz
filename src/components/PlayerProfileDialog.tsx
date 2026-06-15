@@ -9,6 +9,7 @@ import { Player } from "@/data/types";
 import { TeamLogo } from "@/components/TeamLogo";
 import { SportIcon } from "@/components/SportIcon";
 import { cn } from "@/lib/utils";
+import { LineupPlayerImage } from "@/components/football/LineupPlayerImage";
 import {
     Trophy,
     MapPin,
@@ -28,6 +29,7 @@ import {
 import { useState, useEffect } from "react";
 import { teams } from "@/data/mockData";
 import { cricketApi } from "@/services/api";
+import { useEspnPlayerProfile } from "@/hooks/football/useEspnQueries";
 import { Loader2 } from "lucide-react";
 
 interface PlayerProfileDialogProps {
@@ -41,7 +43,11 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
     const [apiData, setApiData] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Fetch player info when dialog opens
+    // Fetch football player profile
+    const isFootballPlayer = Boolean(isOpen && player && player.sport === 'football' && player.id);
+    const { data: espnProfile, isLoading: espnLoading } = useEspnPlayerProfile(player?.id || '', player?.leagueId, isFootballPlayer);
+
+    // Fetch cricket player info when dialog opens
     useEffect(() => {
         const fetchPlayerInfo = async () => {
             if (isOpen && player && player.sport === 'cricket' && player.id) {
@@ -59,15 +65,23 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
                         setIsLoading(false);
                     }
                 }
+            } else if (player?.sport === 'football') {
+                if (espnProfile?.data) {
+                    setApiData(espnProfile.data);
+                } else {
+                    setApiData(null);
+                }
             } else {
                 setApiData(null);
             }
         };
 
         fetchPlayerInfo();
-    }, [isOpen, player]);
+    }, [isOpen, player, espnProfile]);
 
     if (!player) return null;
+
+    const isDataLoading = isLoading || (isFootballPlayer && espnLoading);
 
     const team = teams.find(t => t.id === player.teamId);
 
@@ -116,6 +130,16 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
             );
         }
 
+        if (player.sport === 'football' && player.id) {
+            return (
+                <LineupPlayerImage 
+                    playerId={player.id} 
+                    playerName={player.name} 
+                    className="w-full h-full object-cover" 
+                />
+            );
+        }
+
         return (
             <div className="w-full h-full flex items-center justify-center bg-secondary">
                 <SportIcon sport={player.sport} size={64} className="opacity-50" />
@@ -123,188 +147,243 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
         );
     };
 
-    // Helper to render stat item
-    const StatItem = ({ label, value, icon: Icon, color = "text-primary" }: any) => (
-        <div className="flex flex-col items-center p-3 bg-card border border-border rounded-xl">
-            <div className={cn("p-2 rounded-full bg-secondary mb-2", color)}>
-                <Icon size={18} />
-            </div>
-            <span className="text-xl font-bold font-mono">{value}</span>
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">{label}</span>
-        </div>
-    );
+
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-background border-border">
-                {isLoading ? (
+            <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden bg-[#0a0a0c] border border-white/10 shadow-2xl rounded-2xl">
+                {isDataLoading ? (
                     <div className="h-64 flex flex-col items-center justify-center gap-4">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-sm text-muted-foreground">Loading player profile...</p>
+                        <Loader2 className="h-8 w-8 animate-spin text-white/40" />
+                        <p className="text-sm text-white/40 font-medium">Loading profile...</p>
                     </div>
                 ) : (
-                    <>
-                        {/* Header / Banner */}
-                        <div className="relative h-32 md:h-40 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent">
-                            <div className="absolute top-4 right-4 z-10">
-                                {team && <TeamLogo logo={team.logo} name={team.name} size="md" />}
-                            </div>
+                    <div className="relative max-h-[85vh] overflow-y-auto overflow-x-hidden">
+                        {/* Header Banner */}
+                        <div className="h-28 relative bg-gradient-to-br from-white/10 to-transparent">
+                            {team && (
+                                <div className="absolute inset-0 flex items-center justify-center opacity-5 overflow-hidden">
+                                    <img src={team.logo} alt="team" className="w-48 h-48 object-contain blur-[2px]" />
+                                </div>
+                            )}
+                        </div>
 
-                            {/* Profile Content */}
-                            <div className="relative px-6 pb-6">
-                                {/* Avatar - overlapping header */}
-                                <div className="relative -mt-16 mb-4 flex justify-between items-end">
-                                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-background overflow-hidden bg-secondary shadow-lg">
+                        {/* Profile Info */}
+                        <div className="px-6 pb-6 relative -mt-14">
+                            <div className="flex flex-col items-center text-center">
+                                {/* Avatar */}
+                                <div className="w-28 h-28 rounded-full border-4 border-[#0a0a0c] overflow-hidden bg-[#0a0a0c] shadow-2xl relative z-10 flex items-center justify-center">
+                                    {team && (
+                                        <img src={team.logo} className="absolute inset-0 w-full h-full object-cover opacity-60 z-0" alt="" />
+                                    )}
+                                    <div className="relative z-10 w-full h-full">
                                         {renderPlayerImage()}
-                                    </div>
-
-                                    {/* Rating Badge */}
-                                    <div className={cn(
-                                        "flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl text-sm font-bold shadow-sm mb-2 ring-1",
-                                        getRatingColor(apiData?.localOverallRating || player.rating)
-                                    )}>
-                                        <div className="flex items-center gap-1.5">
-                                            <Star size={14} fill="currentColor" />
-                                            <span className="text-lg">{(apiData?.localOverallRating ? apiData.localOverallRating / 10 : player.rating).toFixed(1)}</span>
-                                        </div>
-                                        <span className="text-[9px] uppercase tracking-tighter opacity-70">Overall Rating</span>
                                     </div>
                                 </div>
 
-                                {/* Name & Title */}
-                                <div className="mb-6">
-                                    <DialogHeader>
-                                        <DialogTitle className="text-2xl font-bold">{apiData?.name || player.name}</DialogTitle>
-                                    </DialogHeader>
-                                    <div className="flex items-center gap-2 text-muted-foreground mt-1">
-                                        {team && <span className="font-medium text-foreground">{team.name}</span>}
-                                        <span>•</span>
-                                        <span>{apiData?.role || player.position}</span>
+                                {/* Name & Titles */}
+                                <div className="mt-3 w-full">
+                                    <DialogTitle className="text-2xl font-black text-white tracking-tight">
+                                        {apiData?.name || player.name}
+                                    </DialogTitle>
+                                    <div className="flex items-center justify-center gap-2 mt-1.5 flex-wrap">
+                                        {team && (
+                                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 border border-white/10">
+                                                <img src={team.logo} className="w-3.5 h-3.5 object-contain" alt="" />
+                                                <span className="text-[11px] font-bold text-white/80">{team.name}</span>
+                                            </div>
+                                        )}
+                                        <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] font-bold text-white/60 uppercase tracking-wider">
+                                            {apiData?.role || player.position}
+                                        </span>
                                         {apiData?.country && (
-                                            <>
-                                                <span>•</span>
-                                                <span>{apiData.country}</span>
-                                            </>
+                                            <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] font-bold text-white/60">
+                                                {apiData.country}
+                                            </span>
                                         )}
                                     </div>
                                 </div>
 
-                                {/* Recent Performance Trend */}
-                                {apiData?.formTrend && apiData.formTrend.length > 0 && (
-                                    <div className="mb-6 space-y-3">
-                                        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                                            <TrendingUp size={14} /> Recent Form Trend (Last {apiData.formTrend.length} Matches)
-                                        </h4>
-                                        <div className="flex items-end gap-1.5 h-16 bg-secondary/20 p-3 rounded-xl border border-border/50">
-                                            {apiData.formTrend.map((rating: number, i: number) => (
-                                                <div
-                                                    key={i}
-                                                    className={cn(
-                                                        "flex-1 rounded-t-sm transition-all hover:opacity-80",
-                                                        rating >= 80 ? "bg-completed" : rating >= 60 ? "bg-blue-500" : rating >= 40 ? "bg-upcoming" : "bg-muted-foreground"
-                                                    )}
-                                                    style={{ height: `${Math.max(10, rating)}%` }}
-                                                    title={`Rating: ${rating / 10}`}
-                                                />
-                                            ))}
-                                        </div>
-                                        <div className="flex justify-between text-[10px] text-muted-foreground px-1 uppercase font-bold tracking-tighter">
-                                            <span>Older</span>
-                                            <span>Latest</span>
-                                        </div>
+
+                            </div>
+
+                            {/* Divider */}
+                            <div className="w-full h-px bg-white/5 my-6" />
+
+                            {/* Match Performance */}
+                            {player.matchStats && (
+                                <div className="space-y-4">
+                                    <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] text-center">Match Performance</h4>
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden p-2">
+                                        {player.sport === 'football' && player.rawMatchStats && (
+                                            <div className="grid grid-cols-2 gap-x-6">
+                                                {Object.entries(player.rawMatchStats)
+                                                    .filter(([key]) => key.toLowerCase() !== 'rating')
+                                                    .map(([key, value]) => {
+                                                        const label = key.replace(/([A-Z])/g, ' $1').trim();
+                                                        let labelColor = "text-white/60";
+                                                        let valColor = "text-white";
+                                                        
+                                                        if (key.toLowerCase().includes('yellow') && Number(value) > 0) {
+                                                            labelColor = "text-yellow-500/80";
+                                                            valColor = "text-yellow-500";
+                                                        } else if (key.toLowerCase().includes('red') && Number(value) > 0) {
+                                                            labelColor = "text-red-500/80";
+                                                            valColor = "text-red-500";
+                                                        } else if (key.toLowerCase().includes('goal') && Number(value) > 0) {
+                                                            labelColor = "text-emerald-500/80";
+                                                            valColor = "text-emerald-400";
+                                                        }
+                                                        
+                                                        return (
+                                                            <div key={key} className="flex justify-between items-center py-2.5 px-2 border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                                                                <span className={`text-[11px] font-semibold capitalize ${labelColor}`}>{label}</span>
+                                                                <span className={`text-xs font-black tabular-nums ${valColor}`}>{String(value)}</span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                            </div>
+                                        )}
+                                        {player.sport === 'cricket' && (
+                                            <>
+                                                {(player.matchStats as any).runs !== undefined && (
+                                                    <div className="flex justify-between items-center px-4 py-3 hover:bg-white/[0.02] transition-colors">
+                                                        <span className="text-xs font-semibold capitalize text-white/60">Runs</span>
+                                                        <span className="text-sm font-black tabular-nums text-white">{(player.matchStats as any).runs}</span>
+                                                    </div>
+                                                )}
+                                                {(player.matchStats as any).wickets !== undefined && (
+                                                    <div className="flex justify-between items-center px-4 py-3 hover:bg-white/[0.02] transition-colors">
+                                                        <span className="text-xs font-semibold capitalize text-white/60">Wickets</span>
+                                                        <span className="text-sm font-black tabular-nums text-white">{(player.matchStats as any).wickets}</span>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
-                                )}
-
-                                {/* Current Match Performance */}
-                                {player.matchStats && (
-                                    <div className="mb-6 space-y-3">
-                                        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                                            <Activity size={14} /> Match Performance
-                                        </h4>
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                            {/* Show specific match stats based on sport */}
-                                            {player.sport === 'football' && (
-                                                <>
-                                                    {player.matchStats.goals !== undefined && <StatItem label="Goals" value={player.matchStats.goals} icon={Disc} />}
-                                                    {player.matchStats.assists !== undefined && <StatItem label="Assists" value={player.matchStats.assists} icon={Footprints} />}
-                                                    {player.matchStats.saves !== undefined && <StatItem label="Saves" value={player.matchStats.saves} icon={Hand} />}
-                                                    {/* Only show cards if > 0 to save space, or if relevant */}
-                                                    {(player.matchStats.yellowCards || 0) > 0 && <StatItem label="Yellow" value={player.matchStats.yellowCards} icon={RectangleVertical} color="text-yellow-500" />}
-                                                    {(player.matchStats.redCards || 0) > 0 && <StatItem label="Red" value={player.matchStats.redCards} icon={RectangleVertical} color="text-red-500" />}
-                                                </>
-                                            )}
-                                            {player.sport === 'cricket' && (
-                                                <>
-                                                    {(player.matchStats as any).runs !== undefined && <StatItem label="Runs" value={(player.matchStats as any).runs} icon={Activity} />}
-                                                    {(player.matchStats as any).wickets !== undefined && <StatItem label="Wickets" value={(player.matchStats as any).wickets} icon={Disc} />}
-                                                </>
-                                            )}
-                                        </div>
-
-                                        {/* Substitution Info */}
-                                        <div className="flex gap-4 mt-2 text-sm">
+                                    
+                                    {/* Substitution Badges */}
+                                    {(player.matchStats.substitutedIn || player.matchStats.substitutedOut) && (
+                                        <div className="flex flex-wrap justify-center gap-2 mt-3">
                                             {player.matchStats.substitutedIn && (
-                                                <div className="flex items-center gap-2 text-green-600 bg-green-500/10 px-3 py-1.5 rounded-lg border border-green-200 dark:border-green-900">
-                                                    <ArrowUpCircle size={16} />
-                                                    <span>Subbed In: {player.matchStats.substitutedIn}</span>
+                                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+                                                    <ArrowUpCircle size={14} strokeWidth={3} />
+                                                    <span className="text-[11px] font-bold">Subbed In: {player.matchStats.substitutedIn}</span>
                                                 </div>
                                             )}
                                             {player.matchStats.substitutedOut && (
-                                                <div className="flex items-center gap-2 text-red-600 bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-900">
-                                                    <ArrowDownCircle size={16} />
-                                                    <span>Subbed Out: {player.matchStats.substitutedOut}</span>
+                                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-red-500/10 border border-red-500/20 text-red-500">
+                                                    <ArrowDownCircle size={14} strokeWidth={3} />
+                                                    <span className="text-[11px] font-bold">Subbed Out: {player.matchStats.substitutedOut}</span>
                                                 </div>
                                             )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Season Stats / API Stats */}
-                                <div className="space-y-3">
-                                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                                        <Trophy size={14} /> {apiData ? 'Career Stats' : 'Season Stats'}
-                                    </h4>
-
-                                    {apiData ? (
-                                        <div className="space-y-4">
-                                            {apiData.battingStyle && (
-                                                <div className="flex justify-between items-center p-2.5 bg-secondary/30 rounded-lg border border-border/50">
-                                                    <span className="text-sm text-muted-foreground">Batting Style</span>
-                                                    <span className="font-medium">{apiData.battingStyle}</span>
-                                                </div>
-                                            )}
-                                            {apiData.bowlingStyle && (
-                                                <div className="flex justify-between items-center p-2.5 bg-secondary/30 rounded-lg border border-border/50">
-                                                    <span className="text-sm text-muted-foreground">Bowling Style</span>
-                                                    <span className="font-medium">{apiData.bowlingStyle}</span>
-                                                </div>
-                                            )}
-                                            {apiData.dateOfBirth && (
-                                                <div className="flex justify-between items-center p-2.5 bg-secondary/30 rounded-lg border border-border/50">
-                                                    <span className="text-sm text-muted-foreground">DOB</span>
-                                                    <span className="font-medium">{new Date(apiData.dateOfBirth).toLocaleDateString()}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {Object.entries(player.stats).map(([key, value]) => {
-                                                // Skip if already shown or specific keys
-                                                if (key === 'rating') return null;
-                                                return (
-                                                    <div key={key} className="flex justify-between items-center p-2.5 bg-secondary/30 rounded-lg border border-border/50">
-                                                        <span className="text-sm capitalize text-muted-foreground">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                                                        <span className="font-bold font-mono">{String(value)}</span>
-                                                    </div>
-                                                )
-                                            })}
                                         </div>
                                     )}
                                 </div>
+                            )}
 
-                            </div>
+                            {/* Match Performance Info */}
+                            {!apiData && player.personalInfo && Object.values(player.personalInfo).some(v => v) && (
+                                <div className="mt-6 space-y-4">
+                                    <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] text-center">Personal Profile</h4>
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden divide-y divide-white/5">
+                                        {Object.entries(player.personalInfo).map(([key, value]) => {
+                                            if (!value) return null;
+                                            return (
+                                                <div key={key} className="flex justify-between items-center px-4 py-3 hover:bg-white/[0.02] transition-colors">
+                                                    <span className="text-xs font-semibold text-white/60 capitalize">{key}</span>
+                                                    <span className="text-sm font-black text-white text-right">{String(value)}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Season/Career Stats */}
+                            {player.sport !== 'football' && (!apiData && Object.keys(player.stats).filter(k => k !== 'rating').length > 0) && (
+                                <div className="mt-6 space-y-4">
+                                    <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] text-center">Season Statistics</h4>
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden divide-y divide-white/5">
+                                        {Object.entries(player.stats)
+                                            .filter(([k]) => k !== 'rating' && k !== 'Goals' && k !== 'Assists' && k !== 'Yellow Cards' && k !== 'Red Cards' && k !== 'Saves')
+                                            .map(([key, value]) => (
+                                                <div key={key} className="flex justify-between items-center px-4 py-3">
+                                                    <span className="text-xs font-semibold text-white/60 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                                    <span className="text-sm font-black text-white tabular-nums">{String(value)}</span>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Football Detailed Career Profile */}
+                            {apiData && player.sport === 'football' && (
+                                <>
+                                    <div className="mt-6 space-y-4">
+                                        <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] text-center">Personal Profile</h4>
+                                        <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden divide-y divide-white/5">
+                                            {[
+                                                ['Age', apiData.age],
+                                                ['Date of Birth', apiData.dob],
+                                                ['Height', apiData.height],
+                                                ['Weight', apiData.weight],
+                                                ['Birth Place', apiData.birthPlace],
+                                                ['Citizenship', apiData.citizenship]
+                                            ].map(([label, val]) => val && (
+                                                <div key={label} className="flex justify-between items-center px-4 py-3 hover:bg-white/[0.02] transition-colors">
+                                                    <span className="text-xs font-semibold text-white/60 capitalize">{label}</span>
+                                                    <span className="text-sm font-black text-white text-right">{String(val)}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    {apiData.statsSummary && apiData.statsSummary.length > 0 && (
+                                        <div className="mt-6 space-y-4">
+                                            <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] text-center">Season Statistics</h4>
+                                            <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden divide-y divide-white/5">
+                                                {apiData.statsSummary.map((stat: any, idx: number) => (
+                                                    <div key={idx} className="flex justify-between items-center px-4 py-3 hover:bg-white/[0.02] transition-colors">
+                                                        <span className="text-xs font-semibold text-white/60 capitalize">{stat.displayName || stat.name}</span>
+                                                        <span className="text-sm font-black text-white text-right">{String(stat.displayValue || stat.value)}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            {/* Cricket Career Profile */}
+                            {apiData && player.sport === 'cricket' && (
+                                <div className="mt-6 space-y-4">
+                                    <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] text-center">Career Profile</h4>
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden divide-y divide-white/5">
+                                        {apiData.battingStyle && (
+                                            <div className="flex justify-between items-center px-4 py-3 hover:bg-white/[0.02] transition-colors">
+                                                <span className="text-xs font-semibold text-white/60">Batting Style</span>
+                                                <span className="text-sm font-black text-white text-right">{apiData.battingStyle}</span>
+                                            </div>
+                                        )}
+                                        {apiData.bowlingStyle && (
+                                            <div className="flex justify-between items-center px-4 py-3 hover:bg-white/[0.02] transition-colors">
+                                                <span className="text-xs font-semibold text-white/60">Bowling Style</span>
+                                                <span className="text-sm font-black text-white text-right">{apiData.bowlingStyle}</span>
+                                            </div>
+                                        )}
+                                        {apiData.dateOfBirth && (
+                                            <div className="flex justify-between items-center px-4 py-3 hover:bg-white/[0.02] transition-colors">
+                                                <span className="text-xs font-semibold text-white/60">Date of Birth</span>
+                                                <span className="text-sm font-black text-white">{new Date(apiData.dateOfBirth).toLocaleDateString()}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    </>
+                    </div>
                 )}
             </DialogContent>
         </Dialog>

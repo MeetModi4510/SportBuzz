@@ -129,11 +129,14 @@ export interface Player {
     substitutedIn?: string;
     substitutedOut?: string;
   };
+  rawMatchStats?: Record<string, any>;
+  personalInfo?: Record<string, any>;
   photo?: string; // Optional photo URL or ID (format: fp-{playerId} for football)
   photo2?: string;
   photo3?: string;
   image?: string;
   isSubstitute?: boolean;
+  leagueId?: string;
 }
 
 export interface MatchEvent {
