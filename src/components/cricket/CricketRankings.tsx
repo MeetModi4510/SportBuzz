@@ -70,11 +70,16 @@ function PlayerFlag({
   className?: string;
 }) {
   const [error, setError] = useState(false);
+  const isWestIndies = country.toLowerCase().includes('west indies');
+
+  const baseClasses = cn(
+    "flex-shrink-0",
+    isWestIndies ? "rounded-full object-contain bg-white/10 p-0.5" : "rounded-sm object-cover",
+    className
+  );
 
   if (error) {
-    return (
-      <span className={cn("w-4 h-4 rounded-full bg-secondary/30 flex-shrink-0 inline-block", className)} />
-    );
+    return <span className={cn("w-6 h-4 bg-secondary/30 inline-block", baseClasses)} />;
   }
 
   if (flagLocal) {
@@ -83,7 +88,7 @@ function PlayerFlag({
         src={flagLocal}
         alt={country}
         onError={() => setError(true)}
-        className={cn("w-4 h-4 rounded-full object-cover flex-shrink-0", className)}
+        className={baseClasses}
       />
     );
   }
@@ -94,12 +99,12 @@ function PlayerFlag({
         src={`https://flagcdn.com/w40/${flagCode}.png`}
         alt={country}
         onError={() => setError(true)}
-        className={cn("w-4 h-4 rounded-full object-cover flex-shrink-0", className)}
+        className={baseClasses}
       />
     );
   }
 
-  return <span className={cn("w-4 h-4 rounded-full bg-secondary/30 flex-shrink-0 inline-block", className)} />;
+  return <span className={cn("w-6 h-4 bg-secondary/30 inline-block", baseClasses)} />;
 }
 
 function PlayerAvatar({ faceImageId, name, className }: { faceImageId: string | null; name: string; className?: string; }) {
@@ -297,7 +302,12 @@ export const CricketRankings = () => {
                           logo={row.flagCode || ''}
                           name={row.name}
                           size="sm"
-                          className="w-6 h-6 rounded-full shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+                          className={cn(
+                            "shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0",
+                            row.name.toLowerCase().includes('west indies') 
+                              ? "w-6 h-6 rounded-full object-contain" 
+                              : "w-7 h-5 rounded-[4px] object-cover"
+                          )}
                         />
                         <span className={cn('group-hover:text-primary transition-colors truncate', medal ? medal.text : 'text-foreground')}>
                           {row.name}

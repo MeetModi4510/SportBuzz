@@ -41,6 +41,8 @@ import {
 } from "lucide-react";
 
 import { usePlayerBattingStats } from '@/hooks/usePlayerBattingStats';
+import { usePerformanceLabPlayerStats } from '@/hooks/usePerformanceLab';
+import { getCricbuzzPlayerId } from '@/data/cricbuzzPlayerIds';
 import type { BattingFormatKey } from '@/types/playerBattingTypes';
 import { FORMAT_COLORS, FORMAT_LABELS } from '@/utils/playerStatsTransformer';
 
@@ -384,6 +386,12 @@ export const PlayerComparison = () => {
     const { battingStats: statsA, isLoading: loadingA } = usePlayerBattingStats(playerA.id);
     const { battingStats: statsB, isLoading: loadingB } = usePlayerBattingStats(playerB.id);
 
+    const cricbuzzIdA = getCricbuzzPlayerId(playerA.id)?.toString() || null;
+    const cricbuzzIdB = getCricbuzzPlayerId(playerB.id)?.toString() || null;
+
+    const { data: deepStatsA, isLoading: loadingDeepA } = usePerformanceLabPlayerStats(cricbuzzIdA, playerA.name);
+    const { data: deepStatsB, isLoading: loadingDeepB } = usePerformanceLabPlayerStats(cricbuzzIdB, playerB.name);
+
     const formatA = selectedSport === 'cricket' && statsA ? statsA[apiFormat] : null;
     const formatB = selectedSport === 'cricket' && statsB ? statsB[apiFormat] : null;
 
@@ -395,11 +403,24 @@ export const PlayerComparison = () => {
         fullMark: 100,
     }));
 
-    const formData = playerA.formTrend.map((val, i) => ({
-        match: `M${i + 1}`,
-        A: val,
-        B: playerB.formTrend[i] || 0,
-    }));
+    const recentBattingA = deepStatsA?.recentMatches?.batting || [];
+    const recentBattingB = deepStatsB?.recentMatches?.batting || [];
+
+    const getRunSafe = (recentArr: any[], mLabel: string, fallbackArr: number[], i: number) => {
+        if (!recentArr || recentArr.length === 0) return fallbackArr[i];
+        const match = recentArr.find((m: any) => m.match === mLabel);
+        return match && typeof match.runs === 'number' ? match.runs : 0;
+    };
+
+    // The scrape returns M10 to M1 (where M10 is the latest). We reverse them to [M1..M10] for left-to-right timeline.
+    const formData = Array.from({ length: 10 }).map((_, i) => {
+        const mLabel = `M${i + 1}`;
+        return {
+            match: mLabel,
+            A: getRunSafe(recentBattingA, mLabel, playerA.formTrend, i),
+            B: getRunSafe(recentBattingB, mLabel, playerB.formTrend, i),
+        };
+    });
 
     const statComparison = useMemo(() => {
         if (selectedSport === 'cricket' && (formatA || formatB)) {
@@ -603,8 +624,8 @@ export const PlayerComparison = () => {
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                                 <XAxis dataKey="match" tick={{ fill: "#64748b", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
-                                <YAxis domain={[50, 100]} tick={{ fill: "#64748b", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
-                                <Tooltip contentStyle={TOOLTIP_STYLE} />
+                                <YAxis domain={[0, 'auto']} tick={{ fill: "#64748b", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
+                                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value) => [`${value} Runs`, '']} />
                                 <Area
                                     type="monotone"
                                     dataKey="A"

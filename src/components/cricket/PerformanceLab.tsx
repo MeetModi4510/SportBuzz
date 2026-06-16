@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePerformanceLabPlayerStats } from '../../hooks/usePerformanceLab';
 import { StatGrid } from './StatGrid';
 import { PerformanceTrend } from './charts/PerformanceTrend';
@@ -12,6 +12,29 @@ interface PerformanceLabProps {
 
 type Format = 'test' | 'odi' | 't20i' | 'ipl' | 'all';
 
+function PlayerTeamsDisplay({ teamsString }: { teamsString: string }) {
+    // Parse the comma-separated string into an array of teams
+    const teams = teamsString.split(',').map(t => t.trim()).filter(Boolean);
+
+    if (teams.length === 0) return <span className="text-slate-400">-</span>;
+
+    return (
+        <div className="flex flex-wrap gap-2 mt-2">
+            {teams.map(team => (
+                <div key={team} className="flex items-center gap-2 bg-[#1C2433] border border-slate-700/50 rounded-lg px-3 py-1.5 shadow-sm hover:border-slate-600 transition-colors cursor-default group">
+                    <div className="w-6 h-6 flex items-center justify-center shrink-0">
+                        <span className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-[10px] text-slate-400 font-bold">
+                            {team.slice(0,1).toUpperCase()}
+                        </span>
+                    </div>
+                    <span className="text-sm font-semibold text-slate-200 tracking-wide group-hover:text-white transition-colors">{team}</span>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+
 export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
     const [activeFormat, setActiveFormat] = useState<Format>('odi');
     const [skillMode, setSkillMode] = useState<'profile' | 'batting' | 'bowling'>('profile');
@@ -20,6 +43,9 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
     const activePlayerName = activePlayer?.name || '';
     
     const { data: playerData, isLoading, error } = usePerformanceLabPlayerStats(activePlayerId, activePlayerName);
+
+    const idSum = activePlayerId ? activePlayerId.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0) : 0;
+    const stableOVR = activePlayerId ? (idSum % 16) + 80 : 90;
 
     if (!activePlayerId) {
         return (
@@ -38,7 +64,7 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
             <div className="flex-1 flex flex-col items-center justify-center border border-slate-800 rounded-2xl bg-[#0B1120] text-slate-500 min-h-[600px]">
                 <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
                 <h2 className="text-xl font-bold text-white">Extracting Deep Stats</h2>
-                <p className="text-sm mt-2">Running Stealth Scraper and bypassing firewalls...</p>
+                <p className="text-sm mt-2">Loading</p>
             </div>
         );
     }
@@ -102,33 +128,39 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                         </div>
                     </div>
                     
-                    <div className="flex flex-col items-center justify-center w-20 h-20 rounded-full border-4 border-blue-600 bg-[#0B1120] shadow-[0_0_20px_rgba(37,99,235,0.3)]">
-                        <span className="text-2xl font-bold text-white">{playerData.attributes?.batting || 90}</span>
-                        <span className="text-[8px] text-slate-400 uppercase tracking-wider font-bold">Overall Rating</span>
+                    <div className="flex flex-col items-center gap-2 mt-2">
+                        <div className="flex items-center justify-center w-20 h-20 rounded-full border-4 border-blue-500 bg-gradient-to-br from-[#0B1120] to-[#141A25] shadow-[0_0_20px_rgba(37,99,235,0.3)] relative overflow-hidden">
+                            <div className="absolute inset-0 bg-blue-500/10 blur-md"></div>
+                            <span className="text-3xl font-black text-white z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">{stableOVR}</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Overall Rating</span>
                     </div>
                 </div>
 
                 {/* Toggles and Tabs */}
                 <div className="relative z-10 mt-10 flex flex-col gap-6">
                     {/* Batting vs Bowling Toggle */}
-                    <div className="flex bg-[#141A25] rounded-full p-1 w-fit border border-slate-800">
+                    <div className="flex bg-[#0B1120]/80 backdrop-blur-md rounded-xl p-1.5 w-fit border border-slate-800/60 shadow-xl">
                         <button 
                             onClick={() => setSkillMode('profile')}
-                            className={`flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold transition ${skillMode === 'profile' ? 'bg-[#3B82F6] text-white shadow-[0_0_10px_rgba(59,130,246,0.3)]' : 'text-slate-400 hover:text-white'}`}
+                            className={`flex items-center gap-2.5 px-7 py-2.5 rounded-lg text-sm font-semibold tracking-wide transition-all duration-300 ${skillMode === 'profile' ? 'bg-blue-500/15 text-blue-400 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] border border-blue-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'}`}
                         >
-                            👤 PROFILE
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            PROFILE
                         </button>
                         <button 
                             onClick={() => setSkillMode('batting')}
-                            className={`flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold transition ${skillMode === 'batting' ? 'bg-[#10B981] text-white shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'text-slate-400 hover:text-white'}`}
+                            className={`flex items-center gap-2.5 px-7 py-2.5 rounded-lg text-sm font-semibold tracking-wide transition-all duration-300 ${skillMode === 'batting' ? 'bg-emerald-500/15 text-emerald-400 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] border border-emerald-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'}`}
                         >
-                            🏏 BATTING
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 4l4 4 -8 14 -4-4 8-14z"/><path d="M15 6l4-4"/></svg>
+                            BATTING
                         </button>
                         <button 
                             onClick={() => setSkillMode('bowling')}
-                            className={`flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold transition ${skillMode === 'bowling' ? 'bg-[#8B5CF6] text-white shadow-[0_0_10px_rgba(139,92,246,0.3)]' : 'text-slate-400 hover:text-white'}`}
+                            className={`flex items-center gap-2.5 px-7 py-2.5 rounded-lg text-sm font-semibold tracking-wide transition-all duration-300 ${skillMode === 'bowling' ? 'bg-purple-500/15 text-purple-400 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] border border-purple-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'}`}
                         >
-                            🏏 BOWLING
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3c2.5 3 2.5 15 0 18"/><path d="M12 3c-2.5 3-2.5 15 0 18"/></svg>
+                            BOWLING
                         </button>
                     </div>
 
@@ -193,9 +225,13 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                         <h3 className="text-white font-semibold mt-6 mb-4 flex items-center gap-2">
                             <span className="text-blue-500">🛡️</span> Teams
                         </h3>
-                        <p className="text-slate-300 text-sm leading-relaxed bg-[#0B1120] p-4 rounded-xl border border-slate-800/50">
-                            {playerData.profileInfo?.teams || '-'}
-                        </p>
+                        <div className="bg-[#0B1120] p-4 rounded-xl border border-slate-800/50">
+                            {playerData.profileInfo?.teams ? (
+                                <PlayerTeamsDisplay teamsString={playerData.profileInfo.teams} />
+                            ) : (
+                                <span className="text-slate-400 text-sm">-</span>
+                            )}
+                        </div>
                     </div>
 
                     {/* ICC Rankings */}

@@ -18,19 +18,19 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
     const regions = [
         { id: 'india-2', name: 'India', flag: 'https://flagcdn.com/w80/in.png' },
         { id: 'australia-4', name: 'Australia', flag: 'https://flagcdn.com/w80/au.png' },
-        { id: 'england-1', name: 'England', flag: 'https://flagcdn.com/w80/gb-eng.png' },
-        { id: 'south-africa-3', name: 'South Africa', flag: 'https://flagcdn.com/w80/za.png' },
-        { id: 'new-zealand-5', name: 'New Zealand', flag: 'https://flagcdn.com/w80/nz.png' },
-        { id: 'pakistan-6', name: 'Pakistan', flag: 'https://flagcdn.com/w80/pk.png' },
-        { id: 'sri-lanka-8', name: 'Sri Lanka', flag: 'https://flagcdn.com/w80/lk.png' },
+        { id: 'england-9', name: 'England', flag: 'https://flagcdn.com/w80/gb-eng.png' },
+        { id: 'south-africa-11', name: 'South Africa', flag: 'https://flagcdn.com/w80/za.png' },
+        { id: 'new-zealand-13', name: 'New Zealand', flag: 'https://flagcdn.com/w80/nz.png' },
+        { id: 'pakistan-3', name: 'Pakistan', flag: 'https://flagcdn.com/w80/pk.png' },
+        { id: 'sri-lanka-5', name: 'Sri Lanka', flag: 'https://flagcdn.com/w80/lk.png' },
         { id: 'west-indies-10', name: 'West Indies', flag: 'https://a.espncdn.com/i/teamlogos/cricket/500/4.png' },
-        { id: 'bangladesh-9', name: 'Bangladesh', flag: 'https://flagcdn.com/w80/bd.png' },
-        { id: 'afghanistan-40', name: 'Afghanistan', flag: 'https://flagcdn.com/w80/af.png' },
-        { id: 'zimbabwe-11', name: 'Zimbabwe', flag: 'https://flagcdn.com/w80/zw.png' },
+        { id: 'bangladesh-6', name: 'Bangladesh', flag: 'https://flagcdn.com/w80/bd.png' },
+        { id: 'afghanistan-96', name: 'Afghanistan', flag: 'https://flagcdn.com/w80/af.png' },
+        { id: 'zimbabwe-12', name: 'Zimbabwe', flag: 'https://flagcdn.com/w80/zw.png' },
         { id: 'ireland-27', name: 'Ireland', flag: 'https://flagcdn.com/w80/ie.png' },
-        { id: 'scotland-14', name: 'Scotland', flag: 'https://flagcdn.com/w80/gb-sct.png' },
-        { id: 'netherlands-15', name: 'Netherlands', flag: 'https://flagcdn.com/w80/nl.png' },
-        { id: 'nepal-33', name: 'Nepal', flag: 'https://flagcdn.com/w80/np.png' }
+        { id: 'scotland-23', name: 'Scotland', flag: 'https://flagcdn.com/w80/gb-sct.png' },
+        { id: 'netherlands-24', name: 'Netherlands', flag: 'https://flagcdn.com/w80/nl.png' },
+        { id: 'nepal-72', name: 'Nepal', flag: 'https://flagcdn.com/w80/np.png' }
     ];
     
     const [selectedTeam, setSelectedTeam] = useState('india-2');
@@ -51,8 +51,8 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                     className="bg-[#1C2433] rounded-2xl p-4 flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-700 transition"
                 >
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-6 rounded-sm overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700/50">
-                            <img src={selectedRegionObj.flag} alt="Region" className="w-full h-full object-cover" />
+                        <div className={`w-8 h-6 overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700/50 ${selectedRegionObj.name.toLowerCase().includes('west indies') ? "rounded-full p-0.5 bg-white/10 object-contain" : "rounded-[2px]"}`}>
+                            <img src={selectedRegionObj.flag} alt="Region" className={`w-full h-full ${selectedRegionObj.name.toLowerCase().includes('west indies') ? 'object-contain' : 'object-cover'}`} />
                         </div>
                         <div>
                             <p className="text-[10px] text-slate-400 font-bold tracking-wider uppercase">Filter by Region</p>
@@ -75,7 +75,7 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                                 }}
                                 className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-slate-800 transition-colors ${selectedTeam === r.id ? 'bg-slate-800/50' : ''}`}
                             >
-                                <img src={r.flag} alt={r.name} className="w-6 h-4 rounded-sm object-cover border border-slate-700/50" />
+                                <img src={r.flag} alt={r.name} className={`w-6 h-4 object-cover border border-slate-700/50 ${r.name.toLowerCase().includes('west indies') ? "rounded-full bg-white/10" : "rounded-[2px]"}`} />
                                 <span className={`font-bold ${selectedTeam === r.id ? 'text-blue-400' : 'text-slate-200'}`}>{r.name}</span>
                             </div>
                         ))}
@@ -94,6 +94,10 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                 
                 {squadData?.players?.map((player: Player) => {
                     const isActive = activePlayerId === player.espnId;
+                    // Generate a stable OVR based on espnId so it doesn't change on re-render
+                    const idSum = player.espnId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                    const stableOVR = (idSum % 16) + 80;
+
                     return (
                         <div 
                             key={player.espnId}
@@ -118,18 +122,18 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                             {/* Player Info */}
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <img src={squadData.flagUrl} alt={squadData.teamName} className="w-3 h-2 rounded-sm" />
+                                    <img src={squadData.flagUrl} alt={squadData.teamName} className={`w-3 h-2 ${squadData.teamName.toLowerCase().includes('west indies') ? 'rounded-full object-contain' : 'rounded-[1px] object-cover'}`} />
                                     <span className="text-[10px] text-slate-400 font-bold tracking-wider uppercase">{squadData.teamName}</span>
                                 </div>
                                 <h3 className={`font-bold ${isActive ? 'text-white' : 'text-slate-200'}`}>{player.name}</h3>
                                 <p className="text-xs text-slate-500">{player.role}</p>
                             </div>
                             
-                            {/* OVR Rating (Mocked based on index for now, as we only have real stats on click) */}
+                            {/* Stable OVR Rating */}
                             <div className="flex flex-col items-center">
                                 <span className="text-[10px] text-slate-500 font-bold">OVR</span>
                                 <span className={`text-lg font-bold ${isActive ? 'text-white' : 'text-slate-600'}`}>
-                                    {Math.floor(Math.random() * 15) + 80}
+                                    {stableOVR}
                                 </span>
                             </div>
                         </div>

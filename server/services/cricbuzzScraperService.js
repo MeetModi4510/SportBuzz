@@ -1,6 +1,45 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
+let cricbuzzTeamCache = null;
+
+export async function fetchTeamLogo(teamName) {
+    try {
+        let queryName = teamName;
+        const lowerName = teamName.toLowerCase();
+        
+        // Map common partial or domestic names to their primary franchise/national team for logos
+        if (lowerName.includes('india')) queryName = 'India Cricket';
+        else if (lowerName.includes('australia')) queryName = 'Australia Cricket';
+        else if (lowerName.includes('england')) queryName = 'England Cricket';
+        else if (lowerName.includes('pakistan')) queryName = 'Pakistan Cricket';
+        else if (lowerName.includes('sri lanka')) queryName = 'Sri Lanka Cricket';
+        else if (lowerName.includes('bangladesh')) queryName = 'Bangladesh Cricket';
+        else if (lowerName.includes('new zealand')) queryName = 'New Zealand Cricket';
+        else if (lowerName.includes('south africa')) queryName = 'South Africa Cricket';
+        else if (lowerName.includes('mumbai')) queryName = 'Mumbai Indians';
+        else if (lowerName.includes('delhi')) queryName = 'Delhi Capitals';
+        else if (lowerName.includes('bangalore') || lowerName.includes('bengaluru')) queryName = 'Royal Challengers Bangalore';
+        else if (lowerName.includes('chennai')) queryName = 'Chennai Super Kings';
+        else if (lowerName.includes('kolkata')) queryName = 'Kolkata Knight Riders';
+
+        const url = `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(queryName)}`;
+        const res = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        
+        if (res.data && res.data.teams && res.data.teams.length > 0) {
+            // Strictly enforce finding a Cricket team to avoid Soccer fallbacks
+            const cricketTeam = res.data.teams.find(t => t.strSport?.toLowerCase() === 'cricket');
+            if (cricketTeam && cricketTeam.strBadge) {
+                return cricketTeam.strBadge;
+            }
+        }
+        return null;
+    } catch (e) {
+        console.error("Error fetching reliable team logo:", e.message);
+        return null;
+    }
+}
+
 /**
  * Scrapes Cricbuzz for the current team squad using Axios (100% invisible).
  * @param {string} teamUrlSlug - e.g. 'india-2'

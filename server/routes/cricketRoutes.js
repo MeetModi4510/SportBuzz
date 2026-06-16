@@ -9,6 +9,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const router = express.Router();
+import { fetchTeamLogo } from '../services/cricbuzzScraperService.js';
+
+router.get('/team-logo', async (req, res) => {
+    try {
+        const { name } = req.query;
+        if (!name) return res.status(400).json({ error: 'Team name is required' });
+        const logoUrl = await fetchTeamLogo(name);
+        res.json({ logoUrl });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
 
 // Get list of current/live matches
 router.get('/matches', async (req, res) => {
