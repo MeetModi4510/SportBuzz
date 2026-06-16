@@ -14,6 +14,7 @@ import { Helmet } from "react-helmet-async";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TeamLogo } from "@/components/TeamLogo";
 import { cricketApi } from "@/services/api";
+import { CricketPerformanceDashboard } from "@/components/cricket/CricketPerformanceDashboard";
 import {
   BarChart,
   Bar,
@@ -49,29 +50,6 @@ import {
 const PerformanceLab = () => {
   const [activeSport, setActiveSport] = useState<Sport | "all">("cricket");
   const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
-  const [playerAnalysis, setPlayerAnalysis] = useState<any>(null);
-  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
-
-  useEffect(() => {
-    const fetchAnalysis = async () => {
-      if (selectedPlayer.sport === "cricket") {
-        setIsLoadingAnalysis(true);
-        try {
-          const response = await cricketApi.getPlayerAnalysis(selectedPlayer.id);
-          if (response.success) {
-            setPlayerAnalysis(response.data);
-          }
-        } catch (error) {
-          console.error("Failed to fetch player analysis:", error);
-        } finally {
-          setIsLoadingAnalysis(false);
-        }
-      } else {
-        setPlayerAnalysis(null);
-      }
-    };
-    fetchAnalysis();
-  }, [selectedPlayer]);
 
   const filteredPlayers =
     activeSport === "all"
@@ -147,10 +125,14 @@ const PerformanceLab = () => {
                 Venue Analysis
               </TabsTrigger>
             </TabsList>
-
-            {/* Player Analysis Tab */}
             <TabsContent value="players" className="space-y-8 animate-fade-in">
-              <PlayerAnalysisPanel />
+              {activeSport === "cricket" ? (
+                <div className="min-h-[900px] border border-border rounded-xl">
+                   <CricketPerformanceDashboard />
+                </div>
+              ) : (
+                <PlayerAnalysisPanel />
+              )}
             </TabsContent>
 
             {/* Player Comparison Tab */}

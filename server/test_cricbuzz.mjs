@@ -1,46 +1,57 @@
-import axios from 'axios';
+import { connect } from 'puppeteer-real-browser';
+import * as cheerio from 'cheerio';
 
-async function testCricbuzzApi() {
-    const endpointsToTest = [
-        // Web APIs
-        'https://www.cricbuzz.com/api/cricket-match/livematches',
-        'https://www.cricbuzz.com/api/cricket-match/recent',
-        'https://www.cricbuzz.com/api/match/livematches',
-        // Mobile APIs (often less protected)
-        'http://mapps.cricbuzz.com/cbzios/match/livematches',
-        'http://mapps.cricbuzz.com/cbzios/match/recentmatches',
-        // Another variation
-        'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live' // Note: This is rapidAPI, so it will fail without key, but let's test their own origin
-    ];
+async function test() {
+    let browserInstance;
+    try {
+        const { browser, page } = await connect({
+            headless: false,
+            turnstile: true
+        });
+        browserInstance = browser;
 
-    console.log("Testing Cricbuzz Internal APIs...");
-
-    for (const url of endpointsToTest) {
-        if (url.includes('rapidapi')) continue; // Skip rapidapi
-
-        try {
-            const res = await axios.get(url, {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-                    'Accept': 'application/json, text/plain, */*'
-                },
-                timeout: 5000
-            });
-            console.log(`[SUCCESS] ${url} -> Status: ${res.status}`);
-            
-            // Print a snippet of the data
-            if (res.data) {
-                const keys = Object.keys(res.data);
-                console.log(`          Data keys: ${keys.join(', ')}`);
-                // If it's an array, show length
-                if (Array.isArray(res.data)) {
-                    console.log(`          Array length: ${res.data.length}`);
+        // Test Squad Page
+        await page.goto('https://www.cricbuzz.com/cricket-team/india/2/players', { waitUntil: 'networkidle2' });
+        await new Promise(r => setTimeout(r, 2000));
+        let html = await page.content();
+        let $ = cheerio.load(html);
+        
+        const players = [];
+        $('a').each((i, el) => {
+            const href = $(el).attr('href');
+            if (href && href.includes('/profiles/')) {
+                const name = $(el).text().trim();
+                const img = $(el).find('img').attr('src');
+                if (name && name !== 'Profiles' && name !== 'Players') {
+                    players.push({ name, url: 'https://www.cricbuzz.com' + href, img });
                 }
             }
-        } catch (err) {
-            console.log(`[FAILED]  ${url} -> ${err.message}`);
-        }
+        });
+        console.log('INDIA SQUAD EXTRACTED LINKS:', players.slice(0, 5));
+
+        // Test Player Page
+        await page.goto('https://www.cricbuzz.com/profiles/10713/shubman-gill', { waitUntil: 'networkidle2' });
+        await new Promise(r => setTimeout(r, 2000));
+        html = await page.content();
+        $ = cheerio.load(html);
+        
+        let photo = $('img').filter((i, el) => $(el).attr('src') && $(el).attr('src').includes('player')).attr('src');
+        console.log('GILL PHOTO:', photo);
+
+        console.log('--- TABLE HEADERS ---');
+        $('table th').each((i, el) => console.log($(el).text().trim()));
+
+        console.log('--- BATTING STATS ROWS ---');
+        $('table').first().find('tbody tr').each((i, row) => {
+            const rowData = [];
+            $(row).find('td').each((j, td) => rowData.push($(td).text().trim()));
+            console.log(rowData);
+        });
+
+    } catch (e) {
+        console.error('Error:', e.message);
+    } finally {
+        if (browserInstance) await browserInstance.close();
     }
 }
-
-testCricbuzzApi();
+test();

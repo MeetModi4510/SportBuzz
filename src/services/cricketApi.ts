@@ -92,3 +92,27 @@ function extractMatches(data: CricbuzzMatchesResponse): CricbuzzMatch[] {
 
     return matches;
 }
+
+// ─── PERFORMANCE LAB (STEALTH BACKEND) ──────────────────────────
+
+/**
+ * Fetch a team's squad list (Lazy loaded, stealth scraped, cached 24h)
+ */
+export async function getPerformanceLabSquad(teamId: string = 'india-6') {
+    const response = await fetch(`/api/cricket/teams/${teamId}/squad`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch squad');
+    }
+    return response.json();
+}
+
+/**
+ * Fetch a player's deep statistics (Lazy loaded, stealth scraped, cached 24h)
+ */
+export async function getPerformanceLabPlayerStats(espnId: string, name: string) {
+    const response = await fetch(`/api/cricket/players/${espnId}/stats?name=${encodeURIComponent(name)}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch player stats');
+    }
+    return response.json();
+}

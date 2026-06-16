@@ -1158,6 +1158,44 @@ async function getCricbuzzPlayerInfo(playerId) {
                 teams: d.teamNameIds ? d.teamNameIds.map(t => ({ id: t.teamId, name: t.teamName })) : (d.teams ? d.teams.split(',').map(t => ({ id: null, name: t.trim() })) : []),
                 recentBatting: d.recentBatting || null,
                 recentBowling: d.recentBowling || null,
+                stats: {
+                    test: d.batting?.test ? {
+                        matches: d.batting.test.matches || '0',
+                        innings: d.batting.test.innings || '0',
+                        runs: d.batting.test.runs || '0',
+                        highestScore: d.batting.test.highest || '0',
+                        average: d.batting.test.average || '0',
+                        strikeRate: d.batting.test.strikeRate || '0',
+                        hundreds: d.batting.test.centuries || '0',
+                        fifties: d.batting.test.halfCenturies || '0',
+                        fours: d.batting.test.fours || '0',
+                        sixes: d.batting.test.sixes || '0'
+                    } : {},
+                    odi: d.batting?.odi ? {
+                        matches: d.batting.odi.matches || '0',
+                        innings: d.batting.odi.innings || '0',
+                        runs: d.batting.odi.runs || '0',
+                        highestScore: d.batting.odi.highest || '0',
+                        average: d.batting.odi.average || '0',
+                        strikeRate: d.batting.odi.strikeRate || '0',
+                        hundreds: d.batting.odi.centuries || '0',
+                        fifties: d.batting.odi.halfCenturies || '0',
+                        fours: d.batting.odi.fours || '0',
+                        sixes: d.batting.odi.sixes || '0'
+                    } : {},
+                    t20i: d.batting?.t20i ? {
+                        matches: d.batting.t20i.matches || '0',
+                        innings: d.batting.t20i.innings || '0',
+                        runs: d.batting.t20i.runs || '0',
+                        highestScore: d.batting.t20i.highest || '0',
+                        average: d.batting.t20i.average || '0',
+                        strikeRate: d.batting.t20i.strikeRate || '0',
+                        hundreds: d.batting.t20i.centuries || '0',
+                        fifties: d.batting.t20i.halfCenturies || '0',
+                        fours: d.batting.t20i.fours || '0',
+                        sixes: d.batting.t20i.sixes || '0'
+                    } : {}
+                }
             },
             error: null,
         };

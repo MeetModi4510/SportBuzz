@@ -294,4 +294,103 @@ router.get('/player-info/:id', async (req, res) => {
     }
 });
 
+// ─── PERFORMANCE LAB (STEALTH SCRAPER & IN-MEMORY CACHING) ──────────
+
+import { fetchTeamSquad, fetchPlayerDeepStats } from '../services/cricbuzzScraperService.js';
+
+// Local Memory Cache (1 Hour TTL)
+const memCache = new Map();
+
+function getCache(key) {
+    const item = memCache.get(key);
+    if (item && item.expiry > Date.now()) {
+        return item.data;
+    }
+    return null;
+}
+
+function setCache(key, data, ttlHours = 1) {
+    memCache.set(key, {
+        data,
+        expiry: Date.now() + (ttlHours * 60 * 60 * 1000)
+    });
+}
+
+// GET /api/cricket/teams/:teamId/squad
+// Uses Stealth Puppeteer to scrape the live squad from Cricbuzz and caches it for 1 hour
+router.get('/teams/:teamId/squad', async (req, res) => {
+    try {
+        const teamId = req.params.teamId; // e.g. 'india-2'
+        
+        // 1. Check Local Cache
+        const cachedTeam = getCache(`team_${teamId}`);
+        if (cachedTeam) {
+            console.log(`[Cache Hit] Returning cached squad for ${teamId}`);
+            return res.json(cachedTeam);
+        }
+        
+        console.log(`[Cache Miss] Lazy loading squad for ${teamId} via Cricbuzz Scraper...`);
+        // 2. Fetch via Cricbuzz Scraper
+        const players = await fetchTeamSquad(teamId);
+        
+        // Determine name based on slug
+        const teamName = teamId.split('-')[0].charAt(0).toUpperCase() + teamId.split('-')[0].slice(1);
+        
+        const newTeam = {
+            teamId,
+            teamName: teamName,
+            region: teamName,
+            flagUrl: `https://flagcdn.com/w80/${teamName.toLowerCase() === 'india' ? 'in' : 'un'}.png`,
+            players: players
+        };
+        
+        // 3. Save to Local Cache
+        setCache(`team_${teamId}`, newTeam, 1);
+        res.json(newTeam);
+        
+    } catch (error) {
+        console.error("Error fetching team squad:", error);
+        res.status(500).json({ error: 'Failed to fetch squad' });
+    }
+});
+
+// GET /api/cricket/players/:playerId/stats
+// Uses Stealth Puppeteer to scrape Cricbuzz deep data and caches it for 1 hour
+router.get('/players/:playerId/stats', async (req, res) => {
+    try {
+        const playerId = req.params.playerId; // This is now a Cricbuzz ID
+        const playerName = req.query.name || 'Player'; 
+        
+        // 1. Check Local Cache
+        const cachedStats = getCache(`player_${playerId}`);
+        if (cachedStats) {
+            console.log(`[Cache Hit] Returning cached stats for ${playerName} (${playerId})`);
+            return res.json(cachedStats);
+        }
+        
+        console.log(`[Cache Miss] Lazy loading stats for ${playerName} (${playerId}) via Cricbuzz Scraper...`);
+        // 2. Fetch via Cricbuzz Scraper
+        const deepData = await fetchPlayerDeepStats(playerId, playerName);
+        
+        const newStats = {
+            playerId,
+            name: playerName,
+            profileInfo: deepData.profileInfo,
+            stats: deepData.stats,
+            vsOpposition: deepData.vsOpposition,
+            recentMatches: deepData.recentMatches,
+            attributes: deepData.attributes,
+            scoringZones: deepData.scoringZones
+        };
+        
+        // 3. Save to Local Cache
+        setCache(`player_${playerId}`, newStats, 1);
+        res.json(newStats);
+        
+    } catch (error) {
+        console.error("Error fetching player stats:", error);
+        res.status(500).json({ error: 'Failed to fetch player stats' });
+    }
+});
+
 export default router;

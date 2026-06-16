@@ -1240,7 +1240,7 @@ export default function MatchCenter() {
                       <div className="flex-1 flex flex-col justify-evenly pb-4 md:pb-6">
                         {awayRows.map((row, idx) => (
                           <div key={`away-row-${idx}`} className="flex justify-around items-center w-full">
-                            {row.map(item => renderPitchPlayer(item, awayTeamColor))}
+                            {row.map(item => renderPitchPlayer(item, awayTeamColor, awayTeam.id))}
                           </div>
                         ))}
                       </div>
@@ -1252,7 +1252,7 @@ export default function MatchCenter() {
                       <div className="flex-1 flex flex-col justify-evenly pt-4 md:pt-6">
                         {[...homeRows].reverse().map((row, idx) => (
                           <div key={`home-row-${idx}`} className="flex justify-around items-center w-full">
-                            {[...row].reverse().map(item => renderPitchPlayer(item, homeTeamColor))}
+                            {[...row].reverse().map(item => renderPitchPlayer(item, homeTeamColor, homeTeam.id))}
                           </div>
                         ))}
                       </div>
@@ -1281,7 +1281,7 @@ export default function MatchCenter() {
                         Substitutes
                       </h4>
                       <div className="flex flex-col">
-                        {homeSubs.map((item: any) => renderSubstituteRow(item, homeTeamColor))}
+                        {homeSubs.map((item: any) => renderSubstituteRow(item, homeTeamColor, homeTeam.id))}
                         {homeSubs.length === 0 && <p className="text-xs text-muted-foreground py-2">No substitutes.</p>}
                       </div>
                     </div>
@@ -1306,7 +1306,7 @@ export default function MatchCenter() {
                         <img src={awayTeam.logo || `https://a.espncdn.com/i/teamlogos/soccer/500/${awayTeam.id}.png`} alt={awayTeam.name} className="w-4 h-4 object-contain" />
                       </h4>
                       <div className="flex flex-col">
-                        {awaySubs.map((item: any) => renderSubstituteRow(item, awayTeamColor))}
+                        {awaySubs.map((item: any) => renderSubstituteRow(item, awayTeamColor, awayTeam.id))}
                         {awaySubs.length === 0 && <p className="text-xs text-muted-foreground py-2 md:text-right">No substitutes.</p>}
                       </div>
                     </div>
