@@ -1,7 +1,8 @@
 import React from 'react';
 import { 
     BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-    RadialBarChart, RadialBar, PieChart, Pie, Cell, Legend
+    RadialBarChart, RadialBar, PieChart, Pie, Cell, Legend,
+    Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
 
 interface CrossFormatAnalysisProps {
@@ -15,16 +16,19 @@ interface CrossFormatAnalysisProps {
 
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+        // Ignore numeric labels (array indices) which Recharts uses by default for Pie/Radial charts
+        const isNumericLabel = !isNaN(Number(label)) && label !== '';
+        const title = isNumericLabel ? payload[0]?.payload?.name : (label || payload[0]?.payload?.name || 'Metric');
+
         return (
-            <div className="bg-[#0B1120]/90 backdrop-blur-xl border border-blue-500/20 p-4 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] z-50">
-                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-3">{label || payload[0]?.payload?.name || 'Metric'}</p>
+            <div className="bg-[#09090b] border border-white/[0.1] p-4 rounded-xl shadow-2xl z-50">
+                <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-3">{title}</p>
                 {payload.map((entry: any, index: number) => {
-                    // Ignore background track entries in tooltip
                     if (entry.dataKey === 'bgTrack') return null;
                     return (
-                        <div key={index} className="flex items-center gap-3 text-base font-bold text-white mb-1 last:mb-0">
-                            <div className="w-3 h-3 rounded-full shadow-[0_0_10px_currentColor]" style={{ color: entry.color || entry.payload?.fill || '#fff', backgroundColor: entry.color || entry.payload?.fill || '#fff' }}></div>
-                            <span className="text-slate-300 font-medium">{entry.name}:</span>
+                        <div key={index} className="flex items-center gap-3 text-sm font-medium text-white mb-2 last:mb-0">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color || entry.payload?.fill || '#fff' }}></div>
+                            <span className="text-zinc-400">{entry.name}:</span>
                             <span style={{ color: entry.color || entry.payload?.fill || '#fff' }}>{entry.value}</span>
                         </div>
                     );
@@ -47,12 +51,6 @@ const GaugeChart = ({ format, value, color, max = 200 }: { format: string, value
         <div className="flex flex-col items-center justify-center relative h-full w-full py-4">
             <ResponsiveContainer width="100%" height={120}>
                 <PieChart>
-                    <defs>
-                        <filter id={`glow-${format}`} x="-20%" y="-20%" width="140%" height="140%">
-                            <feGaussianBlur stdDeviation="3" result="blur" />
-                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                        </filter>
-                    </defs>
                     <Pie
                         data={data}
                         cx="50%"
@@ -60,20 +58,20 @@ const GaugeChart = ({ format, value, color, max = 200 }: { format: string, value
                         startAngle={180}
                         endAngle={0}
                         innerRadius={38}
-                        outerRadius={48}
+                        outerRadius={42}
                         paddingAngle={0}
                         dataKey="value"
                         stroke="none"
-                        cornerRadius={20}
+                        cornerRadius={4}
                     >
-                        <Cell key="cell-0" fill={color} filter={`url(#glow-${format})`} />
-                        <Cell key="cell-1" fill="rgba(255,255,255,0.05)" />
+                        <Cell key="cell-0" fill={color} />
+                        <Cell key="cell-1" fill="rgba(255,255,255,0.03)" />
                     </Pie>
                 </PieChart>
             </ResponsiveContainer>
             <div className="absolute flex flex-col items-center justify-center top-1/2 mt-1">
-                <span className="text-2xl font-black text-white drop-shadow-md">{value > 0 ? value.toFixed(1) : '-'}</span>
-                <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-1 font-bold">{format}</span>
+                <span className="text-xl font-bold text-white">{value > 0 ? value.toFixed(1) : '-'}</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mt-1 font-bold">{format}</span>
             </div>
         </div>
     );
@@ -83,21 +81,19 @@ export function CrossFormatAnalysis({ stats }: CrossFormatAnalysisProps) {
     const safeStats = stats || {};
     
     const rawData = [
-        { name: 'Test', runs: parseInt(safeStats.test?.runs) || 0, avg: parseFloat(safeStats.test?.average) || 0, sr: parseFloat(safeStats.test?.strikeRate) || 0, fill: '#ef4444' },
-        { name: 'ODI', runs: parseInt(safeStats.odi?.runs) || 0, avg: parseFloat(safeStats.odi?.average) || 0, sr: parseFloat(safeStats.odi?.strikeRate) || 0, fill: '#3b82f6' },
-        { name: 'T20I', runs: parseInt(safeStats.t20i?.runs) || 0, avg: parseFloat(safeStats.t20i?.average) || 0, sr: parseFloat(safeStats.t20i?.strikeRate) || 0, fill: '#10b981' },
+        { name: 'Test', runs: parseInt(safeStats.test?.runs) || 0, avg: parseFloat(safeStats.test?.average) || 0, sr: parseFloat(safeStats.test?.strikeRate) || 0, fill: '#eab308', fifties: parseInt(safeStats.test?.fifties) || 0, hundreds: parseInt(safeStats.test?.hundreds) || 0 }, // amber-500
+        { name: 'ODI', runs: parseInt(safeStats.odi?.runs) || 0, avg: parseFloat(safeStats.odi?.average) || 0, sr: parseFloat(safeStats.odi?.strikeRate) || 0, fill: '#3b82f6', fifties: parseInt(safeStats.odi?.fifties) || 0, hundreds: parseInt(safeStats.odi?.hundreds) || 0 }, // blue-500
+        { name: 'T20I', runs: parseInt(safeStats.t20i?.runs) || 0, avg: parseFloat(safeStats.t20i?.average) || 0, sr: parseFloat(safeStats.t20i?.strikeRate) || 0, fill: '#ec4899', fifties: parseInt(safeStats.t20i?.fifties) || 0, hundreds: parseInt(safeStats.t20i?.hundreds) || 0 }, // pink-500
     ];
     
     const data = rawData.filter(d => d.runs > 0 || d.avg > 0 || d.sr > 0);
     const maxRuns = Math.max(...data.map(d => d.runs), 10000);
 
-    // Runs data with background track
     const runsData = data.map(d => ({
         ...d,
         bgTrack: maxRuns
     }));
 
-    // Boundary data
     const odiFours = parseInt(safeStats.odi?.fours) || 0;
     const odiSixes = parseInt(safeStats.odi?.sixes) || 0;
     const odiTotalRuns = parseInt(safeStats.odi?.runs) || 0;
@@ -105,169 +101,186 @@ export function CrossFormatAnalysis({ stats }: CrossFormatAnalysisProps) {
     const nonBoundaryRuns = Math.max(0, odiTotalRuns - boundaryRuns);
 
     const pieData = [
-        { name: 'Boundaries', value: boundaryRuns, fill: 'url(#donutGrad1)' },
-        { name: 'Running', value: nonBoundaryRuns, fill: 'url(#donutGrad2)' },
+        { name: 'Boundaries', value: boundaryRuns, fill: 'url(#colorBoundaries)' },
+        { name: 'Running', value: nonBoundaryRuns, fill: 'url(#colorRunning)' },
     ];
 
+    const hasMilestones = data.some(d => d.fifties > 0 || d.hundreds > 0);
+
     return (
-        <div className="relative mt-8 p-6 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-[#0F172A] to-[#0B1120] border border-blue-500/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
-            {/* Ultra Premium Background Effects */}
-            <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none mix-blend-screen"></div>
-            <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-purple-500/10 blur-[130px] rounded-full pointer-events-none mix-blend-screen"></div>
-            
-            <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10">
-                <div>
-                    <h2 className="text-3xl font-black text-white tracking-tight">Performance Matrix</h2>
-                    <p className="text-slate-400 text-sm mt-2 font-medium tracking-wide uppercase">Cross-format visual analysis</p>
-                </div>
-                <div className="mt-4 sm:mt-0 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399] animate-pulse"></div>
-                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Live Data</span>
-                </div>
+        <div className="relative mt-8 pt-8 border-t border-white/[0.05]">
+            <div className="relative z-10 flex flex-col mb-8">
+                <h2 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 to-zinc-500 tracking-tight">Performance Matrix</h2>
+                <p className="text-zinc-500 text-[10px] mt-1 font-bold tracking-[0.2em] uppercase">Cross-Format Visual Analysis</p>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 relative z-10">
-                {/* 1. Runs Progress Tracker */}
-                <div className="bg-[#141A25]/80 backdrop-blur-2xl p-6 sm:p-8 rounded-[2rem] border border-slate-800 shadow-xl relative overflow-hidden group hover:border-blue-500/30 transition-all duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-8">Career Runs</h4>
-                    <div className="h-56">
+            {/* Premium Gradients for Recharts */}
+            <svg style={{ height: 0 }}>
+                <defs>
+                    <linearGradient id="colorTest" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#ca8a04" />
+                        <stop offset="100%" stopColor="#fef08a" />
+                    </linearGradient>
+                    <linearGradient id="colorODI" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#2563eb" />
+                        <stop offset="100%" stopColor="#93c5fd" />
+                    </linearGradient>
+                    <linearGradient id="colorT20I" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#db2777" />
+                        <stop offset="100%" stopColor="#fbcfe8" />
+                    </linearGradient>
+                    <linearGradient id="colorIPL" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#8b5cf6" />
+                        <stop offset="100%" stopColor="#c4b5fd" />
+                    </linearGradient>
+                    <linearGradient id="colorBoundaries" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#8b5cf6" />
+                        <stop offset="100%" stopColor="#c4b5fd" />
+                    </linearGradient>
+                    <linearGradient id="colorRunning" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#0ea5e9" />
+                        <stop offset="100%" stopColor="#bae6fd" />
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 relative z-10">
+                {/* 1. Career Runs Distribution (Donut PieChart) */}
+                <div className="xl:col-span-1 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg">
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-4 z-10 relative">Career Runs</h4>
+                    <div className="h-64 relative flex justify-center items-center">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={runsData} layout="vertical" margin={{ top: 0, right: 30, left: 0, bottom: 0 }} barSize={12}>
-                                <XAxis type="number" hide domain={[0, maxRuns]} />
-                                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#fff', fontSize: 13, fontWeight: 700 }} width={60} />
-                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.02)', radius: 8 }} />
-                                {/* Background Track Bar */}
-                                <Bar dataKey="bgTrack" fill="rgba(255,255,255,0.03)" radius={[10, 10, 10, 10]} />
-                                {/* Actual Value Bar overlaid */}
-                                <Bar dataKey="runs" radius={[10, 10, 10, 10]} style={{ transform: 'translateY(-12px)' }}>
-                                    {runsData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.fill} style={{ filter: `drop-shadow(0 0 6px ${entry.fill}80)` }} />
+                            <PieChart>
+                                <Pie 
+                                    data={data} 
+                                    cx="50%" cy="50%" 
+                                    innerRadius="50%" outerRadius="80%" 
+                                    paddingAngle={4} 
+                                    dataKey="runs" 
+                                    stroke="none" 
+                                    cornerRadius={8}
+                                >
+                                    {data.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={`url(#color${entry.name})`} />
                                     ))}
-                                </Bar>
-                            </BarChart>
+                                </Pie>
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                            </PieChart>
                         </ResponsiveContainer>
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none">
+                            <span className="text-3xl font-bold text-white tracking-tight">{data.reduce((sum, d) => sum + d.runs, 0).toLocaleString()}</span>
+                            <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Total</span>
+                        </div>
                     </div>
                 </div>
 
                 {/* 2. Average Radial Rings */}
-                <div className="bg-[#141A25]/80 backdrop-blur-2xl p-6 sm:p-8 rounded-[2rem] border border-slate-800 shadow-xl relative overflow-hidden group hover:border-blue-500/30 transition-all duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-bl from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 z-10 relative">Batting Average</h4>
-                    <div className="h-60 relative flex justify-center items-center">
+                <div className="xl:col-span-1 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg">
+                    <div className="absolute inset-0 bg-gradient-to-t from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-4 z-10 relative">Batting Average</h4>
+                    <div className="h-64 relative flex justify-center items-center">
                         <ResponsiveContainer width="100%" height="100%">
-                            <RadialBarChart 
-                                cx="45%" cy="50%" innerRadius="30%" outerRadius="100%" 
-                                barSize={14} data={data} startAngle={90} endAngle={-270}
-                            >
-                                <RadialBar
-                                    background={{ fill: 'rgba(255,255,255,0.03)' }}
-                                    dataKey="avg"
-                                    cornerRadius={10}
-                                />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Legend 
-                                    iconSize={12} 
-                                    layout="vertical" 
-                                    verticalAlign="middle" 
-                                    align="right"
-                                    wrapperStyle={{ fontSize: '13px', fontWeight: 'bold', color: '#fff', opacity: 0.8 }}
-                                />
+                            <RadialBarChart cx="50%" cy="50%" innerRadius="25%" outerRadius="100%" barSize={16} data={data} startAngle={90} endAngle={-270}>
+                                <RadialBar background={{ fill: 'rgba(255,255,255,0.03)' }} dataKey="avg" cornerRadius={8}>
+                                    {data.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={`url(#color${entry.name})`} />
+                                    ))}
+                                </RadialBar>
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                             </RadialBarChart>
                         </ResponsiveContainer>
+                        {/* Custom Legend */}
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none bg-black/40 p-2 rounded-full backdrop-blur-sm">
+                            <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">AVG</span>
+                        </div>
                     </div>
                 </div>
 
                 {/* 3. Strike Rate Dashboards */}
-                <div className="bg-[#141A25]/80 backdrop-blur-2xl p-6 sm:p-8 rounded-[2rem] border border-slate-800 shadow-xl relative overflow-hidden group xl:col-span-2 hover:border-blue-500/30 transition-all duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-t from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-6">Strike Rate Telemetry</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto md:h-44">
+                <div className="xl:col-span-2 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden shadow-lg">
+                    <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-6">Strike Rate Telemetry</h4>
+                    <div className="flex flex-col sm:flex-row justify-around gap-6 h-60">
                         {data.map((d, i) => (
-                            <div key={i} className="bg-[#0B1120]/60 rounded-3xl border border-slate-800/50 relative overflow-hidden shadow-inner flex items-center justify-center">
-                                <GaugeChart format={d.name} value={d.sr} color={d.fill} max={d.name === 'Test' ? 100 : 200} />
+                            <div key={i} className="flex-1 bg-white/[0.01] rounded-2xl border border-white/[0.02] flex flex-col items-center justify-center p-4 relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="h-32 w-full mb-4">
+                                    <GaugeChart format={d.name} value={d.sr} color={`url(#color${d.name})`} max={d.name === 'Test' ? 100 : 200} />
+                                </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* 4. Run Distribution Hologram */}
-                <div className="bg-[#141A25]/80 backdrop-blur-2xl p-6 sm:p-8 rounded-[2rem] border border-slate-800 shadow-xl relative overflow-hidden group xl:col-span-2 hover:border-blue-500/30 transition-all duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div className="flex justify-between items-center mb-6">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">ODI Shot Distribution</h4>
+                {/* 4. Milestone Frequency (RadarChart) */}
+                {hasMilestones && (
+                    <div className="xl:col-span-1 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg flex flex-col">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-4 z-10 relative">Milestones (50s & 100s)</h4>
+                        <div className="flex-1 min-h-[256px] h-64 relative">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                                    <PolarGrid stroke="rgba(255,255,255,0.08)" />
+                                    <PolarAngleAxis dataKey="name" tick={{ fill: '#a1a1aa', fontSize: 12, fontWeight: 700 }} />
+                                    <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={false} axisLine={false} />
+                                    <Radar name="50s" dataKey="fifties" stroke="#14b8a6" strokeWidth={3} fill="#14b8a6" fillOpacity={0.4} />
+                                    <Radar name="100s" dataKey="hundreds" stroke="#f59e0b" strokeWidth={3} fill="#f59e0b" fillOpacity={0.5} />
+                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                                </RadarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
-                    
-                    {odiTotalRuns > 0 ? (
-                        <div className="flex flex-col items-center">
-                            <div className="h-[280px] w-full relative flex items-center justify-center">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <defs>
-                                            <linearGradient id="donutGrad1" x1="0" y1="0" x2="1" y2="1">
-                                                <stop offset="0%" stopColor="#8b5cf6" />
-                                                <stop offset="100%" stopColor="#d946ef" />
-                                            </linearGradient>
-                                            <linearGradient id="donutGrad2" x1="0" y1="0" x2="1" y2="1">
-                                                <stop offset="0%" stopColor="#3b82f6" />
-                                                <stop offset="100%" stopColor="#0ea5e9" />
-                                            </linearGradient>
-                                            <filter id="neonShadow" x="-20%" y="-20%" width="140%" height="140%">
-                                                <feDropShadow dx="0" dy="0" stdDeviation="15" floodColor="#3b82f6" floodOpacity="0.1" />
-                                            </filter>
-                                        </defs>
-                                        <Pie
-                                            data={pieData}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={85}
-                                            outerRadius={120}
-                                            paddingAngle={6}
-                                            dataKey="value"
-                                            stroke="none"
-                                            cornerRadius={20}
-                                            filter="url(#neonShadow)"
-                                        >
-                                            <Cell key="cell-0" fill="url(#donutGrad1)" />
-                                            <Cell key="cell-1" fill="url(#donutGrad2)" />
-                                        </Pie>
-                                    </PieChart>
-                                </ResponsiveContainer>
-                                
-                                {/* Futuristic Center Display */}
-                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <div className="w-36 h-36 rounded-full border border-blue-500/10 flex flex-col items-center justify-center backdrop-blur-sm bg-[#0B1120]/40 shadow-[inset_0_0_30px_rgba(37,99,235,0.1)]">
-                                        <span className="text-3xl font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">{odiTotalRuns}</span>
-                                        <span className="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold mt-2">Total Runs</span>
-                                    </div>
-                                </div>
-                            </div>
+                )}
+
+                {/* 5. Run Distribution Hologram */}
+                {odiTotalRuns > 0 && (
+                    <div className="md:col-span-2 xl:col-span-3 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden shadow-lg flex flex-col md:flex-row items-center gap-6">
+                        <div className="flex-1 min-w-[200px]">
+                            <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-1">ODI Shot Distribution</h4>
+                            <p className="text-[11px] text-zinc-400 mb-4">Boundary percentage vs Running between wickets</p>
                             
-                            {/* Glass Legend (Now positioned safely below the chart) */}
-                            <div className="flex flex-wrap justify-center gap-4 sm:gap-8 bg-[#0B1120]/80 backdrop-blur-xl px-6 py-4 rounded-2xl border border-slate-800 shadow-[0_10px_30px_rgba(0,0,0,0.5)] w-[90%] sm:w-auto mt-4 z-10">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-3 h-3 rounded-full bg-gradient-to-br from-[#8b5cf6] to-[#d946ef] shadow-[0_0_10px_#8b5cf6]"></div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Boundaries</span>
-                                        <span className="text-sm font-black text-white">{boundaryRuns} <span className="text-xs text-slate-400 font-medium">({Math.round((boundaryRuns/odiTotalRuns)*100)}%)</span></span>
+                            <div className="flex flex-col gap-3 mt-6">
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.03]">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-violet-400 shadow-[0_0_8px_rgba(139,92,246,0.8)]"></div>
+                                        <span className="text-xs text-white font-medium">Boundaries</span>
+                                    </div>
+                                    <div className="text-right">
+                                        <span className="text-sm font-bold text-white">{boundaryRuns}</span>
+                                        <span className="text-[10px] text-zinc-500 ml-2">({Math.round((boundaryRuns/odiTotalRuns)*100)}%)</span>
                                     </div>
                                 </div>
-                                <div className="hidden sm:block w-px h-8 bg-slate-800"></div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-3 h-3 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#0ea5e9] shadow-[0_0_10px_#3b82f6]"></div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Running</span>
-                                        <span className="text-sm font-black text-white">{nonBoundaryRuns} <span className="text-xs text-slate-400 font-medium">({Math.round((nonBoundaryRuns/odiTotalRuns)*100)}%)</span></span>
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.03]">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(14,165,233,0.8)]"></div>
+                                        <span className="text-xs text-white font-medium">Running</span>
+                                    </div>
+                                    <div className="text-right">
+                                        <span className="text-sm font-bold text-white">{nonBoundaryRuns}</span>
+                                        <span className="text-[10px] text-zinc-500 ml-2">({Math.round((nonBoundaryRuns/odiTotalRuns)*100)}%)</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    ) : (
-                        <div className="h-[280px] flex items-center justify-center text-slate-500 text-sm font-medium uppercase tracking-widest">
-                            No telemetry available
+
+                        <div className="flex-1 h-64 w-full relative flex items-center justify-center">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie data={pieData} cx="50%" cy="50%" innerRadius="65%" outerRadius="90%" paddingAngle={5} dataKey="value" stroke="none" cornerRadius={6}>
+                                        {pieData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span className="text-4xl font-bold text-white tracking-tight">{odiTotalRuns}</span>
+                                <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-bold mt-2">Total Runs</span>
+                            </div>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -5,7 +5,7 @@ export function usePerformanceLabSquad(teamId: string) {
     return useQuery({
         queryKey: ['performanceLabSquad', teamId],
         queryFn: () => getPerformanceLabSquad(teamId),
-        staleTime: 24 * 60 * 60 * 1000, // 24 hours caching in React Query
+        staleTime: 5 * 60 * 1000, // 5 minutes caching in React Query
         refetchOnWindowFocus: false,
     });
 }
@@ -15,7 +15,8 @@ export function usePerformanceLabPlayerStats(espnId: string | null, playerName: 
         queryKey: ['performanceLabPlayer', espnId],
         queryFn: () => getPerformanceLabPlayerStats(espnId!, playerName),
         enabled: !!espnId, // Lazy loading: Only fetch when espnId is provided (e.g. user clicks)
-        staleTime: 24 * 60 * 60 * 1000, // 24 hours caching
-        refetchOnWindowFocus: false,
+        staleTime: 0, // Force refetch immediately so new data is shown
+        gcTime: 0, // Do not keep old cache
+        refetchOnWindowFocus: true,
     });
 }

@@ -14,7 +14,6 @@ interface CricketSidebarProps {
 }
 
 export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSidebarProps) {
-    // Hardcoded regions based on user request (India first, then others)
     const regions = [
         { id: 'india-2', name: 'India', flag: 'https://flagcdn.com/w80/in.png' },
         { id: 'australia-4', name: 'Australia', flag: 'https://flagcdn.com/w80/au.png' },
@@ -41,104 +40,111 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
     const selectedRegionObj = regions.find(r => r.id === selectedTeam) || regions[0];
 
     return (
-        <div className="w-[300px] flex-shrink-0 flex flex-col gap-4">
-            <h2 className="text-xs font-bold text-slate-500 tracking-widest uppercase ml-1">Cricket Players</h2>
-            
-            {/* Filter by Region Dropdown */}
-            <div className="relative">
-                <div 
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="bg-[#1C2433] rounded-2xl p-4 flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-700 transition"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className={`w-8 h-6 overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700/50 ${selectedRegionObj.name.toLowerCase().includes('west indies') ? "rounded-full p-0.5 bg-white/10 object-contain" : "rounded-[2px]"}`}>
-                            <img src={selectedRegionObj.flag} alt="Region" className={`w-full h-full ${selectedRegionObj.name.toLowerCase().includes('west indies') ? 'object-contain' : 'object-cover'}`} />
+        <div className="w-full flex-shrink-0 flex flex-col gap-3 z-20">
+            <div className="flex items-center gap-4">
+                
+                {/* Region Dropdown (Left side of the rail) */}
+                <div className="relative z-30 w-[260px] flex-shrink-0">
+                    <div 
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all shadow-lg h-[88px]"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className={`w-10 h-7 overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700/50 shadow-sm ${selectedRegionObj.name.toLowerCase().includes('west indies') ? "rounded-full p-0.5 bg-white/10 object-contain" : "rounded-[4px]"}`}>
+                                <img src={selectedRegionObj.flag} alt="Region" className={`w-full h-full ${selectedRegionObj.name.toLowerCase().includes('west indies') ? 'object-contain' : 'object-cover'}`} />
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-0.5">National Squad</p>
+                                <p className="text-white font-black text-base">{selectedRegionObj.name}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-[10px] text-slate-400 font-bold tracking-wider uppercase">Filter by Region</p>
-                            <p className="text-white font-bold">{selectedRegionObj.name}</p>
-                        </div>
+                        <svg className={`w-5 h-5 text-slate-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                        </svg>
                     </div>
-                    <svg className={`w-5 h-5 text-slate-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+
+                    {isDropdownOpen && (
+                        <div className="absolute top-full mt-3 left-0 w-full bg-[#0B1120]/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.7)] z-50 max-h-[400px] overflow-y-auto custom-scrollbar p-2">
+                            {regions.map(r => (
+                                <div 
+                                    key={r.id}
+                                    onClick={() => {
+                                        setSelectedTeam(r.id);
+                                        setIsDropdownOpen(false);
+                                    }}
+                                    className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer hover:bg-white/10 transition-colors ${selectedTeam === r.id ? 'bg-blue-500/15 border border-blue-500/30' : 'border border-transparent'}`}
+                                >
+                                    <img src={r.flag} alt={r.name} className={`w-8 h-5 object-cover shadow-sm ${r.name.toLowerCase().includes('west indies') ? "rounded-full bg-white/10" : "rounded-[3px]"}`} />
+                                    <span className={`font-bold text-sm tracking-wide ${selectedTeam === r.id ? 'text-blue-400' : 'text-slate-200'}`}>{r.name}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                {isDropdownOpen && (
-                    <div className="absolute top-full mt-2 left-0 w-full bg-[#1C2433] border border-slate-700 rounded-xl shadow-xl z-50 max-h-[240px] overflow-y-auto custom-scrollbar">
-                        {regions.map(r => (
+                {/* Horizontal Player List */}
+                <div className="flex-1 flex items-center gap-4 overflow-x-auto pb-4 pt-2 custom-scrollbar pr-4 hide-scrollbar">
+                    {isLoading && (
+                        <div className="flex items-center justify-center w-full h-[140px] text-zinc-500 gap-3">
+                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                            <span className="text-xs font-medium tracking-[0.2em] uppercase">Syncing Roster</span>
+                        </div>
+                    )}
+                    
+                    {squadData?.players?.map((player: Player) => {
+                        const isActive = activePlayerId === player.espnId;
+                        const idSum = player.espnId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                        const stableOVR = (idSum % 16) + 80;
+
+                        // Force high-res images from ESPN
+                        const highResUrl = player.imageUrl ? player.imageUrl.replace(/w=\d+/g, 'w=800').replace(/h=\d+/g, 'h=800') : '';
+
+                        return (
                             <div 
-                                key={r.id}
-                                onClick={() => {
-                                    setSelectedTeam(r.id);
-                                    setIsDropdownOpen(false);
-                                }}
-                                className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-slate-800 transition-colors ${selectedTeam === r.id ? 'bg-slate-800/50' : ''}`}
+                                key={player.espnId}
+                                onClick={() => onSelectPlayer(player)}
+                                className="group flex-shrink-0 flex flex-col items-center gap-3 w-[72px] md:w-[88px] cursor-pointer"
                             >
-                                <img src={r.flag} alt={r.name} className={`w-6 h-4 object-cover border border-slate-700/50 ${r.name.toLowerCase().includes('west indies') ? "rounded-full bg-white/10" : "rounded-[2px]"}`} />
-                                <span className={`font-bold ${selectedTeam === r.id ? 'text-blue-400' : 'text-slate-200'}`}>{r.name}</span>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+                                <div className={`relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden transition-all duration-500 ${
+                                    isActive 
+                                        ? 'ring-2 ring-white ring-offset-4 ring-offset-[#0A0A0B] shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-105 z-10' 
+                                        : 'ring-1 ring-white/10 opacity-50 group-hover:opacity-100 group-hover:ring-white/30 group-hover:scale-105'
+                                }`}>
+                                    {highResUrl ? (
+                                        <img 
+                                            src={highResUrl} 
+                                            alt={player.name} 
+                                            className="w-full h-full object-cover object-top" 
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
+                                            <svg className="w-8 h-8 text-zinc-700" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 14c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.315 0-10 1.672-10 5v1h20v-1c0-3.328-6.685-5-10-5z" />
+                                            </svg>
+                                        </div>
+                                    )}
 
-            {/* Player List */}
-            <div className="flex flex-col gap-2 overflow-y-auto max-h-[700px] pr-2 custom-scrollbar">
-                {isLoading && (
-                    <div className="text-center p-8 text-slate-500">
-                        <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                        <p className="text-xs">Loading Squad...</p>
-                    </div>
-                )}
-                
-                {squadData?.players?.map((player: Player) => {
-                    const isActive = activePlayerId === player.espnId;
-                    // Generate a stable OVR based on espnId so it doesn't change on re-render
-                    const idSum = player.espnId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                    const stableOVR = (idSum % 16) + 80;
-
-                    return (
-                        <div 
-                            key={player.espnId}
-                            onClick={() => onSelectPlayer(player)}
-                            className={`flex items-center p-3 rounded-2xl cursor-pointer transition-all border ${
-                                isActive 
-                                    ? 'bg-[#1C2433] border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.2)] border-l-4 border-l-blue-500' 
-                                    : 'bg-[#141A25] border-transparent hover:bg-[#1C2433]'
-                            }`}
-                        >
-                            {/* Headshot */}
-                            <div className={`w-12 h-12 rounded-full overflow-hidden bg-gradient-to-b from-slate-700 to-slate-900 border-2 ${isActive ? 'border-blue-500' : 'border-slate-700'} flex-shrink-0 relative mr-4`}>
-                                {player.imageUrl ? (
-                                    <img src={player.imageUrl} alt={player.name} className="w-full h-full object-cover object-top" />
-                                ) : (
-                                    <svg className="w-full h-full text-slate-500 mt-2" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 14c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.315 0-10 1.672-10 5v1h20v-1c0-3.328-6.685-5-10-5z" />
-                                    </svg>
-                                )}
-                            </div>
-                            
-                            {/* Player Info */}
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <img src={squadData.flagUrl} alt={squadData.teamName} className={`w-3 h-2 ${squadData.teamName.toLowerCase().includes('west indies') ? 'rounded-full object-contain' : 'rounded-[1px] object-cover'}`} />
-                                    <span className="text-[10px] text-slate-400 font-bold tracking-wider uppercase">{squadData.teamName}</span>
+                                    {/* OVR Badge Floating at the bottom */}
+                                    <div className="absolute bottom-0 w-full flex justify-center pb-1">
+                                        <div className={`px-2 py-[1px] rounded-full text-[9px] font-black backdrop-blur-md border ${
+                                            isActive 
+                                                ? 'bg-white text-black border-white' 
+                                                : 'bg-black/60 border-white/20 text-white'
+                                        }`}>
+                                            {stableOVR}
+                                        </div>
+                                    </div>
                                 </div>
-                                <h3 className={`font-bold ${isActive ? 'text-white' : 'text-slate-200'}`}>{player.name}</h3>
-                                <p className="text-xs text-slate-500">{player.role}</p>
-                            </div>
-                            
-                            {/* Stable OVR Rating */}
-                            <div className="flex flex-col items-center">
-                                <span className="text-[10px] text-slate-500 font-bold">OVR</span>
-                                <span className={`text-lg font-bold ${isActive ? 'text-white' : 'text-slate-600'}`}>
-                                    {stableOVR}
+                                
+                                <span className={`text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-center w-full truncate transition-colors ${
+                                    isActive ? 'text-white drop-shadow-md' : 'text-zinc-500 group-hover:text-zinc-300'
+                                }`}>
+                                    {player.name.split(' ').pop()}
                                 </span>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );
