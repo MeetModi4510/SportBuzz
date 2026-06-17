@@ -15,6 +15,8 @@ interface MatchSectionProps {
   onViewAllClick?: () => void;
   isLoading?: boolean;
   onlyLive?: boolean;
+  activeTabOverride?: 'live' | 'upcoming' | 'recent';
+  onTabChange?: (tab: 'live' | 'upcoming' | 'recent') => void;
 }
 
 export const MatchSection = ({
@@ -27,8 +29,16 @@ export const MatchSection = ({
   onViewAllClick,
   isLoading = false,
   onlyLive = false,
+  activeTabOverride,
+  onTabChange,
 }: MatchSectionProps) => {
-  const [activeTab, setActiveTab] = useState<'live' | 'upcoming' | 'recent'>('live');
+  const [internalTab, setInternalTab] = useState<'live' | 'upcoming' | 'recent'>('live');
+  const activeTab = activeTabOverride || internalTab;
+
+  const handleTabClick = (tab: 'live' | 'upcoming' | 'recent') => {
+    setInternalTab(tab);
+    if (onTabChange) onTabChange(tab);
+  };
 
   // Loading state
   if (isLoading) {
@@ -138,7 +148,7 @@ export const MatchSection = ({
 
   // Not onlyLive: Show Live, Upcoming, Recent
   const upcomingMatches = matches.filter((m) => m.status === "upcoming");
-  const completedMatches = matches.filter((m) => m.status === "completed" || m.status === "recent");
+  const completedMatches = matches.filter((m) => m.status === "completed");
 
 
 
@@ -158,7 +168,7 @@ export const MatchSection = ({
       {/* Tab Buttons */}
       <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
         <button 
-          onClick={() => setActiveTab('live')}
+          onClick={() => handleTabClick('live')}
           className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2", activeTab === 'live' ? "bg-primary text-primary-foreground" : "bg-secondary/50 text-foreground hover:bg-secondary")}
         >
           <span className="relative flex h-2 w-2">
@@ -168,13 +178,13 @@ export const MatchSection = ({
           Live
         </button>
         <button 
-          onClick={() => setActiveTab('upcoming')}
+          onClick={() => handleTabClick('upcoming')}
           className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all", activeTab === 'upcoming' ? "bg-primary text-primary-foreground" : "bg-secondary/50 text-foreground hover:bg-secondary")}
         >
           Upcoming
         </button>
         <button 
-          onClick={() => setActiveTab('recent')}
+          onClick={() => handleTabClick('recent')}
           className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all", activeTab === 'recent' ? "bg-primary text-primary-foreground" : "bg-secondary/50 text-foreground hover:bg-secondary")}
         >
           Recent

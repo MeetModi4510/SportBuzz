@@ -9,7 +9,43 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const router = express.Router();
-import { fetchTeamLogo } from '../services/cricbuzzScraperService.js';
+import { fetchTeamLogo, fetchLiveMatchesScraped, fetchRecentMatchesScraped, fetchUpcomingMatchesScraped, fetchMatchDetailScraped, fetchMatchSquadsScraped } from '../services/cricbuzzScraperService.js';
+import axios from 'axios';
+
+// ─── STAGGERED TEAM LOGO PROXY ───────────────────────────────────────────────
+const teamLogoQueue = [];
+let isProcessingLogoQueue = false;
+
+async function processLogoQueue() {
+    if (isProcessingLogoQueue || teamLogoQueue.length === 0) return;
+    isProcessingLogoQueue = true;
+    
+    while (teamLogoQueue.length > 0) {
+        const { imageId, res } = teamLogoQueue.shift();
+        try {
+            const url = `https://static.cricbuzz.com/a/img/v1/i1/c${imageId}/i.jpg`;
+            const imageResponse = await axios.get(url, { responseType: 'stream', headers: { 'User-Agent': 'Mozilla/5.0' } });
+            res.setHeader('Content-Type', 'image/jpeg');
+            res.setHeader('Cache-Control', 'public, max-age=3600');
+            imageResponse.data.pipe(res);
+        } catch (e) {
+            res.status(404).end();
+        }
+        // Strict 1-second interval to prevent Cricbuzz bans!
+        await new Promise(r => setTimeout(r, 1000));
+    }
+    
+    isProcessingLogoQueue = false;
+}
+
+router.get('/scraped/team-logo/:imageId', (req, res) => {
+    if (!req.params.imageId || req.params.imageId === 'undefined') {
+        return res.status(404).end();
+    }
+    teamLogoQueue.push({ imageId: req.params.imageId, res });
+    processLogoQueue();
+});
+// ─────────────────────────────────────────────────────────────────────────────
 
 router.get('/team-logo', async (req, res) => {
     try {
@@ -25,18 +61,45 @@ router.get('/team-logo', async (req, res) => {
 // Get list of current/live matches
 router.get('/matches', async (req, res) => {
     try {
-        const matches = await cricketService.getCurrentMatches();
-        res.json(matches);
+        const matches = await fetchLiveMatchesScraped();
+        res.json({ status: 'success', data: matches });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// Get specific match details
+// ====== SCRAPER ROUTES ======
+router.get('/scraped/matches/live', async (req, res) => {
+    const data = await fetchLiveMatchesScraped();
+    res.json({ status: 'success', data });
+});
+
+router.get('/scraped/matches/recent', async (req, res) => {
+    const data = await fetchRecentMatchesScraped();
+    res.json({ status: 'success', data });
+});
+
+router.get('/scraped/matches/upcoming', async (req, res) => {
+    const data = await fetchUpcomingMatchesScraped();
+    res.json({ status: 'success', data });
+});
+
+router.get('/scraped/match/:id/squads', async (req, res) => {
+    const data = await fetchMatchSquadsScraped(req.params.id);
+    res.json({ status: 'success', data });
+});
+
+router.get('/scraped/match/:id/:endpointType', async (req, res) => {
+    const data = await fetchMatchDetailScraped(req.params.id, req.params.endpointType);
+    res.json({ status: 'success', data });
+});
+// =============================
+
+// Get specific match details - now uses scraper
 router.get('/match/:id', async (req, res) => {
     try {
-        const match = await cricketService.getMatchInfo(req.params.id);
-        res.json(match);
+        const data = await fetchMatchDetailScraped(req.params.id, 'info');
+        res.json(data);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -73,11 +136,11 @@ router.get('/match/:id/info', async (req, res) => {
             }
         }
 
-        // 2. Fallback to external API
-        const match = await cricketService.getMatchInfo(id);
-        res.json(match);
+        // 2. Fallback to Scraper API instead of RapidAPI
+        const matchInfo = await fetchMatchDetailScraped(id, 'info');
+        res.json({ status: 'success', data: matchInfo });
     } catch (error) {
-        console.error("Local/External match fetch error:", error);
+        console.error("Local/Scraper match fetch error:", error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -145,31 +208,31 @@ router.get('/players/:id', async (req, res) => {
 
 // ====== CRICBUZZ PROXY ROUTES (Scorecard, Squads, Commentary) ======
 
-// Cricbuzz Scorecard — accepts Cricbuzz match ID directly
+// Cricbuzz Scorecard
 router.get('/cb/scorecard/:matchId', async (req, res) => {
     try {
-        const result = await cricbuzzService.getScorecard(req.params.matchId);
-        res.json(result);
+        const data = await fetchMatchDetailScraped(req.params.matchId, 'scorecard');
+        res.json({ status: 'success', data });
     } catch (error) {
         res.status(500).json({ error: error.message, data: null });
     }
 });
 
-// Cricbuzz Squads — extracted from scorecard data
+// Cricbuzz Squads
 router.get('/cb/squads/:matchId', async (req, res) => {
     try {
-        const result = await cricbuzzService.getSquads(req.params.matchId);
-        res.json(result);
+        const data = await fetchMatchDetailScraped(req.params.matchId, 'squads');
+        res.json({ status: 'success', data });
     } catch (error) {
         res.status(500).json({ error: error.message, data: null });
     }
 });
 
-// Cricbuzz Commentary — highlight commentary
+// Cricbuzz Commentary
 router.get('/cb/commentary/:matchId', async (req, res) => {
     try {
-        const result = await cricbuzzService.getCommentary(req.params.matchId);
-        res.json(result);
+        const data = await fetchMatchDetailScraped(req.params.matchId, 'commentary');
+        res.json({ status: 'success', data });
     } catch (error) {
         res.status(500).json({ error: error.message, data: null });
     }

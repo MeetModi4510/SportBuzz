@@ -104,8 +104,21 @@ export const LiveTicker = () => {
     }
 
     const allPotential = [...followedAsTicker, ...football, ...cricket, ...mockLiveMatches] as any[];
-    const liveOnly = allPotential.filter(m => m.status === "live");
-    return liveOnly.length > 0 ? liveOnly : allPotential;
+    
+    const uniqueMatches: any[] = [];
+    const seen = new Set<string>();
+    for (const match of allPotential) {
+      const id = match._id || match.id;
+      if (id && !seen.has(id)) {
+        seen.add(id);
+        uniqueMatches.push(match);
+      } else if (!id) {
+        uniqueMatches.push(match);
+      }
+    }
+
+    const liveOnly = uniqueMatches.filter(m => m.status === "live");
+    return liveOnly.length > 0 ? liveOnly : uniqueMatches;
   }, [cricketFeatured, espnLiveMatches, mockLiveMatches, followedAsTicker]);
 
   // Only check cricket loading so we don't hang if football is just waiting for cache

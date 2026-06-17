@@ -1,0 +1,1646 @@
+{
+  "matchInfo": {
+    "matchId": 129563,
+    "alertType": "auto",
+    "dayNumber": 1,
+    "isFantasyEnabled": false,
+    "isMatchNotCovered": false,
+    "livestreamEnabledGeo": [
+      "AE",
+      "BH",
+      "BN",
+      "CA",
+      "CC",
+      "CN",
+      "CX",
+      "DJ",
+      "DZ",
+      "EG",
+      "FM",
+      "HK",
+      "ID",
+      "IQ",
+      "IR",
+      "JO",
+      "JP",
+      "KH",
+      "KR",
+      "KW",
+      "LA",
+      "LB",
+      "LY",
+      "MA",
+      "MN",
+      "MO",
+      "MR",
+      "MU",
+      "MY",
+      "NC",
+      "OM",
+      "PH",
+      "PS",
+      "QA",
+      "RE",
+      "SA",
+      "SD",
+      "SG",
+      "SO",
+      "SS",
+      "SY",
+      "TD",
+      "TH",
+      "TL",
+      "TN",
+      "TW",
+      "US",
+      "VN",
+      "YE",
+      "YT"
+    ],
+    "matchCompleteTimestamp": 1782061200000,
+    "matchDescription": "2nd Test",
+    "matchFormat": "TEST",
+    "matchImageId": 1008419,
+    "matchStartTimestamp": 1781690400000,
+    "matchTeamInfo": [
+      {
+        "battingTeamId": 13,
+        "battingTeamShortName": "NZ",
+        "bowlingTeamId": 9,
+        "bowlingTeamShortName": "ENG"
+      }
+    ],
+    "matchType": "International",
+    "playersOfTheMatch": [],
+    "playersOfTheSeries": [],
+    "referee": {
+      "id": 3395,
+      "name": "Andy Pycroft",
+      "country": "ZIM"
+    },
+    "series": {
+      "id": 10559,
+      "name": "New Zealand tour of England, 2026",
+      "startDate": 1780444800000,
+      "endDate": 1782777600000,
+      "seriesFolder": "",
+      "odiSeriesResult": "",
+      "t20SeriesResult": "",
+      "testSeriesResult": "Series levelled 0-0"
+    },
+    "state": "stump",
+    "status": "Day 1: Stumps",
+    "team1": {
+      "id": 9,
+      "name": "England",
+      "playerDetails": [
+        {
+          "id": 8502,
+          "name": "Ben Duckett",
+          "fullName": "Ben Duckett",
+          "nickName": "Ben Duckett",
+          "captain": false,
+          "role": "Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 9,
+          "battingStyle": "LEFT",
+          "bowlingStyle": "Right Arm off break",
+          "teamName": "ENG",
+          "faceImageId": 848549
+        },
+        {
+          "id": 14819,
+          "name": "Emilio Gay",
+          "fullName": "Emilio Gay",
+          "nickName": "Emilio Gay",
+          "captain": false,
+          "role": "Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 9,
+          "battingStyle": "LEFT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "ENG",
+          "faceImageId": 182026
+        },
+        {
+          "id": 19636,
+          "name": "Jacob Bethell",
+          "fullName": "Jacob Bethell",
+          "nickName": "Jacob Bethell",
+          "captain": false,
+          "role": "Batting Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 9,
+          "battingStyle": "LEFT",
+          "bowlingStyle": "Left arm orthodox",
+          "teamName": "ENG",
+          "faceImageId": 848524
+        },
+        {
+          "id": 8019,
+          "name": "Root",
+          "fullName": "Joe Root",
+          "nickName": "Root",
+          "captain": true,
+          "role": "Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 9,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm off break",
+          "teamName": "ENG",
+          "faceImageId": 717792
+        },
+        {
+          "id": 12201,
+          "name": "Harry Brook",
+          "fullName": "Harry Brook",
+          "nickName": "Harry Brook",
+          "captain": false,
+          "role": "Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 9,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "ENG",
+          "faceImageId": 848570
+        },
+        {
+          "id": 19771,
+          "name": "James Rew",
+          "fullName": "James Rew",
+          "nickName": "James Rew",
+          "captain": false,
+          "role": "WK-Batsman",
+          "keeper": true,
+          "substitute": false,
+          "teamId": 9,
+          "battingStyle": "LEFT",
+          "teamName": "ENG",
+          "faceImageId": 699399,
+          "playingXIChange": "IN"
+        },
+        {
+          "id": 14813,
+          "name": "Jordan Cox",
+          "fullName": "Jordan Cox",
+          "nickName": "Jordan Cox",
+          "captain": false,
+          "role": "WK-Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 9,
+          "battingStyle": "RIGHT",
+          "teamName": "ENG",
+          "faceImageId": 593790,
+          "playingXIChange": "IN"
+        },
+        {
+          "id": 11540,
+          "name": "Jofra Archer",
+          "fullName": "Jofra Archer",
+          "nickName": "Jofra Archer",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 9,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast",
+          "teamName": "ENG",
+          "faceImageId": 848536,
+          "playingXIChange": "IN"
+        },
+        {
+          "id": 12747,
+          "name": "Josh Tongue",
+          "fullName": "Josh Tongue",
+          "nickName": "Josh Tongue",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 9,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "ENG",
+          "faceImageId": 848540
+        },
+        {
+          "id": 9392,
+          "name": "Fisher",
+          "fullName": "Matthew Fisher",
+          "nickName": "Fisher",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 9,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "ENG",
+          "faceImageId": 182026,
+          "playingXIChange": "IN"
+        },
+        {
+          "id": 20031,
+          "name": "Sonny Baker",
+          "fullName": "Sonny Baker",
+          "nickName": "Sonny Baker",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 9,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "ENG",
+          "faceImageId": 182026,
+          "playingXIChange": "IN"
+        },
+        {
+          "id": 9531,
+          "name": "Ollie Robinson",
+          "fullName": "Ollie Robinson",
+          "nickName": "Ollie Robinson",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 9,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "ENG",
+          "faceImageId": 240049,
+          "playingXIChange": "OUT"
+        },
+        {
+          "id": 18190,
+          "name": "Henry Crocombe",
+          "fullName": "Henry Crocombe",
+          "nickName": "H Crocombe",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 9,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "ENG",
+          "faceImageId": 182026
+        },
+        {
+          "id": 19767,
+          "name": "Rehan Ahmed",
+          "fullName": "Rehan Ahmed",
+          "nickName": "Rehan Ahmed",
+          "captain": false,
+          "role": "Bowling Allrounder",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 9,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm leg break",
+          "teamName": "ENG",
+          "faceImageId": 848541
+        },
+        {
+          "id": 46023,
+          "name": "Shoaib Bashir",
+          "fullName": "Shoaib Bashir",
+          "nickName": "Bashir",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 9,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm off break",
+          "teamName": "ENG",
+          "faceImageId": 717785,
+          "playingXIChange": "OUT"
+        },
+        {
+          "id": 201,
+          "name": "Brendon McCullum",
+          "fullName": "Brendon McCullum",
+          "nickName": "Brendon McCullum",
+          "role": "Head Coach",
+          "teamId": 9,
+          "teamName": "ENG",
+          "faceImageId": 156149,
+          "isSupportStaff": true
+        },
+        {
+          "id": 66,
+          "name": "Paul Collingwood",
+          "fullName": "Paul Collingwood",
+          "nickName": "Collingwood",
+          "role": "Assistant Coach",
+          "teamId": 9,
+          "teamName": "ENG",
+          "faceImageId": 157662,
+          "isSupportStaff": true
+        },
+        {
+          "id": 44,
+          "name": "Marcus Trescothick",
+          "fullName": "Marcus Trescothick",
+          "nickName": "Trescothick",
+          "role": "Batting Coach",
+          "teamId": 9,
+          "teamName": "ENG",
+          "faceImageId": 156638,
+          "isSupportStaff": true
+        },
+        {
+          "id": 435,
+          "name": "Jeetan Patel",
+          "fullName": "Jeetan Patel",
+          "nickName": "Jeetan Patel",
+          "role": "Spin Bowling Coach",
+          "teamId": 9,
+          "teamName": "ENG",
+          "faceImageId": 156011,
+          "isSupportStaff": true
+        },
+        {
+          "id": 50334,
+          "name": "David Saker",
+          "fullName": "David Saker",
+          "nickName": "David Saker",
+          "role": "Fast Bowling Coach",
+          "teamId": 9,
+          "teamName": "ENG",
+          "faceImageId": 182026,
+          "isSupportStaff": true
+        }
+      ],
+      "shortName": "ENG"
+    },
+    "team2": {
+      "id": 13,
+      "name": "New Zealand",
+      "playerDetails": [
+        {
+          "id": 8216,
+          "name": "Tom Latham",
+          "fullName": "Tom Latham",
+          "nickName": "Tom Latham",
+          "captain": true,
+          "role": "WK-Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 13,
+          "battingStyle": "LEFT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "NZ",
+          "faceImageId": 616421
+        },
+        {
+          "id": 9838,
+          "name": "Devon Conway",
+          "fullName": "Devon Conway",
+          "nickName": "Devon Conway",
+          "captain": false,
+          "role": "WK-Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 13,
+          "battingStyle": "LEFT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "NZ",
+          "faceImageId": 845526
+        },
+        {
+          "id": 10694,
+          "name": "Henry Nicholls",
+          "fullName": "Henry Nicholls",
+          "nickName": "Nicholls",
+          "captain": false,
+          "role": "Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 13,
+          "battingStyle": "LEFT",
+          "bowlingStyle": "Right Arm off break",
+          "teamName": "NZ",
+          "faceImageId": 170745,
+          "playingXIChange": "IN"
+        },
+        {
+          "id": 11177,
+          "name": "Rachin Ravindra",
+          "fullName": "Rachin Ravindra",
+          "nickName": "Rachin Ravindra",
+          "captain": false,
+          "role": "Batting Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 13,
+          "battingStyle": "LEFT",
+          "bowlingStyle": "Left arm orthodox",
+          "teamName": "NZ",
+          "faceImageId": 845519
+        },
+        {
+          "id": 10713,
+          "name": "Daryl Mitchell",
+          "fullName": "Daryl Mitchell",
+          "nickName": "Daryl Mitchell",
+          "captain": false,
+          "role": "Batting Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 13,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "NZ",
+          "faceImageId": 845511
+        },
+        {
+          "id": 10717,
+          "name": "Tom Blundell",
+          "fullName": "Tom Blundell",
+          "nickName": "Blundell",
+          "captain": false,
+          "role": "WK-Batsman",
+          "keeper": true,
+          "substitute": false,
+          "teamId": 13,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm off break",
+          "teamName": "NZ",
+          "faceImageId": 170757
+        },
+        {
+          "id": 10693,
+          "name": "Glenn Phillips",
+          "fullName": "Glenn Phillips",
+          "nickName": "Glenn Phillips",
+          "captain": false,
+          "role": "WK-Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 13,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm off break",
+          "teamName": "NZ",
+          "faceImageId": 845521
+        },
+        {
+          "id": 11170,
+          "name": "Nathan Smith",
+          "fullName": "Nathan Smith",
+          "nickName": "Nathan Smith",
+          "captain": false,
+          "role": "Bowling Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 13,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "NZ",
+          "faceImageId": 616429
+        },
+        {
+          "id": 9441,
+          "name": "Kyle Jamieson",
+          "fullName": "Kyle Jamieson",
+          "nickName": "Kyle Jamieson",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 13,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "NZ",
+          "faceImageId": 845508
+        },
+        {
+          "id": 9067,
+          "name": "Matt Henry",
+          "fullName": "Matt Henry",
+          "nickName": "Matt Henry",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 13,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "NZ",
+          "faceImageId": 845495
+        },
+        {
+          "id": 15925,
+          "name": "William ORourke",
+          "fullName": "William ORourke",
+          "nickName": "William ORourke",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 13,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "NZ",
+          "faceImageId": 616423
+        },
+        {
+          "id": 8549,
+          "name": "Will Young",
+          "fullName": "Will Young",
+          "nickName": "Will Young",
+          "captain": false,
+          "role": "Batsman",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 13,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm off break",
+          "teamName": "NZ",
+          "faceImageId": 616420
+        },
+        {
+          "id": 10730,
+          "name": "Blair Tickner",
+          "fullName": "Blair Tickner",
+          "nickName": "Blair Tickner",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 13,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "NZ",
+          "faceImageId": 226325
+        },
+        {
+          "id": 11197,
+          "name": "Dean Foxcroft",
+          "fullName": "Dean Foxcroft",
+          "nickName": "Dean Foxcroft",
+          "captain": false,
+          "role": "Bowling Allrounder",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 13,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm off break",
+          "teamName": "NZ",
+          "faceImageId": 182026
+        },
+        {
+          "id": 24391,
+          "name": "Zakary Foulkes",
+          "fullName": "Zakary Foulkes",
+          "nickName": "Zakary Foulkes",
+          "captain": false,
+          "role": "Bowling Allrounder",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 13,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "NZ",
+          "faceImageId": 829852
+        },
+        {
+          "id": 46170,
+          "name": "Rob Walter",
+          "fullName": "Rob Walter",
+          "nickName": "Rob Walter",
+          "role": "Head Coach",
+          "teamId": 13,
+          "teamName": "NZ",
+          "faceImageId": 182026,
+          "isSupportStaff": true
+        },
+        {
+          "id": 1396,
+          "name": "Luke Ronchi",
+          "fullName": "Luke Ronchi",
+          "nickName": "Ronchi",
+          "role": "Batting Coach",
+          "teamId": 13,
+          "teamName": "NZ",
+          "faceImageId": 146398,
+          "isSupportStaff": true
+        },
+        {
+          "id": 59,
+          "name": "Jacob Oram",
+          "fullName": "Jacob Oram",
+          "nickName": "Oram",
+          "role": "Bowling Coach",
+          "teamId": 13,
+          "teamName": "NZ",
+          "faceImageId": 151503,
+          "isSupportStaff": true
+        },
+        {
+          "id": 1914,
+          "name": "James Foster",
+          "fullName": "James Foster",
+          "nickName": "Foster",
+          "role": "Fielding Coach",
+          "teamId": 13,
+          "teamName": "NZ",
+          "faceImageId": 156640,
+          "isSupportStaff": true
+        }
+      ],
+      "shortName": "NZ"
+    },
+    "tossResults": {
+      "tossWinnerId": 9,
+      "tossWinnerName": "England",
+      "decision": "Bowling"
+    },
+    "umpire1": {
+      "id": 8112,
+      "name": "Adrian Holdstock",
+      "country": "RSA"
+    },
+    "umpire2": {
+      "id": 8862,
+      "name": "Nitin Menon",
+      "country": "IND"
+    },
+    "umpire3": {
+      "id": 7240,
+      "name": "Rod Tucker",
+      "country": "AUS"
+    },
+    "venue": {
+      "id": 12,
+      "name": "Kennington Oval",
+      "city": "London",
+      "country": "England",
+      "timezone": "+01:00",
+      "latitude": "51.48368",
+      "longitude": "-0.114885"
+    },
+    "year": 2026,
+    "shortStatus": "ENG opt to bowl",
+    "isForecastEnabled": false,
+    "isPollEnabled": true,
+    "complete": false,
+    "dayNight": false,
+    "domestic": false,
+    "HYSEnabled": 0,
+    "livestreamEnabled": false
+  },
+  "matchScore": {
+    "team1Score": {
+      "inngs1": {
+        "inningsId": 1,
+        "runs": 291,
+        "wickets": 7,
+        "overs": 76.6
+      }
+    }
+  },
+  "matchId": 129563,
+  "seriesId": 10559,
+  "seriesName": "New Zealand tour of England, 2026",
+  "matchDesc": "2nd Test",
+  "matchFormat": "TEST",
+  "startDate": "1781690400000",
+  "endDate": "1782061200000",
+  "state": "stump",
+  "status": "Day 1: Stumps",
+  "team1": "ENG",
+  "team2": "NZ",
+  "venueInfo": {
+    "id": 12,
+    "ground": "Kennington Oval",
+    "city": "London",
+    "timezone": "+01:00",
+    "latitude": "51.48368",
+    "longitude": "-0.114885"
+  },
+  "currBatTeamId": 13,
+  "seriesStartDt": "1780531200000",
+  "seriesEndDt": "1782864000000",
+  "isTimeAnnounced": true,
+  "stateTitle": "Stumps",
+  "matchType": "International",
+  "shortStatus": "ENG opt to bowl",
+  "matchImageId": 1008419,
+  "commentaryPageData": {
+    "matchCommentary": {
+      "1781720321948": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "$21",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": "$undefined",
+        "teamName": "NZ",
+        "timestamp": 1781720321948,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 0,
+          "playerName": ""
+        },
+        "bowlerDetails": {
+          "playerId": 0,
+          "playerName": ""
+        }
+      },
+      "1781719335592": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "$22",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": "$undefined",
+        "teamName": "NZ",
+        "timestamp": 1781719335592,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 0,
+          "playerName": ""
+        },
+        "bowlerDetails": {
+          "playerId": 0,
+          "playerName": ""
+        }
+      },
+      "1781719264555": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Jacob Bethell to Kyle Jamieson, no run, pitched up by the bowler around off, pushed back to the bowler. <b>That is Stumps on Day 1</b>",
+        "inningsId": 1,
+        "event": [
+          "over-break",
+          "all"
+        ],
+        "ballMetric": 76.6,
+        "teamName": "NZ",
+        "timestamp": 1781719264555,
+        "overSeparator": {
+          "timestamp": 1781719264555,
+          "overNumber": 77,
+          "overSummary": "1 0 0 0 0 0 ",
+          "overRuns": 1,
+          "batTeamObj": {
+            "teamName": "NZ",
+            "teamScore": "291-7"
+          },
+          "batStrikerObj": {
+            "playerId": 9441,
+            "playerName": "Kyle Jamieson",
+            "playerScore": "6(13)"
+          },
+          "batNonStrikerObj": {
+            "playerId": 10693,
+            "playerName": "Glenn Phillips",
+            "playerScore": "49(74)"
+          },
+          "bowlerObj": {
+            "playerId": 19636,
+            "playerName": "Jacob Bethell",
+            "playerScore": "5-1-8-2"
+          }
+        },
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 19636,
+          "playerName": "Jacob Bethell"
+        }
+      },
+      "1781719236435": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Jacob Bethell to Kyle Jamieson, no run, on a length around off, knocked to cover by Kyle Jamieson",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 76.5,
+        "teamName": "NZ",
+        "timestamp": 1781719236435,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 19636,
+          "playerName": "Jacob Bethell"
+        }
+      },
+      "1781719213080": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Jacob Bethell to Kyle Jamieson, no run, flatter delivery around middle and leg, middle to mid-wicket",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 76.4,
+        "teamName": "NZ",
+        "timestamp": 1781719213080,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 19636,
+          "playerName": "Jacob Bethell"
+        }
+      },
+      "1781719184958": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Jacob Bethell to Kyle Jamieson, no run, flatter delivery around middle and leg, nudged to the leg-side",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 76.3,
+        "teamName": "NZ",
+        "timestamp": 1781719184958,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 19636,
+          "playerName": "Jacob Bethell"
+        }
+      },
+      "1781719163341": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Jacob Bethell to Kyle Jamieson, no run, on a length around middle and leg, nudged to mid-on",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 76.2,
+        "teamName": "NZ",
+        "timestamp": 1781719163341,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 19636,
+          "playerName": "Jacob Bethell"
+        }
+      },
+      "1781719115343": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Jacob Bethell to Glenn Phillips, 1 run, flatter around off, punched through the off-side for a single",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 76.1,
+        "teamName": "NZ",
+        "timestamp": 1781719115343,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 10693,
+          "playerName": "Glenn Phillips"
+        },
+        "bowlerDetails": {
+          "playerId": 19636,
+          "playerName": "Jacob Bethell"
+        }
+      },
+      "1781719110404": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "<b>Jacob Bethell [4.0-1-7-2] is back into the attack</b>",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": "$undefined",
+        "teamName": "NZ",
+        "timestamp": 1781719110404,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 10693,
+          "playerName": "Glenn Phillips"
+        },
+        "bowlerDetails": {
+          "playerId": 19636,
+          "playerName": "Jacob Bethell"
+        }
+      },
+      "1781719026633": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Josh Tongue to Kyle Jamieson, no run, short and quick ball on leg, Kyle Jamieson goes for a pull, gets hit on the body",
+        "inningsId": 1,
+        "event": [
+          "over-break",
+          "all"
+        ],
+        "ballMetric": 75.6,
+        "teamName": "NZ",
+        "timestamp": 1781719026633,
+        "overSeparator": {
+          "timestamp": 1781719026633,
+          "overNumber": 76,
+          "overSummary": "0 0 2 4 0 0 ",
+          "overRuns": 6,
+          "batTeamObj": {
+            "teamName": "NZ",
+            "teamScore": "290-7"
+          },
+          "batStrikerObj": {
+            "playerId": 9441,
+            "playerName": "Kyle Jamieson",
+            "playerScore": "6(8)"
+          },
+          "batNonStrikerObj": {
+            "playerId": 10693,
+            "playerName": "Glenn Phillips",
+            "playerScore": "48(73)"
+          },
+          "bowlerObj": {
+            "playerId": 12747,
+            "playerName": "Josh Tongue",
+            "playerScore": "16-1-74-1"
+          }
+        },
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 12747,
+          "playerName": "Josh Tongue"
+        }
+      },
+      "1781718992867": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Josh Tongue to Kyle Jamieson, no run, bouncer down the leg-side and Kyle Jamieson lets it through to the keeper",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 75.5,
+        "teamName": "NZ",
+        "timestamp": 1781718992867,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 12747,
+          "playerName": "Josh Tongue"
+        }
+      },
+      "1781718950062": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Josh Tongue to Kyle Jamieson, <b>FOUR</b>, on the shorter side, Kyle Jamieson rocks back and carves it away through the off-side for four runs",
+        "inningsId": 1,
+        "event": [
+          "four",
+          "all"
+        ],
+        "ballMetric": 75.4,
+        "teamName": "NZ",
+        "timestamp": 1781718950062,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 12747,
+          "playerName": "Josh Tongue"
+        }
+      },
+      "1781718908064": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Josh Tongue to Kyle Jamieson, 2 runs, short and quick on middle and leg, Kyle Jamieson pulls it towards deep mid-wicket, but it doesn't carry to the fielder charging in, two runs taken",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all",
+          "two"
+        ],
+        "ballMetric": 75.3,
+        "teamName": "NZ",
+        "timestamp": 1781718908064,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 12747,
+          "playerName": "Josh Tongue"
+        }
+      },
+      "1781718846548": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Josh Tongue to Kyle Jamieson, no run, another bouncer as Kyle Jamieson ducks for cover",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 75.2,
+        "teamName": "NZ",
+        "timestamp": 1781718846548,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 12747,
+          "playerName": "Josh Tongue"
+        }
+      },
+      "1781718813359": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Josh Tongue to Kyle Jamieson, no run, short ball by Josh Tongue and Kyle Jamieson lets it through",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 75.1,
+        "teamName": "NZ",
+        "timestamp": 1781718813359,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 12747,
+          "playerName": "Josh Tongue"
+        }
+      },
+      "1781718808405": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "<b>Josh Tongue [15.0-1-68-1] is back into the attack</b>",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": "$undefined",
+        "teamName": "NZ",
+        "timestamp": 1781718808405,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 9441,
+          "playerName": "Kyle Jamieson"
+        },
+        "bowlerDetails": {
+          "playerId": 12747,
+          "playerName": "Josh Tongue"
+        }
+      },
+      "1781718643309": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Jofra Archer to Glenn Phillips, no run, short and quick on leg, Glenn Phillips looks to defend, gets surprised due to the steep bounce and is hit on the glove",
+        "inningsId": 1,
+        "event": [
+          "over-break",
+          "all"
+        ],
+        "ballMetric": 74.6,
+        "teamName": "NZ",
+        "timestamp": 1781718643309,
+        "overSeparator": {
+          "timestamp": 1781718643309,
+          "overNumber": 75,
+          "overSummary": "4 0 0 0 0 0 ",
+          "overRuns": 4,
+          "batTeamObj": {
+            "teamName": "NZ",
+            "teamScore": "284-7"
+          },
+          "batStrikerObj": {
+            "playerId": 10693,
+            "playerName": "Glenn Phillips",
+            "playerScore": "48(73)"
+          },
+          "batNonStrikerObj": {
+            "playerId": 9441,
+            "playerName": "Kyle Jamieson",
+            "playerScore": "0(2)"
+          },
+          "bowlerObj": {
+            "playerId": 11540,
+            "playerName": "Jofra Archer",
+            "playerScore": "19-4-58-1"
+          }
+        },
+        "batsmanDetails": {
+          "playerId": 10693,
+          "playerName": "Glenn Phillips"
+        },
+        "bowlerDetails": {
+          "playerId": 11540,
+          "playerName": "Jofra Archer"
+        }
+      },
+      "1781718601667": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Jofra Archer to Glenn Phillips, no run, short ball down the leg-side, left alone",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 74.5,
+        "teamName": "NZ",
+        "timestamp": 1781718601667,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 10693,
+          "playerName": "Glenn Phillips"
+        },
+        "bowlerDetails": {
+          "playerId": 11540,
+          "playerName": "Jofra Archer"
+        }
+      },
+      "1781718547766": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Jofra Archer to Glenn Phillips, no run, short ball on leg, nips back in sharply as Glenn Phillips sways away",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 74.4,
+        "teamName": "NZ",
+        "timestamp": 1781718547766,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 10693,
+          "playerName": "Glenn Phillips"
+        },
+        "bowlerDetails": {
+          "playerId": 11540,
+          "playerName": "Jofra Archer"
+        }
+      },
+      "1781718502466": {
+        "matchId": 129563,
+        "commType": "commentary",
+        "commText": "Jofra Archer to Glenn Phillips, no run, short ball down the leg-side, Glenn Phillips lets it through to the keeper",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 74.3,
+        "teamName": "NZ",
+        "timestamp": 1781718502466,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 10693,
+          "playerName": "Glenn Phillips"
+        },
+        "bowlerDetails": {
+          "playerId": 11540,
+          "playerName": "Jofra Archer"
+        }
+      }
+    },
+    "miniscore": {
+      "inningsId": 1,
+      "batTeam": {
+        "teamId": 13,
+        "teamScore": 291,
+        "teamWkts": 7
+      },
+      "status": "Day 1: Stumps",
+      "batsmanStriker": {
+        "id": 10693,
+        "name": "Glenn Phillips",
+        "runs": 49,
+        "balls": 74,
+        "fours": 9,
+        "sixes": 0,
+        "strikeRate": "66.22",
+        "playerUrl": "/profiles/10693/glenn-phillips",
+        "playerMatchHighlightsUrl": "/player-match-highlights/129563/1/10693/batting"
+      },
+      "batsmanNonStriker": {
+        "id": 9441,
+        "name": "Kyle Jamieson",
+        "runs": 6,
+        "balls": 13,
+        "fours": 1,
+        "sixes": 0,
+        "strikeRate": "46.15",
+        "playerUrl": "/profiles/9441/kyle-jamieson",
+        "playerMatchHighlightsUrl": "/player-match-highlights/129563/1/9441/batting"
+      },
+      "bowlerStriker": {
+        "id": 12747,
+        "name": "Josh Tongue",
+        "overs": 16,
+        "maidens": 1,
+        "economy": 4.63,
+        "runs": 74,
+        "wickets": 1,
+        "playerUrl": "/profiles/12747/josh-tongue",
+        "playerMatchHighlightsUrl": "/player-match-highlights/129563/1/12747/bowling"
+      },
+      "bowlerNonStriker": {
+        "id": 19636,
+        "name": "Jacob Bethell",
+        "overs": 5,
+        "maidens": 1,
+        "economy": 1.6,
+        "runs": 8,
+        "wickets": 2,
+        "playerUrl": "/profiles/19636/jacob-bethell",
+        "playerMatchHighlightsUrl": "/player-match-highlights/129563/1/19636/bowling"
+      },
+      "overs": 77,
+      "target": null,
+      "partnerShip": {
+        "balls": 20,
+        "runs": 11
+      },
+      "currentRunRate": 3.78,
+      "requiredRunRate": 0,
+      "runsPerBall": 0,
+      "requiredRunsPerBall": 0,
+      "matchScoreDetails": {
+        "matchId": 129563,
+        "inningsScoreList": [
+          {
+            "inningsId": 1,
+            "batTeamId": 13,
+            "batTeamName": "NZ",
+            "score": 291,
+            "wickets": 7,
+            "overs": 77,
+            "isDeclared": false,
+            "isFollowOn": false,
+            "ballNbr": 462
+          }
+        ],
+        "isMatchNotCovered": false,
+        "matchFormat": "TEST",
+        "customStatus": "Day 1: Stumps",
+        "state": "Stumps"
+      },
+      "lastWicket": "Nathan Smith  c Jordan Cox b Jacob Bethell 4(21)  - 280/7 in 73.4 ov.",
+      "remRunsToWin": 0,
+      "oversRem": "$undefined",
+      "responseLastUpdated": 1781723709,
+      "latestPerformance": [
+        {
+          "runs": 32,
+          "wkts": 2,
+          "label": "Last 10 overs"
+        }
+      ],
+      "recentOvsStats": "...  | 0 0 2 4 0 0  | 1 0 0 0 0 0",
+      "event": "over-break",
+      "batTeamScoreObj": {
+        "teamName": "NZ",
+        "teamInningsArray": [
+          {
+            "inningsId": 1,
+            "batTeamId": 13,
+            "batTeamName": "NZ",
+            "score": 291,
+            "wickets": 7,
+            "overs": 76.6,
+            "isDeclared": false,
+            "isFollowOn": false,
+            "ballNbr": 462
+          }
+        ]
+      },
+      "bowlTeamScoreObj": {
+        "teamName": "",
+        "teamInningsArray": []
+      },
+      "matchUdrs": {
+        "matchId": 129563,
+        "inningsId": 1,
+        "timestamp": "2026-06-17T14:27:17.677Z",
+        "team1Id": 9,
+        "team1Remaining": 2,
+        "team1Successful": 0,
+        "team1Unsuccessful": 1,
+        "team2Id": 13,
+        "team2Remaining": 3,
+        "team2Successful": 0,
+        "team2Unsuccessful": 0
+      }
+    },
+    "enableNoContent": false,
+    "matchHeader": {
+      "matchId": 129563,
+      "matchDescription": "2nd Test",
+      "matchFormat": "TEST",
+      "matchType": "International",
+      "complete": false,
+      "domestic": false,
+      "matchStartTimestamp": 1781690400000,
+      "matchStartTimeIST": "3:30 PM",
+      "matchStartTimeGMT": "10:00 AM",
+      "matchStartTimeLocal": "11:00 AM",
+      "matchCompleteTimeIST": "10:30 PM",
+      "matchCompleteTimeGMT": "Sun, Jun 21, 5:00:00 PM",
+      "matchCompleteTimeLocal": "6:00 PM",
+      "dayNight": false,
+      "year": 2026,
+      "state": "Stumps",
+      "status": "Day 1: Stumps",
+      "tossResults": {
+        "tossWinnerId": 9,
+        "tossWinnerName": "England",
+        "decision": "Bowling"
+      },
+      "result": {},
+      "revisedTarget": {},
+      "playersOfTheMatch": [],
+      "playersOfTheSeries": [],
+      "matchTeamInfo": [
+        {
+          "battingTeamId": 13,
+          "battingTeamShortName": "NZ",
+          "bowlingTeamId": 9,
+          "bowlingTeamShortName": "ENG"
+        }
+      ],
+      "team1": {
+        "id": 9,
+        "name": "England",
+        "playerDetails": [],
+        "shortName": "ENG"
+      },
+      "team2": {
+        "id": 13,
+        "name": "New Zealand",
+        "playerDetails": [],
+        "shortName": "NZ"
+      },
+      "seriesDesc": "New Zealand tour of England, 2026",
+      "seriesId": 10559,
+      "seriesName": "New Zealand tour of England, 2026",
+      "alertType": "auto",
+      "isMatchNotCovered": false,
+      "livestreamEnabled": false
+    },
+    "matchVideos": [],
+    "page": "commentary",
+    "responseLastUpdated": 1781723709,
+    "partnersStrip": "$undefined",
+    "winProbability": {
+      "matchId": 129563,
+      "drawTiePercent": 2,
+      "team1": {
+        "id": 9,
+        "percent": 53,
+        "name": "England",
+        "shortName": "ENG",
+        "color": "#DC3838|#DC3838"
+      },
+      "team2": {
+        "id": 13,
+        "percent": 45,
+        "name": "New Zealand",
+        "shortName": "NZ",
+        "color": "#1E293B|#999999"
+      },
+      "lastUpdatedOver": 77,
+      "odds": {
+        "team1_point": 1.9,
+        "team2_point": 2.2
+      }
+    }
+  },
+  "isHundred": false,
+  "specialsAdUnitArr": [],
+  "isMiniscorePollingEnabled": true,
+  "commType": "commentary",
+  "commText": "Jofra Archer to Glenn Phillips, no run, short ball down the leg-side, Glenn Phillips lets it through to the keeper",
+  "inningsId": 1,
+  "event": [
+    "none",
+    "all"
+  ],
+  "ballMetric": 74.3,
+  "teamName": "NZ",
+  "timestamp": "2026-06-17T14:27:17.677Z",
+  "overSeparator": null,
+  "batsmanDetails": {
+    "playerId": 10693,
+    "playerName": "Glenn Phillips"
+  },
+  "bowlerDetails": {
+    "playerId": 11540,
+    "playerName": "Jofra Archer"
+  },
+  "inningsScoreList": [
+    {
+      "inningsId": 1,
+      "batTeamId": 13,
+      "batTeamName": "NZ",
+      "score": 291,
+      "wickets": 7,
+      "overs": 77,
+      "isDeclared": false,
+      "isFollowOn": false,
+      "ballNbr": 462
+    }
+  ],
+  "isMatchNotCovered": false,
+  "customStatus": "Day 1: Stumps",
+  "team1Id": 9,
+  "team1Remaining": 2,
+  "team1Successful": 0,
+  "team1Unsuccessful": 1,
+  "team2Id": 13,
+  "team2Remaining": 3,
+  "team2Successful": 0,
+  "team2Unsuccessful": 0,
+  "matchDescription": "2nd Test",
+  "complete": false,
+  "domestic": false,
+  "matchStartTimestamp": 1781690400000,
+  "matchStartTimeIST": "3:30 PM",
+  "matchStartTimeGMT": "10:00 AM",
+  "matchStartTimeLocal": "11:00 AM",
+  "matchCompleteTimeIST": "10:30 PM",
+  "matchCompleteTimeGMT": "Sun, Jun 21, 5:00:00 PM",
+  "matchCompleteTimeLocal": "6:00 PM",
+  "dayNight": false,
+  "year": 2026,
+  "tossResults": {
+    "tossWinnerId": 9,
+    "tossWinnerName": "England",
+    "decision": "Bowling"
+  },
+  "result": {},
+  "revisedTarget": {},
+  "playersOfTheMatch": [],
+  "playersOfTheSeries": [],
+  "matchTeamInfo": [
+    {
+      "battingTeamId": 13,
+      "battingTeamShortName": "NZ",
+      "bowlingTeamId": 9,
+      "bowlingTeamShortName": "ENG"
+    }
+  ],
+  "seriesDesc": "New Zealand tour of England, 2026",
+  "alertType": "auto",
+  "livestreamEnabled": false,
+  "drawTiePercent": 2,
+  "lastUpdatedOver": 77,
+  "odds": {
+    "team1_point": 1.9,
+    "team2_point": 2.2
+  },
+  "dayNumber": 1,
+  "isFantasyEnabled": false,
+  "livestreamEnabledGeo": [
+    "AE",
+    "BH",
+    "BN",
+    "CA",
+    "CC",
+    "CN",
+    "CX",
+    "DJ",
+    "DZ",
+    "EG",
+    "FM",
+    "HK",
+    "ID",
+    "IQ",
+    "IR",
+    "JO",
+    "JP",
+    "KH",
+    "KR",
+    "KW",
+    "LA",
+    "LB",
+    "LY",
+    "MA",
+    "MN",
+    "MO",
+    "MR",
+    "MU",
+    "MY",
+    "NC",
+    "OM",
+    "PH",
+    "PS",
+    "QA",
+    "RE",
+    "SA",
+    "SD",
+    "SG",
+    "SO",
+    "SS",
+    "SY",
+    "TD",
+    "TH",
+    "TL",
+    "TN",
+    "TW",
+    "US",
+    "VN",
+    "YE",
+    "YT"
+  ],
+  "matchCompleteTimestamp": 1782061200000,
+  "referee": {
+    "id": 3395,
+    "name": "Andy Pycroft",
+    "country": "ZIM"
+  },
+  "series": {
+    "id": 10559,
+    "name": "New Zealand tour of England, 2026",
+    "startDate": 1780444800000,
+    "endDate": 1782777600000,
+    "seriesFolder": "",
+    "odiSeriesResult": "",
+    "t20SeriesResult": "",
+    "testSeriesResult": "Series levelled 0-0"
+  },
+  "umpire1": {
+    "id": 8112,
+    "name": "Adrian Holdstock",
+    "country": "RSA"
+  },
+  "umpire2": {
+    "id": 8862,
+    "name": "Nitin Menon",
+    "country": "IND"
+  },
+  "umpire3": {
+    "id": 7240,
+    "name": "Rod Tucker",
+    "country": "AUS"
+  },
+  "venue": {
+    "id": 12,
+    "name": "Kennington Oval",
+    "city": "London",
+    "country": "England",
+    "timezone": "+01:00",
+    "latitude": "51.48368",
+    "longitude": "-0.114885"
+  },
+  "isForecastEnabled": false,
+  "isPollEnabled": true,
+  "HYSEnabled": 0
+}

@@ -16,8 +16,8 @@ export function useFeaturedLiveCricketMatches() {
                 return EMPTY;
             }
         },
-        refetchInterval: 900_000,   // 15 min
-        staleTime:       870_000,   // 14.5 min
+        refetchInterval: 60_000,    // 1 min
+        staleTime:       60_000,    // 1 min
         refetchOnMount: true,       // always re-fetch to bypass stale empty cache
         retry: 1,
     });

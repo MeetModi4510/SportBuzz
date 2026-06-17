@@ -63,15 +63,17 @@ export const authApi = {
 };
 
 export const cricketApi = {
-    getLiveMatches: () => api.get('cricket/matches/live'),
-    getUpcomingMatches: () => api.get('cricket/matches/upcoming'),
-    getRecentMatches: () => api.get('cricket/matches/recent'),
-    getMatchScorecard: (matchId: string) => api.get(`cricket/match/${matchId}/scorecard`),
-    getMatchSquads: (matchId: string) => api.get(`cricket/match/${matchId}/squads`),
-    getMatchInfo: (matchId: string) => api.get(`cricket/match/${matchId}/info`),
-    getCricbuzzScorecard: (matchId: string) => api.get(`cricket/cb/scorecard/${matchId}`),
-    getCricbuzzSquads: (matchId: string) => api.get(`cricket/cb/squads/${matchId}`),
-    getCricbuzzCommentary: (matchId: string) => api.get(`cricket/cb/commentary/${matchId}`),
+    getLiveMatches: () => api.get('cricket/scraped/matches/live'),
+    getUpcomingMatches: () => api.get('cricket/scraped/matches/upcoming'),
+    getRecentMatches: () => api.get('cricket/scraped/matches/recent'),
+    getMatchScorecard: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/scorecard`),
+    getMatchSquads: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/squads`),
+    getMatchInfo: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/info`),
+    getCricbuzzScorecard: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/scorecard`),
+    getCricbuzzSquads: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/squads`),
+    getCricbuzzCommentary: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/commentary`),
+    getCricbuzzSummary: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/summary`),
+    getCricbuzzInfo: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/info`),
     getFeaturedMatches: async () => {
         try {
             const res = await api.get('featured/matches');
@@ -106,13 +108,26 @@ export const cricketApi = {
         }
     },
 
-    /** Helper to call one of the lazy featured endpoints and map matches */
+    /** Helper to call one of the lazy scraped endpoints and map matches */
     _fetchFeaturedSlice: async (endpoint: string): Promise<{ test: Match[], odi: Match[], t20: Match[] }> => {
         try {
             const res = await api.get(endpoint);
-            // Server returns: { success, data: { test, odi, t20 }, cacheTTL }
-            // axios interceptor returns response.data, so res = { success, data: { test, odi, t20 }, cacheTTL }
             const payload = (res as any)?.data ?? res;
+            
+            // Scraped data returns a flat array in payload or payload.data
+            const rawData = Array.isArray(payload) ? payload : (payload?.data || []);
+            
+            const testRaw: any[] = [];
+            const odiRaw: any[] = [];
+            const t20Raw: any[] = [];
+            
+            rawData.forEach((m: any) => {
+                const type = m.matchType?.toLowerCase() || '';
+                if (type === 'test') testRaw.push(m);
+                else if (type === 'odi') odiRaw.push(m);
+                else t20Raw.push(m);
+            });
+
             const processFormat = (formatData: any): Match[] => {
                 if (!Array.isArray(formatData)) return [];
                 return formatData
@@ -120,9 +135,9 @@ export const cricketApi = {
                     .filter(Boolean) as Match[];
             };
             return {
-                test: processFormat(payload?.test),
-                odi:  processFormat(payload?.odi),
-                t20:  processFormat(payload?.t20),
+                test: processFormat(testRaw),
+                odi:  processFormat(odiRaw),
+                t20:  processFormat(t20Raw),
             };
         } catch (error) {
             console.error(`[cricketApi] ${endpoint} failed:`, error);
@@ -130,17 +145,17 @@ export const cricketApi = {
         }
     },
 
-    /** Only live — called on initial load. Cached 15 min on server. */
+    /** Only live — called on initial load. Cached 1 minute on server. */
     getLiveCricketFeatured: (): Promise<{ test: Match[], odi: Match[], t20: Match[] }> =>
-        cricketApi._fetchFeaturedSlice('featured/matches/live'),
+        cricketApi._fetchFeaturedSlice('cricket/scraped/matches/live'),
 
     /** Only upcoming — called lazily when user clicks "Upcoming". Cached 30 min. */
     getUpcomingCricketFeatured: (): Promise<{ test: Match[], odi: Match[], t20: Match[] }> =>
-        cricketApi._fetchFeaturedSlice('featured/matches/upcoming'),
+        cricketApi._fetchFeaturedSlice('cricket/scraped/matches/upcoming'),
 
     /** Only recent/completed — called lazily when user clicks "Completed". Cached 30 min. */
     getRecentCricketFeatured: (): Promise<{ test: Match[], odi: Match[], t20: Match[] }> =>
-        cricketApi._fetchFeaturedSlice('featured/matches/recent'),
+        cricketApi._fetchFeaturedSlice('cricket/scraped/matches/recent'),
 };
 
 export const footballApi = {

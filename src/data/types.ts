@@ -56,6 +56,7 @@ export interface Match {
   summaryText?: string;
   displayTime?: string; // Pre-formatted IST time string from backend
   chaseLine?: string | null;  // PROMPT 3: Live chase requirement line e.g. "India need 9 runs in 12 balls"
+  _scoresUnavailable?: boolean;
 
   // Test Match Specific
   stumpsStatus?: string;

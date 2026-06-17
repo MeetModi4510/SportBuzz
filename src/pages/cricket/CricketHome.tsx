@@ -12,14 +12,15 @@ import { Match } from "../../data/types";
 
 export default function CricketHome() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'live' | 'upcoming' | 'recent'>('live');
   const { data: liveData, isLoading: liveLoading } = useFeaturedLiveCricketMatches();
-  const { data: upcomingData, isLoading: upcomingLoading } = useFeaturedUpcomingCricketMatches(true);
-  const { data: recentData, isLoading: recentLoading } = useFeaturedRecentCricketMatches(true);
+  const { data: upcomingData, isLoading: upcomingLoading } = useFeaturedUpcomingCricketMatches(activeTab === 'upcoming');
+  const { data: recentData, isLoading: recentLoading } = useFeaturedRecentCricketMatches(activeTab === 'recent');
 
   const isLoading = liveLoading || upcomingLoading || recentLoading;
 
   const currentMatches = useMemo(() => {
-    const matches = [];
+    const matches: Match[] = [];
     if (liveData) {
       matches.push(...(liveData.test || []), ...(liveData.odi || []), ...(liveData.t20 || []));
     }
@@ -29,7 +30,16 @@ export default function CricketHome() {
     if (recentData) {
       matches.push(...(recentData.test || []), ...(recentData.odi || []), ...(recentData.t20 || []));
     }
-    return matches;
+    
+    const uniqueMatches: Match[] = [];
+    const seenIds = new Set<string>();
+    for (const match of matches) {
+      if (!seenIds.has(match.id)) {
+        seenIds.add(match.id);
+        uniqueMatches.push(match);
+      }
+    }
+    return uniqueMatches;
   }, [liveData, upcomingData, recentData]);
 
   const handleMatchClick = (matchId: string) => {
@@ -67,6 +77,8 @@ export default function CricketHome() {
                   matches={currentMatches}
                   onMatchClick={(match) => handleMatchClick(match.id)}
                   isLoading={false}
+                  activeTabOverride={activeTab}
+                  onTabChange={setActiveTab}
                 />
               )}
           </div>

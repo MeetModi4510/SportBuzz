@@ -39,23 +39,38 @@ const Index = () => {
   const [activeStatus, setActiveStatus] = useState<MatchStatus | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCategory, setSearchCategory] = useState<"all" | "team" | "venue" | "type">("all");
+  const [cricketTab, setCricketTab] = useState<'live' | 'upcoming' | 'recent'>('live');
 
   // ─── Cricket: lazy-load by filter ───────────────────────────────────────────
-  // Live: always on (initial load). Upcoming/Recent: load when cricket is in scope.
+  // Live: always on (initial load). Upcoming/Recent: load when cricket is in scope AND tab is active.
   const { data: liveData,     isLoading: liveLoading     } = useFeaturedLiveCricketMatches();
   const { data: upcomingData, isLoading: upcomingLoading } = useFeaturedUpcomingCricketMatches(
-    activeSport === 'cricket' || activeSport === 'all'   // always fetch when cricket is visible
+    (activeSport === 'cricket' || activeSport === 'all') && cricketTab === 'upcoming'
   );
   const { data: recentData,   isLoading: recentLoading   } = useFeaturedRecentCricketMatches(
-    activeSport === 'cricket' || activeSport === 'all'   // always fetch when cricket is visible
+    (activeSport === 'cricket' || activeSport === 'all') && cricketTab === 'recent'
   );
 
   // Merge whichever slices are loaded — live always, others when fetched
-  const cricketData = {
-    test: [...(liveData?.test || []), ...(upcomingData?.test || []), ...(recentData?.test || [])],
-    odi:  [...(liveData?.odi  || []), ...(upcomingData?.odi  || []), ...(recentData?.odi  || [])],
-    t20:  [...(liveData?.t20  || []), ...(upcomingData?.t20  || []), ...(recentData?.t20  || [])],
-  };
+  const cricketData = useMemo(() => {
+    const dedupe = (arrs: (Match[] | undefined)[]) => {
+      const all = arrs.flat().filter(Boolean) as Match[];
+      const unique: Match[] = [];
+      const seen = new Set<string>();
+      for (const m of all) {
+        if (!seen.has(m.id)) {
+          seen.add(m.id);
+          unique.push(m);
+        }
+      }
+      return unique;
+    };
+    return {
+      test: dedupe([liveData?.test, upcomingData?.test, recentData?.test]),
+      odi: dedupe([liveData?.odi, upcomingData?.odi, recentData?.odi]),
+      t20: dedupe([liveData?.t20, upcomingData?.t20, recentData?.t20]),
+    };
+  }, [liveData, upcomingData, recentData]);
   const cricketLoading = liveLoading || upcomingLoading || recentLoading;
 
   const liveCricketMatches = useMemo(() => {
@@ -329,6 +344,8 @@ const Index = () => {
                 matches={filteredMatches}
                 onMatchClick={(match) => handleMatchClick(match.id)}
                 isLoading={(activeSport === "cricket" && cricketLoading)}
+                activeTabOverride={activeSport === "cricket" ? cricketTab : undefined}
+                onTabChange={activeSport === "cricket" ? setCricketTab : undefined}
               />
             </div>
           )}

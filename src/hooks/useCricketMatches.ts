@@ -10,9 +10,17 @@ import { getTeamAcronym } from '@/lib/utils';
 export function mapApiMatchToModel(apiMatch: any): Match {
     if (!apiMatch) return {} as Match;
     
-    // Extract team names
+    // Extract team names and logos
     const team1Name = apiMatch.teamInfo?.[0]?.name || apiMatch.homeTeam?.name || 'T1';
     const team2Name = apiMatch.teamInfo?.[1]?.name || apiMatch.awayTeam?.name || 'T2';
+    
+    const team1ImageId = apiMatch.teamInfo?.[0]?.imageId;
+    const team2ImageId = apiMatch.teamInfo?.[1]?.imageId;
+    
+    // We use the backend proxy for Cricbuzz images, fallback to emoji
+    // Use localhost in dev, or relative in prod. We can just use relative URL since proxy works on same host.
+    const team1Logo = team1ImageId ? `/api/cricket/scraped/team-logo/${team1ImageId}` : '🏏';
+    const team2Logo = team2ImageId ? `/api/cricket/scraped/team-logo/${team2ImageId}` : '🏏';
 
     // Determine status
     const getStatus = (state: string): 'live' | 'upcoming' | 'completed' => {
@@ -29,7 +37,7 @@ export function mapApiMatchToModel(apiMatch: any): Match {
             id: `team-${team1Name}`,
             name: team1Name,
             shortName: getTeamAcronym(team1Name),
-            logo: '🏏',
+            logo: team1Logo,
             sport: 'cricket',
             primaryColor: '#6366f1',
             players: apiMatch.homeTeam?.players
@@ -38,7 +46,7 @@ export function mapApiMatchToModel(apiMatch: any): Match {
             id: `team-${team2Name}`,
             name: team2Name,
             shortName: getTeamAcronym(team2Name),
-            logo: '🏏',
+            logo: team2Logo,
             sport: 'cricket',
             primaryColor: '#6366f1',
             players: apiMatch.awayTeam?.players
@@ -67,10 +75,11 @@ export function useLiveCricketMatches() {
         queryKey: ['cricket', 'matches', 'live'],
         queryFn: async (): Promise<Match[]> => {
             const response = await cricketApi.getLiveMatches();
-            return response.data?.data || response.data || [];
+            const data = response.data?.data || response.data || [];
+            return (Array.isArray(data) ? data : []).map(mapApiMatchToModel);
         },
-        refetchInterval: 720000,
-        staleTime: 720000,
+        refetchInterval: 60000,
+        staleTime: 60000,
     });
 }
 
@@ -79,7 +88,8 @@ export function useUpcomingCricketMatches() {
         queryKey: ['cricket', 'matches', 'upcoming'],
         queryFn: async (): Promise<Match[]> => {
             const response = await cricketApi.getUpcomingMatches();
-            return response.data?.data || response.data || [];
+            const data = response.data?.data || response.data || [];
+            return (Array.isArray(data) ? data : []).map(mapApiMatchToModel);
         },
         staleTime: 600000,
     });
@@ -90,7 +100,8 @@ export function useRecentCricketMatches() {
         queryKey: ['cricket', 'matches', 'recent'],
         queryFn: async (): Promise<Match[]> => {
             const response = await cricketApi.getRecentMatches();
-            return response.data?.data || response.data || [];
+            const data = response.data?.data || response.data || [];
+            return (Array.isArray(data) ? data : []).map(mapApiMatchToModel);
         },
         staleTime: 600000,
     });
@@ -146,5 +157,33 @@ export function useCricketMatchSquads(matchId: string | undefined) {
             return response.data;
         },
         enabled: !!matchId,
+        staleTime: 3600000, // Cache squads for 1 hour
+    });
+}
+
+export function useCricbuzzSummary(matchId: string | undefined) {
+    return useQuery({
+        queryKey: ['cricket', 'summary', matchId],
+        queryFn: async () => {
+            if (!matchId) return null;
+            const res = await cricketApi.getCricbuzzSummary(matchId);
+            return res.data || res;
+        },
+        enabled: !!matchId,
+        refetchInterval: 60000, // 1 minute auto-refresh
+        staleTime: 60000,
+    });
+}
+
+export function useCricbuzzInfo(matchId: string | undefined, isSummaryLoaded: boolean) {
+    return useQuery({
+        queryKey: ['cricket', 'info', matchId],
+        queryFn: async () => {
+            if (!matchId) return null;
+            const res = await cricketApi.getCricbuzzInfo(matchId);
+            return res.data || res;
+        },
+        enabled: !!matchId && isSummaryLoaded,
+        staleTime: 3600000, // 1 hour cache
     });
 }

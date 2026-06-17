@@ -1,0 +1,52 @@
+{
+  "status": "success",
+  "data": {
+    "matchInfo": {
+      "matchId": 129563,
+      "seriesId": 10559,
+      "seriesName": "New Zealand tour of England, 2026",
+      "matchDesc": "2nd Test",
+      "matchFormat": "TEST",
+      "startDate": 1781690400000,
+      "endDate": 1782061200000,
+      "state": "In Progress",
+      "status": "Day 1: 3rd Session",
+      "team1": {
+        "teamId": 13,
+        "teamName": "New Zealand",
+        "teamSName": "NZ",
+        "imageId": 776333
+      },
+      "team2": {
+        "teamId": 9,
+        "teamName": "England",
+        "teamSName": "ENG",
+        "imageId": 776237
+      },
+      "venueInfo": {
+        "id": 12,
+        "ground": "Kennington Oval",
+        "city": "London",
+        "timezone": "+01:00"
+      },
+      "currBatTeamId": 13,
+      "seriesStartDt": 1780444800000,
+      "seriesEndDt": 1782777600000,
+      "isTimeAnnounced": true,
+      "stateTitle": "In Progress",
+      "matchType": "International",
+      "shortStatus": "ENG opt to bowl",
+      "matchImageId": 1008419
+    },
+    "matchScore": {
+      "team1Score": {
+        "inngs1": {
+          "inningsId": 1,
+          "runs": 280,
+          "wickets": 7,
+          "overs": 73.6
+        }
+      }
+    }
+  }
+}

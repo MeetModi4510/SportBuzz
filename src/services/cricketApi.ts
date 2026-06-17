@@ -1,96 +1,61 @@
 import type {
-    CricbuzzMatchesResponse,
     CricbuzzScorecard,
     CricbuzzMatch
 } from './cricketTypes';
 
-const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
-const RAPIDAPI_HOST = import.meta.env.VITE_RAPIDAPI_HOST || 'cricbuzz-cricket.p.rapidapi.com';
-
-const headers = {
-    'x-rapidapi-key': RAPIDAPI_KEY,
-    'x-rapidapi-host': RAPIDAPI_HOST,
-};
-
-const BASE_URL = `https://${RAPIDAPI_HOST}`;
-
 /**
- * Fetch wrapper with error handling
+ * Fetch wrapper to communicate with our custom Node.js Scraper backend
  */
-async function fetchCricbuzz<T>(endpoint: string): Promise<T> {
-    if (!RAPIDAPI_KEY) {
-        throw new Error('VITE_RAPIDAPI_KEY is not configured');
-    }
-
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-        method: 'GET',
-        headers,
-    });
-
+async function fetchScraper<T>(endpoint: string): Promise<T> {
+    const response = await fetch(`/api/cricket${endpoint}`);
     if (!response.ok) {
-        throw new Error(`Cricbuzz API error: ${response.status} ${response.statusText}`);
+        throw new Error(`Scraper API error: ${response.status} ${response.statusText}`);
     }
-
-    return response.json();
+    const data = await response.json();
+    return data.data || data; // Backend wraps in { status: 'success', data }
 }
 
 /**
  * Get live cricket matches
  */
 export async function getLiveCricketMatches(): Promise<CricbuzzMatch[]> {
-    const data = await fetchCricbuzz<CricbuzzMatchesResponse>('/matches/v1/live');
-    return extractMatches(data);
+    return fetchScraper<CricbuzzMatch[]>('/scraped/matches/live');
 }
 
 /**
  * Get upcoming cricket matches
  */
 export async function getUpcomingCricketMatches(): Promise<CricbuzzMatch[]> {
-    const data = await fetchCricbuzz<CricbuzzMatchesResponse>('/matches/v1/upcoming');
-    return extractMatches(data);
+    return fetchScraper<CricbuzzMatch[]>('/scraped/matches/upcoming');
 }
 
 /**
  * Get recent/completed cricket matches
  */
 export async function getRecentCricketMatches(): Promise<CricbuzzMatch[]> {
-    const data = await fetchCricbuzz<CricbuzzMatchesResponse>('/matches/v1/recent');
-    return extractMatches(data);
+    return fetchScraper<CricbuzzMatch[]>('/scraped/matches/recent');
 }
 
 /**
- * Get match scorecard/details
+ * Get match deep detail dynamically
+ * Supported types: summary, scorecard, info, commentary, overs, squads, highlights, graphs
  */
-export async function getCricketMatchScorecard(matchId: number): Promise<CricbuzzScorecard> {
-    return fetchCricbuzz<CricbuzzScorecard>(`/mcenter/v1/${matchId}/hscard`);
+export async function getMatchDetailDynamic(matchId: number | string, endpointType: string): Promise<any> {
+    return fetchScraper<any>(`/scraped/match/${matchId}/${endpointType}`);
 }
 
 /**
- * Get match mini scorecard (for live updates)
+ * Legacy support for specific scorecard fetching
  */
-export async function getCricketMatchMini(matchId: number): Promise<CricbuzzScorecard> {
-    return fetchCricbuzz<CricbuzzScorecard>(`/mcenter/v1/${matchId}/scard`);
+export async function getCricketMatchScorecard(matchId: number): Promise<any> {
+    return fetchScraper<any>(`/scraped/match/${matchId}/scorecard`);
 }
 
 /**
- * Extract matches from the nested API response structure
+ * Legacy support for mini scorecard
  */
-function extractMatches(data: CricbuzzMatchesResponse): CricbuzzMatch[] {
-    const matches: CricbuzzMatch[] = [];
-
-    if (!data.typeMatches) {
-        return matches;
-    }
-
-    for (const typeMatch of data.typeMatches) {
-        for (const seriesMatch of typeMatch.seriesMatches) {
-            if (seriesMatch.seriesAdWrapper?.matches) {
-                matches.push(...seriesMatch.seriesAdWrapper.matches);
-            }
-        }
-    }
-
-    return matches;
+export async function getCricketMatchMini(matchId: number): Promise<any> {
+    return fetchScraper<any>(`/scraped/match/${matchId}/summary`);
 }
 
 // ─── PERFORMANCE LAB (STEALTH BACKEND) ──────────────────────────

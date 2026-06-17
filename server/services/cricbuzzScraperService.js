@@ -1,5 +1,11 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import NodeCache from 'node-cache';
+
+// TTLs: 1 min for live, 30 min for recent/upcoming/info/squads
+const liveCache = new NodeCache({ stdTTL: 60 });
+const standardCache = new NodeCache({ stdTTL: 1800 });
+const squadsCache = new NodeCache({ stdTTL: 3600 }); // 1 hour cache for squads
 
 let cricbuzzTeamCache = null;
 
@@ -604,3 +610,427 @@ export async function fetchPlayerDeepStats(cricbuzzId, name) {
         throw error;
     }
 }
+
+// ─── NEW MATCH SCRAPER LOGIC ──────────────────────────────────────────────────
+
+// Helper to extract JSON objects via bracket matching
+function extractJsonObjects(str) {
+    const results = [];
+    let searchIdx = 0;
+    while (true) {
+        const idx = str.indexOf('"matchInfo"', searchIdx);
+        if (idx === -1) break;
+        
+        // Find the start of the object containing "matchInfo"
+        let startObjIdx = str.lastIndexOf('{', idx);
+        if (startObjIdx !== -1) {
+            let openBraces = 0;
+            let endObjIdx = -1;
+            for (let i = startObjIdx; i < str.length; i++) {
+                if (str[i] === '{') openBraces++;
+                if (str[i] === '}') openBraces--;
+                if (openBraces === 0) {
+                    endObjIdx = i;
+                    break;
+                }
+            }
+            if (endObjIdx !== -1) {
+                try {
+                    let jsonStr = str.substring(startObjIdx, endObjIdx + 1);
+                    jsonStr = jsonStr.replace(/\\"/g, '"');
+                    let parsed = JSON.parse(jsonStr);
+                    // Ensure it has matchInfo before pushing
+                    if (parsed && parsed.matchInfo) {
+                        results.push(parsed);
+                    }
+                } catch(e) {}
+            }
+        }
+        searchIdx = idx + '"matchInfo"'.length;
+    }
+    return results;
+}
+
+export async function fetchLiveMatchesScraped() {
+    const cached = liveCache.get('scraped_live_matches');
+    if (cached) return cached;
+
+    try {
+        const res = await axios.get('https://www.cricbuzz.com/cricket-match/live-scores', {
+            headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+        
+        let dataStr = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
+        dataStr = dataStr.replace(/\\"/g, '"');
+        const matchDataArray = extractJsonObjects(dataStr);
+        
+        // Combine them based on matchId
+        const uniqueMatches = [];
+        const seen = new Set();
+        matchDataArray.forEach(matchData => {
+            const info = matchData.matchInfo;
+            const scoreObj = matchData.matchScore;
+            
+            if (info && !seen.has(info.matchId)) {
+                seen.add(info.matchId);
+                
+                // Map to our standard format
+                const matchType = (info.matchFormat || 'T20').toLowerCase();
+                const team1Name = info.team1?.teamName || 'Team 1';
+                const team2Name = info.team2?.teamName || 'Team 2';
+                
+                let score = [];
+                if (scoreObj) {
+                    if (scoreObj.team1Score?.inngs1) score.push({ inning: `${team1Name} 1st Innings`, r: scoreObj.team1Score.inngs1.runs || 0, w: scoreObj.team1Score.inngs1.wickets || 0, o: parseFloat(scoreObj.team1Score.inngs1.overs) || 0 });
+                    if (scoreObj.team2Score?.inngs1) score.push({ inning: `${team2Name} 1st Innings`, r: scoreObj.team2Score.inngs1.runs || 0, w: scoreObj.team2Score.inngs1.wickets || 0, o: parseFloat(scoreObj.team2Score.inngs1.overs) || 0 });
+                    if (scoreObj.team1Score?.inngs2) score.push({ inning: `${team1Name} 2nd Innings`, r: scoreObj.team1Score.inngs2.runs || 0, w: scoreObj.team1Score.inngs2.wickets || 0, o: parseFloat(scoreObj.team1Score.inngs2.overs) || 0 });
+                    if (scoreObj.team2Score?.inngs2) score.push({ inning: `${team2Name} 2nd Innings`, r: scoreObj.team2Score.inngs2.runs || 0, w: scoreObj.team2Score.inngs2.wickets || 0, o: parseFloat(scoreObj.team2Score.inngs2.overs) || 0 });
+                }
+
+                const state = (info.state || '').toLowerCase();
+                const matchStarted = state === 'in progress' || state === 'live' || state === 'complete' || state === 'result' || state === 'innings break' || state === 'stumps';
+                const matchEnded = state === 'complete' || state === 'result' || state === 'abandon' || state === 'abandoned';
+
+                uniqueMatches.push({
+                    id: String(info.matchId),
+                    name: `${team1Name} vs ${team2Name}`,
+                    matchType,
+                    state: info.state || 'Preview',
+                    status: info.status || 'Match Started',
+                    venue: info.venueInfo?.ground ? `${info.venueInfo.ground}, ${info.venueInfo.city}` : 'Unknown',
+                    dateTimeGMT: info.startDate ? new Date(parseInt(info.startDate)).toISOString() : new Date().toISOString(),
+                    teams: [team1Name, team2Name],
+                    teamInfo: [
+                        { name: team1Name, shortname: info.team1?.teamSName || 'T1', imageId: info.team1?.imageId },
+                        { name: team2Name, shortname: info.team2?.teamSName || 'T2', imageId: info.team2?.imageId }
+                    ],
+                    matchStarted,
+                    matchEnded,
+                    score,
+                    series: info.seriesName || ''
+                });
+            }
+        });
+        
+        liveCache.set('scraped_live_matches', uniqueMatches);
+        return uniqueMatches;
+    } catch (e) {
+        console.error("Live match scrape error:", e.message);
+        return [];
+    }
+}
+
+async function fetchRscMatchList(url, cacheKey) {
+    const cached = standardCache.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+        const res = await axios.get(url, {
+            headers: { 'User-Agent': 'Mozilla/5.0', 'RSC': '1', 'x-nextjs-data': '1' }
+        });
+        
+        let dataStr = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
+        dataStr = dataStr.replace(/\\"/g, '"');
+        const matchDataArray = extractJsonObjects(dataStr);
+        
+        const uniqueMatches = [];
+        const seen = new Set();
+        matchDataArray.forEach(matchData => {
+            const info = matchData.matchInfo;
+            const scoreObj = matchData.matchScore;
+            
+            if (info && !seen.has(info.matchId)) {
+                seen.add(info.matchId);
+                const team1Name = info.team1?.teamName || 'Team 1';
+                const team2Name = info.team2?.teamName || 'Team 2';
+                
+                let score = [];
+                if (scoreObj) {
+                    if (scoreObj.team1Score?.inngs1) score.push({ inning: `${team1Name} 1st Innings`, r: scoreObj.team1Score.inngs1.runs || 0, w: scoreObj.team1Score.inngs1.wickets || 0, o: parseFloat(scoreObj.team1Score.inngs1.overs) || 0 });
+                    if (scoreObj.team2Score?.inngs1) score.push({ inning: `${team2Name} 1st Innings`, r: scoreObj.team2Score.inngs1.runs || 0, w: scoreObj.team2Score.inngs1.wickets || 0, o: parseFloat(scoreObj.team2Score.inngs1.overs) || 0 });
+                    if (scoreObj.team1Score?.inngs2) score.push({ inning: `${team1Name} 2nd Innings`, r: scoreObj.team1Score.inngs2.runs || 0, w: scoreObj.team1Score.inngs2.wickets || 0, o: parseFloat(scoreObj.team1Score.inngs2.overs) || 0 });
+                    if (scoreObj.team2Score?.inngs2) score.push({ inning: `${team2Name} 2nd Innings`, r: scoreObj.team2Score.inngs2.runs || 0, w: scoreObj.team2Score.inngs2.wickets || 0, o: parseFloat(scoreObj.team2Score.inngs2.overs) || 0 });
+                }
+
+                const state = (info.state || '').toLowerCase();
+                const matchStarted = state === 'in progress' || state === 'live' || state === 'complete' || state === 'result' || state === 'innings break' || state === 'stumps';
+                const matchEnded = state === 'complete' || state === 'result' || state === 'abandon' || state === 'abandoned';
+
+                uniqueMatches.push({
+                    id: String(info.matchId),
+                    name: `${team1Name} vs ${team2Name}`,
+                    matchType: (info.matchFormat || 'T20').toLowerCase(),
+                    state: info.state || 'Scheduled',
+                    status: info.status || 'Scheduled',
+                    venue: info.venueInfo?.ground ? `${info.venueInfo.ground}, ${info.venueInfo.city}` : 'Unknown',
+                    dateTimeGMT: info.startDate ? new Date(parseInt(info.startDate)).toISOString() : new Date().toISOString(),
+                    teams: [team1Name, team2Name],
+                    teamInfo: [
+                        { name: team1Name, shortname: info.team1?.teamSName || 'T1', imageId: info.team1?.imageId },
+                        { name: team2Name, shortname: info.team2?.teamSName || 'T2', imageId: info.team2?.imageId }
+                    ],
+                    matchStarted,
+                    matchEnded,
+                    score,
+                    series: info.seriesName || ''
+                });
+            }
+        });
+        
+        standardCache.set(cacheKey, uniqueMatches);
+        return uniqueMatches;
+    } catch (e) {
+        console.error("Match list scrape error:", e.message);
+        return [];
+    }
+}
+
+export async function fetchRecentMatchesScraped() {
+    return fetchRscMatchList('https://www.cricbuzz.com/cricket-match/live-scores/recent-matches', 'scraped_recent_matches');
+}
+
+export async function fetchUpcomingMatchesScraped() {
+    return fetchRscMatchList('https://www.cricbuzz.com/cricket-match/live-scores/upcoming-matches', 'scraped_upcoming_matches');
+}
+
+// Deep Match Details Scraper with dynamic TTL based on state
+export async function fetchMatchDetailScraped(matchId, endpointType) {
+    const urlMap = {
+        'summary': `https://www.cricbuzz.com/live-cricket-scores/${matchId}/match`,
+        'scorecard': `https://www.cricbuzz.com/live-cricket-scorecard/${matchId}/match`,
+        'info': `https://www.cricbuzz.com/cricket-match-facts/${matchId}/match`,
+        'commentary': `https://www.cricbuzz.com/live-cricket-full-commentary/${matchId}/match`,
+        'overs': `https://www.cricbuzz.com/live-cricket-over-by-over/${matchId}/match`,
+        'squads': `https://www.cricbuzz.com/cricket-match-squads/${matchId}/match`,
+        'highlights': `https://www.cricbuzz.com/cricket-match-highlights/${matchId}/match`,
+        'graphs': `https://www.cricbuzz.com/live-cricket-graphs/${matchId}/match`
+    };
+
+    const url = urlMap[endpointType];
+    if (!url) return null;
+
+    // We need to know if match is live to determine TTL.
+    // Fetch from live matches first, if not there, use standard cache
+    let isLive = false;
+    const liveList = liveCache.get('scraped_live_matches') || [];
+    if (liveList.find(m => m.id === String(matchId))) {
+        isLive = true;
+    }
+
+    const cacheKey = `scraped_detail_${endpointType}_${matchId}`;
+    const cachedLive = liveCache.get(cacheKey);
+    const cachedStd = standardCache.get(cacheKey);
+
+    // If endpoint is info or squads, always use standard TTL
+    if (endpointType === 'info' || endpointType === 'squads') {
+        if (cachedStd) return cachedStd;
+    } else {
+        if (isLive && cachedLive) return cachedLive;
+        if (!isLive && cachedStd) return cachedStd;
+    }
+
+    try {
+        const res = await axios.get(url, {
+            headers: { 'User-Agent': 'Mozilla/5.0', 'RSC': '1', 'x-nextjs-data': '1' }
+        });
+        
+        const payloadStr = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
+        
+        // Robust Next.js RSC Flight Data Parser
+        let parsed = null;
+        try {
+            const lines = payloadStr.split('\n');
+            let foundData = {};
+            const expectedMatchId = Number(matchId);
+
+            // The NextJS payload is heavily escaped stringified JSON.
+            // We unescape it and find all embedded JSON objects that have our matchId.
+            const unescaped = payloadStr.replace(/\\"/g, '"');
+            let start = 0;
+            while ((start = unescaped.indexOf('{"', start)) !== -1) {
+                let end = start + 1;
+                let braces = 1;
+                while (end < unescaped.length && braces > 0) {
+                    if (unescaped[end] === '{') braces++;
+                    else if (unescaped[end] === '}') braces--;
+                    end++;
+                }
+                if (braces === 0) {
+                    try {
+                        const obj = JSON.parse(unescaped.substring(start, end));
+                        if (obj.matchId === expectedMatchId || obj.matchInfo?.matchId === expectedMatchId) {
+                            foundData = { ...foundData, ...obj };
+                        }
+                    } catch(e) {}
+                }
+                start++;
+            }
+
+            if (Object.keys(foundData).length > 0) {
+                parsed = foundData;
+            }
+            
+            // Fallback for simple JSON responses (mobile APIs)
+            if (!parsed && payloadStr.startsWith('{')) {
+                parsed = JSON.parse(payloadStr);
+            }
+        } catch(e) {
+            console.error("Next.js Parser Error:", e);
+        }
+
+        if (parsed) {
+            // TTL Setup: info = 1 hr (3600), summary = 1 min (60)
+            let ttl = 300; // default 5 min
+            if (endpointType === 'info' || endpointType === 'squads') {
+                ttl = 3600; 
+            } else if (endpointType === 'summary') {
+                ttl = 60;
+            } else if (isLive) {
+                ttl = 60;
+            }
+            
+            if (ttl === 60) {
+                liveCache.set(cacheKey, parsed, ttl);
+            } else {
+                standardCache.set(cacheKey, parsed, ttl);
+            }
+            return parsed;
+        }
+        
+        // Fallback: If we couldn't parse the outer shell, try to find the specific keys based on endpoint
+        let specificData = { rawString: payloadStr.substring(0, 500) }; // Basic fallback
+        if (endpointType === 'scorecard') {
+            const scard = extractJsonObjects(payloadStr, 'scoreCard');
+            if (scard.length > 0) specificData = { scorecard: scard };
+        } else if (endpointType === 'commentary') {
+            const comm = extractJsonObjects(payloadStr, 'commentaryList');
+            if (comm.length > 0) specificData = { commentaryList: comm };
+        } else if (endpointType === 'summary') {
+            const sum = extractJsonObjects(payloadStr, 'matchScoreDetails');
+            if (sum.length > 0) specificData = { matchScoreDetails: sum[0] };
+        }
+
+        const responseData = parsed || specificData;
+
+        if (endpointType === 'info' || endpointType === 'squads') {
+            standardCache.set(cacheKey, responseData);
+        } else {
+            if (isLive) liveCache.set(cacheKey, responseData);
+            else standardCache.set(cacheKey, responseData);
+        }
+
+        return responseData;
+    } catch (e) {
+        console.error(`Match detail scrape error for ${endpointType}:`, e.message);
+        return null;
+    }
+}
+
+export async function fetchMatchSquadsScraped(matchId) {
+    if (!matchId) return { success: false, message: 'Match ID is required' };
+
+    const cacheKey = `cb_squads_${matchId}`;
+    const cachedResult = squadsCache.get(cacheKey);
+    if (cachedResult) return cachedResult;
+
+    const urlsToTry = [
+        `https://www.cricbuzz.com/cricket-match-squads/${matchId}/match`,
+        `https://www.cricbuzz.com/live-cricket-squads/${matchId}/match`
+    ];
+
+    let foundObjects = [];
+    let lastError = null;
+
+    for (const url of urlsToTry) {
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0',
+                    'RSC': '1',
+                    'x-nextjs-data': '1'
+                },
+                timeout: 10000
+            });
+
+            if (!response.data) continue;
+
+            const payloadStr = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+            const unescaped = payloadStr.replace(/\\"/g, '"');
+            
+            foundObjects = [];
+            let start = 0;
+            while ((start = unescaped.indexOf('{"', start)) !== -1) {
+                let end = start + 1;
+                let braces = 1;
+                while (end < unescaped.length && braces > 0) {
+                    if (unescaped[end] === '{') braces++;
+                    else if (unescaped[end] === '}') braces--;
+                    end++;
+                }
+                if (braces === 0) {
+                    try {
+                        const obj = JSON.parse(unescaped.substring(start, end));
+                        if (obj['playing XI'] || obj.bench || obj.team) {
+                            foundObjects.push(obj);
+                        }
+                    } catch(e) {}
+                }
+                start++;
+            }
+
+            if (foundObjects.length >= 2) {
+                break; // We found the squad objects, stop trying URLs
+            }
+        } catch (error) {
+            lastError = error;
+            console.error(`Failed to fetch squads from ${url}:`, error.message);
+        }
+    }
+
+    if (foundObjects.length < 2) {
+        return {
+            success: false,
+            message: 'Could not extract squads data from Cricbuzz',
+            error: lastError?.message
+        };
+    }
+
+    // Process the objects. Usually Team 1 is obj 0 and 1, Team 2 is obj 2 and 3
+    let team1 = null;
+    let team2 = null;
+
+    for (let i = 0; i < foundObjects.length; i++) {
+        const obj = foundObjects[i];
+        if (obj.team) {
+            // It's a metadata object
+            const nextObj = foundObjects[i + 1] || {};
+            // Is it team1 or team2?
+            if (!team1) {
+                team1 = { ...obj, ...nextObj };
+                i++; // Skip next object as we merged it
+            } else if (!team2) {
+                team2 = { ...obj, ...nextObj };
+                i++;
+            }
+        }
+    }
+
+    if (!team1 && !team2) {
+         return {
+            success: false,
+            message: 'Failed to process extracted squads objects'
+        };
+    }
+
+    const result = {
+        success: true,
+        data: {
+            team1,
+            team2
+        }
+    };
+
+    squadsCache.set(cacheKey, result);
+    return result;
+}
+        

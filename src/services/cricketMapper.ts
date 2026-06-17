@@ -8,23 +8,18 @@ import { getTeamAcronym } from "@/lib/utils";
 export function mapApiMatchToModel(apiMatch: any): Match {
     // Determine status
     let status: 'live' | 'upcoming' | 'completed' = 'upcoming';
+    const stateLower = (apiMatch.state || '').toLowerCase();
     const statusLower = (apiMatch.status || '').toLowerCase();
-
-    const hasMeaningfulScores = () => {
-        if (!Array.isArray(apiMatch.score) || apiMatch.score.length === 0) return false;
-        return apiMatch.score.some((s: any) => (s.r || 0) > 0 || (s.w || 0) > 0 || parseFloat(s.o || 0) > 0);
-    };
 
     const resultKeywords = ['won by', 'won at', 'draw', 'drawn', 'tied', 'no result', 'abandoned', 'match ended', 'completed'];
     const hasResult = resultKeywords.some(k => statusLower.includes(k));
-
-    if (hasResult || apiMatch.matchEnded) {
+    
+    // Improved Status resolution using state from scraper
+    if (stateLower === 'complete' || stateLower === 'result' || stateLower === 'abandon' || stateLower === 'abandoned' || hasResult || apiMatch.matchEnded) {
         status = 'completed';
-    } else if (!hasMeaningfulScores() && !apiMatch.matchStarted) {
-        status = 'upcoming';
-    } else if (apiMatch.matchStarted && !apiMatch.matchEnded) {
+    } else if (stateLower === 'in progress' || stateLower === 'live' || stateLower === 'innings break' || stateLower === 'stumps' || stateLower === 'tea' || stateLower === 'lunch' || (apiMatch.matchStarted && !apiMatch.matchEnded)) {
         status = 'live';
-    } else if (!apiMatch.matchStarted) {
+    } else {
         status = 'upcoming';
     }
 
@@ -98,7 +93,7 @@ export function mapApiMatchToModel(apiMatch: any): Match {
             id: `cricket-${team1Info.id || team1Name.replace(/\s+/g, '-')}`,
             name: team1Name,
             shortName: team1Info.shortname || getTeamAcronym(team1Name),
-            logo: apiMatch.team1Flag || team1Info.img || '🏏',
+            logo: apiMatch.team1Flag || (team1Info.imageId ? `/api/cricket/scraped/team-logo/${team1Info.imageId}` : (team1Info.img || '🏏')),
             sport: 'cricket',
             primaryColor: '#6366f1',
             players: apiMatch.homeTeam?.players || team1Info.players
@@ -107,7 +102,7 @@ export function mapApiMatchToModel(apiMatch: any): Match {
             id: `cricket-${team2Info.id || team2Name.replace(/\s+/g, '-')}`,
             name: team2Name,
             shortName: team2Info.shortname || getTeamAcronym(team2Name),
-            logo: apiMatch.team2Flag || team2Info.img || '🏏',
+            logo: apiMatch.team2Flag || (team2Info.imageId ? `/api/cricket/scraped/team-logo/${team2Info.imageId}` : (team2Info.img || '🏏')),
             sport: 'cricket',
             primaryColor: '#6366f1',
             players: apiMatch.awayTeam?.players || team2Info.players

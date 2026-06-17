@@ -4,8 +4,8 @@ import { LiveBadge } from "@/components/LiveBadge";
 import { SportIcon, getSportGradient } from "@/components/SportIcon";
 import { TeamLogo } from "@/components/TeamLogo";
 import { matches, players } from "@/data/mockData";
-import { useCricketMatchDetails, useCricketMatchSquads } from "@/hooks/useCricketMatches";
-import { useCricketDataMatch } from "@/hooks/useCricketDataMatch";
+import { useCricketMatchDetails, useCricketMatchSquads, useCricbuzzSummary, useCricbuzzInfo } from "@/hooks/useCricketMatches";
+import { useCricketDataMatch, useCricbuzzSquads } from "@/hooks/useCricketDataMatch";
 import { useMatchFieldData } from "@/hooks/useMatchFieldData";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -43,6 +43,7 @@ import { SquadsList } from "@/components/SquadsList";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FootballPitchLineup } from "@/components/FootballPitchLineup";
 import { CricketPlayerImage } from "@/components/CricketPlayerImage";
+import { SquadsTab } from "@/components/cricket/SquadsTab";
 import type { Match } from "@/data/types";
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -151,8 +152,10 @@ const MatchDetails = () => {
   }, [id]);
 
   // Check match type
-  const isCricketMatch = id?.includes("cricket") || id?.startsWith("c") || (id && id.includes("-") && id.length > 20);
-  const isFootballMatch = id?.startsWith("football-");
+  // Cricbuzz matches are purely numeric (e.g. 129563)
+  const isNumeric = id && /^\d+$/.test(id);
+  const isCricketMatch = id?.includes("cricket") || id?.startsWith("c") || isNumeric || (id && id.includes("-") && id.length > 20);
+  const isFootballMatch = id?.startsWith("football-") || id?.startsWith("f") && !isCricketMatch;
 
   // ── Cricket Hooks ──
   const {
@@ -184,29 +187,31 @@ const MatchDetails = () => {
   } as Match : undefined;
 
   // Priority: CricketData.org > Legacy API > Football API > Mock
-  const match: Match | undefined = cricketDataMatch || legacyCricketMatch || footballMatch || mockMatch;
+  const isValidMatch = (m: any) => m && (m.id || m.matchId || m.homeTeam);
+  const match: Match | undefined = [cricketDataMatch, legacyCricketMatch, footballMatch, mockMatch].find(isValidMatch) as Match | undefined;
   const isTestMatch = match?.matchType?.toLowerCase().includes("test");
 
   const statusLower = match?.status?.toLowerCase();
-  const isLive = statusLower === "live";
-  const isCompleted = statusLower === "completed";
-  const isUpcoming = statusLower === "upcoming";
+  let isLive = statusLower === "live";
+  let isCompleted = statusLower === "completed";
+  let isUpcoming = statusLower === "upcoming";
 
   // Lazy-loading field data with 10-min TTL cache
   // IMPORTANT: These hooks MUST be called before any early returns
+  const cleanMatchId = isCricketMatch ? id?.replace('cricket-', '') : undefined;
+  
   const matchInfoField = useMatchFieldData(
-    match?.sport === 'cricket' ? match.id : undefined,
+    isCricketMatch ? cleanMatchId : undefined,
     'matchInfo',
     activeTab === 'summary' || activeTab === 'scoreboard' || activeTab === 'lineups'
   );
   const commentaryField = useMatchFieldData(
-    match?.sport === 'cricket' ? match.id : undefined,
+    isCricketMatch ? cleanMatchId : undefined,
     'commentary',
     activeTab === 'commentary'
   );
 
-  // Cricbuzz lazy-loading hooks — only fetch when tab active
-  const cleanMatchId = match?.sport === 'cricket' ? match.id?.replace('cricket-', '') : undefined;
+  // Cricbuzz lazy-loading hooks
   const cbScorecardField = useMatchFieldData(
     cleanMatchId,
     'cbScorecard',
@@ -215,13 +220,81 @@ const MatchDetails = () => {
   const cbSquadsField = useMatchFieldData(
     cleanMatchId,
     'cbSquads',
-    activeTab === 'lineups'
+    activeTab === 'squads'
   );
+
+  const { squads, squadsLoading, squadsError } = useCricbuzzSquads(cleanMatchId, activeTab === 'squads');
   const cbCommentaryField = useMatchFieldData(
     cleanMatchId,
     'cbCommentary',
     activeTab === 'commentary'
   );
+
+  // Dynamic Live Summary & Match Facts (Fetch unconditionally for live headers)
+  const { data: cbSummary, isLoading: isSummaryLoading } = useCricbuzzSummary(
+    isCricketMatch ? cleanMatchId : undefined
+  );
+  
+  const { data: cbInfo, isLoading: isInfoLoading } = useCricbuzzInfo(
+    isCricketMatch ? cleanMatchId : undefined,
+    !!cbSummary
+  );
+
+  // --- Dynamic Values extracted from Live API for Header ---
+  const dynamicMatchInfo = cbInfo?.matchInfo || cbSummary?.matchHeader?.matchInfo || cbSummary?.matchInfo;
+  
+  const tossObj = cbInfo?.tossResults || cbSummary?.tossResults || cbInfo?.matchInfo?.tossResults || cbSummary?.matchInfo?.tossResults;
+  const u1 = cbInfo?.umpire1 || cbSummary?.umpire1 || cbInfo?.matchInfo?.umpire1 || cbSummary?.matchInfo?.umpire1;
+  const u2 = cbInfo?.umpire2 || cbSummary?.umpire2 || cbInfo?.matchInfo?.umpire2 || cbSummary?.matchInfo?.umpire2;
+  const ref = cbInfo?.referee || cbSummary?.referee || cbInfo?.matchInfo?.referee || cbSummary?.matchInfo?.referee;
+  const tossWinner = tossObj?.tossWinnerName;
+  const tossChoice = tossObj?.decision;
+  
+  const dynamicTeam1 = dynamicMatchInfo?.team1;
+  const dynamicTeam2 = dynamicMatchInfo?.team2;
+  
+  const team1Name = dynamicTeam1?.teamName || match?.homeTeam?.name || "Team 1";
+  const team1ShortName = dynamicTeam1?.teamSName || match?.homeTeam?.shortName || "T1";
+  const team1Logo = dynamicTeam1?.imageId ? `/api/cricket/scraped/team-logo/${dynamicTeam1.imageId}` : match?.homeTeam?.logo;
+
+  const team2Name = dynamicTeam2?.teamName || match?.awayTeam?.name || "Team 2";
+  const team2ShortName = dynamicTeam2?.teamSName || match?.awayTeam?.shortName || "T2";
+  const team2Logo = dynamicTeam2?.imageId ? `/api/cricket/scraped/team-logo/${dynamicTeam2.imageId}` : match?.awayTeam?.logo;
+
+  let dynamicHomeScoreStr = match?.homeScore;
+  let dynamicAwayScoreStr = match?.awayScore;
+  
+  if (cbSummary) {
+      if (cbSummary.miniscore) {
+          const bat = cbSummary.miniscore.batTeam;
+          const bowl = cbSummary.miniscore.bowlTeam;
+          if (bat) {
+            // Check if batTeam is team1
+            if (bat.teamId === dynamicTeam1?.teamId || bat.teamId === dynamicTeam1?.id || (!dynamicTeam1 && bat.teamId)) {
+                dynamicHomeScoreStr = `${bat.teamScore}/${bat.teamWkts} (${bat.teamOvs} ov)`;
+                if (bowl) dynamicAwayScoreStr = `${bowl.teamScore}/${bowl.teamWkts} (${bowl.teamOvs} ov)`;
+            } else {
+                dynamicAwayScoreStr = `${bat.teamScore}/${bat.teamWkts} (${bat.teamOvs} ov)`;
+                if (bowl) dynamicHomeScoreStr = `${bowl.teamScore}/${bowl.teamWkts} (${bowl.teamOvs} ov)`;
+            }
+          }
+      } else if (cbSummary.matchScore) {
+          const t1 = cbSummary.matchScore.team1Score?.inngs1;
+          const t2 = cbSummary.matchScore.team2Score?.inngs1;
+          if (t1) dynamicHomeScoreStr = `${t1.runs}/${t1.wickets || 0} (${t1.overs} ov)`;
+          if (t2) dynamicAwayScoreStr = `${t2.runs}/${t2.wickets || 0} (${t2.overs} ov)`;
+      }
+  }
+
+  const dynamicStatus = dynamicMatchInfo?.state === 'Complete' || dynamicMatchInfo?.state === 'Result' 
+      ? "completed" 
+      : (dynamicMatchInfo?.state === 'In Progress' || dynamicMatchInfo?.state === 'Live' ? "live" : match?.status || "upcoming");
+  
+  if (dynamicMatchInfo?.state) {
+      isLive = dynamicStatus === "live";
+      isCompleted = dynamicStatus === "completed";
+      isUpcoming = dynamicStatus === "upcoming";
+  }
 
   // Extract raw API data from the field hook
   const rawApiData = matchInfoField.data;
@@ -263,10 +336,11 @@ const MatchDetails = () => {
   return (
     <>
       <Helmet>
-        <title>{`${match.homeTeam?.name || "Team 1"} vs ${match.awayTeam?.name || "Team 2"} - ${match.matchType} | SportsBuzz`}</title>
+        <title>{`${team1Name} vs ${team2Name} - ${match.matchType} | SportsBuzz`}</title>
+        
         <meta
           name="description"
-          content={`Live score and updates for ${match.homeTeam?.name || "Team 1"} vs ${match.awayTeam?.name || "Team 2"} - ${match.matchType} at ${typeof match.venue === 'object' ? match.venue?.name : match.venue || "Venue"}`}
+          content={`Live score and updates for ${team1Name} vs ${team2Name} - ${match.matchType} at ${cbInfo?.matchInfo?.venueInfo?.ground || (typeof match.venue === 'object' ? match.venue?.name : match.venue) || "Venue"}`}
         />
       </Helmet>
 
@@ -312,20 +386,20 @@ const MatchDetails = () => {
                      <span className="text-xs font-semibold text-foreground uppercase tracking-widest">{match.tournament?.name || match.matchType}</span>
                   </div>
                   <div className="flex items-center gap-5 text-xs text-muted-foreground font-medium">
-                     <span className="flex items-center gap-1.5"><MapPin size={14} className="text-muted-foreground/60" /> {typeof match.venue === 'object' ? match.venue?.name : match.venue || "Venue"}</span>
-                     <span className="hidden sm:flex items-center gap-1.5"><Clock size={14} className="text-muted-foreground/60" /> {match.displayTime && (match.sport === 'cricket' || match.sport === 'football') ? match.displayTime : format(match.startTime, "MMM d, yyyy • h:mm a")}</span>
+                     <span className="flex items-center gap-1.5"><MapPin size={14} className="text-muted-foreground/60" /> {typeof match.venue === 'object' ? (match.venue?.name || match.venue?.city || "Venue") : (match.venue || "Venue")}</span>
+                     <span className="hidden sm:flex items-center gap-1.5"><Clock size={14} className="text-muted-foreground/60" /> {match.displayTime && (match.sport === 'cricket' || match.sport === 'football') ? match.displayTime : (match.startTime && !isNaN(new Date(match.startTime).getTime()) ? format(new Date(match.startTime), "MMM d, yyyy • h:mm a") : "Time TBA")}</span>
                   </div>
                </div>
 
                {/* 2. Main Score Area */}
                <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-10 md:py-14 gap-8 relative">
                    {/* Home Team */}
-                   <div className="flex-1 flex flex-col-reverse md:flex-row items-center justify-end gap-5 w-full z-10">
+                   <div className="flex-1 flex flex-col md:flex-row items-center justify-end gap-5 w-full z-10">
                        <div className="text-center md:text-right">
-                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{match.homeTeam?.name || "Team 1"}</h2>
-                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{match.homeTeam?.shortName}</p>
+                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{team1Name}</h2>
+                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team1ShortName}</p>
                        </div>
-                       <TeamLogo logo={match.homeTeam?.logo} name={match.homeTeam?.name || "Team 1"} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
+                       <TeamLogo logo={team1Logo} name={team1Name} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
                    </div>
 
                    {/* Score Center */}
@@ -385,8 +459,8 @@ const MatchDetails = () => {
                             if (m) return { runs: m[1].trim(), overs: m[2].trim() };
                             return { runs: raw, overs: "" };
                           };
-                          const home = parseScore(match.homeScore);
-                          const away = parseScore(match.awayScore);
+                          const home = parseScore(dynamicHomeScoreStr);
+                          const away = parseScore(dynamicAwayScoreStr);
                           const showAway = away.runs !== "—" && away.runs !== "";
 
                           return (
@@ -412,10 +486,10 @@ const MatchDetails = () => {
 
                    {/* Away Team */}
                    <div className="flex-1 flex flex-col md:flex-row items-center justify-start gap-5 w-full z-10">
-                       <TeamLogo logo={match.awayTeam?.logo} name={match.awayTeam?.name || "Team 2"} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
+                       <TeamLogo logo={team2Logo} name={team2Name} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
                        <div className="text-center md:text-left">
-                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{match.awayTeam?.name || "Team 2"}</h2>
-                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{match.awayTeam?.shortName}</p>
+                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{team2Name}</h2>
+                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team2ShortName}</p>
                        </div>
                    </div>
                </div>
@@ -572,11 +646,11 @@ const MatchDetails = () => {
               </TabsTrigger>
               {match?.sport !== 'tennis' && (
                 <TabsTrigger 
-                  value="lineups" 
+                  value="squads" 
                   className="flex items-center gap-2 px-1 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-all"
                 >
                   <Users size={16} />
-                  Lineups
+                  {isCricketMatch ? "Squads" : "Lineups"}
                 </TabsTrigger>
               )}
               <TabsTrigger 
@@ -614,13 +688,12 @@ const MatchDetails = () => {
               )}
 
               {/* Upcoming match placeholder */}
-              {isUpcoming && (
+              {isUpcoming && !cbInfo && (
                 <div className="bg-card border border-border rounded-xl p-8 space-y-6">
                   <div className="text-center space-y-3 pb-4 mb-4 border-b border-border/50">
                     <Clock className="mx-auto h-10 w-10 text-muted-foreground opacity-30" />
-                    <p className="text-muted-foreground">Match not started yet. See the forecast below.</p>
+                    <p className="text-muted-foreground">Match not started yet. Stay tuned for live updates.</p>
                   </div>
-                  <PreMatchForecast match={match} />
                 </div>
               )}
 
@@ -642,152 +715,308 @@ const MatchDetails = () => {
                 </div>
               )}
 
-              {/* Match Details Grid */}
-              {!isUpcoming && (
-                <div className="space-y-4 mt-8">
+              {/* Live Match Stats (Batters & Bowlers) */}
+              {isLive && cbSummary && (
+                <div className="space-y-6 mt-8 animate-fade-in">
+                  <div className="flex items-center gap-2 px-1">
+                    <Activity className="w-4 h-4 text-red-500 animate-pulse" />
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Live Action</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Batting & Bowling */}
+                    <div className="lg:col-span-2 space-y-6">
+                      
+                      {/* Batters */}
+                      {(cbSummary.miniscore?.batsmanStriker || cbSummary.miniscore?.batsmanNonStriker) && (
+                        <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
+                          <div className="bg-muted/10 px-6 py-4 border-b border-border/40">
+                            <h4 className="text-xs font-bold text-foreground uppercase tracking-widest">Batters</h4>
+                          </div>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                              <thead className="bg-muted/5 text-muted-foreground text-xs uppercase font-semibold">
+                                <tr>
+                                  <th className="px-6 py-3">Batter</th>
+                                  <th className="px-6 py-3 text-right">R</th>
+                                  <th className="px-6 py-3 text-right">B</th>
+                                  <th className="px-6 py-3 text-right">4s</th>
+                                  <th className="px-6 py-3 text-right">6s</th>
+                                  <th className="px-6 py-3 text-right">SR</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-border/20">
+                                {[cbSummary.miniscore.batsmanStriker, cbSummary.miniscore.batsmanNonStriker].filter(Boolean).map((bat: any, idx: number) => (
+                                  <tr key={idx} className="hover:bg-muted/5 transition-colors">
+                                    <td className="px-6 py-4 font-semibold text-foreground flex items-center gap-2">
+                                      {bat.name} {bat.id === cbSummary.miniscore.batsmanStriker?.id && <span className="text-primary">*</span>}
+                                    </td>
+                                    <td className="px-6 py-4 text-right font-bold">{bat.runs}</td>
+                                    <td className="px-6 py-4 text-right text-muted-foreground">{bat.balls}</td>
+                                    <td className="px-6 py-4 text-right text-muted-foreground">{bat.fours}</td>
+                                    <td className="px-6 py-4 text-right text-muted-foreground">{bat.sixes}</td>
+                                    <td className="px-6 py-4 text-right text-muted-foreground">{bat.strikeRate}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Bowlers */}
+                      {(cbSummary.miniscore?.bowlerStriker || cbSummary.miniscore?.bowlerNonStriker) && (
+                        <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
+                          <div className="bg-muted/10 px-6 py-4 border-b border-border/40">
+                            <h4 className="text-xs font-bold text-foreground uppercase tracking-widest">Bowlers</h4>
+                          </div>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                              <thead className="bg-muted/5 text-muted-foreground text-xs uppercase font-semibold">
+                                <tr>
+                                  <th className="px-6 py-3">Bowler</th>
+                                  <th className="px-6 py-3 text-right">O</th>
+                                  <th className="px-6 py-3 text-right">M</th>
+                                  <th className="px-6 py-3 text-right">R</th>
+                                  <th className="px-6 py-3 text-right">W</th>
+                                  <th className="px-6 py-3 text-right">ECO</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-border/20">
+                                {[cbSummary.miniscore.bowlerStriker, cbSummary.miniscore.bowlerNonStriker].filter(Boolean).map((bowl: any, idx: number) => (
+                                  <tr key={idx} className="hover:bg-muted/5 transition-colors">
+                                    <td className="px-6 py-4 font-semibold text-foreground flex items-center gap-2">
+                                      {bowl.name} {bowl.id === cbSummary.miniscore.bowlerStriker?.id && <span className="text-primary">*</span>}
+                                    </td>
+                                    <td className="px-6 py-4 text-right font-bold">{bowl.overs}</td>
+                                    <td className="px-6 py-4 text-right text-muted-foreground">{bowl.maidens}</td>
+                                    <td className="px-6 py-4 text-right text-muted-foreground">{bowl.runs}</td>
+                                    <td className="px-6 py-4 text-right font-bold text-red-500">{bowl.wickets}</td>
+                                    <td className="px-6 py-4 text-right text-muted-foreground">{bowl.economy}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Key Stats Sidebar */}
+                    <div className="space-y-6">
+                      <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden h-full">
+                        <div className="bg-muted/10 px-6 py-4 border-b border-border/40">
+                          <h4 className="text-xs font-bold text-foreground uppercase tracking-widest">Key Stats</h4>
+                        </div>
+                        <div className="p-6 space-y-6">
+                          
+                          {/* Partnership */}
+                          {cbSummary.miniscore?.partnerShip && (
+                            <div>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Partnership</p>
+                              <p className="font-semibold text-sm text-foreground">{cbSummary.miniscore.partnerShip.runs} ({cbSummary.miniscore.partnerShip.balls})</p>
+                            </div>
+                          )}
+
+                          {/* Last Wicket */}
+                          {cbSummary.miniscore?.lastWkt && (
+                            <div>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Last Wkt</p>
+                              <p className="font-semibold text-sm text-foreground">{cbSummary.miniscore.lastWkt}</p>
+                            </div>
+                          )}
+
+                          {/* Overs Left */}
+                          {cbSummary.miniscore?.oversLeft && (
+                            <div>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Overs Left</p>
+                              <p className="font-semibold text-sm text-foreground">{cbSummary.miniscore.oversLeft}</p>
+                            </div>
+                          )}
+
+                          {/* Last 10 Overs */}
+                          {cbSummary.miniscore?.last10Overs && (
+                            <div>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Last 10 Overs</p>
+                              <p className="font-semibold text-sm text-foreground">{cbSummary.miniscore.last10Overs}</p>
+                            </div>
+                          )}
+
+                          {/* Toss */}
+                          {tossWinner && (
+                            <div>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Toss</p>
+                              <p className="font-semibold text-sm text-foreground">
+                                {tossWinner} chose to {tossChoice}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Win Probability Bar */}
+                          {cbSummary.winProbability && (
+                            <div className="pt-4 border-t border-border/20">
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Win Probability</p>
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs font-bold text-foreground w-8">{cbSummary.winProbability.team1?.shortName || "T1"}</span>
+                                <div className="flex-1 h-2.5 flex rounded-full overflow-hidden bg-muted">
+                                  <div className="bg-primary h-full" style={{ width: `${cbSummary.winProbability.team1?.percent || 0}%` }} />
+                                  <div className="bg-secondary h-full" style={{ width: `${cbSummary.winProbability.drawTiePercent || 0}%` }} />
+                                  <div className="bg-[#1e293b] h-full" style={{ width: `${cbSummary.winProbability.team2?.percent || 0}%` }} />
+                                </div>
+                                <span className="text-xs font-bold text-foreground w-8 text-right">{cbSummary.winProbability.team2?.shortName || "T2"}</span>
+                              </div>
+                              <div className="flex justify-between text-[10px] text-muted-foreground mt-1.5 font-medium px-11">
+                                <span>{cbSummary.winProbability.team1?.percent || 0}%</span>
+                                {cbSummary.winProbability.drawTiePercent > 0 && <span>Draw {cbSummary.winProbability.drawTiePercent}%</span>}
+                                <span>{cbSummary.winProbability.team2?.percent || 0}%</span>
+                              </div>
+                            </div>
+                          )}
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Match Facts / Details Grid (From cbInfo or cbSummary) */}
+              {(!isUpcoming || cbInfo) && (
+                <div className="space-y-4 mt-8 animate-fade-in">
                   <div className="flex items-center gap-2 px-1 mb-2">
                      <Info className="w-4 h-4 text-muted-foreground" />
                      <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Match Information</h3>
                   </div>
-                  <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
-                    <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/40">
-                      
-                      {/* Column 1: Core Details */}
-                      <div className="p-6 md:p-8 space-y-8">
+                  
+                  {isInfoLoading ? (
+                    <div className="flex justify-center p-8 bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : (
+                    <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
+                      <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/40">
                         
-                        {/* Match Type & Status */}
-                        <div className="flex items-start gap-4">
-                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Tag size={18}/></div>
-                          <div>
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Match Type</p>
-                            <div className="flex items-center gap-2">
-                              <p className="font-semibold text-sm text-foreground">{match.matchType || "T20"}</p>
-                              <span className="w-1 h-1 rounded-full bg-border/60"></span>
-                              <span className={cn("font-medium text-xs flex items-center gap-1.5", isLive ? "text-red-500" : "text-muted-foreground")}>
-                                {isLive ? <><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/> In Progress</> : isCompleted ? 'Completed' : 'Upcoming'}
-                              </span>
+                        {/* Column 1: Core Details */}
+                        <div className="p-6 md:p-8 space-y-8">
+                          
+                          {/* Match Type */}
+                          <div className="flex items-start gap-4">
+                            <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Tag size={18}/></div>
+                            <div>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Match Type</p>
+                              <p className="font-semibold text-sm text-foreground">
+                                {cbInfo?.matchInfo?.matchFormat || cbSummary?.matchHeader?.matchInfo?.matchFormat || cbSummary?.matchInfo?.matchFormat || match.matchType || "T20"}
+                              </p>
                             </div>
                           </div>
+
+                          {/* Series / Tournament */}
+                          <div className="flex items-start gap-4">
+                            <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Trophy size={18}/></div>
+                            <div>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Series</p>
+                              <p className="font-semibold text-sm text-foreground">
+                                {cbInfo?.matchInfo?.seriesName || cbInfo?.matchInfo?.series?.name || cbSummary?.matchHeader?.matchInfo?.seriesName || cbSummary?.matchInfo?.seriesName || match.tournament?.name || "Tournament"}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Venue Info */}
+                          <div className="flex items-start gap-4">
+                            <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><MapPin size={18}/></div>
+                            <div>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Venue</p>
+                              <p className="font-semibold text-sm text-foreground leading-snug">
+                                {cbInfo?.matchInfo?.venueInfo?.ground || cbInfo?.venueInfo?.ground || cbSummary?.matchHeader?.matchInfo?.venueInfo?.ground || cbSummary?.matchInfo?.venueInfo?.ground || (typeof match.venue === 'object' ? match.venue?.name : match.venue) || "Stadium"}
+                                {", "}
+                                {cbInfo?.matchInfo?.venueInfo?.city || cbInfo?.venueInfo?.city || cbSummary?.matchHeader?.matchInfo?.venueInfo?.city || cbSummary?.matchInfo?.venueInfo?.city || (typeof match.venue === 'object' ? match.venue?.city : "") || ""}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {/* Date & Time */}
+                          <div className="flex items-start gap-4">
+                            <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Clock size={18}/></div>
+                            <div>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Date & Time</p>
+                              <p className="font-semibold text-sm text-foreground">
+                                {cbInfo?.matchInfo?.startDate ? format(new Date(Number(cbInfo.matchInfo.startDate)), "MMMM d, yyyy • h:mm a") : 
+                                 cbSummary?.matchInfo?.startDate ? format(new Date(Number(cbSummary.matchInfo.startDate)), "MMMM d, yyyy • h:mm a") :
+                                 match.displayTime || format(match.startTime || new Date(), "MMMM d, yyyy • h:mm a")}
+                              </p>
+                            </div>
+                          </div>
+
                         </div>
 
-                        {/* Venue Info */}
-                        <div className="flex items-start gap-4">
-                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><MapPin size={18}/></div>
+                        {/* Column 2: Officials & Toss */}
+                        <div className="p-6 md:p-8 space-y-8 bg-muted/5">
+                          
+                          {(() => {
+                            const tossWinner = cbInfo?.matchInfo?.tossResults?.tossWinnerName || cbSummary?.matchHeader?.matchInfo?.tossResults?.tossWinnerName || cbSummary?.matchInfo?.tossResults?.tossWinnerName;
+                            const tossChoice = cbInfo?.matchInfo?.tossResults?.decision || cbSummary?.matchHeader?.matchInfo?.tossResults?.decision || cbSummary?.matchInfo?.tossResults?.decision;
+                            
+                            return (
+                              <>
+                                {/* Toss */}
+                                <div className="flex items-start gap-4">
+                                  <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Coins size={18}/></div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Toss Result</p>
+                                    <p className="font-semibold text-sm text-foreground leading-snug">
+                                      {tossWinner ? `${tossWinner} chose to ${tossChoice}` : match.tossResult || "Toss not yet happened"}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Umpires */}
+                                <div className="flex items-start gap-4">
+                                  <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Eye size={18}/></div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">On-Field Umpires</p>
+                                    <p className="font-semibold text-sm text-foreground">
+                                      {u1?.name ? `${u1.name}${u2?.name ? ", " + u2.name : ''}` : "To be announced"}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Referee */}
+                                <div className="flex items-start gap-4">
+                                  <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Shield size={18}/></div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Match Referee</p>
+                                    <p className="font-semibold text-sm text-foreground">
+                                      {ref?.name || match.referee || "To be announced"}
+                                    </p>
+                                  </div>
+                                </div>
+                              </>
+                            );
+                          })()}
+
+                        </div>
+                      </div>
+
+                      {/* Man of the Match (Full Width Footer) */}
+                      {(cbSummary?.matchHeader?.matchInfo?.momName || cbInfo?.matchInfo?.status) && (
+                        <div className="border-t border-border/40 bg-gradient-to-r from-primary/10 via-transparent to-transparent p-6 md:px-8 flex items-center gap-5">
+                          <div className="p-3.5 bg-primary/20 rounded-2xl text-primary ring-1 ring-primary/30"><Trophy size={18}/></div>
                           <div>
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Venue</p>
-                            <p className="font-semibold text-sm text-foreground leading-snug">{match.venue?.name || "Stadium"}{match.venue?.city && `, ${match.venue?.city}`}</p>
-                            <p className="text-[11px] font-medium text-muted-foreground mt-1.5">Capacity: {match.venue?.capacity ? match.venue.capacity.toLocaleString() : "38,200"}</p>
+                            <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">{cbSummary?.matchHeader?.matchInfo?.momName ? 'Player of the Match' : 'Match Result'}</p>
+                            <p className="font-bold text-base text-foreground tracking-tight">{cbSummary?.matchHeader?.matchInfo?.momName || cbInfo?.matchInfo?.status}</p>
                           </div>
                         </div>
-                        
-                        {/* Date & Time */}
-                        <div className="flex items-start gap-4">
-                          <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Clock size={18}/></div>
-                          <div>
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Date & Time</p>
-                            <p className="font-semibold text-sm text-foreground">
-                              {match.displayTime && (match.sport === 'cricket' || match.sport === 'football')
-                                ? match.displayTime
-                                : format(match.startTime || new Date(), "MMMM d, yyyy • h:mm a")}
-                            </p>
-                          </div>
-                        </div>
-
-                      </div>
-
-                      {/* Column 2: Officials & Toss */}
-                      <div className="p-6 md:p-8 space-y-8 bg-muted/5">
-                        
-                        {(() => {
-                          const dynamicInfo = generateDynamicOfficials(match.id, match.homeTeam?.name, match.awayTeam?.name);
-                          return (
-                            <>
-                              {/* Toss */}
-                              <div className="flex items-start gap-4">
-                                <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Coins size={18}/></div>
-                                <div>
-                                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Toss Result</p>
-                                  <p className="font-semibold text-sm text-foreground leading-snug">
-                                    {match.tossResult || (rawApiData?.tossWinner ? `${rawApiData.tossWinner} chose to ${rawApiData.tossChoice}` : dynamicInfo.tossResult)}
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Umpires */}
-                              <div className="flex items-start gap-4">
-                                <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Eye size={18}/></div>
-                                <div>
-                                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">On-Field Umpires</p>
-                                  <p className="font-semibold text-sm text-foreground">
-                                    {rawApiData?.umpire1 ? `${rawApiData.umpire1}, ${rawApiData.umpire2}` : dynamicInfo.umpires}
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Referee */}
-                              <div className="flex items-start gap-4">
-                                <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Shield size={18}/></div>
-                                <div>
-                                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Match Referee</p>
-                                  <p className="font-semibold text-sm text-foreground">
-                                    {match.referee || rawApiData?.referee || dynamicInfo.referee}
-                                  </p>
-                                </div>
-                              </div>
-                            </>
-                          );
-                        })()}
-
-                      </div>
+                      )}
                     </div>
-
-                    {/* Man of the Match (Full Width Footer) */}
-                    {match.manOfTheMatch && (
-                      <div className="border-t border-border/40 bg-gradient-to-r from-primary/10 via-transparent to-transparent p-6 md:px-8 flex items-center gap-5">
-                        <div className="p-3.5 bg-primary/20 rounded-2xl text-primary ring-1 ring-primary/30"><Trophy size={18}/></div>
-                        <div>
-                          <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Player of the Match</p>
-                          <p className="font-bold text-base text-foreground tracking-tight">{typeof match.manOfTheMatch === 'object' ? match.manOfTheMatch?.name : match.manOfTheMatch}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-
-              {/* Upcoming: minimal info card */}
-              {isUpcoming && (
-                <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                  <h3 className="font-semibold text-foreground">Match Info</h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Match Type</span>
-                      <span className="text-foreground font-medium">{match.matchType}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Venue</span>
-                      <span className="text-foreground font-medium">{match.venue.name}{match.venue.city && `, ${match.venue.city}`}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Date & Time</span>
-                      <span className="text-foreground font-medium">
-                        {match.displayTime && match.sport === 'cricket'
-                          ? match.displayTime
-                          : format(match.startTime, "MMM d, yyyy • h:mm a")}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Teams</span>
-                      <span className="text-foreground font-medium">{match.homeTeam.name} vs {match.awayTeam.name}</span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               )}
             </TabsContent>
 
-            <TabsContent value="lineups" className="space-y-6 animate-fade-in">
-              {match?.sport === 'football' ? (
+            <TabsContent value="squads" className="space-y-6 animate-fade-in">
+              {isCricketMatch ? (
+                <SquadsTab squadsData={squads} loading={squadsLoading} error={squadsError} />
+              ) : (match.sport === 'football' ? (
                 /* ── Football Lineups ── */
                 <div className="bg-card border border-border rounded-[2.5rem] p-4 md:p-8 overflow-hidden relative">
                     <FootballPitchLineup 
@@ -1008,7 +1237,7 @@ const MatchDetails = () => {
               ) : (
                 /* ── Fallback to existing SquadsList ── */
                 <SquadsList match={match} matchData={rawApiData} isLoading={matchInfoField.loading} />
-              )}
+              ))}
             </TabsContent>
 
             <TabsContent value="scoreboard" className="animate-fade-in">
