@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, formatOversText, formatScoreString } from "@/lib/utils";
 import { Match, Sport } from "@/data/types";
 import { formatToIST } from "@/lib/dateUtils";
 import { MapPin, Clock } from "lucide-react";
@@ -13,6 +13,8 @@ interface MatchCardProps {
   className?: string;
   showSeriesName?: boolean;
 }
+
+
 
 export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesName }: MatchCardProps) => {
   const [match, setMatch] = useState<Match>(initialMatch);
@@ -39,10 +41,10 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
               updated.cricketLiveDetails = data.cricketLiveDetails;
             }
             if (data.score && data.score.team1) {
-              updated.homeScore = `${data.score.team1.runs}/${data.score.team1.wickets} (${data.score.team1.overs})`;
+              updated.homeScore = `${data.score.team1.runs}/${data.score.team1.wickets} (${formatOversText(data.score.team1.overs)})`;
             }
             if (data.score && data.score.team2) {
-              updated.awayScore = `${data.score.team2.runs}/${data.score.team2.wickets} (${data.score.team2.overs})`;
+              updated.awayScore = `${data.score.team2.runs}/${data.score.team2.wickets} (${formatOversText(data.score.team2.overs)})`;
             }
             return updated;
           });
@@ -69,7 +71,7 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
       if (match.sport === "football" && match.currentMinute) return `${match.currentMinute}'`;
       if (match.sport === "basketball" && match.currentQuarter) return `Q${match.currentQuarter}`;
       if (match.sport === "tennis" && match.currentSet) return `Set ${match.currentSet}`;
-      if (match.sport === "cricket" && match.currentOver) return `Ov ${match.currentOver}`;
+      if (match.sport === "cricket" && match.currentOver) return `Ov ${formatScoreString(String(match.currentOver))}`;
       return "Live";
     }
     if (isUpcoming) return "Upcoming";
@@ -125,14 +127,14 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
                       </span>
                       {inn.overs && (
                         <span className="text-xs text-muted-foreground font-medium">
-                          ({inn.overs})
+                          ({formatOversText(inn.overs)})
                         </span>
                       )}
                     </div>
                  ))
              ) : (
                  <span className="font-bold text-[15px] tracking-tight text-foreground">
-                   {match.homeScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
+                   {formatScoreString(match.homeScore) || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                  </span>
              )}
           </div>
@@ -153,14 +155,14 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
                       </span>
                       {inn.overs && (
                         <span className="text-xs text-muted-foreground font-medium">
-                          ({inn.overs})
+                          ({formatOversText(inn.overs)})
                         </span>
                       )}
                     </div>
                  ))
              ) : (
                  <span className="font-bold text-[15px] tracking-tight text-foreground">
-                   {match.awayScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
+                   {formatScoreString(match.awayScore) || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                  </span>
              )}
           </div>

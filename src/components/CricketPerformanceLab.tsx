@@ -1,9 +1,7 @@
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import {
-    Activity, TrendingUp, Target, Zap, BarChart3, Award, Shield,
-    Loader2, AlertTriangle, Clock, ChevronDown, ChevronUp
-} from "lucide-react";
+import { Clock, Loader2, AlertTriangle, Activity, TrendingUp, Target, Zap, Shield, ChevronDown, ChevronUp, BarChart3, Award } from "lucide-react";
+import { formatScoreString, formatOversText } from "@/lib/utils";
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
     AreaChart, Area, PieChart, Pie, RadarChart, Radar, PolarGrid,
@@ -486,7 +484,7 @@ export default function CricketPerformanceLab({
             {/* ── 1. Quick Stats ──────────────────────────────────────────────── */}
             {quickStats && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                    <StatCard label="Total Runs" value={`${quickStats.totalRuns}/${quickStats.totalWickets}`} sub={`${quickStats.overs} overs`} color={COLORS.primary} />
+                    <StatCard label="Total Runs" value={`${quickStats.totalRuns}/${quickStats.totalWickets}`} sub={`${formatOversText(quickStats.overs)}`} color={COLORS.primary} />
                     <StatCard label="Run Rate" value={quickStats.runRate} color={COLORS.accent} />
                     <StatCard label="Boundaries" value={quickStats.totalBoundaries} sub={`${quickStats.boundaryPercent}% of runs`} color={COLORS.warning} />
                     <StatCard label="Top Scorer" value={quickStats.topScorer?.runs ?? 0} sub={shortName(quickStats.topScorer?.name || "")} color={COLORS.secondary} />
@@ -506,7 +504,7 @@ export default function CricketPerformanceLab({
                             <div key={i} className="bg-secondary/20 rounded-lg p-3 text-center border border-border/40">
                                 <p className="text-xs text-muted-foreground font-medium mb-1">{r.name}</p>
                                 <p className="text-xl font-bold font-mono" style={{ color: r.fill }}>{r.rr}</p>
-                                <p className="text-[10px] text-muted-foreground">{r.score}/{r.wickets} ({r.overs} ov)</p>
+                                <p className="text-[10px] text-muted-foreground">{r.score}/{r.wickets} ({formatOversText(r.overs)})</p>
                             </div>
                         ))}
                     </div>

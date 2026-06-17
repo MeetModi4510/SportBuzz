@@ -69,7 +69,7 @@ export const cricketApi = {
     getMatchScorecard: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/scorecard`),
     getMatchSquads: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/squads`),
     getMatchInfo: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/info`),
-    getCricbuzzScorecard: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/scorecard`),
+    getCricbuzzScorecard: (matchId: string, slug?: string) => api.get(`cricket/scraped/match/${matchId}/scorecard${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`),
     getCricbuzzSquads: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/squads`),
     getCricbuzzCommentary: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/commentary`),
     getCricbuzzSummary: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/summary`),

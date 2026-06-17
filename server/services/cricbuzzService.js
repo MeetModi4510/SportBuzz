@@ -2,6 +2,7 @@ import axios from 'axios';
 import NodeCache from 'node-cache';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 // Fix for ES module hoisting: explicit .env loading
@@ -670,33 +671,92 @@ async function checkPlayerImageExists(playerId) {
     }
 }
 
+// ─── Disk-based Player Image Cache ────────────────────────────────────────────
+const PLAYER_IMAGE_CACHE_DIR = path.join(__dirname, '..', 'cache', 'player-images');
+const PLAYER_IMAGE_CACHE_TTL_MS = 3600 * 1000; // 1 hour
+
+// Ensure cache directory exists
+try { fs.mkdirSync(PLAYER_IMAGE_CACHE_DIR, { recursive: true }); } catch {}
+
+function getImageCachePath(playerId) {
+    return path.join(PLAYER_IMAGE_CACHE_DIR, `${playerId}.jpg`);
+}
+
+function isCachedImageFresh(cachePath) {
+    try {
+        const stat = fs.statSync(cachePath);
+        return (Date.now() - stat.mtimeMs) < PLAYER_IMAGE_CACHE_TTL_MS;
+    } catch {
+        return false;
+    }
+}
+
 // Stream the player image from Cricbuzz to the frontend (via backend proxy)
+// Uses disk cache (server/cache/player-images/{playerId}.jpg) with 1-hour TTL.
 async function streamPlayerImage(playerId, res) {
     if (!playerId) { res.status(404).end(); return; }
-    const cacheKey = `cb_img_exists_${playerId}`;
-    const cached = imageCache.get(cacheKey);
-    if (cached === false) { res.status(204).end(); return; }
 
+    const cachePath = getImageCachePath(playerId);
+
+    // ── Serve from disk cache if fresh ──────────────────────────────────────────
+    if (isCachedImageFresh(cachePath)) {
+        try {
+            const data = fs.readFileSync(cachePath);
+            res.setHeader('Content-Type', 'image/jpeg');
+            res.setHeader('Cache-Control', 'public, max-age=3600');
+            res.setHeader('X-Cache', 'HIT');
+            res.send(data);
+            return;
+        } catch {
+            // If read fails, fall through to fetch
+        }
+    }
+
+    // ── Check in-memory "not found" cache to avoid hammering Cricbuzz ───────────
+    const notFoundKey = `cb_img_404_${playerId}`;
+    if (imageCache.get(notFoundKey)) { res.status(204).end(); return; }
+
+    // ── Fetch from Cricbuzz (Public Static CDN) ──────────────────────────────────
     try {
         const https = await import('https');
-        const req = https.default.request({
-            method: 'GET',
-            hostname: CB_IMAGE_HOST,
-            path: `/img/v1/i1/c${playerId}/i.jpg`,
-            headers: cbImageHeaders
-        }, (imgRes) => {
-            if (imgRes.statusCode !== 200) {
-                imageCache.set(cacheKey, false, 3600);
-                res.status(204).end();
-                return;
-            }
-            imageCache.set(cacheKey, true, 3600);
-            res.setHeader('Content-Type', imgRes.headers['content-type'] || 'image/jpeg');
-            res.setHeader('Cache-Control', 'public, max-age=3600');
-            imgRes.pipe(res);
+        await new Promise((resolve) => {
+            const req = https.default.request({
+                method: 'GET',
+                hostname: 'static.cricbuzz.com',
+                path: `/a/img/v1/152x152/i1/c${playerId}/player.jpg`,
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                    'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+                    'Referer': 'https://www.cricbuzz.com/'
+                }
+            }, (imgRes) => {
+                if (imgRes.statusCode !== 200) {
+                    imageCache.set(notFoundKey, true, 3600); // Don't retry for 1hr
+                    res.status(204).end();
+                    resolve();
+                    return;
+                }
+
+                // Collect chunks and write to disk + send response simultaneously
+                const chunks = [];
+                imgRes.on('data', (chunk) => chunks.push(chunk));
+                imgRes.on('end', () => {
+                    const buffer = Buffer.concat(chunks);
+                    // Write to disk cache (non-blocking)
+                    fs.writeFile(cachePath, buffer, (err) => {
+                        if (err) console.warn(`[PlayerImage] Disk cache write failed for ${playerId}:`, err.message);
+                    });
+                    res.setHeader('Content-Type', 'image/jpeg');
+                    res.setHeader('Cache-Control', 'public, max-age=3600');
+                    res.setHeader('X-Cache', 'MISS');
+                    res.send(buffer);
+                    resolve();
+                });
+                imgRes.on('error', () => { res.status(204).end(); resolve(); });
+            });
+            req.on('error', () => { res.status(204).end(); resolve(); });
+            req.end();
         });
-        req.on('error', () => res.status(204).end());
-        req.end();
     } catch {
         res.status(204).end();
     }

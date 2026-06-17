@@ -38,17 +38,22 @@ function isCacheValid(entry: CacheEntry | undefined): entry is CacheEntry {
 export function useMatchFieldData(
     matchId: string | undefined,
     field: FieldType,
-    enabled: boolean
+    enabled: boolean,
+    slug?: string
 ): FieldDataResult {
     const [data, setData] = useState<any | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const abortRef = useRef<AbortController | null>(null);
+    const prevMatchIdRef = useRef<string | undefined>(undefined);
 
     const fetchData = useCallback(async () => {
         if (!matchId) return;
 
-        const cacheKey = `${matchId}:${field}`;
+        // Include slug in cache key for cbScorecard to avoid stale data across matches
+        const cacheKey = field === 'cbScorecard' && slug
+            ? `${matchId}:${field}:${slug}`
+            : `${matchId}:${field}`;
 
         // Check cache first
         const cached = fieldCache.get(cacheKey);
@@ -79,16 +84,12 @@ export function useMatchFieldData(
                 const response = await cricketApi.getMatchInfo(cleanId);
                 result = response?.data || response;
             } else if (field === 'commentary') {
-                // currentMatches endpoint — serves Commentary (bpiList)
-                const response = await cricketApi.getCurrentMatches();
-                // Find this specific match in the response list
-                const matches = response?.data || [];
-                result = matches.find?.(
-                    (m: any) => m.id === cleanId || m.id === matchId
-                ) || null;
+                // Use the Cricbuzz commentary endpoint for this match
+                const response = await cricketApi.getCricbuzzCommentary(cleanId);
+                result = response?.data || null;
             } else if (field === 'cbScorecard') {
-                // Cricbuzz scorecard via backend proxy
-                const response = await cricketApi.getCricbuzzScorecard(cleanId);
+                // Cricbuzz scorecard via dedicated HTML scraper
+                const response = await cricketApi.getCricbuzzScorecard(cleanId, slug);
                 result = response?.data || null;
             } else if (field === 'cbSquads') {
                 // Cricbuzz squads (extracted from scorecard)
@@ -117,7 +118,18 @@ export function useMatchFieldData(
                 setLoading(false);
             }
         }
-    }, [matchId, field]);
+    }, [matchId, field, slug]);
+
+    // Reset data immediately when matchId changes to avoid stale data from previous match
+    useEffect(() => {
+        if (prevMatchIdRef.current !== matchId) {
+            prevMatchIdRef.current = matchId;
+            setData(null);
+            setError(null);
+            // Abort any in-flight request for the old match
+            abortRef.current?.abort();
+        }
+    }, [matchId]);
 
     useEffect(() => {
         if (!enabled || !matchId) {
@@ -125,7 +137,9 @@ export function useMatchFieldData(
         }
 
         // On activation: check cache, else fetch
-        const cacheKey = `${matchId}:${field}`;
+        const cacheKey = field === 'cbScorecard' && slug
+            ? `${matchId}:${field}:${slug}`
+            : `${matchId}:${field}`;
         const cached = fieldCache.get(cacheKey);
         if (isCacheValid(cached)) {
             setData(cached.data);

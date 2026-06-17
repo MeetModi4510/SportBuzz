@@ -145,6 +145,9 @@ export function useCricketMatchDetails(matchId: string | undefined) {
             return response.data ? mapApiMatchToModel(response.data) : null;
         },
         enabled: !!matchId,
+        // Never show stale data from a different match — always treat as fresh query per matchId
+        staleTime: 0,
+        placeholderData: undefined,
     });
 }
 

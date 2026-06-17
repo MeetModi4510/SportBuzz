@@ -7,7 +7,7 @@ import { matches, players } from "@/data/mockData";
 import { useCricketMatchDetails, useCricketMatchSquads, useCricbuzzSummary, useCricbuzzInfo } from "@/hooks/useCricketMatches";
 import { useCricketDataMatch, useCricbuzzSquads } from "@/hooks/useCricketDataMatch";
 import { useMatchFieldData } from "@/hooks/useMatchFieldData";
-import { cn } from "@/lib/utils";
+import { cn, formatScoreString, formatOversText } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ArrowLeft,
@@ -54,6 +54,18 @@ import { useToast } from "@/hooks/use-toast";
 const MatchPerformanceLab = lazy(() => import("@/components/MatchPerformanceLab"));
 const CricketPerformanceLab = lazy(() => import("@/components/CricketPerformanceLab"));
 
+/** Safely converts any value to a renderable string. Prevents "Objects are not valid as React child" errors. */
+const safeStr = (val: any, fallback = ''): string => {
+  if (val === null || val === undefined) return fallback;
+  if (typeof val === 'string') return val || fallback;
+  if (typeof val === 'number') return String(val);
+  if (typeof val === 'object') {
+    // Handle common venue-like objects
+    return val.name || val.ground || val.city || fallback;
+  }
+  return String(val) || fallback;
+};
+
 const generateDynamicOfficials = (id: string, homeTeam: string, awayTeam: string) => {
   let hash = 0;
   for (let i = 0; i < (id || "").length; i++) {
@@ -90,6 +102,12 @@ const MatchDetails = () => {
   const [favoriteId, setFavoriteId] = useState(null);
   const [activeTab, setActiveTab] = useState('summary');
   const [activeInningsIndex, setActiveInningsIndex] = useState<number>(-1);
+
+  // Reset tab & index when navigating to a different match
+  useEffect(() => {
+    setActiveTab('summary');
+    setActiveInningsIndex(-1);
+  }, [id]);
 
   const summarizePlayerEvents = (playerName: string, events: any[], teamGoalsConceded: number = 0) => {
       const playerEvents = {
@@ -212,10 +230,23 @@ const MatchDetails = () => {
   );
 
   // Cricbuzz lazy-loading hooks
+  // Build Cricbuzz URL slug from available match info.
+  // e.g. "eng-vs-nz-2nd-test-new-zealand-tour-of-england-2026"
+  // The server will auto-resolve the slug if this derivation is wrong.
+  const cricbuzzSlug = (() => {
+    const t1 = (match?.homeTeam?.shortName || '').toLowerCase().replace(/\s+/g, '-');
+    const t2 = (match?.awayTeam?.shortName || '').toLowerCase().replace(/\s+/g, '-');
+    const mType = (match?.matchType || '').toLowerCase().replace(/\s+/g, '-');
+    if (!t1 || !t2 || !mType) return undefined;
+    // Build a minimal slug: "{t1}-vs-{t2}-{matchType}"
+    return `${t1}-vs-${t2}-${mType}`.replace(/[^a-z0-9-]/g, '');
+  })();
+
   const cbScorecardField = useMatchFieldData(
     cleanMatchId,
     'cbScorecard',
-    activeTab === 'scoreboard' || activeTab === 'performance'
+    activeTab === 'scoreboard' || activeTab === 'performance',
+    cricbuzzSlug
   );
   const cbSquadsField = useMatchFieldData(
     cleanMatchId,
@@ -285,6 +316,9 @@ const MatchDetails = () => {
           if (t2) dynamicAwayScoreStr = `${t2.runs}/${t2.wickets || 0} (${t2.overs} ov)`;
       }
   }
+
+  if (dynamicHomeScoreStr) dynamicHomeScoreStr = formatScoreString(dynamicHomeScoreStr);
+  if (dynamicAwayScoreStr) dynamicAwayScoreStr = formatScoreString(dynamicAwayScoreStr);
 
   const dynamicStatus = dynamicMatchInfo?.state === 'Complete' || dynamicMatchInfo?.state === 'Result' 
       ? "completed" 
@@ -383,10 +417,10 @@ const MatchDetails = () => {
                             UPCOMING
                         </span>
                      )}
-                     <span className="text-xs font-semibold text-foreground uppercase tracking-widest">{match.tournament?.name || match.matchType}</span>
+                     <span className="text-xs font-semibold text-foreground uppercase tracking-widest">{safeStr(match.tournament?.name || match.matchType, 'Cricket')}</span>
                   </div>
                   <div className="flex items-center gap-5 text-xs text-muted-foreground font-medium">
-                     <span className="flex items-center gap-1.5"><MapPin size={14} className="text-muted-foreground/60" /> {typeof match.venue === 'object' ? (match.venue?.name || match.venue?.city || "Venue") : (match.venue || "Venue")}</span>
+                     <span className="flex items-center gap-1.5"><MapPin size={14} className="text-muted-foreground/60" /> {safeStr(typeof match.venue === 'object' ? (match.venue?.name || (match.venue as any)?.ground || match.venue?.city || "Venue") : match.venue, "Venue")}</span>
                      <span className="hidden sm:flex items-center gap-1.5"><Clock size={14} className="text-muted-foreground/60" /> {match.displayTime && (match.sport === 'cricket' || match.sport === 'football') ? match.displayTime : (match.startTime && !isNaN(new Date(match.startTime).getTime()) ? format(new Date(match.startTime), "MMM d, yyyy • h:mm a") : "Time TBA")}</span>
                   </div>
                </div>
@@ -430,7 +464,7 @@ const MatchDetails = () => {
                                 )}>
                                   {inn.score || "—"}
                                 </span>
-                                {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{inn.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                                {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{formatOversText(inn.overs).replace(/ov/i, '').trim()} OVERS</span>}
                               </div>
                             ))}
                           </div>
@@ -446,7 +480,7 @@ const MatchDetails = () => {
                                 )}>
                                   {inn.score || "—"}
                                 </span>
-                                {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{inn.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                                {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{formatOversText(inn.overs).replace(/ov/i, '').trim()} OVERS</span>}
                               </div>
                             ))}
                           </div>
@@ -550,7 +584,7 @@ const MatchDetails = () => {
                       
                       {isLive && (
                         <div className="text-[10px] font-bold text-red-500 tracking-widest uppercase flex items-center gap-2">
-                          {match.sport === "cricket" && match.currentOver && <span>OVER {match.currentOver}</span>}
+                          {match.sport === "cricket" && match.currentOver && <span>OVER {formatScoreString(String(match.currentOver))}</span>}
                           {match.sport === "football" && match.currentMinute && <><Clock size={12} className="animate-pulse" /> <span>{match.currentMinute}</span></>}
                           {match.sport === "basketball" && match.currentQuarter && <span>{match.currentQuarter} - {match.timeRemaining}</span>}
                           {match.sport === "tennis" && match.currentSet && <span>{match.currentSet}</span>}
@@ -830,7 +864,7 @@ const MatchDetails = () => {
                           {cbSummary.miniscore?.oversLeft && (
                             <div>
                               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Overs Left</p>
-                              <p className="font-semibold text-sm text-foreground">{cbSummary.miniscore.oversLeft}</p>
+                              <p className="font-semibold text-sm text-foreground">{formatScoreString(String(cbSummary.miniscore.oversLeft))}</p>
                             </div>
                           )}
 
@@ -1181,7 +1215,7 @@ const MatchDetails = () => {
                                              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                              <div className="flex items-center gap-4 relative z-10 w-full justify-between md:justify-end">
                                                 <div className="md:absolute md:left-4 z-20 shrink-0">
-                                                   <CricketPlayerImage playerId={p1.faceImageId} playerName={p1.name} size={40} />
+                                                   <CricketPlayerImage playerId={undefined} playerName={p1.name} size={40} />
                                                 </div>
                                                 <div className="flex flex-col items-start md:items-end z-10 ml-12 md:ml-0">
                                                    <span className="font-bold text-foreground text-sm md:text-base tracking-tight">{p1.name}</span>
@@ -1218,7 +1252,7 @@ const MatchDetails = () => {
                                                    </div>
                                                 </div>
                                                 <div className="md:absolute md:right-4 z-20 shrink-0">
-                                                   <CricketPlayerImage playerId={p2.faceImageId} playerName={p2.name} size={40} align="right" />
+                                                   <CricketPlayerImage playerId={undefined} playerName={p2.name} size={40} align="right" />
                                                 </div>
                                              </div>
                                           </div>
@@ -1441,7 +1475,7 @@ const MatchDetails = () => {
                       <ListOrdered className="mx-auto h-12 w-12 mb-3 opacity-10" />
                       <p>Match not started yet — scoreboard will be available once play begins.</p>
                     </div>
-                  ) : (cbScorecardField.loading || matchInfoField.loading) ? (
+                  ) : (cbScorecardField.loading) ? (
                     <div className="flex justify-center p-8">
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
@@ -1454,6 +1488,8 @@ const MatchDetails = () => {
                           <span className="font-medium text-foreground">{cbScorecardField.data.status}</span>
                         </div>
                       )}
+
+
 
                       {(() => {
                         const inningsList = cbScorecardField.data.innings;
@@ -1494,46 +1530,67 @@ const MatchDetails = () => {
                             <div className="flex flex-col sm:items-end">
                               <span className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Score</span>
                               <span className="text-2xl sm:text-3xl font-mono font-black text-primary leading-none">
-                                {inn.score}/{inn.wickets} <span className="text-sm text-muted-foreground font-medium ml-1">({inn.overs} ov)</span>
+                                {inn.score}/{inn.wickets} <span className="text-sm text-muted-foreground font-medium ml-1">({formatOversText(inn.overs)})</span>
                               </span>
                             </div>
                           </div>
 
-                          {/* Card-Based Batting Scorecard */}
+                          {/* Card-Based Batting Scorecard — all 11 players shown together */}
                           <div className="pt-2 pb-8">
                             <h5 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 font-bold mb-4 px-1">Batting</h5>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                               {(() => {
-                                // Find the first two batsmen who are "batting" or "not out" - these are the active ones at the crease
-                                const activeBatterIndices = (inn.batsmen || [])
+                                // Build complete 11-player list:
+                                // 1. Batsmen who have batted (from inn.batsmen)
+                                // 2. Players yet to bat (from inn.yetToBat — now objects with faceImageId)
+                                const battedList = (inn.batsmen || []).map((b: any) => ({
+                                  ...b,
+                                  _status: 'batted' as const,
+                                }));
+
+                                // inn.yetToBat can be an array of objects {name, faceImageId} (new scraper)
+                                // or legacy string array
+                                const yetToBatList = (inn.yetToBat || []).map((p: any) => {
+                                  if (typeof p === 'string') {
+                                    return { name: p, faceImageId: null, cricbuzzPlayerId: null, isCaptain: false, isKeeper: false, _status: 'yet' as const };
+                                  }
+                                  return { ...p, isCaptain: false, isKeeper: false, _status: 'yet' as const };
+                                });
+
+                                const allPlayers = [...battedList, ...yetToBatList];
+
+                                // Find the 2 current batsmen at the crease (not out + batting)
+                                const activeBatterIndices = battedList
                                   .map((b: any, idx: number) => {
-                                    const rawDismissal = b.dismissal?.toLowerCase() || '';
-                                    return (rawDismissal.includes('not out') || rawDismissal === 'batting' || rawDismissal === '') ? idx : -1;
+                                    const d = (b.dismissal || '').toLowerCase();
+                                    return (d === 'batting' || d === '' || d === 'not out') ? idx : -1;
                                   })
                                   .filter((idx: number) => idx !== -1)
                                   .slice(0, 2);
 
-                                return inn.batsmen?.map((b: any, bIdx: number) => {
-                                  const rawDismissal = b.dismissal?.toLowerCase() || '';
-                                  const isEligibleNotOut = rawDismissal.includes('not out') || rawDismissal === 'batting' || rawDismissal === '';
-                                  const isActiveAtCrease = activeBatterIndices.includes(bIdx);
-                                  const isYetToBat = isEligibleNotOut && !isActiveAtCrease;
-                                  
-                                  const displayDismissal = isYetToBat ? "Yet to bat" : 
-                                                          (isActiveAtCrease ? "Batting" : 
-                                                          (b.dismissal || "Batting"));
+                                return allPlayers.map((b: any, bIdx: number) => {
+                                  const isYetToBat = b._status === 'yet';
+                                  const isActiveAtCrease = !isYetToBat && activeBatterIndices.includes(bIdx);
+
+                                  const displayDismissal = isYetToBat ? 'Yet to Bat' :
+                                                           (isActiveAtCrease ? 'Batting' : (b.dismissal || 'Batting'));
 
                                   return (
                                   <div key={bIdx} className={cn(
                                     "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group",
-                                    isActiveAtCrease ? "border-primary/40 shadow-[0_4px_20px_rgba(var(--primary),0.1)]" : "border-border/40 shadow-sm"
+                                    isYetToBat
+                                      ? "border-border/20 opacity-60"
+                                      : isActiveAtCrease
+                                        ? "border-primary/40 shadow-[0_4px_20px_rgba(var(--primary),0.1)]"
+                                        : "border-border/40 shadow-sm"
                                   )}>
-                                    {/* Subtle background glow for not out */}
+                                    {/* Subtle background glow for batsmen at crease */}
                                     {isActiveAtCrease && <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 blur-2xl rounded-full pointer-events-none"></div>}
-                                    
+
                                     <div className="flex items-start gap-3 relative z-10">
+                                      {/* Image loads in parallel since faceImageId is already known */}
                                       <CricketPlayerImage
-                                        playerId={b.faceImageId}
+                                        playerId={undefined} // Force name-based resolution to get proper headshots
                                         playerName={b.name}
                                         size={40}
                                         className="shrink-0 mt-0.5"
@@ -1548,23 +1605,28 @@ const MatchDetails = () => {
                                               {b.isKeeper && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">WK</span>}
                                             </div>
                                           </div>
-                                          <span className={cn("text-3xl font-black tracking-tighter leading-none shrink-0", isActiveAtCrease ? "text-primary" : "text-foreground")}>{b.runs}</span>
+                                          <span className={cn(
+                                            "text-3xl font-black tracking-tighter leading-none shrink-0",
+                                            isYetToBat ? "text-muted-foreground/30" : isActiveAtCrease ? "text-primary" : "text-foreground"
+                                          )}>
+                                            {isYetToBat ? '-' : b.runs}
+                                          </span>
                                         </div>
                                       </div>
                                     </div>
-                                    
-                                    <div className={cn("mt-3 mb-4 relative z-10", 
-                                      isYetToBat ? "opacity-50" : "opacity-100"
-                                    )}>
+
+                                    <div className={cn("mt-3 mb-4 relative z-10", isYetToBat ? "opacity-40" : "opacity-100")}>
                                       {(() => {
                                         const text = typeof displayDismissal === 'string' ? displayDismissal.trim() : String(displayDismissal);
-                                        if (text === "Batting" || text === "Yet to bat" || text === "Not Out") {
-                                            return <span className={cn("text-xs font-semibold px-2 py-1 rounded-md", 
-                                                text === "Not Out" ? "bg-green-500/10 text-green-400" : "bg-primary/10 text-primary"
+                                        if (text === 'Batting' || text === 'Yet to Bat' || text === 'Not Out') {
+                                            return <span className={cn("text-xs font-semibold px-2 py-1 rounded-md",
+                                                text === 'Not Out' ? "bg-green-500/10 text-green-400" :
+                                                text === 'Yet to Bat' ? "bg-secondary/30 text-muted-foreground/60" :
+                                                "bg-primary/10 text-primary"
                                             )}>{text}</span>;
                                         }
-                                        
-                                        const cAndB = text.match(/^c\\s+(.+?)\\s+b\\s+(.+)$/i);
+
+                                        const cAndB = text.match(/^c\s+(.+?)\s+b\s+(.+)$/i);
                                         if (cAndB) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">c</span>
@@ -1573,8 +1635,8 @@ const MatchDetails = () => {
                                                 <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{cAndB[2]}</span>
                                             </div>
                                         );
-                                        
-                                        const justB = text.match(/^b\\s+(.+)$/i);
+
+                                        const justB = text.match(/^b\s+(.+)$/i);
                                         if (justB) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">b</span>
@@ -1582,7 +1644,7 @@ const MatchDetails = () => {
                                             </div>
                                         );
 
-                                        const lbwB = text.match(/^[Il]bw\\s+b\\s+(.+)$/i);
+                                        const lbwB = text.match(/^[Il]bw\s+b\s+(.+)$/i);
                                         if (lbwB) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">lbw b</span>
@@ -1590,15 +1652,15 @@ const MatchDetails = () => {
                                             </div>
                                         );
 
-                                        const runOut = text.match(/^run out\\s+\\((.*?)\\)$/i);
+                                        const runOut = text.match(/^run out\s+\((.*?)\)$/i);
                                         if (runOut) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">run out</span>
                                                 <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{runOut[1]}</span>
                                             </div>
                                         );
-                                        
-                                        const stAndB = text.match(/^st\\s+(.+?)\\s+b\\s+(.+)$/i);
+
+                                        const stAndB = text.match(/^st\s+(.+?)\s+b\s+(.+)$/i);
                                         if (stAndB) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">st</span>
@@ -1608,7 +1670,7 @@ const MatchDetails = () => {
                                             </div>
                                         );
 
-                                        const candB = text.match(/^c\\s+&\\s+b\\s+(.+)$/i);
+                                        const candB = text.match(/^c\s+&\s+b\s+(.+)$/i);
                                         if (candB) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">c & b</span>
@@ -1616,7 +1678,6 @@ const MatchDetails = () => {
                                             </div>
                                         );
 
-                                        // Fallback
                                         return (
                                             <div className="flex flex-wrap items-center text-[11px]">
                                                 <span className="bg-white/5 border border-white/10 text-foreground/80 px-2 py-0.5 rounded-md font-medium">{text}</span>
@@ -1624,15 +1685,16 @@ const MatchDetails = () => {
                                         );
                                       })()}
                                     </div>
-                                    
+
                                     <div className="grid grid-cols-4 gap-1 text-center border-t border-border/20 pt-3 relative z-10">
-                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">Balls</span><span className="font-mono text-xs font-bold text-foreground/90">{b.balls}</span></div>
-                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">4s</span><span className="font-mono text-xs font-medium text-muted-foreground">{b.fours}</span></div>
-                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">6s</span><span className="font-mono text-xs font-medium text-muted-foreground">{b.sixes}</span></div>
-                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">SR</span><span className="font-mono text-xs font-bold text-foreground/90">{b.strikeRate}</span></div>
+                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">Balls</span><span className="font-mono text-xs font-bold text-foreground/90">{isYetToBat ? '-' : b.balls}</span></div>
+                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">4s</span><span className="font-mono text-xs font-medium text-muted-foreground">{isYetToBat ? '-' : b.fours}</span></div>
+                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">6s</span><span className="font-mono text-xs font-medium text-muted-foreground">{isYetToBat ? '-' : b.sixes}</span></div>
+                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">SR</span><span className="font-mono text-xs font-bold text-foreground/90">{isYetToBat ? '-' : b.strikeRate}</span></div>
                                     </div>
                                   </div>
-                                )});
+                                  );
+                                });
                               })()}
                             </div>
                           </div>
@@ -1684,7 +1746,7 @@ const MatchDetails = () => {
                                   {/* Player photo + name + wickets row */}
                                   <div className="flex items-start gap-3 relative z-10">
                                     <CricketPlayerImage
-                                      playerId={b.faceImageId}
+                                      playerId={undefined} // Force name-based resolution
                                       playerName={b.name}
                                       size={40}
                                       className="shrink-0 mt-0.5"

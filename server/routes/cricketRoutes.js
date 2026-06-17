@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { cricketService } from '../services/cricketApiService.js';
 import { cricbuzzService } from '../services/cricbuzzService.js';
+import { scrapeScorecard } from '../services/cricbuzzScorecardScraper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -87,6 +88,27 @@ router.get('/scraped/matches/upcoming', async (req, res) => {
 router.get('/scraped/match/:id/squads', async (req, res) => {
     const data = await fetchMatchSquadsScraped(req.params.id);
     res.json({ status: 'success', data });
+});
+
+// ── Dedicated Cricbuzz Scorecard Route ────────────────────────────────────────
+// GET /api/cricket/scraped/match/:id/scorecard?slug=eng-vs-nz-2nd-test-...
+// The slug is the path component after the matchId in the Cricbuzz URL.
+// e.g. /live-cricket-scorecard/129563/eng-vs-nz-2nd-test-new-zealand-tour-of-england-2026
+//      -> matchId=129563, slug=eng-vs-nz-2nd-test-new-zealand-tour-of-england-2026
+// If slug is omitted, it will be auto-resolved from live/recent match lists.
+router.get('/scraped/match/:id/scorecard', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { slug } = req.query; // optional
+        const data = await scrapeScorecard(id, slug || null);
+        if (!data) {
+            return res.status(200).json({ status: 'success', data: null, message: 'No scorecard data available yet — match may not have started.' });
+        }
+        res.json({ status: 'success', data });
+    } catch (error) {
+        console.error('[scorecard route] Error:', error.message);
+        res.status(500).json({ status: 'error', data: null, error: error.message });
+    }
 });
 
 router.get('/scraped/match/:id/:endpointType', async (req, res) => {
@@ -208,10 +230,15 @@ router.get('/players/:id', async (req, res) => {
 
 // ====== CRICBUZZ PROXY ROUTES (Scorecard, Squads, Commentary) ======
 
-// Cricbuzz Scorecard
+// Cricbuzz Scorecard (uses dedicated HTML scraper)
 router.get('/cb/scorecard/:matchId', async (req, res) => {
     try {
-        const data = await fetchMatchDetailScraped(req.params.matchId, 'scorecard');
+        const { matchId } = req.params;
+        const { slug } = req.query;
+        const data = await scrapeScorecard(matchId, slug || null);
+        if (!data) {
+            return res.status(200).json({ status: 'success', data: null, message: 'No scorecard data available yet.' });
+        }
         res.json({ status: 'success', data });
     } catch (error) {
         res.status(500).json({ error: error.message, data: null });

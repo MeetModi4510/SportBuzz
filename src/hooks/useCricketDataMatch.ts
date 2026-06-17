@@ -9,6 +9,13 @@ export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Reset state immediately when matchId changes to avoid stale data from previous match
+    useEffect(() => {
+        setData(null);
+        setError(null);
+        setLoading(false);
+    }, [matchId]);
+
     const fetchData = useCallback(async () => {
         if (!matchId) return;
 

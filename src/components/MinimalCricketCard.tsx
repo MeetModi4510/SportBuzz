@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, formatScoreString, formatOversText } from "@/lib/utils";
 import { Match } from "@/data/types";
 import { formatToIST } from "@/lib/dateUtils";
 import { MapPin, Clock } from "lucide-react";
@@ -68,14 +68,14 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
                   </span>
                   {inn.overs && (
                     <span className="text-xs text-muted-foreground font-medium">
-                      ({inn.overs})
+                      ({formatOversText(inn.overs)})
                     </span>
                   )}
                 </div>
              ))}
              {(!Array.isArray(match.inningsScores) || match.inningsScores.filter(i => i?.team === 'home').length === 0) && (
                <span className="font-bold text-[15px] tracking-tight text-foreground">
-                 {match.homeScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
+                 {formatScoreString(match.homeScore) || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                </span>
              )}
           </div>
@@ -95,14 +95,14 @@ export const MinimalCricketCard = ({ match, onClick, className }: MinimalCricket
                   </span>
                   {inn.overs && (
                     <span className="text-xs text-muted-foreground font-medium">
-                      ({inn.overs})
+                      ({formatOversText(inn.overs)})
                     </span>
                   )}
                 </div>
              ))}
              {(!Array.isArray(match.inningsScores) || match.inningsScores.filter(i => i?.team === 'away').length === 0) && (
                <span className="font-bold text-[15px] tracking-tight text-foreground">
-                 {match.awayScore || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
+                 {formatScoreString(match.awayScore) || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
                </span>
              )}
           </div>
