@@ -40,7 +40,7 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
     const selectedRegionObj = regions.find(r => r.id === selectedTeam) || regions[0];
 
     return (
-        <div className="w-full flex-shrink-0 flex flex-col gap-3 z-20">
+        <div className="w-full flex-shrink-0 flex flex-col gap-3 relative z-50">
             <div className="flex items-center gap-4">
                 
                 {/* Region Dropdown (Left side of the rail) */}
@@ -91,59 +91,96 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                         </div>
                     )}
                     
-                    {squadData?.players?.map((player: Player) => {
-                        const isActive = activePlayerId === player.espnId;
-                        const idSum = player.espnId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                        const stableOVR = (idSum % 16) + 80;
+                    {(() => {
+                        if (!squadData?.players) return null;
 
-                        // Force high-res images from ESPN
-                        const highResUrl = player.imageUrl ? player.imageUrl.replace(/w=\d+/g, 'w=800').replace(/h=\d+/g, 'h=800') : '';
+                        const groups = [
+                            { label: 'BATSMEN', players: [] as Player[] },
+                            { label: 'ALL-ROUNDERS', players: [] as Player[] },
+                            { label: 'WICKET-KEEPERS', players: [] as Player[] },
+                            { label: 'BOWLERS', players: [] as Player[] }
+                        ];
 
-                        return (
-                            <div 
-                                key={player.espnId}
-                                onClick={() => onSelectPlayer(player)}
-                                className="group flex-shrink-0 flex flex-col items-center gap-3 w-[72px] md:w-[88px] cursor-pointer"
-                            >
-                                <div className={`relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden transition-all duration-500 ${
-                                    isActive 
-                                        ? 'ring-2 ring-white ring-offset-4 ring-offset-[#0A0A0B] shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-105 z-10' 
-                                        : 'ring-1 ring-white/10 opacity-50 group-hover:opacity-100 group-hover:ring-white/30 group-hover:scale-105'
-                                }`}>
-                                    {highResUrl ? (
-                                        <img 
-                                            src={highResUrl} 
-                                            alt={player.name} 
-                                            className="w-full h-full object-cover object-top" 
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
-                                            <svg className="w-8 h-8 text-zinc-700" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M12 14c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.315 0-10 1.672-10 5v1h20v-1c0-3.328-6.685-5-10-5z" />
-                                            </svg>
+                        squadData.players.forEach((player: Player) => {
+                            const r = (player.role || '').toLowerCase();
+                            if (r.includes('wicket')) groups[2].players.push(player);
+                            else if (r.includes('all')) groups[1].players.push(player);
+                            else if (r.includes('bowl')) groups[3].players.push(player);
+                            else groups[0].players.push(player);
+                        });
+
+                        return groups.map((group, groupIdx) => {
+                            if (group.players.length === 0) return null;
+                            return (
+                                <React.Fragment key={group.label}>
+                                    <div className="flex items-center gap-4 pl-2">
+                                        <div className="flex flex-col items-center justify-center shrink-0">
+                                            <span 
+                                                className="text-[9px] text-zinc-600 font-black uppercase tracking-[0.3em] whitespace-nowrap" 
+                                                style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+                                            >
+                                                {group.label}
+                                            </span>
                                         </div>
-                                    )}
+                                        {group.players.map((player: Player) => {
+                                            const isActive = activePlayerId === player.espnId;
+                                            const idSum = player.espnId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                                            const stableOVR = (idSum % 16) + 80;
 
-                                    {/* OVR Badge Floating at the bottom */}
-                                    <div className="absolute bottom-0 w-full flex justify-center pb-1">
-                                        <div className={`px-2 py-[1px] rounded-full text-[9px] font-black backdrop-blur-md border ${
-                                            isActive 
-                                                ? 'bg-white text-black border-white' 
-                                                : 'bg-black/60 border-white/20 text-white'
-                                        }`}>
-                                            {stableOVR}
-                                        </div>
+                                            const highResUrl = player.imageUrl ? player.imageUrl.replace(/w=\d+/g, 'w=800').replace(/h=\d+/g, 'h=800') : '';
+
+                                            return (
+                                                <div 
+                                                    key={player.espnId}
+                                                    onClick={() => onSelectPlayer(player)}
+                                                    className="group flex-shrink-0 flex flex-col items-center gap-3 w-[72px] md:w-[88px] cursor-pointer"
+                                                >
+                                                    <div className={`relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden transition-all duration-500 ${
+                                                        isActive 
+                                                            ? 'ring-2 ring-white ring-offset-4 ring-offset-[#0A0A0B] shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-105 z-10' 
+                                                            : 'ring-1 ring-white/10 opacity-50 group-hover:opacity-100 group-hover:ring-white/30 group-hover:scale-105'
+                                                    }`}>
+                                                        {highResUrl ? (
+                                                            <img 
+                                                                src={highResUrl} 
+                                                                alt={player.name} 
+                                                                className="w-full h-full object-cover object-top" 
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
+                                                                <svg className="w-8 h-8 text-zinc-700" fill="currentColor" viewBox="0 0 24 24">
+                                                                    <path d="M12 14c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.315 0-10 1.672-10 5v1h20v-1c0-3.328-6.685-5-10-5z" />
+                                                                </svg>
+                                                            </div>
+                                                        )}
+
+                                                        <div className="absolute bottom-0 w-full flex justify-center pb-1">
+                                                            <div className={`px-2 py-[1px] rounded-full text-[9px] font-black backdrop-blur-md border ${
+                                                                isActive 
+                                                                    ? 'bg-white text-black border-white' 
+                                                                    : 'bg-black/60 border-white/20 text-white'
+                                                            }`}>
+                                                                {stableOVR}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <span className={`text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-center w-full truncate transition-colors ${
+                                                        isActive ? 'text-white drop-shadow-md' : 'text-zinc-500 group-hover:text-zinc-300'
+                                                    }`}>
+                                                        {player.name.split(' ').pop()}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
-                                </div>
-                                
-                                <span className={`text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-center w-full truncate transition-colors ${
-                                    isActive ? 'text-white drop-shadow-md' : 'text-zinc-500 group-hover:text-zinc-300'
-                                }`}>
-                                    {player.name.split(' ').pop()}
-                                </span>
-                            </div>
-                        );
-                    })}
+                                    {groupIdx < groups.length - 1 && groups[groupIdx + 1].players.length > 0 && (
+                                        <div className="w-[1px] h-16 bg-white/[0.05] ml-2 mr-2 rounded-full shrink-0"></div>
+                                    )}
+                                </React.Fragment>
+                            );
+                        });
+                    })()}
                 </div>
             </div>
         </div>

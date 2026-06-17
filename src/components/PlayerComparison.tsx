@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 
 import { usePlayerBattingStats } from '@/hooks/usePlayerBattingStats';
-import { usePerformanceLabPlayerStats } from '@/hooks/usePerformanceLab';
+import { usePerformanceLabPlayerStats, usePerformanceLabSquad } from '@/hooks/usePerformanceLab';
 import { getCricbuzzPlayerId } from '@/data/cricbuzzPlayerIds';
 import type { BattingFormatKey } from '@/types/playerBattingTypes';
 import { FORMAT_COLORS, FORMAT_LABELS } from '@/utils/playerStatsTransformer';
@@ -206,47 +206,55 @@ function PlayerSelectorHUD({
             <button
                 onClick={() => setOpen(!open)}
                 className={cn(
-                    "relative w-full overflow-visible transition-all duration-500",
-                    "rounded-[2.5rem] border-2 bg-[#020617]/40 backdrop-blur-xl group-hover/hud:translate-y-[-4px]",
-                    open ? "border-primary shadow-[0_0_30px_rgba(59,130,246,0.3)]" : "border-white/5"
+                    "relative w-full overflow-hidden transition-all duration-300",
+                    "rounded-3xl border bg-white/[0.01] backdrop-blur-md group-hover/hud:bg-white/[0.03]",
+                    open ? "border-white/20 shadow-lg" : "border-white/[0.05]"
                 )}
-                style={{ borderColor: open ? accentColor : undefined }}
+                style={{ 
+                    boxShadow: open ? `0 0 30px ${accentColor}15` : undefined,
+                    borderColor: open ? `${accentColor}50` : undefined
+                }}
             >
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent opacity-20 pointer-events-none" />
-                
                 <div className={cn(
-                    "flex items-center gap-6 p-6",
+                    "flex items-center gap-5 p-4 md:p-5",
                     side === "right" && "flex-row-reverse"
                 )}>
+                    {/* Minimalist Image Avatar */}
                     <div className="relative shrink-0">
-                        <div className="w-24 h-24 rounded-[2rem] bg-slate-900 border border-white/10 flex items-center justify-center shadow-2xl relative overflow-hidden group-hover/hud:scale-105 transition-transform">
+                        <div className={cn(
+                            "w-16 h-16 md:w-20 md:h-20 rounded-full bg-slate-900 flex items-center justify-center shadow-inner relative overflow-hidden transition-transform duration-500",
+                            "ring-2 ring-white/5 group-hover/hud:ring-white/10"
+                        )}>
                             {current?.photo ? (
-                                <img src={current.photo} alt={current.name} className="w-full h-full object-cover" />
+                                <img src={current.photo} alt={current.name} className="w-full h-full object-cover scale-[1.02] group-hover/hud:scale-110 transition-transform duration-500 ease-out" />
                             ) : (
-                                <span className="text-3xl font-black text-white">{current?.name.charAt(0)}</span>
+                                <span className="text-2xl font-bold text-white/50">{current?.name.charAt(0)}</span>
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent animate-pulse" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover/hud:opacity-100 transition-opacity" />
                         </div>
-                        <div className="absolute -inset-2 rounded-[2.5rem] border border-white/5 animate-[spin_10s_linear_infinite]" />
                     </div>
 
+                    {/* Typography & Badges */}
                     <div className={cn("flex-1 min-w-0", side === "right" ? "text-right" : "text-left")}>
-                        <h4 className="text-2xl font-black text-white tracking-tighter uppercase mb-1 truncate">
-                            {current?.name}
+                        <h4 className="text-lg md:text-xl font-bold text-white/90 uppercase tracking-wide mb-1.5 truncate">
+                            {current?.name || "Select Player"}
                         </h4>
-                        <div className={cn("flex items-center gap-3", side === "right" && "flex-row-reverse")}>
+                        <div className={cn("flex items-center gap-2.5 opacity-80", side === "right" && "flex-row-reverse")}>
                             {getFlagUrl(current?.country || "") ? (
-                                <img src={getFlagUrl(current?.country || "")!} alt={current?.country} className="w-6 h-4 object-cover rounded-sm shadow-sm" />
-                            ) : (
-                                <span className="text-xl shrink-0">{current?.countryFlag}</span>
+                                <img src={getFlagUrl(current?.country || "")!} alt={current?.country} className="w-5 h-3.5 object-cover rounded-[2px]" />
+                            ) : current?.countryFlag ? (
+                                <span className="text-sm shrink-0">{current.countryFlag}</span>
+                            ) : null}
+                            
+                            {current?.overallRating && (
+                                <span className="px-2.5 py-0.5 rounded-full bg-white/[0.03] border border-white/10 text-[10px] font-semibold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                                    RTG {current.overallRating}
+                                </span>
                             )}
-                            <span className="px-3 py-1 rounded-full bg-slate-900 border border-white/10 text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
-                                RTG {current?.overallRating}
-                            </span>
                         </div>
                     </div>
                     
-                    <ChevronDown size={24} className={cn("text-slate-500 transition-transform duration-500", open && "rotate-180")} />
+                    <ChevronDown size={20} className={cn("text-slate-500 transition-transform duration-300", open && "rotate-180")} />
                 </div>
             </button>
 
@@ -364,68 +372,98 @@ export const PlayerComparison = () => {
     const [playerAId, setPlayerAId] = useState<string>("");
     const [playerBId, setPlayerBId] = useState<string>("");
 
-    const sportPlayers = useMemo(() => 
-        ANALYSIS_PLAYERS[selectedSport] || [],
-    [selectedSport]);
+    const { data: squadData, isLoading: loadingSquad } = usePerformanceLabSquad('india-2');
+
+    const sportPlayers = useMemo(() => {
+        if (selectedSport === 'cricket' && squadData?.players) {
+            return squadData.players.map((p: any) => ({
+                id: p.espnId || p.id,
+                name: p.name,
+                country: 'India',
+                countryFlag: '🇮🇳',
+                role: p.role || 'Player',
+                photo: p.imageUrl,
+                overallRating: 85, // Computed dynamically later
+                attributes: {}, // Computed dynamically later
+                formTrend: [], // Computed dynamically later
+                detailedStats: {} // Computed dynamically later
+            }));
+        }
+        return ANALYSIS_PLAYERS[selectedSport] || [];
+    }, [selectedSport, squadData]);
 
     // Initial player selection when sport changes
-    useEffect(() => {
-        if (sportPlayers.length >= 2) {
-            setPlayerAId(sportPlayers[0].id);
-            setPlayerBId(sportPlayers[1].id);
-        }
-    }, [selectedSport, sportPlayers]);
+    // Removed auto-selection to allow empty state
 
-    const playerA = sportPlayers.find(p => p.id === playerAId) || sportPlayers[0];
-    const playerB = sportPlayers.find(p => p.id === playerBId) || sportPlayers[1];
-
-    if (!playerA || !playerB) return null;
+    const playerA = sportPlayers.find(p => p.id === playerAId || String(p.id) === String(playerAId)) || null;
+    const playerB = sportPlayers.find(p => p.id === playerBId || String(p.id) === String(playerBId)) || null;
 
     const [apiFormat, setApiFormat] = useState<BattingFormatKey>('odi');
 
-    const { battingStats: statsA, isLoading: loadingA } = usePlayerBattingStats(playerA.id);
-    const { battingStats: statsB, isLoading: loadingB } = usePlayerBattingStats(playerB.id);
+    const { battingStats: statsA, isLoading: loadingA } = usePlayerBattingStats(playerA?.id || "");
+    const { battingStats: statsB, isLoading: loadingB } = usePlayerBattingStats(playerB?.id || "");
 
-    const cricbuzzIdA = getCricbuzzPlayerId(playerA.id)?.toString() || null;
-    const cricbuzzIdB = getCricbuzzPlayerId(playerB.id)?.toString() || null;
+    const cricbuzzIdA = playerA ? (/^\d+$/.test(String(playerA.id).trim()) ? String(playerA.id).trim() : getCricbuzzPlayerId(playerA.id)?.toString()) || null : null;
+    const cricbuzzIdB = playerB ? (/^\d+$/.test(String(playerB.id).trim()) ? String(playerB.id).trim() : getCricbuzzPlayerId(playerB.id)?.toString()) || null : null;
 
-    const { data: deepStatsA, isLoading: loadingDeepA } = usePerformanceLabPlayerStats(cricbuzzIdA, playerA.name);
-    const { data: deepStatsB, isLoading: loadingDeepB } = usePerformanceLabPlayerStats(cricbuzzIdB, playerB.name);
+    const { data: deepStatsA, isLoading: loadingDeepA } = usePerformanceLabPlayerStats(cricbuzzIdA, playerA?.name || "");
+    const { data: deepStatsB, isLoading: loadingDeepB } = usePerformanceLabPlayerStats(cricbuzzIdB, playerB?.name || "");
 
     const formatA = selectedSport === 'cricket' && statsA ? statsA[apiFormat] : null;
     const formatB = selectedSport === 'cricket' && statsB ? statsB[apiFormat] : null;
 
     // ─── Chart Data ──────────────────────────────────────────────
-    const radarData = Object.keys(playerA.attributes).map(key => ({
-        attribute: key,
-        A: playerA.attributes[key],
-        B: playerB.attributes[key],
-        fullMark: 100,
-    }));
+    const radarData = useMemo(() => {
+        if (selectedSport !== 'cricket' || (!deepStatsA?.stats && !deepStatsB?.stats)) {
+            return playerA && playerB ? Object.keys(playerA.attributes || {}).map(key => ({
+                attribute: key,
+                A: playerA.attributes[key],
+                B: playerB.attributes[key],
+                fullMark: 100,
+            })) : [];
+        }
+
+        const getA = (key: any) => deepStatsA?.stats?.batting?.[apiFormat === 't20' ? 't20i' : apiFormat]?.[key] || 0;
+        const getB = (key: any) => deepStatsB?.stats?.batting?.[apiFormat === 't20' ? 't20i' : apiFormat]?.[key] || 0;
+
+        const calcPower = (sr: number) => Math.min(Math.round((sr / 200) * 100), 100);
+        const calcConsistency = (avg: number) => Math.min(Math.round((avg / 60) * 100), 100);
+        const calcTechnique = (avg: number, sr: number) => Math.min(Math.round(((avg * sr) / 8000) * 100), 100);
+        const calcClutch = (hundreds: number) => Math.min(Math.round((hundreds / 40) * 100), 100);
+        const calcImpact = (sixes: number) => Math.min(Math.round((sixes / 200) * 100), 100);
+
+        return [
+            { attribute: 'Power', A: calcPower(getA('strikeRate')), B: calcPower(getB('strikeRate')), fullMark: 100 },
+            { attribute: 'Consistency', A: calcConsistency(getA('average')), B: calcConsistency(getB('average')), fullMark: 100 },
+            { attribute: 'Technique', A: calcTechnique(getA('average'), getA('strikeRate')), B: calcTechnique(getB('average'), getB('strikeRate')), fullMark: 100 },
+            { attribute: 'Clutch', A: calcClutch(getA('hundreds')), B: calcClutch(getB('hundreds')), fullMark: 100 },
+            { attribute: 'Impact', A: calcImpact(getA('sixes')), B: calcImpact(getB('sixes')), fullMark: 100 },
+        ];
+    }, [selectedSport, deepStatsA, deepStatsB, apiFormat, playerA, playerB]);
 
     const recentBattingA = deepStatsA?.recentMatches?.batting || [];
     const recentBattingB = deepStatsB?.recentMatches?.batting || [];
 
-    const getRunSafe = (recentArr: any[], mLabel: string, fallbackArr: number[], i: number) => {
-        if (!recentArr || recentArr.length === 0) return fallbackArr[i];
-        const match = recentArr.find((m: any) => m.match === mLabel);
-        return match && typeof match.runs === 'number' ? match.runs : 0;
+    const getRunSafe = (recentArr: any[], fallbackArr: number[], i: number) => {
+        if (!recentArr || recentArr.length === 0) return fallbackArr ? (fallbackArr[i] || 0) : 0;
+        const match = recentArr[i];
+        if (!match) return 0;
+        const r = typeof match.runs === 'number' ? match.runs : parseInt(match.runs);
+        return isNaN(r) ? 0 : r;
     };
 
-    // The scrape returns M10 to M1 (where M10 is the latest). We reverse them to [M1..M10] for left-to-right timeline.
     const formData = Array.from({ length: 10 }).map((_, i) => {
-        const mLabel = `M${i + 1}`;
         return {
-            match: mLabel,
-            A: getRunSafe(recentBattingA, mLabel, playerA.formTrend, i),
-            B: getRunSafe(recentBattingB, mLabel, playerB.formTrend, i),
+            match: `M${i + 1}`,
+            A: getRunSafe(recentBattingA, playerA?.formTrend || [], i),
+            B: getRunSafe(recentBattingB, playerB?.formTrend || [], i),
         };
     });
 
     const statComparison = useMemo(() => {
-        if (selectedSport === 'cricket' && (formatA || formatB)) {
-            const getA = (key: any) => formatA ? (formatA as any)[key] : 0;
-            const getB = (key: any) => formatB ? (formatB as any)[key] : 0;
+        if (selectedSport === 'cricket' && (deepStatsA?.stats || deepStatsB?.stats)) {
+            const getA = (key: any) => deepStatsA?.stats?.batting?.[apiFormat === 't20' ? 't20i' : apiFormat]?.[key] || 0;
+            const getB = (key: any) => deepStatsB?.stats?.batting?.[apiFormat === 't20' ? 't20i' : apiFormat]?.[key] || 0;
             return [
                 { label: 'Matches', valA: getA('matches'), valB: getB('matches') },
                 { label: 'Innings', valA: getA('innings'), valB: getB('innings') },
@@ -440,13 +478,54 @@ export const PlayerComparison = () => {
             ];
         }
 
-        // Fallback for non-cricket or missing data
-        return Object.keys(playerA.detailedStats).map(key => ({
-            label: key,
-            valA: playerA.detailedStats[key],
-            valB: playerB.detailedStats[key],
-        }));
-    }, [selectedSport, formatA, formatB, playerA, playerB]);
+        if (playerA && playerB) {
+            return Object.keys(playerA.detailedStats || {}).map(key => ({
+                label: key,
+                valA: playerA.detailedStats[key] || 0,
+                valB: playerB.detailedStats[key] || 0,
+            }));
+        }
+        
+        return [];
+    }, [selectedSport, deepStatsA, deepStatsB, apiFormat, playerA, playerB]);
+
+    const insightsData = useMemo(() => {
+        if (selectedSport === 'cricket' && (deepStatsA?.stats || deepStatsB?.stats)) {
+            const getA = (key: any) => deepStatsA?.stats?.batting?.[apiFormat === 't20' ? 't20i' : apiFormat]?.[key] || 0;
+            const getB = (key: any) => deepStatsB?.stats?.batting?.[apiFormat === 't20' ? 't20i' : apiFormat]?.[key] || 0;
+            
+            const calcOvr = (avg: number, sr: number) => Math.min(Math.round(((avg * sr) / 6000) * 100), 99);
+            const ovrA = calcOvr(getA('average'), getA('strikeRate'));
+            const ovrB = calcOvr(getB('average'), getB('strikeRate'));
+
+            const formA = recentBattingA.length > 0 ? Math.round(recentBattingA.slice(0,5).reduce((acc: number, m: any) => acc + (parseInt(m.runs) || 0), 0) / Math.min(recentBattingA.length, 5)) : 0;
+            const formB = recentBattingB.length > 0 ? Math.round(recentBattingB.slice(0,5).reduce((acc: number, m: any) => acc + (parseInt(m.runs) || 0), 0) / Math.min(recentBattingB.length, 5)) : 0;
+            
+            const clutchA = Math.min(Math.round((getA('hundreds') / 40) * 100), 99);
+            const clutchB = Math.min(Math.round((getB('hundreds') / 40) * 100), 99);
+
+            const total = (ovrA + ovrB) || 1;
+            const winA = Math.round((ovrA / total) * 100);
+            
+            return [
+                { label: "Overall Rating", valA: ovrA, valB: ovrB, icon: <Trophy size={14} /> },
+                { label: "Recent Form (Runs)", valA: formA, valB: formB, icon: <Activity size={14} /> },
+                { label: "Clutch Peak", valA: clutchA, valB: clutchB, icon: <Zap size={14} /> },
+                { label: "Win Probability", valA: `${winA}%`, valB: `${100 - winA}%`, icon: <TrendingUp size={14} /> },
+            ];
+        }
+
+        const ovrA = playerA?.overallRating || 80;
+        const ovrB = playerB?.overallRating || 80;
+        const winA = Math.round((ovrA / ((ovrA + ovrB) || 1)) * 100);
+
+        return [
+            { label: "Overall Rating", valA: ovrA, valB: ovrB, icon: <Trophy size={14} /> },
+            { label: "Recent Form", valA: playerA?.formTrend ? Math.round(playerA.formTrend.reduce((a,b)=>a+b,0)/playerA.formTrend.length) : 0, valB: playerB?.formTrend ? Math.round(playerB.formTrend.reduce((a,b)=>a+b,0)/playerB.formTrend.length) : 0, icon: <Activity size={14} /> },
+            { label: "Clutch Peak", valA: playerA?.attributes?.["Clutch"] || 85, valB: playerB?.attributes?.["Clutch"] || 82, icon: <Zap size={14} /> },
+            { label: "Win Probability", valA: `${winA}%`, valB: `${100 - winA}%`, icon: <TrendingUp size={14} /> },
+        ];
+    }, [selectedSport, deepStatsA, deepStatsB, apiFormat, playerA, playerB, recentBattingA, recentBattingB]);
 
     return (
         <div className="space-y-8 animate-fade-in overflow-visible pb-20">
@@ -480,13 +559,13 @@ export const PlayerComparison = () => {
             </div>
 
             {/* ═══ Player Selection HUD ═══ */}
-            <div className="relative z-50 rounded-[4rem] border border-white/5 p-12 overflow-visible bg-[#020617]/40 backdrop-blur-3xl shadow-2xl">
-                <div className="absolute inset-0 cyber-grid opacity-10 pointer-events-none rounded-[4rem]" />
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-2 bg-primary rounded-full text-[10px] font-black text-white uppercase tracking-[0.3em] shadow-[0_0_20px_rgba(59,130,246,0.5)]">
-                    Elite Matchup Analysis
+            <div className="relative z-50 rounded-3xl border border-white/[0.05] p-8 md:p-12 bg-white/[0.01] backdrop-blur-2xl shadow-2xl">
+                <div className="absolute inset-0 cyber-grid opacity-[0.03] pointer-events-none rounded-3xl" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-5 py-1.5 bg-slate-900 border border-white/10 rounded-full text-[9px] font-bold text-white/70 uppercase tracking-[0.2em] shadow-lg">
+                    Face-Off Analysis
                 </div>
 
-                <div className="relative grid lg:grid-cols-[1fr,100px,1fr] gap-12 items-center">
+                <div className="relative grid lg:grid-cols-[1fr,80px,1fr] gap-8 md:gap-12 items-center">
                     <PlayerSelectorHUD
                         players={sportPlayers}
                         selectedId={playerAId}
@@ -496,12 +575,10 @@ export const PlayerComparison = () => {
                     />
 
                     <div className="flex flex-col items-center justify-center">
-                        <div className="relative w-24 h-24 rounded-full bg-slate-900 border-4 border-white/10 flex items-center justify-center font-black text-3xl text-white shadow-2xl overflow-hidden group">
-                            <div className="absolute inset-0 rounded-full animate-ping bg-primary/20" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
-                            <span className="relative z-10 group-hover:scale-110 transition-transform duration-500">VS</span>
+                        <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-slate-900/80 border border-white/[0.05] flex items-center justify-center shadow-inner group transition-transform duration-500 hover:scale-105 backdrop-blur-sm">
+                            <span className="text-xl md:text-2xl font-bold text-white/50 group-hover:text-white/90 transition-colors duration-300">VS</span>
                         </div>
-                        <div className="h-24 w-[2px] bg-gradient-to-b from-primary via-white/10 to-transparent mt-4" />
+                        <div className="h-16 w-px bg-gradient-to-b from-white/10 to-transparent mt-6" />
                     </div>
 
                     <PlayerSelectorHUD
@@ -513,67 +590,77 @@ export const PlayerComparison = () => {
                     />
                 </div>
 
-                {/* API Format Selector (Cricket Only) */}
-                {selectedSport === 'cricket' && (
-                    <div className="flex flex-col items-center justify-center mt-8">
-                        <div className="flex items-center justify-center gap-2">
-                            {(['test', 'odi', 't20', 'ipl'] as BattingFormatKey[]).map((fmt) => (
-                                <button
-                                    key={fmt}
-                                    onClick={() => setApiFormat(fmt)}
-                                    className={cn(
-                                        "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border",
-                                        apiFormat === fmt
-                                            ? "text-white border-transparent shadow-lg scale-105"
-                                            : "bg-[#0a0f1e]/80 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white"
-                                    )}
-                                    style={apiFormat === fmt ? { background: FORMAT_COLORS[fmt], boxShadow: `0 4px 20px ${FORMAT_COLORS[fmt]}40` } : undefined}
-                                >
-                                    {FORMAT_LABELS[fmt]}
-                                </button>
+                {(!playerA || !playerB) ? (
+                    <div className="mt-16 flex flex-col items-center justify-center py-20 text-center relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+                        <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-2xl">
+                            <Swords size={40} className="text-white/20" />
+                        </div>
+                        <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Awaiting Challengers</h3>
+                        <p className="text-slate-500 max-w-sm text-sm">Select two players from the dropdowns above to unlock live Face-Off Metrics, Career History, and detailed Matchup Analysis.</p>
+                    </div>
+                ) : (
+                    <>
+                        {/* API Format Selector (Cricket Only) */}
+                        {selectedSport === 'cricket' && (
+                            <div className="flex flex-col items-center justify-center mt-8">
+                                <div className="flex items-center justify-center gap-2">
+                                    {(['test', 'odi', 't20', 'ipl'] as BattingFormatKey[]).map((fmt) => (
+                                        <button
+                                            key={fmt}
+                                            onClick={() => setApiFormat(fmt)}
+                                            className={cn(
+                                                "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border",
+                                                apiFormat === fmt
+                                                    ? "text-white border-transparent shadow-lg scale-105"
+                                                    : "bg-[#0a0f1e]/80 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white"
+                                            )}
+                                            style={apiFormat === fmt ? { background: FORMAT_COLORS[fmt], boxShadow: `0 4px 20px ${FORMAT_COLORS[fmt]}40` } : undefined}
+                                        >
+                                            {FORMAT_LABELS[fmt]}
+                                        </button>
+                                    ))}
+                                </div>
+                                {(loadingDeepA || loadingDeepB || loadingA || loadingB) && (
+                                    <span className="mt-3 text-[10px] font-black uppercase tracking-widest text-blue-400 flex items-center gap-2">
+                                        <Loader2 size={12} className="animate-spin" /> Syncing Live Stats...
+                                    </span>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Quick Insight Strip */}
+                        <div className="relative mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
+                            {insightsData.map((insight, i) => (
+                                <div key={i} className="bg-[#0a0f1e]/60 border border-white/5 rounded-3xl p-6 hover:bg-white/[0.05] transition-all group/insight shadow-xl">
+                                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-4 flex items-center gap-2">
+                                        {insight.icon} {insight.label}
+                                    </p>
+                                    <div className="flex items-center justify-between">
+                                        <span className={cn("text-xl font-black", insight.valA > insight.valB ? "text-indigo-400" : "text-white/40")}>
+                                            {insight.valA}
+                                        </span>
+                                        <div className="h-[2px] flex-1 mx-4 bg-white/5 relative overflow-hidden rounded-full">
+                                            <div className={cn(
+                                                "absolute inset-y-0 w-1/2 rounded-full",
+                                                insight.valA > insight.valB ? "left-0 bg-indigo-500" : "right-0 bg-rose-500"
+                                            )} />
+                                        </div>
+                                        <span className={cn("text-xl font-black", insight.valB > insight.valA ? "text-rose-400" : "text-white/40")}>
+                                            {insight.valB}
+                                        </span>
+                                    </div>
+                                </div>
                             ))}
                         </div>
-                        {(loadingA || loadingB) && (
-                            <span className="mt-3 text-[10px] font-black uppercase tracking-widest text-blue-400 flex items-center gap-2">
-                                <Loader2 size={12} className="animate-spin" /> Syncing Live Stats...
-                            </span>
-                        )}
-                    </div>
+                    </>
                 )}
-
-                {/* Quick Insight Strip */}
-                <div className="relative mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {[
-                        { label: "Overall Rating", valA: playerA.overallRating, valB: playerB.overallRating, icon: <Trophy size={14} /> },
-                        { label: "Recent Form", valA: Math.round(playerA.formTrend.reduce((a,b)=>a+b,0)/playerA.formTrend.length), valB: Math.round(playerB.formTrend.reduce((a,b)=>a+b,0)/playerB.formTrend.length), icon: <Activity size={14} /> },
-                        { label: "Clutch Peak", valA: playerA.attributes["Clutch"] || 85, valB: playerB.attributes["Clutch"] || 82, icon: <Zap size={14} /> },
-                        { label: "Win Probability", valA: playerA.overallRating > playerB.overallRating ? "54%" : "46%", valB: playerB.overallRating > playerA.overallRating ? "54%" : "46%", icon: <TrendingUp size={14} /> },
-                    ].map((insight, i) => (
-                        <div key={i} className="bg-[#0a0f1e]/60 border border-white/5 rounded-3xl p-6 hover:bg-white/[0.05] transition-all group/insight shadow-xl">
-                            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-4 flex items-center gap-2">
-                                {insight.icon} {insight.label}
-                            </p>
-                            <div className="flex items-center justify-between">
-                                <span className={cn("text-xl font-black", insight.valA > insight.valB ? "text-indigo-400" : "text-white/40")}>
-                                    {insight.valA}
-                                </span>
-                                <div className="h-[2px] flex-1 mx-4 bg-white/5 relative overflow-hidden rounded-full">
-                                    <div className={cn(
-                                        "absolute inset-y-0 w-1/2 rounded-full",
-                                        insight.valA > insight.valB ? "left-0 bg-indigo-500" : "right-0 bg-rose-500"
-                                    )} />
-                                </div>
-                                <span className={cn("text-xl font-black", insight.valB > insight.valA ? "text-rose-400" : "text-white/40")}>
-                                    {insight.valB}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
             </div>
 
-            {/* ═══ Stats & Analytics Grid ═══ */}
-            <div className="relative z-10 grid lg:grid-cols-2 gap-8">
+            {playerA && playerB && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 space-y-8">
+                    {/* ═══ Stats & Analytics Grid ═══ */}
+                    <div className="relative z-10 grid lg:grid-cols-2 gap-8">
                 {/* Radar: Attribute Comparison */}
                 <SectionCard icon={<Target size={24} />} title="Technical Attribute Radar" gradient>
                     <div className="h-[400px]">
@@ -671,34 +758,90 @@ export const PlayerComparison = () => {
                     </div>
 
                     {/* Stat Rows */}
-                    <div className="space-y-4 pt-4">
+                    <div className="space-y-3 pt-8 pb-4 relative">
+                        {/* Center decorative line */}
+                        <div className="absolute top-0 bottom-0 left-1/2 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent -translate-x-1/2 pointer-events-none" />
+                        
                         {statComparison.map((stat, i) => {
                             const valA = typeof stat.valA === 'number' ? stat.valA : parseFloat(String(stat.valA)) || 0;
                             const valB = typeof stat.valB === 'number' ? stat.valB : parseFloat(String(stat.valB)) || 0;
-                            const total = valA + valB || 1;
-                            const pctA = (valA / total) * 100;
+                            const maxVal = Math.max(valA, valB) || 1;
+                            const barWidthA = (valA / maxVal) * 100;
+                            const barWidthB = (valB / maxVal) * 100;
+                            const isATie = valA === valB;
 
                             return (
-                                <div key={i} className="group/stat">
-                                    <div className="flex justify-between items-center mb-2 px-2">
-                                        <div className="flex flex-col">
-                                            <span className={cn("text-lg font-black", valA > valB ? "text-indigo-400" : "text-white/40")}>{stat.valA}</span>
-                                        </div>
-                                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover/stat:text-white transition-colors uppercase">{stat.label}</span>
-                                        <div className="flex flex-col items-end">
-                                            <span className={cn("text-lg font-black", valB > valA ? "text-rose-400" : "text-white/40")}>{stat.valB}</span>
+                                <div key={i} className="relative py-4 group/stat hover:scale-[1.02] transition-transform duration-500">
+                                    {/* Glass Background Overlay */}
+                                    <div className="absolute inset-0 bg-[#0f172a]/40 rounded-2xl border border-white/5 shadow-2xl backdrop-blur-sm opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                                    {/* Center Badge */}
+                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                                        <div className="px-5 py-2 rounded-full bg-slate-950/90 border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur-xl group-hover/stat:border-white/30 group-hover/stat:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all">
+                                            <span className="text-[10px] font-black text-slate-300 group-hover/stat:text-white uppercase tracking-[0.3em] whitespace-nowrap">{stat.label}</span>
                                         </div>
                                     </div>
-                                    <div className="relative h-2 bg-slate-900 rounded-full overflow-hidden flex shadow-inner">
-                                        <div 
-                                            className="h-full transition-all duration-1000 shadow-[0_0_15px_rgba(99,102,241,0.5)]"
-                                            style={{ width: `${pctA}%`, background: `linear-gradient(90deg, #4f46e5, ${PLAYER_A_COLOR})` }}
-                                        />
-                                        <div 
-                                            className="h-full transition-all duration-1000 shadow-[0_0_15px_rgba(244,63,94,0.5)]"
-                                            style={{ width: `${100 - pctA}%`, background: `linear-gradient(90deg, ${PLAYER_B_COLOR}, #e11d48)` }}
-                                        />
-                                        <div className="absolute top-0 bottom-0 w-1 bg-white/40 left-1/2 -translate-x-1/2 z-10" />
+
+                                    {/* Content Flex Container */}
+                                    <div className="relative z-10 flex items-center justify-between px-4 md:px-8">
+                                        
+                                        {/* ─── PLAYER A SIDE ─── */}
+                                        <div className="flex-1 flex flex-col gap-3 max-w-[40%]">
+                                            <div className="flex items-end justify-between gap-3 px-1">
+                                                <div className="opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500">
+                                                    {(valA > valB) && <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest bg-indigo-500/10 px-2 py-1 rounded shadow-[0_0_10px_rgba(99,102,241,0.2)] animate-pulse">Leader</span>}
+                                                </div>
+                                                <span className={cn(
+                                                    "text-2xl md:text-3xl font-black tabular-nums tracking-tighter transition-all duration-500",
+                                                    valA > valB ? "text-indigo-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.6)]" : (isATie ? "text-slate-300" : "text-slate-600 group-hover/stat:text-slate-500")
+                                                )}>
+                                                    {stat.valA}
+                                                </span>
+                                            </div>
+                                            
+                                            {/* Bar Track */}
+                                            <div className="h-1.5 md:h-2 w-full bg-slate-800/40 rounded-full overflow-hidden flex justify-end shadow-inner">
+                                                <div 
+                                                    className="h-full rounded-l-full transition-all duration-1000 ease-out"
+                                                    style={{ 
+                                                        width: `${Math.max(2, barWidthA)}%`, 
+                                                        background: valA > valB ? `linear-gradient(270deg, ${PLAYER_A_COLOR}, #818cf8)` : (isATie ? '#64748b' : '#334155'),
+                                                        boxShadow: valA > valB ? `0 0 20px ${PLAYER_A_COLOR}` : 'none'
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Center Spacer */}
+                                        <div className="w-24 md:w-36 shrink-0" />
+
+                                        {/* ─── PLAYER B SIDE ─── */}
+                                        <div className="flex-1 flex flex-col gap-3 max-w-[40%]">
+                                            <div className="flex items-end justify-between flex-row-reverse gap-3 px-1">
+                                                <div className="opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500">
+                                                    {(valB > valA) && <span className="text-[8px] font-black text-rose-400 uppercase tracking-widest bg-rose-500/10 px-2 py-1 rounded shadow-[0_0_10px_rgba(244,63,94,0.2)] animate-pulse">Leader</span>}
+                                                </div>
+                                                <span className={cn(
+                                                    "text-2xl md:text-3xl font-black tabular-nums tracking-tighter transition-all duration-500",
+                                                    valB > valA ? "text-rose-400 drop-shadow-[0_0_15px_rgba(244,63,94,0.6)]" : (isATie ? "text-slate-300" : "text-slate-600 group-hover/stat:text-slate-500")
+                                                )}>
+                                                    {stat.valB}
+                                                </span>
+                                            </div>
+
+                                            {/* Bar Track */}
+                                            <div className="h-1.5 md:h-2 w-full bg-slate-800/40 rounded-full overflow-hidden flex justify-start shadow-inner">
+                                                <div 
+                                                    className="h-full rounded-r-full transition-all duration-1000 ease-out"
+                                                    style={{ 
+                                                        width: `${Math.max(2, barWidthB)}%`, 
+                                                        background: valB > valA ? `linear-gradient(90deg, ${PLAYER_B_COLOR}, #fb7185)` : (isATie ? '#64748b' : '#334155'),
+                                                        boxShadow: valB > valA ? `0 0 20px ${PLAYER_B_COLOR}` : 'none'
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             );
@@ -706,6 +849,8 @@ export const PlayerComparison = () => {
                     </div>
                 </div>
             </SectionCard>
+                </div>
+            )}
         </div>
     );
 };
