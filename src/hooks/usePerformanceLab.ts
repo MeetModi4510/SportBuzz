@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { getPerformanceLabSquad, getPerformanceLabPlayerStats } from '../services/cricketApi';
 
 export function usePerformanceLabSquad(teamId: string) {
@@ -7,6 +7,17 @@ export function usePerformanceLabSquad(teamId: string) {
         queryFn: () => getPerformanceLabSquad(teamId),
         staleTime: 5 * 60 * 1000, // 5 minutes caching in React Query
         refetchOnWindowFocus: false,
+    });
+}
+
+export function usePerformanceLabSquads(teamIds: string[]) {
+    return useQueries({
+        queries: teamIds.map((teamId) => ({
+            queryKey: ['performanceLabSquad', teamId],
+            queryFn: () => getPerformanceLabSquad(teamId),
+            staleTime: 5 * 60 * 1000,
+            refetchOnWindowFocus: false,
+        }))
     });
 }
 

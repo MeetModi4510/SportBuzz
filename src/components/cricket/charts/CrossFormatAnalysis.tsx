@@ -11,7 +11,8 @@ interface CrossFormatAnalysisProps {
         odi: any;
         t20i: any;
         ipl: any;
-    }
+    };
+    skillMode?: 'batting' | 'bowling';
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -77,8 +78,13 @@ const GaugeChart = ({ format, value, color, max = 200 }: { format: string, value
     );
 };
 
-export function CrossFormatAnalysis({ stats }: CrossFormatAnalysisProps) {
+export function CrossFormatAnalysis({ stats, skillMode = 'batting' }: CrossFormatAnalysisProps) {
     const safeStats = stats || {};
+    const isBowling = skillMode === 'bowling';
+
+    const titleRuns = isBowling ? 'RUNS CONCEDED' : 'CAREER RUNS';
+    const titleAvg = isBowling ? 'BOWLING AVERAGE' : 'BATTING AVERAGE';
+    const titleSR = isBowling ? 'BOWLING STRIKE RATE' : 'STRIKE RATE TELEMETRY';
     
     const rawData = [
         { name: 'Test', runs: parseInt(safeStats.test?.runs) || 0, avg: parseFloat(safeStats.test?.average) || 0, sr: parseFloat(safeStats.test?.strikeRate) || 0, fill: '#eab308', fifties: parseInt(safeStats.test?.fifties) || 0, hundreds: parseInt(safeStats.test?.hundreds) || 0 }, // amber-500
@@ -94,16 +100,13 @@ export function CrossFormatAnalysis({ stats }: CrossFormatAnalysisProps) {
         bgTrack: maxRuns
     }));
 
-    const odiFours = parseInt(safeStats.odi?.fours) || 0;
-    const odiSixes = parseInt(safeStats.odi?.sixes) || 0;
-    const odiTotalRuns = parseInt(safeStats.odi?.runs) || 0;
-    const boundaryRuns = (odiFours * 4) + (odiSixes * 6);
-    const nonBoundaryRuns = Math.max(0, odiTotalRuns - boundaryRuns);
-
-    const pieData = [
-        { name: 'Boundaries', value: boundaryRuns, fill: 'url(#colorBoundaries)' },
-        { name: 'Running', value: nonBoundaryRuns, fill: 'url(#colorRunning)' },
-    ];
+    const formatPieData = data.map(d => ({
+        name: d.name,
+        value: d.runs,
+        fill: d.fill
+    })).filter(d => d.value > 0);
+    
+    const totalRunsAllFormats = formatPieData.reduce((sum, d) => sum + d.value, 0);
 
     const hasMilestones = data.some(d => d.fifties > 0 || d.hundreds > 0);
 
@@ -148,7 +151,7 @@ export function CrossFormatAnalysis({ stats }: CrossFormatAnalysisProps) {
                 {/* 1. Career Runs Distribution (Donut PieChart) */}
                 <div className="xl:col-span-1 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg">
                     <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-4 z-10 relative">Career Runs</h4>
+                    <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-4 z-10 relative">{titleRuns}</h4>
                     <div className="h-64 relative flex justify-center items-center">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
@@ -178,7 +181,7 @@ export function CrossFormatAnalysis({ stats }: CrossFormatAnalysisProps) {
                 {/* 2. Average Radial Rings */}
                 <div className="xl:col-span-1 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg">
                     <div className="absolute inset-0 bg-gradient-to-t from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-4 z-10 relative">Batting Average</h4>
+                    <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-4 z-10 relative">{titleAvg}</h4>
                     <div className="h-64 relative flex justify-center items-center">
                         <ResponsiveContainer width="100%" height="100%">
                             <RadialBarChart cx="50%" cy="50%" innerRadius="25%" outerRadius="100%" barSize={16} data={data} startAngle={90} endAngle={-270}>
@@ -199,7 +202,7 @@ export function CrossFormatAnalysis({ stats }: CrossFormatAnalysisProps) {
 
                 {/* 3. Strike Rate Dashboards */}
                 <div className="xl:col-span-2 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden shadow-lg">
-                    <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-6">Strike Rate Telemetry</h4>
+                    <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-6">{titleSR}</h4>
                     <div className="flex flex-col sm:flex-row justify-around gap-6 h-60">
                         {data.map((d, i) => (
                             <div key={i} className="flex-1 bg-white/[0.01] rounded-2xl border border-white/[0.02] flex flex-col items-center justify-center p-4 relative overflow-hidden group">
@@ -232,42 +235,34 @@ export function CrossFormatAnalysis({ stats }: CrossFormatAnalysisProps) {
                     </div>
                 )}
 
-                {/* 5. Run Distribution Hologram */}
-                {odiTotalRuns > 0 && (
+                {/* 5. Format Runs Distribution Hologram */}
+                {totalRunsAllFormats > 0 && (
                     <div className="md:col-span-2 xl:col-span-3 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden shadow-lg flex flex-col md:flex-row items-center gap-6">
                         <div className="flex-1 min-w-[200px]">
-                            <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-1">ODI Shot Distribution</h4>
-                            <p className="text-[11px] text-zinc-400 mb-4">Boundary percentage vs Running between wickets</p>
+                            <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-1">FORMAT DISTRIBUTION</h4>
+                            <p className="text-[11px] text-zinc-400 mb-4">{isBowling ? 'Runs conceded across formats' : 'Runs scored across formats'}</p>
                             
                             <div className="flex flex-col gap-3 mt-6">
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.03]">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-2.5 h-2.5 rounded-full bg-violet-400 shadow-[0_0_8px_rgba(139,92,246,0.8)]"></div>
-                                        <span className="text-xs text-white font-medium">Boundaries</span>
+                                {formatPieData.map((d, idx) => (
+                                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.03]">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: d.fill, color: d.fill }}></div>
+                                            <span className="text-xs text-white font-medium">{d.name}</span>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="text-sm font-bold text-white">{d.value.toLocaleString()}</span>
+                                            <span className="text-[10px] text-zinc-500 ml-2">({Math.round((d.value/totalRunsAllFormats)*100)}%)</span>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <span className="text-sm font-bold text-white">{boundaryRuns}</span>
-                                        <span className="text-[10px] text-zinc-500 ml-2">({Math.round((boundaryRuns/odiTotalRuns)*100)}%)</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.03]">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(14,165,233,0.8)]"></div>
-                                        <span className="text-xs text-white font-medium">Running</span>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className="text-sm font-bold text-white">{nonBoundaryRuns}</span>
-                                        <span className="text-[10px] text-zinc-500 ml-2">({Math.round((nonBoundaryRuns/odiTotalRuns)*100)}%)</span>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
 
                         <div className="flex-1 h-64 w-full relative flex items-center justify-center">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
-                                    <Pie data={pieData} cx="50%" cy="50%" innerRadius="65%" outerRadius="90%" paddingAngle={5} dataKey="value" stroke="none" cornerRadius={6}>
-                                        {pieData.map((entry, index) => (
+                                    <Pie data={formatPieData} cx="50%" cy="50%" innerRadius="65%" outerRadius="90%" paddingAngle={5} dataKey="value" stroke="none" cornerRadius={6}>
+                                        {formatPieData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.fill} />
                                         ))}
                                     </Pie>
@@ -275,8 +270,8 @@ export function CrossFormatAnalysis({ stats }: CrossFormatAnalysisProps) {
                                 </PieChart>
                             </ResponsiveContainer>
                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                <span className="text-4xl font-bold text-white tracking-tight">{odiTotalRuns}</span>
-                                <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-bold mt-2">Total Runs</span>
+                                <span className="text-4xl font-bold text-white tracking-tight">{totalRunsAllFormats.toLocaleString()}</span>
+                                <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-bold mt-2">Total {isBowling ? 'Conceded' : 'Runs'}</span>
                             </div>
                         </div>
                     </div>

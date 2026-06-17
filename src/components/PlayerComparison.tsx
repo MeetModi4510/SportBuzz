@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 
 import { usePlayerBattingStats } from '@/hooks/usePlayerBattingStats';
-import { usePerformanceLabPlayerStats, usePerformanceLabSquad } from '@/hooks/usePerformanceLab';
+import { usePerformanceLabPlayerStats, usePerformanceLabSquad, usePerformanceLabSquads } from '@/hooks/usePerformanceLab';
 import { getCricbuzzPlayerId } from '@/data/cricbuzzPlayerIds';
 import type { BattingFormatKey } from '@/types/playerBattingTypes';
 import { FORMAT_COLORS, FORMAT_LABELS } from '@/utils/playerStatsTransformer';
@@ -372,28 +372,51 @@ export const PlayerComparison = () => {
     const [playerAId, setPlayerAId] = useState<string>("");
     const [playerBId, setPlayerBId] = useState<string>("");
 
-    const { data: squadData, isLoading: loadingSquad } = usePerformanceLabSquad('india-2');
+    const CRICKET_TEAMS = useMemo(() => ['india-2', 'australia-4', 'england-9', 'pakistan-3', 'south-africa-11', 'new-zealand-13'], []);
+    const squadQueries = usePerformanceLabSquads(selectedSport === 'cricket' ? CRICKET_TEAMS : []);
+    const [squadFilters, setSquadFilters] = useState<string[]>([]);
+    
+    const toggleSquadFilter = (teamId: string) => {
+        setSquadFilters(prev => prev.includes(teamId) ? prev.filter(id => id !== teamId) : [...prev, teamId]);
+    };
 
     const sportPlayers = useMemo(() => {
-        if (selectedSport === 'cricket' && squadData?.players) {
-            return squadData.players.map((p: any) => ({
-                id: p.espnId || p.id,
-                name: p.name,
-                country: 'India',
-                countryFlag: '🇮🇳',
-                role: p.role || 'Player',
-                photo: p.imageUrl,
-                overallRating: 85, // Computed dynamically later
-                attributes: {}, // Computed dynamically later
-                formTrend: [], // Computed dynamically later
-                detailedStats: {} // Computed dynamically later
-            }));
+        if (selectedSport === 'cricket' && squadQueries.some(q => q.data?.players)) {
+            const players: any[] = [];
+            squadQueries.forEach((query, index) => {
+                if (!query.data?.players) return;
+                const teamId = CRICKET_TEAMS[index];
+                if (squadFilters.length > 0 && !squadFilters.includes(teamId)) return;
+                
+                const TEAM_META: Record<string, {name: string, iso: string}> = {
+                    'india-2': {name: 'India', iso: 'in'},
+                    'australia-4': {name: 'Australia', iso: 'au'},
+                    'england-9': {name: 'England', iso: 'gb-eng'},
+                    'pakistan-3': {name: 'Pakistan', iso: 'pk'},
+                    'south-africa-11': {name: 'South Africa', iso: 'za'},
+                    'new-zealand-13': {name: 'New Zealand', iso: 'nz'}
+                };
+                const meta = TEAM_META[teamId] || {name: teamId, iso: 'un'};
+
+                query.data.players.forEach((p: any) => {
+                    players.push({
+                        id: p.espnId || p.id,
+                        name: p.name,
+                        country: meta.name,
+                        countryFlag: meta.iso,
+                        role: p.role || 'Player',
+                        photo: p.imageUrl,
+                        overallRating: 85,
+                        attributes: {},
+                        formTrend: [],
+                        detailedStats: {}
+                    });
+                });
+            });
+            return players;
         }
         return ANALYSIS_PLAYERS[selectedSport] || [];
-    }, [selectedSport, squadData]);
-
-    // Initial player selection when sport changes
-    // Removed auto-selection to allow empty state
+    }, [selectedSport, squadQueries, squadFilters]);
 
     const playerA = sportPlayers.find(p => p.id === playerAId || String(p.id) === String(playerAId)) || null;
     const playerB = sportPlayers.find(p => p.id === playerBId || String(p.id) === String(playerBId)) || null;
@@ -529,6 +552,44 @@ export const PlayerComparison = () => {
 
     return (
         <div className="space-y-8 animate-fade-in overflow-visible pb-20">
+            {selectedSport === 'cricket' && (
+                <div className="flex overflow-x-auto hide-scrollbar gap-3 mb-6 pb-2">
+                    {squadQueries.map((query, index) => {
+                        const teamId = CRICKET_TEAMS[index];
+                        const TEAM_META: Record<string, {name: string, iso: string}> = {
+                            'india-2': {name: 'India', iso: 'in'},
+                            'australia-4': {name: 'Australia', iso: 'au'},
+                            'england-9': {name: 'England', iso: 'gb-eng'},
+                            'pakistan-3': {name: 'Pakistan', iso: 'pk'},
+                            'south-africa-11': {name: 'South Africa', iso: 'za'},
+                            'new-zealand-13': {name: 'New Zealand', iso: 'nz'}
+                        };
+                        const meta = TEAM_META[teamId] || {name: teamId, iso: 'un'};
+                        const teamName = meta.name;
+                        const flagImgUrl = query.data?.flagUrl?.includes('http') ? query.data.flagUrl : `https://flagcdn.com/w40/${meta.iso}.png`;
+                        const isActive = squadFilters.includes(teamId);
+
+                        return (
+                            <button
+                                key={teamId}
+                                onClick={() => toggleSquadFilter(teamId)}
+                                className={cn(
+                                    "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border shrink-0",
+                                    isActive
+                                        ? "bg-slate-800 text-white border-white/20 shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
+                                        : "bg-slate-900/50 text-slate-500 border-white/5 hover:bg-slate-800/80 hover:text-slate-300"
+                                )}
+                            >
+                                <div className="w-[18px] h-[13px] rounded-sm overflow-hidden bg-slate-800 border border-white/10 shrink-0 shadow-sm flex items-center justify-center">
+                                    <img src={flagImgUrl} alt={teamName} className="w-full h-full object-cover" />
+                                </div>
+                                <span className="uppercase tracking-widest">{teamName}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+            
             {/* ═══ Sport Selector ═══ */}
             <div className="flex flex-wrap gap-3 justify-center mb-12">
                 {(Object.keys(SPORT_LABELS) as AnalysisSport[]).map((sport) => {

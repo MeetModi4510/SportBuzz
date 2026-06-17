@@ -260,7 +260,7 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
 
                         {/* Cross Format Analysis (Full Width Matrix) */}
                         <div className="w-full">
-                            <CrossFormatAnalysis stats={playerData.stats?.[skillMode]} />
+                            <CrossFormatAnalysis stats={playerData.stats?.[skillMode]} skillMode={skillMode as any} />
                         </div>
                         
                         {/* Opposition Stats */}
