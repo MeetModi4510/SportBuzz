@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { cricketApi } from '@/services/api';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-export type FieldType = 'matchInfo' | 'commentary' | 'cbScorecard' | 'cbSquads' | 'cbCommentary';
+export type FieldType = 'matchInfo' | 'commentary' | 'cbScorecard' | 'cbSquads' | 'cbCommentary' | 'cbFullCommentary';
 
 interface CacheEntry {
     data: any;
@@ -98,6 +98,10 @@ export function useMatchFieldData(
             } else if (field === 'cbCommentary') {
                 // Cricbuzz highlight commentary
                 const response = await cricketApi.getCricbuzzCommentary(cleanId);
+                result = response?.data || null;
+            } else if (field === 'cbFullCommentary') {
+                // Full Cricbuzz commentary scraped from the full-commentary page
+                const response = await cricketApi.getCricbuzzFullCommentary(cleanId, slug);
                 result = response?.data || null;
             }
 

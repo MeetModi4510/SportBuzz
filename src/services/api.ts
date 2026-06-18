@@ -74,6 +74,8 @@ export const cricketApi = {
     getCricbuzzCommentary: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/commentary`),
     getCricbuzzSummary: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/summary`),
     getCricbuzzInfo: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/info`),
+    getCricbuzzFullCommentary: (matchId: string, slug?: string) =>
+        api.get(`cricket/cb/full-commentary/${matchId}${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`),
     getFeaturedMatches: async () => {
         try {
             const res = await api.get('featured/matches');

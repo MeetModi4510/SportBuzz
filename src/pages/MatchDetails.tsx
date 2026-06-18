@@ -101,6 +101,7 @@ const MatchDetails = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null);
   const [activeTab, setActiveTab] = useState('summary');
+  const [activeInningsTab, setActiveInningsTab] = useState<number | 'preview'>(-1);
   const [activeInningsIndex, setActiveInningsIndex] = useState<number>(-1);
 
   // Reset tab & index when navigating to a different match
@@ -242,6 +243,20 @@ const MatchDetails = () => {
     return `${t1}-vs-${t2}-${mType}`.replace(/[^a-z0-9-]/g, '');
   })();
 
+  // Build a full commentary slug that matches Cricbuzz's URL format:
+  // e.g. "eng-vs-nz-2nd-test-new-zealand-tour-of-england-2026"
+  // We try to use the match id from the URL itself as it's most accurate
+  const commentarySlug = (() => {
+    // If this is a Cricbuzz match (numeric ID), we can build a slug from match data
+    if (!cleanMatchId || !isCricketMatch) return undefined;
+    const t1 = (match?.homeTeam?.shortName || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    const t2 = (match?.awayTeam?.shortName || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    const mType = (match?.matchType || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    if (!t1 || !t2) return cricbuzzSlug;
+    // Return minimal slug — server will auto-resolve
+    return `${t1}-vs-${t2}${mType ? `-${mType}` : ''}`.replace(/[^a-z0-9-]/g, '');
+  })();
+
   const cbScorecardField = useMatchFieldData(
     cleanMatchId,
     'cbScorecard',
@@ -259,6 +274,14 @@ const MatchDetails = () => {
     cleanMatchId,
     'cbCommentary',
     activeTab === 'commentary'
+  );
+
+  // ── Full Commentary from Cricbuzz HTML page scraper ───────────────────────
+  const cbFullCommentaryField = useMatchFieldData(
+    isCricketMatch ? cleanMatchId : undefined,
+    'cbFullCommentary',
+    activeTab === 'commentary',
+    commentarySlug
   );
 
   // Dynamic Live Summary & Match Facts (Fetch unconditionally for live headers)
@@ -1819,189 +1842,397 @@ const MatchDetails = () => {
 
 
             <TabsContent value="commentary" className="animate-fade-in">
-              <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-foreground">Commentary</h3>
-                  {isLive && (
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              <div className="bg-card border border-border rounded-xl overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-border/40 bg-muted/10">
+                  <div className="flex items-center gap-3">
+                    <MessageSquare className="w-4 h-4 text-primary" />
+                    <h3 className="font-semibold text-foreground tracking-tight">Commentary</h3>
+                    {isCricketMatch && (
+                      <span className="text-[10px] font-bold text-primary/70 uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-full">
+                        Cricbuzz
                       </span>
-                      Live Updates
+                    )}
+                  </div>
+                  {(isLive || cbFullCommentaryField.loading) && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      {cbFullCommentaryField.loading ? (
+                        <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                      ) : (
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                        </span>
+                      )}
+                      {cbFullCommentaryField.loading ? 'Loading...' : 'Live Updates'}
                     </div>
                   )}
                 </div>
 
-                {match?.sport === 'football' ? (
-                  isUpcoming ? (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <MessageSquare className="mx-auto h-12 w-12 mb-3 opacity-10" />
-                      <p>Match not started yet — commentary will be available once play begins.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {(() => {
-                        const seed = (match.id || "").length;
-                        const homeTeam = match.homeTeam?.shortName || match.homeTeam?.name || "Home";
-                        const awayTeam = match.awayTeam?.shortName || match.awayTeam?.name || "Away";
-                        
-                        const events = [];
-                        
-                        if (match.details?.incidents) {
-                          match.details.incidents.forEach((inc: any) => {
-                            let type = 'info';
-                            if (inc.incidentType === 'goal') type = 'goal';
-                            else if (inc.incidentClass === 'yellow') type = 'yellow';
-                            else if (inc.incidentClass === 'red') type = 'red';
-                            else if (inc.incidentType === 'substitution') type = 'sub';
-
-                            const teamName = inc.isHome ? homeTeam : awayTeam;
-                            let text = inc.text || inc.incidentType;
-                            if (inc.player?.name) {
-                              text = `${inc.player.name} (${inc.incidentType})`;
-                              if (inc.assist1?.name) text += ` - Assist: ${inc.assist1.name}`;
-                            }
-
-                            events.push({
-                              minute: inc.time,
-                              type,
-                              team: teamName,
-                              text
+                <div className="p-6 space-y-4">
+                  {match?.sport === 'football' ? (
+                    /* ── Football events ──────────────────────────────────── */
+                    isUpcoming ? (
+                      <div className="text-center py-12 text-muted-foreground">
+                        <MessageSquare className="mx-auto h-12 w-12 mb-3 opacity-10" />
+                        <p>Match not started yet — commentary will be available once play begins.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {(() => {
+                          const homeTeam = match.homeTeam?.shortName || match.homeTeam?.name || "Home";
+                          const awayTeam = match.awayTeam?.shortName || match.awayTeam?.name || "Away";
+                          const events: any[] = [];
+                          if (match.details?.incidents) {
+                            match.details.incidents.forEach((inc: any) => {
+                              let type = 'info';
+                              if (inc.incidentType === 'goal') type = 'goal';
+                              else if (inc.incidentClass === 'yellow') type = 'yellow';
+                              else if (inc.incidentClass === 'red') type = 'red';
+                              else if (inc.incidentType === 'substitution') type = 'sub';
+                              const teamName = inc.isHome ? homeTeam : awayTeam;
+                              let text = inc.text || inc.incidentType;
+                              if (inc.player?.name) {
+                                text = `${inc.player.name} (${inc.incidentType})`;
+                                if (inc.assist1?.name) text += ` - Assist: ${inc.assist1.name}`;
+                              }
+                              events.push({ minute: inc.time, type, team: teamName, text });
                             });
-                          });
-                        } else if (match.goals && match.goals.length > 0) {
-                          match.goals.forEach((g: any) => {
-                            events.push({ minute: g.minute, type: 'goal', team: g.teamId === match.homeTeam?.id ? homeTeam : awayTeam, text: `GOAL! ${g.player} scores for ${g.teamId === match.homeTeam?.id ? homeTeam : awayTeam}! ${g.assist ? `Assist by ${g.assist}.` : 'Brilliant finish.'}` });
-                          });
-                        }
-                        
-                        if (events.length === 0) {
-                          return (
-                            <div className="bg-card border border-border rounded-xl p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[200px]">
-                              <AlertTriangle className="h-8 w-8 text-muted-foreground/50" />
-                              <p className="text-sm text-muted-foreground">Commentary and incidents not available for this match</p>
+                          } else if (match.goals && match.goals.length > 0) {
+                            match.goals.forEach((g: any) => {
+                              events.push({ minute: g.minute, type: 'goal', team: g.teamId === match.homeTeam?.id ? homeTeam : awayTeam, text: `GOAL! ${g.player} scores for ${g.teamId === match.homeTeam?.id ? homeTeam : awayTeam}! ${g.assist ? `Assist by ${g.assist}.` : 'Brilliant finish.'}` });
+                            });
+                          }
+                          if (events.length === 0) {
+                            return (
+                              <div className="text-center py-12 text-muted-foreground">
+                                <AlertTriangle className="h-8 w-8 mb-3 opacity-30 mx-auto" />
+                                <p className="text-sm">Commentary and incidents not available for this match</p>
+                              </div>
+                            );
+                          }
+                          const sortedEvents = events.sort((a, b) => b.minute - a.minute);
+                          return sortedEvents.map((evt, idx) => (
+                            <div key={idx} className="relative pl-8 pb-3 last:pb-0 border-l border-border/60 last:border-l-0">
+                              <div className={cn("absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full", evt.type === 'goal' ? "bg-green-500" : evt.type === 'yellow' ? "bg-yellow-400" : evt.type === 'red' ? "bg-red-500" : evt.type === 'sub' ? "bg-blue-400" : "bg-primary/60")} />
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-bold font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">{evt.minute}'</span>
+                                <span className="text-xs font-medium text-muted-foreground">{evt.team}</span>
+                              </div>
+                              <p className={cn("text-sm leading-relaxed p-3 rounded-lg border", evt.type === 'goal' ? "bg-green-500/10 border-green-500/20 text-foreground font-medium" : evt.type === 'info' ? "bg-secondary/50 border-border text-foreground font-medium text-center" : "bg-secondary/30 border-border/50 text-foreground/80")}>{evt.text}</p>
                             </div>
-                          );
-                        }
-                        
-                        // Sort events by minute descending
-                        const sortedEvents = events.sort((a, b) => b.minute - a.minute);
-                        
-                        // If live, filter events past current minute
-                        const currentMinStr = match.currentMinute ? match.currentMinute.replace(/\D/g, '') : '90';
-                        const currentMin = parseInt(currentMinStr) || 90;
-                        const visibleEvents = isLive ? sortedEvents.filter(e => e.minute <= currentMin) : sortedEvents;
-                        
-                        return visibleEvents.map((evt, idx) => (
-                          <div key={idx} className="relative pl-8 pb-3 last:pb-0 border-l border-border/60 last:border-l-0">
-                            <div className={cn(
-                              "absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full flex items-center justify-center text-[8px]",
-                              evt.type === 'goal' ? "bg-green-500" :
-                              evt.type === 'yellow' ? "bg-yellow-400" :
-                              evt.type === 'red' ? "bg-red-500" :
-                              evt.type === 'sub' ? "bg-blue-400" : "bg-primary/60"
-                            )}>
-                              {evt.type === 'goal' ? '⚽' : ''}
+                          ));
+                        })()}
+                      </div>
+                    )
+                  ) : cbFullCommentaryField.loading ? (
+                    /* ── Loading state ─────────────────────────────────────── */
+                    <div className="space-y-3">
+                      {[...Array(6)].map((_, i) => (
+                        <div key={i} className="flex gap-4 animate-pulse">
+                          <div className="w-12 h-12 rounded-lg bg-muted/40 shrink-0" />
+                          <div className="flex-1 space-y-2 pt-1">
+                            <div className="h-3 bg-muted/40 rounded w-24" />
+                            <div className="h-4 bg-muted/30 rounded w-full" />
+                            <div className="h-4 bg-muted/20 rounded w-3/4" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : cbFullCommentaryField.data?.commentary && cbFullCommentaryField.data.commentary.length > 0 ? (
+                    /* ── Full Cricbuzz Commentary ──────────────────────────── */
+                    (() => {
+                      const items: any[] = cbFullCommentaryField.data.commentary;
+                      // Group by innings
+                      const byInnings: Record<number, any[]> = {};
+                      items.forEach(item => {
+                        if (!byInnings[item.inningsId]) byInnings[item.inningsId] = [];
+                        byInnings[item.inningsId].push(item);
+                      });
+
+                      const inningsIds = Object.keys(byInnings).map(Number).sort((a, b) => a - b);
+                      
+                      const effectiveTab = activeInningsTab === -1 ? (inningsIds.length > 0 ? inningsIds[inningsIds.length - 1] : 'preview') : activeInningsTab;
+                      const displayInnIds = effectiveTab === 'preview' ? [] : [effectiveTab as number].filter(id => byInnings[id]);
+
+                      return (
+                        <div className="space-y-8">
+                          {/* Innings Tabs */}
+                          <div className="flex flex-wrap gap-3 mb-4 border-b pb-3">
+                            <button
+                              onClick={() => setActiveInningsTab('preview')}
+                              className={cn("px-4 py-1.5 rounded-full text-sm font-medium transition-colors", effectiveTab === 'preview' ? "bg-primary text-primary-foreground shadow-sm" : "bg-secondary text-secondary-foreground hover:bg-primary/20")}
+                            >
+                              Preview
+                            </button>
+                            {inningsIds.map(id => {
+                              // A guess on team name mapping. Usually 1st innings is Team 1 or 2 based on toss, but we can just use generic if unknown
+                              const t1 = match?.homeTeam?.shortName || "Team 1";
+                              const t2 = match?.awayTeam?.shortName || "Team 2";
+                              const tabName = id === 1 ? `${t1} Innings` : id === 2 ? `${t2} Innings` : `Innings ${id}`;
+                              
+                              return (
+                                <button
+                                  key={id}
+                                  onClick={() => setActiveInningsTab(id)}
+                                  className={cn("px-4 py-1.5 rounded-full text-sm font-medium transition-colors", effectiveTab === id ? "bg-primary text-primary-foreground shadow-sm" : "bg-secondary text-secondary-foreground hover:bg-primary/20")}
+                                >
+                                  {tabName}
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {effectiveTab === 'preview' && (
+                            <div className="p-8 bg-secondary/10 rounded-xl text-center border">
+                              <p className="text-muted-foreground font-medium">Match Preview & Updates</p>
+                              <p className="text-sm mt-2 text-muted-foreground/70">Click an innings tab above to view ball-by-ball commentary.</p>
                             </div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-bold font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                                {evt.minute}'
-                              </span>
-                              <span className="text-xs font-medium text-muted-foreground">{evt.team}</span>
-                            </div>
-                            <p className={cn(
-                              "text-sm leading-relaxed p-3 rounded-lg border",
-                              evt.type === 'goal' ? "bg-green-500/10 border-green-500/20 text-foreground font-medium" :
-                              evt.type === 'info' ? "bg-secondary/50 border-border text-foreground font-medium text-center" :
-                              "bg-secondary/30 border-border/50 text-foreground/80"
-                            )}>
-                              {evt.text}
+                          )}
+
+                          {displayInnIds.map((innId) => {
+                            const innItems = byInnings[innId]; // Do not reverse: keep latest first for over grouping
+                            // Group by over
+                            const byOver: Record<number, any[]> = {};
+                            innItems.forEach((item: any) => {
+                              const ov = item.overNum ?? -1;
+                              if (!byOver[ov]) byOver[ov] = [];
+                              byOver[ov].push(item);
+                            });
+                            const overKeys = Object.keys(byOver).map(Number).sort((a, b) => b - a);
+
+                            return (
+                              <div key={innId} className="space-y-5">
+
+                                {overKeys.map((ov) => {
+                                  const overItems = byOver[ov];
+                                  const isSpecialOver = ov < 0;
+
+                                  return (
+                                    <div key={ov} className="space-y-2">
+                                      {/* Over label */}
+                                      {!isSpecialOver && (
+                                        <div className="flex items-center gap-2 mb-2">
+                                          <div className="px-2.5 py-1 bg-primary/15 text-primary text-[11px] font-bold rounded-md tracking-wide">
+                                            Over {ov + 1}
+                                          </div>
+                                          <div className="h-px flex-1 bg-border/30" />
+                                        </div>
+                                      )}
+
+                                      {/* Commentary items */}
+                                      {overItems.map((item: any, idx: number) => {
+                                        const evt = item.event || 'NONE';
+                                        const isWicket = evt === 'WICKET';
+                                        const isSix = evt === 'SIX';
+                                        const isFour = evt === 'FOUR';
+                                        const isNoBall = evt === 'NOBALL';
+                                        const isWide = evt === 'WIDE';
+                                        const isOverComplete = evt === 'OVER_BREAK';
+
+                                        const dotColor = isWicket ? 'bg-red-500' :
+                                          isSix ? 'bg-amber-400' :
+                                          isFour ? 'bg-blue-400' :
+                                          isNoBall ? 'bg-orange-400' :
+                                          isWide ? 'bg-purple-400' :
+                                          isOverComplete ? 'bg-emerald-500' :
+                                          'bg-muted-foreground/30';
+
+                                        const cardBg = isWicket ? 'bg-red-500/8 border-red-500/20' :
+                                          isSix ? 'bg-amber-500/8 border-amber-500/20' :
+                                          isFour ? 'bg-blue-500/8 border-blue-500/20' :
+                                          isOverComplete ? 'bg-emerald-500/8 border-emerald-500/20' :
+                                          'bg-secondary/20 border-border/40';
+
+                                        const eventIcon = isWicket ? '🏏' :
+                                          isSix ? '🔥' :
+                                          isFour ? '🏃' :
+                                          isNoBall ? '🚫' :
+                                          isWide ? '↔️' :
+                                          isOverComplete ? '🔔' : '';
+
+                                        const eventLabel = isWicket ? 'WICKET' :
+                                          isSix ? 'SIX' :
+                                          isFour ? 'FOUR' :
+                                          isNoBall ? 'NO BALL' :
+                                          isWide ? 'WIDE' :
+                                          isOverComplete ? 'OVER' : '';
+
+                                        return (
+                                          <div
+                                            key={idx}
+                                            className={cn(
+                                              "relative flex gap-3 p-4 rounded-xl border transition-all",
+                                              cardBg,
+                                              (isWicket || isSix) && "shadow-sm"
+                                            )}
+                                          >
+                                            {/* Left: over.ball indicator */}
+                                            <div className="shrink-0 flex flex-col items-center gap-1 pt-0.5">
+                                              <div className={cn("w-2.5 h-2.5 rounded-full", dotColor)} />
+                                              {!isSpecialOver && item.ballNbr > 0 && (
+                                                <span className="text-[9px] font-mono text-muted-foreground/60 leading-none">
+                                                  {ov}.{item.ballInOver || (item.ballNbr % 6)}
+                                                </span>
+                                              )}
+                                            </div>
+
+                                            {/* Center: text */}
+                                            <div className="flex-1 min-w-0">
+                                              {/* Event badge + batsman/bowler context */}
+                                              <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                                                {eventLabel && (
+                                                  <span className={cn(
+                                                    "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full",
+                                                    isWicket ? "bg-red-500/20 text-red-400" :
+                                                    isSix ? "bg-amber-500/20 text-amber-400" :
+                                                    isFour ? "bg-blue-500/20 text-blue-400" :
+                                                    isOverComplete ? "bg-emerald-500/20 text-emerald-400" :
+                                                    "bg-muted/40 text-muted-foreground"
+                                                  )}>
+                                                    {eventIcon && <span>{eventIcon}</span>}
+                                                    {eventLabel}
+                                                  </span>
+                                                )}
+                                                {item.batsman && (
+                                                  <span className="text-[11px] font-semibold text-foreground/80">
+                                                    {item.batsman}
+                                                    {item.batsmanRuns != null && (
+                                                      <span className="ml-1 text-muted-foreground font-normal">
+                                                        ({item.batsmanRuns}{item.batsmanBalls != null ? `/${item.batsmanBalls}b` : ''})
+                                                      </span>
+                                                    )}
+                                                  </span>
+                                                )}
+                                                {item.batsman && item.bowler && (
+                                                  <span className="text-muted-foreground/40 text-[10px]">·</span>
+                                                )}
+                                                {item.bowler && (
+                                                  <span className="text-[11px] text-muted-foreground">
+                                                    {item.bowler}
+                                                  </span>
+                                                )}
+                                              </div>
+
+                                              {/* Commentary text */}
+                                              <p className={cn(
+                                                "text-sm leading-relaxed",
+                                                isWicket ? "text-foreground font-semibold" :
+                                                isSix ? "text-foreground font-medium" :
+                                                isFour ? "text-foreground/90" :
+                                                "text-foreground/80"
+                                              )}>
+                                                {item.commText}
+                                              </p>
+                                            </div>
+
+                                            {/* Right: runs badge for scoring balls */}
+                                            {item.legalRuns != null && item.legalRuns > 0 && !isWicket && (
+                                              <div className="shrink-0 self-center">
+                                                <div className={cn(
+                                                  "w-8 h-8 rounded-full flex items-center justify-center text-sm font-black border-2",
+                                                  isSix ? "bg-amber-500/20 border-amber-500/40 text-amber-400" :
+                                                  isFour ? "bg-blue-500/20 border-blue-500/40 text-blue-400" :
+                                                  "bg-muted/30 border-border/40 text-foreground/70"
+                                                )}>
+                                                  {item.legalRuns}
+                                                </div>
+                                              </div>
+                                            )}
+                                            {isWicket && (
+                                              <div className="shrink-0 self-center">
+                                                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-red-500/20 border-2 border-red-500/40">
+                                                  <span className="text-base">🏏</span>
+                                                </div>
+                                              </div>
+                                            )}
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            );
+                          })}
+
+                          {/* Attribution footer */}
+                          <div className="text-center pt-4 border-t border-border/20">
+                            <p className="text-[10px] text-muted-foreground/50">
+                              Commentary sourced from Cricbuzz
                             </p>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  ) : cbCommentaryField.data?.commentary && cbCommentaryField.data.commentary.length > 0 ? (
+                    /* ── Cricbuzz Highlight Commentary Fallback ─────────────── */
+                    <div className="space-y-3">
+                      {cbCommentaryField.data.commentary.map((item: any, idx: number) => {
+                        const icon = item.eventType === 'WICKET' ? '🏏' : item.eventType === 'SIX' ? '🔥' : item.eventType === 'FOUR' ? '➖' : '•';
+                        return (
+                          <div key={idx} className="relative pl-8 pb-2 last:pb-0 border-l border-border/60 last:border-l-0">
+                            <div className={cn("absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full", item.eventType === 'WICKET' ? "bg-red-500" : item.eventType === 'SIX' ? "bg-yellow-400" : item.eventType === 'FOUR' ? "bg-blue-400" : "bg-primary/60")} />
+                            <div className="flex items-center gap-2 mb-1">
+                              {item.overNum != null && (<span className="text-xs font-bold font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">Ov {item.overNum}</span>)}
+                              <span className="text-sm">{icon}</span>
+                            </div>
+                            <p className="text-sm text-foreground/80 leading-relaxed bg-secondary/30 p-3 rounded-lg border border-border/50">{item.text}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : commentaryField.data?.bpiList && commentaryField.data.bpiList.length > 0 ? (
+                    /* ── CricketData.org bpiList Fallback ─────────────────── */
+                    <div className="space-y-6">
+                      {(() => {
+                        const grouped = commentaryField.data.bpiList.reduce((acc: any, item: string) => {
+                          const matchResult = item.match(/^(\d+)\./);
+                          const over = matchResult ? parseInt(matchResult[1]) + 1 : 'General';
+                          if (!acc[over]) acc[over] = [];
+                          acc[over].push(item);
+                          return acc;
+                        }, {});
+                        const overs = Object.keys(grouped).sort((a, b) => {
+                          if (a === 'General') return 1;
+                          if (b === 'General') return -1;
+                          return parseInt(b) - parseInt(a);
+                        });
+                        return overs.map((over) => (
+                          <div key={over} className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <div className="px-2 py-0.5 bg-primary/20 text-primary text-xs font-bold rounded">{over !== 'General' ? `Over ${over}` : 'Highlights'}</div>
+                              <div className="h-px flex-1 bg-border/50" />
+                            </div>
+                            <div className="space-y-2">
+                              {grouped[over].map((text: string, tIdx: number) => (
+                                <div key={tIdx} className="bg-secondary/30 p-3 rounded-lg text-sm text-foreground/90 border border-border/50">{text}</div>
+                              ))}
+                            </div>
                           </div>
                         ));
                       })()}
                     </div>
-                  )
-                ) : isUpcoming ? (
-                  <div className="flex justify-center p-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : cbCommentaryField.data?.commentary && cbCommentaryField.data.commentary.length > 0 ? (
-                  /* ── Cricbuzz Highlight Commentary ── */
-                  <div className="space-y-3">
-                    {cbCommentaryField.data.commentary.map((item: any, idx: number) => {
-                      const icon = item.eventType === 'WICKET' ? '🏏' :
-                        item.eventType === 'SIX' ? '🔥' :
-                          item.eventType === 'FOUR' ? '➖' : '•';
-                      return (
-                        <div key={idx} className="relative pl-8 pb-2 last:pb-0 border-l border-border/60 last:border-l-0">
-                          <div className={cn(
-                            "absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full",
-                            item.eventType === 'WICKET' ? "bg-red-500" :
-                              item.eventType === 'SIX' ? "bg-yellow-400" :
-                                item.eventType === 'FOUR' ? "bg-blue-400" : "bg-primary/60"
-                          )} />
-                          <div className="flex items-center gap-2 mb-1">
-                            {item.overNum != null && (
-                              <span className="text-xs font-bold font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                                Ov {item.overNum}
-                              </span>
-                            )}
-                            <span className="text-sm">{icon}</span>
-                          </div>
-                          <p className="text-sm text-foreground/80 leading-relaxed bg-secondary/30 p-3 rounded-lg border border-border/50">
-                            {item.text}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : commentaryField.data?.bpiList && commentaryField.data.bpiList.length > 0 ? (
-                  /* ── CricketData.org bpiList Fallback ── */
-                  <div className="space-y-6">
-                    {(() => {
-                      const grouped = commentaryField.data.bpiList.reduce((acc: any, item: string) => {
-                        const matchResult = item.match(/^(\d+)\./);
-                        const over = matchResult ? parseInt(matchResult[1]) + 1 : 'General';
-                        if (!acc[over]) acc[over] = [];
-                        acc[over].push(item);
-                        return acc;
-                      }, {});
-
-                      const overs = Object.keys(grouped).sort((a, b) => {
-                        if (a === 'General') return 1;
-                        if (b === 'General') return -1;
-                        return parseInt(b) - parseInt(a);
-                      });
-
-                      return overs.map((over) => (
-                        <div key={over} className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <div className="px-2 py-0.5 bg-primary/20 text-primary text-xs font-bold rounded">
-                              {over !== 'General' ? `Over ${over}` : 'Highlights'}
-                            </div>
-                            <div className="h-px flex-1 bg-border/50"></div>
-                          </div>
-                          <div className="space-y-2">
-                            {grouped[over].map((text: string, tIdx: number) => (
-                              <div key={tIdx} className="bg-secondary/30 p-3 rounded-lg text-sm text-foreground/90 border border-border/50">
-                                {text}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ));
-                    })()}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <MessageSquare className="mx-auto h-12 w-12 mb-3 opacity-10" />
-                    <p>No commentary available for this match.</p>
-                  </div>
-                )}
+                  ) : cbFullCommentaryField.error ? (
+                    /* ── Error state ────────────────────────────────────────── */
+                    <div className="text-center py-12 text-muted-foreground">
+                      <AlertTriangle className="mx-auto h-12 w-12 mb-3 opacity-30" />
+                      <p className="font-medium">Commentary temporarily unavailable</p>
+                      <p className="text-xs mt-1 opacity-60">Data will refresh shortly</p>
+                    </div>
+                  ) : (
+                    /* ── Empty / upcoming ───────────────────────────────────── */
+                    <div className="text-center py-12 text-muted-foreground">
+                      <MessageSquare className="mx-auto h-12 w-12 mb-3 opacity-10" />
+                      <p>No commentary available for this match.</p>
+                      {isUpcoming && <p className="text-xs mt-2 opacity-60">Commentary will appear once the match begins.</p>}
+                    </div>
+                  )}
+                </div>
               </div>
             </TabsContent>
+
+
             {(match?.sport === 'football' || match?.sport === 'cricket') && (
               <TabsContent value="performance" className="animate-fade-in">
                 <Suspense fallback={

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { cricketService } from '../services/cricketApiService.js';
 import { cricbuzzService } from '../services/cricbuzzService.js';
 import { scrapeScorecard } from '../services/cricbuzzScorecardScraper.js';
+import { scrapeFullCommentary } from '../services/cricbuzzScraperService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -255,13 +256,38 @@ router.get('/cb/squads/:matchId', async (req, res) => {
     }
 });
 
-// Cricbuzz Commentary
+// Cricbuzz Commentary (legacy RSC endpoint - used as fallback)
 router.get('/cb/commentary/:matchId', async (req, res) => {
     try {
         const data = await fetchMatchDetailScraped(req.params.matchId, 'commentary');
         res.json({ status: 'success', data });
     } catch (error) {
         res.status(500).json({ error: error.message, data: null });
+    }
+});
+
+// ── Full Commentary Scraper (Cricbuzz HTML page → RSC payload extraction)
+// GET /api/cricket/cb/full-commentary/:matchId?slug=eng-vs-nz-2nd-test-...
+// The slug is the URL path segment after the matchId on Cricbuzz's full-commentary page.
+// Example: /live-cricket-full-commentary/129563/eng-vs-nz-2nd-test-new-zealand-tour-of-england-2026
+//   → matchId=129563, slug=eng-vs-nz-2nd-test-new-zealand-tour-of-england-2026
+// If slug is omitted, the server attempts auto-resolution from cached live match data.
+router.get('/cb/full-commentary/:matchId', async (req, res) => {
+    try {
+        const { matchId } = req.params;
+        const { slug } = req.query; // optional
+        const data = await scrapeFullCommentary(matchId, slug || null);
+        if (!data) {
+            return res.status(200).json({
+                status: 'success',
+                data: null,
+                message: 'No commentary data available — match may not have started or page structure changed.'
+            });
+        }
+        res.json({ status: 'success', data });
+    } catch (error) {
+        console.error('[full-commentary route] Error:', error.message);
+        res.status(500).json({ status: 'error', data: null, error: error.message });
     }
 });
 

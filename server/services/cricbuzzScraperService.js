@@ -926,6 +926,214 @@ export async function fetchMatchDetailScraped(matchId, endpointType) {
     }
 }
 
+/**
+ * ── Full Commentary Scraper ──────────────────────────────────────────────────
+ * Scrapes the Cricbuzz full commentary page for a given matchId + slug.
+ * URL format: https://www.cricbuzz.com/live-cricket-full-commentary/{matchId}/{slug}
+ *
+ * The page is Next.js RSC-rendered. Commentary data lives inside:
+ *   self.__next_f.push([1, "...escaped JSON..."]) blocks.
+ * The JSON has: matchPreviewFullComm.commentary[].commentaryList[].{commText, event, ballNbr, overNum}
+ * commText values starting with "$N" are RSC lazy references resolved elsewhere in the page.
+ *
+ * @param {string|number} matchId   - Cricbuzz numeric match ID
+ * @param {string}        slug      - URL slug after the matchId
+ * @returns {Promise<{commentary: Array, matchId: number, totalPages: number}>}
+ */
+const commentaryCache = new NodeCache({ stdTTL: 60 }); // 60s for live, refreshed on each request
+
+export async function scrapeFullCommentary(matchId, slug) {
+    const cacheKey = `full_commentary_${matchId}`;
+    const cached = commentaryCache.get(cacheKey);
+    if (cached) return cached;
+
+    if (!slug) {
+        // Attempt to auto-derive slug from live/recent matches
+        try {
+            const live = liveCache.get('scraped_live_matches') || [];
+            const m = live.find(x => String(x.id) === String(matchId));
+            if (m) {
+                const t1 = (m.teamInfo?.[0]?.shortname || '').toLowerCase();
+                const t2 = (m.teamInfo?.[1]?.shortname || '').toLowerCase();
+                const type = (m.matchType || '').toLowerCase();
+                if (t1 && t2 && type) slug = `${t1}-vs-${t2}-${type}`.replace(/[^a-z0-9-]/g, '');
+            }
+        } catch (_) {}
+        if (!slug) slug = 'match'; // last resort fallback
+    }
+
+    const liveUrl = `https://www.cricbuzz.com/live-cricket-scores/${matchId}/${slug}`;
+    const fullUrl = `https://www.cricbuzz.com/live-cricket-full-commentary/${matchId}/${slug}`;
+    console.log(`[Commentary Scraper] Fetching: ${liveUrl}`);
+
+    try {
+        // We will fetch the live-cricket-scores page since that contains the actual DOM with the latest ball-by-ball commentary
+        const res = await axios.get(liveUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,*/*',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Referer': 'https://www.cricbuzz.com/'
+            },
+            timeout: 15000
+        });
+
+        const html = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
+        const cheerio = await import('cheerio');
+        const $ = cheerio.load(html);
+        
+        const commentaryList = [];
+
+        // Parse DOM for ball-by-ball
+        $('div.font-bold').each((i, el) => {
+            const text = $(el).text().trim();
+            // Match over and ball (e.g., "76.6")
+            if (/^\d+\.\d+$/.test(text)) {
+                const parts = text.split('.');
+                const overNum = parts[0];
+                const ballNbr = parts[1];
+                
+                const parentCol = $(el).parent();
+                const commentaryNode = parentCol.next();
+                let commText = commentaryNode.text().trim();
+                
+                // Identify event type
+                const isWicket = commText.includes('OUT') || commText.includes('Wicket') || commText.includes('bowled') || $(el).parent().find('span').text().includes('W');
+                const isFour = commText.includes('FOUR') || $(el).parent().find('span').text().includes('4');
+                const isSix = commText.includes('SIX') || $(el).parent().find('span').text().includes('6');
+                
+                commentaryList.push({
+                    commText: commText,
+                    overNum: parseInt(overNum),
+                    ballNbr: parseInt(ballNbr),
+                    event: isWicket ? 'WICKET' : isSix ? 'SIX' : isFour ? 'FOUR' : 'NONE',
+                    timestamp: Date.now() - (i * 1000) // fake timestamps to preserve order
+                });
+            }
+        });
+
+        // Also fetch the matchPreviewFullComm payload from the page in case there are squad/toss updates
+        const marker = 'matchPreviewFullComm';
+        const markerIdx = html.indexOf(marker);
+        let previewItems = [];
+        let mpObj = {};
+        
+        if (markerIdx !== -1) {
+            const scriptStart = html.lastIndexOf('self.__next_f.push', markerIdx);
+            if (scriptStart !== -1) {
+                const scriptClose = html.indexOf('</script>', scriptStart);
+                const rawScript = html.substring(scriptStart, scriptClose === -1 ? Math.min(scriptStart + 80000, html.length) : scriptClose);
+                const payloadMatch = rawScript.match(/self\.__next_f\.push\(\[1,"([\s\S]+?)"\]\)/);
+                
+                if (payloadMatch) {
+                    let unescaped;
+                    try {
+                        unescaped = JSON.parse('"' + payloadMatch[1] + '"');
+                    } catch (_) {
+                        unescaped = payloadMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+                    }
+                    
+                    const mpIdx = unescaped.indexOf('"matchPreviewFullComm":{');
+                    if (mpIdx !== -1) {
+                        const objStart = mpIdx + '"matchPreviewFullComm":'.length;
+                        let braces = 0;
+                        let objEnd = objStart;
+                        for (let i = objStart; i < unescaped.length; i++) {
+                            if (unescaped[i] === '{') braces++;
+                            else if (unescaped[i] === '}') braces--;
+                            if (braces === 0 && i > objStart) { objEnd = i + 1; break; }
+                        }
+                        try {
+                            mpObj = JSON.parse(unescaped.substring(objStart, objEnd));
+                            if (mpObj.commentary && mpObj.commentary[0]?.commentaryList) {
+                                previewItems = mpObj.commentary[0].commentaryList;
+                                // Clean preview text (resolve RSC refs if needed)
+                                previewItems.forEach(item => {
+                                    if (item.commText && item.commText.startsWith('$')) {
+                                        // Simple fallback for unresolved Next.js text refs
+                                        const refId = item.commText.substring(1);
+                                        const possibleText = unescaped.match(new RegExp(`"${refId}":"([^"]+)"`));
+                                        if (possibleText) item.commText = possibleText[1];
+                                        else item.commText = ''; 
+                                        
+                                        // Handle commentaryFormats.bold.formatValue if text is empty
+                                        if (!item.commText && item.commentaryFormats?.bold?.formatValue) {
+                                            item.commText = item.commentaryFormats.bold.formatValue.join(' ');
+                                        }
+                                    }
+                                });
+                            }
+                        } catch(e) { }
+                    }
+                }
+            }
+        }
+
+        // ── Step 4: Map RSC references and format the result ────────────────
+        const formattedPreview = [];
+        
+        for (const item of previewItems) {
+            let text = item.commText || '';
+            if (text.startsWith('$')) {
+                const refId = text.substring(1);
+                if (refMap && refMap[refId]) {
+                    text = refMap[refId];
+                }
+            }
+            
+            // Apply bold formats: replace "B0$" markers with actual player names
+            const formats = item.commentaryFormats?.bold;
+            if (formats && formats.formatId && formats.formatValue) {
+                for (let fi = 0; fi < formats.formatId.length; fi++) {
+                    const fid = formats.formatId[fi];
+                    const fval = formats.formatValue[fi] || '';
+                    text = text.replace(new RegExp(fid.replace(/\$/g, '\\$'), 'g'), fval);
+                }
+            }
+            
+            if (!text || text.trim().length === 0) continue;
+            
+            formattedPreview.push({
+                inningsId: item.inningsId || 0,
+                overNum: item.overNum,
+                ballNbr: item.ballNbr,
+                event: item.event || 'NONE',
+                batsman: item.batsmanStriker?.batName || '',
+                bowler: item.bowlerStriker?.bowlName || '',
+                commText: text.trim(),
+                timestamp: item.timestamp || 0
+            });
+        }
+
+        // Combine ball-by-ball with preview items
+        const combinedList = [...commentaryList, ...formattedPreview].filter(c => c.commText && c.commText.length > 2);
+        
+        // Ensure every item has an inningsId, defaulting to 1 (or 0 if API starts at 0, MatchDetails expects it for grouping)
+        const defaultInningsId = mpObj.commentary?.[0]?.inningsId || 1;
+        const finalList = combinedList.map(item => ({
+            ...item,
+            inningsId: item.inningsId !== undefined ? item.inningsId : defaultInningsId
+        }));
+
+        const result = {
+            matchId: mpObj.matchId || parseInt(matchId),
+            totalPages: mpObj.totalPages || 1,
+            inningsCount: mpObj.commentary?.length || 1,
+            commentary: finalList
+        };
+
+        if (result.commentary.length > 0) {
+            // cache with 1 minute TTL as requested by user
+            commentaryCache.set(cacheKey, result, 60);
+            return result;
+        }
+
+    } catch (err) {
+        console.error('[Commentary Scraper] Error:', err.message);
+        return null;
+    }
+}
+
 export async function fetchMatchSquadsScraped(matchId) {
     if (!matchId) return { success: false, message: 'Match ID is required' };
 
