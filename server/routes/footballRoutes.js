@@ -1027,35 +1027,21 @@ if (!fs.existsSync(IMAGE_CACHE_DIR)) {
 }
 
 // GET /api/football/player-image/:playerName
-// Fetches player image sequentially, caches it locally for 30 minutes
+// Fetches player image sequentially, caches it in browser for 1 hour
 router.get('/player-image/:playerName', async (req, res) => {
     const { playerName } = req.params;
     const { team } = req.query;
     if (!playerName) return res.status(400).json({ success: false, message: 'Player name required' });
 
-    const safeName = playerName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    const safeTeam = team ? team.toString().replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'unk';
-    const imagePath = path.join(IMAGE_CACHE_DIR, `${safeName}_${safeTeam}.png`);
     const apiKey = process.env.sofascore_api_footballtopstats_playerimages;
 
     try {
-        // Check local cache
-        if (fs.existsSync(imagePath)) {
-            const stats = fs.statSync(imagePath);
-            const ageMinutes = (Date.now() - stats.mtimeMs) / (1000 * 60);
-            
-            // If less than 30 minutes old, serve from cache
-            if (ageMinutes < 30) {
-                return res.sendFile(imagePath);
-            }
-        }
-
         if (!apiKey) {
-            // Serve placeholder if no API key and no valid cache
+            // Serve placeholder if no API key
             return res.status(404).send('No API key');
         }
 
-        // Cache miss or expired: fetch from Sofascore
+        // Fetch from Sofascore
         const searchRes = await axios.get(`https://sofascore.p.rapidapi.com/players/search?name=${encodeURIComponent(playerName)}`, {
             headers: { 'x-rapidapi-host': 'sofascore.p.rapidapi.com', 'x-rapidapi-key': apiKey },
             timeout: 8000
@@ -1093,9 +1079,10 @@ router.get('/player-image/:playerName', async (req, res) => {
             });
 
             if (imgRes.headers['content-type']?.includes('image') && imgRes.data) {
-                // Save locally
-                fs.writeFileSync(imagePath, Buffer.from(imgRes.data));
-                return res.sendFile(imagePath);
+                const contentType = imgRes.headers['content-type'];
+                res.set('Content-Type', contentType);
+                res.set('Cache-Control', 'public, max-age=3600');
+                return res.send(imgRes.data);
             }
         }
         
@@ -1104,10 +1091,6 @@ router.get('/player-image/:playerName', async (req, res) => {
 
     } catch (err) {
         console.error(`[Football Player Image] Error for ${playerName}:`, err.message);
-        // If error but we have a stale cache, serve the stale cache as fallback
-        if (fs.existsSync(imagePath)) {
-            return res.sendFile(imagePath);
-        }
         res.status(500).send('Error');
     }
 });

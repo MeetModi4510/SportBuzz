@@ -2313,46 +2313,10 @@ const MatchDetails = () => {
                         byInnings[item.inningsId].push(item);
                       });
 
-                      const inningsIds = Object.keys(byInnings).map(Number).sort((a, b) => a - b);
-                      
-                      const effectiveTab = activeInningsTab === -1 ? (inningsIds.length > 0 ? inningsIds[inningsIds.length - 1] : 'preview') : activeInningsTab;
-                      const displayInnIds = effectiveTab === 'preview' ? [] : [effectiveTab as number].filter(id => byInnings[id]);
+                      const displayInnIds = Object.keys(byInnings).map(Number).sort((a, b) => b - a);
 
                       return (
-                        <div className="space-y-8">
-                          {/* Innings Tabs */}
-                          <div className="flex flex-wrap gap-3 mb-4 border-b pb-3">
-                            <button
-                              onClick={() => setActiveInningsTab('preview')}
-                              className={cn("px-4 py-1.5 rounded-full text-sm font-medium transition-colors", effectiveTab === 'preview' ? "bg-primary text-primary-foreground shadow-sm" : "bg-secondary text-secondary-foreground hover:bg-primary/20")}
-                            >
-                              Preview
-                            </button>
-                            {inningsIds.map(id => {
-                              // A guess on team name mapping. Usually 1st innings is Team 1 or 2 based on toss, but we can just use generic if unknown
-                              const t1 = match?.homeTeam?.shortName || "Team 1";
-                              const t2 = match?.awayTeam?.shortName || "Team 2";
-                              const tabName = id === 1 ? `${t1} Innings` : id === 2 ? `${t2} Innings` : `Innings ${id}`;
-                              
-                              return (
-                                <button
-                                  key={id}
-                                  onClick={() => setActiveInningsTab(id)}
-                                  className={cn("px-4 py-1.5 rounded-full text-sm font-medium transition-colors", effectiveTab === id ? "bg-primary text-primary-foreground shadow-sm" : "bg-secondary text-secondary-foreground hover:bg-primary/20")}
-                                >
-                                  {tabName}
-                                </button>
-                              );
-                            })}
-                          </div>
-
-                          {effectiveTab === 'preview' && (
-                            <div className="p-8 bg-secondary/10 rounded-xl text-center border">
-                              <p className="text-muted-foreground font-medium">Match Preview & Updates</p>
-                              <p className="text-sm mt-2 text-muted-foreground/70">Click an innings tab above to view ball-by-ball commentary.</p>
-                            </div>
-                          )}
-
+                        <div className="space-y-8 mt-2">
                           {displayInnIds.map((innId) => {
                             const innItems = byInnings[innId]; // Do not reverse: keep latest first for over grouping
                             // Group by over
@@ -2366,7 +2330,6 @@ const MatchDetails = () => {
 
                             return (
                               <div key={innId} className="space-y-5">
-
                                 {overKeys.map((ov) => {
                                   const overItems = byOver[ov];
                                   const isSpecialOver = ov < 0;
@@ -2412,13 +2375,13 @@ const MatchDetails = () => {
                                             isOverComplete ? 'bg-emerald-500/5 dark:bg-emerald-500/10' :
                                             'bg-transparent hover:bg-muted/30';
 
-                                          const eventIcon = isWicket ? '🏏' :
+                                          const eventIcon = isWicket ? '☝️' :
                                             isMilestone ? '🌟' :
-                                            isSix ? '🔥' :
-                                            isFour ? '🏃' :
+                                            isSix ? '6️⃣' :
+                                            isFour ? '4️⃣' :
                                             isNoBall ? '🚫' :
                                             isWide ? '↔️' :
-                                            isOverComplete ? '🔔' : '';
+                                            isOverComplete ? '🔄' : '';
 
                                           let milestoneLabel = 'MILESTONE';
                                           if (isMilestone && item.commText) {
@@ -2447,7 +2410,7 @@ const MatchDetails = () => {
                                             <div className="shrink-0 flex flex-col items-center gap-1 pt-0.5">
                                               <div className={cn("w-2.5 h-2.5 rounded-full", dotColor)} />
                                               {!isSpecialOver && item.ballNbr > 0 && (
-                                                <span className="text-[9px] font-mono text-muted-foreground/60 leading-none">
+                                                <span className="text-[10px] font-bold font-mono text-foreground/80 leading-none mt-0.5">
                                                   {(() => {
                                                     const bInOver = item.ballInOver || (item.ballNbr % 6 === 0 ? 6 : item.ballNbr % 6);
                                                     return bInOver === 6 ? `${ov + 1}.0` : `${ov}.${bInOver}`;
@@ -2596,7 +2559,7 @@ const MatchDetails = () => {
                     /* ── Cricbuzz Highlight Commentary Fallback ─────────────── */
                     <div className="space-y-3">
                       {cbCommentaryField.data.commentary.map((item: any, idx: number) => {
-                        const icon = item.eventType === 'WICKET' ? '🏏' : item.eventType === 'SIX' ? '🔥' : item.eventType === 'FOUR' ? '➖' : '•';
+                        const icon = item.eventType === 'WICKET' ? '☝️' : item.eventType === 'SIX' ? '6️⃣' : item.eventType === 'FOUR' ? '4️⃣' : '•';
                         return (
                           <div key={idx} className="relative pl-8 pb-2 last:pb-0 border-l border-border/60 last:border-l-0">
                             <div className={cn("absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full", item.eventType === 'WICKET' ? "bg-red-500" : item.eventType === 'SIX' ? "bg-yellow-400" : item.eventType === 'FOUR' ? "bg-blue-400" : "bg-primary/60")} />
