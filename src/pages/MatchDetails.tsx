@@ -33,7 +33,8 @@ import {
   Tag,
   Coins,
   Eye,
-  Shield
+  Shield,
+  Monitor
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { Helmet } from "react-helmet-async";
@@ -551,8 +552,8 @@ const MatchDetails = () => {
       if (cbSummary.matchScore) {
           const t1 = cbSummary.matchScore.team1Score?.inngs1;
           const t2 = cbSummary.matchScore.team2Score?.inngs1;
-          if (t1) dynamicHomeScoreStr = `${t1.runs}/${t1.wickets || 0} (${t1.overs} ov)`;
-          if (t2) dynamicAwayScoreStr = `${t2.runs}/${t2.wickets || 0} (${t2.overs} ov)`;
+          if (t1) dynamicHomeScoreStr = `${t1.runs}/${t1.wickets || 0}${t1.overs ? ` (${t1.overs} ov)` : ''}`;
+          if (t2) dynamicAwayScoreStr = `${t2.runs}/${t2.wickets || 0}${t2.overs ? ` (${t2.overs} ov)` : ''}`;
       }
   }
 
@@ -1281,7 +1282,8 @@ const MatchDetails = () => {
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
                   ) : (
-                    <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
+                    <>
+                      <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
                       <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/40">
                         
                         {/* Column 1: Core Details */}
@@ -1374,10 +1376,25 @@ const MatchDetails = () => {
                                   <div>
                                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Match Referee</p>
                                     <p className="font-semibold text-sm text-foreground">
-                                      {ref?.name || match.referee || "To be announced"}
+                                      {ref?.name || match.referee || cbInfo?.extraInfo?.Referee || "To be announced"}
                                     </p>
                                   </div>
                                 </div>
+
+                                {/* Broadcast Guide */}
+                                {(cbInfo?.extraInfo?.TV || cbInfo?.extraInfo?.Streaming) && (
+                                  <div className="flex items-start gap-4">
+                                    <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Monitor size={18}/></div>
+                                    <div>
+                                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Broadcast</p>
+                                      <p className="font-semibold text-sm text-foreground">
+                                        {cbInfo?.extraInfo?.TV && <span><span className="text-muted-foreground">TV:</span> {cbInfo.extraInfo.TV}</span>}
+                                        {cbInfo?.extraInfo?.TV && cbInfo?.extraInfo?.Streaming && <span className="mx-2">•</span>}
+                                        {cbInfo?.extraInfo?.Streaming && <span><span className="text-muted-foreground">Stream:</span> {cbInfo.extraInfo.Streaming}</span>}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
                               </>
                             );
                           })()}
@@ -1396,8 +1413,71 @@ const MatchDetails = () => {
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
+
+                    {/* Full Match Information & Venue Guide Tables */}
+                    {cbInfo?.extraInfo && Object.keys(cbInfo.extraInfo).length > 0 && (
+                      <div className="mt-8 space-y-6 animate-fade-in">
+                        {/* INFO Table */}
+                        <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
+                          <div className="bg-muted/10 px-6 py-4 border-b border-border/40">
+                            <h4 className="text-xs font-bold text-foreground uppercase tracking-widest text-primary">Info</h4>
+                          </div>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                              <tbody className="divide-y divide-border/20">
+                                {[
+                                  { label: 'Match', value: cbInfo.extraInfo.Match || (match as any).name },
+                                  { label: 'Series', value: cbInfo.matchInfo?.seriesName || cbSummary?.matchHeader?.matchInfo?.seriesName || cbSummary?.matchInfo?.seriesName || match.tournament?.name },
+                                  { label: 'Date', value: cbInfo.extraInfo.Date },
+                                  { label: 'Time', value: cbInfo.extraInfo.Time },
+                                  { label: 'Toss', value: cbInfo.extraInfo.Toss || match.tossResult },
+                                  { label: 'Venue', value: `${cbInfo.matchInfo?.venueInfo?.ground || cbInfo.extraInfo.Stadium}, ${cbInfo.matchInfo?.venueInfo?.city || cbInfo.extraInfo.City}` },
+                                  { label: 'Umpires', value: cbInfo.extraInfo.Umpires || (u1?.name ? `${u1.name}${u2?.name ? ", " + u2.name : ''}` : null) },
+                                  { label: '3rd Umpire', value: cbInfo.extraInfo['3rd Umpire'] },
+                                  { label: 'Referee', value: cbInfo.extraInfo.Referee || ref?.name || match.referee },
+                                  { label: 'Broadcast', value: [cbInfo.extraInfo.TV ? `TV: ${cbInfo.extraInfo.TV}` : null, cbInfo.extraInfo.Streaming ? `Stream: ${cbInfo.extraInfo.Streaming}` : null].filter(Boolean).join(' • ') }
+                                ].map((row, idx) => row.value && (
+                                  <tr key={idx} className="hover:bg-muted/5 transition-colors">
+                                    <td className="px-6 py-4 font-bold text-foreground w-1/3 md:w-1/4">{row.label}</td>
+                                    <td className="px-6 py-4 text-muted-foreground">{row.value}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+
+                        {/* VENUE GUIDE Table */}
+                        {(cbInfo.extraInfo.Stadium || cbInfo.extraInfo.Capacity || cbInfo.extraInfo.Ends) && (
+                          <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
+                            <div className="bg-muted/10 px-6 py-4 border-b border-border/40">
+                              <h4 className="text-xs font-bold text-foreground uppercase tracking-widest text-primary">Venue Guide</h4>
+                            </div>
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-sm text-left">
+                                <tbody className="divide-y divide-border/20">
+                                  {[
+                                    { label: 'Stadium', value: cbInfo.extraInfo.Stadium },
+                                    { label: 'City', value: cbInfo.extraInfo.City },
+                                    { label: 'Capacity', value: cbInfo.extraInfo.Capacity },
+                                    { label: 'Ends', value: cbInfo.extraInfo.Ends },
+                                    { label: 'Hosts To', value: cbInfo.extraInfo['Hosts To'] }
+                                  ].map((row, idx) => row.value && (
+                                    <tr key={idx} className="hover:bg-muted/5 transition-colors">
+                                      <td className="px-6 py-4 font-bold text-foreground w-1/3 md:w-1/4">{row.label}</td>
+                                      <td className="px-6 py-4 text-muted-foreground">{row.value}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
               )}
             </TabsContent>
 

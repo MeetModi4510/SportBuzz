@@ -820,15 +820,16 @@ export async function fetchMatchDetailScraped(matchId, endpointType, force = fal
         isLive = true;
     }
 
-    const cacheKey = `scraped_detail_${endpointType}_${matchId}`;
+    const cacheKey = `scraped_detail_${endpointType}_${matchId}_v4`;
     const cachedLive = liveCache.get(cacheKey);
     const cachedStd = standardCache.get(cacheKey);
+    const cachedSquads = squadsCache.get(cacheKey);
 
     // Skip cache entirely when force=true (called by auto-refresh timer)
     if (!force) {
-        // If endpoint is info or squads, always use standard TTL
+        // If endpoint is info or squads, always use 1-hour TTL
         if (endpointType === 'info' || endpointType === 'squads') {
-            if (cachedStd) return cachedStd;
+            if (cachedSquads) return cachedSquads;
         } else {
             if (isLive && cachedLive) return cachedLive;
             if (!isLive && cachedStd) return cachedStd;
@@ -894,6 +895,24 @@ export async function fetchMatchDetailScraped(matchId, endpointType, force = fal
             console.error("Next.js Parser Error:", e);
         }
 
+        // EXTRA: Extract facts directly from the Next.js RSC payload string
+        if (parsed && endpointType === 'info') {
+            try {
+                const extraInfo = {};
+                const regex = /"children":"([^"]+)"\}\]\,\["\$","div",null,\{"children":"([^"]+)"/g;
+                let match;
+                while ((match = regex.exec(payloadStr)) !== null) {
+                    extraInfo[match[1]] = match[2];
+                }
+                
+                if (Object.keys(extraInfo).length > 0) {
+                    parsed.extraInfo = extraInfo;
+                }
+            } catch(e) {
+                console.error("Info RSC Regex Extraction Error:", e);
+            }
+        }
+
         if (parsed) {
             // TTL: info/squads = 1h, live volatile endpoints = 60s (frontend 60s cycle gets fresh data via force parameter)
             let ttl = 300; // default 5 min
@@ -929,7 +948,7 @@ export async function fetchMatchDetailScraped(matchId, endpointType, force = fal
         const responseData = parsed || specificData;
 
         if (endpointType === 'info' || endpointType === 'squads') {
-            standardCache.set(cacheKey, responseData);
+            squadsCache.set(cacheKey, responseData);
         } else {
             if (isLive) liveCache.set(cacheKey, responseData);
             else standardCache.set(cacheKey, responseData);
