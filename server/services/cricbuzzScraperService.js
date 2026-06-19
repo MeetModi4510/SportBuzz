@@ -1128,6 +1128,7 @@ export async function scrapeFullCommentary(matchId, slug, force = false) {
             matchId: mpObj.matchId || parseInt(matchId),
             totalPages: mpObj.totalPages || 1,
             inningsCount: mpObj.commentary?.length || 1,
+            matchHeader: mpObj.matchHeader || null,
             commentary: finalList
         };
 
