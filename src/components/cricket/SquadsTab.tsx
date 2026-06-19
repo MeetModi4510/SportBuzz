@@ -68,7 +68,7 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
                     {players.map((p, i) => {
                         const imageId = p.imageDetails?.imageId;
                         return (
-                        <div key={`${p.id}-${i}`} className="flex items-center gap-4 p-4 bg-card/40 hover:bg-card/60 transition-colors border border-border/40 rounded-2xl">
+                        <div key={`${p.id}-${i}`} className="flex items-center gap-4 p-4 bg-card/40 hover:bg-card/60 transition-colors border border-border/40 rounded-2xl h-[112px]">
                             <div className="w-14 h-14 rounded-full overflow-hidden bg-secondary/50 flex-shrink-0 border-2 border-border/50 relative">
                                 {imageId ? (
                                     <img 
@@ -102,39 +102,56 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
         );
     };
 
-    const renderTeamSquad = (team?: TeamSquad) => {
-        if (!team) return null;
-
+    const renderTeamHeader = (team?: TeamSquad) => {
+        if (!team) return <div />;
         return (
-            <div className="space-y-6">
-                <div className="flex items-center gap-4 border-b border-border/40 pb-4">
-                    {team.imageDetails && (
-                        <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary p-1 shrink-0">
-                            <img 
-                                src={`http://localhost:5000/api/cricket/scraped/team-logo/${team.imageDetails.imageId}`} 
-                                alt={team.teamName} 
-                                className="w-full h-full object-contain" 
-                                onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + team.teamName + '&background=random'; }}
-                            />
-                        </div>
-                    )}
-                    <h2 className="text-xl font-black uppercase tracking-wider">{team.teamName}</h2>
-                </div>
-
-                {renderPlayerGroup('Playing XI', team['playing XI'], false)}
-                {renderPlayerGroup('Bench', team.bench, false)}
-                {renderPlayerGroup('Support Staff', team['support staff'], true)}
+            <div className="flex items-center gap-4 border-b border-border/40 pb-4">
+                {team.imageDetails && (
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary p-1 shrink-0">
+                        <img 
+                            src={`/api/cricket/scraped/team-logo/${team.imageDetails.imageId}`} 
+                            alt={team.teamName} 
+                            className="w-full h-full object-contain" 
+                            onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + team.teamName + '&background=random'; }}
+                        />
+                    </div>
+                )}
+                <h2 className="text-xl font-black uppercase tracking-wider">{team.teamName}</h2>
             </div>
         );
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 animate-fade-in">
-            <div className="bg-muted/5 rounded-3xl p-6 border border-border/20">
-                {renderTeamSquad(team1)}
+        <div className="animate-fade-in">
+            {/* Desktop Unified Layout */}
+            <div className="hidden lg:grid grid-cols-2 gap-x-12 bg-muted/5 rounded-3xl p-8 border border-border/20">
+                <div className="col-span-1">{renderTeamHeader(team1)}</div>
+                <div className="col-span-1">{renderTeamHeader(team2)}</div>
+
+                <div className="col-span-1">{renderPlayerGroup('Playing XI', team1?.['playing XI'], false)}</div>
+                <div className="col-span-1">{renderPlayerGroup('Playing XI', team2?.['playing XI'], false)}</div>
+
+                <div className="col-span-1">{renderPlayerGroup('Bench', team1?.bench, false)}</div>
+                <div className="col-span-1">{renderPlayerGroup('Bench', team2?.bench, false)}</div>
+
+                <div className="col-span-1">{renderPlayerGroup('Support Staff', team1?.['support staff'], true)}</div>
+                <div className="col-span-1">{renderPlayerGroup('Support Staff', team2?.['support staff'], true)}</div>
             </div>
-            <div className="bg-muted/5 rounded-3xl p-6 border border-border/20">
-                {renderTeamSquad(team2)}
+
+            {/* Mobile Split Layout */}
+            <div className="grid grid-cols-1 gap-8 lg:hidden">
+                <div className="bg-muted/5 rounded-3xl p-6 border border-border/20">
+                    {renderTeamHeader(team1)}
+                    {renderPlayerGroup('Playing XI', team1?.['playing XI'], false)}
+                    {renderPlayerGroup('Bench', team1?.bench, false)}
+                    {renderPlayerGroup('Support Staff', team1?.['support staff'], true)}
+                </div>
+                <div className="bg-muted/5 rounded-3xl p-6 border border-border/20">
+                    {renderTeamHeader(team2)}
+                    {renderPlayerGroup('Playing XI', team2?.['playing XI'], false)}
+                    {renderPlayerGroup('Bench', team2?.bench, false)}
+                    {renderPlayerGroup('Support Staff', team2?.['support staff'], true)}
+                </div>
             </div>
         </div>
     );

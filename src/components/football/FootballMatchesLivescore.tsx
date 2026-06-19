@@ -24,13 +24,13 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
   const { data: liveData, isLoading: liveLoading, refetch: refetchLive, isFetching: liveFetching } =
     useEspnLiveMatches(true);
 
-  // Upcoming: only enabled when user clicks "Upcoming"
+  // Upcoming: only enabled when user clicks "Upcoming" OR on dashboard (for fallback)
   const { data: upcomingData, isLoading: upcomingLoading, refetch: refetchUpcoming, isFetching: upcomingFetching } =
-    useEspnUpcomingMatches(filter === 'upcoming');
+    useEspnUpcomingMatches(filter === 'upcoming' || variant === 'dashboard');
 
-  // Recent: only enabled when user clicks "Recent"
+  // Recent: only enabled when user clicks "Recent" OR on dashboard (for fallback)
   const { data: recentData, isLoading: recentLoading, refetch: refetchRecent, isFetching: recentFetching } =
-    useEspnRecentMatches(filter === 'recent');
+    useEspnRecentMatches(filter === 'recent' || variant === 'dashboard');
 
   // ─── Derived state ────────────────────────────────────────────────────
   const liveMatches  = liveData?.data     || [];
@@ -38,15 +38,17 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
 
   const handleManualRefresh = () => {
     refetchLive();
-    if (filter === 'upcoming') refetchUpcoming();
-    if (filter === 'recent')   refetchRecent();
+    if (filter === 'upcoming' || variant === 'dashboard') refetchUpcoming();
+    if (filter === 'recent' || variant === 'dashboard')   refetchRecent();
   };
 
   const isRefreshing = liveFetching || upcomingFetching || recentFetching;
-  const isLoading =
-    (filter === 'live'     && liveLoading) ||
-    (filter === 'upcoming' && upcomingLoading) ||
-    (filter === 'recent'   && recentLoading);
+  
+  const isLoading = variant === 'dashboard'
+    ? (liveLoading || (liveMatches.length === 0 && (upcomingLoading || recentLoading)))
+    : ((filter === 'live'     && liveLoading) ||
+       (filter === 'upcoming' && upcomingLoading) ||
+       (filter === 'recent'   && recentLoading));
 
   // ─── Date grouping logic ──────────────────────────────────────────────
   const formatDateLabel = (dateStr: string) => {

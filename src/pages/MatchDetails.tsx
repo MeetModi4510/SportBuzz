@@ -211,7 +211,7 @@ const MatchDetails = () => {
   // Priority: CricketData.org > Legacy API > Football API > Mock
   const isValidMatch = (m: any) => m && (m.id || m.matchId || m.homeTeam);
   const match: Match | undefined = [cricketDataMatch, legacyCricketMatch, footballMatch, mockMatch].find(isValidMatch) as Match | undefined;
-  const isTestMatch = match?.matchType?.toLowerCase().includes("test");
+  let isTestMatch = match?.matchType?.toLowerCase().includes("test") || match?.format?.toLowerCase().includes("test");
 
   const statusLower = match?.status?.toLowerCase();
   let isLive = statusLower === "live";
@@ -432,6 +432,44 @@ const MatchDetails = () => {
   // --- Dynamic Values extracted from Live API for Header ---
   const dynamicMatchInfo = cbInfo?.matchInfo || cbSummary?.matchHeader?.matchInfo || cbSummary?.matchInfo;
   
+  const dynamicVenueStr = dynamicMatchInfo?.venueInfo?.ground 
+      ? `${dynamicMatchInfo.venueInfo.ground}${dynamicMatchInfo.venueInfo.city ? `, ${dynamicMatchInfo.venueInfo.city}` : ''}`
+      : typeof match?.venue === 'object' ? (match?.venue?.name || (match?.venue as any)?.ground || match?.venue?.city || "Unknown Venue") : match?.venue || "Unknown Venue";
+
+  let parsedMs = dynamicMatchInfo?.matchStartTimestamp ? parseInt(dynamicMatchInfo.matchStartTimestamp) : undefined;
+  if (!parsedMs && dynamicMatchInfo?.startDate) {
+      parsedMs = parseInt(dynamicMatchInfo.startDate);
+  }
+
+  if (parsedMs && parsedMs < 10000000000) { // If it's less than 10 billion, it's definitely in seconds
+      parsedMs *= 1000;
+  }
+  let dynamicStartTimeMs: any = parsedMs || match?.startTime;
+  
+  // If it's a Date object, extract the milliseconds
+  if (dynamicStartTimeMs instanceof Date) {
+      dynamicStartTimeMs = dynamicStartTimeMs.getTime();
+  }
+  
+  // If it's STILL in seconds (less than 10 billion, which is year 1970), multiply by 1000
+  if (typeof dynamicStartTimeMs === 'number' && dynamicStartTimeMs > 0 && dynamicStartTimeMs < 10000000000) {
+      dynamicStartTimeMs *= 1000;
+  }
+
+  if (dynamicStartTimeMs === 0 || dynamicStartTimeMs === "0") {
+      dynamicStartTimeMs = undefined;
+  }
+      
+  const dynamicTimeStr = match?.displayTime && (match?.sport === 'cricket' || match?.sport === 'football') 
+      ? match.displayTime 
+      : (dynamicStartTimeMs && !isNaN(new Date(dynamicStartTimeMs).getTime()) 
+          ? format(new Date(dynamicStartTimeMs), "MMM d, yyyy • h:mm a") 
+          : "Time TBA");
+  
+  if (dynamicMatchInfo?.matchFormat?.toUpperCase() === 'TEST') {
+      isTestMatch = true;
+  }
+  
   const tossObj = cbInfo?.tossResults || cbSummary?.tossResults || cbInfo?.matchInfo?.tossResults || cbSummary?.matchInfo?.tossResults;
   const u1 = cbInfo?.umpire1 || cbSummary?.umpire1 || cbInfo?.matchInfo?.umpire1 || cbSummary?.matchInfo?.umpire1;
   const u2 = cbInfo?.umpire2 || cbSummary?.umpire2 || cbInfo?.matchInfo?.umpire2 || cbSummary?.matchInfo?.umpire2;
@@ -486,6 +524,21 @@ const MatchDetails = () => {
   }
 
   let reconciledInningsScores = match?.inningsScores ? [...match.inningsScores] : [];
+  
+  if (isTestMatch && cbSummary?.matchScore) {
+      const summaryInnings: any[] = [];
+      const ms = cbSummary.matchScore;
+      
+      if (ms.team1Score?.inngs1) summaryInnings.push({ team: 'home', score: `${ms.team1Score.inngs1.runs}/${ms.team1Score.inngs1.wickets || 0}`, overs: ms.team1Score.inngs1.overs });
+      if (ms.team1Score?.inngs2) summaryInnings.push({ team: 'home', score: `${ms.team1Score.inngs2.runs}/${ms.team1Score.inngs2.wickets || 0}`, overs: ms.team1Score.inngs2.overs });
+      
+      if (ms.team2Score?.inngs1) summaryInnings.push({ team: 'away', score: `${ms.team2Score.inngs1.runs}/${ms.team2Score.inngs1.wickets || 0}`, overs: ms.team2Score.inngs1.overs });
+      if (ms.team2Score?.inngs2) summaryInnings.push({ team: 'away', score: `${ms.team2Score.inngs2.runs}/${ms.team2Score.inngs2.wickets || 0}`, overs: ms.team2Score.inngs2.overs });
+      
+      if (summaryInnings.length > 0 && summaryInnings.length >= reconciledInningsScores.length) {
+          reconciledInningsScores = summaryInnings;
+      }
+  }
 
   // Scorecard reconciliation: if Scoreboard tab has fresher data (higher run count OR higher ball count),
   // update the header score so both always match. Cricket scores only go up.
@@ -502,27 +555,29 @@ const MatchDetails = () => {
       const homeMatch = scTeamName && team1Name && scTeamName.includes(team1Name.toLowerCase().split(' ')[0]);
       const existingRuns = parseInt((homeMatch ? dynamicHomeScoreStr : dynamicAwayScoreStr) || '0');
       
+      // ALWAYS Rebuild Test Match Innings if we have Scorecard data
+      if (isTestMatch) {
+          reconciledInningsScores = cbScorecardField.data.innings.map((inn: any) => {
+              const iSd = inn?.scoreDetails || inn;
+              const iRuns = iSd?.runs ?? iSd?.teamScore ?? 0;
+              const iWkts = iSd?.wickets ?? iSd?.teamWkts ?? 0;
+              const iOvs = iSd?.overs ?? iSd?.teamOvs ?? '';
+              const iTeamName = (inn?.batTeamDetails?.batTeamName || '').toLowerCase();
+              const iHome = iTeamName && team1Name && iTeamName.includes(team1Name.toLowerCase().split(' ')[0]);
+              return {
+                  team: iHome ? 'home' : 'away',
+                  score: `${iRuns}/${iWkts}`,
+                  overs: iOvs
+              };
+          });
+      }
+
       // If Scorecard is fresher (runs OR balls are higher), or if they are equal but we are viewing Scoreboard
       if (scRuns > existingRuns || scorecardBalls > summaryBalls || (scRuns === existingRuns && activeTab === 'scoreboard')) {
         // Only actually overwrite the score if Scorecard is truly ahead
         if (scRuns > existingRuns || scorecardBalls > summaryBalls) {
             if (homeMatch) dynamicHomeScoreStr = scStr;
             else dynamicAwayScoreStr = scStr;
-            
-            // Reconcile Test Matches
-            if (isTestMatch && reconciledInningsScores.length > 0) {
-                const teamFilter = homeMatch ? 'home' : 'away';
-                const teamInnings = reconciledInningsScores.filter(i => i.team === teamFilter);
-                if (teamInnings.length > 0) {
-                    const lastInn = teamInnings[teamInnings.length - 1];
-                    const globalIdx = reconciledInningsScores.indexOf(lastInn);
-                    reconciledInningsScores[globalIdx] = {
-                        ...lastInn,
-                        score: `${scRuns}/${scWkts}`,
-                        overs: scOvs
-                    };
-                }
-            }
         }
         if (cbScorecardField.data?.status && scorecardBalls === masterTargetBalls) {
             reconciledStatusText = cbScorecardField.data.status;
@@ -663,8 +718,8 @@ const MatchDetails = () => {
                      <span className="text-xs font-semibold text-foreground uppercase tracking-widest">{safeStr(match.tournament?.name || match.matchType, 'Cricket')}</span>
                   </div>
                   <div className="flex items-center gap-5 text-xs text-muted-foreground font-medium">
-                     <span className="flex items-center gap-1.5"><MapPin size={14} className="text-muted-foreground/60" /> {safeStr(typeof match.venue === 'object' ? (match.venue?.name || (match.venue as any)?.ground || match.venue?.city || "Venue") : match.venue, "Venue")}</span>
-                     <span className="hidden sm:flex items-center gap-1.5"><Clock size={14} className="text-muted-foreground/60" /> {match.displayTime && (match.sport === 'cricket' || match.sport === 'football') ? match.displayTime : (match.startTime && !isNaN(new Date(match.startTime).getTime()) ? format(new Date(match.startTime), "MMM d, yyyy • h:mm a") : "Time TBA")}</span>
+                     <span className="flex items-center gap-1.5"><MapPin size={14} className="text-muted-foreground/60" /> {safeStr(dynamicVenueStr, "Unknown Venue")}</span>
+                     <span className="hidden sm:flex items-center gap-1.5"><Clock size={14} className="text-muted-foreground/60" /> {dynamicTimeStr}</span>
                   </div>
                </div>
 
@@ -699,33 +754,39 @@ const MatchDetails = () => {
                      ) : isTestMatch && reconciledInningsScores && reconciledInningsScores.length > 0 ? (
                         <div className="flex items-start justify-center gap-8 md:gap-10">
                           <div className="flex flex-col items-center gap-3">
-                            {reconciledInningsScores.filter(i => i.team === 'home').map((inn, idx) => (
-                              <div key={idx} className="flex flex-col items-center">
-                                <span className={cn(
-                                  "font-black tracking-tighter",
-                                  idx === 0 ? "text-4xl md:text-5xl text-foreground" : "text-xl md:text-2xl text-muted-foreground"
-                                )}>
-                                  {inn.score || "—"}
-                                </span>
-                                {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{formatOversText(inn.overs).replace(/ov/i, '').trim()} OVERS</span>}
-                              </div>
-                            ))}
+                            {(() => {
+                              const homeInnings = reconciledInningsScores.filter(i => i.team === 'home');
+                              return homeInnings.map((inn, idx) => (
+                                <div key={idx} className="flex flex-col items-center">
+                                  <span className={cn(
+                                    "font-black tracking-tighter",
+                                    idx === homeInnings.length - 1 ? "text-4xl md:text-5xl text-foreground" : "text-xl md:text-2xl text-muted-foreground"
+                                  )}>
+                                    {inn.score || "—"}
+                                  </span>
+                                  {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{formatOversText(inn.overs).replace(/ov/i, '').trim()} OVERS</span>}
+                                </div>
+                              ));
+                            })()}
                           </div>
                           {reconciledInningsScores.filter(i => i.team === 'away').length > 0 && (
                             <span className="text-border text-2xl font-light mt-2">-</span>
                           )}
                           <div className="flex flex-col items-center gap-3">
-                            {reconciledInningsScores.filter(i => i.team === 'away').map((inn, idx) => (
-                              <div key={idx} className="flex flex-col items-center">
-                                <span className={cn(
-                                  "font-black tracking-tighter",
-                                  idx === 0 ? "text-4xl md:text-5xl text-foreground" : "text-xl md:text-2xl text-muted-foreground"
-                                )}>
-                                  {inn.score || "—"}
-                                </span>
-                                {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{formatOversText(inn.overs).replace(/ov/i, '').trim()} OVERS</span>}
-                              </div>
-                            ))}
+                            {(() => {
+                              const awayInnings = reconciledInningsScores.filter(i => i.team === 'away');
+                              return awayInnings.map((inn, idx) => (
+                                <div key={idx} className="flex flex-col items-center">
+                                  <span className={cn(
+                                    "font-black tracking-tighter",
+                                    idx === awayInnings.length - 1 ? "text-4xl md:text-5xl text-foreground" : "text-xl md:text-2xl text-muted-foreground"
+                                  )}>
+                                    {inn.score || "—"}
+                                  </span>
+                                  {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{formatOversText(inn.overs).replace(/ov/i, '').trim()} OVERS</span>}
+                                </div>
+                              ));
+                            })()}
                           </div>
                         </div>
                      ) : (
@@ -2239,70 +2300,86 @@ const MatchDetails = () => {
                                   const isSpecialOver = ov < 0;
 
                                   return (
-                                    <div key={ov} className="space-y-2">
+                                    <div key={ov} className="mb-6">
                                       {/* Over label */}
                                       {!isSpecialOver && (
-                                        <div className="flex items-center gap-2 mb-2">
-                                          <div className="px-2.5 py-1 bg-primary/15 text-primary text-[11px] font-bold rounded-md tracking-wide">
+                                        <div className="flex items-center gap-3 mb-3">
+                                          <div className="px-3 py-1 bg-primary/10 text-primary text-[11px] font-bold rounded-full tracking-wide shadow-sm border border-primary/20">
                                             Over {ov + 1}
                                           </div>
-                                          <div className="h-px flex-1 bg-border/30" />
+                                          <div className="h-px flex-1 bg-gradient-to-r from-border/50 to-transparent" />
                                         </div>
                                       )}
 
-                                      {/* Commentary items */}
-                                      {overItems.map((item: any, idx: number) => {
-                                        const evt = item.event || 'NONE';
-                                        const isWicket = evt === 'WICKET';
-                                        const isSix = evt === 'SIX';
-                                        const isFour = evt === 'FOUR';
-                                        const isNoBall = evt === 'NOBALL';
-                                        const isWide = evt === 'WIDE';
-                                        const isOverComplete = evt === 'OVER_BREAK';
+                                      {/* Commentary items wrapped in a single premium card */}
+                                      <div className="bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden flex flex-col">
+                                        {overItems.map((item: any, idx: number) => {
+                                          const evt = item.event || 'NONE';
+                                          const isWicket = evt === 'WICKET' || (item.commText && (/(?:,\s*out\s+(?:caught|bowled|lbw|stumped|run out))/i.test(item.commText) || /\bWICKET\b/.test(item.commText)));
+                                          const isSix = evt === 'SIX' || (item.commText && /(?:,\s*SIX\b)/.test(item.commText));
+                                          const isFour = evt === 'FOUR' || (item.commText && /(?:,\s*FOUR\b)/.test(item.commText));
+                                          const isNoBall = evt === 'NOBALL';
+                                          const isWide = evt === 'WIDE';
+                                          const isOverComplete = evt === 'OVER_BREAK';
+                                          const isMilestone = evt === 'MILESTONE' || 
+                                            (item.commText && /(fifty|hundred|century|half century|half-century|\b50\b|\b100\b|\b150\b|\b200\b)/i.test(item.commText) && !item.commText.toLowerCase().includes('partnership'));
 
-                                        const dotColor = isWicket ? 'bg-red-500' :
-                                          isSix ? 'bg-amber-400' :
-                                          isFour ? 'bg-blue-400' :
-                                          isNoBall ? 'bg-orange-400' :
-                                          isWide ? 'bg-purple-400' :
-                                          isOverComplete ? 'bg-emerald-500' :
-                                          'bg-muted-foreground/30';
+                                          const dotColor = isWicket ? 'bg-red-500' :
+                                            isMilestone ? 'bg-purple-500' :
+                                            isSix ? 'bg-amber-500' :
+                                            isFour ? 'bg-blue-500' :
+                                            isNoBall ? 'bg-orange-500' :
+                                            isWide ? 'bg-purple-400' :
+                                            isOverComplete ? 'bg-emerald-500' :
+                                            'bg-muted-foreground/30';
 
-                                        const cardBg = isWicket ? 'bg-red-500/8 border-red-500/20' :
-                                          isSix ? 'bg-amber-500/8 border-amber-500/20' :
-                                          isFour ? 'bg-blue-500/8 border-blue-500/20' :
-                                          isOverComplete ? 'bg-emerald-500/8 border-emerald-500/20' :
-                                          'bg-secondary/20 border-border/40';
+                                          const cardBg = isWicket ? 'bg-red-500/5 dark:bg-red-500/10' :
+                                            isMilestone ? 'bg-purple-500/5 dark:bg-purple-500/10' :
+                                            isSix ? 'bg-amber-500/5 dark:bg-amber-500/10' :
+                                            isFour ? 'bg-blue-500/5 dark:bg-blue-500/10' :
+                                            isOverComplete ? 'bg-emerald-500/5 dark:bg-emerald-500/10' :
+                                            'bg-transparent hover:bg-muted/30';
 
-                                        const eventIcon = isWicket ? '🏏' :
-                                          isSix ? '🔥' :
-                                          isFour ? '🏃' :
-                                          isNoBall ? '🚫' :
-                                          isWide ? '↔️' :
-                                          isOverComplete ? '🔔' : '';
+                                          const eventIcon = isWicket ? '🏏' :
+                                            isMilestone ? '🌟' :
+                                            isSix ? '🔥' :
+                                            isFour ? '🏃' :
+                                            isNoBall ? '🚫' :
+                                            isWide ? '↔️' :
+                                            isOverComplete ? '🔔' : '';
 
-                                        const eventLabel = isWicket ? 'WICKET' :
-                                          isSix ? 'SIX' :
-                                          isFour ? 'FOUR' :
-                                          isNoBall ? 'NO BALL' :
-                                          isWide ? 'WIDE' :
-                                          isOverComplete ? 'OVER' : '';
+                                          let milestoneLabel = 'MILESTONE';
+                                          if (isMilestone && item.commText) {
+                                            const t = item.commText.toLowerCase();
+                                            if (/(hundred|century|\b100\b)/.test(t)) milestoneLabel = 'HUNDRED';
+                                            else if (/(fifty|half century|half-century|\b50\b)/.test(t)) milestoneLabel = 'FIFTY';
+                                          }
 
-                                        return (
-                                          <div
-                                            key={idx}
-                                            className={cn(
-                                              "relative flex gap-3 p-4 rounded-xl border transition-all",
-                                              cardBg,
-                                              (isWicket || isSix) && "shadow-sm"
-                                            )}
-                                          >
+                                          const eventLabel = isWicket ? 'WICKET' :
+                                            isMilestone ? milestoneLabel :
+                                            isSix ? 'SIX' :
+                                            isFour ? 'FOUR' :
+                                            isNoBall ? 'NO BALL' :
+                                            isWide ? 'WIDE' :
+                                            isOverComplete ? 'OVER' : '';
+
+                                          return (
+                                            <div
+                                              key={idx}
+                                              className={cn(
+                                                "relative flex gap-4 p-4 border-b border-border/40 last:border-0 transition-colors",
+                                                cardBg
+                                              )}
+                                            >
                                             {/* Left: over.ball indicator */}
                                             <div className="shrink-0 flex flex-col items-center gap-1 pt-0.5">
                                               <div className={cn("w-2.5 h-2.5 rounded-full", dotColor)} />
                                               {!isSpecialOver && item.ballNbr > 0 && (
                                                 <span className="text-[9px] font-mono text-muted-foreground/60 leading-none">
-                                                  {ov}.{item.ballInOver || (item.ballNbr % 6)}
+                                                  {(() => {
+                                                    const bInOver = item.ballInOver || (item.ballNbr % 6 === 0 ? 6 : item.ballNbr % 6);
+                                                    return bInOver === 6 ? `${ov + 1}.0` : `${ov}.${bInOver}`;
+                                                  })()}
                                                 </span>
                                               )}
                                             </div>
@@ -2313,12 +2390,13 @@ const MatchDetails = () => {
                                               <div className="flex flex-wrap items-center gap-2 mb-1.5">
                                                 {eventLabel && (
                                                   <span className={cn(
-                                                    "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full",
-                                                    isWicket ? "bg-red-500/20 text-red-400" :
-                                                    isSix ? "bg-amber-500/20 text-amber-400" :
-                                                    isFour ? "bg-blue-500/20 text-blue-400" :
-                                                    isOverComplete ? "bg-emerald-500/20 text-emerald-400" :
-                                                    "bg-muted/40 text-muted-foreground"
+                                                    "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-sm text-white",
+                                                    isWicket ? "bg-red-500" :
+                                                    isMilestone ? "bg-purple-500" :
+                                                    isSix ? "bg-amber-500" :
+                                                    isFour ? "bg-blue-500" :
+                                                    isOverComplete ? "bg-emerald-500" :
+                                                    "bg-muted-foreground"
                                                   )}>
                                                     {eventIcon && <span>{eventIcon}</span>}
                                                     {eventLabel}
@@ -2345,15 +2423,61 @@ const MatchDetails = () => {
                                               </div>
 
                                               {/* Commentary text */}
-                                              <p className={cn(
-                                                "text-sm leading-relaxed",
-                                                isWicket ? "text-foreground font-semibold" :
-                                                isSix ? "text-foreground font-medium" :
-                                                isFour ? "text-foreground/90" :
-                                                "text-foreground/80"
-                                              )}>
-                                                {item.commText}
-                                              </p>
+                                              <div className="text-sm leading-relaxed mt-0.5">
+                                                {(() => {
+                                                  const text = item.commText || '';
+                                                  
+                                                  const highlightMilestones = (str: string) => {
+                                                    if (!isMilestone && !/(fifty|hundred|century|half century|half-century|\b50\b|\b100\b)/i.test(str)) return str;
+                                                    const parts = str.split(/(fifty|hundred|century|half century|half-century|\b50\b|\b100\b)/i);
+                                                    return parts.map((part, i) => 
+                                                      i % 2 === 1 ? <strong key={i} className="font-bold text-foreground">{part.toUpperCase()}</strong> : part
+                                                    );
+                                                  };
+
+                                                  const bangIndex = text.indexOf('!!');
+                                                  
+                                                  if (bangIndex !== -1) {
+                                                    const firstPart = text.substring(0, bangIndex + 2);
+                                                    const rest = text.substring(bangIndex + 2);
+                                                    
+                                                    const lastPeriod = rest.lastIndexOf('. ');
+                                                    if (lastPeriod !== -1) {
+                                                      const description = rest.substring(0, lastPeriod + 1);
+                                                      const summary = rest.substring(lastPeriod + 2);
+                                                      
+                                                      if (/(?: c | b | lbw |run out|stumped|hit wicket)/i.test(summary) || / \d+\(\d+\)/.test(summary)) {
+                                                        return (
+                                                          <>
+                                                            <span className="font-bold text-foreground">{firstPart}</span>
+                                                            <span className="font-normal text-foreground/80">{highlightMilestones(description)}</span>
+                                                            <span className="font-bold text-foreground block mt-1.5">{summary}</span>
+                                                          </>
+                                                        );
+                                                      }
+                                                    }
+                                                    
+                                                    return (
+                                                      <>
+                                                        <span className="font-bold text-foreground">{firstPart}</span>
+                                                        <span className="font-normal text-foreground/80">{highlightMilestones(rest)}</span>
+                                                      </>
+                                                    );
+                                                  }
+                                                  
+                                                  const boundaryMatch = text.match(/^(.*?(?:,\s*FOUR\b|,\s*SIX\b)[^,.]*)(.*)$/);
+                                                  if (boundaryMatch) {
+                                                     return (
+                                                       <>
+                                                         <span className="font-bold text-foreground">{boundaryMatch[1]}</span>
+                                                         <span className="font-normal text-foreground/80">{highlightMilestones(boundaryMatch[2])}</span>
+                                                       </>
+                                                     );
+                                                  }
+
+                                                  return <span className="font-normal text-foreground/80">{highlightMilestones(text)}</span>;
+                                                })()}
+                                              </div>
                                             </div>
 
                                             {/* Right: runs badge for scoring balls */}
@@ -2378,7 +2502,8 @@ const MatchDetails = () => {
                                             )}
                                           </div>
                                         );
-                                      })}
+                                       })}
+                                     </div>
                                     </div>
                                   );
                                 })}
