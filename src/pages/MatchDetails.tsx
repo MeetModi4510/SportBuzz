@@ -676,9 +676,13 @@ const MatchDetails = () => {
   if (dynamicHomeScoreStr) dynamicHomeScoreStr = formatScoreString(dynamicHomeScoreStr);
   if (dynamicAwayScoreStr) dynamicAwayScoreStr = formatScoreString(dynamicAwayScoreStr);
 
-  const dynamicStatus = dynamicMatchInfo?.state === 'Complete' || dynamicMatchInfo?.state === 'Result' 
-      ? "completed" 
-      : (dynamicMatchInfo?.state === 'In Progress' || dynamicMatchInfo?.state === 'Live' ? "live" : match?.status || "upcoming");
+  const dynamicStatus = (() => {
+      const st = (dynamicMatchInfo?.state || '').toLowerCase();
+      if (!st) return match?.status || "upcoming";
+      if (st === 'complete' || st === 'completed' || st === 'result' || st === 'abandoned' || st === 'cancelled') return 'completed';
+      if (st === 'preview' || st === 'upcoming') return 'upcoming';
+      return 'live';
+  })();
   
   if (dynamicMatchInfo?.state) {
       isLive = dynamicStatus === "live";
@@ -1100,7 +1104,7 @@ const MatchDetails = () => {
 
 
               {/* Live Match Stats (Batters & Bowlers) */}
-              {isLive && cbSummary && (
+              {!isUpcoming && cbSummary && (cbSummary.miniscore?.batsmanStriker || cbSummary.miniscore?.bowlerStriker || cbSummary.miniscore?.partnerShip) && (
                 <div className="space-y-6 mt-8 animate-fade-in">
                   <div className="flex items-center gap-2 px-1">
                     <Activity className="w-4 h-4 text-red-500 animate-pulse" />

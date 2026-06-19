@@ -51,9 +51,10 @@ export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean
                     seriesName: info.series?.name || raw.seriesName || '',
                     status: (() => {
                         const st = (info.state || raw.state || '').toLowerCase();
-                        if (st === 'inprogress') return 'live';
-                        if (st === 'complete' || st === 'completed') return 'completed';
-                        return 'upcoming';
+                        if (st === 'complete' || st === 'completed' || st === 'result' || st === 'abandoned' || st === 'cancelled') return 'completed';
+                        if (st === 'preview' || st === 'upcoming' || st === '') return 'upcoming';
+                        // Stumps, Lunch, Tea, Innings Break, Rain, In Progress, Live, etc.
+                        return 'live';
                     })(),
                     summaryText: info.status || raw.status || '',
                     startTime: info.matchStartTimestamp ? new Date(parseInt(info.matchStartTimestamp)) : new Date(),
