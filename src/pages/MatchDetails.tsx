@@ -34,7 +34,8 @@ import {
   Coins,
   Eye,
   Shield,
-  Monitor
+  Monitor,
+  Calendar
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { Helmet } from "react-helmet-async";
@@ -815,42 +816,54 @@ const MatchDetails = () => {
                           )}
                         </div>
                      ) : isTestMatch && reconciledInningsScores && reconciledInningsScores.length > 0 ? (
-                        <div className="flex items-start justify-center gap-8 md:gap-10">
-                          <div className="flex flex-col items-center gap-3">
-                            {(() => {
-                              const homeInnings = reconciledInningsScores.filter(i => i.team === 'home');
-                              return homeInnings.map((inn, idx) => (
-                                <div key={idx} className="flex flex-col items-center">
-                                  <span className={cn(
-                                    "font-black tracking-tighter",
-                                    idx === homeInnings.length - 1 ? "text-4xl md:text-5xl text-foreground" : "text-xl md:text-2xl text-muted-foreground"
-                                  )}>
-                                    {inn.score || "—"}
-                                  </span>
-                                  {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{formatOversText(inn.overs).replace(/ov/i, '').trim()} OVERS</span>}
+                        <div className="flex flex-col items-center justify-center w-full min-w-[240px] gap-4">
+                          {(() => {
+                            const homeInns = reconciledInningsScores.filter(i => i.team === 'home');
+                            const awayInns = reconciledInningsScores.filter(i => i.team === 'away');
+                            const maxInns = Math.max(homeInns.length, awayInns.length, 1);
+                            
+                            return Array.from({ length: maxInns }).map((_, idx) => {
+                              const home = homeInns[idx];
+                              const away = awayInns[idx];
+                              const isHomeLatest = idx === homeInns.length - 1;
+                              const isAwayLatest = idx === awayInns.length - 1;
+                              
+                              return (
+                                <div key={idx} className={cn("grid grid-cols-[1fr_auto_1fr] items-center w-full", idx > 0 && "pt-4 border-t border-border/30")}>
+                                  {/* Home Score */}
+                                  <div className="flex flex-col items-end pr-4 md:pr-6">
+                                    {home ? (
+                                      <>
+                                        <span className={cn("font-black tracking-tighter transition-all", isHomeLatest ? "text-4xl md:text-5xl text-foreground" : "text-2xl md:text-3xl text-muted-foreground")}>{home.score}</span>
+                                        {home.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversText(home.overs).replace(/ov/i, '').trim()} OVERS</span>}
+                                      </>
+                                    ) : (
+                                       <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">—</span>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Center Inning Badge */}
+                                  <div className="flex items-center justify-center">
+                                     <div className="px-2.5 py-1 bg-muted/40 border border-border/40 rounded-full text-[9px] font-black text-muted-foreground uppercase tracking-[0.25em] shadow-sm">
+                                       INN {idx + 1}
+                                     </div>
+                                  </div>
+
+                                  {/* Away Score */}
+                                  <div className="flex flex-col items-start pl-4 md:pl-6">
+                                    {away ? (
+                                      <>
+                                        <span className={cn("font-black tracking-tighter transition-all", isAwayLatest ? "text-4xl md:text-5xl text-foreground" : "text-2xl md:text-3xl text-muted-foreground")}>{away.score}</span>
+                                        {away.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversText(away.overs).replace(/ov/i, '').trim()} OVERS</span>}
+                                      </>
+                                    ) : (
+                                       <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">—</span>
+                                    )}
+                                  </div>
                                 </div>
-                              ));
-                            })()}
-                          </div>
-                          {reconciledInningsScores.filter(i => i.team === 'away').length > 0 && (
-                            <span className="text-border text-2xl font-light mt-2">-</span>
-                          )}
-                          <div className="flex flex-col items-center gap-3">
-                            {(() => {
-                              const awayInnings = reconciledInningsScores.filter(i => i.team === 'away');
-                              return awayInnings.map((inn, idx) => (
-                                <div key={idx} className="flex flex-col items-center">
-                                  <span className={cn(
-                                    "font-black tracking-tighter",
-                                    idx === awayInnings.length - 1 ? "text-4xl md:text-5xl text-foreground" : "text-xl md:text-2xl text-muted-foreground"
-                                  )}>
-                                    {inn.score || "—"}
-                                  </span>
-                                  {inn.overs && <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-semibold bg-secondary/20 px-2 py-0.5 rounded-sm">{formatOversText(inn.overs).replace(/ov/i, '').trim()} OVERS</span>}
-                                </div>
-                              ));
-                            })()}
-                          </div>
+                              );
+                            });
+                          })()}
                         </div>
                      ) : (
                         (() => {
@@ -1118,74 +1131,84 @@ const MatchDetails = () => {
                       
                       {/* Batters */}
                       {(cbSummary.miniscore?.batsmanStriker || cbSummary.miniscore?.batsmanNonStriker) && (
-                        <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
-                          <div className="bg-muted/10 px-6 py-4 border-b border-border/40">
-                            <h4 className="text-xs font-bold text-foreground uppercase tracking-widest">Batters</h4>
+                        <div className="bg-card/20 backdrop-blur-sm border border-border/30 rounded-[1.5rem] p-1.5 shadow-sm">
+                          <div className="px-5 pt-4 pb-3 flex items-center justify-between border-b border-border/20">
+                            <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                               <div className="w-1.5 h-1.5 rounded-full bg-primary"></div> Batters
+                            </h4>
+                            <div className="hidden sm:flex gap-6 md:gap-8 text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-[0.15em] text-right pr-2">
+                              <span className="w-8">R</span><span className="w-8">B</span><span className="w-8">4s</span><span className="w-8">6s</span><span className="w-12">SR</span>
+                            </div>
                           </div>
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                              <thead className="bg-muted/5 text-muted-foreground text-xs uppercase font-semibold">
-                                <tr>
-                                  <th className="px-6 py-3">Batter</th>
-                                  <th className="px-6 py-3 text-right">R</th>
-                                  <th className="px-6 py-3 text-right">B</th>
-                                  <th className="px-6 py-3 text-right">4s</th>
-                                  <th className="px-6 py-3 text-right">6s</th>
-                                  <th className="px-6 py-3 text-right">SR</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-border/20">
-                                {[cbSummary.miniscore.batsmanStriker, cbSummary.miniscore.batsmanNonStriker].filter(Boolean).map((bat: any, idx: number) => (
-                                  <tr key={idx} className="hover:bg-muted/5 transition-colors">
-                                    <td className="px-6 py-4 font-semibold text-foreground flex items-center gap-2">
-                                      {bat.name} {bat.id === cbSummary.miniscore.batsmanStriker?.id && <span className="text-primary">*</span>}
-                                    </td>
-                                    <td className="px-6 py-4 text-right font-bold">{bat.runs}</td>
-                                    <td className="px-6 py-4 text-right text-muted-foreground">{bat.balls}</td>
-                                    <td className="px-6 py-4 text-right text-muted-foreground">{bat.fours}</td>
-                                    <td className="px-6 py-4 text-right text-muted-foreground">{bat.sixes}</td>
-                                    <td className="px-6 py-4 text-right text-muted-foreground">{bat.strikeRate}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                          <div className="p-1 space-y-1 mt-1">
+                            {[cbSummary.miniscore.batsmanStriker, cbSummary.miniscore.batsmanNonStriker].filter(Boolean).map((bat: any, idx: number) => {
+                              const isOnStrike = bat.id === cbSummary.miniscore.batsmanStriker?.id;
+                              return (
+                                <div key={idx} className={cn(
+                                  "flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl transition-all duration-300",
+                                  isOnStrike ? "bg-primary/5 border border-primary/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]" : "hover:bg-muted/10 border border-transparent"
+                                )}>
+                                  <div className="flex items-center gap-3 mb-4 sm:mb-0">
+                                    <span className={cn(
+                                      "font-semibold tracking-tight transition-colors", 
+                                      isOnStrike ? "text-foreground text-lg" : "text-muted-foreground text-base"
+                                    )}>{bat.name}</span>
+                                    {isOnStrike && <span className="text-[8px] font-black text-primary uppercase tracking-widest px-2 py-0.5 bg-primary/10 rounded-sm">Strike</span>}
+                                  </div>
+                                  
+                                  {/* Stats Row */}
+                                  <div className="flex gap-6 md:gap-8 items-center justify-between sm:justify-end text-right font-mono text-sm sm:text-base pr-2">
+                                    <div className="flex flex-col sm:block w-auto sm:w-8 items-center"><span className="text-[9px] text-muted-foreground sm:hidden mb-1 font-sans font-bold uppercase tracking-widest">R</span><span className={cn("font-black", isOnStrike ? "text-foreground text-xl" : "text-foreground")}>{bat.runs}</span></div>
+                                    <div className="flex flex-col sm:block w-auto sm:w-8 items-center"><span className="text-[9px] text-muted-foreground sm:hidden mb-1 font-sans font-bold uppercase tracking-widest">B</span><span className="text-muted-foreground font-medium">{bat.balls}</span></div>
+                                    <div className="flex flex-col sm:block w-auto sm:w-8 items-center"><span className="text-[9px] text-muted-foreground sm:hidden mb-1 font-sans font-bold uppercase tracking-widest">4s</span><span className="text-muted-foreground">{bat.fours}</span></div>
+                                    <div className="flex flex-col sm:block w-auto sm:w-8 items-center"><span className="text-[9px] text-muted-foreground sm:hidden mb-1 font-sans font-bold uppercase tracking-widest">6s</span><span className="text-muted-foreground">{bat.sixes}</span></div>
+                                    <div className="flex flex-col sm:block w-auto sm:w-12 items-end"><span className="text-[9px] text-muted-foreground sm:hidden mb-1 font-sans font-bold uppercase tracking-widest">SR</span><span className={cn("font-bold tracking-tight", parseFloat(bat.strikeRate) > 130 ? "text-primary" : "text-muted-foreground")}>{bat.strikeRate}</span></div>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
 
                       {/* Bowlers */}
                       {(cbSummary.miniscore?.bowlerStriker || cbSummary.miniscore?.bowlerNonStriker) && (
-                        <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
-                          <div className="bg-muted/10 px-6 py-4 border-b border-border/40">
-                            <h4 className="text-xs font-bold text-foreground uppercase tracking-widest">Bowlers</h4>
+                        <div className="bg-card/20 backdrop-blur-sm border border-border/30 rounded-[1.5rem] p-1.5 shadow-sm mt-6">
+                          <div className="px-5 pt-4 pb-3 flex items-center justify-between border-b border-border/20">
+                            <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                               <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div> Bowlers
+                            </h4>
+                            <div className="hidden sm:flex gap-6 md:gap-8 text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-[0.15em] text-right pr-2">
+                              <span className="w-8">O</span><span className="w-8">M</span><span className="w-8">R</span><span className="w-8">W</span><span className="w-12">ECO</span>
+                            </div>
                           </div>
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                              <thead className="bg-muted/5 text-muted-foreground text-xs uppercase font-semibold">
-                                <tr>
-                                  <th className="px-6 py-3">Bowler</th>
-                                  <th className="px-6 py-3 text-right">O</th>
-                                  <th className="px-6 py-3 text-right">M</th>
-                                  <th className="px-6 py-3 text-right">R</th>
-                                  <th className="px-6 py-3 text-right">W</th>
-                                  <th className="px-6 py-3 text-right">ECO</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-border/20">
-                                {[cbSummary.miniscore.bowlerStriker, cbSummary.miniscore.bowlerNonStriker].filter(Boolean).map((bowl: any, idx: number) => (
-                                  <tr key={idx} className="hover:bg-muted/5 transition-colors">
-                                    <td className="px-6 py-4 font-semibold text-foreground flex items-center gap-2">
-                                      {bowl.name} {bowl.id === cbSummary.miniscore.bowlerStriker?.id && <span className="text-primary">*</span>}
-                                    </td>
-                                    <td className="px-6 py-4 text-right font-bold">{bowl.overs}</td>
-                                    <td className="px-6 py-4 text-right text-muted-foreground">{bowl.maidens}</td>
-                                    <td className="px-6 py-4 text-right text-muted-foreground">{bowl.runs}</td>
-                                    <td className="px-6 py-4 text-right font-bold text-red-500">{bowl.wickets}</td>
-                                    <td className="px-6 py-4 text-right text-muted-foreground">{bowl.economy}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                          <div className="p-1 space-y-1 mt-1">
+                            {[cbSummary.miniscore.bowlerStriker, cbSummary.miniscore.bowlerNonStriker].filter(Boolean).map((bowl: any, idx: number) => {
+                              const isBowling = bowl.id === cbSummary.miniscore.bowlerStriker?.id;
+                              return (
+                                <div key={idx} className={cn(
+                                  "flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl transition-all duration-300",
+                                  isBowling ? "bg-red-500/5 border border-red-500/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]" : "hover:bg-muted/10 border border-transparent"
+                                )}>
+                                  <div className="flex items-center gap-3 mb-4 sm:mb-0">
+                                    <span className={cn(
+                                      "font-semibold tracking-tight transition-colors", 
+                                      isBowling ? "text-foreground text-lg" : "text-muted-foreground text-base"
+                                    )}>{bowl.name}</span>
+                                    {isBowling && <span className="text-[8px] font-black text-red-500 uppercase tracking-widest px-2 py-0.5 bg-red-500/10 rounded-sm">Bowling</span>}
+                                  </div>
+                                  
+                                  {/* Stats Row */}
+                                  <div className="flex gap-6 md:gap-8 items-center justify-between sm:justify-end text-right font-mono text-sm sm:text-base pr-2">
+                                    <div className="flex flex-col sm:block w-auto sm:w-8 items-center"><span className="text-[9px] text-muted-foreground sm:hidden mb-1 font-sans font-bold uppercase tracking-widest">O</span><span className="text-muted-foreground font-medium">{bowl.overs}</span></div>
+                                    <div className="flex flex-col sm:block w-auto sm:w-8 items-center"><span className="text-[9px] text-muted-foreground sm:hidden mb-1 font-sans font-bold uppercase tracking-widest">M</span><span className="text-muted-foreground">{bowl.maidens}</span></div>
+                                    <div className="flex flex-col sm:block w-auto sm:w-8 items-center"><span className="text-[9px] text-muted-foreground sm:hidden mb-1 font-sans font-bold uppercase tracking-widest">R</span><span className="text-foreground">{bowl.runs}</span></div>
+                                    <div className="flex flex-col sm:block w-auto sm:w-8 items-center"><span className="text-[9px] text-muted-foreground sm:hidden mb-1 font-sans font-bold uppercase tracking-widest">W</span><span className={cn("font-black", isBowling ? "text-red-500 text-xl" : "text-red-500")}>{bowl.wickets}</span></div>
+                                    <div className="flex flex-col sm:block w-auto sm:w-12 items-end"><span className="text-[9px] text-muted-foreground sm:hidden mb-1 font-sans font-bold uppercase tracking-widest">ECO</span><span className={cn("font-bold tracking-tight", parseFloat(bowl.economy) < 6 ? "text-green-500" : "text-muted-foreground")}>{bowl.economy}</span></div>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
@@ -1193,71 +1216,83 @@ const MatchDetails = () => {
 
                     {/* Key Stats Sidebar */}
                     <div className="space-y-6">
-                      <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden h-full">
-                        <div className="bg-muted/10 px-6 py-4 border-b border-border/40">
-                          <h4 className="text-xs font-bold text-foreground uppercase tracking-widest">Key Stats</h4>
+                      <div className="bg-card/20 backdrop-blur-sm border border-border/30 rounded-[1.5rem] shadow-sm overflow-hidden h-full">
+                        <div className="px-5 py-4 border-b border-border/20 flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary/70"></div>
+                          <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Key Stats</h4>
                         </div>
-                        <div className="p-6 space-y-6">
+                        <div className="p-4 space-y-4">
                           
-                          {/* Partnership */}
-                          {cbSummary.miniscore?.partnerShip && (
-                            <div>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Partnership</p>
-                              <p className="font-semibold text-sm text-foreground">{cbSummary.miniscore.partnerShip.runs} ({cbSummary.miniscore.partnerShip.balls})</p>
-                            </div>
-                          )}
+                          <div className="grid grid-cols-2 gap-3">
+                            {/* Partnership */}
+                            {cbSummary.miniscore?.partnerShip && (
+                              <div className="bg-muted/10 border border-border/40 rounded-xl p-3.5 flex flex-col justify-center transition-colors hover:bg-muted/20">
+                                <span className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-widest mb-1.5">Partnership</span>
+                                <div className="flex items-baseline gap-1.5 font-mono">
+                                  <span className="text-xl font-black text-foreground">{cbSummary.miniscore.partnerShip.runs}</span>
+                                  <span className="text-xs text-muted-foreground font-semibold">({cbSummary.miniscore.partnerShip.balls})</span>
+                                </div>
+                              </div>
+                            )}
 
-                          {/* Last Wicket */}
-                          {cbSummary.miniscore?.lastWkt && (
-                            <div>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Last Wkt</p>
-                              <p className="font-semibold text-sm text-foreground">{cbSummary.miniscore.lastWkt}</p>
-                            </div>
-                          )}
+                            {/* Last Wicket */}
+                            {cbSummary.miniscore?.lastWkt && (
+                              <div className="bg-muted/10 border border-border/40 rounded-xl p-3.5 flex flex-col justify-center transition-colors hover:bg-muted/20">
+                                <span className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-widest mb-1.5">Last Wkt</span>
+                                <span className="text-sm font-semibold text-foreground line-clamp-2">{cbSummary.miniscore.lastWkt}</span>
+                              </div>
+                            )}
 
-                          {/* Overs Left */}
-                          {cbSummary.miniscore?.oversLeft && (
-                            <div>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Overs Left</p>
-                              <p className="font-semibold text-sm text-foreground">{formatScoreString(String(cbSummary.miniscore.oversLeft))}</p>
-                            </div>
-                          )}
+                            {/* Overs Left */}
+                            {cbSummary.miniscore?.oversLeft && (
+                              <div className="bg-muted/10 border border-border/40 rounded-xl p-3.5 flex flex-col justify-center transition-colors hover:bg-muted/20">
+                                <span className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-widest mb-1.5">Overs Left</span>
+                                <span className="text-lg font-black font-mono text-foreground">{formatScoreString(String(cbSummary.miniscore.oversLeft))}</span>
+                              </div>
+                            )}
 
-                          {/* Last 10 Overs */}
-                          {cbSummary.miniscore?.last10Overs && (
-                            <div>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Last 10 Overs</p>
-                              <p className="font-semibold text-sm text-foreground">{cbSummary.miniscore.last10Overs}</p>
-                            </div>
-                          )}
+                            {/* Last 10 Overs */}
+                            {cbSummary.miniscore?.last10Overs && (
+                              <div className="bg-muted/10 border border-border/40 rounded-xl p-3.5 flex flex-col justify-center transition-colors hover:bg-muted/20">
+                                <span className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-widest mb-1.5">Last 10 Ov</span>
+                                <span className="text-lg font-black font-mono text-foreground">{cbSummary.miniscore.last10Overs}</span>
+                              </div>
+                            )}
+                          </div>
 
                           {/* Toss */}
                           {tossWinner && (
-                            <div>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Toss</p>
-                              <p className="font-semibold text-sm text-foreground">
-                                {tossWinner} chose to {tossChoice}
-                              </p>
+                            <div className="bg-muted/10 border border-border/40 rounded-xl p-4 flex items-center justify-between gap-4 transition-colors hover:bg-muted/20">
+                              <div className="flex flex-col">
+                                <span className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-widest mb-1.5">Toss</span>
+                                <span className="text-sm font-semibold text-foreground">{tossWinner} chose to <span className="text-primary">{tossChoice}</span></span>
+                              </div>
+                              <div className="w-8 h-8 rounded-full bg-background/50 border border-border/50 flex items-center justify-center shrink-0 shadow-sm">
+                                <span className="text-xs font-black text-muted-foreground">T</span>
+                              </div>
                             </div>
                           )}
 
                           {/* Win Probability Bar */}
                           {cbSummary.winProbability && (
-                            <div className="pt-4 border-t border-border/20">
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Win Probability</p>
-                              <div className="flex items-center gap-3">
-                                <span className="text-xs font-bold text-foreground w-8">{cbSummary.winProbability.team1?.shortName || "T1"}</span>
-                                <div className="flex-1 h-2.5 flex rounded-full overflow-hidden bg-muted">
-                                  <div className="bg-primary h-full" style={{ width: `${cbSummary.winProbability.team1?.percent || 0}%` }} />
-                                  <div className="bg-secondary h-full" style={{ width: `${cbSummary.winProbability.drawTiePercent || 0}%` }} />
-                                  <div className="bg-[#1e293b] h-full" style={{ width: `${cbSummary.winProbability.team2?.percent || 0}%` }} />
-                                </div>
-                                <span className="text-xs font-bold text-foreground w-8 text-right">{cbSummary.winProbability.team2?.shortName || "T2"}</span>
+                            <div className="bg-muted/10 border border-border/40 rounded-xl p-4 transition-colors hover:bg-muted/20">
+                              <div className="flex items-center justify-between mb-4">
+                                 <span className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-widest">Win Probability</span>
+                                 <Activity className="w-3.5 h-3.5 text-primary opacity-80" />
                               </div>
-                              <div className="flex justify-between text-[10px] text-muted-foreground mt-1.5 font-medium px-11">
-                                <span>{cbSummary.winProbability.team1?.percent || 0}%</span>
-                                {cbSummary.winProbability.drawTiePercent > 0 && <span>Draw {cbSummary.winProbability.drawTiePercent}%</span>}
-                                <span>{cbSummary.winProbability.team2?.percent || 0}%</span>
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs font-black text-foreground w-8">{cbSummary.winProbability.team1?.shortName || "T1"}</span>
+                                <div className="flex-1 h-2 flex rounded-full overflow-hidden bg-background border border-border/50 shadow-inner">
+                                  <div className="bg-primary h-full transition-all duration-1000 ease-out" style={{ width: `${cbSummary.winProbability.team1?.percent || 0}%` }} />
+                                  <div className="bg-secondary h-full transition-all duration-1000 ease-out" style={{ width: `${cbSummary.winProbability.drawTiePercent || 0}%` }} />
+                                  <div className="bg-[#1e293b] h-full transition-all duration-1000 ease-out" style={{ width: `${cbSummary.winProbability.team2?.percent || 0}%` }} />
+                                </div>
+                                <span className="text-xs font-black text-foreground w-8 text-right">{cbSummary.winProbability.team2?.shortName || "T2"}</span>
+                              </div>
+                              <div className="flex justify-between text-[10px] text-muted-foreground mt-2 font-bold font-mono px-11">
+                                <span className="text-primary drop-shadow-sm">{cbSummary.winProbability.team1?.percent || 0}%</span>
+                                {cbSummary.winProbability.drawTiePercent > 0 && <span className="text-secondary drop-shadow-sm">Draw {cbSummary.winProbability.drawTiePercent}%</span>}
+                                <span className="text-[#1e293b] dark:text-slate-400 drop-shadow-sm">{cbSummary.winProbability.team2?.percent || 0}%</span>
                               </div>
                             </div>
                           )}
@@ -1268,7 +1303,6 @@ const MatchDetails = () => {
                   </div>
                 </div>
               )}
-
               {/* Match Facts / Details Grid (From cbInfo or cbSummary) */}
               {(!isUpcoming || cbInfo) && (
                 <div className="space-y-4 mt-8 animate-fade-in">
@@ -1283,193 +1317,164 @@ const MatchDetails = () => {
                     </div>
                   ) : (
                     <>
-                      <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
-                      <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/40">
-                        
-                        {/* Column 1: Core Details */}
-                        <div className="p-6 md:p-8 space-y-8">
-                          
-                          {/* Match Type */}
-                          <div className="flex items-start gap-4">
-                            <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Tag size={18}/></div>
-                            <div>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Match Type</p>
-                              <p className="font-semibold text-sm text-foreground">
-                                {cbInfo?.matchInfo?.matchFormat || cbSummary?.matchHeader?.matchInfo?.matchFormat || cbSummary?.matchInfo?.matchFormat || match.matchType || "T20"}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Series / Tournament */}
-                          <div className="flex items-start gap-4">
-                            <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Trophy size={18}/></div>
-                            <div>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Series</p>
-                              <p className="font-semibold text-sm text-foreground">
-                                {cbInfo?.matchInfo?.seriesName || cbInfo?.matchInfo?.series?.name || cbSummary?.matchHeader?.matchInfo?.seriesName || cbSummary?.matchInfo?.seriesName || match.tournament?.name || "Tournament"}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Venue Info */}
-                          <div className="flex items-start gap-4">
-                            <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><MapPin size={18}/></div>
-                            <div>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Venue</p>
-                              <p className="font-semibold text-sm text-foreground leading-snug">
-                                {cbInfo?.matchInfo?.venueInfo?.ground || cbInfo?.venueInfo?.ground || cbSummary?.matchHeader?.matchInfo?.venueInfo?.ground || cbSummary?.matchInfo?.venueInfo?.ground || (typeof match.venue === 'object' ? match.venue?.name : match.venue) || "Stadium"}
-                                {", "}
-                                {cbInfo?.matchInfo?.venueInfo?.city || cbInfo?.venueInfo?.city || cbSummary?.matchHeader?.matchInfo?.venueInfo?.city || cbSummary?.matchInfo?.venueInfo?.city || (typeof match.venue === 'object' ? match.venue?.city : "") || ""}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          {/* Date & Time */}
-                          <div className="flex items-start gap-4">
-                            <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Clock size={18}/></div>
-                            <div>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Date & Time</p>
-                              <p className="font-semibold text-sm text-foreground">
-                                {cbInfo?.matchInfo?.startDate ? format(new Date(Number(cbInfo.matchInfo.startDate)), "MMMM d, yyyy • h:mm a") : 
-                                 cbSummary?.matchInfo?.startDate ? format(new Date(Number(cbSummary.matchInfo.startDate)), "MMMM d, yyyy • h:mm a") :
-                                 match.displayTime || format(match.startTime || new Date(), "MMMM d, yyyy • h:mm a")}
-                              </p>
-                            </div>
-                          </div>
-
-                        </div>
-
-                        {/* Column 2: Officials & Toss */}
-                        <div className="p-6 md:p-8 space-y-8 bg-muted/5">
-                          
-                          {(() => {
-                            const tossWinner = cbInfo?.matchInfo?.tossResults?.tossWinnerName || cbSummary?.matchHeader?.matchInfo?.tossResults?.tossWinnerName || cbSummary?.matchInfo?.tossResults?.tossWinnerName;
-                            const tossChoice = cbInfo?.matchInfo?.tossResults?.decision || cbSummary?.matchHeader?.matchInfo?.tossResults?.decision || cbSummary?.matchInfo?.tossResults?.decision;
-                            
-                            return (
-                              <>
-                                {/* Toss */}
-                                <div className="flex items-start gap-4">
-                                  <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Coins size={18}/></div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Toss Result</p>
-                                    <p className="font-semibold text-sm text-foreground leading-snug">
-                                      {tossWinner ? `${tossWinner} chose to ${tossChoice}` : match.tossResult || "Toss not yet happened"}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                {/* Umpires */}
-                                <div className="flex items-start gap-4">
-                                  <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Eye size={18}/></div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">On-Field Umpires</p>
-                                    <p className="font-semibold text-sm text-foreground">
-                                      {u1?.name ? `${u1.name}${u2?.name ? ", " + u2.name : ''}` : "To be announced"}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                {/* Referee */}
-                                <div className="flex items-start gap-4">
-                                  <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Shield size={18}/></div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Match Referee</p>
-                                    <p className="font-semibold text-sm text-foreground">
-                                      {ref?.name || match.referee || cbInfo?.extraInfo?.Referee || "To be announced"}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                {/* Broadcast Guide */}
-                                {(cbInfo?.extraInfo?.TV || cbInfo?.extraInfo?.Streaming) && (
-                                  <div className="flex items-start gap-4">
-                                    <div className="p-3.5 bg-secondary/60 rounded-2xl text-foreground"><Monitor size={18}/></div>
-                                    <div>
-                                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Broadcast</p>
-                                      <p className="font-semibold text-sm text-foreground">
-                                        {cbInfo?.extraInfo?.TV && <span><span className="text-muted-foreground">TV:</span> {cbInfo.extraInfo.TV}</span>}
-                                        {cbInfo?.extraInfo?.TV && cbInfo?.extraInfo?.Streaming && <span className="mx-2">•</span>}
-                                        {cbInfo?.extraInfo?.Streaming && <span><span className="text-muted-foreground">Stream:</span> {cbInfo.extraInfo.Streaming}</span>}
-                                      </p>
-                                    </div>
-                                  </div>
-                                )}
-                              </>
-                            );
-                          })()}
-
-                        </div>
-                      </div>
-
-                      {/* Man of the Match (Full Width Footer) */}
-                      {(cbSummary?.matchHeader?.matchInfo?.momName || cbInfo?.matchInfo?.status) && (
-                        <div className="border-t border-border/40 bg-gradient-to-r from-primary/10 via-transparent to-transparent p-6 md:px-8 flex items-center gap-5">
-                          <div className="p-3.5 bg-primary/20 rounded-2xl text-primary ring-1 ring-primary/30"><Trophy size={18}/></div>
-                          <div>
-                            <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">{cbSummary?.matchHeader?.matchInfo?.momName ? 'Player of the Match' : 'Match Result'}</p>
-                            <p className="font-bold text-base text-foreground tracking-tight">{cbSummary?.matchHeader?.matchInfo?.momName || cbInfo?.matchInfo?.status}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
                     {/* Full Match Information & Venue Guide Tables */}
                     {cbInfo?.extraInfo && Object.keys(cbInfo.extraInfo).length > 0 && (
                       <div className="mt-8 space-y-6 animate-fade-in">
-                        {/* INFO Table */}
-                        <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
-                          <div className="bg-muted/10 px-6 py-4 border-b border-border/40">
-                            <h4 className="text-xs font-bold text-foreground uppercase tracking-widest text-primary">Info</h4>
-                          </div>
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                              <tbody className="divide-y divide-border/20">
-                                {[
-                                  { label: 'Match', value: cbInfo.extraInfo.Match || (match as any).name },
-                                  { label: 'Series', value: cbInfo.matchInfo?.seriesName || cbSummary?.matchHeader?.matchInfo?.seriesName || cbSummary?.matchInfo?.seriesName || match.tournament?.name },
-                                  { label: 'Date', value: cbInfo.extraInfo.Date },
-                                  { label: 'Time', value: cbInfo.extraInfo.Time },
-                                  { label: 'Toss', value: cbInfo.extraInfo.Toss || match.tossResult },
-                                  { label: 'Venue', value: `${cbInfo.matchInfo?.venueInfo?.ground || cbInfo.extraInfo.Stadium}, ${cbInfo.matchInfo?.venueInfo?.city || cbInfo.extraInfo.City}` },
-                                  { label: 'Umpires', value: cbInfo.extraInfo.Umpires || (u1?.name ? `${u1.name}${u2?.name ? ", " + u2.name : ''}` : null) },
-                                  { label: '3rd Umpire', value: cbInfo.extraInfo['3rd Umpire'] },
-                                  { label: 'Referee', value: cbInfo.extraInfo.Referee || ref?.name || match.referee },
-                                  { label: 'Broadcast', value: [cbInfo.extraInfo.TV ? `TV: ${cbInfo.extraInfo.TV}` : null, cbInfo.extraInfo.Streaming ? `Stream: ${cbInfo.extraInfo.Streaming}` : null].filter(Boolean).join(' • ') }
-                                ].map((row, idx) => row.value && (
-                                  <tr key={idx} className="hover:bg-muted/5 transition-colors">
-                                    <td className="px-6 py-4 font-bold text-foreground w-1/3 md:w-1/4">{row.label}</td>
-                                    <td className="px-6 py-4 text-muted-foreground">{row.value}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                        {/* --- THE TICKET DESIGN --- */}
+                        <div className="relative w-full max-w-5xl mx-auto mt-10 filter drop-shadow-2xl animate-fade-in group">
+                          {/* Outer Ticket Container */}
+                          <div className="flex flex-col md:flex-row bg-card/80 backdrop-blur-2xl rounded-[2rem] overflow-hidden relative border border-border/50 group-hover:border-primary/30 transition-colors duration-500">
+                            
+                            {/* Decorative Cutouts for Ticket Effect */}
+                            <div className="hidden md:block absolute top-0 bottom-0 left-[65%] w-[2px] border-l-[3px] border-dashed border-border/40 z-10"></div>
+                            <div className="hidden md:block absolute -top-5 left-[65%] -translate-x-1/2 w-10 h-10 rounded-full bg-background border border-border/50 z-20"></div>
+                            <div className="hidden md:block absolute -bottom-5 left-[65%] -translate-x-1/2 w-10 h-10 rounded-full bg-background border border-border/50 z-20"></div>
+
+                            {/* Main Ticket Area (Left) */}
+                            <div className="w-full md:w-[65%] p-6 sm:p-10 relative overflow-hidden">
+                              {/* Background Watermark Logo */}
+                              <div className="absolute top-0 right-0 -mr-16 -mt-16 text-primary/[0.03] group-hover:text-primary/[0.05] transition-colors duration-700 rotate-12 scale-150 pointer-events-none">
+                                <Trophy className="w-64 h-64" />
+                              </div>
+
+                              <div className="relative z-10">
+                                {/* Header badge & Series */}
+                                <div className="flex flex-wrap items-center gap-3 mb-8">
+                                  <div className="px-4 py-1.5 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-md">
+                                    Official Ticket
+                                  </div>
+                                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.15em] border-l-2 border-primary/30 pl-3">
+                                    {cbInfo.matchInfo?.seriesName || cbSummary?.matchHeader?.matchInfo?.seriesName || cbSummary?.matchInfo?.seriesName || match.tournament?.name || "Cricket Match"}
+                                  </span>
+                                </div>
+
+                                {/* Main Match Title */}
+                                <div className="mb-8">
+                                  {(() => {
+                                    const matchTitleStr = cbInfo.extraInfo.Match || (match as any).name || "";
+                                    const titleParts = matchTitleStr.split(/(?:,|•)/).map((p: string) => p.trim()).filter(Boolean);
+                                    if (titleParts.length > 1) {
+                                      const mainTitle = titleParts[0];
+                                      const subTitles = titleParts.slice(1).join(" • ");
+                                      return (
+                                        <h2 className="flex flex-col gap-1.5 sm:gap-2">
+                                          <span className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] font-black text-foreground uppercase tracking-tighter leading-none bg-gradient-to-br from-foreground to-foreground/80 bg-clip-text text-transparent pb-1">
+                                            {mainTitle}
+                                          </span>
+                                          <span className="text-xs sm:text-sm font-bold text-muted-foreground uppercase tracking-[0.15em] leading-relaxed max-w-2xl">
+                                            {subTitles}
+                                          </span>
+                                        </h2>
+                                      );
+                                    }
+                                    return (
+                                      <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground uppercase tracking-tighter leading-[1.1] bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+                                        {matchTitleStr}
+                                      </h2>
+                                    );
+                                  })()}
+                                </div>
+
+                                {/* Core Details Row */}
+                                <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mb-8 p-5 bg-background/50 rounded-2xl border border-border/40">
+                                  <div>
+                                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5"><Calendar className="w-3 h-3"/> Date</span>
+                                    <span className="text-sm font-black text-foreground">{cbInfo.extraInfo.Date}</span>
+                                  </div>
+                                  <div className="w-px h-10 bg-border/60 hidden sm:block"></div>
+                                  <div>
+                                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5"><Clock className="w-3 h-3"/> Time</span>
+                                    <span className="text-sm font-black text-foreground">{cbInfo.extraInfo.Time}</span>
+                                  </div>
+                                </div>
+
+                                {/* Secondary Details Grid */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-6">
+                                   <div>
+                                    <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Venue</span>
+                                    <span className="text-sm font-bold text-foreground flex items-center gap-1.5">{`${cbInfo.matchInfo?.venueInfo?.ground || cbInfo.extraInfo.Stadium}`}</span>
+                                   </div>
+                                   {cbInfo.extraInfo.Toss && (
+                                     <div>
+                                      <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Toss</span>
+                                      <span className="text-sm font-bold text-foreground flex items-center gap-1.5 line-clamp-2" title={cbInfo.extraInfo.Toss || match.tossResult}>{cbInfo.extraInfo.Toss || match.tossResult}</span>
+                                     </div>
+                                   )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Ticket Stub (Right) */}
+                            <div className="w-full md:w-[35%] bg-muted/40 p-6 sm:p-10 relative flex flex-col justify-between border-t md:border-t-0 md:border-l border-border/30 border-dashed backdrop-blur-3xl">
+                              <div className="space-y-6">
+                                <div>
+                                  <span className="flex items-center gap-1.5 text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5"><Eye className="w-3 h-3"/> Umpires</span>
+                                  <span className="text-[13px] font-bold text-foreground leading-snug">{cbInfo.extraInfo.Umpires || (u1?.name ? `${u1.name}${u2?.name ? ", " + u2.name : ''}` : "TBA")}</span>
+                                </div>
+                                {cbInfo.extraInfo['3rd Umpire'] && (
+                                  <div>
+                                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5"><Monitor className="w-3 h-3"/> 3rd Umpire</span>
+                                    <span className="text-[13px] font-bold text-foreground leading-snug">{cbInfo.extraInfo['3rd Umpire']}</span>
+                                  </div>
+                                )}
+                                <div>
+                                  <span className="flex items-center gap-1.5 text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5"><Shield className="w-3 h-3"/> Referee</span>
+                                  <span className="text-[13px] font-bold text-foreground leading-snug">{cbInfo.extraInfo.Referee || ref?.name || match.referee || "TBA"}</span>
+                                </div>
+                                {([cbInfo.extraInfo.TV ? `TV: ${cbInfo.extraInfo.TV}` : null, cbInfo.extraInfo.Streaming ? `Stream: ${cbInfo.extraInfo.Streaming}` : null].filter(Boolean).length > 0) && (
+                                  <div className="pt-4 border-t border-border/50">
+                                    <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Broadcast</span>
+                                    <span className="text-[11px] font-bold text-foreground leading-snug block opacity-80">{[cbInfo.extraInfo.TV ? `TV: ${cbInfo.extraInfo.TV}` : null, cbInfo.extraInfo.Streaming ? `Stream: ${cbInfo.extraInfo.Streaming}` : null].filter(Boolean).join(' • ')}</span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Stylized Barcode Element */}
+                              <div className="mt-8 opacity-40 mix-blend-overlay flex flex-col items-center">
+                                <div className="h-12 w-full bg-[repeating-linear-gradient(to_right,currentColor_0,currentColor_2px,transparent_2px,transparent_5px,currentColor_5px,currentColor_8px,transparent_8px,transparent_10px,currentColor_10px,currentColor_11px,transparent_11px,transparent_15px,currentColor_15px,currentColor_18px,transparent_18px,transparent_22px)]"></div>
+                                <div className="text-center text-[9px] font-mono mt-2 font-bold tracking-[0.4em] uppercase text-foreground/70">M-{match.id.substring(0, 8)}</div>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
-                        {/* VENUE GUIDE Table */}
+                        {/* --- STADIUM ACCESS PASS (Venue Guide) --- */}
                         {(cbInfo.extraInfo.Stadium || cbInfo.extraInfo.Capacity || cbInfo.extraInfo.Ends) && (
-                          <div className="bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl shadow-sm overflow-hidden">
-                            <div className="bg-muted/10 px-6 py-4 border-b border-border/40">
-                              <h4 className="text-xs font-bold text-foreground uppercase tracking-widest text-primary">Venue Guide</h4>
-                            </div>
-                            <div className="overflow-x-auto">
-                              <table className="w-full text-sm text-left">
-                                <tbody className="divide-y divide-border/20">
-                                  {[
-                                    { label: 'Stadium', value: cbInfo.extraInfo.Stadium },
-                                    { label: 'City', value: cbInfo.extraInfo.City },
-                                    { label: 'Capacity', value: cbInfo.extraInfo.Capacity },
-                                    { label: 'Ends', value: cbInfo.extraInfo.Ends },
-                                    { label: 'Hosts To', value: cbInfo.extraInfo['Hosts To'] }
-                                  ].map((row, idx) => row.value && (
-                                    <tr key={idx} className="hover:bg-muted/5 transition-colors">
-                                      <td className="px-6 py-4 font-bold text-foreground w-1/3 md:w-1/4">{row.label}</td>
-                                      <td className="px-6 py-4 text-muted-foreground">{row.value}</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
+                          <div className="relative w-full max-w-5xl mx-auto mt-6 filter drop-shadow-md animate-fade-in group">
+                            <div className="bg-card/40 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/40 flex flex-col sm:flex-row items-stretch hover:border-primary/20 transition-all duration-300">
+                              {/* Color Accent Bar */}
+                              <div className="w-full sm:w-3 bg-gradient-to-b from-primary/80 to-primary/40 shrink-0"></div>
+                              
+                              <div className="flex-1 p-5 sm:p-6 flex flex-col md:flex-row items-center gap-6 sm:gap-8">
+                                 {/* Icon Badge */}
+                                 <div className="flex items-center justify-center w-14 h-14 rounded-[1rem] bg-primary/10 border border-primary/20 shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-500">
+                                   <MapPin className="w-6 h-6 text-primary" />
+                                 </div>
+                                 
+                                 {/* Venue Data Grid */}
+                                 <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-y-5 gap-x-4 w-full text-center md:text-left">
+                                   <div>
+                                    <span className="block text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Stadium</span>
+                                    <span className="text-[13px] font-black text-foreground">{cbInfo.extraInfo.Stadium}</span>
+                                   </div>
+                                   <div>
+                                    <span className="block text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">City</span>
+                                    <span className="text-[13px] font-black text-foreground">{cbInfo.extraInfo.City || "N/A"}</span>
+                                   </div>
+                                   {cbInfo.extraInfo.Capacity && (
+                                     <div>
+                                      <span className="block text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Capacity</span>
+                                      <span className="text-[13px] font-black text-foreground">{cbInfo.extraInfo.Capacity}</span>
+                                     </div>
+                                   )}
+                                   {cbInfo.extraInfo.Ends && (
+                                     <div className="col-span-2 md:col-span-1">
+                                      <span className="block text-[9px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Ends</span>
+                                      <span className="text-[12px] font-bold text-foreground/90 line-clamp-2 leading-tight" title={cbInfo.extraInfo.Ends}>{cbInfo.extraInfo.Ends}</span>
+                                     </div>
+                                   )}
+                                 </div>
+                              </div>
                             </div>
                           </div>
                         )}
@@ -1479,6 +1484,7 @@ const MatchDetails = () => {
                 )}
               </div>
               )}
+
             </TabsContent>
 
             <TabsContent value="squads" className="space-y-6 animate-fade-in">
@@ -2154,12 +2160,33 @@ const MatchDetails = () => {
                               <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-hide relative z-10 flex-1 md:justify-end">
                                 <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70 font-bold bg-background/50 px-2 py-1 rounded shrink-0">Fall of Wickets</span>
                                 <div className="flex items-center gap-3">
-                                  {inn.fallOfWickets.map((f: any, fIdx: number) => (
-                                    <div key={fIdx} className="flex items-center gap-1.5 shrink-0 bg-background/30 px-2.5 py-1 rounded-full border border-border/10">
-                                      <span className="text-xs font-bold text-foreground/80">{f.score}/{f.wicketNum}</span>
-                                      <span className="text-[10px] text-muted-foreground/60 max-w-[80px] truncate">{f.batsmanName}</span>
-                                    </div>
-                                  ))}
+                                  {inn.fallOfWickets.map((f: any, fIdx: number) => {
+                                      let score, wicketNum, batsmanName;
+                                      
+                                      if (typeof f === 'string') {
+                                          // Parse string like "27-1 (Conway, 3.2 ov)"
+                                          const match = f.match(/^(\d+)-(\d+)\s*\(([^,]+)(?:,[^)]*)?\)/i);
+                                          if (match) {
+                                              score = match[1];
+                                              wicketNum = match[2];
+                                              batsmanName = match[3].trim();
+                                          } else {
+                                              // Fallback if the string format is completely unexpected
+                                              return <div key={fIdx} className="flex items-center shrink-0 bg-background/30 px-2.5 py-1 rounded-full border border-border/10 text-xs text-muted-foreground">{f}</div>;
+                                          }
+                                      } else {
+                                          score = f.score;
+                                          wicketNum = f.wicketNum;
+                                          batsmanName = f.batsmanName;
+                                      }
+                                      
+                                      return (
+                                        <div key={fIdx} className="flex items-center gap-1.5 shrink-0 bg-background/30 px-2.5 py-1 rounded-full border border-border/10">
+                                          <span className="text-xs font-bold text-foreground/80">{score}/{wicketNum}</span>
+                                          <span className="text-[10px] text-muted-foreground/60 max-w-[80px] truncate">{batsmanName}</span>
+                                        </div>
+                                      );
+                                  })}
                                 </div>
                               </div>
                             )}

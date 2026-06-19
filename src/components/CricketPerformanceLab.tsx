@@ -196,19 +196,89 @@ export default function CricketPerformanceLab({
         return result;
     }, [currentInnings]);
 
-    // ── Run progression (FOW-based) ───────────────────────────────────────────
+    // ── Run progression (FOW-based + Interpolation) ───────────────────────────
     const runProgression = useMemo(() => {
         if (!currentInnings) return [];
-        const pts: { over: number; runs: number; wicket?: string }[] = [{ over: 0, runs: 0 }];
-        const fow = [...(currentInnings.fallOfWickets || [])].sort((a, b) => a.wicketNum - b.wicketNum);
-        for (const f of fow) {
-            pts.push({ over: f.overs, runs: f.score, wicket: f.batsmanName });
+        
+        const basePts: { over: number; runs: number; wicket?: string }[] = [{ over: 0, runs: 0 }];
+        const parsedFow = (currentInnings.fallOfWickets || []).map((f: any, idx: number) => {
+            if (typeof f === 'string') {
+                const match = f.match(/^(\d+)-(\d+)\s*\(([^,]+)(?:,\s*([\d.]+)\s*ov)?\)/i);
+                if (match) {
+                    return {
+                        score: Number(match[1]),
+                        wicketNum: Number(match[2]),
+                        batsmanName: match[3].trim(),
+                        overs: match[4] ? Number(match[4]) : undefined
+                    };
+                }
+                return { wicketNum: idx + 1, score: 0 };
+            }
+            return f;
+        }).sort((a: any, b: any) => a.wicketNum - b.wicketNum);
+        
+        for (const f of parsedFow) {
+            let overVal = Number(f.overs);
+            if (isNaN(overVal) && (f as any).over) overVal = Number((f as any).over);
+            
+            // If the API failed to provide the over for this wicket, estimate it mathematically
+            if ((isNaN(overVal) || !overVal) && f.score > 0 && currentInnings.score > 0 && currentInnings.overs > 0) {
+                overVal = (f.score / currentInnings.score) * currentInnings.overs;
+            }
+            overVal = overVal || 0;
+            
+            basePts.push({ over: overVal, runs: Number(f.score) || 0, wicket: f.batsmanName || `Wicket ${f.wicketNum}` });
         }
-        // Final score point
-        if (currentInnings.overs > 0) {
-            pts.push({ over: currentInnings.overs, runs: currentInnings.score });
+        
+        const currentOvers = Number(currentInnings.overs) || 0;
+        const currentRuns = Number(currentInnings.score) || 0;
+        
+        if (currentOvers > 0) {
+            basePts.push({ over: currentOvers, runs: currentRuns });
         }
-        return pts;
+        
+        basePts.sort((a, b) => a.over - b.over);
+
+        // Interpolate to generate a hover point for EVERY integer over
+        const interpolatedPts: { over: number; runs: number; wicket?: string }[] = [];
+        const maxOver = Math.ceil(currentOvers);
+        
+        for (let o = 0; o <= maxOver; o++) {
+            // Find if there's a base point exactly on this integer over
+            const exactPts = basePts.filter(p => p.over === o);
+            if (exactPts.length > 0) {
+                // If there's a wicket at this exact integer over, make sure we use it!
+                const wicketPt = exactPts.find(p => p.wicket);
+                interpolatedPts.push(wicketPt || exactPts[0]);
+            } else {
+                const prev = [...basePts].reverse().find(p => p.over < o) || basePts[0];
+                const next = basePts.find(p => p.over > o) || basePts[basePts.length - 1];
+                
+                if (prev && next && next.over !== prev.over) {
+                    const progress = (o - prev.over) / (next.over - prev.over);
+                    const interpolatedRuns = Math.round(prev.runs + (next.runs - prev.runs) * progress);
+                    interpolatedPts.push({ over: o, runs: interpolatedRuns });
+                } else {
+                    interpolatedPts.push({ over: o, runs: prev.runs });
+                }
+            }
+        }
+        
+        // Merge ANY missing wicket points back into the final array (fractional overs, or missed integer overs)
+        const allPts = [...interpolatedPts];
+        for (const bp of basePts) {
+            if (bp.wicket) {
+                const existing = allPts.find(p => p.over === bp.over);
+                if (existing) {
+                    // Inject the wicket marker into the existing point
+                    existing.wicket = bp.wicket;
+                } else {
+                    allPts.push(bp);
+                }
+            }
+        }
+        
+        return allPts.sort((a, b) => a.over - b.over);
     }, [currentInnings]);
 
     // ── Wicket distribution by over ───────────────────────────────────────────
@@ -540,8 +610,17 @@ export default function CricketPerformanceLab({
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                            <XAxis dataKey="over" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} label={{ value: "Overs", position: "insideBottomRight", offset: -5, fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
-                            <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} label={{ value: "Runs", angle: -90, position: "insideLeft", fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+                            <XAxis 
+                                type="number" 
+                                domain={[0, 'dataMax']} 
+                                dataKey="over" 
+                                tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
+                                label={{ value: "Overs", position: "insideBottomRight", offset: -5, fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
+                            />
+                            <YAxis 
+                                tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
+                                label={{ value: "Runs", angle: -90, position: "insideLeft", fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
+                            />
                             <Tooltip
                                 contentStyle={TOOLTIP_STYLE}
                                 formatter={(value: number, name: string) => [`${value} runs`, "Score"]}

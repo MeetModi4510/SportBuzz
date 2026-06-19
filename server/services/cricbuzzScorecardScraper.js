@@ -354,16 +354,38 @@ export async function scrapeScorecard(matchId, slug = null, force = false) {
 
         // Fall of wickets
         let fallOfWickets = [];
-        scorecardDiv.find('div').each((_, el) => {
-            const text = $(el).text().trim();
-            if (text.startsWith('Fall of Wickets') || $(el).prev().text().trim() === 'Fall of Wickets') {
-                const fowText = $(el).text().replace('Fall of Wickets', '').trim();
-                if (fowText) {
-                    // Parse "27-1 (Conway, 3.2 ov), 63-2 (Latham, 19.4 ov)"
-                    fallOfWickets = fowText.split(/,\s*(?=\d+-)/).map(s => s.trim()).filter(Boolean);
+        const fowGrids = scorecardDiv.find('.scorecard-fow-grid, .scorecard-fow-grid-web');
+        if (fowGrids.length > 0) {
+            fowGrids.each((_, row) => {
+                const $row = $(row);
+                const firstChild = $row.children().first();
+                if (firstChild.text().trim() === 'Fall of Wickets') return; // skip header
+
+                const nameEl = $row.find('a').first();
+                if (!nameEl.length) return;
+
+                const batsmanName = nameEl.text().trim();
+                const cells = [];
+                $row.children('div').each((_, cell) => cells.push($(cell).text().trim()));
+
+                const scoreStr = cells[0] || '';
+                const overStr = cells[1] || '0';
+                if (scoreStr.includes('-')) {
+                    // Returning old string format for backward compatibility
+                    fallOfWickets.push(`${scoreStr} (${batsmanName}, ${overStr} ov)`);
                 }
-            }
-        });
+            });
+        } else {
+            scorecardDiv.find('div').each((_, el) => {
+                const text = $(el).text().trim();
+                if (text.startsWith('Fall of Wickets') || $(el).prev().text().trim() === 'Fall of Wickets') {
+                    const fowText = $(el).text().replace('Fall of Wickets', '').trim();
+                    if (fowText) {
+                        fallOfWickets = fowText.split(/,\s*(?=\d+-)/).map(s => s.trim()).filter(Boolean);
+                    }
+                }
+            });
+        }
 
         innings.push({
             inningsNumber: parseInt(inningsNum),
