@@ -1098,23 +1098,6 @@ const MatchDetails = () => {
                 </div>
               )}
 
-              {/* Match Status & Result (Live + Completed) */}
-              {!isUpcoming && (match.sport === 'cricket' ? reconciledStatusText : match.summaryText) && (
-                <div className="relative overflow-hidden bg-card border border-border/40 rounded-2xl p-6 md:p-8 flex items-center gap-6 group shadow-sm transition-all hover:border-border/60">
-                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary" />
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <Activity className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 block">
-                      {isCompleted ? 'Match Result' : 'Current Status'}
-                    </span>
-                    <h3 className="text-lg md:text-xl font-bold text-foreground tracking-tight leading-snug">
-                      {match.sport === 'cricket' ? reconciledStatusText : match.summaryText}
-                    </h3>
-                  </div>
-                </div>
-              )}
 
               {/* Live Match Stats (Batters & Bowlers) */}
               {isLive && cbSummary && (
