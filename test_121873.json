@@ -1,0 +1,1470 @@
+{
+  "matchInfo": {
+    "matchId": 121873,
+    "alertType": "auto",
+    "isFantasyEnabled": false,
+    "isMatchNotCovered": false,
+    "livestreamEnabledGeo": [
+      "CA",
+      "US"
+    ],
+    "matchCompleteTimestamp": 1781901000000,
+    "matchDescription": "13th Match, Group B",
+    "matchFormat": "T20",
+    "matchImageId": 1011066,
+    "matchStartTimestamp": 1781890200000,
+    "matchTeamInfo": [
+      {
+        "battingTeamId": 98,
+        "battingTeamShortName": "NZW",
+        "bowlingTeamId": 189,
+        "bowlingTeamShortName": "IREW"
+      }
+    ],
+    "matchType": "International",
+    "playersOfTheMatch": [],
+    "playersOfTheSeries": [],
+    "referee": {
+      "id": 9181,
+      "name": "Shandre Fritz",
+      "country": "RSA"
+    },
+    "series": {
+      "id": 10119,
+      "name": "ICC Women's T20 World Cup 2026",
+      "startDate": 1781136000000,
+      "endDate": 1783296000000,
+      "seriesFolder": "",
+      "odiSeriesResult": "",
+      "t20SeriesResult": "",
+      "testSeriesResult": "",
+      "tournament": true
+    },
+    "state": "inprogress",
+    "status": "Ireland Women opt to bowl",
+    "team1": {
+      "id": 98,
+      "name": "New Zealand Women",
+      "playerDetails": [
+        {
+          "id": 26332,
+          "name": "Isabella Gaze",
+          "fullName": "Isabella Gaze",
+          "nickName": "Isabella Gaze",
+          "captain": false,
+          "role": "WK-Batsman",
+          "keeper": true,
+          "substitute": false,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "teamName": "NZW",
+          "faceImageId": 1005825
+        },
+        {
+          "id": 24446,
+          "name": "Georgia Plimmer",
+          "fullName": "Georgia Plimmer",
+          "nickName": "Georgia Plimmer",
+          "captain": false,
+          "role": "Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "NZW",
+          "faceImageId": 1005824
+        },
+        {
+          "id": 11855,
+          "name": "Amelia Kerr",
+          "fullName": "Amelia Kerr",
+          "nickName": "Amelia Kerr",
+          "captain": true,
+          "role": "Bowling Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm leg break",
+          "teamName": "NZW",
+          "faceImageId": 1005820
+        },
+        {
+          "id": 9996,
+          "name": "Maddy Green",
+          "fullName": "Maddy Green",
+          "nickName": "Maddy Green",
+          "captain": false,
+          "role": "Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm off break",
+          "teamName": "NZW",
+          "faceImageId": 1005829
+        },
+        {
+          "id": 19117,
+          "name": "Brooke Halliday",
+          "fullName": "Brooke Halliday",
+          "nickName": "Brooke Halliday",
+          "captain": false,
+          "role": "Batting Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 98,
+          "battingStyle": "LEFT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "NZW",
+          "faceImageId": 1005822
+        },
+        {
+          "id": 36879,
+          "name": "Izzy Sharp",
+          "fullName": "Izzy Sharp",
+          "nickName": "Izzy Sharp",
+          "captain": false,
+          "role": "WK-Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "teamName": "NZW",
+          "faceImageId": 1005826
+        },
+        {
+          "id": 9163,
+          "name": "Suzie Bates",
+          "fullName": "Suzie Bates",
+          "nickName": "Suzie Bates",
+          "captain": false,
+          "role": "Batting Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "NZW",
+          "faceImageId": 1005835,
+          "playingXIChange": "IN"
+        },
+        {
+          "id": 16557,
+          "name": "Jess Kerr",
+          "fullName": "Jess Kerr",
+          "nickName": "Jess Kerr",
+          "captain": false,
+          "role": "Bowling Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "NZW",
+          "faceImageId": 1005827
+        },
+        {
+          "id": 19172,
+          "name": "Nensi Patel",
+          "fullName": "Nensi Patel",
+          "nickName": "Nensi Patel",
+          "captain": false,
+          "role": "Bowling Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm off break",
+          "teamName": "NZW",
+          "faceImageId": 1005830
+        },
+        {
+          "id": 14550,
+          "name": "Rosemary Mair",
+          "fullName": "Rosemary Mair",
+          "nickName": "Rosemary Mair",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "NZW",
+          "faceImageId": 1005832
+        },
+        {
+          "id": 19168,
+          "name": "Bree Illing",
+          "fullName": "Bree Illing",
+          "nickName": "Bree Illing",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 98,
+          "battingStyle": "LEFT",
+          "teamName": "NZW",
+          "faceImageId": 1005821
+        },
+        {
+          "id": 1433163,
+          "name": "Polly Inglis",
+          "fullName": "Polly Inglis",
+          "nickName": "Polly Inglis",
+          "captain": false,
+          "role": "WK-Batsman",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "NZW",
+          "faceImageId": 1005831
+        },
+        {
+          "id": 1451596,
+          "name": "Flora Devonshire",
+          "fullName": "Flora Devonshire",
+          "nickName": "Flora Devonshire",
+          "captain": false,
+          "role": "Bowling Allrounder",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 98,
+          "battingStyle": "LEFT",
+          "teamName": "NZW",
+          "faceImageId": 1005823
+        },
+        {
+          "id": 9170,
+          "name": "Lea Tahuhu",
+          "fullName": "Lea Tahuhu",
+          "nickName": "Lea Tahuhu",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "NZW",
+          "faceImageId": 1005828
+        },
+        {
+          "id": 9165,
+          "name": "Sophie Devine",
+          "fullName": "Sophie Devine",
+          "nickName": "Sophie Devine",
+          "captain": false,
+          "role": "Batting Allrounder",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 98,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "NZW",
+          "faceImageId": 1005834,
+          "playingXIChange": "OUT"
+        },
+        {
+          "id": 1463218,
+          "name": "Ben Sawyer",
+          "fullName": "Ben Sawyer",
+          "nickName": "Ben Sawyer",
+          "role": "Head Coach",
+          "teamId": 98,
+          "teamName": "NZW",
+          "faceImageId": 182026,
+          "isSupportStaff": true
+        },
+        {
+          "id": 7814,
+          "name": "Dean Brownlie",
+          "fullName": "Dean Brownlie",
+          "nickName": "Brownlie",
+          "role": "Assistant coach",
+          "teamId": 98,
+          "teamName": "NZW",
+          "faceImageId": 156108,
+          "isSupportStaff": true
+        },
+        {
+          "id": 57,
+          "name": "Craig McMillan",
+          "fullName": "Craig McMillan",
+          "nickName": "McMillan",
+          "role": "Assistant coach",
+          "teamId": 98,
+          "teamName": "NZW",
+          "faceImageId": 151884,
+          "isSupportStaff": true
+        },
+        {
+          "id": 4096,
+          "name": "Paul Wiseman",
+          "fullName": "Paul Wiseman",
+          "nickName": "Wiseman",
+          "role": "Spin Coach",
+          "teamId": 98,
+          "teamName": "NZW",
+          "faceImageId": 154580,
+          "isSupportStaff": true
+        }
+      ],
+      "shortName": "NZW"
+    },
+    "team2": {
+      "id": 189,
+      "name": "Ireland Women",
+      "playerDetails": [
+        {
+          "id": 19572,
+          "name": "Amy Hunter",
+          "fullName": "Amy Hunter",
+          "nickName": "Amy Hunter",
+          "captain": false,
+          "role": "WK-Batsman",
+          "keeper": true,
+          "substitute": false,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "teamName": "IREW",
+          "faceImageId": 1005847
+        },
+        {
+          "id": 11258,
+          "name": "Gaby Lewis",
+          "fullName": "Gaby Lewis",
+          "nickName": "Gaby Lewis",
+          "captain": true,
+          "role": "Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm leg break",
+          "teamName": "IREW",
+          "faceImageId": 1005852
+        },
+        {
+          "id": 13742,
+          "name": "Orla Prendergast",
+          "fullName": "Orla Prendergast",
+          "nickName": "Orla Prendergast",
+          "captain": false,
+          "role": "Batting Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm fast medium",
+          "teamName": "IREW",
+          "faceImageId": 1005858
+        },
+        {
+          "id": 12764,
+          "name": "Rebecca Stokell",
+          "fullName": "Rebecca Stokell",
+          "nickName": "Rebecca Stokell",
+          "captain": false,
+          "role": "Batsman",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "IREW",
+          "faceImageId": 1005859
+        },
+        {
+          "id": 11558,
+          "name": "Leah Paul",
+          "fullName": "Leah Paul",
+          "nickName": "Leah Paul",
+          "captain": false,
+          "role": "Batting Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 189,
+          "battingStyle": "LEFT",
+          "bowlingStyle": "Left arm orthodox",
+          "teamName": "IREW",
+          "faceImageId": 1005856
+        },
+        {
+          "id": 1428769,
+          "name": "Alice Tector",
+          "fullName": "Alice Tector",
+          "nickName": "Alice Tector",
+          "captain": false,
+          "role": "Batting Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "IREW",
+          "faceImageId": 1005846
+        },
+        {
+          "id": 12760,
+          "name": "Louise Little",
+          "fullName": "Louise Little",
+          "nickName": "Louise Little",
+          "captain": false,
+          "role": "Bowling Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "IREW",
+          "faceImageId": 1005857
+        },
+        {
+          "id": 26213,
+          "name": "Arlene Kelly",
+          "fullName": "Arlene Kelly",
+          "nickName": "Arlene Kelly",
+          "captain": false,
+          "role": "Batting Allrounder",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "IREW",
+          "faceImageId": 1005848
+        },
+        {
+          "id": 38358,
+          "name": "Aimee Maguire",
+          "fullName": "Aimee Maguire",
+          "nickName": "Aimee Maguire",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Left arm orthodox",
+          "teamName": "IREW",
+          "faceImageId": 1005844
+        },
+        {
+          "id": 13741,
+          "name": "Cara Murray",
+          "fullName": "Cara Murray",
+          "nickName": "Cara Murray",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm leg break",
+          "teamName": "IREW",
+          "faceImageId": 1005850
+        },
+        {
+          "id": 1449424,
+          "name": "Lara McBride",
+          "fullName": "Lara McBride",
+          "nickName": "Lara McBride",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": false,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm off break",
+          "teamName": "IREW",
+          "faceImageId": 1005855,
+          "playingXIChange": "IN"
+        },
+        {
+          "id": 1428760,
+          "name": "Coulter Reilly",
+          "fullName": "Coulter Reilly",
+          "nickName": "Coulter Reilly",
+          "captain": false,
+          "role": "WK-Batsman",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "teamName": "IREW",
+          "faceImageId": 1005851
+        },
+        {
+          "id": 19557,
+          "name": "Georgina Dempsey",
+          "fullName": "Georgina Dempsey",
+          "nickName": "Georgina Dempsey",
+          "captain": false,
+          "role": "Bowling Allrounder",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "IREW",
+          "faceImageId": 1005853
+        },
+        {
+          "id": 26211,
+          "name": "Alana Dalzell",
+          "fullName": "Alana Dalzell",
+          "nickName": "Alana Dalzell",
+          "captain": false,
+          "role": "Batting Allrounder",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "IREW",
+          "faceImageId": 1005845,
+          "playingXIChange": "OUT"
+        },
+        {
+          "id": 19567,
+          "name": "Ava Canning",
+          "fullName": "Ava Canning",
+          "nickName": "Ava Canning",
+          "captain": false,
+          "role": "Bowler",
+          "keeper": false,
+          "substitute": true,
+          "teamId": 189,
+          "battingStyle": "RIGHT",
+          "bowlingStyle": "Right Arm medium",
+          "teamName": "IREW",
+          "faceImageId": 1005849
+        }
+      ],
+      "shortName": "IREW"
+    },
+    "tossResults": {
+      "tossWinnerId": 189,
+      "tossWinnerName": "Ireland Women",
+      "decision": "Bowling"
+    },
+    "umpire1": {
+      "id": 12554,
+      "name": "Sue Redfern",
+      "country": "ENG"
+    },
+    "umpire2": {
+      "id": 14463,
+      "name": "Eloise Sheridan",
+      "country": "AUS"
+    },
+    "umpire3": {
+      "id": 39541,
+      "name": "Shathira Jakir",
+      "country": "BAN"
+    },
+    "venue": {
+      "id": 21,
+      "name": "The Rose Bowl",
+      "city": "Southampton",
+      "country": "England",
+      "timezone": "+01:00",
+      "latitude": "50.924131",
+      "longitude": "-1.322163"
+    },
+    "year": 2026,
+    "shortStatus": "IREW opt to bowl",
+    "isForecastEnabled": true,
+    "isPollEnabled": true,
+    "complete": false,
+    "dayNight": false,
+    "domestic": false,
+    "HYSEnabled": 1,
+    "livestreamEnabled": false
+  },
+  "matchScore": {
+    "team1Score": {
+      "inngs1": {
+        "inningsId": 1,
+        "runs": 42,
+        "wickets": 3,
+        "overs": 6.5
+      }
+    }
+  },
+  "matchId": 121873,
+  "seriesId": 10119,
+  "seriesName": "ICC Women's T20 World Cup 2026",
+  "matchDesc": "13th Match, Group B",
+  "matchFormat": "T20",
+  "startDate": "1781890200000",
+  "endDate": "1781902800000",
+  "state": "inprogress",
+  "status": "Ireland Women opt to bowl",
+  "team1": "NZW",
+  "team2": "IREW",
+  "venueInfo": {
+    "id": 21,
+    "ground": "The Rose Bowl",
+    "city": "Southampton",
+    "timezone": "+01:00",
+    "latitude": "50.924131",
+    "longitude": "-1.322163"
+  },
+  "currBatTeamId": 98,
+  "isTournament": true,
+  "seriesStartDt": "1781222400000",
+  "seriesEndDt": "1783382400000",
+  "isTimeAnnounced": true,
+  "stateTitle": "In Progress",
+  "matchType": "International",
+  "shortStatus": "IREW opt to bowl",
+  "matchImageId": 1011066,
+  "isForecastEnabled": true,
+  "isFantasyEnabled": false,
+  "commentaryPageData": {
+    "matchCommentary": {
+      "1781892018337": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Cara Murray to Amelia Kerr, <b>FOUR</b>, to backward square leg",
+        "inningsId": 1,
+        "event": [
+          "four",
+          "all"
+        ],
+        "ballMetric": 6.5,
+        "teamName": "NZW",
+        "timestamp": 1781892018337,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 13741,
+          "playerName": "Cara Murray"
+        }
+      },
+      "1781891998434": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Cara Murray to Brooke Halliday, 1 run, oh generously tossed up, Halliday pushes hard at it, the ball squirts off the inside edge to backward square leg",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 6.4,
+        "teamName": "NZW",
+        "timestamp": 1781891998434,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 19117,
+          "playerName": "Brooke Halliday"
+        },
+        "bowlerDetails": {
+          "playerId": 13741,
+          "playerName": "Cara Murray"
+        }
+      },
+      "1781891966905": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Cara Murray to Amelia Kerr, 1 run, short again outside off, Kerr was hanging back, cuts it away to sweeper cover",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 6.3,
+        "teamName": "NZW",
+        "timestamp": 1781891966905,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 13741,
+          "playerName": "Cara Murray"
+        }
+      },
+      "1781891925176": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Cara Murray to Brooke Halliday, 1 run, slightly shorter, Halliday cuts it away to sweeper cover",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 6.2,
+        "teamName": "NZW",
+        "timestamp": 1781891925176,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 19117,
+          "playerName": "Brooke Halliday"
+        },
+        "bowlerDetails": {
+          "playerId": 13741,
+          "playerName": "Cara Murray"
+        }
+      },
+      "1781891887803": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Cara Murray to Brooke Halliday, <b>FOUR</b>, very ordinary effort at point, back of a length and outside off, Halliday cuts it straight to the fielder, who lets it through as the ball turned away at the last minute, a good sliding effort in the deep, but just when she was pulling it back, her feet was touching the ropes",
+        "inningsId": 1,
+        "event": [
+          "four",
+          "all"
+        ],
+        "ballMetric": 6.1,
+        "teamName": "NZW",
+        "timestamp": 1781891887803,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 19117,
+          "playerName": "Brooke Halliday"
+        },
+        "bowlerDetails": {
+          "playerId": 13741,
+          "playerName": "Cara Murray"
+        }
+      },
+      "1781891862375": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "<b>Cara Murray, right-arm leg break, comes into the attack</b>",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": "$undefined",
+        "teamName": "NZW",
+        "timestamp": 1781891862375,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 19117,
+          "playerName": "Brooke Halliday"
+        },
+        "bowlerDetails": {
+          "playerId": 13741,
+          "playerName": "Cara Murray"
+        }
+      },
+      "1781891797745": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "<b>Drinks</b>, and Ireland are all over the Kiwis. Remember they are without the experienced Sophie Devine today and they need Amelia Kerr to stay till the end in order to post a decent total.",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": "$undefined",
+        "teamName": "NZW",
+        "timestamp": 1781891797745,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 0,
+          "playerName": ""
+        },
+        "bowlerDetails": {
+          "playerId": 0,
+          "playerName": ""
+        }
+      },
+      "1781891685943": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Arlene Kelly to Amelia Kerr, 2 runs, good over to end the powerplay, shorter and drifting in, Kerr was hanging back, punches it in the gap to wide long-on",
+        "inningsId": 1,
+        "event": [
+          "over-break",
+          "all",
+          "two"
+        ],
+        "ballMetric": 5.6,
+        "teamName": "NZW",
+        "timestamp": 1781891685943,
+        "overSeparator": {
+          "timestamp": 1781891685943,
+          "overNumber": 6,
+          "overSummary": "0 0 0 4 4 2 ",
+          "overRuns": 10,
+          "batTeamObj": {
+            "teamName": "NZW",
+            "teamScore": "31-3"
+          },
+          "batStrikerObj": {
+            "playerId": 11855,
+            "playerName": "Amelia Kerr",
+            "playerScore": "21(16)"
+          },
+          "batNonStrikerObj": {
+            "playerId": 19117,
+            "playerName": "Brooke Halliday",
+            "playerScore": "1(5)"
+          },
+          "bowlerObj": {
+            "playerId": 26213,
+            "playerName": "Arlene Kelly",
+            "playerScore": "2-0-12-0"
+          }
+        },
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 26213,
+          "playerName": "Arlene Kelly"
+        }
+      },
+      "1781891643519": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Arlene Kelly to Amelia Kerr, <b>FOUR</b>, now she finds the gap on the off side, trifle short and outside off, Kerr quickly moves back, gets on top of the ball and cuts it away to sweeper cover",
+        "inningsId": 1,
+        "event": [
+          "four",
+          "all"
+        ],
+        "ballMetric": 5.5,
+        "teamName": "NZW",
+        "timestamp": 1781891643519,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 26213,
+          "playerName": "Arlene Kelly"
+        }
+      },
+      "1781891612813": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Arlene Kelly to Amelia Kerr, <b>FOUR</b>, that's cheeky from the skipper, length delivery on the pads, Kerr moves across to the off side and laps it past the keeper to fine leg, she placed it well!`",
+        "inningsId": 1,
+        "event": [
+          "four",
+          "all"
+        ],
+        "ballMetric": 5.4,
+        "teamName": "NZW",
+        "timestamp": 1781891612813,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 26213,
+          "playerName": "Arlene Kelly"
+        }
+      },
+      "1781891581961": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Arlene Kelly to Amelia Kerr, no run, tighter line around the off stump, cramping her for any room, Kerr pushes it towards covers",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 5.3,
+        "teamName": "NZW",
+        "timestamp": 1781891581961,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 26213,
+          "playerName": "Arlene Kelly"
+        }
+      },
+      "1781891556858": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Arlene Kelly to Amelia Kerr, no run, slower delivery outside off, Kerr pushes it to point",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 5.2,
+        "teamName": "NZW",
+        "timestamp": 1781891556858,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 26213,
+          "playerName": "Arlene Kelly"
+        }
+      },
+      "1781891526531": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Arlene Kelly to Amelia Kerr, no run, full and in the slot, Kerr can't find the gap, hits it straight to the fielder at covers",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 5.1,
+        "teamName": "NZW",
+        "timestamp": 1781891526531,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 26213,
+          "playerName": "Arlene Kelly"
+        }
+      },
+      "1781891509281": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "<b>Arlene Kelly [1.0-0-2-0] is back into the attack</b>",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": "$undefined",
+        "teamName": "NZW",
+        "timestamp": 1781891509281,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 26213,
+          "playerName": "Arlene Kelly"
+        }
+      },
+      "1781891442510": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Aimee Maguire to Amelia Kerr, 1 run, charges down the track, takes it on the full and drives it down to long-on",
+        "inningsId": 1,
+        "event": [
+          "over-break",
+          "all"
+        ],
+        "ballMetric": 4.6,
+        "teamName": "NZW",
+        "timestamp": 1781891442510,
+        "overSeparator": {
+          "timestamp": 1781891442510,
+          "overNumber": 5,
+          "overSummary": "1 0 1 4 0 1 ",
+          "overRuns": 7,
+          "batTeamObj": {
+            "teamName": "NZW",
+            "teamScore": "21-3"
+          },
+          "batStrikerObj": {
+            "playerId": 11855,
+            "playerName": "Amelia Kerr",
+            "playerScore": "11(10)"
+          },
+          "batNonStrikerObj": {
+            "playerId": 19117,
+            "playerName": "Brooke Halliday",
+            "playerScore": "1(5)"
+          },
+          "bowlerObj": {
+            "playerId": 38358,
+            "playerName": "Aimee Maguire",
+            "playerScore": "2-0-12-1"
+          }
+        },
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 38358,
+          "playerName": "Aimee Maguire"
+        }
+      },
+      "1781891418788": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Aimee Maguire to Amelia Kerr, no run, quicker delivery outside off, Kerr defends it to the off side",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 4.5,
+        "teamName": "NZW",
+        "timestamp": 1781891418788,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 38358,
+          "playerName": "Aimee Maguire"
+        }
+      },
+      "1781891389984": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Aimee Maguire to Amelia Kerr, <b>FOUR</b>, excellent shot, charges down the track, takes it on the full and threads it through the gap to deep extra cover, the Kiwis need her to stay",
+        "inningsId": 1,
+        "event": [
+          "four",
+          "all"
+        ],
+        "ballMetric": 4.4,
+        "teamName": "NZW",
+        "timestamp": 1781891389984,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 38358,
+          "playerName": "Aimee Maguire"
+        }
+      },
+      "1781891372655": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Aimee Maguire to Brooke Halliday, 1 run, tossed up outside off Halliday taps it to backward point, a fumble and they get the single",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 4.3,
+        "teamName": "NZW",
+        "timestamp": 1781891372655,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 19117,
+          "playerName": "Brooke Halliday"
+        },
+        "bowlerDetails": {
+          "playerId": 38358,
+          "playerName": "Aimee Maguire"
+        }
+      },
+      "1781891344670": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Aimee Maguire to Brooke Halliday, no run, well flighted outside off, this one goes straight on, Halliday pokes at it and misses, probing length from Maguire",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 4.2,
+        "teamName": "NZW",
+        "timestamp": 1781891344670,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 19117,
+          "playerName": "Brooke Halliday"
+        },
+        "bowlerDetails": {
+          "playerId": 38358,
+          "playerName": "Aimee Maguire"
+        }
+      },
+      "1781891306692": {
+        "matchId": 121873,
+        "commType": "commentary",
+        "commText": "Aimee Maguire to Amelia Kerr, 1 run, well tossed up outside off and turning away, this one grips off the surface, Kerr watches it late and taps it to backward point",
+        "inningsId": 1,
+        "event": [
+          "none",
+          "all"
+        ],
+        "ballMetric": 4.1,
+        "teamName": "NZW",
+        "timestamp": 1781891306692,
+        "overSeparator": null,
+        "batsmanDetails": {
+          "playerId": 11855,
+          "playerName": "Amelia Kerr"
+        },
+        "bowlerDetails": {
+          "playerId": 38358,
+          "playerName": "Aimee Maguire"
+        }
+      }
+    },
+    "miniscore": {
+      "inningsId": 1,
+      "batTeam": {
+        "teamId": 98,
+        "teamScore": 42,
+        "teamWkts": 3
+      },
+      "status": "Ireland Women opt to bowl",
+      "batsmanStriker": {
+        "id": 11855,
+        "name": "Amelia Kerr",
+        "runs": 26,
+        "balls": 18,
+        "fours": 4,
+        "sixes": 0,
+        "strikeRate": "144.44",
+        "playerUrl": "/profiles/11855/amelia-kerr",
+        "playerMatchHighlightsUrl": "/player-match-highlights/121873/1/11855/batting"
+      },
+      "batsmanNonStriker": {
+        "id": 19117,
+        "name": "Brooke Halliday",
+        "runs": 7,
+        "balls": 8,
+        "fours": 1,
+        "sixes": 0,
+        "strikeRate": "87.50",
+        "playerUrl": "/profiles/19117/brooke-halliday",
+        "playerMatchHighlightsUrl": "/player-match-highlights/121873/1/19117/batting"
+      },
+      "bowlerStriker": {
+        "id": 13741,
+        "name": "Cara Murray",
+        "overs": 0.5,
+        "maidens": 0,
+        "economy": 13.2,
+        "runs": 11,
+        "wickets": 0,
+        "playerUrl": "/profiles/13741/cara-murray",
+        "playerMatchHighlightsUrl": "/player-match-highlights/121873/1/13741/bowling"
+      },
+      "bowlerNonStriker": {
+        "id": 26213,
+        "name": "Arlene Kelly",
+        "overs": 2,
+        "maidens": 0,
+        "economy": 6,
+        "runs": 12,
+        "wickets": 0,
+        "playerUrl": "/profiles/26213/arlene-kelly",
+        "playerMatchHighlightsUrl": "/player-match-highlights/121873/1/26213/bowling"
+      },
+      "overs": 6.5,
+      "target": null,
+      "partnerShip": {
+        "balls": 22,
+        "runs": 32
+      },
+      "currentRunRate": 6.15,
+      "requiredRunRate": 0,
+      "runsPerBall": 0,
+      "requiredRunsPerBall": 0,
+      "matchScoreDetails": {
+        "matchId": 121873,
+        "inningsScoreList": [
+          {
+            "inningsId": 1,
+            "batTeamId": 98,
+            "batTeamName": "NZW",
+            "score": 42,
+            "wickets": 3,
+            "overs": 6.5,
+            "isDeclared": false,
+            "isFollowOn": false,
+            "ballNbr": 41
+          }
+        ],
+        "isMatchNotCovered": false,
+        "matchFormat": "T20",
+        "customStatus": "Ireland Women opt to bowl",
+        "state": "In Progress"
+      },
+      "lastWicket": "Maddy Green   b Orla Prendergast 2(8)  - 10/3 in 3.1 ov.",
+      "remRunsToWin": 0,
+      "oversRem": "$undefined",
+      "responseLastUpdated": 1781892033,
+      "latestPerformance": [
+        {
+          "runs": 35,
+          "wkts": 1,
+          "label": "Last 5 overs"
+        },
+        {
+          "runs": 28,
+          "wkts": 0,
+          "label": "Last 3 overs"
+        }
+      ],
+      "recentOvsStats": "4 1 1 1 4",
+      "event": "four",
+      "batTeamScoreObj": {
+        "teamName": "NZW",
+        "teamInningsArray": [
+          {
+            "inningsId": 1,
+            "batTeamId": 98,
+            "batTeamName": "NZW",
+            "score": 42,
+            "wickets": 3,
+            "overs": 6.5,
+            "isDeclared": false,
+            "isFollowOn": false,
+            "ballNbr": 41
+          }
+        ]
+      },
+      "bowlTeamScoreObj": {
+        "teamName": "",
+        "teamInningsArray": []
+      },
+      "matchUdrs": null
+    },
+    "enableNoContent": false,
+    "matchHeader": {
+      "matchId": 121873,
+      "matchDescription": "13th Match, Group B",
+      "matchFormat": "T20",
+      "matchType": "International",
+      "complete": false,
+      "domestic": false,
+      "matchStartTimestamp": 1781890200000,
+      "matchStartTimeIST": "11:00 PM",
+      "matchStartTimeGMT": "5:30 PM",
+      "matchStartTimeLocal": "6:30 PM",
+      "matchCompleteTimeIST": "2:00 AM",
+      "matchCompleteTimeGMT": "Fri, Jun 19, 8:30:00 PM",
+      "matchCompleteTimeLocal": "9:30 PM",
+      "dayNight": false,
+      "year": 2026,
+      "state": "In Progress",
+      "status": "Ireland Women opt to bowl",
+      "tossResults": {
+        "tossWinnerId": 189,
+        "tossWinnerName": "Ireland Women",
+        "decision": "Bowling"
+      },
+      "result": {},
+      "revisedTarget": {},
+      "playersOfTheMatch": [],
+      "playersOfTheSeries": [],
+      "matchTeamInfo": [
+        {
+          "battingTeamId": 98,
+          "battingTeamShortName": "NZW",
+          "bowlingTeamId": 189,
+          "bowlingTeamShortName": "IREW"
+        }
+      ],
+      "team1": {
+        "id": 98,
+        "name": "New Zealand Women",
+        "playerDetails": [],
+        "shortName": "NZW"
+      },
+      "team2": {
+        "id": 189,
+        "name": "Ireland Women",
+        "playerDetails": [],
+        "shortName": "IREW"
+      },
+      "seriesDesc": "ICC Women's T20 World Cup 2026",
+      "seriesId": 10119,
+      "seriesName": "ICC Women's T20 World Cup 2026",
+      "alertType": "auto",
+      "isMatchNotCovered": false,
+      "livestreamEnabled": false
+    },
+    "matchVideos": [
+      {
+        "id": "195431",
+        "icon": "cbPlayIcon scale-75",
+        "title": "Match Forecast: Women's T20 WC - NZ W vs IRE W, 13th Match",
+        "onCardClick": "/cricket-match-forecast/121873/icc-womens-t20-world-cup-2026-13th-match-group-b",
+        "isCbPlusContent": false,
+        "isPremiumFree": false,
+        "isLive": "$undefined",
+        "videoType": "Match Forecast",
+        "imageObj": {
+          "imageId": "1011065",
+          "alt": "match-forecast-womens-t20-wc-nz-w-vs-ire-w-13th-match",
+          "src": "imagesrc",
+          "w": 170,
+          "h": 90,
+          "aspect": "16:9",
+          "imageType": "thumb",
+          "priority": true
+        }
+      }
+    ],
+    "page": "commentary",
+    "responseLastUpdated": 1781892033,
+    "partnersStrip": "$undefined",
+    "winProbability": {
+      "matchId": 121873,
+      "drawTiePercent": 0,
+      "team1": {
+        "id": 98,
+        "percent": 43,
+        "name": "New Zealand Women",
+        "shortName": "NZW",
+        "color": "#1E293B|#999999"
+      },
+      "team2": {
+        "id": 189,
+        "percent": 57,
+        "name": "Ireland Women",
+        "shortName": "IREW",
+        "color": "#10BC83|#10BC83"
+      },
+      "lastUpdatedOver": 6.3,
+      "odds": {
+        "team1_point": 2.3,
+        "team2_point": 1.8
+      }
+    }
+  },
+  "isHundred": false,
+  "specialsAdUnitArr": [],
+  "isMiniscorePollingEnabled": true,
+  "commType": "commentary",
+  "commText": "Aimee Maguire to Amelia Kerr, 1 run, well tossed up outside off and turning away, this one grips off the surface, Kerr watches it late and taps it to backward point",
+  "inningsId": 1,
+  "event": [
+    "none",
+    "all"
+  ],
+  "ballMetric": 4.1,
+  "teamName": "NZW",
+  "timestamp": 1781891306692,
+  "overSeparator": null,
+  "batsmanDetails": {
+    "playerId": 11855,
+    "playerName": "Amelia Kerr"
+  },
+  "bowlerDetails": {
+    "playerId": 38358,
+    "playerName": "Aimee Maguire"
+  },
+  "inningsScoreList": [
+    {
+      "inningsId": 1,
+      "batTeamId": 98,
+      "batTeamName": "NZW",
+      "score": 42,
+      "wickets": 3,
+      "overs": 6.5,
+      "isDeclared": false,
+      "isFollowOn": false,
+      "ballNbr": 41
+    }
+  ],
+  "isMatchNotCovered": false,
+  "customStatus": "Ireland Women opt to bowl",
+  "matchDescription": "13th Match, Group B",
+  "complete": false,
+  "domestic": false,
+  "matchStartTimestamp": 1781890200000,
+  "matchStartTimeIST": "11:00 PM",
+  "matchStartTimeGMT": "5:30 PM",
+  "matchStartTimeLocal": "6:30 PM",
+  "matchCompleteTimeIST": "2:00 AM",
+  "matchCompleteTimeGMT": "Fri, Jun 19, 8:30:00 PM",
+  "matchCompleteTimeLocal": "9:30 PM",
+  "dayNight": false,
+  "year": 2026,
+  "tossResults": {
+    "tossWinnerId": 189,
+    "tossWinnerName": "Ireland Women",
+    "decision": "Bowling"
+  },
+  "result": {},
+  "revisedTarget": {},
+  "playersOfTheMatch": [],
+  "playersOfTheSeries": [],
+  "matchTeamInfo": [
+    {
+      "battingTeamId": 98,
+      "battingTeamShortName": "NZW",
+      "bowlingTeamId": 189,
+      "bowlingTeamShortName": "IREW"
+    }
+  ],
+  "seriesDesc": "ICC Women's T20 World Cup 2026",
+  "alertType": "auto",
+  "livestreamEnabled": false,
+  "drawTiePercent": 0,
+  "lastUpdatedOver": 6.3,
+  "odds": {
+    "team1_point": 2.3,
+    "team2_point": 1.8
+  },
+  "livestreamEnabledGeo": [
+    "CA",
+    "US"
+  ],
+  "matchCompleteTimestamp": 1781901000000,
+  "referee": {
+    "id": 9181,
+    "name": "Shandre Fritz",
+    "country": "RSA"
+  },
+  "series": {
+    "id": 10119,
+    "name": "ICC Women's T20 World Cup 2026",
+    "startDate": 1781136000000,
+    "endDate": 1783296000000,
+    "seriesFolder": "",
+    "odiSeriesResult": "",
+    "t20SeriesResult": "",
+    "testSeriesResult": "",
+    "tournament": true
+  },
+  "umpire1": {
+    "id": 12554,
+    "name": "Sue Redfern",
+    "country": "ENG"
+  },
+  "umpire2": {
+    "id": 14463,
+    "name": "Eloise Sheridan",
+    "country": "AUS"
+  },
+  "umpire3": {
+    "id": 39541,
+    "name": "Shathira Jakir",
+    "country": "BAN"
+  },
+  "venue": {
+    "id": 21,
+    "name": "The Rose Bowl",
+    "city": "Southampton",
+    "country": "England",
+    "timezone": "+01:00",
+    "latitude": "50.924131",
+    "longitude": "-1.322163"
+  },
+  "isPollEnabled": true,
+  "HYSEnabled": 1
+}

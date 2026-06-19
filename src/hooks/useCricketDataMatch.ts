@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Match } from '@/data/types';
-import { cricketApi } from '@/services/api';
-// Import the shared mapper locally or define a simple one if import fails
-import { mapApiMatchToModel } from '@/services/cricketMapper';
+
 
 export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean) => {
     const [data, setData] = useState<Match | null>(null);
@@ -23,21 +21,59 @@ export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean
         setError(null);
 
         try {
-            // Use the backend proxy instead of direct calls
-            // This ensures we use the correct keys and endpoints managed by the server
-            const response = await cricketApi.getMatchInfo(matchId);
+            // Use the scraped summary endpoint — this reliably identifies the match by its
+            // Cricbuzz numeric ID without any slug-redirect issues that /info had.
+            const BACKEND = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const response = await fetch(`${BACKEND}/cricket/scraped/match/${matchId}/summary`);
+            const json = await response.json();
+            const raw = json?.data;
 
-            if (response && response.data) {
-                // Map the backend response to our Match model
-                // The backend returns { success: true, data: { ...rawAPIdata } }
-                const matchData = mapApiMatchToModel(response.data);
-                setData(matchData);
-            } else if (response && (response as any).id) {
-                // Handle case where response IS the data (direct return)
-                const matchData = mapApiMatchToModel(response);
+            if (raw && (raw.matchInfo || raw.matchId)) {
+                // Map scraped summary to our Match model
+                const info = raw.matchInfo || {};
+                const score = raw.matchScore || {};
+
+                // Build innings scores from matchScore
+                const inningsScores: any[] = [];
+                const t1Score = score.team1Score?.inngs1;
+                const t2Score = score.team2Score?.inngs1;
+                if (t1Score) inningsScores.push({ team: 'home', score: `${t1Score.runs}/${t1Score.wickets}`, overs: t1Score.overs });
+                if (t2Score) inningsScores.push({ team: 'away', score: `${t2Score.runs}/${t2Score.wickets}`, overs: t2Score.overs });
+
+                const team1Info = Array.isArray(info.matchTeamInfo) ? info.matchTeamInfo[0] : null;
+                const home = info.team1 || {};
+                const away = info.team2 || {};
+
+                const matchData: any = {
+                    id: String(raw.matchId || matchId),
+                    sport: 'cricket',
+                    matchType: info.matchFormat || info.matchType || 'T20',
+                    seriesName: info.series?.name || raw.seriesName || '',
+                    status: (() => {
+                        const st = (info.state || raw.state || '').toLowerCase();
+                        if (st === 'inprogress') return 'live';
+                        if (st === 'complete' || st === 'completed') return 'completed';
+                        return 'upcoming';
+                    })(),
+                    summaryText: info.status || raw.status || '',
+                    startTime: info.matchStartTimestamp ? new Date(parseInt(info.matchStartTimestamp)) : new Date(),
+                    homeTeam: {
+                        name: home.name || raw.team1 || 'TBA',
+                        shortName: home.shortName || raw.team1 || '',
+                        logo: home.imageId ? `/api/cricket/scraped/team-logo/${home.imageId}` : '',
+                    },
+                    awayTeam: {
+                        name: away.name || raw.team2 || 'TBA',
+                        shortName: away.shortName || raw.team2 || '',
+                        logo: away.imageId ? `/api/cricket/scraped/team-logo/${away.imageId}` : '',
+                    },
+                    venue: info.venue ? `${info.venue.name || ''}, ${info.venue.city || ''}`.trim().replace(/^,|,$/g, '') : '',
+                    homeScore: t1Score ? `${t1Score.runs}/${t1Score.wickets}` : '',
+                    awayScore: t2Score ? `${t2Score.runs}/${t2Score.wickets}` : '',
+                    inningsScores,
+                };
                 setData(matchData);
             } else {
-                // Fallback if data is missing
                 setError('Match data not found');
             }
 

@@ -547,29 +547,15 @@ const MatchDetails = () => {
   let dynamicAwayScoreStr: string | undefined = undefined;
   
   if (cbSummary) {
-      if (cbSummary.miniscore) {
-          const bat = cbSummary.miniscore.batTeam;
-          const bowl = cbSummary.miniscore.bowlTeam;
-          if (bat) {
-            // Check if batTeam is team1
-            if (bat.teamId === dynamicTeam1?.teamId || bat.teamId === dynamicTeam1?.id || (!dynamicTeam1 && bat.teamId)) {
-                dynamicHomeScoreStr = `${bat.teamScore}/${bat.teamWkts} (${bat.teamOvs} ov)`;
-                if (bowl) dynamicAwayScoreStr = `${bowl.teamScore}/${bowl.teamWkts} (${bowl.teamOvs} ov)`;
-            } else {
-                dynamicAwayScoreStr = `${bat.teamScore}/${bat.teamWkts} (${bat.teamOvs} ov)`;
-                if (bowl) dynamicHomeScoreStr = `${bowl.teamScore}/${bowl.teamWkts} (${bowl.teamOvs} ov)`;
-            }
-          }
-      }
-      
-      // Also check matchScore if miniscore didn't give us both
-      if (cbSummary.matchScore && (!dynamicHomeScoreStr || !dynamicAwayScoreStr)) {
+      // Build the header score strings using matchScore which cleanly contains both teams' data
+      if (cbSummary.matchScore) {
           const t1 = cbSummary.matchScore.team1Score?.inngs1;
           const t2 = cbSummary.matchScore.team2Score?.inngs1;
-          if (t1 && !dynamicHomeScoreStr) dynamicHomeScoreStr = `${t1.runs}/${t1.wickets || 0} (${t1.overs} ov)`;
-          if (t2 && !dynamicAwayScoreStr) dynamicAwayScoreStr = `${t2.runs}/${t2.wickets || 0} (${t2.overs} ov)`;
+          if (t1) dynamicHomeScoreStr = `${t1.runs}/${t1.wickets || 0} (${t1.overs} ov)`;
+          if (t2) dynamicAwayScoreStr = `${t2.runs}/${t2.wickets || 0} (${t2.overs} ov)`;
       }
   }
+
 
   let reconciledStatusText = dynamicMatchInfo?.status || match?.summaryText;
 

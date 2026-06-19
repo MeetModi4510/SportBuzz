@@ -873,6 +873,16 @@ export async function fetchMatchDetailScraped(matchId, endpointType, force = fal
             }
 
             if (Object.keys(foundData).length > 0) {
+                // Cricbuzz's RSC payload puts miniscore and winProbability in a
+                // SEPARATE chunk that has matchCommentary as the top-level key (no matchId).
+                // BUT that chunk is nested inside commentaryPageData which IS in a matchId chunk.
+                // So after merging, we lift them up to the top level for easy access.
+                if (!foundData.miniscore && foundData.commentaryPageData?.miniscore) {
+                    foundData.miniscore = foundData.commentaryPageData.miniscore;
+                }
+                if (!foundData.winProbability && foundData.commentaryPageData?.winProbability) {
+                    foundData.winProbability = foundData.commentaryPageData.winProbability;
+                }
                 parsed = foundData;
             }
             
