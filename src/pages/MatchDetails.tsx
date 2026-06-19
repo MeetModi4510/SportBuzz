@@ -211,7 +211,7 @@ const MatchDetails = () => {
   // Priority: CricketData.org > Legacy API > Football API > Mock
   const isValidMatch = (m: any) => m && (m.id || m.matchId || m.homeTeam);
   const match: Match | undefined = [cricketDataMatch, legacyCricketMatch, footballMatch, mockMatch].find(isValidMatch) as Match | undefined;
-  let isTestMatch = match?.matchType?.toLowerCase().includes("test") || match?.format?.toLowerCase().includes("test");
+  let isTestMatch = match?.matchType?.toLowerCase().includes("test") || (match as any)?.format?.toLowerCase().includes("test");
 
   const statusLower = match?.status?.toLowerCase();
   let isLive = statusLower === "live";
@@ -353,74 +353,129 @@ const MatchDetails = () => {
   if (cbScorecardField.data?.innings?.length > 0) {
       const latestInn = cbScorecardField.data.innings[cbScorecardField.data.innings.length - 1];
       const sd = latestInn?.scoreDetails || latestInn;
-      if (sd?.overs ?? sd?.teamOvs) {
-          scorecardBalls = parseBalls(sd.overs ?? sd.teamOvs);
+      const targetOvers = latestInn.overs ?? sd?.overs ?? sd?.teamOvs;
+      if (targetOvers !== undefined && targetOvers !== null && targetOvers !== '') {
+          scorecardBalls = parseBalls(targetOvers);
       }
   }
 
   let commentaryBalls = 0;
-  if (cbFullCommentaryField.data?.commentary?.length > 0) {
-      const commList = cbFullCommentaryField.data.commentary[0]?.commentaryList || [];
-      const latestComm = commList.find((c: any) => c.overNum !== undefined);
-      if (latestComm) {
-          commentaryBalls = parseBalls(latestComm.overNum);
+  if (cbFullCommentaryField.data) {
+      const rawComm = cbFullCommentaryField.data;
+      // Shape 1: { commentary: [...flatArray...], matchHeader: {...} }  ← actual scraper output
+      // Shape 2: { commentary: [{ commentaryList: [...] }] }            ← legacy nested shape
+      // Shape 3: [...flatArray...]                                       ← array directly
+      let commEntries: any[] = [];
+
+      if (Array.isArray(rawComm)) {
+          // Shape 3
+          commEntries = rawComm;
+      } else if (Array.isArray(rawComm?.commentary)) {
+          const first = rawComm.commentary[0];
+          if (Array.isArray(first?.commentaryList)) {
+              // Shape 2 — nested
+              commEntries = first.commentaryList;
+          } else {
+              // Shape 1 — flat (actual scraper output)
+              commEntries = rawComm.commentary;
+          }
       }
-  } else if (Array.isArray(cbFullCommentaryField.data)) {
-      const latestComm = cbFullCommentaryField.data.find((c: any) => c.overNum !== undefined);
-      if (latestComm) {
-          commentaryBalls = parseBalls(latestComm.overNum);
+
+      // Find the entry with the highest overNum — that is the latest ball
+      let maxOverBalls = 0;
+      for (const c of commEntries) {
+          if (c.overNum !== undefined && c.overNum !== null) {
+              // overNum from the scraper is integer (e.g. 53), ballNbr is the ball within the over
+              const entryBalls = (parseInt(String(c.overNum)) * 6) + (parseInt(String(c.ballNbr ?? 0)) || 0);
+              if (entryBalls > maxOverBalls) maxOverBalls = entryBalls;
+          }
       }
+      commentaryBalls = maxOverBalls;
   }
 
-  // ── The Global "Highest" Target Balls ──
-  // Whichever API endpoint is the most advanced becomes the master truth
-  const masterTargetBalls = Math.max(summaryBalls, scorecardBalls, commentaryBalls);
+  // ── Global Mismatch Detector ──
+  // A mismatch exists whenever ANY two of the three live sources disagree.
+  // This is tab-independent: even if the user is on Commentary and it is ahead
+  // of the header, we must detect it and force the header to catch up.
+  const hasMismatch = isLive && (() => {
+      const hasSummary     = summaryBalls     > 0;
+      const hasScorecard   = scorecardBalls   > 0;
+      const hasCommentary  = commentaryBalls  > 0;
 
-  // ── Global Sequential Catch-Up Loop ──
-  // If there is ANY mismatch among the active tabs, fire sequential API requests
-  const hasMismatch = isLive && (
-      (summaryBalls > 0 && summaryBalls < masterTargetBalls) ||
-      (activeTab === 'scoreboard' && scorecardBalls > 0 && scorecardBalls < masterTargetBalls) ||
-      (activeTab === 'commentary' && commentaryBalls > 0 && commentaryBalls < masterTargetBalls)
-  );
+      // Commentary vs Header (the exact case in the screenshot)
+      if (hasSummary && hasCommentary && summaryBalls !== commentaryBalls) return true;
+      // Scorecard vs Header
+      if (hasSummary && hasScorecard && summaryBalls !== scorecardBalls) return true;
+      // Commentary vs Scorecard
+      if (hasScorecard && hasCommentary && scorecardBalls !== commentaryBalls) return true;
+
+      return false;
+  })();
 
   const globalRetries = useRef(0);
+  const lastCatchupTime = useRef(0);
+  // Track the "signature" of the last mismatch to reset retries on genuinely new events
+  const lastMismatchSig = useRef('');
 
   useEffect(() => {
       if (!hasMismatch) {
-          globalRetries.current = 0; // Caught up!
+          globalRetries.current = 0;
+          lastMismatchSig.current = '';
           return;
       }
-      if (globalRetries.current >= 8) return;
 
-      console.log(`[Catch-Up] Mismatch detected. master=${masterTargetBalls}, summary=${summaryBalls}, scorecard=${scorecardBalls}, commentary=${commentaryBalls}. Polling sequentially...`);
-      
-      const id = setTimeout(async () => {
+      // Build a signature: the MAX ball count across all sources.
+      // When a new ball is bowled, this number increases → new event → reset retries.
+      const sig = `${Math.max(summaryBalls, scorecardBalls, commentaryBalls)}`;
+      if (sig !== lastMismatchSig.current) {
+          // Genuinely new event — reset retry counter
+          globalRetries.current = 0;
+          lastMismatchSig.current = sig;
+      }
+
+      if (globalRetries.current >= 3) return;
+
+      // Throttle: at least 1 second between catch-up attempts
+      const timeSinceLast = Date.now() - lastCatchupTime.current;
+      const delay = Math.max(1000, 1000 - timeSinceLast);
+
+      console.log(`[Catch-Up] Mismatch sig=${sig}. summary=${summaryBalls}, scorecard=${scorecardBalls}, commentary=${commentaryBalls}. Attempt ${globalRetries.current + 1}/3 in ${delay}ms`);
+
+      const timer = setTimeout(async () => {
           globalRetries.current++;
-          
+          lastCatchupTime.current = Date.now();
+
           try {
-              // 1. Fetch Header (Summary) if lagging
-              if (summaryBalls > 0 && summaryBalls < masterTargetBalls && cleanMatchId) {
-                  const res = await cricketApi.getCricbuzzSummary(cleanMatchId, true);
-                  queryClient.setQueryData(['cricket', 'summary', cleanMatchId], res.data || res);
+              // 1. ALWAYS force-refetch the Header (Summary)
+              if (cleanMatchId) {
+                  queryClient.invalidateQueries({ queryKey: ['cricket', 'summary', cleanMatchId] });
+                  // Also do a direct force-fetch to bypass server cache
+                  cricketApi.getCricbuzzSummary(cleanMatchId, true)
+                      .then((res: any) => {
+                          const freshData = res?.data ?? res;
+                          if (freshData && (freshData.miniscore || freshData.matchScore || freshData.matchHeader)) {
+                              queryClient.setQueryData(['cricket', 'summary', cleanMatchId], freshData);
+                          }
+                      })
+                      .catch(e => console.error('[Catch-Up] Summary refetch failed', e));
               }
-              
-              // 2. Fetch Scorecard if active and lagging
-              if (activeTab === 'scoreboard' && scorecardBalls > 0 && scorecardBalls < masterTargetBalls) {
+
+              // 2. Refetch the active tab's data source so IT also catches up
+              if (activeTab === 'scoreboard' || activeTab === 'performance') {
+                  setScorecardSyncTrigger(Date.now());
+              } else if (activeTab === 'commentary') {
+                  setCommentarySyncTrigger(Date.now());
+              } else {
+                  // On Summary/Squads tabs, refresh scorecard (header reads from it for Test innings)
                   setScorecardSyncTrigger(Date.now());
               }
-              
-              // 3. Fetch Commentary if active and lagging
-              if (activeTab === 'commentary' && commentaryBalls > 0 && commentaryBalls < masterTargetBalls) {
-                  setCommentarySyncTrigger(Date.now());
-              }
           } catch (e) {
-              console.error("Catch-up fetch failed", e);
+              console.error('[Catch-Up] Trigger failed', e);
           }
-      }, 1000);
+      }, delay);
 
-      return () => clearTimeout(id);
-  }, [hasMismatch, masterTargetBalls, summaryBalls, scorecardBalls, commentaryBalls, activeTab, cleanMatchId, queryClient]);
+      return () => clearTimeout(timer);
+  }, [hasMismatch, summaryBalls, scorecardBalls, commentaryBalls, activeTab, cleanMatchId, queryClient]);
 
 
   
@@ -519,7 +574,7 @@ const MatchDetails = () => {
   let reconciledStatusText = dynamicMatchInfo?.status || match?.summaryText;
 
   // Commentary reconciliation: if Commentary is the freshest, use its match status
-  if (cbFullCommentaryField.data?.matchHeader?.status && commentaryBalls === masterTargetBalls) {
+  if (cbFullCommentaryField.data?.matchHeader?.status && commentaryBalls >= summaryBalls && commentaryBalls >= scorecardBalls) {
       reconciledStatusText = cbFullCommentaryField.data.matchHeader.status;
   }
 
@@ -545,10 +600,10 @@ const MatchDetails = () => {
   if (cbScorecardField.data?.innings?.length > 0) {
     const latestInn = cbScorecardField.data.innings[cbScorecardField.data.innings.length - 1];
     const sd = latestInn?.scoreDetails || latestInn;
-    const scRuns = sd?.runs ?? sd?.teamScore;
-    const scWkts = sd?.wickets ?? sd?.teamWkts ?? 0;
-    const scOvs = sd?.overs ?? sd?.teamOvs ?? '';
-    const scTeamName = (latestInn?.batTeamDetails?.batTeamName || '').toLowerCase();
+    const scRuns = latestInn?.score ?? sd?.runs ?? sd?.teamScore;
+    const scWkts = latestInn?.wickets ?? sd?.wickets ?? sd?.teamWkts ?? 0;
+    const scOvs = latestInn?.overs ?? sd?.overs ?? sd?.teamOvs ?? '';
+    const scTeamName = (latestInn?.teamName || latestInn?.batTeamDetails?.batTeamName || '').toLowerCase();
     if (scRuns !== undefined) {
       const scStr = `${scRuns}/${scWkts} (${scOvs} ov)`;
       // Determine if latest innings is home or away
@@ -559,10 +614,10 @@ const MatchDetails = () => {
       if (isTestMatch) {
           reconciledInningsScores = cbScorecardField.data.innings.map((inn: any) => {
               const iSd = inn?.scoreDetails || inn;
-              const iRuns = iSd?.runs ?? iSd?.teamScore ?? 0;
-              const iWkts = iSd?.wickets ?? iSd?.teamWkts ?? 0;
-              const iOvs = iSd?.overs ?? iSd?.teamOvs ?? '';
-              const iTeamName = (inn?.batTeamDetails?.batTeamName || '').toLowerCase();
+              const iRuns = inn?.score ?? iSd?.runs ?? iSd?.teamScore ?? 0;
+              const iWkts = inn?.wickets ?? iSd?.wickets ?? iSd?.teamWkts ?? 0;
+              const iOvs = inn?.overs ?? iSd?.overs ?? iSd?.teamOvs ?? '';
+              const iTeamName = (inn?.teamName || inn?.batTeamDetails?.batTeamName || '').toLowerCase();
               const iHome = iTeamName && team1Name && iTeamName.includes(team1Name.toLowerCase().split(' ')[0]);
               return {
                   team: iHome ? 'home' : 'away',
@@ -579,7 +634,7 @@ const MatchDetails = () => {
             if (homeMatch) dynamicHomeScoreStr = scStr;
             else dynamicAwayScoreStr = scStr;
         }
-        if (cbScorecardField.data?.status && scorecardBalls === masterTargetBalls) {
+        if (cbScorecardField.data?.status && scorecardBalls >= summaryBalls && scorecardBalls >= commentaryBalls) {
             reconciledStatusText = cbScorecardField.data.status;
         }
       }
@@ -589,25 +644,42 @@ const MatchDetails = () => {
   // Commentary Regex Replacement: If Commentary is the absolute freshest (ahead of both Summary AND Scorecard),
   // we manually inject its updated ball count into the Header string, because Commentary lacks a native Score string!
   if (commentaryBalls > summaryBalls && commentaryBalls > scorecardBalls) {
-      const oldOverStr = `${Math.floor(summaryBalls / 6)}.${summaryBalls % 6}`;
       const newOverStr = `${Math.floor(commentaryBalls / 6)}.${commentaryBalls % 6}`;
-      
-      // Target the string that contains the old overs and swap it
-      if (dynamicHomeScoreStr?.includes(oldOverStr)) {
-          dynamicHomeScoreStr = dynamicHomeScoreStr.replace(oldOverStr, newOverStr);
-      }
-      if (dynamicAwayScoreStr?.includes(oldOverStr)) {
-          dynamicAwayScoreStr = dynamicAwayScoreStr.replace(oldOverStr, newOverStr);
-      }
-      
+
+      // Build a list of all the old over strings we might need to replace
+      // Each could appear as "53.0" (decimal) or just "53" (whole number from miniscore)
+      const oldStrings: string[] = [];
+      const addOldStr = (balls: number) => {
+          const dec = `${Math.floor(balls / 6)}.${balls % 6}`;
+          const whole = `${Math.floor(balls / 6)}`;
+          oldStrings.push(dec);
+          // Only add whole-number variant if it won't greedily match inside a larger number
+          if (!oldStrings.includes(whole)) oldStrings.push(whole);
+      };
+      addOldStr(summaryBalls);
+      addOldStr(scorecardBalls);
+
+      const replaceOvers = (str: string | undefined): string | undefined => {
+          if (!str) return str;
+          for (const old of oldStrings) {
+              // Use word-boundary-like regex to avoid replacing "53" inside "530" etc.
+              const pattern = new RegExp(`(\\b|(?<=\\())(${old.replace('.', '\\.')})(?=(\\s*ov|\\s*Ov|\\)|$))`, 'g');
+              if (pattern.test(str)) {
+                  return str.replace(pattern, newOverStr);
+              }
+          }
+          return str;
+      };
+
+      dynamicHomeScoreStr = replaceOvers(dynamicHomeScoreStr);
+      dynamicAwayScoreStr = replaceOvers(dynamicAwayScoreStr);
+
       // Reconcile Test Matches
       if (isTestMatch) {
-          reconciledInningsScores = reconciledInningsScores.map(inn => {
-              if (inn.overs && String(inn.overs).includes(oldOverStr)) {
-                  return { ...inn, overs: String(inn.overs).replace(oldOverStr, newOverStr) };
-              }
-              return inn;
-          });
+          reconciledInningsScores = reconciledInningsScores.map(inn => ({
+              ...inn,
+              overs: replaceOvers(String(inn.overs || '')) ?? inn.overs
+          }));
       }
   }
 
