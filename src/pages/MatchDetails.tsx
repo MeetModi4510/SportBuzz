@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { Helmet } from "react-helmet-async";
-import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayerCard } from "@/components/PlayerCard";
 import { SquadsList } from "@/components/SquadsList";
@@ -96,7 +96,7 @@ const generateDynamicOfficials = (id: string, homeTeam: string, awayTeam: string
 };
 
 const MatchDetails = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -220,16 +220,69 @@ const MatchDetails = () => {
   // Lazy-loading field data with 10-min TTL cache
   // IMPORTANT: These hooks MUST be called before any early returns
   const cleanMatchId = isCricketMatch ? id?.replace('cricket-', '') : undefined;
+
+  // Dynamic Live Summary & Match Facts (Fetch unconditionally for live headers)
+  const { data: cbSummary, isLoading: isSummaryLoading, dataUpdatedAt: summaryUpdatedAt } = useCricbuzzSummary(
+    isCricketMatch ? cleanMatchId : undefined
+  );
+
+  // Force-refetch summary each time user navigates to this match page.
+  // This ensures the header score is never stale vs the dashboard card.
+  useEffect(() => {
+    if (cleanMatchId && isCricketMatch) {
+      queryClient.refetchQueries({ queryKey: ['cricket', 'summary', cleanMatchId] });
+    }
+  }, [cleanMatchId, isCricketMatch, queryClient]);
+
+  // ── Helper to calculate balls bowled from overs string (e.g. "11.4" -> 70) ──
+  const parseBalls = useCallback((overStr: string | number | undefined): number => {
+      if (!overStr) return 0;
+      const str = String(overStr);
+      const match = str.match(/(\d+)\.?(\d*)/);
+      if (!match) return 0;
+      const overs = parseInt(match[1]) || 0;
+      const balls = parseInt(match[2]) || 0;
+      return overs * 6 + balls;
+  }, []);
+
+  // Calculate target balls from summary (Master Target)
+  let summaryBalls = 0;
+  if (cbSummary?.miniscore?.overs) {
+      summaryBalls = parseBalls(cbSummary.miniscore.overs);
+  } else if (cbSummary?.matchScore?.team1Score?.inngs1?.overs) {
+      summaryBalls = Math.max(
+          parseBalls(cbSummary.matchScore.team1Score.inngs1.overs),
+          parseBalls(cbSummary.matchScore.team2Score?.inngs1?.overs)
+      );
+  }
+
+  // Local sync triggers for the catch-up polling loop
+  const [scorecardSyncTrigger, setScorecardSyncTrigger] = useState<number | undefined>(undefined);
+  const [commentarySyncTrigger, setCommentarySyncTrigger] = useState<number | undefined>(undefined);
+  const scorecardRetries = useRef(0);
+  const commentaryRetries = useRef(0);
+
+  // Sync to master timer initially
+  useEffect(() => {
+      setScorecardSyncTrigger(summaryUpdatedAt);
+      setCommentarySyncTrigger(summaryUpdatedAt);
+      scorecardRetries.current = 0;
+      commentaryRetries.current = 0;
+  }, [summaryUpdatedAt]);
   
   const matchInfoField = useMatchFieldData(
     isCricketMatch ? cleanMatchId : undefined,
     'matchInfo',
-    activeTab === 'summary' || activeTab === 'scoreboard' || activeTab === 'lineups'
+    activeTab === 'summary' || activeTab === 'scoreboard' || activeTab === 'lineups',
+    undefined,
+    summaryUpdatedAt
   );
   const commentaryField = useMatchFieldData(
     isCricketMatch ? cleanMatchId : undefined,
     'commentary',
-    activeTab === 'commentary'
+    activeTab === 'commentary',
+    undefined,
+    commentarySyncTrigger
   );
 
   // Cricbuzz lazy-loading hooks
@@ -263,19 +316,24 @@ const MatchDetails = () => {
     cleanMatchId,
     'cbScorecard',
     activeTab === 'scoreboard' || activeTab === 'performance',
-    cricbuzzSlug
+    cricbuzzSlug,
+    scorecardSyncTrigger
   );
   const cbSquadsField = useMatchFieldData(
     cleanMatchId,
     'cbSquads',
-    activeTab === 'squads'
+    activeTab === 'squads',
+    undefined,
+    summaryUpdatedAt
   );
 
   const { squads, squadsLoading, squadsError } = useCricbuzzSquads(cleanMatchId, activeTab === 'squads');
   const cbCommentaryField = useMatchFieldData(
     cleanMatchId,
     'cbCommentary',
-    activeTab === 'commentary'
+    activeTab === 'commentary',
+    undefined,
+    commentarySyncTrigger
   );
 
   // ── Full Commentary from Cricbuzz HTML page scraper ───────────────────────
@@ -283,21 +341,68 @@ const MatchDetails = () => {
     isCricketMatch ? cleanMatchId : undefined,
     'cbFullCommentary',
     activeTab === 'commentary',
-    commentarySlug
+    commentarySlug,
+    commentarySyncTrigger
   );
 
-  // Dynamic Live Summary & Match Facts (Fetch unconditionally for live headers)
-  const { data: cbSummary, isLoading: isSummaryLoading } = useCricbuzzSummary(
-    isCricketMatch ? cleanMatchId : undefined
-  );
-
-  // Force-refetch summary each time user navigates to this match page.
-  // This ensures the header score is never stale vs the dashboard card.
+  // ── Scorecard Catch-Up Loop ──
   useEffect(() => {
-    if (cleanMatchId && isCricketMatch) {
-      queryClient.refetchQueries({ queryKey: ['cricket', 'summary', cleanMatchId] });
-    }
-  }, [cleanMatchId, isCricketMatch, queryClient]);
+      if (activeTab !== 'scoreboard' && activeTab !== 'performance') return;
+      if (!cbScorecardField.data || scorecardRetries.current >= 8) return;
+
+      let scorecardBalls = 0;
+      if (cbScorecardField.data?.innings?.length > 0) {
+          const latestInn = cbScorecardField.data.innings[cbScorecardField.data.innings.length - 1];
+          const sd = latestInn?.scoreDetails || latestInn;
+          if (sd?.overs ?? sd?.teamOvs) {
+              scorecardBalls = parseBalls(sd.overs ?? sd.teamOvs);
+          }
+      }
+      
+      const targetBalls = Math.max(summaryBalls, scorecardBalls);
+      
+      if (scorecardBalls > 0 && scorecardBalls < targetBalls) {
+          console.log(`[Catch-Up] Scorecard is lagging (${scorecardBalls} balls < ${targetBalls} target). Polling in 1s...`);
+          const id = setTimeout(() => {
+              scorecardRetries.current++;
+              setScorecardSyncTrigger(Date.now());
+          }, 1000);
+          return () => clearTimeout(id);
+      }
+  }, [cbScorecardField.data, summaryBalls, activeTab, parseBalls]);
+
+  // ── Commentary Catch-Up Loop ──
+  useEffect(() => {
+      if (activeTab !== 'commentary') return;
+      if (!cbFullCommentaryField.data || commentaryRetries.current >= 8) return;
+
+      let commentaryBalls = 0;
+      if (cbFullCommentaryField.data?.commentary?.length > 0) {
+          const commList = cbFullCommentaryField.data.commentary[0]?.commentaryList || [];
+          const latestComm = commList.find((c: any) => c.overNum !== undefined);
+          if (latestComm) {
+              commentaryBalls = (latestComm.overNum * 6) + (latestComm.ballNbr || 0);
+          }
+      } else if (Array.isArray(cbFullCommentaryField.data)) {
+          const latestComm = cbFullCommentaryField.data.find((c: any) => c.overNum !== undefined);
+          if (latestComm) {
+              commentaryBalls = (latestComm.overNum * 6) + (latestComm.ballNbr || 0);
+          }
+      }
+      
+      const targetBalls = Math.max(summaryBalls, commentaryBalls);
+      
+      if (commentaryBalls > 0 && commentaryBalls < targetBalls) {
+          console.log(`[Catch-Up] Commentary is lagging (${commentaryBalls} balls < ${targetBalls} target). Polling in 1s...`);
+          const id = setTimeout(() => {
+              commentaryRetries.current++;
+              setCommentarySyncTrigger(Date.now());
+          }, 1000);
+          return () => clearTimeout(id);
+      }
+  }, [cbFullCommentaryField.data, summaryBalls, activeTab]);
+
+
   
   const { data: cbInfo, isLoading: isInfoLoading } = useCricbuzzInfo(
     isCricketMatch ? cleanMatchId : undefined,
@@ -353,6 +458,8 @@ const MatchDetails = () => {
       }
   }
 
+  let reconciledStatusText = dynamicMatchInfo?.status || match?.summaryText;
+
   // Scorecard reconciliation: if Scoreboard tab has fresher data (higher run count),
   // update the header score so both always match. Cricket scores only go up.
   if (cbScorecardField.data?.innings?.length > 0) {
@@ -367,9 +474,16 @@ const MatchDetails = () => {
       // Determine if latest innings is home or away
       const homeMatch = scTeamName && team1Name && scTeamName.includes(team1Name.toLowerCase().split(' ')[0]);
       const existingRuns = parseInt((homeMatch ? dynamicHomeScoreStr : dynamicAwayScoreStr) || '0');
-      if (scRuns > existingRuns) {
-        if (homeMatch) dynamicHomeScoreStr = scStr;
-        else dynamicAwayScoreStr = scStr;
+      
+      // If Scorecard is fresher, or if they are equal but we are viewing the Scoreboard tab (to prevent visual dissonance)
+      if (scRuns > existingRuns || (scRuns === existingRuns && activeTab === 'scoreboard')) {
+        if (scRuns > existingRuns) {
+            if (homeMatch) dynamicHomeScoreStr = scStr;
+            else dynamicAwayScoreStr = scStr;
+        }
+        if (cbScorecardField.data?.status) {
+            reconciledStatusText = cbScorecardField.data.status;
+        }
       }
     }
   }
@@ -639,9 +753,14 @@ const MatchDetails = () => {
                <div className="flex flex-col sm:flex-row items-center justify-between px-6 md:px-10 py-4 bg-muted/10 border-t border-border/40 gap-4">
                    {/* Status Area */}
                    <div className="flex flex-col items-center sm:items-start gap-1">
-                      {(match.sport === 'cricket' || match.sport === 'football') && match.summaryText && (
-                        <span className="text-[11px] font-bold text-primary uppercase tracking-widest">{match.summaryText}</span>
-                      )}
+                      {(() => {
+                        const statusText = match.sport === 'cricket' ? reconciledStatusText : match.summaryText;
+                        if (!statusText && !isLive) return null;
+                        
+                        return statusText ? (
+                          <span className="text-[11px] font-bold text-primary uppercase tracking-widest">{statusText}</span>
+                        ) : null;
+                      })()}
                       
                       {isLive && (
                         <div className="text-[10px] font-bold text-red-500 tracking-widest uppercase flex items-center gap-2">
@@ -654,7 +773,7 @@ const MatchDetails = () => {
                           )}
                         </div>
                       )}
-                      {(!match.summaryText && !isLive) && (
+                      {(!reconciledStatusText && !isLive) && (
                          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
                            {isCompleted ? "MATCH ENDED" : "MATCH UPCOMING"}
                          </span>
@@ -793,7 +912,7 @@ const MatchDetails = () => {
               )}
 
               {/* Match Status & Result (Live + Completed) */}
-              {!isUpcoming && match.summaryText && (
+              {!isUpcoming && (match.sport === 'cricket' ? reconciledStatusText : match.summaryText) && (
                 <div className="relative overflow-hidden bg-card border border-border/40 rounded-2xl p-6 md:p-8 flex items-center gap-6 group shadow-sm transition-all hover:border-border/60">
                   <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary" />
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
@@ -804,7 +923,7 @@ const MatchDetails = () => {
                       {isCompleted ? 'Match Result' : 'Current Status'}
                     </span>
                     <h3 className="text-lg md:text-xl font-bold text-foreground tracking-tight leading-snug">
-                      {match.summaryText}
+                      {match.sport === 'cricket' ? reconciledStatusText : match.summaryText}
                     </h3>
                   </div>
                 </div>

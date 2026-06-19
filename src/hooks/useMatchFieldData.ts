@@ -60,18 +60,20 @@ function getCacheKey(matchId: string, field: FieldType, slug?: string): string {
  * @param slug     - Optional slug (used for cbScorecard cache key differentiation)
  */
 export function useMatchFieldData(
-    matchId: string | undefined,
-    field: FieldType,
-    enabled: boolean,
-    slug?: string
+    matchId?: string, 
+    field: FieldType = 'matchInfo', 
+    enabled: boolean = true, 
+    slug?: string, 
+    syncTrigger?: number
 ): FieldDataResult {
-    const [data, setData]               = useState<any | null>(null);
-    const [loading, setLoading]         = useState(false);
-    const [error, setError]             = useState<string | null>(null);
-    const [lastUpdated, setLastUpdated] = useState<number | null>(null);
-
-    const abortRef      = useRef<AbortController | null>(null);
+    const [data, setData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [lastUpdated, setLastUpdated] = useState<number>(Date.now());
+    
+    const abortRef = useRef<AbortController | null>(null);
     const prevMatchRef  = useRef<string | undefined>(undefined);
+    const prevSyncRef   = useRef<number | undefined>(syncTrigger);
     const autoRefreshId = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // ── Fetch ────────────────────────────────────────────────────────────────
@@ -79,7 +81,7 @@ export function useMatchFieldData(
         if (!matchId) return;
 
         const cacheKey = getCacheKey(matchId, field, slug);
-        const ttl      = FIELD_TTL[field];
+        const ttl      = FIELD_TTL[field] || 60000;
 
         // Check cache unless caller explicitly bypasses (auto-refresh timer)
         if (!bypassCache) {
@@ -98,7 +100,11 @@ export function useMatchFieldData(
         const controller = new AbortController();
         abortRef.current = controller;
 
-        setLoading(true);
+        // Silent refresh: don't show loading spinner if we already have data
+        const hasExistingData = fieldCache.has(cacheKey) && fieldCache.get(cacheKey)?.data;
+        if (!hasExistingData) {
+            setLoading(true);
+        }
         setError(null);
 
         // When bypassCache=true (timer-triggered refresh), pass force=true to also
@@ -144,8 +150,10 @@ export function useMatchFieldData(
             }
         } catch (err: any) {
             if (!controller.signal.aborted) {
-                console.error(`[useMatchFieldData] ${field} fetch error:`, err);
-                setError(err.message || 'Failed to fetch data');
+                console.error(`[useMatchFieldData] Error fetching ${field}:`, err);
+                if (!hasExistingData) {
+                    setError(err.message || 'Failed to fetch data');
+                }
                 setLoading(false);
             }
         }
@@ -153,19 +161,29 @@ export function useMatchFieldData(
 
     // ── Auto-refresh scheduler ────────────────────────────────────────────────
     const scheduleAutoRefresh = useCallback(() => {
-        // Clear any existing timer
         if (autoRefreshId.current !== null) {
             clearTimeout(autoRefreshId.current);
             autoRefreshId.current = null;
         }
 
-        const ttl = FIELD_TTL[field];
+        if (syncTrigger !== undefined) return;
+
+        const ttl = FIELD_TTL[field] || 60000;
         autoRefreshId.current = setTimeout(async () => {
-            // Only refresh if still enabled (user is still on this tab)
-            await fetchData(true); // bypass cache — forced fresh fetch
-            scheduleAutoRefresh(); // reschedule for the next cycle
+            await fetchData(true);
+            scheduleAutoRefresh();
         }, ttl);
-    }, [field, fetchData]);
+    }, [field, fetchData, syncTrigger]);
+
+    // ── Sync with external trigger (e.g. Header refresh) ─────────────────────
+    useEffect(() => {
+        if (syncTrigger !== undefined && prevSyncRef.current !== syncTrigger) {
+            prevSyncRef.current = syncTrigger;
+            if (enabled) {
+                fetchData(true);
+            }
+        }
+    }, [syncTrigger, enabled, fetchData]);
 
     // ── Reset on matchId change ───────────────────────────────────────────────
     useEffect(() => {
@@ -173,7 +191,7 @@ export function useMatchFieldData(
             prevMatchRef.current = matchId;
             setData(null);
             setError(null);
-            setLastUpdated(null);
+            setLastUpdated(Date.now());
             abortRef.current?.abort();
             if (autoRefreshId.current !== null) {
                 clearTimeout(autoRefreshId.current);
@@ -185,7 +203,6 @@ export function useMatchFieldData(
     // ── Main effect: activate / deactivate ───────────────────────────────────
     useEffect(() => {
         if (!enabled || !matchId) {
-            // User navigated away — stop the auto-refresh timer
             if (autoRefreshId.current !== null) {
                 clearTimeout(autoRefreshId.current);
                 autoRefreshId.current = null;
@@ -193,9 +210,8 @@ export function useMatchFieldData(
             return;
         }
 
-        // On activation: serve from cache if still valid, else fetch fresh
         const cacheKey = getCacheKey(matchId, field, slug);
-        const ttl      = FIELD_TTL[field];
+        const ttl      = FIELD_TTL[field] || 60000;
         const cached   = fieldCache.get(cacheKey);
 
         if (isCacheValid(cached, ttl)) {
@@ -203,7 +219,6 @@ export function useMatchFieldData(
             setLastUpdated(cached.timestamp);
             setLoading(false);
             setError(null);
-            // Schedule refresh for when this cache entry expires
             const remaining = ttl - (Date.now() - cached.timestamp);
             autoRefreshId.current = setTimeout(async () => {
                 await fetchData(true);
@@ -214,7 +229,6 @@ export function useMatchFieldData(
         }
 
         return () => {
-            // Cleanup on unmount or when enabled → false
             abortRef.current?.abort();
             if (autoRefreshId.current !== null) {
                 clearTimeout(autoRefreshId.current);
