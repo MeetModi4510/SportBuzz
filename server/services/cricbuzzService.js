@@ -671,46 +671,11 @@ async function checkPlayerImageExists(playerId) {
     }
 }
 
-// ─── Disk-based Player Image Cache ────────────────────────────────────────────
-const PLAYER_IMAGE_CACHE_DIR = path.join(__dirname, '..', 'cache', 'player-images');
-const PLAYER_IMAGE_CACHE_TTL_MS = 3600 * 1000; // 1 hour
-
-// Ensure cache directory exists
-try { fs.mkdirSync(PLAYER_IMAGE_CACHE_DIR, { recursive: true }); } catch {}
-
-function getImageCachePath(playerId) {
-    return path.join(PLAYER_IMAGE_CACHE_DIR, `${playerId}.jpg`);
-}
-
-function isCachedImageFresh(cachePath) {
-    try {
-        const stat = fs.statSync(cachePath);
-        return (Date.now() - stat.mtimeMs) < PLAYER_IMAGE_CACHE_TTL_MS;
-    } catch {
-        return false;
-    }
-}
-
-// Stream the player image from Cricbuzz to the frontend (via backend proxy)
-// Uses disk cache (server/cache/player-images/{playerId}.jpg) with 1-hour TTL.
+// ─── Stream Player Image (No Disk Cache) ─────────────────────────────────────────
+// Proxies the image directly from Cricbuzz to the frontend.
+// relies entirely on the browser's local Cache-Control for caching.
 async function streamPlayerImage(playerId, res) {
     if (!playerId) { res.status(404).end(); return; }
-
-    const cachePath = getImageCachePath(playerId);
-
-    // ── Serve from disk cache if fresh ──────────────────────────────────────────
-    if (isCachedImageFresh(cachePath)) {
-        try {
-            const data = fs.readFileSync(cachePath);
-            res.setHeader('Content-Type', 'image/jpeg');
-            res.setHeader('Cache-Control', 'public, max-age=3600');
-            res.setHeader('X-Cache', 'HIT');
-            res.send(data);
-            return;
-        } catch {
-            // If read fails, fall through to fetch
-        }
-    }
 
     // ── Check in-memory "not found" cache to avoid hammering Cricbuzz ───────────
     const notFoundKey = `cb_img_404_${playerId}`;
@@ -737,21 +702,12 @@ async function streamPlayerImage(playerId, res) {
                     return;
                 }
 
-                // Collect chunks and write to disk + send response simultaneously
-                const chunks = [];
-                imgRes.on('data', (chunk) => chunks.push(chunk));
-                imgRes.on('end', () => {
-                    const buffer = Buffer.concat(chunks);
-                    // Write to disk cache (non-blocking)
-                    fs.writeFile(cachePath, buffer, (err) => {
-                        if (err) console.warn(`[PlayerImage] Disk cache write failed for ${playerId}:`, err.message);
-                    });
-                    res.setHeader('Content-Type', 'image/jpeg');
-                    res.setHeader('Cache-Control', 'public, max-age=3600');
-                    res.setHeader('X-Cache', 'MISS');
-                    res.send(buffer);
-                    resolve();
-                });
+                res.setHeader('Content-Type', 'image/jpeg');
+                res.setHeader('Cache-Control', 'public, max-age=3600');
+                
+                // Stream directly to client
+                imgRes.pipe(res);
+                imgRes.on('end', () => resolve());
                 imgRes.on('error', () => { res.status(204).end(); resolve(); });
             });
             req.on('error', () => { res.status(204).end(); resolve(); });
