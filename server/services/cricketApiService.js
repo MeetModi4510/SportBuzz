@@ -131,7 +131,12 @@ export const cricketService = {
 
     // Get player details from Cricbuzz
     getPlayerInfo: async (id) => {
-        return await cricbuzzService.getPlayerInfo(id);
+        const { fetchPlayerProfile } = await import('./cricbuzzScraperService.js');
+        const data = await fetchPlayerProfile(id);
+        if (data) {
+            return { status: 'success', data };
+        }
+        return { status: 'error', message: 'Failed to fetch player profile' };
     },
 
     // Series info fallback

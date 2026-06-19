@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Users, Info } from 'lucide-react';
 import { CricketPlayerImage } from '@/components/CricketPlayerImage';
+import { PlayerProfilePanel } from '@/components/cricket/PlayerProfilePanel';
 
 interface Player {
     id: number | string;
@@ -34,6 +35,9 @@ interface SquadsTabProps {
 }
 
 export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error }) => {
+    const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+    const [selectedPlayerName, setSelectedPlayerName] = useState<string>('');
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center p-12 space-y-4">
@@ -55,6 +59,11 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
 
     const { team1, team2 } = squadsData;
 
+    const handlePlayerClick = (p: Player) => {
+        setSelectedPlayerId(String(p.id));
+        setSelectedPlayerName(p.name);
+    };
+
     const renderPlayerGroup = (title: string, players?: Player[], isSupportStaff: boolean = false) => {
         if (!players || players.length === 0) return null;
 
@@ -68,7 +77,11 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
                     {players.map((p, i) => {
                         const imageId = p.imageDetails?.imageId;
                         return (
-                        <div key={`${p.id}-${i}`} className="flex items-center gap-4 p-4 bg-card/40 hover:bg-card/60 transition-colors border border-border/40 rounded-2xl h-[112px]">
+                        <div 
+                            key={`${p.id}-${i}`} 
+                            onClick={() => handlePlayerClick(p)}
+                            className="flex items-center gap-4 p-4 bg-card/40 hover:bg-card hover:shadow-md cursor-pointer transition-all duration-200 border border-border/40 hover:border-primary/30 rounded-2xl h-[112px]"
+                        >
                             <div className="w-14 h-14 rounded-full overflow-hidden bg-secondary/50 flex-shrink-0 border-2 border-border/50 relative">
                                 {imageId ? (
                                     <img 
@@ -78,7 +91,7 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
                                         onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=random`; }}
                                     />
                                 ) : (
-                                    <CricketPlayerImage playerId={undefined} playerName={p.name} className="w-full h-full object-cover" />
+                                    <CricketPlayerImage playerId={p.id?.toString()} playerName={p.name} className="w-full h-full object-cover" />
                                 )}
                             </div>
                             <div className="min-w-0 flex-1">
@@ -153,6 +166,13 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
                     {renderPlayerGroup('Support Staff', team2?.['support staff'], true)}
                 </div>
             </div>
+
+            <PlayerProfilePanel 
+                playerId={selectedPlayerId} 
+                isOpen={!!selectedPlayerId} 
+                onClose={() => setSelectedPlayerId(null)} 
+                fallbackName={selectedPlayerName}
+            />
         </div>
     );
 };

@@ -82,6 +82,7 @@ export const cricketApi = {
     getCricbuzzSummary: (matchId: string, force?: boolean) =>
         api.get(`cricket/scraped/match/${matchId}/summary${force ? '?force=1' : ''}`),
     getCricbuzzInfo: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/info`),
+    getPlayerProfile: (playerId: string) => api.get(`cricket/players/${playerId}`),
     getBallMap: (matchId: string, inningsId: string) => api.get(`cricket/scraped/match/${matchId}/graphs/ballmap/${inningsId}`),
     getPartnershipGraph: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/graphs/partnerships`),
     getCricbuzzFullCommentary: (matchId: string, slug?: string, force?: boolean) => {

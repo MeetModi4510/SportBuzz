@@ -33,9 +33,7 @@ export const GraphsTab: React.FC<GraphsTabProps> = ({ matchId, inningsList = [],
         if (!ballsArray || ballsArray.length === 0) {
             return (
                 <div className="flex-1 flex flex-col items-center justify-center text-center opacity-70 p-12">
-                    <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
-                    <p className="text-lg font-bold">Data Unavailable</p>
-                    <p className="text-sm text-muted-foreground max-w-sm mt-2">The ball map for this innings is currently not available.</p>
+                    <p className="text-sm font-medium text-muted-foreground tracking-wide">Ball map data not available</p>
                 </div>
             );
         }
@@ -47,34 +45,84 @@ export const GraphsTab: React.FC<GraphsTabProps> = ({ matchId, inningsList = [],
             oversMap.get(overInt)!.push(b);
         });
 
-        const sortedOvers = Array.from(oversMap.keys()).sort((a, b) => b - a); // Newest overs first
+        // Sorted newest to oldest
+        const sortedOvers = Array.from(oversMap.keys()).sort((a, b) => b - a);
 
         return (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-6">
-                {sortedOvers.map(over => (
-                    <div key={over} className="flex flex-col items-center gap-3 p-4 bg-muted/10 rounded-2xl border border-border/40 hover:bg-muted/20 transition-colors">
-                        <span className="text-xs font-black tracking-widest text-muted-foreground uppercase">Over {over}</span>
-                        <div className="flex flex-wrap gap-1.5 justify-center max-w-[80px]">
-                            {oversMap.get(over)!.sort((a,b) => a.ballNbr - b.ballNbr).map((ball: any) => {
-                                let color = "bg-card border border-border text-foreground";
-                                if (ball.event === "WICKET" || ball.ballLabel === "W") color = "bg-red-500 text-white border-red-600 shadow-sm shadow-red-500/20";
-                                else if (ball.event === "FOUR" || ball.ballLabel === "4") color = "bg-blue-500 text-white border-blue-600 shadow-sm shadow-blue-500/20";
-                                else if (ball.event === "SIX" || ball.ballLabel === "6") color = "bg-purple-500 text-white border-purple-600 shadow-sm shadow-purple-500/20";
-                                else if (ball.ballLabel === "•" || ball.ballLabel === ".") color = "bg-muted border border-border/50 text-muted-foreground";
+            <div className="mt-8 relative w-full pb-10">
+                {/* Legend */}
+                <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mb-10 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-muted-foreground bg-background/80 backdrop-blur-sm py-2 px-6 rounded-full w-max mx-auto border border-border/40 shadow-sm">
+                    <span className="flex items-center gap-2.5"><div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm" /> Wicket</span>
+                    <span className="flex items-center gap-2.5"><div className="w-2.5 h-2.5 rounded-full bg-foreground shadow-sm" /> Boundary</span>
+                    <span className="flex items-center gap-2.5"><div className="w-2.5 h-2.5 rounded-full border-2 border-border bg-muted/20" /> Dot</span>
+                    <span className="flex items-center gap-2.5"><div className="w-2.5 h-2.5 rounded-full border-2 border-border bg-card" /> Run</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full">
+                    {sortedOvers.map((over) => {
+                        const balls = oversMap.get(over)!.sort((a, b) => a.ballNbr - b.ballNbr);
+                        
+                        let overRuns = 0;
+                        balls.forEach(b => {
+                            const match = String(b.ballLabel || '').match(/\d+/);
+                            if (match) overRuns += parseInt(match[0]);
+                        });
+
+                        const isOdd = over % 2 !== 0;
+
+                        return (
+                            <div 
+                                key={over} 
+                                className={cn(
+                                    "flex flex-col gap-3 p-5 rounded-[1.5rem] bg-card/60 backdrop-blur-sm border border-border/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-primary/30 transition-all duration-300",
+                                    isOdd ? "md:col-start-1" : "md:col-start-2"
+                                )}
+                            >
+                                {/* Over Header */}
+                                <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                                    <span className="text-sm font-black tracking-widest text-muted-foreground/80 uppercase">Over {over}</span>
+                                    <span className="text-xs font-bold text-foreground bg-foreground/10 px-2.5 py-1 rounded-md">{overRuns > 0 ? `${overRuns} Runs` : 'Maiden'}</span>
+                                </div>
                                 
-                                return (
-                                    <div 
-                                        key={ball.ballNbr} 
-                                        className={cn("w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold", color)} 
-                                        title={`${ball.event} - Striker: ${ball.batsmanStrikerId}`}
-                                    >
-                                        {ball.ballLabel}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                ))}
+                                {/* Balls Layout (Horizontal Line) */}
+                                <div className="flex flex-wrap gap-2.5 items-center pt-1">
+                                    {balls.map((ball: any) => {
+                                        const lbl = String(ball.ballLabel || '');
+                                        const isWicket = ball.event === "WICKET" || lbl === "W";
+                                        const isBoundary = lbl === "4" || lbl === "6";
+                                        const isDot = lbl === "•" || lbl === ".";
+                                        
+                                        // Premium base shape: large, clear circles, centered text
+                                        let style = "w-10 h-10 flex shrink-0 items-center justify-center text-[14px] rounded-full transition-transform hover:scale-110 cursor-default";
+                                        let displayLbl = lbl;
+
+                                        if (isWicket) {
+                                            style += " bg-red-500 text-white font-black shadow-md border border-red-600/50";
+                                            displayLbl = "W";
+                                        } else if (isBoundary) {
+                                            style += " bg-foreground text-background font-black shadow-md border border-border/20";
+                                        } else if (isDot) {
+                                            style += " bg-muted/20 border-2 border-border text-muted-foreground font-black text-2xl pb-1";
+                                            displayLbl = "·";
+                                        } else {
+                                            style += " bg-card border-2 border-border shadow-sm text-foreground/80 font-bold";
+                                        }
+
+                                        return (
+                                            <div 
+                                                key={ball.ballNbr} 
+                                                className={style}
+                                                title={`${ball.event || 'Delivery'} - Striker: ${ball.batsmanStrikerId}`}
+                                            >
+                                                {displayLbl}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         );
     };

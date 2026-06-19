@@ -1318,4 +1318,121 @@ export async function fetchPartnershipGraph(matchId) {
         console.error(`Error fetching Partnership Graph for match ${matchId}:`, e.message);
     }
     return null;
+}
+
+export async function fetchPlayerProfile(playerId) {
+    const cacheKey = `player_profile_${playerId}`;
+    const cached = liveCache.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+        // Scrape from the mobile site to bypass React hydration complexities
+        const url = `https://m.cricbuzz.com/profiles/${playerId}/player`;
+        const res = await axios.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1'
+            },
+            timeout: 8000
+        });
+
+        const $ = cheerio.load(res.data);
+        
+        const name = $('h1').text().trim() || $('title').text().split('Profile')[0].trim();
+        
+        // Extract Personal Info
+        const personalInfo = {};
+        $('div').each((_, el) => {
+            const text = $(el).text().trim();
+            // We want exact matches for the labels to avoid matching the huge concatenated div
+            if (text === 'Born') {
+                personalInfo.born = $(el).next().text().trim();
+            } else if (text === 'Birth Place') {
+                personalInfo.birthPlace = $(el).next().text().trim();
+            } else if (text === 'Role') {
+                personalInfo.role = $(el).next().text().trim();
+            } else if (text === 'Batting Style') {
+                personalInfo.battingStyle = $(el).next().text().trim();
+            } else if (text === 'Bowling Style') {
+                personalInfo.bowlingStyle = $(el).next().text().trim();
+            }
+        });
+
+        // Fallback if the strict div matching fails (some pages have different layouts)
+        if (Object.keys(personalInfo).length === 0) {
+            $('div').each((_, el) => {
+                const text = $(el).text().trim();
+                if (text.startsWith('Born') && text !== 'Born' && !text.includes('Birth Place')) {
+                    personalInfo.born = text.replace('Born', '').trim();
+                }
+                if (text.startsWith('Birth Place') && text !== 'Birth Place' && !text.includes('Role')) {
+                    personalInfo.birthPlace = text.replace('Birth Place', '').trim();
+                }
+                if (text.startsWith('Role') && text !== 'Role' && !text.includes('Batting Style')) {
+                    personalInfo.role = text.replace('Role', '').trim();
+                }
+                if (text.startsWith('Batting Style') && text !== 'Batting Style' && !text.includes('Bowling Style')) {
+                    personalInfo.battingStyle = text.replace('Batting Style', '').trim();
+                }
+                if (text.startsWith('Bowling Style') && text !== 'Bowling Style' && !text.includes('Teams')) {
+                    personalInfo.bowlingStyle = text.replace('Bowling Style', '').trim();
+                }
+            });
+        }
+
+        // Extract Stats Tables
+        const parseTable = (index) => {
+            const table = $('table').eq(index);
+            if (!table.length) return null;
+            
+            const stats = {};
+            // Row 0 is headers (Test, ODI, T20, IPL)
+            const headers = [];
+            table.find('tr').eq(0).find('th, td').each((i, el) => {
+                if (i > 0) headers.push($(el).text().trim());
+            });
+
+            table.find('tr').each((i, row) => {
+                if (i === 0) return; // skip header
+                const cells = [];
+                $(row).find('td, th').each((_, cell) => cells.push($(cell).text().trim()));
+                
+                if (cells.length > 1) {
+                    const statName = cells[0].toLowerCase().replace(/\s+/g, '_');
+                    stats[statName] = {};
+                    headers.forEach((h, hIdx) => {
+                        stats[statName][h.toLowerCase()] = cells[hIdx + 1];
+                    });
+                }
+            });
+            return stats;
+        };
+
+        // Table 2 is usually Batting, Table 3 is Bowling (Table 0 and 1 are ICC rankings)
+        let battingStats = null;
+        let bowlingStats = null;
+        
+        $('table').each((i, tbl) => {
+            const firstCell = $(tbl).find('tr').eq(1).find('td, th').first().text().trim();
+            if (firstCell === 'Matches') {
+                if (!battingStats) battingStats = parseTable(i);
+                else if (!bowlingStats) bowlingStats = parseTable(i);
+            }
+        });
+
+        const result = {
+            id: playerId,
+            name,
+            personalInfo,
+            battingStats,
+            bowlingStats
+        };
+
+        // Cache for 24 hours
+        liveCache.set(cacheKey, result, 86400);
+        return result;
+
+    } catch (e) {
+        console.error(`Error scraping player profile ${playerId}:`, e.message);
+        return null;
+    }
 }
