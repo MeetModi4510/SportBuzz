@@ -13,27 +13,51 @@ interface FieldDataResult {
     data: any | null;
     loading: boolean;
     error: string | null;
+    lastUpdated: number | null; // epoch ms — for "Updated X ago" display
 }
 
 // ── Cache (module-level, survives across component mounts) ─────────────────────
-// Keyed by "matchId:field"
+// Keyed by "matchId:field" or "matchId:field:slug"
 const fieldCache = new Map<string, CacheEntry>();
 
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes in ms
+// ── Per-field TTL ──────────────────────────────────────────────────────────────
+// Volatile (live data) → 60 s | Stable (static info) → 30 min
+const FIELD_TTL: Record<FieldType, number> = {
+    matchInfo:          30 * 60 * 1000, // 30 min — not volatile
+    cbSquads:           30 * 60 * 1000, // 30 min — not volatile
+    commentary:              60 * 1000, // 1 min — live
+    cbScorecard:             60 * 1000, // 1 min — live
+    cbCommentary:            60 * 1000, // 1 min — live
+    cbFullCommentary:        60 * 1000, // 1 min — live
+};
 
-function isCacheValid(entry: CacheEntry | undefined): entry is CacheEntry {
+function isCacheValid(entry: CacheEntry | undefined, ttl: number): entry is CacheEntry {
     if (!entry) return false;
-    return Date.now() - entry.timestamp < CACHE_TTL;
+    return Date.now() - entry.timestamp < ttl;
+}
+
+function getCacheKey(matchId: string, field: FieldType, slug?: string): string {
+    return field === 'cbScorecard' && slug
+        ? `${matchId}:${field}:${slug}`
+        : `${matchId}:${field}`;
 }
 
 // ── Hook ───────────────────────────────────────────────────────────────────────
 /**
- * Lazy-loading hook with 10-minute TTL cache for match detail fields.
+ * Lazy-loading hook with per-field TTL cache for match detail fields.
  *
- * @param matchId  - The cricket match ID (e.g. "cricket-xxxxx")
- * @param field    - Which data to fetch: 'matchInfo' (summary/lineups/scoreboard)
- *                   or 'commentary' (currentMatches endpoint)
+ * TTLs:
+ *   - Scorecard / Commentary / Overs (volatile): 60 s
+ *   - Match Info / Squads (stable):              30 min
+ *
+ * Auto-refresh: while `enabled=true`, the hook schedules a setTimeout to
+ * re-fetch once the current TTL expires. The timer is cleared when the user
+ * navigates away (`enabled` becomes false) or the component unmounts.
+ *
+ * @param matchId  - The cricket match ID (e.g. "cricket-xxxxx" or raw numeric id)
+ * @param field    - Which data to fetch
  * @param enabled  - true when the relevant tab is active; false to skip fetch
+ * @param slug     - Optional slug (used for cbScorecard cache key differentiation)
  */
 export function useMatchFieldData(
     matchId: string | undefined,
@@ -41,37 +65,45 @@ export function useMatchFieldData(
     enabled: boolean,
     slug?: string
 ): FieldDataResult {
-    const [data, setData] = useState<any | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const abortRef = useRef<AbortController | null>(null);
-    const prevMatchIdRef = useRef<string | undefined>(undefined);
+    const [data, setData]               = useState<any | null>(null);
+    const [loading, setLoading]         = useState(false);
+    const [error, setError]             = useState<string | null>(null);
+    const [lastUpdated, setLastUpdated] = useState<number | null>(null);
 
-    const fetchData = useCallback(async () => {
+    const abortRef      = useRef<AbortController | null>(null);
+    const prevMatchRef  = useRef<string | undefined>(undefined);
+    const autoRefreshId = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // ── Fetch ────────────────────────────────────────────────────────────────
+    const fetchData = useCallback(async (bypassCache = false) => {
         if (!matchId) return;
 
-        // Include slug in cache key for cbScorecard to avoid stale data across matches
-        const cacheKey = field === 'cbScorecard' && slug
-            ? `${matchId}:${field}:${slug}`
-            : `${matchId}:${field}`;
+        const cacheKey = getCacheKey(matchId, field, slug);
+        const ttl      = FIELD_TTL[field];
 
-        // Check cache first
-        const cached = fieldCache.get(cacheKey);
-        if (isCacheValid(cached)) {
-            setData(cached.data);
-            setLoading(false);
-            setError(null);
-            return;
+        // Check cache unless caller explicitly bypasses (auto-refresh timer)
+        if (!bypassCache) {
+            const cached = fieldCache.get(cacheKey);
+            if (isCacheValid(cached, ttl)) {
+                setData(cached.data);
+                setLastUpdated(cached.timestamp);
+                setLoading(false);
+                setError(null);
+                return;
+            }
         }
-
-        // Fetch from API
-        setLoading(true);
-        setError(null);
 
         // Abort any previous in-flight request for this field
         abortRef.current?.abort();
         const controller = new AbortController();
         abortRef.current = controller;
+
+        setLoading(true);
+        setError(null);
+
+        // When bypassCache=true (timer-triggered refresh), pass force=true to also
+        // bypass the backend NodeCache — otherwise we'd get the same old data back
+        const force = bypassCache;
 
         try {
             let result: any = null;
@@ -80,36 +112,31 @@ export function useMatchFieldData(
                 : matchId;
 
             if (field === 'matchInfo') {
-                // match_info endpoint — serves Summary, Lineups, Scoreboard
                 const response = await cricketApi.getMatchInfo(cleanId);
                 result = response?.data || response;
             } else if (field === 'commentary') {
-                // Use the Cricbuzz commentary endpoint for this match
-                const response = await cricketApi.getCricbuzzCommentary(cleanId);
+                const response = await cricketApi.getCricbuzzCommentary(cleanId, force);
                 result = response?.data || null;
             } else if (field === 'cbScorecard') {
-                // Cricbuzz scorecard via dedicated HTML scraper
-                const response = await cricketApi.getCricbuzzScorecard(cleanId, slug);
+                const response = await cricketApi.getCricbuzzScorecard(cleanId, slug, force);
                 result = response?.data || null;
             } else if (field === 'cbSquads') {
-                // Cricbuzz squads (extracted from scorecard)
                 const response = await cricketApi.getCricbuzzSquads(cleanId);
                 result = response?.data || null;
             } else if (field === 'cbCommentary') {
-                // Cricbuzz highlight commentary
-                const response = await cricketApi.getCricbuzzCommentary(cleanId);
+                const response = await cricketApi.getCricbuzzCommentary(cleanId, force);
                 result = response?.data || null;
             } else if (field === 'cbFullCommentary') {
-                // Full Cricbuzz commentary scraped from the full-commentary page
-                const response = await cricketApi.getCricbuzzFullCommentary(cleanId, slug);
+                const response = await cricketApi.getCricbuzzFullCommentary(cleanId, slug, force);
                 result = response?.data || null;
             }
 
-            // Only update if this request wasn't aborted
             if (!controller.signal.aborted) {
                 if (result) {
-                    fieldCache.set(cacheKey, { data: result, timestamp: Date.now() });
+                    const ts = Date.now();
+                    fieldCache.set(cacheKey, { data: result, timestamp: ts });
                     setData(result);
+                    setLastUpdated(ts);
                 } else {
                     setError('No data found');
                 }
@@ -124,40 +151,77 @@ export function useMatchFieldData(
         }
     }, [matchId, field, slug]);
 
-    // Reset data immediately when matchId changes to avoid stale data from previous match
+    // ── Auto-refresh scheduler ────────────────────────────────────────────────
+    const scheduleAutoRefresh = useCallback(() => {
+        // Clear any existing timer
+        if (autoRefreshId.current !== null) {
+            clearTimeout(autoRefreshId.current);
+            autoRefreshId.current = null;
+        }
+
+        const ttl = FIELD_TTL[field];
+        autoRefreshId.current = setTimeout(async () => {
+            // Only refresh if still enabled (user is still on this tab)
+            await fetchData(true); // bypass cache — forced fresh fetch
+            scheduleAutoRefresh(); // reschedule for the next cycle
+        }, ttl);
+    }, [field, fetchData]);
+
+    // ── Reset on matchId change ───────────────────────────────────────────────
     useEffect(() => {
-        if (prevMatchIdRef.current !== matchId) {
-            prevMatchIdRef.current = matchId;
+        if (prevMatchRef.current !== matchId) {
+            prevMatchRef.current = matchId;
             setData(null);
             setError(null);
-            // Abort any in-flight request for the old match
+            setLastUpdated(null);
             abortRef.current?.abort();
+            if (autoRefreshId.current !== null) {
+                clearTimeout(autoRefreshId.current);
+                autoRefreshId.current = null;
+            }
         }
     }, [matchId]);
 
+    // ── Main effect: activate / deactivate ───────────────────────────────────
     useEffect(() => {
         if (!enabled || !matchId) {
+            // User navigated away — stop the auto-refresh timer
+            if (autoRefreshId.current !== null) {
+                clearTimeout(autoRefreshId.current);
+                autoRefreshId.current = null;
+            }
             return;
         }
 
-        // On activation: check cache, else fetch
-        const cacheKey = field === 'cbScorecard' && slug
-            ? `${matchId}:${field}:${slug}`
-            : `${matchId}:${field}`;
-        const cached = fieldCache.get(cacheKey);
-        if (isCacheValid(cached)) {
+        // On activation: serve from cache if still valid, else fetch fresh
+        const cacheKey = getCacheKey(matchId, field, slug);
+        const ttl      = FIELD_TTL[field];
+        const cached   = fieldCache.get(cacheKey);
+
+        if (isCacheValid(cached, ttl)) {
             setData(cached.data);
+            setLastUpdated(cached.timestamp);
             setLoading(false);
             setError(null);
+            // Schedule refresh for when this cache entry expires
+            const remaining = ttl - (Date.now() - cached.timestamp);
+            autoRefreshId.current = setTimeout(async () => {
+                await fetchData(true);
+                scheduleAutoRefresh();
+            }, remaining);
         } else {
-            fetchData();
+            fetchData().then(() => scheduleAutoRefresh());
         }
 
-        // Cleanup: abort in-flight requests on unmount (dashboard navigation)
         return () => {
+            // Cleanup on unmount or when enabled → false
             abortRef.current?.abort();
+            if (autoRefreshId.current !== null) {
+                clearTimeout(autoRefreshId.current);
+                autoRefreshId.current = null;
+            }
         };
-    }, [enabled, matchId, field, fetchData]);
+    }, [enabled, matchId, field, slug, fetchData, scheduleAutoRefresh]);
 
-    return { data, loading, error };
+    return { data, loading, error, lastUpdated };
 }

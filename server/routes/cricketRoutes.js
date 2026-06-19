@@ -101,7 +101,8 @@ router.get('/scraped/match/:id/scorecard', async (req, res) => {
     try {
         const { id } = req.params;
         const { slug } = req.query; // optional
-        const data = await scrapeScorecard(id, slug || null);
+        const force = req.query.force === '1' || req.query.force === 'true';
+        const data = await scrapeScorecard(id, slug || null, force);
         if (!data) {
             return res.status(200).json({ status: 'success', data: null, message: 'No scorecard data available yet — match may not have started.' });
         }
@@ -113,7 +114,8 @@ router.get('/scraped/match/:id/scorecard', async (req, res) => {
 });
 
 router.get('/scraped/match/:id/:endpointType', async (req, res) => {
-    const data = await fetchMatchDetailScraped(req.params.id, req.params.endpointType);
+    const force = req.query.force === '1' || req.query.force === 'true';
+    const data = await fetchMatchDetailScraped(req.params.id, req.params.endpointType, force);
     res.json({ status: 'success', data });
 });
 // =============================
@@ -236,7 +238,8 @@ router.get('/cb/scorecard/:matchId', async (req, res) => {
     try {
         const { matchId } = req.params;
         const { slug } = req.query;
-        const data = await scrapeScorecard(matchId, slug || null);
+        const force = req.query.force === '1' || req.query.force === 'true';
+        const data = await scrapeScorecard(matchId, slug || null, force);
         if (!data) {
             return res.status(200).json({ status: 'success', data: null, message: 'No scorecard data available yet.' });
         }
@@ -259,7 +262,8 @@ router.get('/cb/squads/:matchId', async (req, res) => {
 // Cricbuzz Commentary (legacy RSC endpoint - used as fallback)
 router.get('/cb/commentary/:matchId', async (req, res) => {
     try {
-        const data = await fetchMatchDetailScraped(req.params.matchId, 'commentary');
+        const force = req.query.force === '1' || req.query.force === 'true';
+        const data = await fetchMatchDetailScraped(req.params.matchId, 'commentary', force);
         res.json({ status: 'success', data });
     } catch (error) {
         res.status(500).json({ error: error.message, data: null });
@@ -276,7 +280,8 @@ router.get('/cb/full-commentary/:matchId', async (req, res) => {
     try {
         const { matchId } = req.params;
         const { slug } = req.query; // optional
-        const data = await scrapeFullCommentary(matchId, slug || null);
+        const force = req.query.force === '1' || req.query.force === 'true';
+        const data = await scrapeFullCommentary(matchId, slug || null, force);
         if (!data) {
             return res.status(200).json({
                 status: 'success',

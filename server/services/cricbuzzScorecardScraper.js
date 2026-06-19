@@ -218,12 +218,16 @@ function parseBowling($, container) {
  *                          If omitted, will be auto-resolved.
  * @returns {Promise<object>} Scorecard data with innings array
  */
-export async function scrapeScorecard(matchId, slug = null) {
+export async function scrapeScorecard(matchId, slug = null, force = false) {
     const cacheKey = `scorecard_html_${matchId}`;
-    const cached = scorecardCache.get(cacheKey);
-    if (cached) {
-        console.log(`[ScorecardScraper] Cache hit for match ${matchId}`);
-        return cached;
+    if (!force) {
+        const cached = scorecardCache.get(cacheKey);
+        if (cached) {
+            console.log(`[ScorecardScraper] Cache hit for match ${matchId}`);
+            return cached;
+        }
+    } else {
+        console.log(`[ScorecardScraper] Force-bypass cache for match ${matchId}`);
     }
 
     // Resolve slug if not provided
@@ -235,7 +239,8 @@ export async function scrapeScorecard(matchId, slug = null) {
         resolvedSlug = 'match'; // fallback — Cricbuzz often accepts this
     }
 
-    const url = `https://www.cricbuzz.com/live-cricket-scorecard/${matchId}/${resolvedSlug}`;
+    const timestamp = Date.now();
+    const url = `https://www.cricbuzz.com/live-cricket-scorecard/${matchId}/${resolvedSlug}?_t=${timestamp}`;
     console.log(`[ScorecardScraper] Fetching: ${url}`);
 
     let html;
@@ -250,7 +255,7 @@ export async function scrapeScorecard(matchId, slug = null) {
         if (resolvedSlug !== 'match') {
             console.warn(`[ScorecardScraper] Failed with slug "${resolvedSlug}", retrying with "match"`);
             try {
-                const fallbackUrl = `https://www.cricbuzz.com/live-cricket-scorecard/${matchId}/match`;
+                const fallbackUrl = `https://www.cricbuzz.com/live-cricket-scorecard/${matchId}/match?_t=${timestamp}`;
                 const res = await axios.get(fallbackUrl, { headers: BROWSER_HEADERS, timeout: 12000 });
                 html = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
             } catch (e2) {
@@ -392,9 +397,11 @@ export async function scrapeScorecard(matchId, slug = null) {
     };
 
     // Cache: shorter TTL if match is live (status includes "Stumps", "Live", "Day")
+    // 60s for live (frontend bypasses this via force on its 60s cycle), 600s for completed
     const isLive = /live|stumps|day \d|innings break/i.test(matchStatus);
-    scorecardCache.set(cacheKey, result, isLive ? 60 : 600);
-    console.log(`[ScorecardScraper] Parsed ${innings.length} innings for match ${matchId} (TTL: ${isLive ? 60 : 600}s)`);
+    const liveTtl = 60; // 60s cache time
+    scorecardCache.set(cacheKey, result, isLive ? liveTtl : 600);
+    console.log(`[ScorecardScraper] Parsed ${innings.length} innings for match ${matchId} (TTL: ${isLive ? liveTtl : 600}s, force=${force})`);
 
     return result;
 }

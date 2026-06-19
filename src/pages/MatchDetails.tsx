@@ -5,6 +5,7 @@ import { SportIcon, getSportGradient } from "@/components/SportIcon";
 import { TeamLogo } from "@/components/TeamLogo";
 import { matches, players } from "@/data/mockData";
 import { useCricketMatchDetails, useCricketMatchSquads, useCricbuzzSummary, useCricbuzzInfo } from "@/hooks/useCricketMatches";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCricketDataMatch, useCricbuzzSquads } from "@/hooks/useCricketDataMatch";
 import { useMatchFieldData } from "@/hooks/useMatchFieldData";
 import { cn, formatScoreString, formatOversText } from "@/lib/utils";
@@ -34,7 +35,7 @@ import {
   Eye,
   Shield
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { Helmet } from "react-helmet-async";
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -98,6 +99,7 @@ const MatchDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null);
   const [activeTab, setActiveTab] = useState('summary');
@@ -288,6 +290,14 @@ const MatchDetails = () => {
   const { data: cbSummary, isLoading: isSummaryLoading } = useCricbuzzSummary(
     isCricketMatch ? cleanMatchId : undefined
   );
+
+  // Force-refetch summary each time user navigates to this match page.
+  // This ensures the header score is never stale vs the dashboard card.
+  useEffect(() => {
+    if (cleanMatchId && isCricketMatch) {
+      queryClient.refetchQueries({ queryKey: ['cricket', 'summary', cleanMatchId] });
+    }
+  }, [cleanMatchId, isCricketMatch, queryClient]);
   
   const { data: cbInfo, isLoading: isInfoLoading } = useCricbuzzInfo(
     isCricketMatch ? cleanMatchId : undefined,
@@ -315,8 +325,8 @@ const MatchDetails = () => {
   const team2ShortName = dynamicTeam2?.teamSName || match?.awayTeam?.shortName || "T2";
   const team2Logo = dynamicTeam2?.imageId ? `/api/cricket/scraped/team-logo/${dynamicTeam2.imageId}` : match?.awayTeam?.logo;
 
-  let dynamicHomeScoreStr = match?.homeScore;
-  let dynamicAwayScoreStr = match?.awayScore;
+  let dynamicHomeScoreStr: string | undefined = undefined;
+  let dynamicAwayScoreStr: string | undefined = undefined;
   
   if (cbSummary) {
       if (cbSummary.miniscore) {
@@ -332,13 +342,41 @@ const MatchDetails = () => {
                 if (bowl) dynamicHomeScoreStr = `${bowl.teamScore}/${bowl.teamWkts} (${bowl.teamOvs} ov)`;
             }
           }
-      } else if (cbSummary.matchScore) {
+      }
+      
+      // Also check matchScore if miniscore didn't give us both
+      if (cbSummary.matchScore && (!dynamicHomeScoreStr || !dynamicAwayScoreStr)) {
           const t1 = cbSummary.matchScore.team1Score?.inngs1;
           const t2 = cbSummary.matchScore.team2Score?.inngs1;
-          if (t1) dynamicHomeScoreStr = `${t1.runs}/${t1.wickets || 0} (${t1.overs} ov)`;
-          if (t2) dynamicAwayScoreStr = `${t2.runs}/${t2.wickets || 0} (${t2.overs} ov)`;
+          if (t1 && !dynamicHomeScoreStr) dynamicHomeScoreStr = `${t1.runs}/${t1.wickets || 0} (${t1.overs} ov)`;
+          if (t2 && !dynamicAwayScoreStr) dynamicAwayScoreStr = `${t2.runs}/${t2.wickets || 0} (${t2.overs} ov)`;
       }
   }
+
+  // Scorecard reconciliation: if Scoreboard tab has fresher data (higher run count),
+  // update the header score so both always match. Cricket scores only go up.
+  if (cbScorecardField.data?.innings?.length > 0) {
+    const latestInn = cbScorecardField.data.innings[cbScorecardField.data.innings.length - 1];
+    const sd = latestInn?.scoreDetails || latestInn;
+    const scRuns = sd?.runs ?? sd?.teamScore;
+    const scWkts = sd?.wickets ?? sd?.teamWkts ?? 0;
+    const scOvs = sd?.overs ?? sd?.teamOvs ?? '';
+    const scTeamName = (latestInn?.batTeamDetails?.batTeamName || '').toLowerCase();
+    if (scRuns !== undefined) {
+      const scStr = `${scRuns}/${scWkts} (${scOvs} ov)`;
+      // Determine if latest innings is home or away
+      const homeMatch = scTeamName && team1Name && scTeamName.includes(team1Name.toLowerCase().split(' ')[0]);
+      const existingRuns = parseInt((homeMatch ? dynamicHomeScoreStr : dynamicAwayScoreStr) || '0');
+      if (scRuns > existingRuns) {
+        if (homeMatch) dynamicHomeScoreStr = scStr;
+        else dynamicAwayScoreStr = scStr;
+      }
+    }
+  }
+
+  // Fallback to match object ONLY IF cbSummary hasn't produced a score
+  if (!dynamicHomeScoreStr && match?.homeScore) dynamicHomeScoreStr = match.homeScore;
+  if (!dynamicAwayScoreStr && match?.awayScore) dynamicAwayScoreStr = match.awayScore;
 
   if (dynamicHomeScoreStr) dynamicHomeScoreStr = formatScoreString(dynamicHomeScoreStr);
   if (dynamicAwayScoreStr) dynamicAwayScoreStr = formatScoreString(dynamicAwayScoreStr);
@@ -1837,6 +1875,11 @@ const MatchDetails = () => {
                   )}
                 </div>
               )}
+              {cbScorecardField.lastUpdated && (
+                <p className="text-[10px] text-muted-foreground/50 text-right mt-2 font-medium">
+                  Updated {formatDistanceToNow(cbScorecardField.lastUpdated)} ago
+                </p>
+              )}
             </TabsContent>
 
 
@@ -2230,6 +2273,11 @@ const MatchDetails = () => {
                   )}
                 </div>
               </div>
+              {cbCommentaryField.lastUpdated && (
+                <p className="text-[10px] text-muted-foreground/50 text-right mt-2 font-medium">
+                  Updated {formatDistanceToNow(cbCommentaryField.lastUpdated)} ago
+                </p>
+              )}
             </TabsContent>
 
 

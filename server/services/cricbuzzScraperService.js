@@ -656,7 +656,8 @@ export async function fetchLiveMatchesScraped() {
     if (cached) return cached;
 
     try {
-        const res = await axios.get('https://www.cricbuzz.com/cricket-match/live-scores', {
+        const timestamp = Date.now();
+        const res = await axios.get(`https://www.cricbuzz.com/cricket-match/live-scores?_t=${timestamp}`, {
             headers: { 'User-Agent': 'Mozilla/5.0' }
         });
         
@@ -725,7 +726,8 @@ async function fetchRscMatchList(url, cacheKey) {
     if (cached) return cached;
 
     try {
-        const res = await axios.get(url, {
+        const timestamp = Date.now();
+        const res = await axios.get(`${url}?_t=${timestamp}`, {
             headers: { 'User-Agent': 'Mozilla/5.0', 'RSC': '1', 'x-nextjs-data': '1' }
         });
         
@@ -794,16 +796,17 @@ export async function fetchUpcomingMatchesScraped() {
 }
 
 // Deep Match Details Scraper with dynamic TTL based on state
-export async function fetchMatchDetailScraped(matchId, endpointType) {
+export async function fetchMatchDetailScraped(matchId, endpointType, force = false) {
+    const t = Date.now();
     const urlMap = {
-        'summary': `https://www.cricbuzz.com/live-cricket-scores/${matchId}/match`,
-        'scorecard': `https://www.cricbuzz.com/live-cricket-scorecard/${matchId}/match`,
-        'info': `https://www.cricbuzz.com/cricket-match-facts/${matchId}/match`,
-        'commentary': `https://www.cricbuzz.com/live-cricket-full-commentary/${matchId}/match`,
-        'overs': `https://www.cricbuzz.com/live-cricket-over-by-over/${matchId}/match`,
-        'squads': `https://www.cricbuzz.com/cricket-match-squads/${matchId}/match`,
-        'highlights': `https://www.cricbuzz.com/cricket-match-highlights/${matchId}/match`,
-        'graphs': `https://www.cricbuzz.com/live-cricket-graphs/${matchId}/match`
+        'summary': `https://www.cricbuzz.com/live-cricket-scores/${matchId}/match?_t=${t}`,
+        'scorecard': `https://www.cricbuzz.com/live-cricket-scorecard/${matchId}/match?_t=${t}`,
+        'info': `https://www.cricbuzz.com/cricket-match-facts/${matchId}/match?_t=${t}`,
+        'commentary': `https://www.cricbuzz.com/live-cricket-full-commentary/${matchId}/match?_t=${t}`,
+        'overs': `https://www.cricbuzz.com/live-cricket-over-by-over/${matchId}/match?_t=${t}`,
+        'squads': `https://www.cricbuzz.com/cricket-match-squads/${matchId}/match?_t=${t}`,
+        'highlights': `https://www.cricbuzz.com/cricket-match-highlights/${matchId}/match?_t=${t}`,
+        'graphs': `https://www.cricbuzz.com/live-cricket-graphs/${matchId}/match?_t=${t}`
     };
 
     const url = urlMap[endpointType];
@@ -821,12 +824,15 @@ export async function fetchMatchDetailScraped(matchId, endpointType) {
     const cachedLive = liveCache.get(cacheKey);
     const cachedStd = standardCache.get(cacheKey);
 
-    // If endpoint is info or squads, always use standard TTL
-    if (endpointType === 'info' || endpointType === 'squads') {
-        if (cachedStd) return cachedStd;
-    } else {
-        if (isLive && cachedLive) return cachedLive;
-        if (!isLive && cachedStd) return cachedStd;
+    // Skip cache entirely when force=true (called by auto-refresh timer)
+    if (!force) {
+        // If endpoint is info or squads, always use standard TTL
+        if (endpointType === 'info' || endpointType === 'squads') {
+            if (cachedStd) return cachedStd;
+        } else {
+            if (isLive && cachedLive) return cachedLive;
+            if (!isLive && cachedStd) return cachedStd;
+        }
     }
 
     try {
@@ -879,14 +885,14 @@ export async function fetchMatchDetailScraped(matchId, endpointType) {
         }
 
         if (parsed) {
-            // TTL Setup: info = 1 hr (3600), summary = 1 min (60)
+            // TTL: info/squads = 1h, live volatile endpoints = 60s (frontend 60s cycle gets fresh data via force parameter)
             let ttl = 300; // default 5 min
             if (endpointType === 'info' || endpointType === 'squads') {
                 ttl = 3600; 
             } else if (endpointType === 'summary') {
-                ttl = 60;
+                ttl = 60; // 60s cache time
             } else if (isLive) {
-                ttl = 60;
+                ttl = 60; // 60s for all other live endpoints
             }
             
             if (ttl === 60) {
@@ -942,10 +948,12 @@ export async function fetchMatchDetailScraped(matchId, endpointType) {
  */
 const commentaryCache = new NodeCache({ stdTTL: 60 }); // 60s for live, refreshed on each request
 
-export async function scrapeFullCommentary(matchId, slug) {
+export async function scrapeFullCommentary(matchId, slug, force = false) {
     const cacheKey = `full_commentary_${matchId}`;
-    const cached = commentaryCache.get(cacheKey);
-    if (cached) return cached;
+    if (!force) {
+        const cached = commentaryCache.get(cacheKey);
+        if (cached) return cached;
+    }
 
     if (!slug) {
         // Attempt to auto-derive slug from live/recent matches
@@ -962,8 +970,9 @@ export async function scrapeFullCommentary(matchId, slug) {
         if (!slug) slug = 'match'; // last resort fallback
     }
 
-    const liveUrl = `https://www.cricbuzz.com/live-cricket-scores/${matchId}/${slug}`;
-    const fullUrl = `https://www.cricbuzz.com/live-cricket-full-commentary/${matchId}/${slug}`;
+    const timestamp = Date.now();
+    const liveUrl = `https://www.cricbuzz.com/live-cricket-scores/${matchId}/${slug}?_t=${timestamp}`;
+    const fullUrl = `https://www.cricbuzz.com/live-cricket-full-commentary/${matchId}/${slug}?_t=${timestamp}`;
     console.log(`[Commentary Scraper] Fetching: ${liveUrl}`);
 
     try {
@@ -1123,7 +1132,7 @@ export async function scrapeFullCommentary(matchId, slug) {
         };
 
         if (result.commentary.length > 0) {
-            // cache with 1 minute TTL as requested by user
+            // cache with 60s TTL
             commentaryCache.set(cacheKey, result, 60);
             return result;
         }
@@ -1141,9 +1150,10 @@ export async function fetchMatchSquadsScraped(matchId) {
     const cachedResult = squadsCache.get(cacheKey);
     if (cachedResult) return cachedResult;
 
+    const timestamp = Date.now();
     const urlsToTry = [
-        `https://www.cricbuzz.com/cricket-match-squads/${matchId}/match`,
-        `https://www.cricbuzz.com/live-cricket-squads/${matchId}/match`
+        `https://www.cricbuzz.com/cricket-match-squads/${matchId}/match?_t=${timestamp}`,
+        `https://www.cricbuzz.com/live-cricket-squads/${matchId}/match?_t=${timestamp}`
     ];
 
     let foundObjects = [];

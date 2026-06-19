@@ -69,13 +69,26 @@ export const cricketApi = {
     getMatchScorecard: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/scorecard`),
     getMatchSquads: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/squads`),
     getMatchInfo: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/info`),
-    getCricbuzzScorecard: (matchId: string, slug?: string) => api.get(`cricket/scraped/match/${matchId}/scorecard${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`),
+    getCricbuzzScorecard: (matchId: string, slug?: string, force?: boolean) => {
+        const params = new URLSearchParams();
+        if (slug) params.set('slug', slug);
+        if (force) params.set('force', '1');
+        const qs = params.toString();
+        return api.get(`cricket/scraped/match/${matchId}/scorecard${qs ? `?${qs}` : ''}`);
+    },
     getCricbuzzSquads: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/squads`),
-    getCricbuzzCommentary: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/commentary`),
-    getCricbuzzSummary: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/summary`),
+    getCricbuzzCommentary: (matchId: string, force?: boolean) =>
+        api.get(`cricket/scraped/match/${matchId}/commentary${force ? '?force=1' : ''}`),
+    getCricbuzzSummary: (matchId: string, force?: boolean) =>
+        api.get(`cricket/scraped/match/${matchId}/summary${force ? '?force=1' : ''}`),
     getCricbuzzInfo: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/info`),
-    getCricbuzzFullCommentary: (matchId: string, slug?: string) =>
-        api.get(`cricket/cb/full-commentary/${matchId}${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`),
+    getCricbuzzFullCommentary: (matchId: string, slug?: string, force?: boolean) => {
+        const params = new URLSearchParams();
+        if (slug) params.set('slug', slug);
+        if (force) params.set('force', '1');
+        const qs = params.toString();
+        return api.get(`cricket/cb/full-commentary/${matchId}${qs ? `?${qs}` : ''}`);
+    },
     getFeaturedMatches: async () => {
         try {
             const res = await api.get('featured/matches');

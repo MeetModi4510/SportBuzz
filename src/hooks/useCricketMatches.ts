@@ -174,7 +174,7 @@ export function useCricbuzzSummary(matchId: string | undefined) {
         },
         enabled: !!matchId,
         refetchInterval: 60000, // 1 minute auto-refresh
-        staleTime: 60000,
+        staleTime: 30000,
     });
 }
 
