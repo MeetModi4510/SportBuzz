@@ -57,6 +57,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const MatchPerformanceLab = lazy(() => import("@/components/MatchPerformanceLab"));
 const CricketPerformanceLab = lazy(() => import("@/components/CricketPerformanceLab"));
+const GraphsTab = lazy(() => import("@/components/cricket/GraphsTab").then(m => ({ default: m.GraphsTab })));
 
 /** Safely converts any value to a renderable string. Prevents "Objects are not valid as React child" errors. */
 const safeStr = (val: any, fallback = ''): string => {
@@ -320,7 +321,7 @@ const MatchDetails = () => {
   const cbScorecardField = useMatchFieldData(
     cleanMatchId,
     'cbScorecard',
-    activeTab === 'scoreboard' || activeTab === 'performance',
+    activeTab === 'scoreboard' || activeTab === 'performance' || activeTab === 'graphs',
     cricbuzzSlug,
     scorecardSyncTrigger
   );
@@ -1087,6 +1088,15 @@ const MatchDetails = () => {
                 <MessageSquare size={16} />
                 Commentary
               </TabsTrigger>
+              {match?.sport === 'cricket' && (
+                <TabsTrigger 
+                  value="graphs" 
+                  className="flex items-center gap-2 px-1 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-all"
+                >
+                  <Activity size={16} />
+                  Graphs
+                </TabsTrigger>
+              )}
               {(match?.sport === 'football' || match?.sport === 'cricket') && (
                 <TabsTrigger 
                   value="performance" 
@@ -2706,6 +2716,33 @@ const MatchDetails = () => {
                 </p>
               )}
             </TabsContent>
+
+
+            {match?.sport === 'cricket' && (
+              <TabsContent value="graphs" className="animate-fade-in">
+                <Suspense fallback={<div className="p-12 flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+                  <GraphsTab 
+                      matchId={id || ""} 
+                      inningsList={cbScorecardField.data?.innings?.map((inn: any) => {
+                          const rawName = inn.teamName || inn.inningsName || `Innings ${inn.inningsNumber || inn.inningsId}`;
+                          let formattedName = rawName;
+                          if (rawName.includes(' Innings')) {
+                              const [teamPart, innPart] = rawName.split(' Innings');
+                              let abbr = teamPart.trim();
+                              const abbrMap: Record<string, string> = { "New Zealand": "NZ", "England": "ENG", "Australia": "AUS", "India": "IND", "South Africa": "RSA", "West Indies": "WI", "Pakistan": "PAK", "Sri Lanka": "SL", "Bangladesh": "BAN", "Afghanistan": "AFG" };
+                              if (abbrMap[abbr]) abbr = abbrMap[abbr];
+                              formattedName = `${abbr} (${innPart.trim().split(' ')[0]} Inn)`;
+                          }
+                          return {
+                              id: inn.inningsNumber || inn.inningsId,
+                              name: formattedName
+                          };
+                      }) || [{ id: 1, name: 'Innings 1' }, { id: 2, name: 'Innings 2' }]} 
+                      syncTrigger={scorecardSyncTrigger}
+                  />
+                </Suspense>
+              </TabsContent>
+            )}
 
 
             {(match?.sport === 'football' || match?.sport === 'cricket') && (

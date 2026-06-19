@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { cricketApi } from '@/services/api';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-export type FieldType = 'matchInfo' | 'commentary' | 'cbScorecard' | 'cbSquads' | 'cbCommentary' | 'cbFullCommentary';
+export type FieldType = 'matchInfo' | 'commentary' | 'cbScorecard' | 'cbSquads' | 'cbCommentary' | 'cbFullCommentary' | 'cbBallMap' | 'cbPartnershipGraph';
 
 interface CacheEntry {
     data: any;
@@ -29,6 +29,8 @@ const FIELD_TTL: Record<FieldType, number> = {
     cbScorecard:             60 * 1000, // 1 min — live
     cbCommentary:            60 * 1000, // 1 min — live
     cbFullCommentary:        60 * 1000, // 1 min — live
+    cbBallMap:               60 * 1000, // 1 min — live
+    cbPartnershipGraph:      60 * 1000, // 1 min — live
 };
 
 function isCacheValid(entry: CacheEntry | undefined, ttl: number): entry is CacheEntry {
@@ -37,7 +39,7 @@ function isCacheValid(entry: CacheEntry | undefined, ttl: number): entry is Cach
 }
 
 function getCacheKey(matchId: string, field: FieldType, slug?: string): string {
-    return field === 'cbScorecard' && slug
+    return slug
         ? `${matchId}:${field}:${slug}`
         : `${matchId}:${field}`;
 }
@@ -135,6 +137,13 @@ export function useMatchFieldData(
             } else if (field === 'cbFullCommentary') {
                 const response = await cricketApi.getCricbuzzFullCommentary(cleanId, slug, force);
                 result = response?.data || null;
+            } else if (field === 'cbBallMap') {
+                // For Ball Map, we use the slug parameter to pass the inningsId
+                const response = await cricketApi.getBallMap(cleanId, slug || '1');
+                result = response?.data || response;
+            } else if (field === 'cbPartnershipGraph') {
+                const response = await cricketApi.getPartnershipGraph(cleanId);
+                result = response?.data || response;
             }
 
             if (!controller.signal.aborted) {

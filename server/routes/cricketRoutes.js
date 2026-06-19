@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const router = express.Router();
-import { fetchTeamLogo, fetchLiveMatchesScraped, fetchRecentMatchesScraped, fetchUpcomingMatchesScraped, fetchMatchDetailScraped, fetchMatchSquadsScraped } from '../services/cricbuzzScraperService.js';
+import { fetchTeamLogo, fetchLiveMatchesScraped, fetchRecentMatchesScraped, fetchUpcomingMatchesScraped, fetchMatchDetailScraped, fetchMatchSquadsScraped, fetchBallMap, fetchPartnershipGraph } from '../services/cricbuzzScraperService.js';
 import axios from 'axios';
 
 // ─── STAGGERED TEAM LOGO PROXY ───────────────────────────────────────────────
@@ -88,6 +88,18 @@ router.get('/scraped/matches/upcoming', async (req, res) => {
 
 router.get('/scraped/match/:id/squads', async (req, res) => {
     const data = await fetchMatchSquadsScraped(req.params.id);
+    res.json({ status: 'success', data });
+});
+
+router.get('/scraped/match/:id/graphs/ballmap/:inningsId', async (req, res) => {
+    const data = await fetchBallMap(req.params.id, req.params.inningsId);
+    if (!data) return res.status(404).json({ status: 'error', message: 'Ball map not found' });
+    res.json({ status: 'success', data });
+});
+
+router.get('/scraped/match/:id/graphs/partnerships', async (req, res) => {
+    const data = await fetchPartnershipGraph(req.params.id);
+    if (!data) return res.status(404).json({ status: 'error', message: 'Partnership graph not found' });
     res.json({ status: 'success', data });
 });
 

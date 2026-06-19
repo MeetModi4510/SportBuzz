@@ -1281,4 +1281,41 @@ export async function fetchMatchSquadsScraped(matchId) {
     squadsCache.set(cacheKey, result);
     return result;
 }
-        
+
+export async function fetchBallMap(matchId, inningsId) {
+    const cacheKey = `ballmap_${matchId}_${inningsId}`;
+    const cached = liveCache.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+        const url = `https://www.cricbuzz.com/api/mcenter/balls-map/${matchId}/${inningsId}`;
+        const res = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        
+        if (res.data) {
+            liveCache.set(cacheKey, res.data);
+            return res.data;
+        }
+    } catch (e) {
+        console.error(`Error fetching Ball Map for match ${matchId} innings ${inningsId}:`, e.message);
+    }
+    return null;
+}
+
+export async function fetchPartnershipGraph(matchId) {
+    const cacheKey = `partnership_${matchId}`;
+    const cached = liveCache.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+        const url = `https://www.cricbuzz.com/api/mcenter/partnership-graph/${matchId}`;
+        const res = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        
+        if (res.data) {
+            liveCache.set(cacheKey, res.data);
+            return res.data;
+        }
+    } catch (e) {
+        console.error(`Error fetching Partnership Graph for match ${matchId}:`, e.message);
+    }
+    return null;
+}

@@ -1,0 +1,372 @@
+[
+  {
+    "url": "https://www.cricbuzz.com/api/home/bottom-navbar-options",
+    "length": 2247,
+    "preview": "{\"bottomBar\":[{\"name\":\"Home\",\"menuIconId\":\"menu-home\",\"appLink\":\"/\"},{\"name\":\"Matches\",\"menuIconId\":\"menu-matches\",\"appLink\":\"/cricket-match/live-scores\"},{\"name\":\"Series\",\"menuIconId\":\"menu-browse-series\",\"appLink\":\"/cricket-schedule/series/all\"},{\"name\":\"Videos\",\"menuIconId\":\"menu-videos\",\"appLink"
+  },
+  {
+    "url": "https://www.cricbuzz.com/api/runtime-config",
+    "length": 31,
+    "preview": "{\"ENABLE_INTERSTITIAL\":\"false\"}"
+  },
+  {
+    "url": "https://www.cricbuzz.com/api/home/bottom-navbar-options",
+    "length": 2247,
+    "preview": "{\"bottomBar\":[{\"name\":\"Home\",\"menuIconId\":\"menu-home\",\"appLink\":\"/\"},{\"name\":\"Matches\",\"menuIconId\":\"menu-matches\",\"appLink\":\"/cricket-match/live-scores\"},{\"name\":\"Series\",\"menuIconId\":\"menu-browse-series\",\"appLink\":\"/cricket-schedule/series/all\"},{\"name\":\"Videos\",\"menuIconId\":\"menu-videos\",\"appLink"
+  },
+  {
+    "url": "https://www.cricbuzz.com/api/mcenter/views-counter/129563",
+    "length": 335,
+    "preview": "{\"viewersCount\":[{\"type\":\"total_view\",\"title\":\"Total Views\",\"count\":\"8.3Cr\"}],\"lastUpdatedTime\":\"1781898300000\",\"disclaimer\":[\"This data includes activity across the Cricbuzz apps and website.\",\"You are not watching alone! You are part of the largest global cricket community. Your passion for the ga"
+  },
+  {
+    "url": "https://www.cricbuzz.com/api/home/sidenav-terms-and-privacy-options",
+    "length": 306,
+    "preview": "{\"appInfo\":[{\"name\":\"About Us\",\"appLink\":\"cricbuzz://webview?page=about-us\",\"webLink\":\"/info/about\"},{\"name\":\"Privacy Notice\",\"appLink\":\"cricbuzz://webview?page=privacy-policy\",\"webLink\":\"/info/privacy\"},{\"name\":\"Terms of Service\",\"appLink\":\"cricbuzz://webview?page=terms-of-use\",\"webLink\":\"/info/ter"
+  },
+  {
+    "url": "https://www.cricbuzz.com/api/mcenter/balls-map/129563/3",
+    "length": 57473,
+    "preview": "{\"balls\":[{\"timestamp\":1781890358327,\"ballNbr\":336,\"overNum\":55.6,\"inningsId\":3,\"event\":\"over-break\",\"totalRuns\":0,\"batsmanStrikerId\":10694,\"bowlerStrikerId\":19636,\"ballLabel\":\"•\"},{\"timestamp\":1781890324165,\"ballNbr\":335,\"overNum\":55.5,\"inningsId\":3,\"event\":\"TEAM_HUNDRED,FOUR\",\"totalRuns\":4,\"batsma"
+  },
+  {
+    "url": "https://c.amazon-adsystem.com/bao-csm/aps-comm/aps_csm.js",
+    "length": 6482,
+    "preview": "var amzn_aps_csm=amzn_aps_csm||{};amzn_aps_csm.errors=[],amzn_aps_csm.reportErrors=function(a){var b,c;for(/^https?:\\/\\//.test(a)===!1&&(a=document.location.protocol+\"//\"+a),\"/\"!==a.substr(a.length-1)&&(a+=\"/\"),b=0;b<amzn_aps_csm.errors.length;b++)c='{\"adViewability\":[{\"error\": {\"m\": \"'+amzn_aps_csm"
+  },
+  {
+    "url": "https://www.cricbuzz.com/api/adverts/desktop/default",
+    "length": 556,
+    "preview": "{\"banners\":{\"leaderboard\":[{\"network\":{\"name\":\"DFP\",\"id\":\"/1024780/728x90_default\"},\"size\":[970,90],\"sizes\":[],\"enabled\":true,\"freq\":1,\"repeat_every\":0,\"render_on_load\":true}],\"mpu2\":[{\"network\":{\"name\":\"DFP\",\"id\":\"/1024780/300x250_default_2\"},\"size\":[300,250],\"sizes\":[[300,250],[300,600]],\"enabled\""
+  },
+  {
+    "url": "https://plausible.k-words.io/api/event",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=1690265054&t=pageview&_s=1&dl=https%3A%2F%2Fwww.cricbuzz.com%2Flive-cricket-graphs%2F129563%2Feng-vs-nz-2nd-test-new-zealand-tour-of-england-2026&ul=en-us&dt=Live%20Cricket%20Score%2C%20Schedule%2C%20Latest%20News%2C%20Stats%20%26%20Videos&sr=800x600&vp=1280x800&_u=YADAAAABAAAAAC~&jid=1154859197&gjid=427896242&cid=1767498412.1781899047&tid=UA-312277-1&_gid=1544981198.1781899047&_r=1&_slc=1&gtm=45He66h0n71PGNCT7v71840711za200zd71840711&gcd=13l3l3l3l1l1&dma=0&tag_exp=115616986~115938466~115938468~119027224~119381662~119392696~119392704~119456239~119456247~119534187&z=1074529006",
+    "length": 3,
+    "preview": "2,x"
+  },
+  {
+    "url": "https://back.k-words.io/api/v1/sites/953d5629-1e19-40c6-9a23-d238fe142148?refresh=false",
+    "length": 218,
+    "preview": "{\"id\":\"953d5629-1e19-40c6-9a23-d238fe142148\",\"hostname\":\"cricbuzz.com\",\"htmlSelector\":\".min-h-container\",\"companyId\":\"5326fb1a-777b-490e-acd6-6772563598bf\",\"placementDistance\":500,\"htmlSelectorParams\":[],\"debug\":false}"
+  },
+  {
+    "url": "https://back.k-words.io/api/v1/sites/953d5629-1e19-40c6-9a23-d238fe142148/pages",
+    "length": 14580,
+    "preview": "{\"id\":\"27638ba1-b502-478a-8721-9d2a60f33abc\",\"pathname\":\"/live-cricket-graphs/129563/eng-vs-nz-2nd-test-new-zealand-tour-of-england-2026\",\"site_disabled_keywords\":[],\"placements\":[{\"id\":\"f74d6b9c-2ac3-4e26-a89d-4bea032472f2\",\"deviceType\":[\"mobile\"],\"formats\":[\"native\",\"banner\",\"video\"],\"visibilityTy"
+  },
+  {
+    "url": "https://plausible.k-words.io/api/event",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://plausible.k-words.io/api/event",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://plausible.k-words.io/api/event",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://plausible.k-words.io/api/event",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://fundingchoicesmessages.google.com/el/AGSKWxWdnvpHb42OLZNx26FtbgasV7cUio3ZX813Ut5-ao9lr2r-XK9-7d9FnSpGim3Xbxc9gFbzNxT3jVHFQLQiZ6evVcjW9GhyEzKAJMVkPcOwLASuZHuTZiiJrHsh37dH35QbOiVJUw==",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://fundingchoicesmessages.google.com/el/AGSKWxWdnvpHb42OLZNx26FtbgasV7cUio3ZX813Ut5-ao9lr2r-XK9-7d9FnSpGim3Xbxc9gFbzNxT3jVHFQLQiZ6evVcjW9GhyEzKAJMVkPcOwLASuZHuTZiiJrHsh37dH35QbOiVJUw==",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://fundingchoicesmessages.google.com/el/AGSKWxWdnvpHb42OLZNx26FtbgasV7cUio3ZX813Ut5-ao9lr2r-XK9-7d9FnSpGim3Xbxc9gFbzNxT3jVHFQLQiZ6evVcjW9GhyEzKAJMVkPcOwLASuZHuTZiiJrHsh37dH35QbOiVJUw==",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://fundingchoicesmessages.google.com/el/AGSKWxWdnvpHb42OLZNx26FtbgasV7cUio3ZX813Ut5-ao9lr2r-XK9-7d9FnSpGim3Xbxc9gFbzNxT3jVHFQLQiZ6evVcjW9GhyEzKAJMVkPcOwLASuZHuTZiiJrHsh37dH35QbOiVJUw==",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://fundingchoicesmessages.google.com/el/AGSKWxWdnvpHb42OLZNx26FtbgasV7cUio3ZX813Ut5-ao9lr2r-XK9-7d9FnSpGim3Xbxc9gFbzNxT3jVHFQLQiZ6evVcjW9GhyEzKAJMVkPcOwLASuZHuTZiiJrHsh37dH35QbOiVJUw==",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://fundingchoicesmessages.google.com/el/AGSKWxWdnvpHb42OLZNx26FtbgasV7cUio3ZX813Ut5-ao9lr2r-XK9-7d9FnSpGim3Xbxc9gFbzNxT3jVHFQLQiZ6evVcjW9GhyEzKAJMVkPcOwLASuZHuTZiiJrHsh37dH35QbOiVJUw==",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://securepubads.g.doubleclick.net/gampad/ads?pvsid=5636889369932876&correlator=3607491953017844&eid=31098216%2C31099254&output=ldjh&gdfp_req=1&vrg=202606170101&ptt=17&impl=fifs&gdpr=0&us_privacy=1---&gpp_sid=-1&iu_parts=1024780%2C728x90_default%2C300x250_default_2%2C300x250_default&enc_prev_ius=%2F0%2F1%2C%2F0%2F2%2C%2F0%2F3&prev_iu_szs=970x90%2C300x250%7C300x600%2C300x250%7C300x600&ifi=1&didk=448557249~835011701~4011376211&dids=leaderboard~mpu2~mpu&adfs=3088533759~2759484566~22759863&sfv=1-0-45&eri=5&sc=1&cookie_enabled=1&cdm=www.cricbuzz.com&abxe=1&dt=1781899048559&adxs=155%2C834%2C834&adys=8%2C1048%2C221&biw=1280&bih=800&scr_x=0&scr_y=0&btvi=0%7C1%7C0&ucis=1%7C2%7C3&oid=2&u_his=2&u_h=600&u_w=800&u_ah=600&u_aw=800&u_cd=24&u_sd=1&u_tz=330&dmc=16&bc=31&nvt=1&uach=WyJXaW5kb3dzIiwiMTAuMCIsIng4NiIsIiIsIjE0OC4wLjAuMCIsbnVsbCwwLG51bGwsIjY0IixbWyJOb3QvQSlCcmFuZCIsIjk5LjAuMC4wIl0sWyJDaHJvbWl1bSIsIjE0OC4wLjc3NzguOTciXV0sMF0.&url=www.cricbuzz.com&loc=https%3A%2F%2Fwww.cricbuzz.com%2Flive-cricket-graphs%2F129563%2Feng-vs-nz-2nd-test-new-zealand-tour-of-england-2026&vis=1&psz=1024x0%7C336x0%7C336x0&msz=970x0%7C300x0%7C300x0&fws=4%2C4%2C4&ohw=1280%2C1280%2C1280&a3p=EhkKCnB1YmNpZC5vcmcY8t7Wi-4zSABSAghkEhwKDWNyd2RjbnRybC5uZXQY8t7Wi-4zSABSAghkEh0KDmVzcC5jcml0ZW8uY29tGPLe1ovuM0gAUgIIZBIhChJpbnRpbWF0ZW1lcmdlci5jb20Y8t7Wi-4zSABSAghkEhgKCXlhaG9vLmNvbRjy3taL7jNIAFICCGQSFwoIbXlnYXJ1SUQY8t7Wi-4zSABSAghkEh8KEGVzcC5wdWJtYXRpYy5jb20Y8t7Wi-4zSABSAghkEhsKDGlkNS1zeW5jLmNvbRjy3taL7jNIAFICCGQSFAoFb3BlbngY8t7Wi-4zSABSAghkEhcKCHJ0YmhvdXNlGPLe1ovuM0gAUgIIZA..&dlt=1781899045066&idt=999&prev_scp=amznbid%3D1%26amznp%3D1%7Camznbid%3D1%26amznp%3D1%7Camznbid%3D1%26amznp%3D1&adks=1012925225%2C1241037061%2C3866185931&frm=20&eoidce=1&pgls=CAk.",
+    "length": 136873,
+    "preview": "{\"/1024780/728x90_default\":[\"html\",0,null,null,0,90,970,0,1,null,null,null,1,[[\"ID=7e238309bbc8668a:T=1781898971:RT=1781898971:S=ALNI_Mb_X6PUROiNBqqXmapGLHu5N0cDJg\",1815594971,\"/\",\"cricbuzz.com\",1],[\"UID=000014770fa853d2:T=1781898971:RT=1781898971:S=ALNI_MaN3goOP3_9kZlN7a2C9TPqbj71nA\",1815594971,\"/\""
+  },
+  {
+    "url": "https://fundingchoicesmessages.google.com/el/AGSKWxWdnvpHb42OLZNx26FtbgasV7cUio3ZX813Ut5-ao9lr2r-XK9-7d9FnSpGim3Xbxc9gFbzNxT3jVHFQLQiZ6evVcjW9GhyEzKAJMVkPcOwLASuZHuTZiiJrHsh37dH35QbOiVJUw==",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://bcp.crwdcntrl.net/6/map?xcid=16589",
+    "length": 156,
+    "preview": "{\"pid\":\"9e8415a9ba74bf3059a7579cc94d5dca\",\"c\":[{\"k\":\"_cc_id\",\"v\":\"9e8415a9ba74bf3059a7579cc94d5dca\",\"e\":23328000}],\"ids\":[{\"c\":\"core\",\"e\":\"1781985372203\"}]}"
+  },
+  {
+    "url": "https://sync6.im-apps.net/9001/pid?ref=null&page=https://www.cricbuzz.com/live-cricket-graphs/129563/eng-vs-nz-2nd-test-new-zealand-tour-of-england-2026",
+    "length": 70,
+    "preview": "{\"ppid\":\"8c529aa0c04f91140ee7085398ef7b2f\",\"uid\":\"h.10912820ce2ba615\"}"
+  },
+  {
+    "url": "https://web-banner.ads.aps.amazon-adsystem.com/e/dtb/bid",
+    "length": 1077,
+    "preview": "{\"requestId\":\"1bb25c0c-4c6c-4a4c-90cf-4329e0524186\",\"contextual\":{\"slots\":[{\"meta\":[\"slotID\",\"mediaType\",\"size\"],\"targeting\":[\"amzniid\",\"amznp\",\"amznsz\",\"amznbid\",\"amznactt\"],\"mediaType\":\"d\",\"slotID\":\"mpu2\",\"amzniid\":\"ASuk-BhX2E_FvgufoxyBBIaZJgwAP_FHhJ5QZ4-qTbYmAAABnuF0jQYAAAGe4XSLrQ\",\"amznactt\":\"OP"
+  },
+  {
+    "url": "https://fundingchoicesmessages.google.com/el/AGSKWxXNl99y6qeQ4510gcG08Pxk3G7vpZHv0BDcpSf7Jceu2CS7F-p5ugLlXN8EInUWixNrYH5IRhJ3U35o7iPijra-m4Ca3SaXnmyrHl2QflTnj0MLHgDuhGnH5lkATUBOImT2Zi9Y-A==",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://id5-sync.com/api/esp/increment?counter=no-config",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://securepubads.g.doubleclick.net/gampad/ads?pvsid=5636889369932876&correlator=3607491953017844&eid=31098216%2C31099254&output=ldjh&gdfp_req=1&vrg=202606170101&ptt=17&impl=fifs&gdpr=0&us_privacy=1---&gpp_sid=-1&iu_parts=1024780%2CMobile_Web%2CLB%2CNews_Index&enc_prev_ius=%2F0%2F1%2F2%2F3&prev_iu_szs=1x1&ifi=4&didk=2648815944&dids=gpt_unit_%2F1024780%2FMobile_Web%2FL&sfv=1-0-45&fas=1&eri=5&sc=1&cookie_enabled=1&cdm=www.cricbuzz.com&abxe=1&dt=1781899049069&adxs=-9&adys=-9&biw=1280&bih=800&scr_x=0&scr_y=0&btvi=-1&ucis=4&oid=2&u_his=2&u_h=600&u_w=800&u_ah=600&u_aw=800&u_cd=24&u_sd=1&u_tz=330&dmc=16&bc=31&nvt=1&uach=WyJXaW5kb3dzIiwiMTAuMCIsIng4NiIsIiIsIjE0OC4wLjAuMCIsbnVsbCwwLG51bGwsIjY0IixbWyJOb3QvQSlCcmFuZCIsIjk5LjAuMC4wIl0sWyJDaHJvbWl1bSIsIjE0OC4wLjc3NzguOTciXV0sMF0.&url=www.cricbuzz.com&loc=https%3A%2F%2Fwww.cricbuzz.com%2Flive-cricket-graphs%2F129563%2Feng-vs-nz-2nd-test-new-zealand-tour-of-england-2026&vis=1&psz=0x-1&msz=0x-1&fws=2&ohw=0&psts=AOrYGslXqzWxZnMwa10HhsoG5C0a&a3p=EhkKCnB1YmNpZC5vcmcY8t7Wi-4zSABSAghkEhwKDWNyd2RjbnRybC5uZXQY8t7Wi-4zSABSAghkEh0KDmVzcC5jcml0ZW8uY29tGPLe1ovuM0gAUgIIZBIhChJpbnRpbWF0ZW1lcmdlci5jb20Y8t7Wi-4zSABSAghkEhgKCXlhaG9vLmNvbRjd7taL7jNIAFICCG8SFwoIbXlnYXJ1SUQY8t7Wi-4zSABSAghkEh8KEGVzcC5wdWJtYXRpYy5jb20Y8t7Wi-4zSABSAghkEhsKDGlkNS1zeW5jLmNvbRjy3taL7jNIAFICCGQSFAoFb3BlbngY2e7Wi-4zSABSAghvEhcKCHJ0YmhvdXNlGPLe1ovuM0gAUgIIZA..&dlt=1781899045066&idt=999&adks=1429933862&frm=20&is_cau=1&no_cau_info=1&eoidce=1&pgls=CAk.",
+    "length": 28128,
+    "preview": "{\"/1024780/Mobile_Web/LB/News_Index\":[\"html\",0,null,null,1,124,1005,0,1,null,null,1,1,[[\"ID=7725fe098e6c81f5:T=1781898972:RT=1781898972:S=ALNI_MaJJpXPEtjaPzeq3tAX_kv2mlw2Pw\",1815594972,\"/\",\"cricbuzz.com\",1],[\"UID=00001477108ed617:T=1781898972:RT=1781898972:S=ALNI_MafOF0tbOjzBdO3GF4IRFqX5ASrcQ\",18155"
+  },
+  {
+    "url": "https://fundingchoicesmessages.google.com/el/AGSKWxVbQLYLg_e_nJUqXxuR5BQmJnGTvsWuyVsRE6h-T8Irg_DXbTraiVo_MOmYvgYR36ensyNeBIa1OphnuDHgqZ47V7yvUic9ohsBrlIueh2vRruBx8fXxX5_n1sdAKcctp-p65P_wQ==",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://image6.pubmatic.com/AdServer/UCookieSetPug?oid=5&p=156578&publisherId=156578&src=esp_google&ver=1&coppa=0&gdpr_consent=&gdpr=0&us_privacy=1---&gpp=&gpp_sid=",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://lb01api.kleekr.com/v3/delivery/start",
+    "length": 3738,
+    "preview": "{\"contextId\":\"a944548e29b5441cb0095f78cf1beffb\",\"requestTime\":\"2026-06-19T19:56:12.774073Z\",\"countryCode\":\"IN\",\"languageCode\":\"en-US\",\"templateUrl\":\"http://lb01api.kleekr.com/v3/display/11861/en-US\",\"reward\":null,\"providers\":[{\"name\":\"AdagioPrebidExt\",\"connectorName\":\"Prebid:adagio\",\"isExternal\":tru"
+  },
+  {
+    "url": "https://lb01api.kleekr.com/v3/delivery/start",
+    "length": 3437,
+    "preview": "{\"contextId\":\"7ba8db726c1e40e784f4edde0b9cd731\",\"requestTime\":\"2026-06-19T19:56:12.7758636Z\",\"countryCode\":\"IN\",\"languageCode\":\"en-US\",\"templateUrl\":\"http://lb01api.kleekr.com/v3/display/11869/en-US\",\"reward\":null,\"providers\":[{\"name\":\"AdagioPrebidExt\",\"connectorName\":\"Prebid:adagio\",\"isExternal\":tr"
+  },
+  {
+    "url": "https://ep1.adtrafficquality.google/getconfig/sodar?sv=200&tid=gpt&tv=m202606170101&st=env&sjk=5636889369932876",
+    "length": 17910,
+    "preview": "{\"sodar_query_id\":\"3J41auW8MonHk7QP94D4yAk\",\"injector_basename\":\"sodar2\",\"bg_hash_basename\":\"1hRPNppSd9yIoHg8K7nnD40uiYSKqJKovrnDcz9hSuY\",\"bg_binary\":\"NOsxjzzrtGk4gfY5NBZxkiVkatqhiL66cnjEuaVnlMxmGiulNiJ19NGaWWzBOHXP7zAdpm88P0z7WhBYdggc6y5eKgwVqTDHcDdNz8LLOF7B9eZGwyeRc7MtV1W3RBsdlpzzkeMxGbQdtFctkwZjo"
+  },
+  {
+    "url": "https://agen-assets.ftstatic.com/display/10256504/4795920.json",
+    "length": 4505,
+    "preview": "{\"id\":44412165,\"timeStamp\":\"2026-03-17T11:45:17+0000\",\"altImageUrl\":\"https://servedby.flashtalking.com/click/7/299371;10256504;4795920;210;[FT_CONFID]/?g=[FT_GUID]&random=164006.60925832856&ft_width=728&ft_height=90&url=https://www.adobe.com/in/products/illustrator.html?sdid=WPHDJ44J&mv=display&mv2="
+  },
+  {
+    "url": "https://mug.criteo.com/sid?cpp=-46DvHx3WC9HSDk5bk5qV3JpS2RUK29xeDV2T0V5RWhleHBtenhvejYwZUIxWHZ5NGJ6aWx3QSt1eEMyTTYwT1BNR0ZjMG90T0RJbkpTNTh4bFBmekVXbHY1T3hOZGJxbS94TzU0R1FXbE9PZitCcW1xRTc4L1p4MGNtN21yazhsOEMvWEJGZWxqdE5HSlAzVUd0eHZlN1hSSEZLeU13eHI0VUhybGRJQnlaYXBRQVVBYzdtZ3pxckp1ODMrclB0U2RKb1FhRUZNZDBPb1ZYOTB0cEt4d2NCcm9KUWluYW9NYzN0ZnJyN0FyL2Q5V0FTUTI1SkZCSllVQ09YN20wVGhlcDNoQUdBcG1WUm9jbjV2eGJvOElNMjJGdFVvUk1sZmFhb1VoU21XOUhJeWQ0RT18&cppv=2",
+    "length": 430,
+    "preview": "{\"sid\":null,\"removeSid\":false,\"bundle\":\"XmhplV9RWHpub09vR1NBOE1CQ2lhNmNNVUklMkZJNG5vcVFIeDVBa2g0cVJBNGlXSWtIdGh6REt6TFVjckh5WDA5WUpOMWZSalNXJTJGZUJmaDl0SUdFZ1djcHBVd0ElMkZTWVA5Y1czSjhraTZ4SnZ2UExDN0Q3aSUyRlBGSTF1NlNEV0FYd3BTJTJGbkNJcDI3a0pxNEpxRTA3UU1XaENxWFNBJTNEJTNE\",\"info\":\"70FY7l9RWHpub09vR1NBOE"
+  },
+  {
+    "url": "https://prebid-server.pbstck.com/cookie_sync",
+    "length": 2244,
+    "preview": "{\"status\":\"no_cookie\",\"bidder_status\":[{\"bidder\":\"adf\",\"no_cookie\":true,\"usersync\":{\"url\":\"https://c1.adform.net/cookie?redirect_url=https%3A%2F%2Fprebid-server.pbstck.com%2Fsetuid%3Fbidder%3Dadf%26gdpr%3D0%26gdpr_consent%3D%26gpp%3D%26gpp_sid%3D%26f%3Di%26uid%3D%24UID\",\"type\":\"redirect\"}},{\"bidder\""
+  },
+  {
+    "url": "https://prebid-server.pbstck.com/openrtb2/auction",
+    "length": 243,
+    "preview": "{\"id\":\"9feb7502-bb32-49b9-bd11-af560e8d5ae0\",\"ext\":{\"responsetimemillis\":{\"OneTag\":77,\"LoopMe\":57},\"warnings\":{\"general\":[{\"code\":10002,\"message\":\"debug turned off for account\"}]},\"tmaxrequest\":650,\"prebid\":{\"auctiontimestamp\":1781898973951}}}"
+  },
+  {
+    "url": "https://mp.4dex.io/prebid",
+    "length": 206,
+    "preview": "{\"userSyncs\":[{\"t\":\"i\",\"u\":\"https://u.4dex.io/usync.html?it=adg-pb-clt\\u0026lang=en\\u0026publisher_id=1438\\u0026website_name=cricbuzz-com\"}],\"data\":{\"vwSmplgNxt\":0.01,\"adagiojs\":{\"sampling\":{\"avw\":0.01}}}}\n"
+  },
+  {
+    "url": "https://ib.adnxs.com/ut/v3/prebid",
+    "length": 139,
+    "preview": "{\"version\":\"3.0.0\",\"tags\":[{\"uuid\":\"27c413572a6f0ec\",\"tag_id\":37295590,\"auction_id\":\"8341505704869723849\",\"nobid\":true,\"ad_profile_id\":0}]}"
+  },
+  {
+    "url": "https://ib.adnxs.com/ut/v3/prebid",
+    "length": 140,
+    "preview": "{\"version\":\"3.0.0\",\"tags\":[{\"uuid\":\"11db381b3e9c0b08\",\"tag_id\":37294267,\"auction_id\":\"3409497347757265655\",\"nobid\":true,\"ad_profile_id\":0}]}"
+  },
+  {
+    "url": "https://mp.4dex.io/prebid",
+    "length": 206,
+    "preview": "{\"userSyncs\":[{\"t\":\"i\",\"u\":\"https://u.4dex.io/usync.html?it=adg-pb-clt\\u0026lang=en\\u0026publisher_id=1438\\u0026website_name=cricbuzz-com\"}],\"data\":{\"vwSmplgNxt\":0.01,\"adagiojs\":{\"sampling\":{\"avw\":0.01}}}}\n"
+  },
+  {
+    "url": "https://prebid-server.pbstck.com/openrtb2/auction",
+    "length": 244,
+    "preview": "{\"id\":\"adc47df7-27a2-4735-8d8c-65fd834c2d54\",\"ext\":{\"responsetimemillis\":{\"OneTag\":52,\"LoopMe\":107},\"prebid\":{\"auctiontimestamp\":1781898974003},\"warnings\":{\"general\":[{\"code\":10002,\"message\":\"debug turned off for account\"}]},\"tmaxrequest\":650}}"
+  },
+  {
+    "url": "https://hbopenbid.pubmatic.com/translator?source=prebid-client",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://prebid.media.net/rtb/prebid?cid=8CUVR9O22",
+    "length": 517,
+    "preview": "{\"id\":\"dd221b2300973590e1a127ef5ddc0ece\",\"ext\":{\"csUrl\":[{\"type\":\"image\",\"url\":\"https://cs.media.net/cksync.php?cs=8\"},{\"type\":\"image\",\"url\":\"https://x.bidswitch.net/sync?ssp=medianet&gdpr=0&gdpr_consent=&gdpr_pd=1\"},{\"type\":\"iframe\",\"url\":\"https://hbx.media.net/checksync.php?vsSync=1&cs=8&cv=31&htt"
+  },
+  {
+    "url": "https://prebid-server.rubiconproject.com/openrtb2/auction",
+    "length": 184,
+    "preview": "{\"id\":\"f965f459-fcf6-48ca-83e1-d24cf40d47d6\",\"seatbid\":[],\"cur\":\"USD\",\"nbr\":0,\"ext\":{\"responsetimemillis\":{\"rubicon\":1},\"tmaxrequest\":1500,\"prebid\":{\"auctiontimestamp\":1781899050646}}}"
+  },
+  {
+    "url": "https://fastlane.rubiconproject.com/a/api/fastlane.json?account_id=27206&site_id=619779&zone_id=4016891&size_id=15&alt_size_ids=2%2C14%2C19%2C43%2C44%2C117&p_pos=atf&gdpr=0&rp_schain=1.0,1!k-words.io,10142,1,,,&eid_pubcid.org=b9a01e03-78ba-4b5d-a345-ceb299def0b8%5E1%5E%5E%5E%5E%5E&rf=https%3A%2F%2Fwww.cricbuzz.com%2Flive-cricket-graphs%2F129563%2Feng-vs-nz-2nd-test-new-zealand-tour-of-england-2026&tg_i.domain=cricbuzz.com&tg_i.page=https%3A%2F%2Fwww.cricbuzz.com%2Flive-cricket-graphs%2F129563%2Feng-vs-nz-2nd-test-new-zealand-tour-of-england-2026&tg_i.documentLang=en&tk_flint=pbjs_lite_v9.53.2&l_pb_bid_id=231960149bf3bc4&p_screen_res=800x600&rp_floor=0.05768&rp_secure=1&p_formats=banner%2Cnative&m_ch_ua=%22Chromium%22%7Cv%3D%22148%22%2C%22Google%20Chrome%22%7Cv%3D%22148%22%2C%22%3BNot%20A%20Brand%22%7Cv%3D%2299%22&m_ch_mobile=%3F0&m_ch_platform=Windows&slots=1&rand=0.18816641946245438",
+    "length": 437,
+    "preview": "{\"status\":\"ok\",\"account_id\":27206,\"site_id\":619779,\"zone_id\":4016891,\"size_id\":15,\"alt_size_ids\":[2,14,19,43,44,117],\"tracking\":\"\",\"inventory\":{\"page\":\"https:\\/\\/www.cricbuzz.com\\/live-cricket-graphs\\/129563\\/eng-vs-nz-2nd-test-new-zealand-tour-of-england-2026\",\"documentLang\":\"en\",\"domain\":\"cricbuzz"
+  },
+  {
+    "url": "https://fastlane.rubiconproject.com/a/api/fastlane.json?account_id=27206&site_id=619779&zone_id=4016889&size_id=15&alt_size_ids=2%2C14%2C19%2C43%2C44%2C117&p_pos=atf&gdpr=0&rp_schain=1.0,1!k-words.io,10142,1,,,&eid_pubcid.org=b9a01e03-78ba-4b5d-a345-ceb299def0b8%5E1%5E%5E%5E%5E%5E&rf=https%3A%2F%2Fwww.cricbuzz.com%2Flive-cricket-graphs%2F129563%2Feng-vs-nz-2nd-test-new-zealand-tour-of-england-2026&tg_i.domain=cricbuzz.com&tg_i.page=https%3A%2F%2Fwww.cricbuzz.com%2Flive-cricket-graphs%2F129563%2Feng-vs-nz-2nd-test-new-zealand-tour-of-england-2026&tg_i.documentLang=en&tk_flint=pbjs_lite_v9.53.2&l_pb_bid_id=19b11917444a998&p_screen_res=800x600&rp_floor=0.05768&rp_secure=1&p_formats=banner%2Cnative&m_ch_ua=%22Chromium%22%7Cv%3D%22148%22%2C%22Google%20Chrome%22%7Cv%3D%22148%22%2C%22%3BNot%20A%20Brand%22%7Cv%3D%2299%22&m_ch_mobile=%3F0&m_ch_platform=Windows&slots=1&rand=0.13707173204711542",
+    "length": 437,
+    "preview": "{\"status\":\"ok\",\"account_id\":27206,\"site_id\":619779,\"zone_id\":4016889,\"size_id\":15,\"alt_size_ids\":[2,14,19,43,44,117],\"tracking\":\"\",\"inventory\":{\"page\":\"https:\\/\\/www.cricbuzz.com\\/live-cricket-graphs\\/129563\\/eng-vs-nz-2nd-test-new-zealand-tour-of-england-2026\",\"documentLang\":\"en\",\"domain\":\"cricbuzz"
+  },
+  {
+    "url": "https://hbopenbid.pubmatic.com/translator?source=prebid-client",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://grid-bidder.criteo.com/openrtb_2_5/pbjs/auction/request?profileId=207&av=37&wv=9.53.2&cb=33762983818&lsavail=1&networkId=12207",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://prebid-server.rubiconproject.com/openrtb2/auction",
+    "length": 185,
+    "preview": "{\"id\":\"203096bf-9169-4b5e-8188-8b502cbbdc30\",\"seatbid\":[],\"cur\":\"USD\",\"nbr\":0,\"ext\":{\"responsetimemillis\":{\"rubicon\":87},\"tmaxrequest\":1500,\"prebid\":{\"auctiontimestamp\":1781899050712}}}"
+  },
+  {
+    "url": "https://grid-bidder.criteo.com/openrtb_2_5/pbjs/auction/request?profileId=207&av=37&wv=9.53.2&cb=61036110757&lsavail=1&networkId=12207",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://prebid-eu.creativecdn.com/bidder/prebid/bids",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://prebid-eu.creativecdn.com/bidder/prebid/bids",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://ssb-global.smartadserver.com/api/bid?callerId=169",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://ssb-global.smartadserver.com/api/bid?callerId=169",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://plausible.k-words.io/api/event",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://plausible.k-words.io/api/event",
+    "length": 0,
+    "preview": ""
+  },
+  {
+    "url": "https://ut.pubmatic.com/geo?pubid=156011",
+    "length": 22,
+    "preview": "{\"cc\":\"IN\",\"sc\":\"mh\"}\n"
+  },
+  {
+    "url": "https://data.ad-score.com/data/cors?pm_st=BKdBnQodDhqVyDtWwtyheBxqefLNQsqR-FE7fPshldVPiNyMY0XrAEUrFOcs=-E03JPcVlaFPrMA==&pm_ct=03ad4cc207494402e6bfe760&pm_pl=1781899050705&pm_td=159&pid=1000942&en=1.1&callback=__pm_glbl_S7h2abZoZ4Q3LrbYfysAnHav._gc1&tt=g&v=5a9d3f1",
+    "length": 192,
+    "preview": "__pm_glbl_S7h2abZoZ4Q3LrbYfysAnHav._gc1({\"bp_policy\":{\"apply\":[74]},\"bp\":{\"url_lists\":[105,140],\"iab\":\"IAB-483\",\"news\":true,\"home\":true,\"geo\":\"IN\",\"subdivisions_code\":\"IN-MH\",\"zip\":\"400104\"}})"
+  },
+  {
+    "url": "https://d9.flashtalking.com/lgc",
+    "length": 103,
+    "preview": "{\"DeviceID\":[\"aee460c4d0154f06900c46d5e615a2b6\"],\"SingleDeviceID\":[\"aee460c4d0154f06900c46d5e615a2b6\"]}"
+  },
+  {
+    "url": "https://data.ad-score.com/data/cors?pm_st=BKdBnQodDhqVyDtWwtyheBxqefLNQsqR-FE7fPshldVPiNyMY0XrAEUrFOcs=-E03JPcVlaFPrMA==&pm_ct=03ad4cc207494402e6bfe760&pm_pl=1781899050705&pm_td=2632&pid=1000942&en=1.1&callback=__pm_glbl_S7h2abZoZ4Q3LrbYfysAnHav._gc2&tt=g&v=5a9d3f1",
+    "length": 1,
+    "preview": "0"
+  },
+  {
+    "url": "https://data.ad-score.com/data/cors?pm_st=BKdBnQodDhqVyDtWwtyheBxqefLNQsqR-FE7fPshldVPiNyMY0XrAEUrFOcs=-E03JPcVlaFPrMA==&pm_ct=03ad4cc207494402e6bfe760&pm_pl=1781899050705&pm_td=2923&pid=1000942&en=1.1&callback=__pm_glbl_S7h2abZoZ4Q3LrbYfysAnHav._gc3&tt=g&v=5a9d3f1",
+    "length": 1,
+    "preview": "0"
+  },
+  {
+    "url": "https://data.ad-score.com/data/cors?pm_st=BKdBnQodDhqVyDtWwtyheBxqefLNQsqR-FE7fPshldVPiNyMY0XrAEUrFOcs=-E03JPcVlaFPrMA==&pm_ct=03ad4cc207494402e6bfe760&pm_pl=1781899050705&pm_td=3242&pid=1000942&en=1.1&callback=__pm_glbl_S7h2abZoZ4Q3LrbYfysAnHav._gc4&tt=g&v=5a9d3f1",
+    "length": 1,
+    "preview": "0"
+  },
+  {
+    "url": "https://data.ad-score.com/data/cors?pm_st=BKdBnQodDhqVyDtWwtyheBxqefLNQsqR-FE7fPshldVPiNyMY0XrAEUrFOcs=-E03JPcVlaFPrMA==&pm_ct=03ad4cc207494402e6bfe760&pm_pl=1781899050705&pm_td=3691&pid=1000942&en=1.1&callback=__pm_glbl_S7h2abZoZ4Q3LrbYfysAnHav._gc5&tt=g&v=5a9d3f1",
+    "length": 1,
+    "preview": "0"
+  },
+  {
+    "url": "https://cs.media.net/cst?gdpr=0&cs=8&usp_status=0&gdprconsent=1&usp_consent=1&cid=8CUVR9O22&coppa=0&itype=PREBID",
+    "length": 71,
+    "preview": "{\"consent\":1,\"ext\":{\"ctc\":\"Ahmedabad\",\"rc\":\"GJ\",\"cc\":\"IN\",\"coc\":\"AS\"}}\n"
+  },
+  {
+    "url": "https://ut.pubmatic.com/geo?pubid=164988",
+    "length": 22,
+    "preview": "{\"cc\":\"IN\",\"sc\":\"mh\"}\n"
+  },
+  {
+    "url": "https://token.rubiconproject.com/khaos.json?gdpr=0&us_privacy=1---",
+    "length": 7,
+    "preview": "{\"c\":1}"
+  },
+  {
+    "url": "https://ut.pubmatic.com/geo?pubid=159110",
+    "length": 22,
+    "preview": "{\"cc\":\"IN\",\"sc\":\"mh\"}\n"
+  },
+  {
+    "url": "https://token.rubiconproject.com/khaos.json?us_privacy=1---&khaos=MQLCN414-17-HC1Q",
+    "length": 7,
+    "preview": "{\"c\":1}"
+  },
+  {
+    "url": "https://ut.pubmatic.com/geo?pubid=0",
+    "length": 22,
+    "preview": "{\"cc\":\"IN\",\"sc\":\"mh\"}\n"
+  },
+  {
+    "url": "https://token.rubiconproject.com/khaos.json?khaos=MQLCN414-17-HC1Q",
+    "length": 7,
+    "preview": "{\"c\":1}"
+  },
+  {
+    "url": "https://www.cricbuzz.com/api/mcenter/partnership-graph/129563",
+    "length": 5367,
+    "preview": "[{\"inningsID\":1,\"batTeamId\":13,\"batTeamName\":\"New Zealand\",\"batTeamShortName\":\"NZ\",\"partnershipDataDTO\":[{\"bat1Id\":8216,\"bat1Name\":\"Tom Latham\",\"bat1Runs\":5,\"bat1balls\":21,\"bat1ImageID\":616421,\"bat2Id\":9838,\"bat2Name\":\"Devon Conway\",\"bat2Runs\":9,\"bat2balls\":15,\"bat2ImageID\":845526,\"totalRuns\":14,\"to"
+  }
+]
