@@ -2842,7 +2842,8 @@ const MatchDetails = () => {
               isOpen={!!selectedPlayerId} 
               onClose={() => setSelectedPlayerId(null)} 
               fallbackName={selectedPlayerName}
-          />
+                faceImageId={getPlayerImageId(selectedPlayerName)}
+            />
         </section>
       </div>
     </>

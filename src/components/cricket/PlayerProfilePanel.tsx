@@ -8,9 +8,10 @@ interface PlayerProfilePanelProps {
     isOpen: boolean;
     onClose: () => void;
     fallbackName?: string;
+    faceImageId?: number | null;
 }
 
-export const PlayerProfilePanel = ({ playerId, isOpen, onClose, fallbackName }: PlayerProfilePanelProps) => {
+export const PlayerProfilePanel = ({ playerId, isOpen, onClose, fallbackName, faceImageId }: PlayerProfilePanelProps) => {
     const { data: profile, isLoading } = usePlayerProfile(playerId);
 
     const renderStatsCards = (stats: any, title: string) => {
@@ -158,45 +159,45 @@ export const PlayerProfilePanel = ({ playerId, isOpen, onClose, fallbackName }: 
     return (
         <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <SheetContent className="w-full sm:max-w-md p-0 overflow-hidden bg-background border-l border-border/40 flex flex-col shadow-2xl">
-                {isLoading ? (
-                    <div className="h-full flex flex-col items-center justify-center gap-4">
-                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground font-medium">Fetching profile...</p>
-                    </div>
-                ) : profile ? (
-                    <div className="flex-1 overflow-y-auto overflow-x-hidden pb-10">
-                        {/* Header Area */}
-                        <div className="relative pt-12 pb-8 px-6 bg-gradient-to-br from-primary/5 via-background to-background border-b border-border/50">
-                            <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
-                            <div className="relative z-10 flex flex-col items-center text-center gap-4">
-                                <div className="rounded-full shadow-xl ring-4 ring-background overflow-hidden bg-muted flex items-center justify-center">
-                                    <CricketPlayerImage 
-                                        playerId={profile.faceImageId || null} 
-                                        playerName={profile.name} 
-                                        size={140}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-1 items-center">
-                                    <SheetTitle className="text-3xl font-black text-foreground drop-shadow-sm tracking-tight leading-none">
-                                        {profile.name}
-                                    </SheetTitle>
-                                    <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
-                                        {profile.personalInfo?.role && (
-                                            <span className="px-3 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold uppercase tracking-wider">
-                                                {profile.personalInfo.role}
-                                            </span>
-                                        )}
-                                        {profile.personalInfo?.battingStyle && (
-                                            <span className="px-3 py-1 rounded-md bg-muted text-muted-foreground border border-border/50 text-[11px] font-medium shadow-sm">
-                                                Bat: {profile.personalInfo.battingStyle}
-                                            </span>
-                                        )}
-                                    </div>
+                <div className="flex-1 overflow-y-auto overflow-x-hidden pb-10">
+                    {/* Header Area - Renders instantly with cached data */}
+                    <div className="relative pt-12 pb-8 px-6 bg-gradient-to-br from-primary/5 via-background to-background border-b border-border/50">
+                        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+                        <div className="relative z-10 flex flex-col items-center text-center gap-4">
+                            <div className="rounded-full shadow-xl ring-4 ring-background overflow-hidden bg-muted flex items-center justify-center">
+                                <CricketPlayerImage 
+                                    playerId={faceImageId || profile?.faceImageId || null} 
+                                    playerName={profile?.name || fallbackName} 
+                                    size={140}
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1 items-center">
+                                <SheetTitle className="text-3xl font-black text-foreground drop-shadow-sm tracking-tight leading-none">
+                                    {profile?.name || fallbackName}
+                                </SheetTitle>
+                                <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+                                    {profile?.personalInfo?.role && (
+                                        <span className="px-3 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold uppercase tracking-wider">
+                                            {profile.personalInfo.role}
+                                        </span>
+                                    )}
+                                    {profile?.personalInfo?.battingStyle && (
+                                        <span className="px-3 py-1 rounded-md bg-muted text-muted-foreground border border-border/50 text-[11px] font-medium shadow-sm">
+                                            Bat: {profile.personalInfo.battingStyle}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Content Area */}
+                    {/* Content Area - Waits for API */}
+                    {isLoading ? (
+                        <div className="h-64 flex flex-col items-center justify-center gap-4">
+                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground font-medium">Fetching career stats...</p>
+                        </div>
+                    ) : profile ? (
                         <div className="px-6 mt-8 space-y-8">
                             
                             {/* Personal Bio */}
@@ -242,16 +243,15 @@ export const PlayerProfilePanel = ({ playerId, isOpen, onClose, fallbackName }: 
                                 </div>
                             )}
                         </div>
-                    </div>
-                ) : (
-                    <div className="h-full flex flex-col items-center justify-center gap-3">
-                        <div className="w-24 h-24 rounded-full bg-muted border border-border/50 mb-2 flex items-center justify-center shadow-inner">
-                            <span className="text-4xl opacity-40">😕</span>
+                    ) : (
+                        <div className="h-64 flex flex-col items-center justify-center gap-3">
+                            <div className="w-16 h-16 rounded-full bg-muted border border-border/50 mb-2 flex items-center justify-center shadow-inner">
+                                <span className="text-2xl opacity-40">😕</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground">Unable to load detailed profile data.</p>
                         </div>
-                        <h3 className="text-lg font-bold text-foreground">{fallbackName || 'Player Not Found'}</h3>
-                        <p className="text-sm text-muted-foreground">Unable to load profile data.</p>
-                    </div>
-                )}
+                    )}
+                </div>
             </SheetContent>
         </Sheet>
     );

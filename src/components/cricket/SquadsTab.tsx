@@ -37,6 +37,7 @@ interface SquadsTabProps {
 export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error }) => {
     const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
     const [selectedPlayerName, setSelectedPlayerName] = useState<string>('');
+    const [selectedPlayerFaceId, setSelectedPlayerFaceId] = useState<number | null>(null);
 
     if (loading) {
         return (
@@ -62,6 +63,7 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
     const handlePlayerClick = (p: Player) => {
         setSelectedPlayerId(String(p.id));
         setSelectedPlayerName(p.name);
+        setSelectedPlayerFaceId(p.imageDetails?.imageId ? Number(p.imageDetails.imageId) : null);
     };
 
     const renderPlayerGroup = (title: string, players?: Player[], isSupportStaff: boolean = false) => {
@@ -172,6 +174,7 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
                 isOpen={!!selectedPlayerId} 
                 onClose={() => setSelectedPlayerId(null)} 
                 fallbackName={selectedPlayerName}
+                faceImageId={selectedPlayerFaceId}
             />
         </div>
     );
