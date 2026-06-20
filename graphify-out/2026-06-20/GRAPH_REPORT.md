@@ -1,16 +1,16 @@
-# Graph Report - dev_scripts  (2026-06-20)
+# Graph Report - dev_scripts  (2026-06-19)
 
 ## Corpus Check
-- 660 files · ~1,568,701 words
+- 648 files · ~1,547,892 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4029 nodes · 6495 edges · 469 communities (372 shown, 97 thin omitted)
+- 3596 nodes · 5982 edges · 410 communities (328 shown, 82 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 57 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `545e53df`
+- Built from commit: `0071e066`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -257,109 +257,55 @@
 - [[_COMMUNITY_Community 401|Community 401]]
 - [[_COMMUNITY_Community 402|Community 402]]
 - [[_COMMUNITY_Community 403|Community 403]]
-- [[_COMMUNITY_Community 410|Community 410]]
-- [[_COMMUNITY_Community 411|Community 411]]
-- [[_COMMUNITY_Community 412|Community 412]]
-- [[_COMMUNITY_Community 413|Community 413]]
-- [[_COMMUNITY_Community 414|Community 414]]
-- [[_COMMUNITY_Community 415|Community 415]]
-- [[_COMMUNITY_Community 416|Community 416]]
-- [[_COMMUNITY_Community 417|Community 417]]
-- [[_COMMUNITY_Community 418|Community 418]]
-- [[_COMMUNITY_Community 419|Community 419]]
-- [[_COMMUNITY_Community 420|Community 420]]
-- [[_COMMUNITY_Community 421|Community 421]]
-- [[_COMMUNITY_Community 422|Community 422]]
-- [[_COMMUNITY_Community 423|Community 423]]
-- [[_COMMUNITY_Community 424|Community 424]]
-- [[_COMMUNITY_Community 425|Community 425]]
-- [[_COMMUNITY_Community 426|Community 426]]
-- [[_COMMUNITY_Community 427|Community 427]]
-- [[_COMMUNITY_Community 428|Community 428]]
-- [[_COMMUNITY_Community 429|Community 429]]
-- [[_COMMUNITY_Community 430|Community 430]]
-- [[_COMMUNITY_Community 431|Community 431]]
-- [[_COMMUNITY_Community 432|Community 432]]
-- [[_COMMUNITY_Community 433|Community 433]]
-- [[_COMMUNITY_Community 434|Community 434]]
-- [[_COMMUNITY_Community 435|Community 435]]
-- [[_COMMUNITY_Community 436|Community 436]]
-- [[_COMMUNITY_Community 437|Community 437]]
-- [[_COMMUNITY_Community 438|Community 438]]
-- [[_COMMUNITY_Community 439|Community 439]]
-- [[_COMMUNITY_Community 440|Community 440]]
-- [[_COMMUNITY_Community 441|Community 441]]
-- [[_COMMUNITY_Community 442|Community 442]]
-- [[_COMMUNITY_Community 443|Community 443]]
-- [[_COMMUNITY_Community 444|Community 444]]
-- [[_COMMUNITY_Community 445|Community 445]]
-- [[_COMMUNITY_Community 446|Community 446]]
-- [[_COMMUNITY_Community 447|Community 447]]
-- [[_COMMUNITY_Community 448|Community 448]]
-- [[_COMMUNITY_Community 449|Community 449]]
-- [[_COMMUNITY_Community 450|Community 450]]
-- [[_COMMUNITY_Community 451|Community 451]]
-- [[_COMMUNITY_Community 452|Community 452]]
-- [[_COMMUNITY_Community 453|Community 453]]
-- [[_COMMUNITY_Community 454|Community 454]]
-- [[_COMMUNITY_Community 455|Community 455]]
-- [[_COMMUNITY_Community 456|Community 456]]
-- [[_COMMUNITY_Community 457|Community 457]]
-- [[_COMMUNITY_Community 458|Community 458]]
-- [[_COMMUNITY_Community 459|Community 459]]
-- [[_COMMUNITY_Community 460|Community 460]]
-- [[_COMMUNITY_Community 461|Community 461]]
-- [[_COMMUNITY_Community 462|Community 462]]
-- [[_COMMUNITY_Community 463|Community 463]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `cn()` - 157 edges
+1. `cn()` - 155 edges
 2. `$` - 48 edges
 3. `Button` - 47 edges
 4. `Card` - 47 edges
 5. `CardContent` - 43 edges
 6. `matchInfo` - 36 edges
-7. `matchInfo` - 35 edges
-8. `CardHeader` - 34 edges
-9. `CardTitle` - 33 edges
-10. `Match` - 28 edges
+7. `CardHeader` - 34 edges
+8. `CardTitle` - 33 edges
+9. `Match` - 28 edges
+10. `Input` - 26 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `mapApiMatchToModel()` --calls--> `hasMeaningfulScores()`  [INFERRED]
   src/services/cricketMapper.ts → server/controllers/featuredController.js
-- `TournamentManager()` --calls--> `groupPlayersByRole()`  [INFERRED]
-  TM.tsx → src/components/FootballPitchLineup.tsx
 - `updatePointsTable()` --calls--> `oversToDecimal()`  [INFERRED]
   server/controllers/matchController.js → src/lib/cricketUtils.ts
-- `testMatchScrape()` --calls--> `$`  [INFERRED]
-  server/test_all_matches2.mjs → server/parse_cheerio.js
+- `TournamentManager()` --calls--> `groupPlayersByRole()`  [INFERRED]
+  TM.tsx → src/components/FootballPitchLineup.tsx
 - `testMatchScrape()` --calls--> `$`  [INFERRED]
   server/test_all_matches3.mjs → server/parse_cheerio.js
+- `test()` --calls--> `$`  [INFERRED]
+  server/test_axios_cricbuzz.mjs → server/parse_cheerio.js
 
 ## Import Cycles
 - 1-file cycle: `src/data/achievements.ts -> src/data/achievements.ts`
 
-## Communities (469 total, 97 thin omitted)
+## Communities (410 total, 82 thin omitted)
 
 ### Community 0 - "Football Match Controller"
 Cohesion: 0.11
 Nodes (34): cache, clearCache(), computeStatusLine(), FD_CUP_CODES, FD_INTL_CODES, FD_LEAGUE_CODES, fetchCurrentSeasons(), fetchLastMatches() (+26 more)
 
 ### Community 1 - "UI Utils and NavLink"
-Cohesion: 0.06
-Nodes (41): Player, PlayerManager(), SortConfig, SortField, SortOrder, UserData, UserManager(), ConfirmModalProps (+33 more)
+Cohesion: 0.12
+Nodes (26): Player, SortConfig, SortField, SortOrder, UserData, AuctionControl(), AuctionControlProps, adminApi (+18 more)
 
 ### Community 2 - "Admin Audit & Settings"
-Cohesion: 0.09
-Nodes (30): LogEntry, AdvancedSearchProps, SearchFilters, ChartData, DataVisualizationProps, EmptyState(), EmptyStateProps, PaginationProps (+22 more)
+Cohesion: 0.08
+Nodes (32): LogEntry, AdvancedSearchProps, SearchFilters, ChartData, DataVisualizationProps, EmptyState(), EmptyStateProps, PaginationProps (+24 more)
 
 ### Community 3 - "Admin Edit Team Dialog"
-Cohesion: 0.08
-Nodes (39): EditTeamDialog(), PRESET_COLORS, ROLES, MatchManagerProps, ROLES, DetailTab, MatchFilter, PRESET_COLORS (+31 more)
+Cohesion: 0.07
+Nodes (43): EditTeamDialog(), PRESET_COLORS, ROLES, MatchManagerProps, ROLES, DetailTab, MatchFilter, PRESET_COLORS (+35 more)
 
 ### Community 4 - "Player Analysis Panel"
-Cohesion: 0.10
-Nodes (19): API_FORMAT_TABS, CHART_TOOLTIP, COUNTRY_CODES, CricketPanels(), getCountryFlagImg(), getTeamColor(), PIE_COLORS, PLAYER_PHOTOS (+11 more)
+Cohesion: 0.12
+Nodes (11): API_FORMAT_TABS, CHART_TOOLTIP, COUNTRY_CODES, getCountryFlagImg(), getTeamColor(), PIE_COLORS, PLAYER_PHOTOS, PlayerAnalysisPanel() (+3 more)
 
 ### Community 5 - "Package Dependencies"
 Cohesion: 0.04
@@ -367,19 +313,19 @@ Nodes (56): dependencies, axios, canvas-confetti, class-variance-authority, clsx
 
 ### Community 6 - "Loading Skeletons"
 Cohesion: 0.05
-Nodes (37): useIsMobile(), Separator, SheetContent, SheetContentProps, SheetDescription, SheetFooter(), SheetHeader(), SheetOverlay (+29 more)
+Nodes (36): useIsMobile(), Separator, SheetContent, SheetContentProps, SheetDescription, SheetFooter(), SheetHeader(), SheetOverlay (+28 more)
 
 ### Community 7 - "Admin Player Manager"
 Cohesion: 0.11
-Nodes (15): Navbar(), NavItemProps, sports, BATTING_STYLES, BOWLING_STYLES, UserData, UserStats, footballApi (+7 more)
+Nodes (13): Notification, TournamentTickerMatch, BATTING_STYLES, BOWLING_STYLES, UserData, UserStats, activityApi, api (+5 more)
 
 ### Community 8 - "Venue Analysis Panel"
 Cohesion: 0.07
 Nodes (30): CHART_TOOLTIP, PIE_COLORS, SPORT_CONFIG, BasketballVenueStats, bernabeu, CricketVenueStats, cryptoArena, FootballVenueStats (+22 more)
 
 ### Community 9 - "Activity & Cricket Controller"
-Cohesion: 0.11
-Nodes (20): getAchievements, getActivityHistory, getActivitySummary, getMatchSquads, deleteNotification, getNotifications, markAllAsRead, markAsRead (+12 more)
+Cohesion: 0.06
+Nodes (35): initializePassport(), getAchievements, getActivityHistory, getActivitySummary, clearCache, getAllMatches, getLiveMatches, getMatchScorecard (+27 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.10
@@ -390,12 +336,12 @@ Cohesion: 0.10
 Nodes (20): devDependencies, autoprefixer, concurrently, eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, globals (+12 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.09
-Nodes (32): extractMatches(), fetchCricbuzz(), fetchScraper(), getCricketMatchMini(), getCricketMatchScorecard(), getLiveCricketMatches(), getMatchDetailDynamic(), getPerformanceLabPlayerStats() (+24 more)
+Cohesion: 0.27
+Nodes (10): countryFlags, enhanceMatchWithScorecard(), getMatchStatus(), getMatchTypeDisplay(), getTeamColor(), getTeamFlag(), teamColors, transformCricbuzzMatch() (+2 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.13
-Nodes (19): emitScoreUpdate(), getIO(), initSocket(), createMatch, deleteMatch, generateMatchIntelligence(), generateMatchIntelligenceData(), getMatchBalls (+11 more)
+Cohesion: 0.14
+Nodes (18): emitScoreUpdate(), getIO(), initSocket(), createMatch, deleteMatch, generateMatchIntelligence(), generateMatchIntelligenceData(), getMatchBalls (+10 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.05
@@ -438,20 +384,20 @@ Cohesion: 0.09
 Nodes (21): compilerOptions, allowImportingTsExtensions, baseUrl, isolatedModules, jsx, lib, module, moduleDetection (+13 more)
 
 ### Community 24 - "Community 24"
-Cohesion: 0.14
-Nodes (14): commentaryCache, extractJsonObjects(), fetchLiveMatchesScraped(), fetchMatchDetailScraped(), fetchMatchSquadsScraped(), fetchPartnershipGraph(), fetchRecentMatchesScraped(), fetchRscMatchList() (+6 more)
+Cohesion: 0.10
+Nodes (20): cricketTeamSchema, __dirname, __filename, memCache, router, teamLogoQueue, commentaryCache, extractJsonObjects() (+12 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.11
-Nodes (20): MinimalCricketCard(), MinimalCricketCardProps, NavLink, NavLinkCompatProps, TeamLogo(), TeamLogoProps, FootballMatchCard(), mapApiMatchToModel() (+12 more)
+Cohesion: 0.18
+Nodes (17): MinimalCricketCard(), TeamLogo(), TeamLogoProps, getTeamColor(), LivescoreMatchCard(), LivescoreMatchCardProps, MatchLike, resolveLogo() (+9 more)
 
 ### Community 26 - "Community 26"
-Cohesion: 0.05
-Nodes (31): cache, CB_IMAGE_TO_FLAG, cbHeaders, cbImageHeaders, COUNTRY_NAME_TO_FLAG, __dirname, __filename, getImageCachePath() (+23 more)
+Cohesion: 0.06
+Nodes (19): cache, CB_IMAGE_TO_FLAG, cbHeaders, cbImageHeaders, COUNTRY_NAME_TO_FLAG, __dirname, __filename, imageCache (+11 more)
 
 ### Community 27 - "Community 27"
-Cohesion: 0.12
-Nodes (14): AnalyticsSection(), CHART_TOOLTIP_STYLE, generateMockData(), HEATMAP_BY_ROLE, HEATMAP_COLORS, MatchEvent, MatchPerformanceLabProps, MockPlayer (+6 more)
+Cohesion: 0.13
+Nodes (13): AnalyticsSection(), CHART_TOOLTIP_STYLE, generateMockData(), HEATMAP_BY_ROLE, HEATMAP_COLORS, MatchEvent, MockPlayer, normalizeRole() (+5 more)
 
 ### Community 28 - "Community 28"
 Cohesion: 0.12
@@ -466,8 +412,8 @@ Cohesion: 0.20
 Nodes (14): addTeamToTournament, createTournament, deleteTournament, followTournament, getTournamentById, getTournaments, getTournamentStats, recalculatePointsTable (+6 more)
 
 ### Community 31 - "Community 31"
-Cohesion: 0.13
-Nodes (19): BATTING_CATEGORIES, BOWLING_CATEGORIES, FIELDING_CATEGORIES, MEDAL, MVP_CATEGORIES, Props, AuctionControl(), AuctionControlProps (+11 more)
+Cohesion: 0.25
+Nodes (7): NavigationMenu, NavigationMenuContent, NavigationMenuIndicator, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle, NavigationMenuViewport
 
 ### Community 32 - "Community 32"
 Cohesion: 0.05
@@ -478,12 +424,12 @@ Cohesion: 0.17
 Nodes (11): Cnm, CnmT, CompD, CompId, CompN, CompST, CompUrlName, Feed (+3 more)
 
 ### Community 34 - "Community 34"
-Cohesion: 0.13
-Nodes (12): BatsmanData, BowlerData, COLORS, CricketPerformanceLab(), CricketPerformanceLabProps, ExtrasData, FOWData, INNINGS_COLORS (+4 more)
+Cohesion: 0.14
+Nodes (12): BatsmanData, BowlerData, COLORS, CricketPerformanceLab(), ExtrasData, FOWData, INNINGS_COLORS, InningsData (+4 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.17
-Nodes (13): categorizeAndEnrich(), enrichLiveWithMatchInfo(), getFeaturedLive(), getFeaturedMatches(), getFeaturedRecent(), getFeaturedUpcoming(), hasMeaningfulScores(), isValidSeries() (+5 more)
+Cohesion: 0.05
+Nodes (38): categorizeAndEnrich(), enrichLiveWithMatchInfo(), getFeaturedLive(), getFeaturedMatches(), getFeaturedRecent(), getFeaturedUpcoming(), hasMeaningfulScores(), isValidSeries() (+30 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.12
@@ -510,20 +456,20 @@ Cohesion: 0.17
 Nodes (14): forgotPassword, getMe, login, logout, resendPasswordOtp, resetPassword, sendPasswordOtp, signup (+6 more)
 
 ### Community 42 - "Community 42"
-Cohesion: 0.15
-Nodes (10): getTeamColor(), incidentMeta, MatchCenter(), MatchTab, parseEsd(), parseFormation(), statLabels, TEAM_COLORS (+2 more)
+Cohesion: 0.12
+Nodes (13): getTeamColor(), incidentMeta, MatchCenter(), MatchTab, parseEsd(), parseFormation(), statLabels, TEAM_COLORS (+5 more)
 
 ### Community 43 - "Community 43"
-Cohesion: 0.12
-Nodes (16): footballApiClient, internalApiClient, transfersApiClient, CacheItem, cacheManager, PRIORITY_CLUBS, PRIORITY_LEAGUES, MOCK_LIVE_MATCHES (+8 more)
+Cohesion: 0.15
+Nodes (12): footballApiClient, internalApiClient, transfersApiClient, CacheItem, cacheManager, PRIORITY_LEAGUES, MOCK_LIVE_MATCHES, MOCK_RECENT_MATCHES (+4 more)
 
 ### Community 44 - "Community 44"
 Cohesion: 0.14
 Nodes (12): Carousel, CarouselApi, CarouselContent, CarouselContext, CarouselContextProps, CarouselItem, CarouselNext, CarouselOptions (+4 more)
 
 ### Community 45 - "Community 45"
-Cohesion: 0.14
-Nodes (26): PlayerComparison(), CRICBUZZ_PLAYER_ID_MAP, getCricbuzzPlayerId(), getCricbuzzPlayerIdByName(), usePlayerBattingStats(), usePlayerBattingStatsByName(), UsePlayerBattingStatsResult, TeamBattingStatsResult (+18 more)
+Cohesion: 0.17
+Nodes (21): CRICBUZZ_PLAYER_ID_MAP, getCricbuzzPlayerId(), usePlayerBattingStats(), UsePlayerBattingStatsResult, TeamBattingStatsResult, getPlayerBattingStats(), BattingFormatKey, BoundaryPieDataPoint (+13 more)
 
 ### Community 46 - "Community 46"
 Cohesion: 0.07
@@ -538,24 +484,24 @@ Cohesion: 0.15
 Nodes (22): overSeparator, overSeparator, overSeparator, playerId, playerName, playerScore, playerId, playerName (+14 more)
 
 ### Community 50 - "Community 50"
-Cohesion: 0.14
-Nodes (11): COUNTRY_ISO, CountrySelectHUD(), CountryTeam, PIE_COLORS, SectionCard(), SPORT_STAT_KEYS, StatComparisonSegment(), TeamComparisonPanel() (+3 more)
+Cohesion: 0.09
+Nodes (22): COUNTRY_CODE_MAP, getFlagUrl(), PlayerComparison(), PlayerSelectorHUD(), SectionCard(), TOOLTIP_STYLE, COUNTRY_ISO, CountrySelectHUD() (+14 more)
 
 ### Community 51 - "Community 51"
 Cohesion: 0.18
 Nodes (7): ChartConfig, ChartContainer, ChartContext, ChartContextProps, ChartLegendContent, ChartTooltipContent, THEMES
 
 ### Community 52 - "Community 52"
-Cohesion: 0.10
-Nodes (16): Command, CommandDialogProps, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator (+8 more)
+Cohesion: 0.18
+Nodes (9): Command, CommandDialogProps, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator (+1 more)
 
 ### Community 53 - "Community 53"
 Cohesion: 0.16
 Nodes (12): deletePlayer(), deleteUser(), getPlayers(), getStats(), getUsers(), updateUserRole(), adminOnly(), Tournament (+4 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.09
-Nodes (28): MatchCard(), MatchCardProps, MatchSectionProps, PlayerCard(), PlayerCardProps, PlayerProfileDialog(), PlayerProfileDialogProps, SportFilter() (+20 more)
+Cohesion: 0.07
+Nodes (32): CricketPerformanceLabProps, MatchCard(), MatchCardProps, MatchPerformanceLabProps, MatchSectionProps, MinimalCricketCardProps, PlayerCard(), PlayerCardProps (+24 more)
 
 ### Community 56 - "Community 56"
 Cohesion: 0.40
@@ -610,8 +556,8 @@ Cohesion: 0.38
 Nodes (7): fetchMatchesList(), getAllMatchesCombined(), getLiveMatches(), getMatchInfo(), getRecentMatches(), getScorecard(), getUpcomingMatches()
 
 ### Community 71 - "Community 71"
-Cohesion: 0.12
-Nodes (10): RUN_COLORS, ShotBall, WagonWheel(), ZONE_ANGLES, ZONE_LABELS, ANALYSIS_PLAYERS, API_FORMAT_TABS, CHART_TOOLTIP_STYLE (+2 more)
+Cohesion: 0.22
+Nodes (5): RUN_COLORS, ShotBall, WagonWheel(), ZONE_ANGLES, ZONE_LABELS
 
 ### Community 72 - "Community 72"
 Cohesion: 0.17
@@ -641,10 +587,6 @@ Nodes (33): 1️⃣ Profile Management, 2️⃣ Favorites System, 3️⃣ Leader
 Cohesion: 0.06
 Nodes (32): 1. Index (Dashboard), 1. ProtectedRoute, 2. AdvancedSearch, 2. Profile, 3. Pagination, 3. Preferences, 4. DataVisualization, 4. Favorites (+24 more)
 
-### Community 163 - "Community 163"
-Cohesion: 0.13
-Nodes (20): footballApi, FootballHome(), Tab, TransferFilter, TransferSort, CARD_THEMES, FALLBACK_NEWS, FootballNewsSidebar() (+12 more)
-
 ### Community 164 - "Community 164"
 Cohesion: 0.12
 Nodes (16): 🗺️ Application Map, 🎨 Color Scheme, 🏗️ Component Architecture, 📊 Component Hierarchy, 📊 Data Flow, 📈 Data Model, 🔄 Feature Interconnections, 🎯 Feature Matrix (+8 more)
@@ -654,8 +596,8 @@ Cohesion: 0.22
 Nodes (9): scripts, build, build:dev, dev, dev:local, lint, live, main (+1 more)
 
 ### Community 167 - "Community 167"
-Cohesion: 0.16
-Nodes (24): useBowlingDerivedStats(), usePlayerBowlingStats(), usePlayerBowlingStatsByName(), UsePlayerBowlingStatsResult, getPlayerBowlingStats(), BowlingChartData, BowlingFormatBarDataPoint, BowlingFormatKey (+16 more)
+Cohesion: 0.13
+Nodes (28): getCricbuzzPlayerIdByName(), useBowlingDerivedStats(), usePlayerBowlingStats(), usePlayerBowlingStatsByName(), UsePlayerBowlingStatsResult, getPlayerBowlingStats(), BowlingChartData, BowlingFormatBarDataPoint (+20 more)
 
 ### Community 172 - "Community 172"
 Cohesion: 0.08
@@ -675,23 +617,23 @@ Nodes (10): Cnm, CnmT, CompD, CompId, CompN, CompUrlName, Feed, Id (+2 more)
 
 ### Community 176 - "Community 176"
 Cohesion: 0.08
-Nodes (22): AuditLogs(), FootballTournamentManager(), MatchManager(), PlatformSettings(), TeamManager(), TournamentManager(), groupPlayersByRole(), Notification (+14 more)
+Nodes (27): AuditLogs(), FootballTournamentManager(), MatchManager(), PlatformSettings(), PlayerManager(), TeamManager(), TournamentManager(), BATTING_CATEGORIES (+19 more)
 
 ### Community 178 - "Community 178"
 Cohesion: 0.15
 Nodes (17): batsmanDetails, batsmanDetails, batsmanDetails, ballMetric, batsmanDetails, commText, commType, event (+9 more)
 
 ### Community 180 - "Community 180"
-Cohesion: 0.15
-Nodes (13): COUNTRY_CODES, FootballTopStats(), PlayerAvatar(), TeamBadge(), PLAYER_STAT_LABELS, playerPhotoUrl(), PlayerStat, TEAM_STAT_LABELS (+5 more)
+Cohesion: 0.07
+Nodes (27): LEAGUES, StandingRow, StandingsResponse, TeamLogo(), WorldCupStandingsResponse, COUNTRY_CODES, FootballTopStats(), PlayerAvatar() (+19 more)
 
 ### Community 181 - "Community 181"
 Cohesion: 0.22
 Nodes (9): getLeaderboard, getMyStats, adminOrScorer(), optionalAuth(), protect(), router, extractToken(), generateToken() (+1 more)
 
 ### Community 183 - "Community 183"
-Cohesion: 0.08
-Nodes (26): matchInfo, alertType, complete, dayNight, domestic, HYSEnabled, isFantasyEnabled, isForecastEnabled (+18 more)
+Cohesion: 0.29
+Nodes (7): deleteNotification, getNotifications, markAllAsRead, markAsRead, Notification, notificationSchema, router
 
 ### Community 185 - "Community 185"
 Cohesion: 0.60
@@ -714,24 +656,24 @@ Cohesion: 0.15
 Nodes (17): ballMetric, bowlerDetails, commText, commType, event, inningsId, matchId, overSeparator (+9 more)
 
 ### Community 194 - "Community 194"
-Cohesion: 0.13
-Nodes (18): FootballEvent, FootballFixture, FootballGoals, FootballLeague, FootballLineup, FootballMatchPlayerStat, FootballPlayerInfo, FootballStatistic (+10 more)
+Cohesion: 0.14
+Nodes (17): FootballEvent, FootballFixture, FootballGoals, FootballLeague, FootballLineup, FootballMatchPlayerStat, FootballPlayerInfo, FootballStatistic (+9 more)
 
 ### Community 195 - "Community 195"
 Cohesion: 0.20
 Nodes (9): PlayerTopStat, playerTopStatSchema, TeamTopStat, teamTopStatSchema, WorldCupStanding, worldCupStandingSchema, fetchAndStoreTopStatsForLeague(), PLAYER_STAT_TYPES (+1 more)
 
 ### Community 196 - "Community 196"
-Cohesion: 0.17
-Nodes (12): TransfersResponse, FootballTransferData, TransferCard(), TransferCardProps, LatestTransfersResponse, NewTransferData, TransferFee, TransferPosition (+4 more)
+Cohesion: 0.16
+Nodes (13): TransfersResponse, FootballTransferData, TransferCard(), TransferCardProps, LatestTransfersResponse, NewTransferData, TransferFee, TransferPosition (+5 more)
 
 ### Community 198 - "Community 198"
-Cohesion: 0.05
-Nodes (40): NavItem(), WorldCupHero(), WorldCupHeroProps, cn(), Badge(), BadgeProps, badgeVariants, Breadcrumb (+32 more)
+Cohesion: 0.03
+Nodes (67): NavItem(), NavLink, NavLinkCompatProps, WorldCupHero(), WorldCupHeroProps, cn(), Badge(), BadgeProps (+59 more)
 
 ### Community 199 - "Community 199"
 Cohesion: 0.09
-Nodes (27): LiveBadge(), LiveBadgeProps, PreMatchForecast(), PreMatchForecastProps, GraphsTab(), GraphsTabProps, useCricbuzzSquads(), useCricketDataMatch() (+19 more)
+Nodes (26): LiveBadge(), LiveBadgeProps, PreMatchForecast(), PreMatchForecastProps, useCricbuzzSquads(), useCricketDataMatch(), useAllCricketMatches(), useCricbuzzInfo() (+18 more)
 
 ### Community 200 - "Community 200"
 Cohesion: 0.09
@@ -746,32 +688,32 @@ Cohesion: 0.11
 Nodes (18): addMatchEvent, createMatch, deleteMatch, finalizeMatch, getMatchById, updateMatchLineups, updateTimer, createEventNews() (+10 more)
 
 ### Community 206 - "Community 206"
-Cohesion: 0.14
-Nodes (22): Creator, creators, CreatorsSection(), SocialLinks, LiveTicker(), MatchSection(), statuses, StatusFilter() (+14 more)
+Cohesion: 0.11
+Nodes (31): Creator, creators, CreatorsSection(), SocialLinks, LiveTicker(), MatchSection(), statuses, StatusFilter() (+23 more)
 
 ### Community 207 - "Community 207"
 Cohesion: 0.23
 Nodes (6): cache, formatDateParam(), getRecentMatches(), getUpcomingMatches(), TOP_LEAGUES, test()
 
 ### Community 208 - "Community 208"
-Cohesion: 0.12
-Nodes (12): AttributeRadar(), AttributeRadarProps, CrossFormatAnalysis(), CrossFormatAnalysisProps, OppositionStats(), OppositionStatsProps, PerformanceTrend(), PerformanceTrendProps (+4 more)
+Cohesion: 0.16
+Nodes (10): AttributeRadar(), AttributeRadarProps, OppositionStats(), OppositionStatsProps, PerformanceTrend(), PerformanceTrendProps, Format, PerformanceLabProps (+2 more)
 
 ### Community 209 - "Community 209"
-Cohesion: 0.16
-Nodes (18): TrendingPlayers(), TrendingPlayersProps, CricketTrendingPlayers(), MEDAL, PlayerAvatar(), PlayerFlag(), PlayerProfileModal(), TrendingCard() (+10 more)
+Cohesion: 0.08
+Nodes (32): TrendingPlayers(), TrendingPlayersProps, MEDAL, PlayerAvatar(), PlayerFlag(), PlayerProfileModal(), TrendingCard(), footballApi (+24 more)
 
 ### Community 210 - "Community 210"
-Cohesion: 0.18
-Nodes (17): FootballMatchesLivescore(), FootballMatchesLivescoreProps, getTeamColor(), LivescoreMatchCard(), LivescoreMatchCardProps, MatchLike, resolveLogo(), TEAM_COLORS (+9 more)
+Cohesion: 0.38
+Nodes (8): FootballMatchesLivescore(), FootballMatchesLivescoreProps, STALE_30_MIN, useEspnLiveMatches(), useEspnRecentMatches(), useEspnUpcomingMatches(), useLivescoreLiveMatches(), useLivescoreMatchesByDate()
 
 ### Community 211 - "Community 211"
 Cohesion: 0.47
 Nodes (7): cache, getFromCache(), getHeaders(), getLiveMatches(), getMatchDetail(), getMatchesByDate(), setCache()
 
 ### Community 215 - "Community 215"
-Cohesion: 0.21
-Nodes (16): DisplayNewsItem, getCricketImageUrl(), NewsSection(), CricketNewsSection(), getImageUrl(), mockNewsData, NewsItem, CricketNewsItem (+8 more)
+Cohesion: 0.22
+Nodes (14): DisplayNewsItem, getCricketImageUrl(), NewsSection(), mockNewsData, NewsItem, CricketNewsItem, useCricketNews(), useCricketNewsDetail() (+6 more)
 
 ### Community 216 - "Community 216"
 Cohesion: 0.83
@@ -790,8 +732,8 @@ Cohesion: 0.17
 Nodes (9): FormControl, FormDescription, FormFieldContext, FormFieldContextValue, FormItem, FormItemContext, FormItemContextValue, FormLabel (+1 more)
 
 ### Community 236 - "Community 236"
-Cohesion: 0.13
-Nodes (12): cricketTeamSchema, __dirname, __filename, memCache, router, teamLogoQueue, fetchBallMap(), fetchTeamSquad() (+4 more)
+Cohesion: 0.47
+Nodes (4): fetchPlayerDeepStats(), fetchTeamSquad(), generateAttributeRadar(), generateScoringZones()
 
 ### Community 237 - "Community 237"
 Cohesion: 0.67
@@ -810,28 +752,28 @@ Cohesion: 0.67
 Nodes (3): headers, main(), testPhoto()
 
 ### Community 292 - "Community 292"
-Cohesion: 0.09
-Nodes (22): currBatTeamId, endDate, isFantasyEnabled, isForecastEnabled, isTimeAnnounced, isTournament, matchDesc, matchFormat (+14 more)
+Cohesion: 0.27
+Nodes (9): ConfirmModalProps, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter(), AlertDialogHeader(), AlertDialogOverlay (+1 more)
 
 ### Community 293 - "Community 293"
 Cohesion: 0.12
 Nodes (16): balls, fours, id, name, runs, sixes, teamId, teamScore (+8 more)
 
 ### Community 294 - "Community 294"
-Cohesion: 0.09
-Nodes (23): ballMetric, bowlerDetails, commText, commType, event, inningsId, matchId, overSeparator (+15 more)
+Cohesion: 0.38
+Nodes (10): extractMatches(), fetchCricbuzz(), fetchScraper(), getCricketMatchMini(), getCricketMatchScorecard(), getLiveCricketMatches(), getMatchDetailDynamic(), getRecentCricketMatches() (+2 more)
 
 ### Community 295 - "Community 295"
-Cohesion: 0.13
-Nodes (21): overSeparator, overSeparator, playerId, playerName, playerScore, playerId, playerName, playerScore (+13 more)
+Cohesion: 0.18
+Nodes (10): CricbuzzBatsman, CricbuzzBowler, CricbuzzInnings, CricbuzzMatch, CricbuzzMatchesResponse, CricbuzzMiniscore, CricbuzzScorecard, CricbuzzTeam (+2 more)
 
 ### Community 296 - "Community 296"
-Cohesion: 0.14
-Nodes (14): clearCache, getAllMatches, getLiveMatches, getMatchScorecard, getPlayerAnalysis, getRecentMatches, getTeamComparison, getUpcomingMatches (+6 more)
+Cohesion: 0.19
+Nodes (12): CricketPanels(), usePlayerBattingStatsByName(), API_FORMAT_TABS, CHART_TOOLTIP_STYLE, COUNTRY_CODE_MAP, DetailTab, getFlagUrl(), PlayerProfilePage() (+4 more)
 
 ### Community 298 - "Community 298"
-Cohesion: 0.13
-Nodes (16): COUNTRY_CODE_MAP, getFlagUrl(), PlayerSelectorHUD(), SectionCard(), TOOLTIP_STYLE, CricketPerformanceDashboard(), CricketSidebar(), CricketSidebarProps (+8 more)
+Cohesion: 0.23
+Nodes (9): CricketPerformanceDashboard(), CricketSidebar(), CricketSidebarProps, Player, PerformanceLab(), usePerformanceLabPlayerStats(), usePerformanceLabSquad(), getPerformanceLabPlayerStats() (+1 more)
 
 ### Community 300 - "Community 300"
 Cohesion: 0.17
@@ -881,10 +823,6 @@ Nodes (11): ballMetric, bowlerDetails, commText, commType, event, inningsId, mat
 Cohesion: 0.18
 Nodes (11): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+3 more)
 
-### Community 323 - "Community 323"
-Cohesion: 0.15
-Nodes (17): ballMetric, bowlerDetails, commText, commType, event, inningsId, matchId, overSeparator (+9 more)
-
 ### Community 324 - "Community 324"
 Cohesion: 0.18
 Nodes (11): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+3 more)
@@ -892,10 +830,6 @@ Nodes (11): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event
 ### Community 327 - "Community 327"
 Cohesion: 0.18
 Nodes (11): ballMetric, batsmanDetails, commText, commType, event, inningsId, matchId, overSeparator (+3 more)
-
-### Community 328 - "Community 328"
-Cohesion: 0.15
-Nodes (17): batsmanDetails, batsmanDetails, batsmanDetails, batsmanDetails, ballMetric, batsmanDetails, commText, commType (+9 more)
 
 ### Community 332 - "Community 332"
 Cohesion: 0.18
@@ -922,8 +856,8 @@ Cohesion: 0.83
 Nodes (3): countMatches(), extractJsonObjects(), run()
 
 ### Community 346 - "Community 346"
-Cohesion: 0.12
-Nodes (10): $, commentary, html, fetchMatches(), test(), testLiveScoresLD(), testRankingsStructure(), testTeamRoles() (+2 more)
+Cohesion: 0.04
+Nodes (27): $, commentary, html, testMatchScrape(), testMatchScrape(), testMatchScrape(), fetchMatches(), testFormScrape() (+19 more)
 
 ### Community 354 - "Community 354"
 Cohesion: 0.22
@@ -934,8 +868,8 @@ Cohesion: 0.25
 Nodes (4): BROWSER_HEADERS, resolveSlug(), scorecardCache, scrapeScorecard()
 
 ### Community 370 - "Community 370"
-Cohesion: 0.17
-Nodes (11): initializePassport(), getPreferences, getProfile, getUserStats, updatePreferences, updateProfile, Achievement, achievementSchema (+3 more)
+Cohesion: 0.43
+Nodes (6): getPreferences, getProfile, getUserStats, updatePreferences, updateProfile, router
 
 ### Community 371 - "Community 371"
 Cohesion: 0.25
@@ -986,176 +920,32 @@ Cohesion: 0.50
 Nodes (4): umpire3, country, id, name
 
 ### Community 388 - "Community 388"
-Cohesion: 0.26
-Nodes (9): filterStateMatches(), formatStateMatch(), getStateMatches(), router, DEFAULT_FLAG, getBadgeUrl(), getStateFlag(), isStateTeam() (+1 more)
+Cohesion: 0.67
+Nodes (3): getImageCachePath(), isCachedImageFresh(), streamPlayerImage()
 
 ### Community 389 - "Community 389"
-Cohesion: 0.18
-Nodes (6): getFlagUrl(), indianStateTeams, isStateTeam(), leagueTeamLogoMap, localFlagMap, teamToCountryCode
-
-### Community 400 - "Community 400"
-Cohesion: 0.17
-Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
-
-### Community 401 - "Community 401"
-Cohesion: 0.17
-Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
-
-### Community 402 - "Community 402"
-Cohesion: 0.17
-Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
-
-### Community 410 - "Community 410"
-Cohesion: 0.17
-Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
-
-### Community 411 - "Community 411"
-Cohesion: 0.17
-Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
-
-### Community 412 - "Community 412"
-Cohesion: 0.17
-Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
-
-### Community 413 - "Community 413"
-Cohesion: 0.17
-Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
-
-### Community 414 - "Community 414"
-Cohesion: 0.17
-Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
-
-### Community 415 - "Community 415"
-Cohesion: 0.17
-Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
-
-### Community 416 - "Community 416"
-Cohesion: 0.17
-Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
-
-### Community 417 - "Community 417"
-Cohesion: 0.18
-Nodes (11): ballMetric, bowlerDetails, commText, commType, event, inningsId, matchId, overSeparator (+3 more)
-
-### Community 418 - "Community 418"
-Cohesion: 0.18
-Nodes (11): ballMetric, bowlerDetails, commText, commType, event, inningsId, matchId, overSeparator (+3 more)
-
-### Community 419 - "Community 419"
-Cohesion: 0.18
-Nodes (11): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+3 more)
-
-### Community 420 - "Community 420"
-Cohesion: 0.18
-Nodes (11): ballMetric, batsmanDetails, commText, commType, event, inningsId, matchId, overSeparator (+3 more)
-
-### Community 421 - "Community 421"
-Cohesion: 0.18
-Nodes (11): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+3 more)
-
-### Community 422 - "Community 422"
-Cohesion: 0.18
-Nodes (11): ballMetric, batsmanDetails, commText, commType, event, inningsId, matchId, overSeparator (+3 more)
-
-### Community 423 - "Community 423"
-Cohesion: 0.18
-Nodes (11): ballMetric, batsmanDetails, commText, commType, event, inningsId, matchId, overSeparator (+3 more)
-
-### Community 424 - "Community 424"
-Cohesion: 0.29
-Nodes (7): addFavorite, checkFavorite, getFavorites, removeFavorite, Favorite, favoriteSchema, router
-
-### Community 425 - "Community 425"
-Cohesion: 0.20
-Nodes (10): balls, fours, id, name, playerMatchHighlightsUrl, playerUrl, runs, sixes (+2 more)
-
-### Community 426 - "Community 426"
-Cohesion: 0.20
-Nodes (10): balls, fours, id, name, playerMatchHighlightsUrl, playerUrl, runs, sixes (+2 more)
-
-### Community 427 - "Community 427"
-Cohesion: 0.20
-Nodes (10): series, endDate, id, name, odiSeriesResult, seriesFolder, startDate, t20SeriesResult (+2 more)
-
-### Community 428 - "Community 428"
-Cohesion: 0.20
-Nodes (9): ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuRadioItem, ContextMenuSeparator, ContextMenuShortcut(), ContextMenuSubContent (+1 more)
-
-### Community 429 - "Community 429"
-Cohesion: 0.25
-Nodes (8): venue, city, country, id, latitude, longitude, name, timezone
-
-### Community 430 - "Community 430"
-Cohesion: 0.29
-Nodes (7): inningsId, overs, runs, wickets, matchScore, team1Score, inngs1
-
-### Community 431 - "Community 431"
-Cohesion: 0.29
-Nodes (7): venueInfo, city, ground, id, latitude, longitude, timezone
-
-### Community 432 - "Community 432"
-Cohesion: 0.33
-Nodes (5): ToggleGroup, ToggleGroupContext, ToggleGroupItem, Toggle, toggleVariants
-
-### Community 433 - "Community 433"
-Cohesion: 0.60
-Nodes (4): getMatches(), getMatchSquads(), getMockMatches(), getMockSquads()
-
-### Community 434 - "Community 434"
-Cohesion: 0.40
-Nodes (5): team1, id, name, playerDetails, shortName
-
-### Community 435 - "Community 435"
-Cohesion: 0.40
-Nodes (5): team2, id, name, playerDetails, shortName
-
-### Community 436 - "Community 436"
-Cohesion: 0.40
-Nodes (4): InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot
-
-### Community 437 - "Community 437"
-Cohesion: 0.50
-Nodes (3): apiUrls, domCommentaryPreview, tabs
-
-### Community 438 - "Community 438"
-Cohesion: 0.50
-Nodes (4): referee, country, id, name
-
-### Community 439 - "Community 439"
-Cohesion: 0.50
-Nodes (4): tossResults, decision, tossWinnerId, tossWinnerName
-
-### Community 440 - "Community 440"
-Cohesion: 0.50
-Nodes (4): umpire1, country, id, name
-
-### Community 441 - "Community 441"
-Cohesion: 0.50
-Nodes (4): umpire2, country, id, name
-
-### Community 442 - "Community 442"
-Cohesion: 0.50
-Nodes (4): umpire3, country, id, name
+Cohesion: 0.67
+Nodes (3): mapCricbuzzMatch(), mapCricbuzzScore(), normalizeOvers()
 
 ## Knowledge Gaps
-- **1863 isolated node(s):** `branch`, `path`, `parentBranch`, `createdAt`, `remote` (+1858 more)
+- **1540 isolated node(s):** `branch`, `path`, `parentBranch`, `createdAt`, `remote` (+1535 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **97 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **82 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `mapApiMatchToModel()` connect `Community 25` to `Community 176`, `Community 35`, `Community 199`?**
-  _High betweenness centrality (0.061) - this node is a cross-community bridge._
+- **Why does `mapApiMatchToModel()` connect `Community 25` to `Community 35`, `Admin Player Manager`, `Community 199`?**
+  _High betweenness centrality (0.090) - this node is a cross-community bridge._
 - **Why does `hasMeaningfulScores()` connect `Community 35` to `Community 25`?**
-  _High betweenness centrality (0.061) - this node is a cross-community bridge._
-- **Why does `cn()` connect `Community 198` to `UI Utils and NavLink`, `Admin Audit & Settings`, `Admin Edit Team Dialog`, `Player Analysis Panel`, `Loading Skeletons`, `Admin Player Manager`, `Venue Analysis Panel`, `Community 15`, `Community 18`, `Community 22`, `Community 25`, `Community 27`, `Community 31`, `Community 34`, `Community 163`, `Community 298`, `Community 42`, `Community 44`, `Community 428`, `Community 176`, `Community 432`, `Community 50`, `Community 51`, `Community 180`, `Community 52`, `Community 54`, `Community 436`, `Community 199`, `Community 200`, `Community 206`, `Community 209`, `Community 210`, `Community 215`, `Community 235`?**
-  _High betweenness centrality (0.039) - this node is a cross-community bridge._
+  _High betweenness centrality (0.090) - this node is a cross-community bridge._
+- **Why does `$` connect `Community 346` to `Community 387`, `Community 395`, `Community 24`, `Community 291`, `Community 299`, `Community 48`, `Community 308`, `Community 309`, `Community 314`, `Community 316`, `Community 317`, `Community 321`, `Community 323`, `Community 197`, `Community 326`, `Community 328`, `Community 330`, `Community 362`, `Community 374`, `Community 254`?**
+  _High betweenness centrality (0.050) - this node is a cross-community bridge._
 - **Are the 44 inferred relationships involving `$` (e.g. with `testMatchScrape()` and `testMatchScrape()`) actually correct?**
   _`$` has 44 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `branch`, `path`, `parentBranch` to the rest of the system?**
-  _1863 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1540 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Football Match Controller` be split into smaller, more focused modules?**
   _Cohesion score 0.11092436974789915 - nodes in this community are weakly interconnected._
 - **Should `UI Utils and NavLink` be split into smaller, more focused modules?**
-  _Cohesion score 0.0641025641025641 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11707317073170732 - nodes in this community are weakly interconnected._

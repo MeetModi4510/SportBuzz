@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import type { Match } from "@/data/types";
 import { useMatchFieldData } from "@/hooks/useMatchFieldData";
+import { WinProbabilityGraph } from "./cricket/graphs/WinProbabilityGraph";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const COLORS = {
@@ -180,6 +181,10 @@ export default function CricketPerformanceLab({
         loading: loadingPartnerships, 
         error: partnershipsError 
     } = useMatchFieldData(match.id, 'cbPartnershipGraph', true, undefined, undefined);
+
+    const { 
+        data: winProbData, 
+    } = useMatchFieldData(match.id, 'cbWinProbability', true, undefined, undefined);
 
     // ── Derived data ──────────────────────────────────────────────────────────
     const currentInnings = innings[selectedInnings] || innings[0];
@@ -758,7 +763,18 @@ export default function CricketPerformanceLab({
                 </AnalyticsSection>
             )}
 
-            {/* ── 3. Run Progression (Momentum via FOW) ─────────────────────── */}
+            {/* --- Win Probability Graph --- */}
+            {winProbData?.available && (
+                <AnalyticsSection
+                    icon={<Activity size={18} className="text-blue-500" />}
+                    title="Win Probability"
+                    subtitle="Live match win probability predictions"
+                >
+                    <WinProbabilityGraph data={winProbData} />
+                </AnalyticsSection>
+            )}
+
+            {/* --- 3. Run Progression (Momentum via FOW) --- */}
             {runProgression.length > 2 && (
                 <AnalyticsSection
                     icon={<TrendingUp size={18} className="text-emerald-500" />}
@@ -1266,7 +1282,7 @@ export default function CricketPerformanceLab({
                             stroke="hsl(var(--background))"
                             fill={COLORS.primary}
                             aspectRatio={4 / 3}
-                            content={(props: any) => {
+                            content={((props: any) => {
                                 const { x, y, width, height, name, size, fill } = props;
                                 if (width < 40 || height < 30) return <rect x={x} y={y} width={width} height={height} fill={fill} stroke="hsl(var(--background))" />;
                                 return (
@@ -1282,7 +1298,7 @@ export default function CricketPerformanceLab({
                                         )}
                                     </g>
                                 );
-                            }}
+                            }) as any}
                         >
                             <Tooltip 
                                 contentStyle={TOOLTIP_STYLE}

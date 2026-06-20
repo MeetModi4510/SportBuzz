@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { cricketApi } from '@/services/api';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-export type FieldType = 'matchInfo' | 'commentary' | 'cbScorecard' | 'cbSquads' | 'cbCommentary' | 'cbFullCommentary' | 'cbBallMap' | 'cbPartnershipGraph';
+export type FieldType = 'matchInfo' | 'commentary' | 'cbScorecard' | 'cbSquads' | 'cbCommentary' | 'cbFullCommentary' | 'cbBallMap' | 'cbPartnershipGraph' | 'cbWinProbability';
 
 interface CacheEntry {
     data: any;
@@ -31,6 +31,7 @@ const FIELD_TTL: Record<FieldType, number> = {
     cbFullCommentary:        60 * 1000, // 1 min — live
     cbBallMap:               60 * 1000, // 1 min — live
     cbPartnershipGraph:      60 * 1000, // 1 min — live
+    cbWinProbability:        5 * 60 * 1000, // 5 min
 };
 
 function isCacheValid(entry: CacheEntry | undefined, ttl: number): entry is CacheEntry {
@@ -143,6 +144,9 @@ export function useMatchFieldData(
                 result = response?.data || response;
             } else if (field === 'cbPartnershipGraph') {
                 const response = await cricketApi.getPartnershipGraph(cleanId);
+                result = response?.data || response;
+            } else if (field === 'cbWinProbability') {
+                const response = await cricketApi.getWinProbability(cleanId);
                 result = response?.data || response;
             }
 

@@ -6,6 +6,7 @@ import { cricketService } from '../services/cricketApiService.js';
 import { cricbuzzService } from '../services/cricbuzzService.js';
 import { scrapeScorecard } from '../services/cricbuzzScorecardScraper.js';
 import { scrapeFullCommentary } from '../services/cricbuzzScraperService.js';
+import { getWinProbabilityGraph } from '../services/cricbuzzWinProbabilityScraper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -101,6 +102,19 @@ router.get('/scraped/match/:id/graphs/partnerships', async (req, res) => {
     const data = await fetchPartnershipGraph(req.params.id);
     if (!data) return res.status(404).json({ status: 'error', message: 'Partnership graph not found' });
     res.json({ status: 'success', data });
+});
+
+router.get('/scraped/match/:id/graphs/win-probability', async (req, res) => {
+    try {
+        const data = await getWinProbabilityGraph(req.params.id);
+        if (!data || !data.available) {
+            return res.status(404).json({ status: 'error', message: 'Win probability graph not found or not available', data: null });
+        }
+        res.json({ status: 'success', data });
+    } catch (err) {
+        console.error('Error fetching win probability graph:', err);
+        res.status(500).json({ status: 'error', message: 'Failed to fetch win probability graph' });
+    }
 });
 
 // ── Dedicated Cricbuzz Scorecard Route ────────────────────────────────────────

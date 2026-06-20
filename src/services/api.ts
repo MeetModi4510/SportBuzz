@@ -85,6 +85,7 @@ export const cricketApi = {
     getPlayerProfile: (playerId: string) => api.get(`cricket/players/${playerId}`),
     getBallMap: (matchId: string, inningsId: string) => api.get(`cricket/scraped/match/${matchId}/graphs/ballmap/${inningsId}`),
     getPartnershipGraph: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/graphs/partnerships`),
+    getWinProbability: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/graphs/win-probability`),
     getCricbuzzFullCommentary: (matchId: string, slug?: string, force?: boolean) => {
         const params = new URLSearchParams();
         if (slug) params.set('slug', slug);
