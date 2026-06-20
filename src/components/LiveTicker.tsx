@@ -7,6 +7,7 @@ import { LiveBadge } from "./LiveBadge";
 import { SportIcon, getSportBorderColor } from "./SportIcon";
 import { ChevronLeft, ChevronRight, Loader2, Bell } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import type { Match } from "@/data/types";
 import { TeamLogo } from "./TeamLogo";
 import { FootballTeamLogo } from "./football/FootballTeamLogo";
@@ -14,6 +15,7 @@ import { FootballTeamLogo } from "./football/FootballTeamLogo";
 import { useEspnLiveMatches } from "@/hooks/football/useEspnQueries";
 
 export const LiveTicker = () => {
+  const navigate = useNavigate();
   // Remove both cricket AND football from mock matches (since we fetch them dynamically)
   const mockLiveMatches = getLiveMatches().filter((m: Match) => m.sport !== "cricket" && m.sport !== "football");
   const { data: cricketFeatured, isLoading: isCricketLoading } = useFeaturedCricketMatches();
@@ -170,7 +172,16 @@ export const LiveTicker = () => {
 
               return (
                 <div key={`${match._id}-${idx}`} className="flex items-center h-full">
-                  <div className="flex items-center px-6 md:px-8 py-1.5 md:py-2 mx-3 md:mx-4 bg-secondary/20 border border-border/50 rounded-full hover:bg-secondary/40 transition-colors cursor-pointer group shadow-sm">
+                  <div 
+                    className="flex items-center px-6 md:px-8 py-1.5 md:py-2 mx-3 md:mx-4 bg-secondary/20 border border-border/50 rounded-full hover:bg-secondary/40 transition-colors cursor-pointer group shadow-sm"
+                    onClick={() => {
+                      if (match.sport === 'football') {
+                        navigate(`/football/match/${match._id || match.id}`);
+                      } else {
+                        navigate(`/match/${match._id || match.id}`, { state: { from: 'ticker', section: 'matches' } });
+                      }
+                    }}
+                  >
                      <div className="flex items-center gap-5 md:gap-8">
                        
                        {/* Match type / Status */}

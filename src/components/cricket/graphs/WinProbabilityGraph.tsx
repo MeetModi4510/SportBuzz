@@ -52,7 +52,7 @@ export const WinProbabilityGraph: React.FC<WinProbabilityGraphProps> = ({ data }
             <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                     data={data.data}
-                    margin={{ top: 20, right: 20, left: -20, bottom: 0 }}
+                    margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
                 >
                     <defs>
                         <linearGradient id={`color_${t1.name}`} x1="0" y1="0" x2="0" y2="1">
@@ -71,7 +71,8 @@ export const WinProbabilityGraph: React.FC<WinProbabilityGraphProps> = ({ data }
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
-                        tickFormatter={(val) => `Over ${val}`}
+                        tickFormatter={(val) => `${val}`}
+                        label={{ value: "Overs", position: "bottom", offset: 0, fontSize: 12, fill: "#ffffff80" }}
                     />
                     <YAxis 
                         stroke="#ffffff50" 
@@ -81,6 +82,7 @@ export const WinProbabilityGraph: React.FC<WinProbabilityGraphProps> = ({ data }
                         domain={[0, 100]}
                         ticks={[0, 25, 50, 75, 100]}
                         tickFormatter={(val) => `${val}%`}
+                        label={{ value: "Win Probability", angle: -90, position: "insideLeft", offset: 15, fontSize: 12, fill: "#ffffff80" }}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />

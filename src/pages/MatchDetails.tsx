@@ -911,7 +911,7 @@ const MatchDetails = () => {
                             </div>
                          ) : (!showHome && !showAway && !showTestScore) ? (
                             <span className="text-4xl text-muted-foreground/30 font-light">—</span>
-                         ) : (
+                         ) : (showHome || showAway) && !showDualScore ? null : (
                             <span className="text-2xl font-bold text-muted-foreground/30 tracking-widest">VS</span>
                          )}
                        </div>
@@ -1325,7 +1325,7 @@ const MatchDetails = () => {
                           )}
 
                           {/* Win Probability Bar */}
-                          {cbSummary.winProbability && (
+                          {cbSummary.winProbability && (cbSummary.winProbability.team1?.percent > 0 || cbSummary.winProbability.team2?.percent > 0) && (
                             <div className="bg-muted/10 border border-border/40 rounded-xl p-4 transition-colors hover:bg-muted/20">
                               <div className="flex items-center justify-between mb-4">
                                  <span className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-widest">Win Probability</span>
@@ -1335,14 +1335,14 @@ const MatchDetails = () => {
                                 <span className="text-xs font-black text-foreground w-8">{cbSummary.winProbability.team1?.shortName || "T1"}</span>
                                 <div className="flex-1 h-2 flex rounded-full overflow-hidden bg-background border border-border/50 shadow-inner">
                                   <div className="bg-primary h-full transition-all duration-1000 ease-out" style={{ width: `${cbSummary.winProbability.team1?.percent || 0}%` }} />
-                                  <div className="bg-secondary h-full transition-all duration-1000 ease-out" style={{ width: `${cbSummary.winProbability.drawTiePercent || 0}%` }} />
-                                  <div className="bg-[#1e293b] h-full transition-all duration-1000 ease-out" style={{ width: `${cbSummary.winProbability.team2?.percent || 0}%` }} />
+                                  <div className="bg-amber-500 h-full transition-all duration-1000 ease-out" style={{ width: `${cbSummary.winProbability.drawTiePercent || 0}%` }} />
+                                  <div className="bg-[#1e293b] dark:bg-slate-500 h-full transition-all duration-1000 ease-out" style={{ width: `${cbSummary.winProbability.team2?.percent || 0}%` }} />
                                 </div>
                                 <span className="text-xs font-black text-foreground w-8 text-right">{cbSummary.winProbability.team2?.shortName || "T2"}</span>
                               </div>
                               <div className="flex justify-between text-[10px] text-muted-foreground mt-2 font-bold font-mono px-11">
                                 <span className="text-primary drop-shadow-sm">{cbSummary.winProbability.team1?.percent || 0}%</span>
-                                {cbSummary.winProbability.drawTiePercent > 0 && <span className="text-secondary drop-shadow-sm">Draw {cbSummary.winProbability.drawTiePercent}%</span>}
+                                {cbSummary.winProbability.drawTiePercent > 0 && <span className="text-amber-500 drop-shadow-sm">Draw {cbSummary.winProbability.drawTiePercent}%</span>}
                                 <span className="text-[#1e293b] dark:text-slate-400 drop-shadow-sm">{cbSummary.winProbability.team2?.percent || 0}%</span>
                               </div>
                             </div>
@@ -2497,7 +2497,7 @@ const MatchDetails = () => {
                                           const isWide = evt === 'WIDE';
                                           const isOverComplete = evt === 'OVER_BREAK';
                                           const isMilestone = evt === 'MILESTONE' || 
-                                            (item.commText && /(fifty|hundred|century|half century|half-century|\b50\b|\b100\b|\b150\b|\b200\b)/i.test(item.commText) && !item.commText.toLowerCase().includes('partnership'));
+                                            (item.commText && /(fifty|hundred|century|half century|half-century|\b50\b|\b100\b|\b150\b|\b200\b)/i.test(item.commText) && !/(partnership|stand)/i.test(item.commText));
 
                                           const dotColor = isWicket ? 'bg-red-500' :
                                             isMilestone ? 'bg-purple-500' :

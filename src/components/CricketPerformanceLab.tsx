@@ -764,7 +764,7 @@ export default function CricketPerformanceLab({
             )}
 
             {/* --- Win Probability Graph --- */}
-            {winProbData?.available && (
+            {winProbData?.available && winProbData.data && winProbData.data.length > 1 && (
                 <AnalyticsSection
                     icon={<Activity size={18} className="text-blue-500" />}
                     title="Win Probability"
