@@ -6,7 +6,7 @@ import {
     BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
     AreaChart, Area, PieChart, Pie, RadarChart, Radar, PolarGrid,
     PolarAngleAxis, PolarRadiusAxis, Legend, CartesianGrid, ScatterChart,
-    Scatter, ZAxis, RadialBarChart, RadialBar, ComposedChart, Line, LabelList, Treemap
+    Scatter, ZAxis, RadialBarChart, RadialBar, ComposedChart, Line, LabelList, Treemap, ReferenceLine
 } from "recharts";
 import type { Match } from "@/data/types";
 import { useMatchFieldData } from "@/hooks/useMatchFieldData";
@@ -439,13 +439,14 @@ export default function CricketPerformanceLab({
     // ── 3. Batter Contribution Treemap ────────────────────────────────────────
     const treemapData = useMemo(() => {
         if (!currentInnings?.batsmen?.length) return [];
+        const PALETTE = [COLORS.primary, COLORS.info, COLORS.secondary, COLORS.accent, COLORS.warning, COLORS.danger];
         const data = currentInnings.batsmen
             .filter(b => b.runs > 0)
             .map((b, i) => ({
                 name: shortName(b.name),
                 size: b.runs,
                 balls: b.balls,
-                fill: i % 2 === 0 ? COLORS.primary : COLORS.secondary // Base alternate fill
+                fill: PALETTE[i % PALETTE.length]
             }));
         // Need a root wrapper for recharts treemap
         return [{ name: "Innings", children: data }];
@@ -917,23 +918,34 @@ export default function CricketPerformanceLab({
                 );
             })()}
 
-            {/* ── 5. Boundary Analysis ──────────────────────────────────────── */}
+            {/* ── 5. Boundary Landscape (Composed Area/Bar Chart) ───────────── */}
             {boundaryData.length > 0 && (
                 <AnalyticsSection
                     icon={<Zap size={18} className="text-amber-500" />}
-                    title="Boundary Analysis"
-                    subtitle="Fours and sixes per batsman"
+                    title="Boundary Landscape"
+                    subtitle="Volume of Fours (Area) vs Sixes (Bars)"
                 >
-                    <ResponsiveContainer width="100%" height={Math.max(200, boundaryData.length * 40)}>
-                        <BarChart data={boundaryData} layout="vertical" barSize={16}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                            <XAxis type="number" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
-                            <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} width={70} />
-                            <Tooltip contentStyle={TOOLTIP_STYLE} />
-                            <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
-                            <Bar dataKey="fours" name="Fours" stackId="a" fill={COLORS.primary} radius={[0, 0, 0, 0]} />
-                            <Bar dataKey="sixes" name="Sixes" stackId="a" fill={COLORS.warning} radius={[0, 4, 4, 0]} />
-                        </BarChart>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <ComposedChart data={boundaryData} margin={{ top: 20, right: 20, bottom: 20, left: -20 }}>
+                            <defs>
+                                <linearGradient id="colorFours" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.4}/>
+                                    <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0}/>
+                                </linearGradient>
+                                <linearGradient id="colorSixes" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor={COLORS.warning} stopOpacity={0.4}/>
+                                    <stop offset="95%" stopColor={COLORS.warning} stopOpacity={0}/>
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} vertical={false} />
+                            <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                            <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                            <Tooltip contentStyle={{ ...TOOLTIP_STYLE, backgroundColor: "#1e1e24", borderColor: "rgba(255,255,255,0.1)", color: "#ffffff" }} itemStyle={{ color: "#ffffff" }} />
+                            <Legend wrapperStyle={{ fontSize: 12, paddingTop: 10 }} />
+                            
+                            <Area type="monotone" dataKey="sixes" name="Sixes" stroke={COLORS.warning} strokeWidth={3} fillOpacity={1} fill="url(#colorSixes)" />
+                            <Area type="monotone" dataKey="fours" name="Fours" stroke={COLORS.primary} strokeWidth={3} fillOpacity={1} fill="url(#colorFours)" />
+                        </ComposedChart>
                     </ResponsiveContainer>
                 </AnalyticsSection>
             )}
@@ -1062,37 +1074,49 @@ export default function CricketPerformanceLab({
                     subtitle={`${extrasPercent}% of total runs came from extras`}
                     defaultOpen={false}
                 >
-                    <div className="flex items-center gap-6 flex-wrap">
-                        <ResponsiveContainer width={180} height={180}>
-                            <PieChart>
-                                <Pie
-                                    data={extrasData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={40}
-                                    outerRadius={70}
-                                    paddingAngle={3}
-                                    dataKey="value"
-                                >
-                                    {extrasData.map((e, i) => (
-                                        <Cell key={i} fill={e.fill} />
-                                    ))}
-                                </Pie>
-                                <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#ffffff" }} itemStyle={{ color: "#ffffff" }} />
-                            </PieChart>
-                        </ResponsiveContainer>
-                        <div className="space-y-2">
-                            {extrasData.map((e, i) => (
-                                <div key={i} className="flex items-center gap-2 text-sm">
-                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: e.fill }} />
-                                    <span className="text-muted-foreground">{e.name}:</span>
-                                    <span className="font-bold text-foreground">{e.value}</span>
-                                </div>
-                            ))}
-                            <div className="flex items-center gap-2 text-sm border-t border-border/50 pt-2 mt-2">
-                                <span className="text-muted-foreground font-medium">Total:</span>
-                                <span className="font-bold text-foreground">{currentInnings?.extras?.total || 0}</span>
-                            </div>
+                    <div className="flex flex-col gap-4">
+                        <div className="pt-6 pb-2">
+                            <ResponsiveContainer width="100%" height={160}>
+                                <PieChart>
+                                    <Pie
+                                        data={extrasData}
+                                        cx="50%"
+                                        cy="100%"
+                                        startAngle={180}
+                                        endAngle={0}
+                                        innerRadius={0}
+                                        outerRadius={130}
+                                        paddingAngle={1}
+                                        cornerRadius={0}
+                                        dataKey="value"
+                                        stroke="hsl(var(--background))"
+                                        strokeWidth={3}
+                                        label={(props: any) => {
+                                            const { cx, cy, midAngle, outerRadius, value, name, fill } = props;
+                                            const RADIAN = Math.PI / 180;
+                                            const radius = outerRadius + 20;
+                                            const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                            const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                                            if (value === 0) return null;
+                                            return (
+                                                <text x={x} y={y} fill={fill} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs font-black tracking-widest uppercase">
+                                                    {name} <tspan fill="hsl(var(--foreground))" className="font-bold">({value})</tspan>
+                                                </text>
+                                            );
+                                        }}
+                                        labelLine={{ stroke: "hsl(var(--border))", strokeWidth: 1, strokeDasharray: "2 2" }}
+                                    >
+                                        {extrasData.map((e, i) => (
+                                            <Cell key={`cell-${i}`} fill={e.fill} opacity={0.85} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip contentStyle={{ ...TOOLTIP_STYLE, backgroundColor: "#1e1e24", borderColor: "rgba(255,255,255,0.1)", color: "#ffffff" }} itemStyle={{ color: "#ffffff" }} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="flex justify-between items-center px-4 py-3 bg-secondary/10 rounded-xl border border-border/20">
+                            <span className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Total Match Extras</span>
+                            <span className="text-xl font-black text-foreground">{currentInnings?.extras?.total || 0}</span>
                         </div>
                     </div>
                 </AnalyticsSection>
@@ -1242,9 +1266,27 @@ export default function CricketPerformanceLab({
                             stroke="hsl(var(--background))"
                             fill={COLORS.primary}
                             aspectRatio={4 / 3}
+                            content={(props: any) => {
+                                const { x, y, width, height, name, size, fill } = props;
+                                if (width < 40 || height < 30) return <rect x={x} y={y} width={width} height={height} fill={fill} stroke="hsl(var(--background))" />;
+                                return (
+                                    <g>
+                                        <rect x={x} y={y} width={width} height={height} fill={fill} stroke="hsl(var(--background))" />
+                                        <text x={x + width / 2} y={y + height / 2 - 2} textAnchor="middle" fill="#ffffff" stroke="none" fontSize={13} fontWeight="bold" dominantBaseline="middle" style={{ textShadow: '0px 1px 3px rgba(0,0,0,0.4)' }}>
+                                            {name}
+                                        </text>
+                                        {height > 45 && (
+                                            <text x={x + width / 2} y={y + height / 2 + 14} textAnchor="middle" fill="#ffffff" stroke="none" fontSize={11} fontWeight="600" dominantBaseline="middle" style={{ textShadow: '0px 1px 2px rgba(0,0,0,0.4)' }}>
+                                                {size} Runs
+                                            </text>
+                                        )}
+                                    </g>
+                                );
+                            }}
                         >
                             <Tooltip 
                                 contentStyle={TOOLTIP_STYLE}
+                                itemStyle={{ color: "hsl(var(--foreground))" }}
                                 formatter={(value: number, name: string, props: any) => [`${value} Runs`, props.payload.name]}
                             />
                         </Treemap>

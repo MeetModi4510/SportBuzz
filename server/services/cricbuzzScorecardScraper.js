@@ -314,13 +314,19 @@ export async function scrapeScorecard(matchId, slug = null, force = false) {
         const batsmen = parseBatting($, scorecardDiv);
 
         // Extras and Total
-        let extras = '';
+        let extras = { total: 0, byes: 0, legbyes: 0, wides: 0, noballs: 0, penalty: 0 };
         let totalStr = '';
         let runRate = '';
         scorecardDiv.find('div.flex.justify-between').each((_, row) => {
             const label = $(row).find('div.font-bold').first().text().trim();
             if (label === 'Extras') {
-                extras = $(row).text().replace('Extras', '').trim();
+                const extrasText = $(row).text().replace('Extras', '').trim(); // e.g. "13 (b 0, lb 4, w 8, nb 1, p 0)"
+                extras.total = parseInt(extrasText.match(/^(\d+)/)?.[1]) || 0;
+                extras.byes = parseInt(extrasText.match(/b\s+(\d+)/)?.[1]) || 0;
+                extras.legbyes = parseInt(extrasText.match(/lb\s+(\d+)/)?.[1]) || 0;
+                extras.wides = parseInt(extrasText.match(/w\s+(\d+)/)?.[1]) || 0;
+                extras.noballs = parseInt(extrasText.match(/nb\s+(\d+)/)?.[1]) || 0;
+                extras.penalty = parseInt(extrasText.match(/p\s+(\d+)/)?.[1]) || 0;
             } else if (label === 'Total') {
                 totalStr = $(row).find('.font-bold').last().text().trim();
                 runRate = $(row).text().match(/RR:\s*([\d.]+)/)?.[1] || '';

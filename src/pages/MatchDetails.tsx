@@ -807,26 +807,40 @@ const MatchDetails = () => {
                  const showTestScore = isTestMatch;
 
                  return (
-                   <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-10 md:py-14 gap-8 relative">
-                       {/* Home Team */}
-                       <div className="flex-1 flex flex-col md:flex-row items-center justify-end gap-5 w-full z-10">
-                           <div className="text-center md:text-right">
-                               <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{team1Name}</h2>
-                               <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team1ShortName}</p>
+                   <div className="flex flex-col md:grid md:grid-cols-[1fr_auto_1fr] items-center px-6 md:px-8 lg:px-16 py-10 md:py-14 gap-8 md:gap-6 lg:gap-8 relative w-full">
+                       
+                       {/* Home Team (Left Side) */}
+                       <div className="flex justify-center md:justify-end z-10 w-full min-w-0">
+                           <div className="flex items-center gap-4 md:gap-5 lg:gap-6 min-w-0">
+                               <div className="text-right min-w-0">
+                                   <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground tracking-tight break-words">{team1Name}</h2>
+                                   <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team1ShortName}</p>
+                               </div>
+                               <TeamLogo logo={team1Logo} name={team1Name} size="lg" className="w-16 h-12 md:w-20 md:h-14 lg:w-24 lg:h-16 object-contain shrink-0 drop-shadow-md" />
+                               
+                               {/* Score next to Home Team if only Home is batting */}
+                               {!showTestScore && showHome && !showDualScore && (
+                                   <div className="ml-2 pl-4 md:ml-4 md:pl-4 lg:ml-6 lg:pl-6 border-l-2 border-primary/20 relative flex items-center md:w-[130px] lg:w-[150px] shrink-0">
+                                       <span className="text-5xl md:text-5xl lg:text-6xl font-black tracking-tighter text-foreground leading-none">{home.runs}</span>
+                                       {home.overs && (
+                                           <div className="absolute top-[105%] left-4 md:left-4 lg:left-6 whitespace-nowrap">
+                                               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md">
+                                                   {home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS
+                                               </span>
+                                           </div>
+                                       )}
+                                   </div>
+                               )}
+                               
+                               {/* Invisible placeholder when Away is batting to keep Flags equidistant */}
+                               {!showTestScore && !showHome && showAway && !showDualScore && (
+                                   <div className="hidden md:block ml-2 pl-4 md:ml-4 md:pl-4 lg:ml-6 lg:pl-6 border-l-2 border-transparent md:w-[130px] lg:w-[150px] shrink-0" />
+                               )}
                            </div>
-                           <TeamLogo logo={team1Logo} name={team1Name} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
-                           
-                           {/* Render Home Score attached to Home Team if only Home is batting */}
-                           {!showTestScore && showHome && !showDualScore && (
-                             <div className="flex flex-col items-start ml-2 md:ml-5 md:border-l-2 border-primary/20 md:pl-5 mt-4 md:mt-0 text-center md:text-left">
-                               <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{home.runs}</span>
-                               {home.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2 uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md">{home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
-                             </div>
-                           )}
                        </div>
 
-                       {/* Score Center (Test matches, Dual Scores, or empty spacer) */}
-                       <div className="flex flex-col items-center justify-center shrink-0 z-10 md:min-w-[40px]">
+                       {/* Center Area (Test matches, Dual Scores, VS, or empty spacer) */}
+                       <div className="flex flex-col items-center justify-center shrink-0 z-10 md:min-w-[40px] my-4 md:my-0">
                          {showTestScore && match.scoreBreakdown ? (
                             <div className="flex flex-col items-center gap-3">
                               <div className="flex items-center gap-6">
@@ -897,23 +911,39 @@ const MatchDetails = () => {
                             </div>
                          ) : (!showHome && !showAway && !showTestScore) ? (
                             <span className="text-4xl text-muted-foreground/30 font-light">—</span>
-                         ) : null}
+                         ) : (
+                            <span className="text-2xl font-bold text-muted-foreground/30 tracking-widest">VS</span>
+                         )}
                        </div>
 
-                       {/* Away Team */}
-                       <div className="flex-1 flex flex-col md:flex-row items-center justify-start gap-5 w-full z-10">
-                           {/* Render Away Score attached to Away Team if only Away is batting */}
-                           {!showTestScore && showAway && !showDualScore && (
-                             <div className="flex flex-col items-end mr-2 md:mr-5 md:border-r-2 border-primary/20 md:pr-5 mb-4 md:mb-0 text-center md:text-right">
-                               <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{away.runs}</span>
-                               {away.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2 uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md">{away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
-                             </div>
-                           )}
-                           
-                           <TeamLogo logo={team2Logo} name={team2Name} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
-                           <div className="text-center md:text-left">
-                               <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{team2Name}</h2>
-                               <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team2ShortName}</p>
+                       {/* Away Team (Right Side) */}
+                       <div className="flex justify-center md:justify-start z-10 w-full min-w-0">
+                           <div className="flex items-center gap-4 md:gap-5 lg:gap-6 min-w-0">
+                               
+                               {/* Invisible placeholder when Home is batting to keep Flags equidistant */}
+                               {!showTestScore && showHome && !showAway && !showDualScore && (
+                                   <div className="hidden md:block mr-2 pr-4 md:mr-4 md:pr-4 lg:mr-6 lg:pr-6 border-r-2 border-transparent md:w-[130px] lg:w-[150px] shrink-0" />
+                               )}
+
+                               {/* Score next to Away Team if only Away is batting */}
+                               {!showTestScore && showAway && !showDualScore && (
+                                   <div className="mr-2 pr-4 md:mr-4 md:pr-4 lg:mr-6 lg:pr-6 border-r-2 border-primary/20 relative flex items-center justify-end md:w-[130px] lg:w-[150px] shrink-0">
+                                       <span className="text-5xl md:text-5xl lg:text-6xl font-black tracking-tighter text-foreground leading-none">{away.runs}</span>
+                                       {away.overs && (
+                                           <div className="absolute top-[105%] right-4 md:right-4 lg:right-6 whitespace-nowrap">
+                                               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md">
+                                                   {away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS
+                                               </span>
+                                           </div>
+                                       )}
+                                   </div>
+                               )}
+                               
+                               <TeamLogo logo={team2Logo} name={team2Name} size="lg" className="w-16 h-12 md:w-20 md:h-14 lg:w-24 lg:h-16 object-contain shrink-0 drop-shadow-md" />
+                               <div className="text-left min-w-0">
+                                   <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground tracking-tight break-words">{team2Name}</h2>
+                                   <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team2ShortName}</p>
+                               </div>
                            </div>
                        </div>
                    </div>
