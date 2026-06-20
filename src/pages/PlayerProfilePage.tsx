@@ -68,6 +68,7 @@ type DetailTab = "traits" | "stats" | "awards" | "wagonwheel" | "matches";
 
 // Format tabs for API-driven batting stats
 const API_FORMAT_TABS: { key: BattingFormatKey; label: string }[] = [
+    { key: 'all', label: 'ALL' },
     { key: 'test', label: 'Test' },
     { key: 'odi', label: 'ODI' },
     { key: 't20', label: 'T20I' },
@@ -176,7 +177,7 @@ const PlayerProfilePage = () => {
     // Auto-select first available format when API data arrives
     useEffect(() => {
         if (hasApiData && apiBattingStats) {
-            const order: BattingFormatKey[] = ['odi', 'test', 't20', 'ipl'];
+            const order: BattingFormatKey[] = ['all', 'odi', 'test', 't20', 'ipl'];
             const firstAvailable = order.find(k => apiBattingStats[k] !== null);
             if (firstAvailable) {
                 setApiBattingFormat(firstAvailable);

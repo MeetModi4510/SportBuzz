@@ -439,7 +439,7 @@ export const PlayerComparison = () => {
     const playerA = sportPlayers.find(p => p.id === playerAId || String(p.id) === String(playerAId)) || null;
     const playerB = sportPlayers.find(p => p.id === playerBId || String(p.id) === String(playerBId)) || null;
 
-    const [apiFormat, setApiFormat] = useState<BattingFormatKey>('odi');
+    const [apiFormat, setApiFormat] = useState<BattingFormatKey>('all');
     const [statCategory, setStatCategory] = useState<'batting'|'bowling'>('batting');
 
     const { battingStats: statsA, isLoading: loadingA } = usePlayerBattingStats(playerA?.id || "");
@@ -659,7 +659,7 @@ export const PlayerComparison = () => {
                                     </button>
                                 </div>
                                 <div className="flex items-center justify-center gap-2">
-                                    {(['test', 'odi', 't20', 'ipl'] as BattingFormatKey[]).map((fmt) => (
+                                    {(['all', 'test', 'odi', 't20', 'ipl'] as BattingFormatKey[]).map((fmt) => (
                                         <button
                                             key={fmt}
                                             onClick={() => setApiFormat(fmt)}

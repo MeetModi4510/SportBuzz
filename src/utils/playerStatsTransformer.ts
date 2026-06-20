@@ -33,6 +33,7 @@ const FORMAT_MAP: Record<string, BattingFormatKey> = {
 };
 
 const FORMAT_COLORS: Record<BattingFormatKey, string> = {
+  all: '#8b5cf6',    // Purple
   test: '#ef4444',   // Red
   odi: '#3b82f6',    // Blue
   t20: '#10b981',    // Emerald
@@ -40,6 +41,7 @@ const FORMAT_COLORS: Record<BattingFormatKey, string> = {
 };
 
 const FORMAT_LABELS: Record<BattingFormatKey, string> = {
+  all: 'ALL',
   test: 'Test',
   odi: 'ODI',
   t20: 'T20I',
@@ -115,6 +117,7 @@ export function transformBattingStats(
   raw: CricbuzzBattingStatsResponse
 ): PlayerBattingStats {
   const result: PlayerBattingStats = {
+    all: null,
     test: null,
     odi: null,
     t20: null,
@@ -156,6 +159,45 @@ export function transformBattingStats(
         result[formatKey] = parseFormatRow(row.values, headers);
       }
     }
+  }
+  
+  // Aggregate 'all' format
+  let matches = 0, innings = 0, notOuts = 0, runs = 0, balls = 0;
+  let hundreds = 0, twoHundreds = 0, fifties = 0, fours = 0, sixes = 0, ducks = 0;
+  let highestScoreNum = 0;
+  let highestScoreStr = '0';
+  let hasAnyFormat = false;
+
+  (['test', 'odi', 't20'] as BattingFormatKey[]).forEach(fmt => {
+    const data = result[fmt];
+    if (data) {
+        hasAnyFormat = true;
+        matches += data.matches;
+        innings += data.innings;
+        notOuts += data.notOuts;
+        runs += data.runs;
+        balls += data.balls;
+        hundreds += data.hundreds;
+        twoHundreds += data.twoHundreds;
+        fifties += data.fifties;
+        fours += data.fours;
+        sixes += data.sixes;
+        ducks += data.ducks;
+        const hsNum = parseInt(data.highestScore.replace(/[^0-9]/g, '') || '0', 10);
+        if (hsNum > highestScoreNum) {
+            highestScoreNum = hsNum;
+            highestScoreStr = data.highestScore;
+        }
+    }
+  });
+
+  if (hasAnyFormat) {
+      result.all = {
+          matches, innings, notOuts, runs, balls, highestScore: highestScoreStr,
+          average: innings - notOuts > 0 ? parseFloat((runs / (innings - notOuts)).toFixed(2)) : 0,
+          strikeRate: balls > 0 ? parseFloat(((runs / balls) * 100).toFixed(2)) : 0,
+          hundreds, twoHundreds, fifties, fours, sixes, ducks
+      };
   }
 
   return result;
@@ -330,6 +372,7 @@ export function generateFormatRadarData(
 ): RadarDataPoint[] {
   // Sensible max baselines per format for normalization
   const baselines: Record<BattingFormatKey, { runs: number; avg: number; sr: number }> = {
+    all: { runs: 25000, avg: 50, sr: 100 },
     test: { runs: 15000, avg: 60, sr: 70 },
     odi: { runs: 14000, avg: 55, sr: 110 },
     t20: { runs: 4000, avg: 50, sr: 160 },

@@ -14,7 +14,7 @@ export interface CricbuzzFormatRow {
 // ─── Transformed Frontend Types ──────────────────────────────────────────────
 // Clean, typed representation for UI consumption.
 
-export type BattingFormatKey = 'test' | 'odi' | 't20' | 'ipl';
+export type BattingFormatKey = 'test' | 'odi' | 't20' | 'ipl' | 'all';
 
 export interface PlayerBattingFormat {
   matches: number;
@@ -38,6 +38,7 @@ export interface PlayerBattingStats {
   odi: PlayerBattingFormat | null;
   t20: PlayerBattingFormat | null;
   ipl: PlayerBattingFormat | null;
+  all: PlayerBattingFormat | null;
 }
 
 // ─── Chart Data Types ────────────────────────────────────────────────────────
