@@ -47,6 +47,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { FootballPitchLineup } from "@/components/FootballPitchLineup";
 import { CricketPlayerImage } from "@/components/CricketPlayerImage";
 import { SquadsTab } from "@/components/cricket/SquadsTab";
+import { PlayerProfilePanel } from "@/components/cricket/PlayerProfilePanel";
 import type { Match } from "@/data/types";
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -109,6 +110,8 @@ const MatchDetails = () => {
   const [activeTab, setActiveTab] = useState('summary');
   const [activeInningsTab, setActiveInningsTab] = useState<number | 'preview'>(-1);
   const [activeInningsIndex, setActiveInningsIndex] = useState<number>(-1);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [selectedPlayerName, setSelectedPlayerName] = useState<string>('');
 
   // Reset tab & index when navigating to a different match
   useEffect(() => {
@@ -789,125 +792,133 @@ const MatchDetails = () => {
                </div>
 
                {/* 2. Main Score Area */}
-               <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-10 md:py-14 gap-8 relative">
-                   {/* Home Team */}
-                   <div className="flex-1 flex flex-col md:flex-row items-center justify-end gap-5 w-full z-10">
-                       <div className="text-center md:text-right">
-                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{team1Name}</h2>
-                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team1ShortName}</p>
+               {(() => {
+                 const parseScore = (raw: string | undefined) => {
+                   if (!raw) return { runs: "—", overs: "" };
+                   const m = raw.match(/^([\d\/]+(?:\s*\(d\))?)\s*\((.+?)\)\s*$/);
+                   if (m) return { runs: m[1].trim(), overs: m[2].trim() };
+                   return { runs: raw, overs: "" };
+                 };
+                 const home = parseScore(dynamicHomeScoreStr);
+                 const away = parseScore(dynamicAwayScoreStr);
+                 const showAway = away.runs !== "—" && away.runs !== "";
+                 const showHome = home.runs !== "—" && home.runs !== "";
+                 const showDualScore = showHome && showAway;
+                 const showTestScore = isTestMatch;
+
+                 return (
+                   <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-10 md:py-14 gap-8 relative">
+                       {/* Home Team */}
+                       <div className="flex-1 flex flex-col md:flex-row items-center justify-end gap-5 w-full z-10">
+                           <div className="text-center md:text-right">
+                               <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{team1Name}</h2>
+                               <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team1ShortName}</p>
+                           </div>
+                           <TeamLogo logo={team1Logo} name={team1Name} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
+                           
+                           {/* Render Home Score attached to Home Team if only Home is batting */}
+                           {!showTestScore && showHome && !showDualScore && (
+                             <div className="flex flex-col items-start ml-2 md:ml-5 md:border-l-2 border-primary/20 md:pl-5 mt-4 md:mt-0 text-center md:text-left">
+                               <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{home.runs}</span>
+                               {home.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2 uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md">{home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                             </div>
+                           )}
                        </div>
-                       <TeamLogo logo={team1Logo} name={team1Name} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
-                   </div>
 
-                   {/* Score Center */}
-                   <div className="flex flex-col items-center justify-center shrink-0 z-10 min-w-[200px]">
-                     {isTestMatch && match.scoreBreakdown ? (
-                        <div className="flex flex-col items-center gap-3">
-                          <div className="flex items-center gap-6">
-                            <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">{match.scoreBreakdown.home.inn1 || "—"}</span>
-                            <span className="text-border text-2xl font-light">-</span>
-                            <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">{match.scoreBreakdown.away.inn1 || "—"}</span>
-                          </div>
-                          {(match.scoreBreakdown.home.inn2 || match.scoreBreakdown.away.inn2) && (
-                            <div className="flex items-center gap-4 text-muted-foreground">
-                              <span className="text-xl md:text-2xl font-bold">{match.scoreBreakdown.home.inn2 || "—"}</span>
-                              <span className="text-border text-lg">-</span>
-                              <span className="text-xl md:text-2xl font-bold">{match.scoreBreakdown.away.inn2 || "—"}</span>
-                            </div>
-                          )}
-                        </div>
-                     ) : isTestMatch && reconciledInningsScores && reconciledInningsScores.length > 0 ? (
-                        <div className="flex flex-col items-center justify-center w-full min-w-[240px] gap-4">
-                          {(() => {
-                            const homeInns = reconciledInningsScores.filter(i => i.team === 'home');
-                            const awayInns = reconciledInningsScores.filter(i => i.team === 'away');
-                            const maxInns = Math.max(homeInns.length, awayInns.length, 1);
-                            
-                            return Array.from({ length: maxInns }).map((_, idx) => {
-                              const home = homeInns[idx];
-                              const away = awayInns[idx];
-                              const isHomeLatest = idx === homeInns.length - 1;
-                              const isAwayLatest = idx === awayInns.length - 1;
-                              
-                              return (
-                                <div key={idx} className={cn("grid grid-cols-[1fr_auto_1fr] items-center w-full", idx > 0 && "pt-4 border-t border-border/30")}>
-                                  {/* Home Score */}
-                                  <div className="flex flex-col items-end pr-4 md:pr-6">
-                                    {home ? (
-                                      <>
-                                        <span className={cn("font-black tracking-tighter transition-all", isHomeLatest ? "text-4xl md:text-5xl text-foreground" : "text-2xl md:text-3xl text-muted-foreground")}>{home.score}</span>
-                                        {home.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversText(home.overs).replace(/ov/i, '').trim()} OVERS</span>}
-                                      </>
-                                    ) : (
-                                       <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">—</span>
-                                    )}
-                                  </div>
-                                  
-                                  {/* Center Inning Badge */}
-                                  <div className="flex items-center justify-center">
-                                     <div className="px-2.5 py-1 bg-muted/40 border border-border/40 rounded-full text-[9px] font-black text-muted-foreground uppercase tracking-[0.25em] shadow-sm">
-                                       INN {idx + 1}
-                                     </div>
-                                  </div>
-
-                                  {/* Away Score */}
-                                  <div className="flex flex-col items-start pl-4 md:pl-6">
-                                    {away ? (
-                                      <>
-                                        <span className={cn("font-black tracking-tighter transition-all", isAwayLatest ? "text-4xl md:text-5xl text-foreground" : "text-2xl md:text-3xl text-muted-foreground")}>{away.score}</span>
-                                        {away.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversText(away.overs).replace(/ov/i, '').trim()} OVERS</span>}
-                                      </>
-                                    ) : (
-                                       <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">—</span>
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            });
-                          })()}
-                        </div>
-                     ) : (
-                        (() => {
-                          const parseScore = (raw: string | undefined) => {
-                            if (!raw) return { runs: "—", overs: "" };
-                            const m = raw.match(/^([\d\/]+(?:\s*\(d\))?)\s*\((.+?)\)\s*$/);
-                            if (m) return { runs: m[1].trim(), overs: m[2].trim() };
-                            return { runs: raw, overs: "" };
-                          };
-                          const home = parseScore(dynamicHomeScoreStr);
-                          const away = parseScore(dynamicAwayScoreStr);
-                          const showAway = away.runs !== "—" && away.runs !== "";
-
-                          return (
-                            <div className="flex items-center gap-6 md:gap-10">
-                              <div className="flex flex-col items-center">
-                                <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground">{home.runs}</span>
-                                {home.overs && <span className="text-[10px] text-muted-foreground font-semibold mt-2 uppercase tracking-widest bg-secondary/30 px-3 py-1 rounded-full">{home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                       {/* Score Center (Test matches, Dual Scores, or empty spacer) */}
+                       <div className="flex flex-col items-center justify-center shrink-0 z-10 md:min-w-[40px]">
+                         {showTestScore && match.scoreBreakdown ? (
+                            <div className="flex flex-col items-center gap-3">
+                              <div className="flex items-center gap-6">
+                                <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">{match.scoreBreakdown.home.inn1 || "—"}</span>
+                                <span className="text-border text-2xl font-light">-</span>
+                                <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">{match.scoreBreakdown.away.inn1 || "—"}</span>
                               </div>
-                              {showAway && (
-                                <>
-                                  <span className="text-border text-4xl font-light mb-4">-</span>
-                                  <div className="flex flex-col items-center">
-                                    <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground">{away.runs}</span>
-                                    {away.overs && <span className="text-[10px] text-muted-foreground font-semibold mt-2 uppercase tracking-widest bg-secondary/30 px-3 py-1 rounded-full">{away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
-                                  </div>
-                                </>
+                              {(match.scoreBreakdown.home.inn2 || match.scoreBreakdown.away.inn2) && (
+                                <div className="flex items-center gap-4 text-muted-foreground">
+                                  <span className="text-xl md:text-2xl font-bold">{match.scoreBreakdown.home.inn2 || "—"}</span>
+                                  <span className="text-border text-lg">-</span>
+                                  <span className="text-xl md:text-2xl font-bold">{match.scoreBreakdown.away.inn2 || "—"}</span>
+                                </div>
                               )}
                             </div>
-                          );
-                        })()
-                     )}
-                   </div>
+                         ) : showTestScore && reconciledInningsScores && reconciledInningsScores.length > 0 ? (
+                            <div className="flex flex-col items-center justify-center w-full min-w-[240px] gap-4">
+                              {(() => {
+                                const homeInns = reconciledInningsScores.filter(i => i.team === 'home');
+                                const awayInns = reconciledInningsScores.filter(i => i.team === 'away');
+                                const maxInns = Math.max(homeInns.length, awayInns.length, 1);
+                                
+                                return Array.from({ length: maxInns }).map((_, idx) => {
+                                  const hInn = homeInns[idx];
+                                  const aInn = awayInns[idx];
+                                  const isHomeLatest = idx === homeInns.length - 1;
+                                  const isAwayLatest = idx === awayInns.length - 1;
+                                  
+                                  return (
+                                    <div key={idx} className={cn("grid grid-cols-[1fr_auto_1fr] items-center w-full", idx > 0 && "pt-4 border-t border-border/30")}>
+                                      <div className="flex flex-col items-end pr-4 md:pr-6">
+                                        {hInn ? (
+                                          <>
+                                            <span className={cn("font-black tracking-tighter transition-all", isHomeLatest ? "text-4xl md:text-5xl text-foreground" : "text-2xl md:text-3xl text-muted-foreground")}>{hInn.score}</span>
+                                            {hInn.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversText(hInn.overs).replace(/ov/i, '').trim()} OVERS</span>}
+                                          </>
+                                        ) : <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">—</span>}
+                                      </div>
+                                      <div className="flex items-center justify-center">
+                                         <div className="px-2.5 py-1 bg-muted/40 border border-border/40 rounded-full text-[9px] font-black text-muted-foreground uppercase tracking-[0.25em] shadow-sm">
+                                           INN {idx + 1}
+                                         </div>
+                                      </div>
+                                      <div className="flex flex-col items-start pl-4 md:pl-6">
+                                        {aInn ? (
+                                          <>
+                                            <span className={cn("font-black tracking-tighter transition-all", isAwayLatest ? "text-4xl md:text-5xl text-foreground" : "text-2xl md:text-3xl text-muted-foreground")}>{aInn.score}</span>
+                                            {aInn.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversText(aInn.overs).replace(/ov/i, '').trim()} OVERS</span>}
+                                          </>
+                                        ) : <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">—</span>}
+                                      </div>
+                                    </div>
+                                  );
+                                });
+                              })()}
+                            </div>
+                         ) : showDualScore ? (
+                            <div className="flex items-center gap-6 md:gap-10">
+                              <div className="flex flex-col items-center">
+                                <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{home.runs}</span>
+                                {home.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2.5 uppercase tracking-widest bg-secondary/40 px-3 py-1 rounded-md">{home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                              </div>
+                              <span className="text-border text-4xl font-light mb-4">-</span>
+                              <div className="flex flex-col items-center">
+                                <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{away.runs}</span>
+                                {away.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2.5 uppercase tracking-widest bg-secondary/40 px-3 py-1 rounded-md">{away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                              </div>
+                            </div>
+                         ) : (!showHome && !showAway && !showTestScore) ? (
+                            <span className="text-4xl text-muted-foreground/30 font-light">—</span>
+                         ) : null}
+                       </div>
 
-                   {/* Away Team */}
-                   <div className="flex-1 flex flex-col md:flex-row items-center justify-start gap-5 w-full z-10">
-                       <TeamLogo logo={team2Logo} name={team2Name} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
-                       <div className="text-center md:text-left">
-                           <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{team2Name}</h2>
-                           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team2ShortName}</p>
+                       {/* Away Team */}
+                       <div className="flex-1 flex flex-col md:flex-row items-center justify-start gap-5 w-full z-10">
+                           {/* Render Away Score attached to Away Team if only Away is batting */}
+                           {!showTestScore && showAway && !showDualScore && (
+                             <div className="flex flex-col items-end mr-2 md:mr-5 md:border-r-2 border-primary/20 md:pr-5 mb-4 md:mb-0 text-center md:text-right">
+                               <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{away.runs}</span>
+                               {away.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2 uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md">{away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                             </div>
+                           )}
+                           
+                           <TeamLogo logo={team2Logo} name={team2Name} size="lg" className="w-20 h-14 md:w-24 md:h-16 object-contain shrink-0 drop-shadow-md" />
+                           <div className="text-center md:text-left">
+                               <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{team2Name}</h2>
+                               <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team2ShortName}</p>
+                           </div>
                        </div>
                    </div>
-               </div>
+                 );
+               })()}
 
                {/* Football Goals Section */}
                {(() => {
@@ -1094,7 +1105,7 @@ const MatchDetails = () => {
                   className="flex items-center gap-2 px-1 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-all"
                 >
                   <Activity size={16} />
-                  Graphs
+                  Overs
                 </TabsTrigger>
               )}
               {(match?.sport === 'football' || match?.sport === 'cricket') && (
@@ -2026,8 +2037,13 @@ const MatchDetails = () => {
                                                            (isActiveAtCrease ? 'Batting' : (b.dismissal || 'Batting'));
 
                                   return (
-                                  <div key={bIdx} className={cn(
-                                    "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group",
+                                  <div key={bIdx} 
+                                    onClick={() => {
+                                      setSelectedPlayerId(b.cricbuzzPlayerId?.toString() || '0');
+                                      setSelectedPlayerName(b.name);
+                                    }}
+                                    className={cn(
+                                    "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group cursor-pointer",
                                     isYetToBat
                                       ? "border-border/20 opacity-60"
                                       : isActiveAtCrease
@@ -2038,7 +2054,6 @@ const MatchDetails = () => {
                                     {isActiveAtCrease && <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 blur-2xl rounded-full pointer-events-none"></div>}
 
                                     <div className="flex items-start gap-3 relative z-10">
-                                      {/* Image loads in parallel since faceImageId is already known */}
                                       <CricketPlayerImage
                                         playerId={undefined} // Force name-based resolution to get proper headshots
                                         playerName={b.name}
@@ -2207,8 +2222,13 @@ const MatchDetails = () => {
                             <h5 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 font-bold mb-4 px-1">Bowling</h5>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                               {inn.bowlers?.map((b: any, bIdx: number) => (
-                                <div key={bIdx} className={cn(
-                                  "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group",
+                                <div key={bIdx} 
+                                  onClick={() => {
+                                    setSelectedPlayerId(b.cricbuzzPlayerId?.toString() || '0');
+                                    setSelectedPlayerName(b.name);
+                                  }}
+                                  className={cn(
+                                  "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group cursor-pointer",
                                   parseInt(b.wickets) >= 3 ? "border-primary/40 shadow-[0_4px_20px_rgba(var(--primary),0.1)]" : "border-border/40 shadow-sm"
                                 )}>
                                   {/* Subtle background glow for high wicket takers */}
@@ -2739,6 +2759,7 @@ const MatchDetails = () => {
                           };
                       }) || [{ id: 1, name: 'Innings 1' }, { id: 2, name: 'Innings 2' }]} 
                       syncTrigger={scorecardSyncTrigger}
+                      isLive={match?.status === 'live'}
                   />
                 </Suspense>
               </TabsContent>
@@ -2768,6 +2789,13 @@ const MatchDetails = () => {
               </TabsContent>
             )}
           </Tabs>
+          
+          <PlayerProfilePanel 
+              playerId={selectedPlayerId} 
+              isOpen={!!selectedPlayerId} 
+              onClose={() => setSelectedPlayerId(null)} 
+              fallbackName={selectedPlayerName}
+          />
         </section>
       </div>
     </>

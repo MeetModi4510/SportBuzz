@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Clock, Loader2, AlertTriangle, Activity, TrendingUp, Target, Zap, Shield, ChevronDown, ChevronUp, BarChart3, Award } from "lucide-react";
 import { formatScoreString, formatOversText } from "@/lib/utils";
@@ -6,9 +6,10 @@ import {
     BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
     AreaChart, Area, PieChart, Pie, RadarChart, Radar, PolarGrid,
     PolarAngleAxis, PolarRadiusAxis, Legend, CartesianGrid, ScatterChart,
-    Scatter, ZAxis
+    Scatter, ZAxis, RadialBarChart, RadialBar, ComposedChart, Line, LabelList, Treemap
 } from "recharts";
 import type { Match } from "@/data/types";
+import { useMatchFieldData } from "@/hooks/useMatchFieldData";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const COLORS = {
@@ -165,9 +166,23 @@ export default function CricketPerformanceLab({
 
     const [selectedInnings, setSelectedInnings] = useState(0);
 
-    // ── Derived data ──────────────────────────────────────────────────────────
+    // ── Auto-select latest innings if live ────────────────────────────────────
     const innings = scorecardData?.innings || [];
-    const currentInnings = innings[selectedInnings];
+    useEffect(() => {
+        if (isLive && innings.length > 0) {
+            setSelectedInnings(innings.length - 1);
+        }
+    }, [isLive, innings.length]);
+
+    // ── Fetch extra partnership data ──────────────────────────────────────────
+    const { 
+        data: partnershipsData, 
+        loading: loadingPartnerships, 
+        error: partnershipsError 
+    } = useMatchFieldData(match.id, 'cbPartnershipGraph', true, undefined, undefined);
+
+    // ── Derived data ──────────────────────────────────────────────────────────
+    const currentInnings = innings[selectedInnings] || innings[0];
 
     // ── Partnership data ──────────────────────────────────────────────────────
     const partnerships = useMemo(() => {
@@ -286,7 +301,9 @@ export default function CricketPerformanceLab({
         if (!currentInnings?.fallOfWickets?.length) return [];
         const overMap: Record<number, number> = {};
         for (const f of currentInnings.fallOfWickets) {
-            const ov = Math.ceil(f.overs);
+            const parsedOvers = parseFloat(String(f.overs || '').replace(/[^0-9.]/g, ''));
+            if (isNaN(parsedOvers)) continue;
+            const ov = Math.ceil(parsedOvers) || 1;
             overMap[ov] = (overMap[ov] || 0) + 1;
         }
         return Object.entries(overMap)
@@ -376,6 +393,124 @@ export default function CricketPerformanceLab({
         if (!currentInnings) return 0;
         const total = currentInnings.extras?.total || 0;
         return currentInnings.score > 0 ? Math.round((total / currentInnings.score) * 1000) / 10 : 0;
+    }, [currentInnings]);
+
+    // ── 1. Bowler Workload & Efficiency (Radar) ──────────────────────────────
+    const bowlerRadarData = useMemo(() => {
+        if (!currentInnings?.bowlers?.length) return [];
+        // Get top 4 bowlers by overs
+        const topBowlers = [...currentInnings.bowlers].sort((a, b) => parseOvers(b.overs) - parseOvers(a.overs)).slice(0, 4);
+        
+        const maxOvers = Math.max(...topBowlers.map(b => parseOvers(b.overs)), 1);
+        const maxMaidens = Math.max(...topBowlers.map(b => b.maidens), 1);
+        const maxEcon = Math.max(...topBowlers.map(b => parseFloat(b.economy) || 0), 1);
+        const maxWickets = Math.max(...topBowlers.map(b => b.wickets), 1);
+
+        // Normalize stats
+        return topBowlers.map(b => ({
+            name: shortName(b.name),
+            Overs: Math.round((parseOvers(b.overs) / maxOvers) * 100),
+            Maidens: Math.round((b.maidens / maxMaidens) * 100),
+            Economy: Math.round((1 - (parseFloat(b.economy) || 0) / (maxEcon * 1.5)) * 100), // Inverse: lower is better
+            Wickets: Math.round((b.wickets / maxWickets) * 100),
+            fullObj: b
+        }));
+    }, [currentInnings]);
+
+    // ── 2. Batsman Aggression Index (Scatter Plot) ───────────────────────────
+    const batsmanAggressionData = useMemo(() => {
+        if (!currentInnings?.batsmen?.length) return [];
+        return currentInnings.batsmen
+            .filter(b => b.balls > 0 && b.runs > 0)
+            .map(b => {
+                const boundaries = b.fours + b.sixes;
+                const sr = parseFloat(b.strikeRate) || 0;
+                return {
+                    name: shortName(b.name),
+                    sr: sr,
+                    boundaries: boundaries,
+                    runs: b.runs,
+                    balls: b.balls
+                };
+            })
+            .sort((a, b) => b.runs - a.runs); // Larger runs rendered later for z-index
+    }, [currentInnings]);
+
+    // ── 3. Batter Contribution Treemap ────────────────────────────────────────
+    const treemapData = useMemo(() => {
+        if (!currentInnings?.batsmen?.length) return [];
+        const data = currentInnings.batsmen
+            .filter(b => b.runs > 0)
+            .map((b, i) => ({
+                name: shortName(b.name),
+                size: b.runs,
+                balls: b.balls,
+                fill: i % 2 === 0 ? COLORS.primary : COLORS.secondary // Base alternate fill
+            }));
+        // Need a root wrapper for recharts treemap
+        return [{ name: "Innings", children: data }];
+    }, [currentInnings]);
+
+    // ── 4. Bowling Impact Bubble Chart (Threat Matrix) ────────────────────────
+    const threatMatrixData = useMemo(() => {
+        if (!currentInnings?.bowlers?.length) return [];
+        return currentInnings.bowlers
+            .filter(b => parseOvers(b.overs) > 0)
+            .map(b => {
+                const overs = parseOvers(b.overs);
+                const balls = Math.floor(overs) * 6 + Math.round((overs % 1) * 10);
+                const ballsPerWicket = b.wickets > 0 ? balls / b.wickets : balls * 1.5; // Penalty for 0 wickets
+                const econ = parseFloat(b.economy) || 0;
+                return {
+                    name: shortName(b.name),
+                    econ: econ,
+                    bpw: Math.round(ballsPerWicket * 10) / 10,
+                    wickets: b.wickets,
+                    runs: b.runs,
+                    balls: balls
+                };
+            });
+    }, [currentInnings]);
+
+    // ── 5. Boundary Dependency Index (Stacked Bar) ────────────────────────────
+    const boundaryDependencyData = useMemo(() => {
+        if (!currentInnings?.batsmen?.length) return [];
+        return currentInnings.batsmen
+            .filter(b => b.runs > 0)
+            .map(b => {
+                const boundaryRuns = (b.fours * 4) + (b.sixes * 6);
+                const runningRuns = b.runs - boundaryRuns;
+                
+                // For 100% stacked
+                const total = b.runs;
+                const boundaryPct = Math.round((boundaryRuns / total) * 100);
+                const runningPct = Math.round((runningRuns / total) * 100);
+
+                return {
+                    name: shortName(b.name),
+                    boundaryPct,
+                    runningPct,
+                    boundaryRuns,
+                    runningRuns,
+                    total
+                };
+            })
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 8); // Top 8 contributors
+    }, [currentInnings]);
+
+    // ── 6. Bowling Control vs Leakage (Dual Metric) ───────────────────────────
+    const bowlingControlData = useMemo(() => {
+        if (!currentInnings?.bowlers?.length) return [];
+        return currentInnings.bowlers
+            .filter(b => parseOvers(b.overs) > 0)
+            .map(b => ({
+                name: shortName(b.name),
+                maidens: b.maidens,
+                economy: parseFloat(b.economy) || 0,
+                overs: parseOvers(b.overs)
+            }))
+            .sort((a, b) => b.economy - a.economy); // Highest econ first
     }, [currentInnings]);
 
     // ── Player radar (top batter + top bowler from current innings) ────────
@@ -562,35 +697,63 @@ export default function CricketPerformanceLab({
                 </div>
             )}
 
-            {/* ── 2. Run Rate Comparison (Cross-Innings) ─────────────────────── */}
+            {/* ── 2. Run Rate Dynamics (Cross-Innings) ─────────────────────── */}
             {rrComparison.length > 1 && (
                 <AnalyticsSection
                     icon={<TrendingUp size={18} className="text-blue-500" />}
-                    title="Run Rate Comparison"
-                    subtitle="Across all innings"
+                    title="Run Rate Dynamics"
+                    subtitle="Pacing comparison across all innings"
                 >
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        {rrComparison.map((r, i) => (
-                            <div key={i} className="bg-secondary/20 rounded-lg p-3 text-center border border-border/40">
-                                <p className="text-xs text-muted-foreground font-medium mb-1">{r.name}</p>
-                                <p className="text-xl font-bold font-mono" style={{ color: r.fill }}>{r.rr}</p>
-                                <p className="text-[10px] text-muted-foreground">{r.score}/{r.wickets} ({formatOversText(r.overs)})</p>
-                            </div>
-                        ))}
+                    <div className="pt-2">
+                        <div className="bg-card border border-border/50 rounded-2xl p-4 sm:p-6 shadow-sm mt-2">
+                            <ResponsiveContainer width="100%" height={Math.max(180, rrComparison.length * 70)}>
+                                <BarChart 
+                                    data={rrComparison} 
+                                    layout="vertical" 
+                                    margin={{ top: 10, right: 60, left: 20, bottom: 10 }}
+                                    barSize={32}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
+                                    <XAxis type="number" hide />
+                                    <YAxis 
+                                        type="category" 
+                                        dataKey="name" 
+                                        axisLine={false} 
+                                        tickLine={false} 
+                                        tick={{ fill: 'hsl(var(--foreground))', fontSize: 13, fontWeight: 700 }} 
+                                        width={80}
+                                    />
+                                    <Tooltip 
+                                        cursor={{ fill: 'hsl(var(--muted)/0.3)', radius: 8 }} 
+                                        contentStyle={TOOLTIP_STYLE}
+                                        formatter={(value: number, name: string, props: any) => {
+                                            const data = props.payload;
+                                            return [
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-lg leading-none" style={{ color: data.fill }}>{value.toFixed(2)} Run Rate</span>
+                                                    <span className="text-xs text-muted-foreground mt-1">
+                                                        {data.score}/{data.wickets} <span className="opacity-50 mx-1">•</span> {formatOversText(data.overs)}
+                                                    </span>
+                                                </div>,
+                                                "" // empty name so it doesn't show "Run Rate: X"
+                                            ];
+                                        }}
+                                    />
+                                    <Bar dataKey="rr" radius={[0, 8, 8, 0]} isAnimationActive={false}>
+                                        {rrComparison.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                                        ))}
+                                        <LabelList 
+                                            dataKey="rr" 
+                                            position="right" 
+                                            formatter={(value: number) => value.toFixed(2)}
+                                            style={{ fill: 'hsl(var(--foreground))', fontSize: 15, fontWeight: 800 }}
+                                        />
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
-                    <ResponsiveContainer width="100%" height={200}>
-                        <BarChart data={rrComparison} barSize={40}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                            <XAxis dataKey="name" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                            <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
-                            <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#ffffff" }} itemStyle={{ color: "#ffffff" }} />
-                            <Bar dataKey="rr" name="Run Rate" radius={[6, 6, 0, 0]}>
-                                {rrComparison.map((r, i) => (
-                                    <Cell key={i} fill={r.fill} />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
                 </AnalyticsSection>
             )}
 
@@ -663,28 +826,96 @@ export default function CricketPerformanceLab({
                 </AnalyticsSection>
             )}
 
-            {/* ── 4. Partnership Analysis ───────────────────────────────────── */}
-            {partnerships.length > 0 && (
-                <AnalyticsSection
-                    icon={<Target size={18} className="text-violet-500" />}
-                    title="Partnership Breakdown"
-                    subtitle={`${currentInnings?.teamShortName || ''} — Runs scored between each wicket`}
-                >
-                    <ResponsiveContainer width="100%" height={Math.max(180, partnerships.length * 36)}>
-                        <BarChart data={partnerships} layout="vertical" barSize={20}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                            <XAxis type="number" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
-                            <YAxis type="category" dataKey="label" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} width={40} />
-                            <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "#ffffff" }} itemStyle={{ color: "#ffffff" }} formatter={(v: number) => [`${v} runs`, "Partnership"]} />
-                            <Bar dataKey="runs" name="Runs" radius={[0, 6, 6, 0]}>
-                                {partnerships.map((p, i) => (
-                                    <Cell key={i} fill={p.runs > 50 ? COLORS.accent : p.runs > 25 ? COLORS.primary : COLORS.muted} />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                </AnalyticsSection>
-            )}
+            {/* ── 4.5. Partnership Contributions ────────────────────────────── */}
+            {(() => {
+                if (loadingPartnerships) {
+                    return (
+                        <div className="bg-card border border-border rounded-xl p-12 text-center">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-3" />
+                            <p className="text-sm text-muted-foreground">Loading Partnership Contributions...</p>
+                        </div>
+                    );
+                }
+
+                if (partnershipsError || !partnershipsData || !Array.isArray(partnershipsData)) {
+                    return null;
+                }
+
+                const currentInningsNum = currentInnings?.inningsNum || selectedInnings + 1;
+                const inningData = partnershipsData.find((p: any) => p.inningsID === currentInningsNum);
+                
+                if (!inningData || !inningData.partnershipDataDTO || inningData.partnershipDataDTO.length === 0) {
+                    return null;
+                }
+
+                return (
+                    <AnalyticsSection
+                        icon={<Target size={18} className="text-emerald-500" />}
+                        title="Partnership Contributions"
+                        subtitle={`${currentInnings?.teamShortName || ''} — Individual runs per partnership`}
+                    >
+                        <div className="space-y-4">
+                            {inningData.partnershipDataDTO.map((p: any, i: number) => {
+                                const total = p.totalRuns || 1;
+                                const p1Pct = Math.max(5, (p.bat1Runs / total) * 100);
+                                const p2Pct = Math.max(5, (p.bat2Runs / total) * 100);
+
+                                return (
+                                    <div key={i} className="bg-muted/5 hover:bg-muted/10 transition-colors border border-border/30 rounded-[1.5rem] p-5 relative overflow-hidden group">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        
+                                        <div className="flex justify-between items-center mb-4 relative z-10">
+                                            {/* Bat 1 */}
+                                            <div className="flex items-center gap-3.5 w-[35%]">
+                                                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full p-0.5 bg-blue-500/20 shrink-0">
+                                                    <img 
+                                                        src={`https://static.cricbuzz.com/a/img/v1/152x152/i1/c${p.bat1ImageID}/player.jpg`} 
+                                                        className="w-full h-full rounded-full object-cover bg-card" 
+                                                        onError={e => e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.bat1Name)}&background=random`} 
+                                                        alt={p.bat1Name}
+                                                    />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-bold truncate text-foreground">{p.bat1Name}</p>
+                                                    <p className="text-xs font-semibold text-blue-500">{p.bat1Runs} <span className="text-muted-foreground font-medium">({p.bat1balls})</span></p>
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Center Total */}
+                                            <div className="flex flex-col items-center justify-center w-[20%]">
+                                                <span className="text-2xl md:text-3xl font-black text-foreground drop-shadow-sm">{p.totalRuns}</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-0.5">{p.totalBalls} balls</span>
+                                            </div>
+
+                                            {/* Bat 2 */}
+                                            <div className="flex items-center justify-end gap-3.5 w-[35%] text-right">
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-bold truncate text-foreground">{p.bat2Name}</p>
+                                                    <p className="text-xs font-semibold text-orange-500">{p.bat2Runs} <span className="text-muted-foreground font-medium">({p.bat2balls})</span></p>
+                                                </div>
+                                                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full p-0.5 bg-orange-500/20 shrink-0">
+                                                    <img 
+                                                        src={`https://static.cricbuzz.com/a/img/v1/152x152/i1/c${p.bat2ImageID}/player.jpg`} 
+                                                        className="w-full h-full rounded-full object-cover bg-card" 
+                                                        onError={e => e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.bat2Name)}&background=random`} 
+                                                        alt={p.bat2Name}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Stacked Bar Indicator */}
+                                        <div className="h-2 w-full bg-muted/50 rounded-full overflow-hidden flex relative z-10 shadow-inner">
+                                            <div className="h-full bg-gradient-to-r from-blue-600 to-blue-400 transition-all duration-700" style={{ width: `${p1Pct}%` }} />
+                                            <div className="h-full bg-gradient-to-l from-orange-600 to-orange-400 transition-all duration-700" style={{ width: `${p2Pct}%` }} />
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </AnalyticsSection>
+                );
+            })()}
 
             {/* ── 5. Boundary Analysis ──────────────────────────────────────── */}
             {boundaryData.length > 0 && (
@@ -900,6 +1131,274 @@ export default function CricketPerformanceLab({
                             </div>
                         </div>
                     </div>
+                </AnalyticsSection>
+            )}
+            {/* ── 12. Bowler Workload & Efficiency (Radar) ──────────────────── */}
+            {bowlerRadarData.length > 2 && (
+                <AnalyticsSection
+                    icon={<Target size={18} className="text-cyan-500" />}
+                    title="Bowler Workload & Efficiency"
+                    subtitle="Multi-axis comparison of the top bowlers (0-100 normalized score)"
+                    defaultOpen={false}
+                >
+                    <ResponsiveContainer width="100%" height={300}>
+                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={bowlerRadarData}>
+                            <PolarGrid stroke="hsl(var(--border))" opacity={0.6} />
+                            <PolarAngleAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--foreground))", fontWeight: 600 }} />
+                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                            
+                            <Radar name="Wickets" dataKey="Wickets" stroke={COLORS.danger} fill={COLORS.danger} fillOpacity={0.4} strokeWidth={2} />
+                            <Radar name="Economy (Inv)" dataKey="Economy" stroke={COLORS.primary} fill={COLORS.primary} fillOpacity={0.2} strokeWidth={2} />
+                            <Radar name="Overs" dataKey="Overs" stroke={COLORS.warning} fill={COLORS.warning} fillOpacity={0.1} strokeWidth={2} />
+                            
+                            <Tooltip contentStyle={TOOLTIP_STYLE} />
+                            <Legend wrapperStyle={{ fontSize: 12, paddingTop: 10 }} />
+                        </RadarChart>
+                    </ResponsiveContainer>
+                </AnalyticsSection>
+            )}
+
+            {/* ── 13. Batsman Aggression Index (Scatter Plot) ───────────────── */}
+            {batsmanAggressionData.length > 0 && (
+                <AnalyticsSection
+                    icon={<Zap size={18} className="text-amber-500" />}
+                    title="Batsman Aggression Index"
+                    subtitle="Strike Rate vs Boundaries (Bubble size = Runs scored)"
+                    defaultOpen={false}
+                >
+                    <ResponsiveContainer width="100%" height={320}>
+                        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: -10 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                            <XAxis 
+                                type="number" 
+                                dataKey="sr" 
+                                name="Strike Rate" 
+                                unit="" 
+                                tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                                domain={['auto', 'auto']}
+                                label={{ value: "Strike Rate", position: "insideBottom", offset: -10, fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                            />
+                            <YAxis 
+                                type="number" 
+                                dataKey="boundaries" 
+                                name="Boundaries" 
+                                tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                                label={{ value: "Boundaries (4s+6s)", angle: -90, position: "insideLeft", fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                            />
+                            <ZAxis type="number" dataKey="runs" range={[50, 400]} name="Runs" />
+                            <Tooltip 
+                                cursor={{ strokeDasharray: '3 3' }} 
+                                content={({ active, payload }) => {
+                                    if (active && payload && payload.length) {
+                                        const data = payload[0].payload;
+                                        return (
+                                            <div className="bg-card/95 backdrop-blur-sm border border-border p-3 rounded-xl shadow-lg min-w-[140px]">
+                                                <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border/50">
+                                                    <div className="w-2 h-2 rounded-full bg-amber-500" />
+                                                    <span className="font-bold text-sm text-foreground uppercase tracking-wider">{data.name}</span>
+                                                </div>
+                                                <div className="flex flex-col gap-1.5 text-xs">
+                                                    <div className="flex justify-between items-center gap-4">
+                                                        <span className="text-muted-foreground">Runs</span>
+                                                        <span className="font-bold text-foreground text-sm">{data.runs}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center gap-4">
+                                                        <span className="text-muted-foreground">Strike Rate</span>
+                                                        <span className="font-medium text-foreground">{data.sr}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center gap-4">
+                                                        <span className="text-muted-foreground">Boundaries</span>
+                                                        <span className="font-medium text-foreground">{data.boundaries}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                }}
+                            />
+                            <Scatter name="Batsmen" data={batsmanAggressionData} fill={COLORS.primary}>
+                                {batsmanAggressionData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS.primary} opacity={0.8} />
+                                ))}
+                            </Scatter>
+                        </ScatterChart>
+                    </ResponsiveContainer>
+                </AnalyticsSection>
+            )}
+
+            {/* ── 14. Batter Contribution Treemap ───────────────────────────── */}
+            {treemapData[0].children && treemapData[0].children.length > 0 && (
+                <AnalyticsSection
+                    icon={<BarChart3 size={18} className="text-indigo-400" />}
+                    title="Batter Contribution Treemap"
+                    subtitle="Visual hierarchy of run scorers (Box size = Runs)"
+                    defaultOpen={false}
+                >
+                    <ResponsiveContainer width="100%" height={280}>
+                        <Treemap
+                            data={treemapData}
+                            dataKey="size"
+                            stroke="hsl(var(--background))"
+                            fill={COLORS.primary}
+                            aspectRatio={4 / 3}
+                        >
+                            <Tooltip 
+                                contentStyle={TOOLTIP_STYLE}
+                                formatter={(value: number, name: string, props: any) => [`${value} Runs`, props.payload.name]}
+                            />
+                        </Treemap>
+                    </ResponsiveContainer>
+                </AnalyticsSection>
+            )}
+
+            {/* ── 15. Bowling Impact Bubble Chart (Threat Matrix) ───────────── */}
+            {threatMatrixData.length > 0 && (
+                <AnalyticsSection
+                    icon={<Shield size={18} className="text-rose-500" />}
+                    title="Threat Matrix (Bowling Impact)"
+                    subtitle="Economy vs Balls per Wicket (Bubble size = Wickets)"
+                    defaultOpen={false}
+                >
+                    <ResponsiveContainer width="100%" height={320}>
+                        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: -10 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                            <XAxis 
+                                type="number" 
+                                dataKey="econ" 
+                                name="Economy Rate" 
+                                tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                                domain={['auto', 'auto']}
+                                label={{ value: "Economy Rate", position: "insideBottom", offset: -10, fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                            />
+                            <YAxis 
+                                type="number" 
+                                dataKey="bpw" 
+                                name="Balls per Wicket" 
+                                reversed // Lower balls per wicket is better, so it goes up
+                                tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                                label={{ value: "Balls per Wicket", angle: -90, position: "insideLeft", fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                            />
+                            <ZAxis type="number" dataKey="wickets" range={[50, 600]} name="Wickets" />
+                            <Tooltip 
+                                cursor={{ strokeDasharray: '3 3' }} 
+                                content={({ active, payload }) => {
+                                    if (active && payload && payload.length) {
+                                        const data = payload[0].payload;
+                                        return (
+                                            <div className="bg-card/95 backdrop-blur-sm border border-border p-3 rounded-xl shadow-lg min-w-[140px]">
+                                                <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border/50">
+                                                    <div className="w-2 h-2 rounded-full bg-rose-500" />
+                                                    <span className="font-bold text-sm text-foreground uppercase tracking-wider">{data.name}</span>
+                                                </div>
+                                                <div className="flex flex-col gap-1.5 text-xs">
+                                                    <div className="flex justify-between items-center gap-4">
+                                                        <span className="text-muted-foreground">Wickets</span>
+                                                        <span className="font-bold text-rose-500 text-sm">{data.wickets}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center gap-4">
+                                                        <span className="text-muted-foreground">Economy</span>
+                                                        <span className="font-medium text-foreground">{data.econ}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center gap-4">
+                                                        <span className="text-muted-foreground">Balls/Wicket</span>
+                                                        <span className="font-medium text-foreground">{data.bpw}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                }}
+                            />
+                            <Scatter name="Bowlers" data={threatMatrixData} fill={COLORS.danger}>
+                                {threatMatrixData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS.danger} opacity={entry.wickets > 0 ? 0.8 : 0.3} />
+                                ))}
+                            </Scatter>
+                        </ScatterChart>
+                    </ResponsiveContainer>
+                </AnalyticsSection>
+            )}
+
+            {/* ── 16. Boundary Dependency Index ─────────────────────────────── */}
+            {boundaryDependencyData.length > 0 && (
+                <AnalyticsSection
+                    icon={<TrendingUp size={18} className="text-fuchsia-500" />}
+                    title="Boundary Dependency Index"
+                    subtitle="Runs from boundaries vs running (100% normalized)"
+                    defaultOpen={false}
+                >
+                    <ResponsiveContainer width="100%" height={280}>
+                        <BarChart 
+                            data={boundaryDependencyData} 
+                            layout="vertical"
+                            margin={{ top: 10, right: 30, left: 10, bottom: 0 }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="hsl(var(--border))" opacity={0.3} />
+                            <XAxis type="number" hide domain={[0, 100]} />
+                            <YAxis 
+                                type="category" 
+                                dataKey="name" 
+                                axisLine={false} 
+                                tickLine={false} 
+                                tick={{ fill: 'hsl(var(--foreground))', fontSize: 11, fontWeight: 600 }} 
+                                width={70}
+                            />
+                            <Tooltip 
+                                cursor={{ fill: 'hsl(var(--muted)/0.2)', radius: 4 }} 
+                                contentStyle={TOOLTIP_STYLE}
+                                formatter={(value: number, name: string) => [`${value}%`, name === 'boundaryPct' ? 'Boundaries' : 'Running']}
+                            />
+                            <Legend wrapperStyle={{ fontSize: 12 }} />
+                            <Bar dataKey="boundaryPct" name="Boundary Runs" stackId="a" fill={COLORS.primary} radius={[0, 0, 0, 4]}>
+                                <LabelList dataKey="boundaryPct" position="inside" formatter={(v: number) => v > 10 ? `${v}%` : ''} fill="#fff" fontSize={11} fontWeight={600} />
+                            </Bar>
+                            <Bar dataKey="runningPct" name="Running Runs" stackId="a" fill={COLORS.muted} radius={[0, 4, 4, 0]}>
+                                <LabelList dataKey="runningPct" position="inside" formatter={(v: number) => v > 10 ? `${v}%` : ''} fill="#fff" fontSize={11} fontWeight={600} />
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </AnalyticsSection>
+            )}
+
+            {/* ── 17. Bowling Control vs Leakage ────────────────────────────── */}
+            {bowlingControlData.length > 0 && (
+                <AnalyticsSection
+                    icon={<Activity size={18} className="text-emerald-500" />}
+                    title="Bowling Control vs Leakage"
+                    subtitle="Maiden overs bowled vs Economy Rate"
+                    defaultOpen={false}
+                >
+                    <ResponsiveContainer width="100%" height={280}>
+                        <ComposedChart data={bowlingControlData} margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                            <XAxis 
+                                dataKey="name" 
+                                scale="band" 
+                                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} 
+                            />
+                            <YAxis 
+                                yAxisId="left" 
+                                orientation="left" 
+                                tick={{ fill: COLORS.accent, fontSize: 11 }} 
+                                label={{ value: 'Maiden Overs', angle: -90, position: 'insideLeft', fill: COLORS.accent, fontSize: 12 }} 
+                            />
+                            <YAxis 
+                                yAxisId="right" 
+                                orientation="right" 
+                                tick={{ fill: COLORS.danger, fontSize: 11 }} 
+                                label={{ value: 'Economy Rate', angle: 90, position: 'insideRight', fill: COLORS.danger, fontSize: 12 }} 
+                            />
+                            <Tooltip 
+                                contentStyle={TOOLTIP_STYLE} 
+                                cursor={{ fill: 'hsl(var(--muted)/0.2)' }}
+                            />
+                            <Legend wrapperStyle={{ fontSize: 12 }} />
+                            <Bar yAxisId="left" dataKey="maidens" name="Maidens" fill={COLORS.accent} barSize={20} radius={[4, 4, 0, 0]} />
+                            <Line yAxisId="right" type="monotone" dataKey="economy" name="Economy Rate" stroke={COLORS.danger} strokeWidth={3} dot={{ r: 4, fill: COLORS.danger }} />
+                        </ComposedChart>
+                    </ResponsiveContainer>
                 </AnalyticsSection>
             )}
         </div>
