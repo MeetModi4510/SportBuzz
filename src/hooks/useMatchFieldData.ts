@@ -67,7 +67,8 @@ export function useMatchFieldData(
     field: FieldType = 'matchInfo', 
     enabled: boolean = true, 
     slug?: string, 
-    syncTrigger?: number
+    syncTrigger?: number,
+    disableAutoRefresh: boolean = false
 ): FieldDataResult {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -84,7 +85,12 @@ export function useMatchFieldData(
         if (!matchId) return;
 
         const cacheKey = getCacheKey(matchId, field, slug);
-        const ttl      = FIELD_TTL[field] || 60000;
+        let ttl      = FIELD_TTL[field] || 60000;
+        
+        // Upgrade cache to 24 hours if match is completed/upcoming
+        if (disableAutoRefresh && ['cbScorecard', 'cbCommentary', 'commentary', 'cbFullCommentary', 'cbBallMap', 'cbPartnershipGraph'].includes(field)) {
+            ttl = 24 * 60 * 60 * 1000;
+        }
 
         // Check cache unless caller explicitly bypasses (auto-refresh timer)
         if (!bypassCache) {
@@ -179,7 +185,7 @@ export function useMatchFieldData(
             autoRefreshId.current = null;
         }
 
-        if (syncTrigger !== undefined) return;
+        if (syncTrigger !== undefined || disableAutoRefresh) return;
 
         const ttl = FIELD_TTL[field] || 60000;
         autoRefreshId.current = setTimeout(async () => {
@@ -224,7 +230,12 @@ export function useMatchFieldData(
         }
 
         const cacheKey = getCacheKey(matchId, field, slug);
-        const ttl      = FIELD_TTL[field] || 60000;
+        let ttl      = FIELD_TTL[field] || 60000;
+        
+        if (disableAutoRefresh && ['cbScorecard', 'cbCommentary', 'commentary', 'cbFullCommentary', 'cbBallMap', 'cbPartnershipGraph'].includes(field)) {
+            ttl = 24 * 60 * 60 * 1000;
+        }
+        
         const cached   = fieldCache.get(cacheKey);
 
         if (isCacheValid(cached, ttl)) {
