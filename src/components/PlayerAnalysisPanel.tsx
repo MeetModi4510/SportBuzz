@@ -944,8 +944,7 @@ const TennisPanels = ({ player, teamColor }: { player: AnalysisPlayer; teamColor
 // ═══════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════
-export const PlayerAnalysisPanel = () => {
-    const [activeSport, setActiveSport] = useState<AnalysisSport>("cricket");
+export const PlayerAnalysisPanel = ({ activeSport }: { activeSport: AnalysisSport }) => {
     const [selectedPlayerId, setSelectedPlayerId] = useState<string>("cr1");
     const [selectedCountry, setSelectedCountry] = useState<string>("All");
     const [apiBattingFormat, setApiBattingFormat] = useState<BattingFormatKey>('odi');
@@ -968,15 +967,13 @@ export const PlayerAnalysisPanel = () => {
             : allPlayers.filter(p => p.country === selectedCountry);
     }, [allPlayers, selectedCountry]);
 
-    // Reset selection when sport changes
-    const handleSportChange = (sport: AnalysisSport) => {
-        setActiveSport(sport);
+    // Reset selection when sport changes (we use an effect to catch external sport changes if needed, but since activeSport is a prop, we can just reset if it changes)
+    // We'll reset selectedPlayerId when activeSport changes
+    useMemo(() => {
         setSelectedCountry("All");
-        // We'll set the first player of the new list in the effect below or just derive it
-        // But for safety, let's grab the first one from the new sport
-        const firstPlayer = ANALYSIS_PLAYERS[sport][0];
-        setSelectedPlayerId(firstPlayer.id);
-    };
+        const firstPlayer = ANALYSIS_PLAYERS[activeSport][0];
+        if (firstPlayer) setSelectedPlayerId(firstPlayer.id);
+    }, [activeSport]);
 
     // Ensure selectedPlayerId is valid for the current filtered list (if possible)
     // If the filtered list doesn't contain the selected player, switch to the first one
@@ -1029,34 +1026,6 @@ export const PlayerAnalysisPanel = () => {
 
     return (
         <div className="space-y-6">
-            {/* ── Premium Minimalist Sport Selector ── */}
-            <div className="inline-flex items-center gap-1.5 p-1.5 rounded-[18px] bg-secondary/30 border border-border/40 shadow-inner backdrop-blur-md">
-                {(Object.keys(SPORT_LABELS) as AnalysisSport[]).map(sport => {
-                    const isActive = activeSport === sport;
-                    return (
-                        <button
-                            key={sport}
-                            onClick={() => handleSportChange(sport)}
-                            className={cn(
-                                "relative px-6 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-300 flex items-center gap-2 outline-none",
-                                isActive
-                                    ? "text-foreground shadow-md bg-background border border-border/50 scale-[1.02]"
-                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 border border-transparent"
-                            )}
-                        >
-                            <span className={cn(
-                                "text-base transition-all duration-300",
-                                isActive ? "scale-110" : "grayscale-[50%] opacity-70"
-                            )}>
-                                {SPORT_LABELS[sport].icon}
-                            </span>
-                            <span className="tracking-wide">{SPORT_LABELS[sport].label}</span>
-                        </button>
-                    );
-                })}
-            </div>
-
-            <div className="grid lg:grid-cols-3 gap-6">
                 {/* ── Player List ── */}
                 <div className="space-y-4">
                     <h3 className="text-xs font-bold text-muted-foreground/70 uppercase tracking-widest px-1 flex items-center gap-2">
@@ -1581,7 +1550,6 @@ export const PlayerAnalysisPanel = () => {
                     </Section>
                 </div>
             </div>
-        </div>
     );
 };
 

@@ -12,6 +12,7 @@ import { useRecentTransfers } from "../../hooks/football/useFootballQueries";
 import { useTrendingPlayers, TrendingPlayerData } from "../../hooks/football/useTrendingPlayers";
 import { TrendingPlayerCard } from "../../components/football/TrendingPlayerCard";
 import { TrendingPlayerModal } from "../../components/football/TrendingPlayerModal";
+
 import { Loader2, ArrowRightLeft, TrendingUp } from "lucide-react";
 import { PRIORITY_CLUBS } from "../../services/football/footballApi";
 import { useWorldCupTheme } from "../../hooks/football/useWorldCupTheme";

@@ -37,6 +37,8 @@ import { protect } from '../middleware/authMiddleware.js';
 import { getDashboardMatches, getCategorizedMatches, getMatchDetail, getGlobalFootballNews, getFootballLiveNews, clearCache } from '../services/footballDataService.js';
 import livescore6Service from '../services/livescore6Service.js';
 import * as espnService from '../services/espnService.js';
+import { fotmobService } from '../services/fotmobService.js';
+import { imageQueueService } from '../services/imageQueueService.js';
 
 const router = express.Router();
 
@@ -58,6 +60,51 @@ router.get('/proxy/*', async (req, res) => {
     } catch (err) {
         console.error(`[Proxy] /${req.params[0]} Error:`, err.message);
         res.status(err.response?.status || 500).json(err.response?.data || { success: false, message: err.message });
+    }
+});
+
+// ─── FOTMOB SQUAD DATA ───────────────────────────────────────────────────────
+router.get('/fotmob-squad/:countryName', async (req, res) => {
+    try {
+        const { countryName } = req.params;
+        if (!countryName) {
+            return res.status(400).json({ success: false, message: 'Country name is required' });
+        }
+
+        const squad = await fotmobService.fetchSquadData(countryName);
+        
+        if (!squad || squad.length === 0) {
+             return res.status(404).json({ success: false, message: 'Squad not found' });
+        }
+
+        res.json({
+            success: true,
+            data: squad
+        });
+
+    } catch (error) {
+        console.error(`[Fotmob Route] Error:`, error.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch squad data' });
+    }
+});
+router.get('/fotmob-player-image/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        
+        req.on('close', () => {
+            if (!res.headersSent) {
+                imageQueueService.cancelRequest(id);
+            }
+        });
+
+        const buffer = await imageQueueService.getImage(id);
+        res.set('Content-Type', 'image/png');
+        res.set('Cache-Control', 'public, max-age=86400');
+        res.send(buffer);
+    } catch (err) {
+        if (!res.headersSent) {
+            res.status(404).send('Not found');
+        }
     }
 });
 

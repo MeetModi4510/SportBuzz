@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TeamLogo } from "@/components/TeamLogo";
 import { cricketApi } from "@/services/api";
 import { CricketPerformanceDashboard } from "@/components/cricket/CricketPerformanceDashboard";
+import { FootballPerformanceDashboard } from "@/components/football/FootballPerformanceDashboard";
 import {
   BarChart,
   Bar,
@@ -91,47 +92,57 @@ const PerformanceLab = () => {
             </p>
           </section>
 
-          {/* Sport Filter removed per user request */}
+          {/* Sport Filter Header */}
+          <div className="flex justify-end mb-6">
+            <SportFilter activeSport={activeSport} onSportChange={setActiveSport} />
+          </div>
 
           {/* Main Tabs */}
-          <Tabs defaultValue="players" className="space-y-8">
-            <TabsList className="w-full justify-start bg-transparent border-b border-border/40 p-0 rounded-none h-12 gap-6 overflow-x-auto hide-scrollbar">
-              <TabsTrigger
-                value="players"
-                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
-              >
-                <Users size={16} />
-                Player Analysis
-              </TabsTrigger>
-              <TabsTrigger
-                value="comparison"
-                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
-              >
-                <GitCompare size={16} />
-                Player VS Player
-              </TabsTrigger>
-              <TabsTrigger
-                value="teams"
-                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
-              >
-                <Target size={16} />
-                Team Comparison
-              </TabsTrigger>
-              <TabsTrigger
-                value="venues"
-                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
-              >
-                <MapPin size={16} />
-                Venue Analysis
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="players" className="space-y-8 animate-fade-in">
+          <Tabs defaultValue="players" className="w-full space-y-8">
+            <div className="flex justify-between items-end border-b border-border/40">
+              <TabsList className="w-full justify-start bg-transparent p-0 rounded-none h-12 gap-6 overflow-x-auto hide-scrollbar border-0">
+                <TabsTrigger
+                  value="players"
+                  className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
+                >
+                  <Users size={16} />
+                  Player Analysis
+                </TabsTrigger>
+                <TabsTrigger
+                  value="comparison"
+                  className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
+                >
+                  <GitCompare size={16} />
+                  Player VS Player
+                </TabsTrigger>
+                <TabsTrigger
+                  value="teams"
+                  className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
+                >
+                  <Target size={16} />
+                  Team Comparison
+                </TabsTrigger>
+                <TabsTrigger
+                  value="venues"
+                  className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
+                >
+                  <MapPin size={16} />
+                  Venue Analysis
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value="players" className="space-y-8 animate-fade-in pt-4">
               {activeSport === "cricket" ? (
                 <div className="min-h-[900px] border border-border rounded-xl">
                    <CricketPerformanceDashboard />
                 </div>
+              ) : activeSport === "football" ? (
+                <div className="min-h-[900px] border border-border rounded-xl">
+                   <FootballPerformanceDashboard />
+                </div>
               ) : (
-                <PlayerAnalysisPanel />
+                <PlayerAnalysisPanel activeSport={activeSport} />
               )}
             </TabsContent>
 

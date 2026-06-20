@@ -10,6 +10,11 @@ export default defineConfig(({ mode }) => ({
     port: 5173,
     allowedHosts: true,
     proxy: {
+      '/api/sofascore': {
+        target: 'https://api.sofascore.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/sofascore/, '/api/v1')
+      },
       '/api': {
         target: 'http://127.0.0.1:5000',
         changeOrigin: false
