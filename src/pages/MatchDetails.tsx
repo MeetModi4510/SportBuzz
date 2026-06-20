@@ -336,7 +336,24 @@ const MatchDetails = () => {
     summaryUpdatedAt
   );
 
-  const { squads, squadsLoading, squadsError } = useCricbuzzSquads(cleanMatchId, activeTab === 'squads');
+  const { squads, squadsLoading, squadsError } = useCricbuzzSquads(cleanMatchId, activeTab === 'squads' || activeTab === 'scoreboard' || activeTab === 'performance');
+
+  const getPlayerImageId = (playerName: string) => {
+    if (!squads || !playerName) return undefined;
+    
+    let allPlayers: any[] = [];
+    if (squads.team1) {
+        if (Array.isArray(squads.team1['playing XI'])) allPlayers.push(...squads.team1['playing XI']);
+        if (Array.isArray(squads.team1.bench)) allPlayers.push(...squads.team1.bench);
+    }
+    if (squads.team2) {
+        if (Array.isArray(squads.team2['playing XI'])) allPlayers.push(...squads.team2['playing XI']);
+        if (Array.isArray(squads.team2.bench)) allPlayers.push(...squads.team2.bench);
+    }
+    
+    const match = allPlayers.find((p: any) => p?.name && (p.name.toLowerCase().includes(playerName.toLowerCase()) || playerName.toLowerCase().includes(p.name.toLowerCase())));
+    return match?.imageDetails?.imageId || undefined;
+  };
   const cbCommentaryField = useMatchFieldData(
     cleanMatchId,
     'cbCommentary',
@@ -1706,7 +1723,7 @@ const MatchDetails = () => {
                                              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                              <div className="flex items-center gap-4 relative z-10 w-full justify-between md:justify-end">
                                                 <div className="md:absolute md:left-4 z-20 shrink-0">
-                                                   <CricketPlayerImage playerId={undefined} playerName={p1.name} size={40} />
+                                                   <CricketPlayerImage playerId={getPlayerImageId(p1.name)} playerName={p1.name} size={40} />
                                                 </div>
                                                 <div className="flex flex-col items-start md:items-end z-10 ml-12 md:ml-0">
                                                    <span className="font-bold text-foreground text-sm md:text-base tracking-tight">{p1.name}</span>
@@ -1743,7 +1760,7 @@ const MatchDetails = () => {
                                                    </div>
                                                 </div>
                                                 <div className="md:absolute md:right-4 z-20 shrink-0">
-                                                   <CricketPlayerImage playerId={undefined} playerName={p2.name} size={40} align="right" />
+                                                   <CricketPlayerImage playerId={getPlayerImageId(p2.name)} playerName={p2.name} size={40} align="right" />
                                                 </div>
                                              </div>
                                           </div>
@@ -2085,7 +2102,7 @@ const MatchDetails = () => {
 
                                     <div className="flex items-start gap-3 relative z-10">
                                       <CricketPlayerImage
-                                        playerId={undefined} // Force name-based resolution to get proper headshots
+                                        playerId={getPlayerImageId(b.name)}
                                         playerName={b.name}
                                         size={40}
                                         className="shrink-0 mt-0.5"
@@ -2267,7 +2284,7 @@ const MatchDetails = () => {
                                   {/* Player photo + name + wickets row */}
                                   <div className="flex items-start gap-3 relative z-10">
                                     <CricketPlayerImage
-                                      playerId={undefined} // Force name-based resolution
+                                      playerId={getPlayerImageId(b.name)}
                                       playerName={b.name}
                                       size={40}
                                       className="shrink-0 mt-0.5"

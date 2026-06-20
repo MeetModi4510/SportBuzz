@@ -659,14 +659,14 @@ async function checkPlayerImageExists(playerId) {
                 headers: cbImageHeaders
             }, (res) => {
                 const exists = res.statusCode === 200;
-                imageCache.set(cacheKey, exists, 3600);
+                imageCache.set(cacheKey, exists, 10800);
                 resolve(exists);
             });
-            req.on('error', () => { imageCache.set(cacheKey, false, 3600); resolve(false); });
+            req.on('error', () => { imageCache.set(cacheKey, false, 10800); resolve(false); });
             req.end();
         });
     } catch {
-        imageCache.set(cacheKey, false, 3600);
+        imageCache.set(cacheKey, false, 10800);
         return false;
     }
 }
@@ -696,14 +696,14 @@ async function streamPlayerImage(playerId, res) {
                 }
             }, (imgRes) => {
                 if (imgRes.statusCode !== 200) {
-                    imageCache.set(notFoundKey, true, 3600); // Don't retry for 1hr
+                    imageCache.set(notFoundKey, true, 10800); // Don't retry for 1hr
                     res.status(204).end();
                     resolve();
                     return;
                 }
 
                 res.setHeader('Content-Type', 'image/jpeg');
-                res.setHeader('Cache-Control', 'public, max-age=3600');
+                res.setHeader('Cache-Control', 'public, max-age=10800');
                 
                 // Stream directly to client
                 imgRes.pipe(res);

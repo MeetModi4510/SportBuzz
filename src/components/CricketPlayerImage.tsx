@@ -61,11 +61,11 @@ async function processQueue() {
     resolve(null);
   }
 
-  // 400ms delay between API calls to stay under rate limit
+  // 2000ms delay between API calls to stay under rate limit and prevent 429
   setTimeout(() => {
     isProcessing = false;
     processQueue();
-  }, 400);
+  }, 2000);
 }
 
 function queueResolve(playerName: string): Promise<string | null> {

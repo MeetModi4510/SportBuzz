@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Match } from '@/data/types';
 
 
@@ -103,49 +104,22 @@ export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean
 };
 
 export const useCricbuzzSquads = (matchId: string | number | undefined, enabled: boolean) => {
-    const [squads, setSquads] = useState<any>(null);
-    const [squadsLoading, setSquadsLoading] = useState(false);
-    const [squadsError, setSquadsError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (!matchId || !enabled) return;
-        
-        let isMounted = true;
-
-        const fetchSquads = async () => {
-            setSquadsLoading(true);
-            setSquadsError(null);
-            
-            try {
-                // Call our proxy endpoint which falls back through both cricbuzz squad URLs and caches for 1 hour
-                const res = await fetch(`http://localhost:5000/api/cricket/scraped/match/${matchId}/squads`);
-                const json = await res.json();
-                
-                if (isMounted) {
-                    if (json.status === 'success' && json.data?.success) {
-                        setSquads(json.data.data);
-                    } else {
-                        setSquadsError(json.data?.message || 'Failed to fetch squads');
-                    }
-                }
-            } catch (err: any) {
-                if (isMounted) {
-                    console.error("Squads Fetch Error:", err);
-                    setSquadsError(err.message || 'Error fetching squads');
-                }
-            } finally {
-                if (isMounted) {
-                    setSquadsLoading(false);
-                }
+    const { data: squads, isLoading: squadsLoading, error } = useQuery({
+        queryKey: ['cricket', 'squads', matchId],
+        queryFn: async () => {
+            const BACKEND = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const res = await fetch(`${BACKEND}/cricket/scraped/match/${matchId}/squads`);
+            if (!res.ok) throw new Error('Network response was not ok');
+            const json = await res.json();
+            if (json.status === 'success' && json.data?.success) {
+                return json.data.data;
             }
-        };
+            throw new Error(json.data?.message || 'Failed to fetch squads');
+        },
+        enabled: !!matchId && enabled,
+        staleTime: 1000 * 60 * 60 * 3, // 3 hours
+        gcTime: 1000 * 60 * 60 * 3, // 3 hours cache retention
+    });
 
-        fetchSquads();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [matchId, enabled]);
-
-    return { squads, squadsLoading, squadsError };
+    return { squads, squadsLoading, squadsError: error ? (error as Error).message : null };
 };
