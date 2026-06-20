@@ -2490,7 +2490,7 @@ const MatchDetails = () => {
                                       <div className="bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden flex flex-col">
                                         {overItems.map((item: any, idx: number) => {
                                           const evt = item.event || 'NONE';
-                                          const isWicket = evt === 'WICKET' || (item.commText && (/(?:,\s*out\s+(?:caught|bowled|lbw|stumped|run out))/i.test(item.commText) || /\bWICKET\b/.test(item.commText)));
+                                          const isWicket = evt === 'WICKET' || (item.commText && (/(?:,\s*out\s+.*?(?:caught|bowled|lbw|stumped|run out|hit wicket))/i.test(item.commText) || /\bWICKET\b/.test(item.commText)));
                                           const isSix = evt === 'SIX' || (item.commText && /(?:,\s*SIX\b)/.test(item.commText));
                                           const isFour = evt === 'FOUR' || (item.commText && /(?:,\s*FOUR\b)/.test(item.commText));
                                           const isNoBall = evt === 'NOBALL';

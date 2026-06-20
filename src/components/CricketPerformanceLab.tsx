@@ -1207,7 +1207,7 @@ export default function CricketPerformanceLab({
                     defaultOpen={false}
                 >
                     <ResponsiveContainer width="100%" height={320}>
-                        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: -10 }}>
+                        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 10 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                             <XAxis 
                                 type="number" 
@@ -1319,7 +1319,7 @@ export default function CricketPerformanceLab({
                     defaultOpen={false}
                 >
                     <ResponsiveContainer width="100%" height={320}>
-                        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: -10 }}>
+                        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 10 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                             <XAxis 
                                 type="number" 
