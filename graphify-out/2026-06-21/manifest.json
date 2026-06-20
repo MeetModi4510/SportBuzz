@@ -100,8 +100,8 @@
     "semantic_hash": "cac197db51d775699234599a2a87f028"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\package.json": {
-    "mtime": 1781979101.075553,
-    "ast_hash": "ad07f930a247507707e19719733b0e86",
+    "mtime": 1781165448.0081358,
+    "ast_hash": "67d5c09000cf0c8d8c2922182c1fde75",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\postcss.config.js": {
@@ -530,8 +530,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\cricketRoutes.js": {
-    "mtime": 1781948879.3865504,
-    "ast_hash": "68742080a8c1427266248e146bd92403",
+    "mtime": 1781899734.4804742,
+    "ast_hash": "8def1051bb61f02d32af8be856cc120d",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\favoritesRoutes.js": {
@@ -545,8 +545,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\footballRoutes.js": {
-    "mtime": 1781980694.869034,
-    "ast_hash": "e00e58461f8d624cf1642ed6f8f65d88",
+    "mtime": 1781893486.7238145,
+    "ast_hash": "325269331753c1572727c533d8f61aad",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\leaderboardRoutes.js": {
@@ -640,8 +640,8 @@
     "semantic_hash": "61f1a12201876545b2461e5a3fefd2a2"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\cricbuzzService.js": {
-    "mtime": 1781956004.4556181,
-    "ast_hash": "51ccfccc02c2e07cbfc9a0e726d9b9bf",
+    "mtime": 1781891591.79372,
+    "ast_hash": "ca8271bbc1357f124372270c816a259b",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\cricketApiService.js": {
@@ -760,8 +760,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\CricketPerformanceLab.tsx": {
-    "mtime": 1781956004.1031957,
-    "ast_hash": "b784f13fcd927faf7e64230b96f80cc0",
+    "mtime": 1781899595.7949388,
+    "ast_hash": "9159d227cbbe11c56fe8ba335e411f98",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\CyberneticPlayerPopup.tsx": {
@@ -795,8 +795,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\LiveTicker.tsx": {
-    "mtime": 1781952744.0148318,
-    "ast_hash": "8a49f5511e1062c58469ab64374c22a2",
+    "mtime": 1781698792.7766678,
+    "ast_hash": "bb6e86370e6f80954e7bf5ceec2ca9e3",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\LoadingSkeleton.tsx": {
@@ -850,8 +850,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\PlayerComparison.tsx": {
-    "mtime": 1781957115.0903869,
-    "ast_hash": "2e72c4f79e58cff2d2ae0d16ec3811e0",
+    "mtime": 1781694942.8697844,
+    "ast_hash": "964a3c70709f98bfd496309742a3352c",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\PlayerProfileDialog.tsx": {
@@ -890,8 +890,8 @@
     "semantic_hash": "bfc6592389be70f65f4a16d7b00c47e1"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\TeamComparisonPanel.tsx": {
-    "mtime": 1781956004.112852,
-    "ast_hash": "f6a7529e7bf8a9227b6cdb33f5cad95e",
+    "mtime": 1781166141.537308,
+    "ast_hash": "fd058f1db25e918aa983f048b8ef6d06",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\TeamLogo.tsx": {
@@ -1300,8 +1300,8 @@
     "semantic_hash": "48c6219da6e633544a8e75c542ec7db5"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useCricketDataMatch.ts": {
-    "mtime": 1781956004.4659848,
-    "ast_hash": "f9f226cf408bdbed945fafc72c857135",
+    "mtime": 1781894202.9195962,
+    "ast_hash": "ccf898a8c0b71269e024a36414d3b805",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useCricketMatches.ts": {
@@ -1330,8 +1330,8 @@
     "semantic_hash": "c12115fb2c34038547a5ff632b04d5c8"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useMatchFieldData.ts": {
-    "mtime": 1781958425.195274,
-    "ast_hash": "c4342838381661adb481b933b55eeafc",
+    "mtime": 1781901229.628864,
+    "ast_hash": "a658c371f60783d483ed304bd3e26f85",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useTournamentFollow.ts": {
@@ -1420,8 +1420,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\MatchDetails.tsx": {
-    "mtime": 1781958428.7320616,
-    "ast_hash": "a67a65082d5d74e619449426d049c5e1",
+    "mtime": 1781901073.7281046,
+    "ast_hash": "f245628c80bdd5c5322bc3c994c81e66",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\NotFound.tsx": {
@@ -1440,8 +1440,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\PlayerProfilePage.tsx": {
-    "mtime": 1781957115.0983872,
-    "ast_hash": "fe199a65aeec08dd9e40f3d97483d815",
+    "mtime": 1781166143.8676476,
+    "ast_hash": "5ddc671df96d24a3f004c097264a515c",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\Preferences.tsx": {
@@ -1550,8 +1550,8 @@
     "semantic_hash": "34f82a26d33116b74005083b1eb00dda"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\api.ts": {
-    "mtime": 1781948926.1691194,
-    "ast_hash": "f24c2e415c6a6c68fe2cac8fb72571a2",
+    "mtime": 1781945613.364532,
+    "ast_hash": "aac0845a7afea38b6c73dddc7fbc90e2",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\cricketApi.ts": {
@@ -2975,13 +2975,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\types\\playerBattingTypes.ts": {
-    "mtime": 1781957115.1014,
-    "ast_hash": "fb969b1a7c32d32f1e4ff12ea774fe0f",
+    "mtime": 1781166144.6936183,
+    "ast_hash": "21312117cb811469d227490d13e83a4d",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\utils\\playerStatsTransformer.ts": {
-    "mtime": 1781957115.1063986,
-    "ast_hash": "b11731ebf6e810ee9d199aabd6c6f2aa",
+    "mtime": 1781166144.73094,
+    "ast_hash": "82e78c543d1d6cc9f31c3097808689f3",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\flags\\mpl_t20_2026_men\\bhopal_leopards.png": {
@@ -3090,8 +3090,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\CricketPlayerImage.tsx": {
-    "mtime": 1781956004.4606502,
-    "ast_hash": "c15985b8c210f8d07b6d4ca2c41b234d",
+    "mtime": 1781166141.143652,
+    "ast_hash": "e4876d1a8614db5c7e25c2034e3e42e5",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\cricket\\CricketNewsSection.tsx": {
@@ -3940,8 +3940,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\cricket\\CricketSidebar.tsx": {
-    "mtime": 1781956004.1195445,
-    "ast_hash": "2aca708b622e45a4956ef8188f72a898",
+    "mtime": 1781690813.952355,
+    "ast_hash": "e6ed596b9f56752c6a563a378e09777f",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\cricket\\PerformanceLab.tsx": {
@@ -4440,8 +4440,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\cricbuzzScorecardScraper.js": {
-    "mtime": 1781948623.5506914,
-    "ast_hash": "cf17f950617613e0cd4457556207c6bb",
+    "mtime": 1781899595.7808638,
+    "ast_hash": "6a1bd1210baa5de9b6842fc0fa32ea95",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\test_api.mjs": {
@@ -4535,8 +4535,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\cricket\\SquadsTab.tsx": {
-    "mtime": 1781956813.7501574,
-    "ast_hash": "2ec29cdda549359367dbcac9a50c0645",
+    "mtime": 1781945613.3625355,
+    "ast_hash": "5ab0d6d47697b811e4ba3a721d6f18a7",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\summary.json": {
@@ -4635,8 +4635,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\cricket\\GraphsTab.tsx": {
-    "mtime": 1781946456.814622,
-    "ast_hash": "5a5eb56343cf42a03d293ed5767f9a89",
+    "mtime": 1781945613.357,
+    "ast_hash": "1f75623f14a71e928677c31255332947",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\test_121873.json": {
@@ -4667,126 +4667,6 @@
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\cache\\player-images\\1005855.jpg": {
     "mtime": 1781892237.02567,
     "ast_hash": "86ff0aaf52e9dca60efcc23e2af46e5b",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\fotmob_profile.json": {
-    "mtime": 1781981201.5665166,
-    "ast_hash": "55739359ccf6c2cb1909ec7c8815b5dc",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\cricbuzzWinProbabilityScraper.js": {
-    "mtime": 1781951568.8290887,
-    "ast_hash": "bb1c9d0acb75e5c99fbaaa33f347b73a",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\sofascoreImageScraper.js": {
-    "mtime": 1781979114.4809542,
-    "ast_hash": "701dc3678d8169a5dcde0611994b0be7",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\test_fotmob_profile.mjs": {
-    "mtime": 1781981192.5423467,
-    "ast_hash": "41cc07fc0be80fe4c554781e41260e89",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\test_info.json": {
-    "mtime": 1781945613.3418307,
-    "ast_hash": "52c50f47298911f2e586a23529c80219",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\test_mobile_scrape.mjs": {
-    "mtime": 1781945613.3418307,
-    "ast_hash": "ccde5241d31ed1f06666782b71bb15a1",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\test_parse_html.mjs": {
-    "mtime": 1781945613.3428428,
-    "ast_hash": "d4a9dc58439d49fdf196dcf9ac44fced",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\test_player_scrape.mjs": {
-    "mtime": 1781945613.3438456,
-    "ast_hash": "4d7c7abf8021213ce5245223690ce98d",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\cricket\\PlayerProfilePanel.tsx": {
-    "mtime": 1781956726.9581394,
-    "ast_hash": "fa86dc2ed212093383329c2d9bcd8e80",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\cricket\\graphs\\WinProbabilityGraph.tsx": {
-    "mtime": 1781952744.0193517,
-    "ast_hash": "1318d68e1d4540e250fdbb89eaf37ba5",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\usePlayerProfile.ts": {
-    "mtime": 1781945613.3625355,
-    "ast_hash": "aabff92faad559958b4e157badca56d1",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\svgs.json": {
-    "mtime": 1781947090.0378993,
-    "ast_hash": "b5f81b64b04c5a5348feb9199c278d95",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\test_sofa_image.mjs": {
-    "mtime": 1781978715.4708846,
-    "ast_hash": "fd6fcdea3b3acdfe7da46e762c4f022a",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\test_svg.js": {
-    "mtime": 1781946868.244538,
-    "ast_hash": "d31f890f320e2cdeaf44299e7eeeda65",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\test_svg.mjs": {
-    "mtime": 1781947052.2273724,
-    "ast_hash": "86729cb6f9b133e110e7280906cd3fa5",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\cric.html": {
-    "mtime": 1781946372.1590247,
-    "ast_hash": "a44ba0c011f93f3de0e1b607ba2fb2e6",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\cricbuzz_facts.html": {
-    "mtime": 1781952015.3312092,
-    "ast_hash": "e468a1dae6dbae651d5bddb953e72a6e",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\cricbuzz_graphs.html": {
-    "mtime": 1781949678.6263168,
-    "ast_hash": "80186c06a6488d7fd11db1ac64e797e5",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\cricbuzz_results.html": {
-    "mtime": 1781952759.789011,
-    "ast_hash": "576e558b8bc3b75f68b8a12de2026e86",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\pup.html": {
-    "mtime": 1781946441.365611,
-    "ast_hash": "1294d3bcbdfb313b81e55f8d31cd9bc8",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\cricbuzz_mobile_profile.html": {
-    "mtime": 1781945613.3285956,
-    "ast_hash": "bce2599e4b972c4ce4d4a5582d79a907",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\cricbuzz_profile.html": {
-    "mtime": 1781945613.3327806,
-    "ast_hash": "2a7f9e6d2383f05ad6ddd8e67807b8d1",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\chart.svg": {
-    "mtime": 1781947112.6008751,
-    "ast_hash": "9776d4ecff445d0c6dbc48a352b0ab82",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\messi_sofascore.png": {
-    "mtime": 1781979180.6200588,
-    "ast_hash": "c8550a9e149be5259fc289b57a8d33f1",
     "semantic_hash": ""
   }
 }

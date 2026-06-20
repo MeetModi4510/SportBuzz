@@ -131,6 +131,52 @@ class FotmobService {
       return [];
     }
   }
+
+  async fetchPlayerData(playerId) {
+    try {
+      const cachePath = path.join(CACHE_DIR, `player_${playerId}.json`);
+
+      // 1. Check cache
+      if (fs.existsSync(cachePath)) {
+        const stats = fs.statSync(cachePath);
+        if (Date.now() - stats.mtimeMs < CACHE_TTL_MS) {
+          console.log(`[FotmobService] Returning cached player data for ID ${playerId}`);
+          return JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+        }
+      }
+
+      // 2. Fetch Player HTML
+      const playerUrl = `https://www.fotmob.com/players/${playerId}/player`;
+      console.log(`[FotmobService] Fetching player data for ID ${playerId} at ${playerUrl}`);
+      
+      const response = await axios.get(playerUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
+      });
+
+      const match = response.data.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
+      if (!match) {
+        throw new Error(`Could not find __NEXT_DATA__ in player page for ID ${playerId}.`);
+      }
+
+      const nextData = JSON.parse(match[1]);
+      
+      // 3. Navigate to player data
+      const playerData = nextData?.props?.pageProps?.fallback?.[`player:${playerId}`];
+      
+      if (!playerData) {
+          throw new Error(`Could not parse player data from HTML for ID ${playerId}`);
+      }
+
+      // 4. Save to cache
+      fs.writeFileSync(cachePath, JSON.stringify(playerData, null, 2), 'utf8');
+      console.log(`[FotmobService] Cached player data for ID ${playerId}`);
+
+      return playerData;
+    } catch (error) {
+      console.error(`[FotmobService] Error fetching player data for ID ${playerId}:`, error.message);
+      return null;
+    }
+  }
 }
 
 export const fotmobService = new FotmobService();

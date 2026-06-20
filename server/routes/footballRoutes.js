@@ -42,6 +42,63 @@ import { imageQueueService } from '../services/imageQueueService.js';
 
 const router = express.Router();
 
+// ─── FOOTBALL PLAYER IMAGE PROXY (BY NAME) ───
+// GET /api/football/player-image?name=Lionel Messi
+// Automatically resolves a player name to an image URL using open APIs and redirects to it.
+router.get('/player-image', async (req, res) => {
+    try {
+        const { name } = req.query;
+        if (!name) return res.status(400).json({ error: "Missing ?name= parameter" });
+
+        // 1. Try ESPN Search API (Incredible quality, huge transparent cutouts, no Cloudflare, extremely fast JSON API)
+        try {
+            const espnSearchUrl = `https://site.web.api.espn.com/apis/search/v2?query=${encodeURIComponent(name)}&limit=5&type=player`;
+            const espnRes = await axios.get(espnSearchUrl, { timeout: 3000 });
+            
+            const players = espnRes.data?.results?.find(r => r.type === 'player')?.contents;
+            if (players && players.length > 0) {
+                const soccerPlayer = players.find(p => p.sport === 'soccer' || p.link?.web?.includes('/soccer/'));
+                if (soccerPlayer && soccerPlayer.image?.default) {
+                    return res.redirect(soccerPlayer.image.default);
+                } else if (players[0].image?.default) {
+                    return res.redirect(players[0].image.default);
+                }
+            }
+        } catch (e) {
+            console.warn(`ESPN search failed for ${name}`);
+        }
+
+        // 2. Try FotMob Search API (Fast, extremely reliable, high quality transparent cutouts)
+        try {
+            const fotmobRes = await axios.get(`https://pub.fotmob.com/searchapi/suggest?term=${encodeURIComponent(name)}`, { timeout: 3000 });
+            const suggestions = fotmobRes.data?.squadMemberSuggest?.[0]?.options;
+            if (suggestions && suggestions.length > 0) {
+                const fotmobId = suggestions[0].payload?.id;
+                if (fotmobId) return res.redirect(`https://images.fotmob.com/image_resources/playerimages/${fotmobId}.png`);
+            }
+        } catch (e) {
+            console.warn(`FotMob search failed for ${name}`);
+        }
+
+        // 3. Fallback to TheSportsDB API
+        try {
+            const tsdbRes = await axios.get(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`, { timeout: 3000 });
+            const players = tsdbRes.data?.player;
+            if (players && players.length > 0) {
+                const imageUrl = players[0].strCutout || players[0].strThumb || players[0].strRender;
+                if (imageUrl) return res.redirect(imageUrl);
+            }
+        } catch (e) {
+            console.warn(`TSDB search failed for ${name}`);
+        }
+
+        // 4. Ultimate Fallback: generic silhouette
+        res.redirect('https://www.thesportsdb.com/images/media/player/thumb/generic.png');
+    } catch (error) {
+        res.redirect('https://www.thesportsdb.com/images/media/player/thumb/generic.png');
+    }
+});
+
 // ─── PROXY ROUTES FOR FRONTEND ───
 // These proxies ensure API keys stay hidden on the backend while the frontend can still use the API-Sports schema
 
@@ -87,6 +144,22 @@ router.get('/fotmob-squad/:countryName', async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to fetch squad data' });
     }
 });
+
+// ─── FOTMOB PLAYER DATA ───
+router.get('/fotmob-player/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const player = await fotmobService.fetchPlayerData(id);
+        if (!player) {
+            return res.status(404).json({ success: false, message: 'Player data not found' });
+        }
+        res.json({ success: true, data: player });
+    } catch (error) {
+        console.error(`[Fotmob Player Route] Error:`, error.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch fotmob player' });
+    }
+});
+
 router.get('/fotmob-player-image/:id', async (req, res) => {
     try {
         const id = req.params.id;

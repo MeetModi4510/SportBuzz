@@ -66,3 +66,22 @@ export function useFotmobSquad(countryName: string) {
         refetchOnWindowFocus: false,
     });
 }
+
+const fetchFotmobPlayerProfile = async (playerId: string | number): Promise<any> => {
+    const res = await fetch(`/api/football/fotmob-player/${playerId}`);
+    if (!res.ok) {
+        throw new Error('Failed to fetch fotmob player profile');
+    }
+    const data = await res.json();
+    return data.data;
+};
+
+export function useFotmobPlayerProfile(playerId: string | number | null) {
+    return useQuery({
+        queryKey: ['fotmobPlayerProfile', playerId],
+        queryFn: () => fetchFotmobPlayerProfile(playerId!),
+        enabled: !!playerId,
+        staleTime: 24 * 60 * 60 * 1000, // 24 hours caching
+        refetchOnWindowFocus: false,
+    });
+}
