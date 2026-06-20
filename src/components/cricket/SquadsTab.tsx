@@ -73,7 +73,7 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
                     <Info className="w-4 h-4 text-primary" />
                     <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">{title} <span className="text-muted-foreground ml-1">({players.length})</span></h3>
                 </div>
-                <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-3">
                     {players.map((p, i) => {
                         const imageId = p.imageDetails?.imageId;
                         return (

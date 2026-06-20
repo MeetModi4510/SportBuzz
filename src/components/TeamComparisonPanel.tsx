@@ -568,38 +568,6 @@ export function TeamComparisonPanel() {
 
     return (
         <div className="space-y-6 animate-fade-in">
-            {/* ═══ Sport Selector ═══ */}
-            <div className="flex flex-wrap gap-2 justify-center">
-                {(Object.keys(SPORT_LABELS) as AnalysisSport[]).map((sport) => {
-                    const meta = SPORT_LABELS[sport];
-                    const active = sport === selectedSport;
-                    return (
-                        <button
-                            key={sport}
-                            onClick={() => handleSportChange(sport)}
-                            className={cn(
-                                "flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-300",
-                                "border-2",
-                                active
-                                    ? "text-white shadow-lg scale-105"
-                                    : "border-border/50 bg-secondary/30 text-muted-foreground hover:bg-secondary/60 hover:scale-[1.02]"
-                            )}
-                            style={
-                                active
-                                    ? {
-                                        background: `linear-gradient(135deg, ${meta.color}, ${meta.color}cc)`,
-                                        borderColor: meta.color,
-                                        boxShadow: `0 4px 20px ${meta.color}40`,
-                                    }
-                                    : undefined
-                            }
-                        >
-                            <span className="text-lg">{meta.icon}</span>
-                            {meta.label}
-                        </button>
-                    );
-                })}
-            </div>
 
             {/* ═══ Team Selection HUD ═══ */}
             <div

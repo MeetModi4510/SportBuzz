@@ -62,14 +62,18 @@ const TOOLTIP_STYLE = {
 const COUNTRY_CODE_MAP: Record<string, string> = {
     'India': 'in',
     'Australia': 'au',
-    'England': 'gb',
+    'England': 'gb-eng',
     'South Africa': 'za',
     'New Zealand': 'nz',
     'Pakistan': 'pk',
     'Sri Lanka': 'lk',
     'Bangladesh': 'bd',
-    'West Indies': 'wi',
+    'West Indies': 'https://a.espncdn.com/i/teamlogos/cricket/500/4.png',
     'Afghanistan': 'af',
+    'Zimbabwe': 'zw',
+    'Ireland': 'ie',
+    'Scotland': 'gb-sct',
+    'Nepal': 'np',
     'France': 'fr',
     'Norway': 'no',
     'Argentina': 'ar',
@@ -97,6 +101,7 @@ const COUNTRY_CODE_MAP: Record<string, string> = {
 const getFlagUrl = (countryName: string) => {
     const code = COUNTRY_CODE_MAP[countryName];
     if (!code) return null;
+    if (code.startsWith('http')) return code;
     return `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
 };
 
@@ -372,7 +377,11 @@ export const PlayerComparison = () => {
     const [playerAId, setPlayerAId] = useState<string>("");
     const [playerBId, setPlayerBId] = useState<string>("");
 
-    const CRICKET_TEAMS = useMemo(() => ['india-2', 'australia-4', 'england-9', 'pakistan-3', 'south-africa-11', 'new-zealand-13'], []);
+    const CRICKET_TEAMS = useMemo(() => [
+        'india-2', 'australia-4', 'england-9', 'south-africa-11', 'new-zealand-13', 'pakistan-3',
+        'sri-lanka-5', 'west-indies-10', 'bangladesh-6', 'afghanistan-96', 'zimbabwe-12', 'ireland-27',
+        'scotland-23', 'netherlands-24', 'nepal-72'
+    ], []);
     const squadQueries = usePerformanceLabSquads(selectedSport === 'cricket' ? CRICKET_TEAMS : []);
     const [squadFilters, setSquadFilters] = useState<string[]>([]);
     
@@ -392,9 +401,18 @@ export const PlayerComparison = () => {
                     'india-2': {name: 'India', iso: 'in'},
                     'australia-4': {name: 'Australia', iso: 'au'},
                     'england-9': {name: 'England', iso: 'gb-eng'},
-                    'pakistan-3': {name: 'Pakistan', iso: 'pk'},
                     'south-africa-11': {name: 'South Africa', iso: 'za'},
-                    'new-zealand-13': {name: 'New Zealand', iso: 'nz'}
+                    'new-zealand-13': {name: 'New Zealand', iso: 'nz'},
+                    'pakistan-3': {name: 'Pakistan', iso: 'pk'},
+                    'sri-lanka-5': {name: 'Sri Lanka', iso: 'lk'},
+                    'west-indies-10': {name: 'West Indies', iso: 'wi'},
+                    'bangladesh-6': {name: 'Bangladesh', iso: 'bd'},
+                    'afghanistan-96': {name: 'Afghanistan', iso: 'af'},
+                    'zimbabwe-12': {name: 'Zimbabwe', iso: 'zw'},
+                    'ireland-27': {name: 'Ireland', iso: 'ie'},
+                    'scotland-23': {name: 'Scotland', iso: 'gb-sct'},
+                    'netherlands-24': {name: 'Netherlands', iso: 'nl'},
+                    'nepal-72': {name: 'Nepal', iso: 'np'}
                 };
                 const meta = TEAM_META[teamId] || {name: teamId, iso: 'un'};
 
@@ -422,6 +440,7 @@ export const PlayerComparison = () => {
     const playerB = sportPlayers.find(p => p.id === playerBId || String(p.id) === String(playerBId)) || null;
 
     const [apiFormat, setApiFormat] = useState<BattingFormatKey>('odi');
+    const [statCategory, setStatCategory] = useState<'batting'|'bowling'>('batting');
 
     const { battingStats: statsA, isLoading: loadingA } = usePlayerBattingStats(playerA?.id || "");
     const { battingStats: statsB, isLoading: loadingB } = usePlayerBattingStats(playerB?.id || "");
@@ -464,41 +483,58 @@ export const PlayerComparison = () => {
         ];
     }, [selectedSport, deepStatsA, deepStatsB, apiFormat, playerA, playerB]);
 
-    const recentBattingA = deepStatsA?.recentMatches?.batting || [];
-    const recentBattingB = deepStatsB?.recentMatches?.batting || [];
+    const recentMatchesA = statCategory === 'batting' ? (deepStatsA?.recentMatches?.batting || []) : (deepStatsA?.recentMatches?.bowling || []);
+    const recentMatchesB = statCategory === 'batting' ? (deepStatsB?.recentMatches?.batting || []) : (deepStatsB?.recentMatches?.bowling || []);
 
-    const getRunSafe = (recentArr: any[], fallbackArr: number[], i: number) => {
+    const getStatSafe = (recentArr: any[], fallbackArr: number[], i: number) => {
         if (!recentArr || recentArr.length === 0) return fallbackArr ? (fallbackArr[i] || 0) : 0;
         const match = recentArr[i];
         if (!match) return 0;
-        const r = typeof match.runs === 'number' ? match.runs : parseInt(match.runs);
+        const val = match.runs;
+        const r = typeof val === 'number' ? val : parseInt(val);
         return isNaN(r) ? 0 : r;
     };
 
     const formData = Array.from({ length: 10 }).map((_, i) => {
         return {
             match: `M${i + 1}`,
-            A: getRunSafe(recentBattingA, playerA?.formTrend || [], i),
-            B: getRunSafe(recentBattingB, playerB?.formTrend || [], i),
+            A: getStatSafe(recentMatchesA, playerA?.formTrend || [], i),
+            B: getStatSafe(recentMatchesB, playerB?.formTrend || [], i),
         };
     });
 
     const statComparison = useMemo(() => {
         if (selectedSport === 'cricket' && (deepStatsA?.stats || deepStatsB?.stats)) {
-            const getA = (key: any) => deepStatsA?.stats?.batting?.[apiFormat === 't20' ? 't20i' : apiFormat]?.[key] || 0;
-            const getB = (key: any) => deepStatsB?.stats?.batting?.[apiFormat === 't20' ? 't20i' : apiFormat]?.[key] || 0;
-            return [
-                { label: 'Matches', valA: getA('matches'), valB: getB('matches') },
-                { label: 'Innings', valA: getA('innings'), valB: getB('innings') },
-                { label: 'Runs', valA: getA('runs'), valB: getB('runs') },
-                { label: 'Highest', valA: getA('highestScore'), valB: getB('highestScore') },
-                { label: 'Average', valA: getA('average'), valB: getB('average') },
-                { label: 'Strike Rate', valA: getA('strikeRate'), valB: getB('strikeRate') },
-                { label: '100s', valA: getA('hundreds'), valB: getB('hundreds') },
-                { label: '50s', valA: getA('fifties'), valB: getB('fifties') },
-                { label: '4s', valA: getA('fours'), valB: getB('fours') },
-                { label: '6s', valA: getA('sixes'), valB: getB('sixes') },
-            ];
+            const getA = (key: any) => deepStatsA?.stats?.[statCategory]?.[apiFormat === 't20' ? 't20i' : apiFormat]?.[key] || 0;
+            const getB = (key: any) => deepStatsB?.stats?.[statCategory]?.[apiFormat === 't20' ? 't20i' : apiFormat]?.[key] || 0;
+            
+            if (statCategory === 'batting') {
+                return [
+                    { label: 'Matches', valA: getA('matches'), valB: getB('matches') },
+                    { label: 'Innings', valA: getA('innings'), valB: getB('innings') },
+                    { label: 'Runs', valA: getA('runs'), valB: getB('runs') },
+                    { label: 'Highest', valA: getA('highestScore'), valB: getB('highestScore') },
+                    { label: 'Average', valA: getA('average'), valB: getB('average') },
+                    { label: 'Strike Rate', valA: getA('strikeRate'), valB: getB('strikeRate') },
+                    { label: '100s', valA: getA('hundreds'), valB: getB('hundreds') },
+                    { label: '50s', valA: getA('fifties'), valB: getB('fifties') },
+                    { label: '4s', valA: getA('fours'), valB: getB('fours') },
+                    { label: '6s', valA: getA('sixes'), valB: getB('sixes') },
+                ];
+            } else {
+                return [
+                    { label: 'Matches', valA: getA('matches'), valB: getB('matches') },
+                    { label: 'Innings', valA: getA('innings'), valB: getB('innings') },
+                    { label: 'Wickets', valA: getA('wickets'), valB: getB('wickets') },
+                    { label: 'BBI', valA: getA('bbi'), valB: getB('bbi'), isString: true },
+                    { label: 'Average', valA: getA('average'), valB: getB('average'), lowerIsBetter: true },
+                    { label: 'Economy', valA: getA('economy'), valB: getB('economy'), lowerIsBetter: true },
+                    { label: 'Strike Rate', valA: getA('strikeRate'), valB: getB('strikeRate'), lowerIsBetter: true },
+                    { label: '4W', valA: getA('fourWickets'), valB: getB('fourWickets') },
+                    { label: '5W', valA: getA('fiveWickets'), valB: getB('fiveWickets') },
+                    { label: 'Maidens', valA: getA('maidens'), valB: getB('maidens') },
+                ];
+            }
         }
 
         if (playerA && playerB) {
@@ -510,7 +546,7 @@ export const PlayerComparison = () => {
         }
         
         return [];
-    }, [selectedSport, deepStatsA, deepStatsB, apiFormat, playerA, playerB]);
+    }, [selectedSport, deepStatsA, deepStatsB, apiFormat, statCategory, playerA, playerB]);
 
     const insightsData = useMemo(() => {
         if (selectedSport === 'cricket' && (deepStatsA?.stats || deepStatsB?.stats)) {
@@ -521,8 +557,12 @@ export const PlayerComparison = () => {
             const ovrA = calcOvr(getA('average'), getA('strikeRate'));
             const ovrB = calcOvr(getB('average'), getB('strikeRate'));
 
-            const formA = recentBattingA.length > 0 ? Math.round(recentBattingA.slice(0,5).reduce((acc: number, m: any) => acc + (parseInt(m.runs) || 0), 0) / Math.min(recentBattingA.length, 5)) : 0;
-            const formB = recentBattingB.length > 0 ? Math.round(recentBattingB.slice(0,5).reduce((acc: number, m: any) => acc + (parseInt(m.runs) || 0), 0) / Math.min(recentBattingB.length, 5)) : 0;
+            const isBowling = statCategory === 'bowling';
+            const recentA = isBowling ? (deepStatsA?.recentMatches?.bowling || []) : (deepStatsA?.recentMatches?.batting || []);
+            const recentB = isBowling ? (deepStatsB?.recentMatches?.bowling || []) : (deepStatsB?.recentMatches?.batting || []);
+            
+            const formA = recentA.length > 0 ? Math.round(recentA.slice(0,5).reduce((acc: number, m: any) => acc + (parseInt(m.runs) || 0), 0) / Math.min(recentA.length, 5)) : 0;
+            const formB = recentB.length > 0 ? Math.round(recentB.slice(0,5).reduce((acc: number, m: any) => acc + (parseInt(m.runs) || 0), 0) / Math.min(recentB.length, 5)) : 0;
             
             const clutchA = Math.min(Math.round((getA('hundreds') / 40) * 100), 99);
             const clutchB = Math.min(Math.round((getB('hundreds') / 40) * 100), 99);
@@ -532,7 +572,7 @@ export const PlayerComparison = () => {
             
             return [
                 { label: "Overall Rating", valA: ovrA, valB: ovrB, icon: <Trophy size={14} /> },
-                { label: "Recent Form (Runs)", valA: formA, valB: formB, icon: <Activity size={14} /> },
+                { label: `Recent Form (${isBowling ? 'Wickets' : 'Runs'})`, valA: formA, valB: formB, icon: <Activity size={14} /> },
                 { label: "Clutch Peak", valA: clutchA, valB: clutchB, icon: <Zap size={14} /> },
                 { label: "Win Probability", valA: `${winA}%`, valB: `${100 - winA}%`, icon: <TrendingUp size={14} /> },
             ];
@@ -548,77 +588,10 @@ export const PlayerComparison = () => {
             { label: "Clutch Peak", valA: playerA?.attributes?.["Clutch"] || 85, valB: playerB?.attributes?.["Clutch"] || 82, icon: <Zap size={14} /> },
             { label: "Win Probability", valA: `${winA}%`, valB: `${100 - winA}%`, icon: <TrendingUp size={14} /> },
         ];
-    }, [selectedSport, deepStatsA, deepStatsB, apiFormat, playerA, playerB, recentBattingA, recentBattingB]);
+    }, [selectedSport, deepStatsA, deepStatsB, apiFormat, statCategory, playerA, playerB]);
 
     return (
         <div className="space-y-8 animate-fade-in overflow-visible pb-20">
-            {selectedSport === 'cricket' && (
-                <div className="flex overflow-x-auto hide-scrollbar gap-3 mb-6 pb-2">
-                    {squadQueries.map((query, index) => {
-                        const teamId = CRICKET_TEAMS[index];
-                        const TEAM_META: Record<string, {name: string, iso: string}> = {
-                            'india-2': {name: 'India', iso: 'in'},
-                            'australia-4': {name: 'Australia', iso: 'au'},
-                            'england-9': {name: 'England', iso: 'gb-eng'},
-                            'pakistan-3': {name: 'Pakistan', iso: 'pk'},
-                            'south-africa-11': {name: 'South Africa', iso: 'za'},
-                            'new-zealand-13': {name: 'New Zealand', iso: 'nz'}
-                        };
-                        const meta = TEAM_META[teamId] || {name: teamId, iso: 'un'};
-                        const teamName = meta.name;
-                        const flagImgUrl = query.data?.flagUrl?.includes('http') ? query.data.flagUrl : `https://flagcdn.com/w40/${meta.iso}.png`;
-                        const isActive = squadFilters.includes(teamId);
-
-                        return (
-                            <button
-                                key={teamId}
-                                onClick={() => toggleSquadFilter(teamId)}
-                                className={cn(
-                                    "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border shrink-0",
-                                    isActive
-                                        ? "bg-slate-800 text-white border-white/20 shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
-                                        : "bg-slate-900/50 text-slate-500 border-white/5 hover:bg-slate-800/80 hover:text-slate-300"
-                                )}
-                            >
-                                <div className="w-[18px] h-[13px] rounded-sm overflow-hidden bg-slate-800 border border-white/10 shrink-0 shadow-sm flex items-center justify-center">
-                                    <img src={flagImgUrl} alt={teamName} className="w-full h-full object-cover" />
-                                </div>
-                                <span className="uppercase tracking-widest">{teamName}</span>
-                            </button>
-                        );
-                    })}
-                </div>
-            )}
-            
-            {/* ═══ Sport Selector ═══ */}
-            <div className="flex flex-wrap gap-3 justify-center mb-12">
-                {(Object.keys(SPORT_LABELS) as AnalysisSport[]).map((sport) => {
-                    const meta = SPORT_LABELS[sport];
-                    const active = sport === selectedSport;
-                    return (
-                        <button
-                            key={sport}
-                            onClick={() => setSelectedSport(sport)}
-                            className={cn(
-                                "flex items-center gap-3 px-6 py-3 rounded-2xl font-black text-sm transition-all duration-500",
-                                "border-2 uppercase tracking-tighter",
-                                active
-                                    ? "text-white shadow-[0_10px_30px_rgba(0,0,0,0.5)] scale-105"
-                                    : "border-white/5 bg-slate-900/40 text-slate-500 hover:bg-slate-900/60 hover:border-white/10 hover:translate-y-[-2px]"
-                            )}
-                            style={active ? {
-                                background: `linear-gradient(135deg, ${meta.color}, ${meta.color}88)`,
-                                borderColor: meta.color,
-                                boxShadow: `0 0 20px ${meta.color}30`
-                            } : undefined}
-                        >
-                            <span className="text-xl">{meta.icon}</span>
-                            {meta.label}
-                        </button>
-                    );
-                })}
-            </div>
-
             {/* ═══ Player Selection HUD ═══ */}
             <div className="relative z-50 rounded-3xl border border-white/[0.05] p-8 md:p-12 bg-white/[0.01] backdrop-blur-2xl shadow-2xl">
                 <div className="absolute inset-0 cyber-grid opacity-[0.03] pointer-events-none rounded-3xl" />
@@ -664,7 +637,27 @@ export const PlayerComparison = () => {
                     <>
                         {/* API Format Selector (Cricket Only) */}
                         {selectedSport === 'cricket' && (
-                            <div className="flex flex-col items-center justify-center mt-8">
+                            <div className="flex flex-col items-center justify-center mt-8 gap-4">
+                                <div className="flex items-center bg-slate-900/80 border border-white/5 p-1 rounded-2xl shadow-inner">
+                                    <button
+                                        onClick={() => setStatCategory('batting')}
+                                        className={cn(
+                                            "px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all",
+                                            statCategory === 'batting' ? "bg-indigo-500/20 text-indigo-400 shadow-sm" : "text-slate-500 hover:text-slate-300"
+                                        )}
+                                    >
+                                        Batting
+                                    </button>
+                                    <button
+                                        onClick={() => setStatCategory('bowling')}
+                                        className={cn(
+                                            "px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all",
+                                            statCategory === 'bowling' ? "bg-rose-500/20 text-rose-400 shadow-sm" : "text-slate-500 hover:text-slate-300"
+                                        )}
+                                    >
+                                        Bowling
+                                    </button>
+                                </div>
                                 <div className="flex items-center justify-center gap-2">
                                     {(['test', 'odi', 't20', 'ipl'] as BattingFormatKey[]).map((fmt) => (
                                         <button
@@ -683,7 +676,7 @@ export const PlayerComparison = () => {
                                     ))}
                                 </div>
                                 {(loadingDeepA || loadingDeepB || loadingA || loadingB) && (
-                                    <span className="mt-3 text-[10px] font-black uppercase tracking-widest text-blue-400 flex items-center gap-2">
+                                    <span className="mt-2 text-[10px] font-black uppercase tracking-widest text-blue-400 flex items-center gap-2">
                                         <Loader2 size={12} className="animate-spin" /> Syncing Live Stats...
                                     </span>
                                 )}
@@ -773,7 +766,7 @@ export const PlayerComparison = () => {
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                                 <XAxis dataKey="match" tick={{ fill: "#64748b", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
                                 <YAxis domain={[0, 'auto']} tick={{ fill: "#64748b", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
-                                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value) => [`${value} Runs`, '']} />
+                                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value) => [`${value} ${statCategory === 'batting' ? 'Runs' : 'Wickets'}`, '']} />
                                 <Area
                                     type="monotone"
                                     dataKey="A"
@@ -818,91 +811,111 @@ export const PlayerComparison = () => {
                         </div>
                     </div>
 
-                    {/* Stat Rows */}
-                    <div className="space-y-3 pt-8 pb-4 relative">
-                        {/* Center decorative line */}
-                        <div className="absolute top-0 bottom-0 left-1/2 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent -translate-x-1/2 pointer-events-none" />
-                        
+                    {/* LED Segmented Face-Off List */}
+                    <div className="space-y-2 pt-8 pb-4">
                         {statComparison.map((stat, i) => {
-                            const valA = typeof stat.valA === 'number' ? stat.valA : parseFloat(String(stat.valA)) || 0;
-                            const valB = typeof stat.valB === 'number' ? stat.valB : parseFloat(String(stat.valB)) || 0;
-                            const maxVal = Math.max(valA, valB) || 1;
-                            const barWidthA = (valA / maxVal) * 100;
-                            const barWidthB = (valB / maxVal) * 100;
+                            let valA, valB;
+                            if (stat.isString) {
+                                valA = stat.valA || '-';
+                                valB = stat.valB || '-';
+                            } else {
+                                valA = typeof stat.valA === 'number' ? stat.valA : parseFloat(String(stat.valA)) || 0;
+                                valB = typeof stat.valB === 'number' ? stat.valB : parseFloat(String(stat.valB)) || 0;
+                            }
+                            
                             const isATie = valA === valB;
+                            
+                            let aWins = false;
+                            let bWins = false;
+                            
+                            if (!stat.isString && !isATie) {
+                                if (stat.lowerIsBetter) {
+                                    aWins = valA < valB;
+                                    bWins = valB < valA;
+                                    if (valA === 0) { aWins = false; bWins = true; } // Handle 0 as worst for lowerIsBetter
+                                    if (valB === 0) { bWins = false; aWins = true; }
+                                } else {
+                                    aWins = valA > valB;
+                                    bWins = valB > valA;
+                                }
+                            }
+
+                            let segmentsA = 20;
+                            let segmentsB = 20;
+
+                            if (!stat.isString) {
+                                if (valA === 0 && valB === 0) {
+                                    segmentsA = 0;
+                                    segmentsB = 0;
+                                } else if (stat.lowerIsBetter) {
+                                    const minVal = Math.min(valA as number, valB as number);
+                                    segmentsA = valA === 0 ? 0 : Math.round((minVal / (valA as number)) * 20);
+                                    segmentsB = valB === 0 ? 0 : Math.round((minVal / (valB as number)) * 20);
+                                } else {
+                                    const maxVal = Math.max(valA as number, valB as number);
+                                    segmentsA = Math.round(((valA as number) / maxVal) * 20);
+                                    segmentsB = Math.round(((valB as number) / maxVal) * 20);
+                                }
+                            }
 
                             return (
-                                <div key={i} className="relative py-4 group/stat hover:scale-[1.02] transition-transform duration-500">
-                                    {/* Glass Background Overlay */}
-                                    <div className="absolute inset-0 bg-[#0f172a]/40 rounded-2xl border border-white/5 shadow-2xl backdrop-blur-sm opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                                <div key={i} className="py-4 md:py-6 border-b border-white/5 last:border-0 relative group">
+                                    {/* Hover Glow */}
+                                    <div className="absolute inset-0 bg-white/[0.01] opacity-0 group-hover:opacity-100 transition-opacity rounded-xl pointer-events-none" />
 
-                                    {/* Center Badge */}
-                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-                                        <div className="px-5 py-2 rounded-full bg-slate-950/90 border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur-xl group-hover/stat:border-white/30 group-hover/stat:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all">
-                                            <span className="text-[10px] font-black text-slate-300 group-hover/stat:text-white uppercase tracking-[0.3em] whitespace-nowrap">{stat.label}</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Content Flex Container */}
-                                    <div className="relative z-10 flex items-center justify-between px-4 md:px-8">
-                                        
-                                        {/* ─── PLAYER A SIDE ─── */}
-                                        <div className="flex-1 flex flex-col gap-3 max-w-[40%]">
-                                            <div className="flex items-end justify-between gap-3 px-1">
-                                                <div className="opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500">
-                                                    {(valA > valB) && <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest bg-indigo-500/10 px-2 py-1 rounded shadow-[0_0_10px_rgba(99,102,241,0.2)] animate-pulse">Leader</span>}
-                                                </div>
-                                                <span className={cn(
-                                                    "text-2xl md:text-3xl font-black tabular-nums tracking-tighter transition-all duration-500",
-                                                    valA > valB ? "text-indigo-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.6)]" : (isATie ? "text-slate-300" : "text-slate-600 group-hover/stat:text-slate-500")
-                                                )}>
-                                                    {stat.valA}
-                                                </span>
-                                            </div>
+                                    <div className="flex flex-col gap-4 relative z-10">
+                                        <div className="flex justify-between items-end px-2 md:px-6">
+                                            <span className={cn(
+                                                "text-2xl md:text-3xl font-black tabular-nums tracking-tighter transition-all duration-300",
+                                                aWins ? "text-indigo-400 drop-shadow-[0_0_12px_rgba(99,102,241,0.6)]" : "text-slate-500 group-hover:text-slate-400"
+                                            )}>{stat.valA}</span>
                                             
-                                            {/* Bar Track */}
-                                            <div className="h-1.5 md:h-2 w-full bg-slate-800/40 rounded-full overflow-hidden flex justify-end shadow-inner">
-                                                <div 
-                                                    className="h-full rounded-l-full transition-all duration-1000 ease-out"
-                                                    style={{ 
-                                                        width: `${Math.max(2, barWidthA)}%`, 
-                                                        background: valA > valB ? `linear-gradient(270deg, ${PLAYER_A_COLOR}, #818cf8)` : (isATie ? '#64748b' : '#334155'),
-                                                        boxShadow: valA > valB ? `0 0 20px ${PLAYER_A_COLOR}` : 'none'
-                                                    }}
-                                                />
-                                            </div>
+                                            <span className="text-[10px] md:text-xs font-black text-slate-400 group-hover:text-white uppercase tracking-[0.3em] transition-colors">
+                                                {stat.label}
+                                            </span>
+                                            
+                                            <span className={cn(
+                                                "text-2xl md:text-3xl font-black tabular-nums tracking-tighter transition-all duration-300",
+                                                bWins ? "text-rose-400 drop-shadow-[0_0_12px_rgba(244,63,94,0.6)]" : "text-slate-500 group-hover:text-slate-400"
+                                            )}>{stat.valB}</span>
                                         </div>
 
-                                        {/* Center Spacer */}
-                                        <div className="w-24 md:w-36 shrink-0" />
-
-                                        {/* ─── PLAYER B SIDE ─── */}
-                                        <div className="flex-1 flex flex-col gap-3 max-w-[40%]">
-                                            <div className="flex items-end justify-between flex-row-reverse gap-3 px-1">
-                                                <div className="opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500">
-                                                    {(valB > valA) && <span className="text-[8px] font-black text-rose-400 uppercase tracking-widest bg-rose-500/10 px-2 py-1 rounded shadow-[0_0_10px_rgba(244,63,94,0.2)] animate-pulse">Leader</span>}
-                                                </div>
-                                                <span className={cn(
-                                                    "text-2xl md:text-3xl font-black tabular-nums tracking-tighter transition-all duration-500",
-                                                    valB > valA ? "text-rose-400 drop-shadow-[0_0_15px_rgba(244,63,94,0.6)]" : (isATie ? "text-slate-300" : "text-slate-600 group-hover/stat:text-slate-500")
-                                                )}>
-                                                    {stat.valB}
-                                                </span>
+                                        {/* LED Meter */}
+                                        <div className="flex gap-1 md:gap-[3px] w-full items-center justify-center px-2 md:px-6">
+                                            {/* Player A Meter */}
+                                            <div className="flex-1 flex justify-end gap-1 md:gap-[3px]">
+                                                {Array.from({ length: 20 }).map((_, idx) => {
+                                                    const isLit = idx >= (20 - segmentsA);
+                                                    let colorClass = "bg-slate-800/40";
+                                                    if (isLit) {
+                                                        if (stat.isString) colorClass = "bg-slate-600";
+                                                        else if (aWins) colorClass = "bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.7)]";
+                                                        else if (isATie) colorClass = "bg-indigo-700/50";
+                                                        else colorClass = "bg-indigo-900/60";
+                                                    }
+                                                    return <div key={`a-${idx}`} className={cn("h-2 md:h-2.5 w-1.5 md:w-2.5 rounded-[1px] skew-x-[-15deg] transition-all duration-500", colorClass)} />
+                                                })}
                                             </div>
 
-                                            {/* Bar Track */}
-                                            <div className="h-1.5 md:h-2 w-full bg-slate-800/40 rounded-full overflow-hidden flex justify-start shadow-inner">
-                                                <div 
-                                                    className="h-full rounded-r-full transition-all duration-1000 ease-out"
-                                                    style={{ 
-                                                        width: `${Math.max(2, barWidthB)}%`, 
-                                                        background: valB > valA ? `linear-gradient(90deg, ${PLAYER_B_COLOR}, #fb7185)` : (isATie ? '#64748b' : '#334155'),
-                                                        boxShadow: valB > valA ? `0 0 20px ${PLAYER_B_COLOR}` : 'none'
-                                                    }}
-                                                />
+                                            <div className="w-6 md:w-10 flex justify-center">
+                                                <div className="w-1 h-1 rounded-full bg-slate-700 shadow-[0_0_5px_rgba(255,255,255,0.2)]" />
+                                            </div>
+
+                                            {/* Player B Meter */}
+                                            <div className="flex-1 flex justify-start gap-1 md:gap-[3px]">
+                                                {Array.from({ length: 20 }).map((_, idx) => {
+                                                    const isLit = idx < segmentsB;
+                                                    let colorClass = "bg-slate-800/40";
+                                                    if (isLit) {
+                                                        if (stat.isString) colorClass = "bg-slate-600";
+                                                        else if (bWins) colorClass = "bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.7)]";
+                                                        else if (isATie) colorClass = "bg-rose-700/50";
+                                                        else colorClass = "bg-rose-900/60";
+                                                    }
+                                                    return <div key={`b-${idx}`} className={cn("h-2 md:h-2.5 w-1.5 md:w-2.5 rounded-[1px] skew-x-[-15deg] transition-all duration-500", colorClass)} />
+                                                })}
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             );
