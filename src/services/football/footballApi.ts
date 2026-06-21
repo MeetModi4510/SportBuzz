@@ -280,5 +280,15 @@ export const footballApi = {
       console.error("Failed to fetch global football news", error);
       return [];
     }
+  },
+
+  async getPlayerRecentMatches(playerName: string): Promise<any[]> {
+    try {
+      const response: any = await api.get(`/football/v3/player-recent-matches/${encodeURIComponent(playerName)}`);
+      return response?.data || [];
+    } catch (error) {
+      console.error(`Failed to fetch recent matches for player: ${playerName}`, error);
+      return [];
+    }
   }
 };

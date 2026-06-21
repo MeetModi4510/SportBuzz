@@ -47,9 +47,61 @@ export interface TopStatsResponse {
   lastFetched: string | null;
   players: PlayerStat[];
   teams: TeamStat[];
+  isFotmob?: boolean;
+  fotmobTabs?: [string, string][];
 }
 
 async function fetchTopStats(leagueId: number): Promise<TopStatsResponse> {
+  if (leagueId === 734 || leagueId === 77) {
+    const res = await fetch(`${API_BASE}/api/football/fotmob-stats/77`);
+    if (!res.ok) throw new Error('Failed to fetch fotmob stats');
+    const json = await res.json();
+    
+    let players: PlayerStat[] = [];
+    let fotmobTabs: [string, string][] = [];
+    
+    if (json.data && Array.isArray(json.data)) {
+      json.data.forEach((group: any, index: number) => {
+        const statTyp = index + 100; // Unique stat type
+        fotmobTabs.push([statTyp.toString(), group.header]);
+        
+        if (group.data && Array.isArray(group.data)) {
+          group.data.forEach((p: any) => {
+            players.push({
+              _id: `${statTyp}-${p.ParticiantId}`,
+              leagueId: 77,
+              leagueName: "World Cup",
+              statTyp: statTyp,
+              rank: p.Rank,
+              playerName: p.ParticipantName,
+              playerId: p.ParticiantId?.toString() || "",
+              teamName: p.TeamName,
+              teamId: p.TeamId?.toString() || "",
+              statValue: p.StatValue?.toString() || "",
+              imageUrl: `https://images.fotmob.com/image_resources/playerimages/${p.ParticiantId}.png`,
+              teamBadgeUrl: p.TeamId?.toString() || "",
+              sofascoreId: "fotmob", 
+              photoBase64: `https://images.fotmob.com/image_resources/playerimages/${p.ParticiantId}.png`, 
+              country: p.ParticipantCountryCode,
+              lastFetched: new Date().toISOString()
+            });
+          });
+        }
+      });
+    }
+
+    return {
+      success: true,
+      fromCache: false,
+      leagueId: 77,
+      lastFetched: new Date().toISOString(),
+      players,
+      teams: [],
+      isFotmob: true,
+      fotmobTabs
+    };
+  }
+
   const res = await fetch(`${API_BASE}/api/football/top-stats?leagueId=${leagueId}`);
   if (!res.ok) throw new Error('Failed to fetch top stats');
   return res.json();

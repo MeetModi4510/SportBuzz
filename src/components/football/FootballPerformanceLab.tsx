@@ -62,7 +62,7 @@ const ActivePlayerLab = ({ player }: { player: FootballPlayer & { country: strin
 
     return (
         <div className="flex-1 w-full relative z-20">
-            <FotmobPlayerCard profile={profile} />
+            <FotmobPlayerCard key={profile.id} profile={profile} player={player} />
         </div>
     );
 };

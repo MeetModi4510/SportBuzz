@@ -1,0 +1,267 @@
+{
+  "playerTrophies": [
+    {
+      "ccode": "USA",
+      "teamId": 960720,
+      "teamName": "Inter Miami CF",
+      "tournaments": [
+        {
+          "ccode": "USA",
+          "leagueId": 130,
+          "leagueName": "MLS",
+          "seasonsWon": [
+            "2025"
+          ],
+          "seasonsRunnerUp": []
+        },
+        {
+          "ccode": "INT",
+          "leagueId": 10043,
+          "leagueName": "Leagues Cup",
+          "seasonsWon": [
+            "2023"
+          ],
+          "seasonsRunnerUp": [
+            "2025"
+          ]
+        }
+      ]
+    },
+    {
+      "ccode": "FRA",
+      "teamId": 9847,
+      "teamName": "Paris Saint-Germain",
+      "tournaments": [
+        {
+          "ccode": "FRA",
+          "leagueId": 207,
+          "leagueName": "Trophée des Champions",
+          "seasonsWon": [
+            "2022/2023"
+          ],
+          "seasonsRunnerUp": []
+        },
+        {
+          "ccode": "FRA",
+          "leagueId": 53,
+          "leagueName": "Ligue 1",
+          "seasonsWon": [
+            "2022/2023",
+            "2021/2022"
+          ],
+          "seasonsRunnerUp": []
+        }
+      ]
+    },
+    {
+      "ccode": "INT",
+      "teamId": 6706,
+      "teamName": "Argentina",
+      "tournaments": [
+        {
+          "ccode": "INT",
+          "leagueId": 44,
+          "leagueName": "Copa America",
+          "seasonsWon": [
+            "2024 USA",
+            "2021 Brazil"
+          ],
+          "seasonsRunnerUp": [
+            "2016  USA",
+            "2015 Chile",
+            "2007 Venezuela"
+          ]
+        },
+        {
+          "ccode": "INT",
+          "leagueId": 77,
+          "leagueName": "World Cup",
+          "seasonsWon": [
+            "2022 Qatar"
+          ],
+          "seasonsRunnerUp": [
+            "2014 Brazil"
+          ]
+        },
+        {
+          "ccode": "INT",
+          "leagueId": -1,
+          "leagueName": "CONMEBOL/UEFA Finalissima",
+          "seasonsWon": [
+            "2022"
+          ],
+          "seasonsRunnerUp": []
+        }
+      ]
+    },
+    {
+      "ccode": "ESP",
+      "teamId": 8634,
+      "teamName": "Barcelona",
+      "tournaments": [
+        {
+          "ccode": "ESP",
+          "leagueId": -1,
+          "leagueName": "Supercopa de Catalunya",
+          "seasonsWon": [
+            "2018"
+          ],
+          "seasonsRunnerUp": [
+            "2019",
+            "2016"
+          ]
+        },
+        {
+          "ccode": "ESP",
+          "leagueId": 87,
+          "leagueName": "LaLiga",
+          "seasonsWon": [
+            "2018/2019",
+            "2017/2018",
+            "2015/2016",
+            "2014/2015",
+            "2012/2013",
+            "2010/2011",
+            "2009/2010",
+            "2008/2009",
+            "2005/2006",
+            "2004/2005"
+          ],
+          "seasonsRunnerUp": [
+            "2019/2020",
+            "2016/2017",
+            "2013/2014",
+            "2011/2012",
+            "2006/2007"
+          ]
+        },
+        {
+          "ccode": "INT",
+          "leagueId": 42,
+          "leagueName": "Champions League",
+          "seasonsWon": [
+            "2014/2015",
+            "2010/2011",
+            "2008/2009",
+            "2005/2006"
+          ],
+          "seasonsRunnerUp": []
+        },
+        {
+          "ccode": "ESP",
+          "leagueId": -1,
+          "leagueName": "Copa Catalunya",
+          "seasonsWon": [
+            "2013/2014"
+          ],
+          "seasonsRunnerUp": []
+        },
+        {
+          "ccode": "INT",
+          "leagueId": 9675,
+          "leagueName": "Audi Cup",
+          "seasonsWon": [
+            "2011"
+          ],
+          "seasonsRunnerUp": []
+        },
+        {
+          "ccode": "INT",
+          "leagueId": 74,
+          "leagueName": "UEFA Super Cup",
+          "seasonsWon": [
+            "2015/2016",
+            "2011/2012",
+            "2009/2010"
+          ],
+          "seasonsRunnerUp": [
+            "2006/2007"
+          ]
+        },
+        {
+          "ccode": "ESP",
+          "leagueId": 138,
+          "leagueName": "Copa del Rey",
+          "seasonsWon": [
+            "2020/2021",
+            "2017/2018",
+            "2016/2017",
+            "2015/2016",
+            "2014/2015",
+            "2011/2012",
+            "2008/2009"
+          ],
+          "seasonsRunnerUp": [
+            "2018/2019",
+            "2013/2014",
+            "2010/2011"
+          ]
+        },
+        {
+          "ccode": "INT",
+          "leagueId": 78,
+          "leagueName": "FIFA Club World Cup",
+          "seasonsWon": [
+            "2015 Japan",
+            "2011 Japan",
+            "2009 UAE"
+          ],
+          "seasonsRunnerUp": [
+            "2006 Japan"
+          ]
+        },
+        {
+          "ccode": "ESP",
+          "leagueId": -1,
+          "leagueName": "Trofeo Joan Gamper",
+          "seasonsWon": [
+            "2020",
+            "2019",
+            "2018",
+            "2017",
+            "2016"
+          ],
+          "seasonsRunnerUp": []
+        },
+        {
+          "ccode": "ESP",
+          "leagueId": 139,
+          "leagueName": "Supercopa de España",
+          "seasonsWon": [
+            "2018/2019",
+            "2016/2017",
+            "2013/2014",
+            "2011/2012",
+            "2010/2011",
+            "2009/2010",
+            "2006/2007",
+            "2005/2006"
+          ],
+          "seasonsRunnerUp": [
+            "2020/2021",
+            "2017/2018",
+            "2015/2016",
+            "2012/2013"
+          ]
+        }
+      ]
+    },
+    {
+      "ccode": "INT",
+      "teamId": 317232,
+      "teamName": "Argentina U23",
+      "tournaments": [
+        {
+          "ccode": "INT",
+          "leagueId": 66,
+          "leagueName": "Summer Olympics",
+          "seasonsWon": [
+            "2008 Beijing"
+          ],
+          "seasonsRunnerUp": []
+        }
+      ]
+    }
+  ],
+  "coachTrophies": []
+}

@@ -45,6 +45,7 @@ export interface FotmobPlayer {
     position: string;
     photo: string;
     cname: string;
+    ccode?: string;
     role?: any;
 }
 

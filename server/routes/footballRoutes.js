@@ -3,8 +3,10 @@ import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import * as cheerio from 'cheerio';
 import FootballStanding from '../models/FootballStanding.js';
 import WorldCupStanding from '../models/WorldCupStanding.js';
+import FotmobCache from '../models/FotmobCache.js';
 import FootballTransfer from '../models/FootballTransfer.js';
 import TrendingPlayer from '../models/TrendingPlayer.js';
 import { PlayerTopStat, TeamTopStat } from '../models/FootballTopStat.js';
@@ -160,6 +162,34 @@ router.get('/fotmob-player/:id', async (req, res) => {
     }
 });
 
+router.get('/fotmob-player-stats', async (req, res) => {
+    try {
+        const { id, seasonId, tournamentId } = req.query;
+        if (!id || !seasonId || !tournamentId) {
+            return res.status(400).json({ success: false, message: 'Missing parameters' });
+        }
+        
+        const url = `https://www.fotmob.com/players/${id}/player?seasonId=${encodeURIComponent(seasonId)}&tournamentId=${tournamentId}`;
+        const response = await axios.get(url, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+        });
+        
+        const match = response.data.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
+        if (!match) return res.status(404).json({ success: false, message: 'Data not found' });
+        
+        const nextData = JSON.parse(match[1]);
+        const playerData = nextData?.props?.pageProps?.fallback?.[`player:${id}`];
+        if (!playerData || !playerData.firstSeasonStats) {
+            return res.status(404).json({ success: false, message: 'Stats not found' });
+        }
+        
+        res.json({ success: true, data: playerData.firstSeasonStats });
+    } catch (error) {
+        console.error(`[Fotmob Player Stats Route] Error:`, error.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch fotmob player stats' });
+    }
+});
+
 router.get('/fotmob-player-image/:id', async (req, res) => {
     try {
         const id = req.params.id;
@@ -181,6 +211,138 @@ router.get('/fotmob-player-image/:id', async (req, res) => {
     }
 });
 
+// ─── FOTMOB TABLE SCRAPER ───────────────────────────────────────────────────
+router.get('/fotmob-table/:leagueId', async (req, res) => {
+    try {
+        const { leagueId } = req.params;
+        const cacheKey = `/fotmob-table/${leagueId}`;
+        
+        // Check cache (1 hour TTL)
+        const cached = await FotmobCache.findOne({ endpoint: cacheKey, cacheExpiry: { $gt: new Date() } });
+        if (cached) {
+            return res.json({ success: true, data: cached.data });
+        }
+
+        const url = `https://www.fotmob.com/leagues/${leagueId}/table`;
+        console.log(`[FotMob Scraper] Fetching ${url}`);
+        
+        const response = await axios.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+        });
+        
+        const $ = cheerio.load(response.data);
+        const nextData = $('#__NEXT_DATA__').html();
+        
+        if (!nextData) {
+            return res.status(404).json({ success: false, message: 'Could not find next data' });
+        }
+        
+        const json = JSON.parse(nextData);
+        const tables = json.props?.pageProps?.table?.[0]?.data?.tables;
+        
+        if (!tables) {
+            return res.status(404).json({ success: false, message: 'Could not find tables in next data' });
+        }
+        
+        // Save to cache
+        await FotmobCache.findOneAndUpdate(
+            { endpoint: cacheKey },
+            { 
+                endpoint: cacheKey, 
+                data: tables, 
+                cacheExpiry: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+                lastFetched: new Date()
+            },
+            { upsert: true, new: true }
+        );
+
+        res.json({ success: true, data: tables });
+    } catch (err) {
+        console.error('[FotMob Scraper] Error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch table' });
+    }
+});
+
+// ─── FOTMOB STATS SCRAPER ───────────────────────────────────────────────────
+router.get('/fotmob-stats/:leagueId', async (req, res) => {
+    try {
+        const { leagueId } = req.params;
+        const cacheKey = `/fotmob-stats/${leagueId}`;
+        
+        // Check cache (1 hour TTL)
+        const cached = await FotmobCache.findOne({ endpoint: cacheKey, cacheExpiry: { $gt: new Date() } });
+        if (cached) {
+            return res.json({ success: true, data: cached.data });
+        }
+
+        const url = `https://www.fotmob.com/leagues/${leagueId}/stats/world-cup/players`;
+        console.log(`[FotMob Scraper] Fetching ${url}`);
+        
+        const response = await axios.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+        });
+        
+        const $ = cheerio.load(response.data);
+        const nextData = $('#__NEXT_DATA__').html();
+        
+        if (!nextData) return res.status(404).json({ success: false, message: 'Could not find next data' });
+        
+        const json = JSON.parse(nextData);
+        const playersStats = json.props?.pageProps?.stats?.players;
+        
+        if (!playersStats || !Array.isArray(playersStats)) {
+            return res.status(404).json({ success: false, message: 'Could not find player stats' });
+        }
+        
+        // Fetch details sequentially with a 300ms delay (Throttling)
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+        const results = [];
+
+        for (const statGroup of playersStats) {
+            if (statGroup.fetchAllUrl) {
+                try {
+                    const fetchUrl = statGroup.fetchAllUrl.startsWith('http') ? statGroup.fetchAllUrl : `https://data.fotmob.com${statGroup.fetchAllUrl}`;
+                    const statRes = await axios.get(fetchUrl, {
+                        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+                    });
+                    results.push({
+                        header: statGroup.header,
+                        data: statRes.data?.TopLists?.[0]?.StatList || []
+                    });
+                } catch (e) {
+                    console.warn(`[FotMob Scraper] Failed to fetch full stats for ${statGroup.header}:`, e.message);
+                    results.push({ header: statGroup.header, data: statGroup.topThree || [] });
+                }
+                
+                // Add the 400ms human-like browsing delay
+                await delay(400);
+            } else {
+                results.push({ header: statGroup.header, data: statGroup.topThree || [] });
+            }
+        }
+        
+        // Save to cache
+        await FotmobCache.findOneAndUpdate(
+            { endpoint: cacheKey },
+            { 
+                endpoint: cacheKey, 
+                data: results, 
+                cacheExpiry: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+                lastFetched: new Date()
+            },
+            { upsert: true, new: true }
+        );
+
+        res.json({ success: true, data: results });
+    } catch (err) {
+        console.error('[FotMob Scraper] Error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch stats' });
+    }
+});
 // ─── LATEST TRANSFERS ─────────────────────────────────────────────────────────
 // Serves transfers from MongoDB cache (2-day TTL).
 
@@ -1481,6 +1643,7 @@ router.get('/v3/tournament-logo/:tournamentId', async (req, res) => {
     }
 });
 // ESPN Player Profile
+// ESPN Player Profile
 router.get('/v3/player-profile/:playerId', async (req, res) => {
     try {
         const { playerId } = req.params;
@@ -1490,6 +1653,27 @@ router.get('/v3/player-profile/:playerId', async (req, res) => {
     } catch (err) {
         console.error('[ESPN] Player profile error:', err.message);
         res.status(404).json({ success: false, message: 'Player profile not found' });
+    }
+});
+
+// Fotmob Player Recent Matches
+router.get('/v3/player-recent-matches/:playerName', async (req, res) => {
+    try {
+        const { playerName } = req.params;
+        const playerInfo = await fotmobService.resolvePlayerId(playerName);
+        if (!playerInfo) {
+             return res.status(404).json({ success: false, message: 'Player not found on Fotmob' });
+        }
+        
+        const playerData = await fotmobService.fetchPlayerData(playerInfo.id);
+        if (!playerData || !playerData.recentMatches) {
+             return res.status(404).json({ success: false, message: 'Recent matches not found' });
+        }
+
+        res.json({ success: true, data: playerData.recentMatches });
+    } catch (err) {
+        console.error('[Fotmob] Recent matches error:', err.message);
+        res.status(500).json({ success: false, message: 'Error fetching recent matches' });
     }
 });
 

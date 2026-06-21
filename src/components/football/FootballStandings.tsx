@@ -59,9 +59,59 @@ const LEAGUES = [
   { id: 77, name: "World Cup", logo: "https://images.fotmob.com/image_resources/logo/leaguelogo/77.png" },
 ];
 
-async function fetchStandings(leagueId: number): Promise<StandingsResponse | WorldCupStandingsResponse> {
+const FEDERATION_LOGOS: Record<string, string> = {
+  "Mexico": "https://a.espncdn.com/i/teamlogos/soccer/500/203.png",
+  "South Korea": "https://a.espncdn.com/i/teamlogos/soccer/500/451.png",
+  "Czechia": "https://a.espncdn.com/i/teamlogos/soccer/500/450.png",
+  "South Africa": "https://a.espncdn.com/i/teamlogos/soccer/500/467.png",
+  "Canada": "https://a.espncdn.com/i/teamlogos/soccer/500/206.png",
+  "Switzerland": "https://a.espncdn.com/i/teamlogos/soccer/500/475.png",
+  "Bosnia and Herzegovina": "https://a.espncdn.com/i/teamlogos/soccer/500/452.png",
+  "Qatar": "https://a.espncdn.com/i/teamlogos/soccer/500/4398.png",
+  "Brazil": "https://a.espncdn.com/i/teamlogos/soccer/500/205.png",
+  "Morocco": "https://a.espncdn.com/i/teamlogos/soccer/500/2869.png",
+  "Scotland": "https://a.espncdn.com/i/teamlogos/soccer/500/580.png",
+  "Haiti": "https://a.espncdn.com/i/teamlogos/soccer/500/2654.png",
+  "USA": "https://a.espncdn.com/i/teamlogos/soccer/500/660.png",
+  "Australia": "https://a.espncdn.com/i/teamlogos/soccer/500/628.png",
+  "Paraguay": "https://a.espncdn.com/i/teamlogos/soccer/500/210.png",
+  "Germany": "https://a.espncdn.com/i/teamlogos/soccer/500/481.png",
+  "Ivory Coast": "https://a.espncdn.com/i/teamlogos/soccer/500/4789.png",
+  "Ecuador": "https://a.espncdn.com/i/teamlogos/soccer/500/209.png",
+  "Curacao": "https://a.espncdn.com/i/teamlogos/soccer/500/11678.png",
+  "Netherlands": "https://a.espncdn.com/i/teamlogos/soccer/500/449.png",
+  "Japan": "https://a.espncdn.com/i/teamlogos/soccer/500/627.png",
+  "Sweden": "https://a.espncdn.com/i/teamlogos/soccer/500/466.png",
+  "Tunisia": "https://a.espncdn.com/i/teamlogos/soccer/500/659.png",
+  "New Zealand": "https://a.espncdn.com/i/teamlogos/soccer/500/2666.png",
+  "Iran": "https://a.espncdn.com/i/teamlogos/soccer/500/469.png",
+  "Belgium": "https://a.espncdn.com/i/teamlogos/soccer/500/459.png",
+  "Egypt": "https://a.espncdn.com/i/teamlogos/soccer/500/2620.png",
+  "Uruguay": "https://a.espncdn.com/i/teamlogos/soccer/500/212.png",
+  "Saudi Arabia": "https://a.espncdn.com/i/teamlogos/soccer/500/655.png",
+  "Spain": "https://a.espncdn.com/i/teamlogos/soccer/500/164.png",
+  "Cape Verde": "https://a.espncdn.com/i/teamlogos/soccer/500/2597.png",
+  "Norway": "https://a.espncdn.com/i/teamlogos/soccer/500/464.png",
+  "France": "https://a.espncdn.com/i/teamlogos/soccer/500/478.png",
+  "Senegal": "https://a.espncdn.com/i/teamlogos/soccer/500/654.png",
+  "Iraq": "https://a.espncdn.com/i/teamlogos/soccer/500/4375.png",
+  "Argentina": "https://a.espncdn.com/i/teamlogos/soccer/500/202.png",
+  "Austria": "https://a.espncdn.com/i/teamlogos/soccer/500/474.png",
+  "Jordan": "https://a.espncdn.com/i/teamlogos/soccer/500/2917.png",
+  "Algeria": "https://a.espncdn.com/i/teamlogos/soccer/500/624.png",
+  "Colombia": "https://a.espncdn.com/i/teamlogos/soccer/500/208.png",
+  "DR Congo": "https://a.espncdn.com/i/teamlogos/soccer/500/2850.png",
+  "Portugal": "https://a.espncdn.com/i/teamlogos/soccer/500/482.png",
+  "Uzbekistan": "https://a.espncdn.com/i/teamlogos/soccer/500/2570.png",
+  "England": "https://a.espncdn.com/i/teamlogos/soccer/500/448.png",
+  "Ghana": "https://a.espncdn.com/i/teamlogos/soccer/500/4469.png",
+  "Panama": "https://a.espncdn.com/i/teamlogos/soccer/500/2659.png",
+  "Croatia": "https://a.espncdn.com/i/teamlogos/soccer/500/477.png"
+};
+
+async function fetchStandings(leagueId: number): Promise<any> {
   if (leagueId === 77) {
-    const res = await fetch(`${API_BASE}/api/football/world-cup-standings`);
+    const res = await fetch(`${API_BASE}/api/football/fotmob-table/77`);
     if (!res.ok) throw new Error("Failed to fetch world cup standings");
     return res.json();
   } else {
@@ -117,13 +167,11 @@ export function FootballStandings() {
   
   // Initialize with World Cup if theme is active, otherwise Premier League
   const [selectedLeagueId, setSelectedLeagueId] = useState<number>(() => {
-    // We cannot reliably use the hook in the useState callback if the hook result changes after mount, 
-    // but the hook returns the initial state synchronously based on Date.now().
-    // For safer updates if it changes during runtime, we'll also use useEffect below.
     return 47; // Default to 47 initially, useEffect will sync it
   });
   
   const [selectedGroup, setSelectedGroup] = useState<string>("Group A");
+  const [selectedTab, setSelectedTab] = useState<"all" | "home" | "away">("all");
 
   useEffect(() => {
     // On mount or when theme changes, set default to World Cup if active
@@ -134,8 +182,8 @@ export function FootballStandings() {
     }
   }, [isWorldCup]);
 
-  const { data, isLoading, isError, isFetching } = useQuery<StandingsResponse | WorldCupStandingsResponse>({
-    queryKey: ["football", "standings", selectedLeagueId],
+  const { data, isLoading, isError, isFetching } = useQuery<any>({
+    queryKey: ["football", "standings-v2", selectedLeagueId],
     queryFn: () => fetchStandings(selectedLeagueId),
     staleTime: 30 * 60 * 1000,   // consider fresh for 30 min in the client
     gcTime: 60 * 60 * 1000,      // keep in memory for 1 hour
@@ -207,31 +255,47 @@ export function FootballStandings() {
 
       {/* Table Content */}
       {selectedLeagueId === 77 ? (
-        /* World Cup Single Group Layout */
-        data?.data && Object.keys(data.data).length > 0 && (
+        /* World Cup FotMob Layout */
+        data?.data && Array.isArray(data.data) && data.data.length > 0 && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center bg-foreground/[0.03] p-3 rounded-2xl border border-border">
-              <span className="text-sm font-semibold text-foreground/80 pl-2">Select Group</span>
-              
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-foreground/[0.03] p-3 rounded-2xl border border-border">
+              {/* Tabs for All, Home, Away */}
+              <div className="flex items-center gap-1 bg-foreground/5 p-1 rounded-xl w-fit">
+                {(["all", "home", "away"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setSelectedTab(tab)}
+                    className={cn(
+                      "px-4 py-1.5 rounded-lg text-sm font-semibold capitalize transition-all",
+                      selectedTab === tab 
+                        ? "bg-foreground text-background shadow-sm" 
+                        : "text-foreground/60 hover:text-foreground hover:bg-foreground/10"
+                    )}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+
               {/* Group Selector Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 px-4 py-2 bg-background hover:bg-foreground/[0.02] border border-border rounded-xl transition-all shadow-sm">
-                    <span className="text-sm font-bold text-foreground/90">{selectedGroup || Object.keys(data.data)[0]}</span>
+                    <span className="text-sm font-bold text-foreground/90">{selectedGroup || data.data[0].leagueName}</span>
                     <ChevronDown size={16} className="text-muted-foreground ml-1" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-popover text-popover-foreground border-border min-w-[150px] p-1.5 rounded-xl shadow-2xl max-h-[300px] overflow-y-auto">
-                  {Object.keys(data.data).map(groupName => (
+                  {data.data.map((group: any) => (
                     <DropdownMenuItem 
-                      key={groupName} 
-                      onClick={() => setSelectedGroup(groupName)}
+                      key={group.leagueName} 
+                      onClick={() => setSelectedGroup(group.leagueName)}
                       className={cn(
                         "flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2 transition-colors",
-                        (selectedGroup || Object.keys(data.data)[0]) === groupName ? "bg-accent text-accent-foreground font-bold" : "text-foreground/70 hover:bg-accent/50 hover:text-accent-foreground"
+                        (selectedGroup || data.data[0].leagueName) === group.leagueName ? "bg-accent text-accent-foreground font-bold" : "text-foreground/70 hover:bg-accent/50 hover:text-accent-foreground"
                       )}
                     >
-                      <span className="text-sm">{groupName}</span>
+                      <span className="text-sm">{group.leagueName}</span>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -240,17 +304,19 @@ export function FootballStandings() {
 
             <div className="grid grid-cols-1">
               {(() => {
-                const groups = data.data as Record<string, StandingRow[]>;
-                const activeGroup = groups[selectedGroup] ? selectedGroup : Object.keys(groups)[0];
-                const teams = groups[activeGroup];
+                const activeGroupData = data.data.find((g: any) => g.leagueName === selectedGroup) || data.data[0];
+                const teams = activeGroupData?.table?.[selectedTab];
                 if (!teams) return null;
 
                 return (
-                  <div key={activeGroup} className="rounded-2xl border border-border bg-foreground/[0.03] backdrop-blur-sm overflow-hidden flex flex-col shadow-sm">
+                  <div key={activeGroupData.leagueName} className="rounded-2xl border border-border bg-[#121316] backdrop-blur-sm overflow-hidden flex flex-col shadow-lg relative">
+                    {/* Subtle Top Gradient */}
+                    <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
+                    
                     {/* Group Header */}
-                    <div className="px-5 py-4 border-b border-border/50 bg-foreground/5 flex items-center justify-between">
-                      <span className="font-black text-foreground tracking-tight text-lg">{activeGroup}</span>
-                      <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md">
+                    <div className="px-5 py-4 border-b border-border/50 bg-[#1A1C20] flex items-center justify-between">
+                      <span className="font-black text-foreground tracking-tight text-lg">{activeGroupData.leagueName}</span>
+                      <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">
                         Top 2 Advance
                       </span>
                     </div>
@@ -258,62 +324,69 @@ export function FootballStandings() {
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
-                          <tr className="text-xs font-black text-muted-foreground/60 uppercase tracking-widest border-b border-border/50 bg-background/30">
+                          <tr className="text-xs font-black text-muted-foreground/50 uppercase tracking-widest border-b border-border/30 bg-[#121316]">
                             <th className="pl-4 pr-3 py-3 text-left w-10">#</th>
                             <th className="px-3 py-3 text-left min-w-[150px]">Team</th>
-                            <th className="px-3 py-3 text-center">MP</th>
+                            <th className="px-3 py-3 text-center">PL</th>
                             <th className="px-3 py-3 text-center">W</th>
                             <th className="px-3 py-3 text-center">D</th>
                             <th className="px-3 py-3 text-center">L</th>
-                            <th className="px-3 py-3 text-center hidden sm:table-cell">GF</th>
-                            <th className="px-3 py-3 text-center hidden sm:table-cell">GA</th>
+                            <th className="px-3 py-3 text-center hidden sm:table-cell">+/-</th>
                             <th className="px-3 py-3 text-center">GD</th>
-                            <th className="pr-4 pl-3 py-3 text-center font-black text-muted-foreground">Pts</th>
+                            <th className="px-3 py-3 text-center font-black text-foreground">PTS</th>
+                            <th className="px-4 py-3 text-left">Form</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-border/50">
-                          {teams.map((row) => (
+                        <tbody className="divide-y divide-border/20">
+                          {teams.map((row: any) => (
                             <tr
-                              key={row._id || row.teamId}
+                              key={row.id}
                               className={cn(
                                 "transition-colors group cursor-default",
-                                row.position <= 2 ? "bg-emerald-500/5 hover:bg-emerald-500/10" : "hover:bg-foreground/5"
+                                row.idx <= 2 ? "hover:bg-emerald-500/5" : "hover:bg-foreground/5"
                               )}
                             >
                               <td className="pl-0 pr-3 py-3">
                                 <div className="flex items-center gap-0">
-                                  <span className={cn("w-1 h-8 rounded-r-full flex-shrink-0", row.position <= 2 ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-transparent")} />
+                                  <span className={cn("w-[3px] h-8 rounded-r-full flex-shrink-0", row.idx <= 2 ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-transparent")} />
                                   <div className="pl-3 w-6 flex justify-end">
-                                    <span className={cn("font-bold text-xs", row.position <= 2 ? "text-emerald-500" : "text-muted-foreground/80")}>
-                                      {row.position}
+                                    <span className={cn("font-bold text-xs", row.idx <= 2 ? "text-emerald-500" : "text-muted-foreground/60")}>
+                                      {row.idx}
                                     </span>
                                   </div>
                                 </div>
                               </td>
                               <td className="px-3 py-3">
                                 <div className="flex items-center gap-3">
-                                  <TeamLogo src={row.logoUrl || (row as any).teamLogo} name={row.teamName} size="w-8 h-8" />
-                                  <span className={cn("font-bold leading-tight whitespace-nowrap text-base sm:text-lg tracking-tight", row.position <= 2 ? "text-foreground" : "text-foreground/80")}>
-                                    {row.teamName}
+                                  <TeamLogo src={FEDERATION_LOGOS[row.name] || `https://images.fotmob.com/image_resources/logo/teamlogo/${row.id}.png`} name={row.name} size="w-7 h-7" />
+                                  <span className={cn("font-bold leading-tight whitespace-nowrap text-[15px] tracking-tight", row.idx <= 2 ? "text-foreground" : "text-foreground/80")}>
+                                    {row.name}
                                   </span>
                                 </div>
                               </td>
-                              <td className="px-3 py-3 text-center text-muted-foreground tabular-nums text-base">{row.played}</td>
-                              <td className="px-3 py-3 text-center text-emerald-400 font-semibold tabular-nums text-base">{row.wins}</td>
-                              <td className="px-3 py-3 text-center text-amber-400/80 font-semibold tabular-nums text-base">{row.draws}</td>
-                              <td className="px-3 py-3 text-center text-rose-400 font-semibold tabular-nums text-base">{row.losses}</td>
-                              <td className="px-3 py-3 text-center text-muted-foreground/80 tabular-nums hidden sm:table-cell text-base">{row.goalsFor}</td>
-                              <td className="px-3 py-3 text-center text-muted-foreground/80 tabular-nums hidden sm:table-cell text-base">{row.goalsAgainst}</td>
-                              <td className={cn(
-                                "px-3 py-3 text-center font-semibold tabular-nums text-base",
-                                row.goalDiff > 0 ? "text-emerald-400" : row.goalDiff < 0 ? "text-rose-400" : "text-muted-foreground/80"
-                              )}>
-                                {row.goalDiff > 0 ? `+${row.goalDiff}` : row.goalDiff}
+                              <td className="px-3 py-3 text-center text-muted-foreground/80 tabular-nums text-sm font-semibold">{row.played}</td>
+                              <td className="px-3 py-3 text-center text-muted-foreground/80 font-semibold tabular-nums text-sm">{row.wins}</td>
+                              <td className="px-3 py-3 text-center text-muted-foreground/80 font-semibold tabular-nums text-sm">{row.draws}</td>
+                              <td className="px-3 py-3 text-center text-muted-foreground/80 font-semibold tabular-nums text-sm">{row.losses}</td>
+                              <td className="px-3 py-3 text-center text-muted-foreground/60 tabular-nums hidden sm:table-cell text-sm">{row.scoresStr}</td>
+                              <td className="px-3 py-3 text-center font-semibold tabular-nums text-sm text-foreground/80">
+                                {row.goalConDiff > 0 ? `+${row.goalConDiff}` : row.goalConDiff}
                               </td>
-                              <td className="pr-4 pl-3 py-3 text-center">
-                                <span className="inline-flex items-center justify-center min-w-[2.5rem] h-9 rounded-lg bg-foreground/5 font-black text-foreground text-base tabular-nums">
-                                  {row.points}
+                              <td className="px-3 py-3 text-center">
+                                <span className="inline-flex items-center justify-center font-black text-foreground text-[15px] tabular-nums">
+                                  {row.pts}
                                 </span>
+                              </td>
+                              <td className="px-4 py-3 text-left">
+                                <div className="flex items-center gap-1.5">
+                                  {/* Just rendering W D L manually for World Cup if form not fully available from FotMob, 
+                                      or extracting from recent matches if needed. 
+                                      For FotMob, if form exists it's usually inside row.form */}
+                                  {row.wins > 0 && <span className="w-5 h-5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] font-black flex items-center justify-center border border-emerald-500/30">W</span>}
+                                  {row.wins > 1 && <span className="w-5 h-5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] font-black flex items-center justify-center border border-emerald-500/30">W</span>}
+                                  {row.draws > 0 && <span className="w-5 h-5 rounded-md bg-foreground/20 text-foreground/70 text-[10px] font-black flex items-center justify-center border border-border">D</span>}
+                                  {row.losses > 0 && <span className="w-5 h-5 rounded-md bg-rose-500/20 text-rose-400 text-[10px] font-black flex items-center justify-center border border-rose-500/30">L</span>}
+                                </div>
                               </td>
                             </tr>
                           ))}
@@ -326,17 +399,7 @@ export function FootballStandings() {
             </div>
             
             {/* World Cup Footer */}
-            <div className="px-5 py-4 rounded-2xl border border-border/50 bg-foreground/[0.02] flex flex-col xl:flex-row justify-between items-center gap-4">
-              <div className="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-2 text-[10px] text-muted-foreground/60 uppercase tracking-widest">
-                <span><strong className="text-foreground/70 font-bold pr-1">MP</strong>Matches Played</span>
-                <span><strong className="text-foreground/70 font-bold pr-1">W</strong>Wins</span>
-                <span><strong className="text-foreground/70 font-bold pr-1">D</strong>Draws</span>
-                <span><strong className="text-foreground/70 font-bold pr-1">L</strong>Losses</span>
-                <span className="hidden sm:inline"><strong className="text-foreground/70 font-bold pr-1">GF</strong>Goals For</span>
-                <span className="hidden sm:inline"><strong className="text-foreground/70 font-bold pr-1">GA</strong>Goals Against</span>
-                <span><strong className="text-foreground/70 font-bold pr-1">GD</strong>Goal Diff</span>
-                <span><strong className="text-foreground/70 font-bold pr-1">PTS</strong>Points</span>
-              </div>
+            <div className="px-5 py-4 rounded-2xl border border-border/50 bg-[#121316] flex flex-col xl:flex-row justify-between items-center gap-4 shadow-sm">
               <div className="flex items-center gap-4 shrink-0">
                 <span className="flex items-center gap-2 text-[10px] sm:text-xs font-medium text-muted-foreground/80">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Advances to Knockout Stage

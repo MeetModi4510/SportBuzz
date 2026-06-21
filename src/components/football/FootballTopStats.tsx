@@ -32,6 +32,73 @@ const COUNTRY_CODES: Record<string, string> = {
   "Chile": "cl", "Mexico": "mx", "Canada": "ca", "Australia": "au"
 };
 
+const FEDERATION_LOGOS: Record<string, string> = {
+  "Mexico": "https://a.espncdn.com/i/teamlogos/soccer/500/203.png",
+  "South Korea": "https://a.espncdn.com/i/teamlogos/soccer/500/451.png",
+  "Czechia": "https://a.espncdn.com/i/teamlogos/soccer/500/450.png",
+  "South Africa": "https://a.espncdn.com/i/teamlogos/soccer/500/467.png",
+  "Canada": "https://a.espncdn.com/i/teamlogos/soccer/500/206.png",
+  "Switzerland": "https://a.espncdn.com/i/teamlogos/soccer/500/475.png",
+  "Bosnia and Herzegovina": "https://a.espncdn.com/i/teamlogos/soccer/500/452.png",
+  "Qatar": "https://a.espncdn.com/i/teamlogos/soccer/500/4398.png",
+  "Brazil": "https://a.espncdn.com/i/teamlogos/soccer/500/205.png",
+  "Morocco": "https://a.espncdn.com/i/teamlogos/soccer/500/2869.png",
+  "Scotland": "https://a.espncdn.com/i/teamlogos/soccer/500/580.png",
+  "Haiti": "https://a.espncdn.com/i/teamlogos/soccer/500/2654.png",
+  "USA": "https://a.espncdn.com/i/teamlogos/soccer/500/660.png",
+  "Australia": "https://a.espncdn.com/i/teamlogos/soccer/500/628.png",
+  "Paraguay": "https://a.espncdn.com/i/teamlogos/soccer/500/210.png",
+  "Germany": "https://a.espncdn.com/i/teamlogos/soccer/500/481.png",
+  "Ivory Coast": "https://a.espncdn.com/i/teamlogos/soccer/500/4789.png",
+  "Ecuador": "https://a.espncdn.com/i/teamlogos/soccer/500/209.png",
+  "Curacao": "https://a.espncdn.com/i/teamlogos/soccer/500/11678.png",
+  "Netherlands": "https://a.espncdn.com/i/teamlogos/soccer/500/449.png",
+  "Japan": "https://a.espncdn.com/i/teamlogos/soccer/500/627.png",
+  "Sweden": "https://a.espncdn.com/i/teamlogos/soccer/500/466.png",
+  "Tunisia": "https://a.espncdn.com/i/teamlogos/soccer/500/659.png",
+  "New Zealand": "https://a.espncdn.com/i/teamlogos/soccer/500/2666.png",
+  "Iran": "https://a.espncdn.com/i/teamlogos/soccer/500/469.png",
+  "Belgium": "https://a.espncdn.com/i/teamlogos/soccer/500/459.png",
+  "Egypt": "https://a.espncdn.com/i/teamlogos/soccer/500/2620.png",
+  "Uruguay": "https://a.espncdn.com/i/teamlogos/soccer/500/212.png",
+  "Saudi Arabia": "https://a.espncdn.com/i/teamlogos/soccer/500/655.png",
+  "Spain": "https://a.espncdn.com/i/teamlogos/soccer/500/164.png",
+  "Cape Verde": "https://a.espncdn.com/i/teamlogos/soccer/500/2597.png",
+  "Norway": "https://a.espncdn.com/i/teamlogos/soccer/500/464.png",
+  "France": "https://a.espncdn.com/i/teamlogos/soccer/500/478.png",
+  "Senegal": "https://a.espncdn.com/i/teamlogos/soccer/500/654.png",
+  "Iraq": "https://a.espncdn.com/i/teamlogos/soccer/500/4375.png",
+  "Argentina": "https://a.espncdn.com/i/teamlogos/soccer/500/202.png",
+  "Austria": "https://a.espncdn.com/i/teamlogos/soccer/500/474.png",
+  "Jordan": "https://a.espncdn.com/i/teamlogos/soccer/500/2917.png",
+  "Algeria": "https://a.espncdn.com/i/teamlogos/soccer/500/624.png",
+  "Colombia": "https://a.espncdn.com/i/teamlogos/soccer/500/208.png",
+  "DR Congo": "https://a.espncdn.com/i/teamlogos/soccer/500/2850.png",
+  "Portugal": "https://a.espncdn.com/i/teamlogos/soccer/500/482.png",
+  "Uzbekistan": "https://a.espncdn.com/i/teamlogos/soccer/500/2570.png",
+  "England": "https://a.espncdn.com/i/teamlogos/soccer/500/448.png",
+  "Ghana": "https://a.espncdn.com/i/teamlogos/soccer/500/4469.png",
+  "Panama": "https://a.espncdn.com/i/teamlogos/soccer/500/2659.png",
+  "Croatia": "https://a.espncdn.com/i/teamlogos/soccer/500/477.png"
+};
+
+const FOTMOB_MAJOR_CATEGORIES: Record<string, string[]> = {
+  "Attacking": ["Top scorer", "Assists", "Goals + Assists", "Goals per 90", "Expected goals (xG)", "Expected goals (xG) per 90", "Expected goals on target (xGOT)", "Shots on target per 90", "Shots per 90", "xG + xA per 90", "Big chances missed"],
+  "Playmaking": ["Accurate passes per 90", "Big chances created", "Chances created", "Accurate long balls per 90", "Expected assist (xA)", "Expected assist (xA) per 90", "Successful dribbles per 90", "Possession won final 3rd per 90"],
+  "Defending": ["Defensive actions per 90", "Tackles per 90", "Interceptions per 90", "Clearances per 90", "Blocks per 90", "Recoveries per 90"],
+  "Goalkeeping": ["Clean sheets", "Save percentage", "Saves per 90", "Goals prevented", "Goals conceded per 90"],
+  "Discipline": ["Yellow cards", "Red cards", "Fouls committed per 90", "Penalties won", "Penalties conceded"],
+  "Overall": ["FotMob rating", "Minutes played"]
+};
+
+function getMajorCategory(label: string) {
+  const lowerLabel = label.toLowerCase();
+  for (const [major, subcats] of Object.entries(FOTMOB_MAJOR_CATEGORIES)) {
+    if (subcats.some(s => s.toLowerCase() === lowerLabel)) return major;
+  }
+  return "Overall";
+}
+
 // ── Small helpers ──────────────────────────────────────────────────────────────
 
 function PlayerAvatar({ photoBase64, name, sofascoreId, className }: { photoBase64?: string; name: string; sofascoreId?: string; className?: string }) {
@@ -72,7 +139,9 @@ function PlayerAvatar({ photoBase64, name, sofascoreId, className }: { photoBase
 
 function TeamBadge({ img, name, className }: { img: string; name: string; className?: string }) {
   const [err, setErr] = useState(false);
-  const src = teamBadgeUrl(img);
+  const src = img && img.length < 10 
+    ? FEDERATION_LOGOS[name] || `https://images.fotmob.com/image_resources/logo/teamlogo/${img}.png`
+    : teamBadgeUrl(img);
   const cx = className || "w-6 h-6";
 
   if (!src || err) {
@@ -99,7 +168,7 @@ function PlayerStatList({ rows }: { rows: PlayerStat[] }) {
     return <p className="text-center text-muted-foreground/60 text-sm py-8 font-light">No data available.</p>;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
       {rows.map((p) => {
         return (
           <div key={p._id} className="group relative flex items-center py-1 transition-transform duration-500 hover:translate-x-3 cursor-default">
@@ -242,6 +311,7 @@ export function FootballTopStats() {
   // Set initial league: 734 (World Cup) if theme is active, else 65 (Premier League)
   const [leagueId, setLeagueId]   = useState(isWorldCupTheme ? 734 : 65);
   const [view, setView]           = useState<"players" | "teams">("players");
+  const [majorCategory, setMajorCategory] = useState<string>("Attacking");
   const [playerTyp, setPlayerTyp] = useState(1);
   const [teamTyp, setTeamTyp]     = useState(10);
 
@@ -252,24 +322,43 @@ export function FootballTopStats() {
 
   const { data, isLoading, isError } = useTopStats(leagueId, playerTyp, view);
 
+  // Sync playerTyp dynamically when FotMob data loads or majorCategory changes
+  useEffect(() => {
+    if (data?.isFotmob && data.fotmobTabs && data.fotmobTabs.length > 0) {
+      const currentExists = data.fotmobTabs.some(t => Number(t[0]) === playerTyp && getMajorCategory(t[1]) === majorCategory);
+      if (!currentExists) {
+        const firstInMajor = data.fotmobTabs.find(t => getMajorCategory(t[1]) === majorCategory);
+        if (firstInMajor) setPlayerTyp(Number(firstInMajor[0]));
+        else setPlayerTyp(Number(data.fotmobTabs[0][0]));
+      }
+    } else if (data && !data.isFotmob) {
+      const currentExists = Object.keys(PLAYER_STAT_LABELS).some(k => Number(k) === playerTyp);
+      if (!currentExists) setPlayerTyp(1);
+    }
+  }, [data, playerTyp, majorCategory]);
+
+  const handleMajorCategoryClick = (major: string) => {
+    setMajorCategory(major);
+  };
+
   // Trigger on-demand background enrichment whenever tab changes
   useEffect(() => {
-    if (view === "players") {
+    if (view === "players" && data && !data.isFotmob) {
       fetch(`${API_BASE}/api/football/top-stats/enrich`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ leagueId, statTyp: playerTyp }),
       }).catch(console.error);
     }
-  }, [leagueId, playerTyp, view]);
+  }, [leagueId, playerTyp, view, data]);
 
   const selectedLeague = TOPSTATS_LEAGUES.find((l) => l.id === leagueId) || TOPSTATS_LEAGUES[0];
 
   // Filter rows to current tab + type
-  const playerRows = (data?.players || []).filter((p) => p.statTyp === playerTyp);
+  const playerRows = (data?.players || []).filter((p) => p.statTyp === playerTyp).slice(0, 10);
   const teamRows   = (data?.teams   || []).filter((t) => t.statTyp === teamTyp);
 
-  const playerTypes = Object.entries(PLAYER_STAT_LABELS);
+  const playerTypes = data?.isFotmob && data.fotmobTabs ? data.fotmobTabs : Object.entries(PLAYER_STAT_LABELS);
   const teamTypes   = Object.entries(TEAM_STAT_LABELS);
 
   return (
@@ -377,19 +466,42 @@ export function FootballTopStats() {
           </div>
 
           {/* ── Category chips ─────── */}
-          <div className="flex flex-wrap gap-x-6 gap-y-3 mb-6">
+          {data?.isFotmob && view === "players" && (
+            <div className="flex items-center gap-3 overflow-x-auto custom-scrollbar pb-4 mb-4 border-b border-border/40">
+              {Object.keys(FOTMOB_MAJOR_CATEGORIES).map(major => {
+                const hasTabs = data.fotmobTabs?.some(t => getMajorCategory(t[1]) === major);
+                if (!hasTabs) return null;
+                return (
+                  <button
+                    key={major}
+                    onClick={() => handleMajorCategoryClick(major)}
+                    className={cn(
+                      "px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all whitespace-nowrap shrink-0",
+                      majorCategory === major
+                        ? "bg-[#d4af37] text-black shadow-md shadow-[#d4af37]/20"
+                        : "bg-foreground/5 text-muted-foreground/60 hover:bg-foreground/10 hover:text-foreground/90"
+                    )}
+                  >
+                    {major}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="flex items-center gap-6 overflow-x-auto custom-scrollbar pb-2 mb-6">
             {view === "players"
-              ? playerTypes.map(([typ, label]) => {
+              ? (data?.isFotmob ? playerTypes.filter(t => getMajorCategory(t[1]) === majorCategory) : playerTypes).map(([typ, label]) => {
                   const t = Number(typ);
                   return (
                     <button
                       key={t}
                       onClick={() => setPlayerTyp(t)}
                       className={cn(
-                        "text-xs font-semibold tracking-widest uppercase transition-all whitespace-nowrap",
+                        "text-[11px] font-bold tracking-wider uppercase transition-all whitespace-nowrap shrink-0",
                         playerTyp === t
                           ? "text-[#d4af37]"
-                          : "text-muted-foreground/70 hover:text-foreground/80"
+                          : "text-muted-foreground/60 hover:text-foreground/80"
                       )}
                     >
                       {label}

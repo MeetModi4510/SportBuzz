@@ -48,8 +48,8 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                     >
                         {selectedRegionObj ? (
                             <div className="flex items-center gap-4 pr-4">
-                                <div className="w-10 h-7 overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700/50 shadow-sm rounded-[4px] p-0.5 bg-white/10">
-                                    <img src={selectedRegionObj.flag} alt="Region" className="w-full h-full object-contain" />
+                                <div className="w-12 h-8 overflow-hidden flex items-center justify-center rounded-[4px]">
+                                    <img src={selectedRegionObj.flag} alt="Region" className="w-full h-full object-cover shadow-sm" />
                                 </div>
                                 <div>
                                     <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-0.5">National Squad</p>
@@ -81,8 +81,8 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                                     }}
                                     className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer hover:bg-white/10 transition-colors ${selectedTeamName === r.id ? 'bg-blue-500/15 border border-blue-500/30' : 'border border-transparent'}`}
                                 >
-                                    <div className="w-8 flex justify-center items-center flex-shrink-0">
-                                        <img src={r.flag} alt={r.name} className="w-8 h-5 object-contain shadow-sm rounded-[3px] bg-white/10" />
+                                    <div className="w-10 flex justify-center items-center flex-shrink-0">
+                                        <img src={r.flag} alt={r.name} className="w-10 h-7 object-cover shadow-sm rounded-[4px]" />
                                     </div>
                                     <span className={`font-bold text-sm tracking-wide whitespace-nowrap ${selectedTeamName === r.id ? 'text-blue-400' : 'text-slate-200'}`}>{r.name}</span>
                                 </div>

@@ -13,7 +13,8 @@ if (!fs.existsSync(CACHE_DIR)) {
   fs.mkdirSync(CACHE_DIR, { recursive: true });
 }
 
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours for squads
+const PLAYER_CACHE_TTL_MS = 1 * 60 * 60 * 1000; // 1 hour for player stats
 
 class FotmobService {
   async fetchTeamId(teamName) {
@@ -49,6 +50,40 @@ class FotmobService {
       return { id, name };
     } catch (error) {
       console.error(`[FotmobService] Error fetching team ID for ${teamName}:`, error.message);
+      return null;
+    }
+  }
+
+  async resolvePlayerId(playerName) {
+    try {
+      const url = `https://apigw.fotmob.com/searchapi/suggest?term=${encodeURIComponent(playerName)}`;
+      console.log(`[FotmobService] Searching for player: ${playerName} at ${url}`);
+      
+      const response = await axios.get(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+      });
+      
+      const suggest = response.data.squadMemberSuggest;
+      if (!suggest || suggest.length === 0) {
+        throw new Error("No player suggestions found.");
+      }
+
+      const options = suggest[0].options;
+      if (!options || options.length === 0) {
+          throw new Error("No options found in player suggestion.");
+      }
+
+      // Try exact match or fallback to first
+      const exactMatch = options.find(o => o.text.split('|')[0].toLowerCase() === playerName.toLowerCase());
+      const selectedOption = exactMatch || options[0];
+      
+      const name = selectedOption.text.split('|')[0];
+      const id = selectedOption.payload.id;
+      
+      console.log(`[FotmobService] Resolved ${playerName} to FotMob Player ID ${id} (${name})`);
+      return { id, name };
+    } catch (error) {
+      console.error(`[FotmobService] Error fetching player ID for ${playerName}:`, error.message);
       return null;
     }
   }
@@ -109,6 +144,7 @@ class FotmobService {
                            position: category.title, // Goalkeepers, Defenders, Midfielders, Attackers
                            photo: `https://images.fotmob.com/image_resources/playerimages/${member.id}.png`,
                            cname: member.cname,
+                           ccode: member.ccode,
                            role: member.role
                        });
                    });
@@ -139,7 +175,7 @@ class FotmobService {
       // 1. Check cache
       if (fs.existsSync(cachePath)) {
         const stats = fs.statSync(cachePath);
-        if (Date.now() - stats.mtimeMs < CACHE_TTL_MS) {
+        if (Date.now() - stats.mtimeMs < PLAYER_CACHE_TTL_MS) {
           console.log(`[FotmobService] Returning cached player data for ID ${playerId}`);
           return JSON.parse(fs.readFileSync(cachePath, 'utf8'));
         }
