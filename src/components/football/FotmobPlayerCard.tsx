@@ -133,7 +133,9 @@ const StatColumn = ({ title, children }: any) => {
 
 // Advanced 2D Shotmap Pitch Renderer
 const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [] }: any) => {
-  const shots = useMemo(() => {
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+
+  const rawShots = useMemo(() => {
     if (realShotmap && realShotmap.length > 0) {
       return realShotmap.map((s: any) => {
         // Fotmob uses 105x68. Always attacking x=105.
@@ -154,7 +156,11 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [] }: 
           top,
           isGoal: s.eventType === 'Goal',
           eventType: s.eventType,
-          expectedGoals: s.expectedGoals
+          expectedGoals: s.expectedGoals || 0,
+          situation: s.situation,
+          shotType: s.shotType,
+          isFromInsideBox: s.isFromInsideBox,
+          isOnTarget: s.isOnTarget
         };
       });
     }
@@ -171,67 +177,187 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [] }: 
       if (!isGoal && seed % 3 === 0) left += (seed % 2 === 0 ? 15 : -15);
       left = Math.max(5, Math.min(left, 95));
       top = Math.max(5, Math.min(top, 95));
-      generated.push({ left, top, isGoal });
+      
+      const shotTypes = ['LeftFoot', 'RightFoot', 'Header'];
+      const situations = ['RegularPlay', 'FreeKick', 'FromCorner', 'Penalty', 'FastBreak'];
+
+      generated.push({ 
+        left, top, isGoal, 
+        eventType: isGoal ? 'Goal' : (seed % 2 === 0 ? 'AttemptSaved' : 'Miss'),
+        expectedGoals: (seed % 100) / 100,
+        situation: situations[seed % situations.length],
+        shotType: shotTypes[seed % shotTypes.length],
+        isFromInsideBox: top > 68.6 && left > 20 && left < 80,
+        isOnTarget: isGoal || seed % 2 === 0
+      });
     }
     return generated;
   }, [playerId, totalGoals, position, realShotmap]);
 
+  const filterCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      'Goals': 0, 'Regular play': 0, 'Free kick': 0, 'Fast break': 0, 'From corner': 0, 'Penalty': 0,
+      'Left foot': 0, 'Right foot': 0, 'Header': 0, 'Shots inside box': 0, 'Shots outside box': 0
+    };
+    rawShots.forEach((s: any) => {
+      if (s.isGoal) counts['Goals']++;
+      if (s.situation === 'RegularPlay') counts['Regular play']++;
+      if (s.situation === 'FreeKick') counts['Free kick']++;
+      if (s.situation === 'FastBreak') counts['Fast break']++;
+      if (s.situation === 'FromCorner') counts['From corner']++;
+      if (s.situation === 'Penalty') counts['Penalty']++;
+      if (s.shotType === 'LeftFoot') counts['Left foot']++;
+      if (s.shotType === 'RightFoot') counts['Right foot']++;
+      if (s.shotType === 'Header') counts['Header']++;
+      if (s.isFromInsideBox) counts['Shots inside box']++;
+      if (s.isFromInsideBox === false) counts['Shots outside box']++;
+    });
+    return counts;
+  }, [rawShots]);
+
+  const filteredShots = useMemo(() => {
+    if (!activeFilter) return rawShots;
+    return rawShots.filter((s: any) => {
+      if (activeFilter === 'Goals') return s.isGoal;
+      if (activeFilter === 'Regular play') return s.situation === 'RegularPlay';
+      if (activeFilter === 'Free kick') return s.situation === 'FreeKick';
+      if (activeFilter === 'Fast break') return s.situation === 'FastBreak';
+      if (activeFilter === 'From corner') return s.situation === 'FromCorner';
+      if (activeFilter === 'Penalty') return s.situation === 'Penalty';
+      if (activeFilter === 'Left foot') return s.shotType === 'LeftFoot';
+      if (activeFilter === 'Right foot') return s.shotType === 'RightFoot';
+      if (activeFilter === 'Header') return s.shotType === 'Header';
+      if (activeFilter === 'Shots inside box') return s.isFromInsideBox;
+      if (activeFilter === 'Shots outside box') return !s.isFromInsideBox;
+      return true;
+    });
+  }, [rawShots, activeFilter]);
+
+  const totalxG = filteredShots.reduce((acc: number, s: any) => acc + (s.expectedGoals || 0), 0).toFixed(2);
+  const totalGoalsFiltered = filteredShots.filter((s: any) => s.isGoal).length;
+  const totalShotsFiltered = filteredShots.length;
+
   return (
-    <div className="relative w-full max-w-[360px] aspect-[68/52.5] bg-[#2E3C2E] border-4 border-black/80 rounded-t-xl mx-auto overflow-hidden shadow-2xl">
-      {/* Grass Pattern */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.15) 10%, rgba(255,255,255,0.15) 20%)' }} />
+    <div className="flex flex-col gap-5 w-full max-w-[360px] mx-auto">
+      <div className="relative w-full aspect-[68/52.5] bg-[#2E3C2E] border-4 border-black/80 rounded-t-xl overflow-hidden shadow-2xl">
+        {/* Grass Pattern */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.15) 10%, rgba(255,255,255,0.15) 20%)' }} />
 
-      {/* Halfway Line (Top) */}
-      <div className="absolute top-0 left-0 right-0 border-t-[3px] border-white/40 pointer-events-none" />
-      {/* Center Circle (Top Half) */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[26.9%] aspect-square border-[3px] border-white/40 rounded-full pointer-events-none" />
+        {/* Halfway Line (Top) */}
+        <div className="absolute top-0 left-0 right-0 border-t-[3px] border-white/40 pointer-events-none" />
+        {/* Center Circle (Top Half) */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[26.9%] aspect-square border-[3px] border-white/40 rounded-full pointer-events-none" />
 
-      {/* D-Arc Wrapper */}
-      <div 
-        className="absolute left-1/2 -translate-x-1/2 w-[26.9%] overflow-hidden pointer-events-none"
-        style={{ bottom: '31.4%', height: '6.95%' }}
-      >
+        {/* D-Arc Wrapper */}
         <div 
-          className="absolute top-0 left-0 w-full border-[3px] border-white/40 rounded-full pointer-events-none"
-          style={{ height: '500%' }}
-        />
+          className="absolute left-1/2 -translate-x-1/2 w-[26.9%] overflow-hidden pointer-events-none"
+          style={{ bottom: '31.4%', height: '6.95%' }}
+        >
+          <div 
+            className="absolute top-0 left-0 w-full border-[3px] border-white/40 rounded-full pointer-events-none"
+            style={{ height: '500%' }}
+          />
+        </div>
+
+        {/* Penalty Box (Bottom) - 59.3% width, 31.4% height (16.5m/52.5m) */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[59.3%] h-[31.4%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
+
+        {/* Goal Box (Bottom) - 26.9% width, 10.5% height (5.5m/52.5m) */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[26.9%] h-[10.5%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
+
+        {/* Penalty Spot - 11m from bottom -> 20.95% */}
+        <div className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white/60 rounded-full pointer-events-none" style={{ bottom: '20.95%' }} />
+
+        {/* Goal Posts */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[10.7%] h-[3%] bg-black/40 border-x-2 border-t-2 border-white pointer-events-none" />
+
+        {/* Render Shots */}
+        {filteredShots.map((shot: any, idx: number) => {
+          // Only render shots in attacking half
+          if (shot.top < 0 || shot.top > 100) return null;
+
+          let sizeClass = 'w-3 h-3';
+          if (shot.expectedGoals && shot.expectedGoals > 0.3) sizeClass = 'w-4 h-4';
+          
+          return (
+            <div
+              key={idx}
+              className={`absolute -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-[1.8] cursor-pointer ${
+                shot.isGoal
+                  ? 'z-30 flex items-center justify-center'
+                  : `${sizeClass} rounded-full ${shot.eventType === 'AttemptSaved' || shot.isOnTarget ? 'bg-[#3B82F6]' : 'bg-[#EF4444]'} border-[1.5px] border-white z-10 shadow-md opacity-90 hover:opacity-100`
+              }`}
+              style={{ left: `${shot.left}%`, top: `${shot.top}%` }}
+              title={shot.isGoal ? 'Goal' : shot.eventType || 'Miss/Saved'}
+            >
+              {shot.isGoal && <span className="text-[16px] leading-none drop-shadow-[0_0_6px_rgba(250,204,21,0.8)] pointer-events-none">⚽</span>}
+            </div>
+          );
+        })}
       </div>
 
-      {/* Penalty Box (Bottom) - 59.3% width, 31.4% height (16.5m/52.5m) */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[59.3%] h-[31.4%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
+      {/* Stats Summary */}
+      <div className="flex justify-around items-center border-b dark:border-white/10 border-slate-200 pb-4">
+        <div className="flex flex-col items-center">
+          <span className="text-2xl font-bold dark:text-white text-slate-900">{totalShotsFiltered}</span>
+          <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">Shots</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="text-2xl font-bold dark:text-white text-slate-900">{totalGoalsFiltered}</span>
+          <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">Goals</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="text-2xl font-bold dark:text-white text-slate-900">{totalxG}</span>
+          <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">xG</span>
+        </div>
+      </div>
 
-      {/* Goal Box (Bottom) - 26.9% width, 10.5% height (5.5m/52.5m) */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[26.9%] h-[10.5%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
+      {/* Legend */}
+      <div className="flex justify-center gap-6 text-[13px] font-medium dark:text-slate-300 text-slate-600">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[14px] leading-none drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]">⚽</span>
+          <span>Goal</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6] border-[1px] border-white shadow-md"></div>
+          <span>Saved</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444] border-[1px] border-white shadow-md"></div>
+          <span>Miss/Block</span>
+        </div>
+      </div>
 
-      {/* Penalty Spot - 11m from bottom -> 20.95% */}
-      <div className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white/60 rounded-full pointer-events-none" style={{ bottom: '20.95%' }} />
-
-      {/* Goal Posts */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[10.7%] h-[3%] bg-black/40 border-x-2 border-t-2 border-white pointer-events-none" />
-
-      {/* Render Shots */}
-      {shots.map((shot: any, idx: number) => {
-        // Only render shots in attacking half
-        if (shot.top < 0 || shot.top > 100) return null;
-
-        let sizeClass = 'w-3 h-3';
-        if (shot.expectedGoals && shot.expectedGoals > 0.3) sizeClass = 'w-4 h-4';
-        
-        return (
-          <div
-            key={idx}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-[1.8] cursor-pointer shadow-md ${
-              shot.isGoal
-                ? 'w-5 h-5 z-20 flex items-center justify-center bg-white rounded-full ring-2 ring-black/20'
-                : `${sizeClass} rounded-full ${shot.eventType === 'AttemptSaved' ? 'bg-[#3B82F6]' : 'bg-[#EF4444]'} border-[1.5px] border-white z-10`
-            }`}
-            style={{ left: `${shot.left}%`, top: `${shot.top}%` }}
-            title={shot.isGoal ? 'Goal' : shot.eventType || 'Miss/Saved'}
-          >
-            {shot.isGoal && <span className="text-[13px] leading-none drop-shadow-sm pointer-events-none">⚽</span>}
-          </div>
-        );
-      })}
+      {/* Filter Section */}
+      <div className="flex flex-col gap-3 mt-1">
+        <div className="flex items-center justify-between">
+          <h4 className="text-[15px] font-bold dark:text-white text-slate-900">Filter</h4>
+          {activeFilter && (
+            <button onClick={() => setActiveFilter(null)} className="text-[12px] font-semibold text-[#3B82F6] hover:underline">
+              Clear Filter
+            </button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {Object.entries(filterCounts).map(([key, count]) => {
+            if (count === 0) return null;
+            const isActive = activeFilter === key;
+            return (
+              <button 
+                key={key}
+                onClick={() => setActiveFilter(isActive ? null : key)}
+                className={`px-3 py-1.5 rounded-full text-[13px] font-medium transition-all border ${
+                  isActive 
+                    ? 'dark:bg-white dark:text-black bg-slate-900 text-white border-transparent shadow-md scale-105' 
+                    : 'dark:bg-transparent dark:text-slate-300 dark:border-white/20 dark:hover:bg-white/10 bg-transparent text-slate-700 border-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                {key} <span className={isActive ? 'opacity-70 ml-1 font-semibold' : 'opacity-60 ml-1'}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };
@@ -804,14 +930,20 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
 
   const isPrimaryTournament = selectedTournament?.tournamentId === statSeasons?.[0]?.tournaments?.[0]?.tournamentId && selectedTournament?.seasonName === statSeasons?.[0]?.seasonName;
 
+  const getFallbackSeasonId = (seasonName: string | undefined, tournamentId: string | number | undefined) => {
+    if (!seasonName || !tournamentId) return undefined;
+    const yearMatch = seasonName.match(/^(\d{4})/);
+    return yearMatch ? `${yearMatch[1]}-${tournamentId}` : `${seasonName}-${tournamentId}`;
+  };
+
   const { data: fetchedStats, isLoading: isStatsLoading } = useFotmobPlayerTournamentStats(
     id,
-    selectedTournament?.entryId || statSeasons?.[0]?.tournaments?.[0]?.entryId,
+    selectedTournament?.entryId || statSeasons?.[0]?.tournaments?.[0]?.entryId || getFallbackSeasonId(selectedTournament?.seasonName, selectedTournament?.tournamentId),
     selectedTournament?.tournamentId || statSeasons?.[0]?.tournaments?.[0]?.tournamentId
   );
   
   const currentStats = fetchedStats || (isPrimaryTournament ? firstSeasonStats : null);
-  const hasDeepStats = !!currentStats?.statsSection?.items?.length;
+  const hasDeepStats = !!currentStats?.statsSection?.items?.length || !!currentStats?.shotmap?.length || !!currentStats?.topStatCard?.items?.length;
 
   const extractTopStat = (statTitle: string) => {
     const items = currentStats?.topStatCard?.items || [];
