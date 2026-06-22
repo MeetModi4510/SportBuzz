@@ -14,7 +14,6 @@ import { TrendingPlayerCard } from "../../components/football/TrendingPlayerCard
 import { TrendingPlayerModal } from "../../components/football/TrendingPlayerModal";
 
 import { Loader2, ArrowRightLeft, TrendingUp } from "lucide-react";
-import { PRIORITY_CLUBS } from "../../services/football/footballApi";
 import { useWorldCupTheme } from "../../hooks/football/useWorldCupTheme";
 
 type TransferFilter = "all" | "transfers" | "loans" | "free_transfers" | "free_agents" | "contracts" | "contract_extensions";
@@ -35,14 +34,10 @@ export default function FootballHome() {
   const processedTransfers = useMemo(() => {
     if (!recentTransfers?.data) return [];
     
-    // Filter by priority clubs
-    const priorityFiltered = recentTransfers.data.filter(t => {
-      const outName = (t.fromClub || t.fromClubFullName || '').toLowerCase();
-      const inName = (t.toClub || t.toClubFullName || '').toLowerCase();
-      return PRIORITY_CLUBS.some(club => outName.includes(club) || inName.includes(club));
-    });
-
-    let result = [...priorityFiltered];
+    // Backend scraper already filters to top leagues — no need to re-filter by club name here.
+    // A second client-side club filter was silently dropping valid transfers due to name mismatches
+    // (e.g. Transfermarkt sends "Man. City" but the list had "man city").
+    let result = [...recentTransfers.data];
 
     // Filter
     if (transferFilter !== "all") {

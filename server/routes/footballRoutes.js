@@ -598,6 +598,23 @@ router.get('/transfers', async (req, res) => {
     }
 });
 
+// Seed transfers cache on server startup so the first user request is fast.
+// Runs in the background — does not block the server boot.
+(async () => {
+    try {
+        const existing = await FootballTransfer.findOne({ cacheExpiry: { $gt: new Date() } });
+        if (!existing) {
+            console.log('[Transfers] No valid cache found on startup — seeding in background...');
+            await updateTransfersCache();
+            console.log('[Transfers] Startup seed complete.');
+        } else {
+            console.log('[Transfers] Cache already warm on startup — skipping seed.');
+        }
+    } catch (err) {
+        console.warn('[Transfers] Startup seed failed (non-fatal):', err.message);
+    }
+})();
+
 // ─── Real Football Data (Hybrid: AllSportsApi2 + Football-Data.org) ───
 
 router.get('/news', async (req, res) => {
