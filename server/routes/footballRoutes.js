@@ -101,6 +101,50 @@ router.get('/player-image', async (req, res) => {
     }
 });
 
+// ─── TRANSFERMARKT IMAGE PROXY ───
+// GET /api/football/tm-img-proxy?url=https://tmssl.akamaized.net/...
+// Fetches Transfermarkt images server-side (bypasses hotlink protection) and streams to browser.
+router.get('/tm-img-proxy', async (req, res) => {
+    try {
+        const { url } = req.query;
+        if (!url) return res.status(400).send('Missing url param');
+
+        // Only allow known Transfermarkt CDN domains for security
+        const allowedDomains = ['tmssl.akamaized.net', 'img.a.transfermarkt.technology', 'transfermarkt.co.in', 'transfermarkt.com'];
+        let parsedUrl;
+        try {
+            parsedUrl = new URL(url);
+        } catch {
+            return res.status(400).send('Invalid URL');
+        }
+        const isAllowed = allowedDomains.some(d => parsedUrl.hostname === d || parsedUrl.hostname.endsWith('.' + d));
+        if (!isAllowed) return res.status(403).send('Domain not allowed');
+
+        const response = await axios.get(url, {
+            responseType: 'stream',
+            timeout: 8000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+                'Referer': 'https://www.transfermarkt.co.in/',
+                'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Cache-Control': 'no-cache',
+            }
+        });
+
+        // Forward the content-type and cache headers
+        const contentType = response.headers['content-type'] || 'image/png';
+        res.set('Content-Type', contentType);
+        res.set('Cache-Control', 'public, max-age=86400'); // Cache for 1 day in browser
+        response.data.pipe(res);
+    } catch (error) {
+        console.warn('[TM Proxy] Failed to proxy image:', error.message);
+        res.status(404).send('Image not found');
+    }
+});
+
+
+
 // ─── PROXY ROUTES FOR FRONTEND ───
 // These proxies ensure API keys stay hidden on the backend while the frontend can still use the API-Sports schema
 
@@ -436,71 +480,25 @@ router.get('/fotmob-stats/:leagueId', async (req, res) => {
     }
 });
 // ─── LATEST TRANSFERS ─────────────────────────────────────────────────────────
-// Serves transfers from MongoDB cache (2-day TTL).
+// Serves transfers from MongoDB cache (2-hour TTL).
+import { scrapeLatestTransfers, scrapeTopTransfers } from '../services/transfermarktScraper.js';
 
-const TRANSFERS_API_HOST = 'free-api-live-football-data.p.rapidapi.com';
-const TRANSFERS_CACHE_MS = 2 * 24 * 60 * 60 * 1000; // 2 days
+const TRANSFERS_CACHE_MS = 2 * 60 * 60 * 1000; // 2 hours
 
-const PRIORITY_CLUBS = [
-  // Premier League (First Division Only)
-  'arsenal', 'aston villa', 'bournemouth', 'brentford', 'brighton', 'chelsea', 'crystal palace', 'everton', 'fulham', 'liverpool', 'man city', 'manchester city', 'man united', 'manchester united', 'newcastle', 'nottm forest', 'nottingham forest', 'tottenham', 'spurs', 'west ham', 'wolves', 'leicester', 'southampton',
-  // La Liga (First Division Only)
-  'athletic club', 'atletico madrid', 'barcelona', 'real madrid', 'real sociedad', 'sevilla', 'valencia', 'villarreal', 'girona', 'betis', 'alaves', 'celta vigo', 'getafe', 'las palmas', 'mallorca', 'osasuna', 'rayo vallecano', 'valladolid', 'leganes', 'espanyol',
-  // Serie A (First Division Only)
-  'ac milan', 'inter', 'inter milan', 'juventus', 'napoli', 'roma', 'lazio', 'atalanta', 'fiorentina', 'bologna', 'torino', 'verona', 'genoa', 'lecce', 'udinese', 'empoli', 'cagliari', 'monza', 'como', 'parma', 'venezia',
-  // Bundesliga (First Division Only)
-  'bayern munich', 'bayern', 'dortmund', 'bayer leverkusen', 'leverkusen', 'rb leipzig', 'leipzig', 'eintracht frankfurt', 'stuttgart', 'freiburg', 'hoffenheim', 'werder bremen', 'wolfsburg', 'augsburg', 'mönchengladbach', 'monchengladbach', 'bochum', 'union berlin', 'mainz', 'st pauli', 'holstein kiel', 'heidenheim',
-  // Ligue 1 (First Division Only)
-  'psg', 'paris saint-germain', 'monaco', 'marseille', 'lyon', 'lille', 'lens', 'rennes', 'nice', 'reims', 'toulouse', 'strasbourg', 'montpellier', 'nantes', 'le havre', 'auxerre', 'angers', 'st etienne', 'brest',
-  // MLS
-  'inter miami', 'lafc', 'la galaxy', 'columbus crew', 'cincinnati', 'philadelphia union', 'seattle sounders', 'atlanta united', 'new york city fc', 'nycfc', 'new york red bulls', 'orlando city', 'nashville', 'portland timbers', 'portland hearts of pine', 'portland', 'houston dynamo', 'houston', 'real salt lake', 'sporting kansas city', 'dallas', 'austin', 'san jose earthquakes', 'toronto fc', 'montreal', 'vancouver whitecaps', 'chicago fire', 'colorado rapids', 'dc united', 'minnesota united', 'new england revolution', 'st. louis city', 'charlotte fc', 'san diego',
-  // Saudi Pro
-  'al nassr', 'al hilal', 'al ittihad', 'al ahli', 'al shabab', 'al taawoun', 'al ettifaq', 'al fateh', 'al wehda', 'al fayha', 'al riyadh', 'damac', 'al okhdood', 'al qadsiah', 'al kholood',
-  // Eredivisie
-  'ajax', 'psv', 'feyenoord', 'az alkmaar', 'twente', 'sparta rotterdam', 'utrecht', 'heerenveen', 'nec nijmegen', 'go ahead eagles', 'pec zwolle', 'almere city', 'heracles', 'rkc waalwijk', 'fortuna sittard', 'nac breda', 'willem ii', 'groningen',
-  // Belgian Pro League
-  'club brugge', 'anderlecht', 'union sg', 'antwerp', 'genk', 'gent', 'standard liege', 'mechelen', 'cercle brugge', 'charleroi', 'st truiden', 'westerlo', 'oh leuven', 'kortrijk', 'dender', 'beerschot',
-  // ISL
-  'mohun bagan', 'mumbai city', 'fc goa', 'odisha', 'kerala blasters', 'chennaiyin', 'northeast united', 'punjab fc', 'east bengal', 'bengaluru fc', 'jamshedpur', 'hyderabad', 'mohammedan',
-  // Others
-  'porto', 'benfica', 'sporting cp', 'sporting lisbon', 'celtic', 'rangers', 'galatasaray', 'fenerbahce', 'besiktas'
-];
-
-async function fetchAndStoreTransfers() {
-    const apiKey = process.env.TRANSFERS_API_KEY;
-    if (!apiKey) throw new Error('TRANSFERS_API_KEY env key not set');
-
-    const headers = {
-        'x-rapidapi-key': apiKey,
-        'x-rapidapi-host': TRANSFERS_API_HOST,
-    };
-
+async function updateTransfersCache() {
     const combined = [];
-    const delay = ms => new Promise(res => setTimeout(res, ms));
+    
+    // Fetch from transfermarkt service
+    console.log('[Transfers] Scraping latest transfers (15 pages)...');
+    const latest = await scrapeLatestTransfers(15);
+    
+    console.log('[Transfers] Scraping top transfers (top 40)...');
+    const top = await scrapeTopTransfers(40);
+    
+    combined.push(...latest);
+    combined.push(...top);
 
-    // Fetch 20 pages sequentially to avoid 429 Rate Limits and get a deep backlog
-    for (let page = 1; page <= 20; page++) {
-        try {
-            console.log(`[Transfers] Fetching page ${page} of 20...`);
-            const [allRes, mvRes] = await Promise.all([
-                axios.get(`https://${TRANSFERS_API_HOST}/football-get-all-transfers`, { params: { page }, headers, timeout: 15000 }).catch(e => { console.error(`All transfers P${page} error:`, e.message); return { data: null }; }),
-                axios.get(`https://${TRANSFERS_API_HOST}/football-get-market-value-transfers`, { params: { page }, headers, timeout: 15000 }).catch(e => { console.error(`MV transfers P${page} error:`, e.message); return { data: null }; })
-            ]);
-
-            const allRaw = allRes.data?.response?.transfers || [];
-            const mvRaw = mvRes.data?.response?.transfers || [];
-
-            combined.push(...(Array.isArray(allRaw) ? allRaw : []));
-            combined.push(...(Array.isArray(mvRaw) ? mvRaw : []));
-
-            // Wait 1 second before requesting the next page to prevent 429 Too Many Requests
-            if (page < 20) await delay(1000);
-        } catch (err) {
-            console.error(`[Transfers] Failed loop on page ${page}:`, err.message);
-        }
-    }
-
-    if (combined.length === 0) throw new Error('Empty transfers response from API after all pages');
+    if (combined.length === 0) throw new Error('Empty transfers response from scraper');
 
     // Deduplicate based on playerId + transferDate
     const uniqueTransfers = [];
@@ -514,35 +512,30 @@ async function fetchAndStoreTransfers() {
         }
     }
 
-    // Filter using the PRIORITY_CLUBS list
-    const priorityTransfers = uniqueTransfers.filter(t => {
-        const outName = (t.fromClub || t.fromClubFullName || '').toLowerCase();
-        const inName = (t.toClub || t.toClubFullName || '').toLowerCase();
-        
-        return PRIORITY_CLUBS.some(club => outName.includes(club) || inName.includes(club));
-    });
-
     const cacheExpiry = new Date(Date.now() + TRANSFERS_CACHE_MS);
     const now = new Date();
 
     // Wipe stale records before bulk-inserting fresh ones
     await FootballTransfer.deleteMany({});
 
-    const docs = priorityTransfers.map(t => ({
+    const docs = uniqueTransfers.map(t => ({
         transferId:        `${t.playerId}_${t.transferDate}`,
         playerId:          t.playerId,
         playerName:        t.name || '',
+        playerImage:       t.playerImage || '',
         position:          t.position?.label || t.position?.key || '',
         fromClub:          t.fromClub || t.fromClubFullName || '',
         fromClubId:        t.fromClubId,
+        fromClubLogo:      t.fromClubLogo || '',
         toClub:            t.toClub || t.toClubFullName || '',
         toClubId:          t.toClubId,
-        transferDate:      new Date(t.fromDate || t.transferDate || now),
-        fee:               t.fee?.feeText || t.fee?.localizedFeeText || t.transferType?.text || '',
-        feeValue:          t.fee?.value || t.amountEuroEstimated || 0,
-        transferType:      t.transferType?.localizationKey || t.transferType?.text || '',
+        toClubLogo:        t.toClubLogo || '',
+        transferDate:      new Date(t.transferDate || now),
+        fee:               t.fee || '',
+        feeValue:          t.feeValue || 0,
+        transferType:      t.transferType || '',
         marketValue:       t.marketValue || 0,
-        leagueId:          'Priority',
+        leagueId:          t.leagueId || '',
         onLoan:            t.onLoan || false,
         contractExtension: t.contractExtension || false,
         cacheExpiry,
@@ -551,7 +544,7 @@ async function fetchAndStoreTransfers() {
 
     if (docs.length > 0) {
         await FootballTransfer.insertMany(docs);
-        console.log(`[Transfers] Stored ${docs.length} filtered transfers from both endpoints.`);
+        console.log(`[Transfers] Stored ${docs.length} transfers from Transfermarkt.`);
     }
     
     return { rows: docs, lastFetched: now };
@@ -580,8 +573,8 @@ router.get('/transfers', async (req, res) => {
         }
 
         // 2. Cache miss – fetch, persist, respond
-        console.log('[Transfers] Cache expired or empty – fetching from API…');
-        const { rows, lastFetched } = await fetchAndStoreTransfers();
+        console.log('[Transfers] Cache expired or empty – fetching from Transfermarkt…');
+        const { rows, lastFetched } = await updateTransfersCache();
 
         return res.json({
             success: true,

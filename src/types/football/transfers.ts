@@ -17,15 +17,18 @@ export interface TransferType {
 
 export interface NewTransferData {
   name: string;
-  playerId: number;
+  playerId: string;
+  playerImage?: string;
   position: TransferPosition | null;
   transferDate: string; // ISO Date String
   fromClub: string;
   fromClubFullName: string;
   fromClubId: number;
+  fromClubLogo?: string;
   toClub: string;
   toClubFullName: string;
   toClubId: number;
+  toClubLogo?: string;
   fee: TransferFee | string | null;
   feeValue?: number;
   transferType: TransferType | string;

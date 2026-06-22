@@ -194,7 +194,7 @@ export const footballApi = {
   },
 
   async getRecentTransfers(forceRefresh = false): Promise<TransfersResponse> {
-    const cacheKey = 'recent_transfers_v4';
+    const cacheKey = 'recent_transfers_v5';
 
     if (!forceRefresh) {
       const cached = cacheManager.get<TransfersResponse>(cacheKey);
@@ -213,14 +213,17 @@ export const footballApi = {
         return {
           name: t.playerName,
           playerId: t.playerId,
+          playerImage: t.playerImage || '',
           position: t.position ? { label: t.position, key: t.position.toLowerCase() } : null,
           transferDate: t.transferDate,
           fromClub: t.fromClub,
           fromClubFullName: t.fromClub,
           fromClubId: t.fromClubId || 0,
+          fromClubLogo: t.fromClubLogo || '',
           toClub: t.toClub,
           toClubFullName: t.toClub,
           toClubId: t.toClubId || 0,
+          toClubLogo: t.toClubLogo || '',
           fee: {
             feeText: t.fee,
             value: t.feeValue

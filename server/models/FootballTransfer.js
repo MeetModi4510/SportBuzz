@@ -2,13 +2,16 @@ import mongoose from 'mongoose';
 
 const footballTransferSchema = new mongoose.Schema({
     transferId:        { type: String, required: true, unique: true }, // playerId + transferDate
-    playerId:          { type: Number, required: true },
+    playerId:          { type: String, required: true }, // Transfermarkt URL or Name
     playerName:        { type: String, required: true },
+    playerImage:       { type: String }, // Transfermarkt Image URL
     position:          { type: String }, 
     fromClub:          { type: String },
     fromClubId:        { type: Number },
+    fromClubLogo:      { type: String }, // Transfermarkt Club Logo
     toClub:            { type: String },
     toClubId:          { type: Number },
+    toClubLogo:        { type: String }, // Transfermarkt Club Logo
     transferDate:      { type: Date, required: true },
     fee:               { type: String }, // localizedFeeText or feeText
     feeValue:          { type: Number }, // amountEuroEstimated or fee value
