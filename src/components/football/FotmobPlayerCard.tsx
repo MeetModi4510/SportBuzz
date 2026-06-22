@@ -4,21 +4,66 @@ import { ChevronDown, Info, Activity, Star, Calendar, Loader2, Trophy } from 'lu
 import { usePlayerRecentMatches } from '../../hooks/football/usePlayerRecentMatches';
 import { useFotmobPlayerTournamentStats } from '../../hooks/useFootballSquads';
 
-const StatRow = ({ label, value, subValue, tooltip }: any) => (
-  <div className="group/row flex justify-between items-center py-2 px-3 text-[13px] transition-all duration-300 rounded-xl hover:dark:bg-white/5 hover:bg-slate-200 hover:shadow-md cursor-default border border-transparent hover:dark:border-white/5 border-slate-200">
-    <span className="dark:text-gray-400 text-slate-500 font-medium flex items-center gap-2 transition-colors group-hover/row:text-gray-200">
-      {label}
-      {tooltip && <Info className="w-3.5 h-3.5 text-blue-400 opacity-50 group-hover/row:opacity-100 transition-opacity" />}
-    </span>
-    <div className="text-right flex items-center gap-2 relative">
-      <div className="absolute inset-0 dark:bg-white/5 bg-slate-200 rounded-md opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 scale-110" />
-      <span className="dark:text-white text-slate-900 font-black font-mono text-[14px] relative z-10 transition-transform duration-300 group-hover/row:scale-110 group-hover/row:dark:text-[#34D399] text-emerald-600">
-        {value !== undefined && value !== null ? value : '-'}
-      </span>
-      {subValue && <span className="dark:text-gray-500 text-slate-600 text-[10px] font-bold relative z-10">({subValue})</span>}
+const StatRow = ({ label, value, subValue, tooltip }: any) => {
+  const isNumber = !isNaN(Number(value)) && value !== '-';
+  return (
+    <div className="group/row flex items-center justify-between py-3 px-2 relative cursor-default border-b border-dashed dark:border-white/10 border-slate-200 last:border-0 transition-all duration-300 hover:dark:bg-white/5 hover:bg-slate-50/50 rounded-lg -mx-2">
+      <div className="flex items-center gap-2.5 z-10">
+        <div className="w-1 h-1 rounded-full dark:bg-slate-600 bg-slate-300 group-hover/row:bg-[#38bdf8] group-hover/row:shadow-[0_0_8px_rgba(56,189,248,0.8)] transition-all duration-300" />
+        <span className="text-[11.5px] font-bold dark:text-gray-400 text-slate-500 group-hover/row:dark:text-white group-hover/row:text-slate-900 transition-colors uppercase tracking-[0.05em]">
+          {label}
+        </span>
+        {tooltip && <Info className="w-3.5 h-3.5 text-blue-400 opacity-50 group-hover/row:opacity-100 transition-opacity" />}
+      </div>
+      <div className="relative z-10 flex items-center gap-2">
+        <span className={`text-[15px] font-black tracking-tight transition-all duration-300 ${isNumber ? 'dark:text-white text-slate-900 group-hover/row:text-[#38bdf8] group-hover/row:dark:text-[#38bdf8] drop-shadow-sm' : 'dark:text-gray-400 text-slate-500'}`}>
+          {value !== undefined && value !== null ? value : '-'}
+        </span>
+        {subValue && <span className="dark:text-gray-500 text-slate-400 text-[10px] font-bold">({subValue})</span>}
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+const StatTile = ({ label, value, subValue, accentHex }: any) => {
+  const isNumber = !isNaN(Number(value)) && value !== '-';
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div 
+      className="relative flex items-stretch gap-4 group cursor-default transition-all duration-300"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="relative flex flex-col items-center shrink-0 w-3 pt-3.5">
+        <div 
+          className="w-[5px] h-[5px] rounded-full z-10 transition-all duration-300 relative" 
+          style={{ 
+            backgroundColor: isHovered ? accentHex : '#334155', 
+            boxShadow: isHovered ? `0 0 12px 2px ${accentHex}` : 'none',
+            transform: isHovered ? 'scale(1.8)' : 'scale(1)'
+          }} 
+        />
+        <div className="w-[1px] h-full mt-2 dark:bg-white/10 bg-slate-200 group-last:hidden" />
+      </div>
+      
+      <div className="flex-1 flex justify-between items-baseline py-3 pr-2 border-b dark:border-white/5 border-slate-200 transition-all duration-300 group-hover:border-transparent group-hover:translate-x-1.5">
+        <span className={`text-[10px] uppercase tracking-[0.12em] font-bold transition-colors duration-300 ${isHovered ? 'dark:text-white text-slate-900' : 'dark:text-gray-400 text-slate-500'}`}>
+          {label}
+        </span>
+        <div className="flex items-baseline gap-1.5">
+          <span 
+            className={`text-[17px] font-black tracking-tight leading-none transition-colors duration-300 ${!isNumber ? 'dark:text-gray-600 text-slate-400' : ''}`}
+            style={isNumber ? { color: isHovered ? accentHex : 'inherit' } : {}}
+          >
+            {value !== undefined && value !== null ? value : '-'}
+          </span>
+          {subValue && <span className="text-[10px] dark:text-gray-600 text-slate-400 font-medium tracking-wide">({subValue})</span>}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const getTeamColor = (id: number) => {
   if (id === 8634) return '#e11d48'; // Bright Red/Pink for Barca
@@ -109,30 +154,35 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 const StatColumn = ({ title, children }: any) => {
-  let gradient = 'from-[#34D399]/20 to-[#3B82F6]/20';
-  let accent = 'bg-[#34D399]';
-  if (title === 'Shooting') { gradient = 'from-[#F87171]/20 to-[#EF4444]/5'; accent = 'bg-[#F87171]'; }
-  if (title === 'Passing') { gradient = 'from-[#60A5FA]/20 to-[#3B82F6]/5'; accent = 'bg-[#60A5FA]'; }
-  if (title === 'Defending') { gradient = 'from-[#A78BFA]/20 to-[#8B5CF6]/5'; accent = 'bg-[#A78BFA]'; }
-  if (title === 'Possession & Discipline') { gradient = 'from-[#FBBF24]/20 to-[#F59E0B]/5'; accent = 'bg-[#FBBF24]'; }
+  let hex = '#34D399';
+  
+  if (title === 'Shooting') { hex = '#F87171'; }
+  if (title === 'Passing') { hex = '#60A5FA'; }
+  if (title === 'Defending') { hex = '#A78BFA'; }
+  if (title === 'Possession & Discipline') { hex = '#FBBF24'; }
 
   return (
-    <div className="relative flex flex-col h-full dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-5 shadow-2xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group overflow-hidden">
-      <div className={`absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br ${gradient} rounded-full blur-[50px] opacity-30 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none`} />
-      
-      <div className="flex items-center gap-3 mb-6 pb-4 border-b dark:border-white/5 border-slate-200 relative z-10">
-        <div className={`w-1.5 h-6 rounded-full ${accent} shadow-[0_0_10px_rgba(255,255,255,0.2)]`} />
-        <h3 className="dark:text-white text-slate-900 font-black text-base tracking-wide uppercase">{title}</h3>
+    <div className="relative flex flex-col h-full group pl-2 pr-1 pt-2">
+      <div className="flex flex-col gap-3 mb-6 relative z-10">
+        <h3 className="dark:text-white text-slate-900 font-black text-[13px] tracking-[0.2em] uppercase text-left">
+          {title}
+        </h3>
+        <div className="h-[2px] w-12 rounded-full" style={{ backgroundColor: hex, boxShadow: `0 0 10px ${hex}` }} />
       </div>
-      <div className="space-y-1.5 flex-1 relative z-10">
-        {children}
+      <div className="flex-1 flex flex-col">
+        {React.Children.map(children, (child: any) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, { accentHex: hex } as any);
+          }
+          return child;
+        })}
       </div>
     </div>
   );
 };
 
 // Advanced 2D Shotmap Pitch Renderer
-const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [] }: any) => {
+const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], matchesBox }: any) => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
   const rawShots = useMemo(() => {
@@ -238,124 +288,130 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [] }: 
   const totalShotsFiltered = filteredShots.length;
 
   return (
-    <div className="flex flex-col gap-5 w-full max-w-[360px] mx-auto">
-      <div className="relative w-full aspect-[68/52.5] bg-[#2E3C2E] border-4 border-black/80 rounded-t-xl overflow-hidden shadow-2xl">
-        {/* Grass Pattern */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.15) 10%, rgba(255,255,255,0.15) 20%)' }} />
-
-        {/* Halfway Line (Top) */}
-        <div className="absolute top-0 left-0 right-0 border-t-[3px] border-white/40 pointer-events-none" />
-        {/* Center Circle (Top Half) */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[26.9%] aspect-square border-[3px] border-white/40 rounded-full pointer-events-none" />
-
-        {/* D-Arc Wrapper */}
-        <div 
-          className="absolute left-1/2 -translate-x-1/2 w-[26.9%] overflow-hidden pointer-events-none"
-          style={{ bottom: '31.4%', height: '6.95%' }}
-        >
-          <div 
-            className="absolute top-0 left-0 w-full border-[3px] border-white/40 rounded-full pointer-events-none"
-            style={{ height: '500%' }}
-          />
-        </div>
-
-        {/* Penalty Box (Bottom) - 59.3% width, 31.4% height (16.5m/52.5m) */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[59.3%] h-[31.4%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
-
-        {/* Goal Box (Bottom) - 26.9% width, 10.5% height (5.5m/52.5m) */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[26.9%] h-[10.5%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
-
-        {/* Penalty Spot - 11m from bottom -> 20.95% */}
-        <div className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white/60 rounded-full pointer-events-none" style={{ bottom: '20.95%' }} />
-
-        {/* Goal Posts */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[10.7%] h-[3%] bg-black/40 border-x-2 border-t-2 border-white pointer-events-none" />
-
-        {/* Render Shots */}
-        {filteredShots.map((shot: any, idx: number) => {
-          // Only render shots in attacking half
-          if (shot.top < 0 || shot.top > 100) return null;
-
-          let sizeClass = 'w-3 h-3';
-          if (shot.expectedGoals && shot.expectedGoals > 0.3) sizeClass = 'w-4 h-4';
-          
-          return (
-            <div
-              key={idx}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-[1.8] cursor-pointer ${
-                shot.isGoal
-                  ? 'z-30 flex items-center justify-center'
-                  : `${sizeClass} rounded-full ${shot.eventType === 'AttemptSaved' || shot.isOnTarget ? 'bg-[#3B82F6]' : 'bg-[#EF4444]'} border-[1.5px] border-white z-10 shadow-md opacity-90 hover:opacity-100`
-              }`}
-              style={{ left: `${shot.left}%`, top: `${shot.top}%` }}
-              title={shot.isGoal ? 'Goal' : shot.eventType || 'Miss/Saved'}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+      <div className="flex flex-col">
+        <h3 className="dark:text-white text-slate-900 font-bold text-center mb-4">Season Shot Map</h3>
+        <div className="w-full max-w-sm mx-auto flex flex-col gap-6">
+          <div className="relative w-full aspect-[4/3] rounded-t-[2rem] rounded-b-lg overflow-hidden border-4 dark:border-white/10 border-slate-300 shadow-2xl bg-gradient-to-b dark:from-[#22522c] dark:to-[#13361a] from-[#2a6839] to-[#1e4a29]">
+            <div 
+              className="absolute inset-0 opacity-40 pointer-events-none"
+              style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.05) 10%, rgba(255,255,255,0.05) 20%)' }}
+            ></div>
+            <div 
+              className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[31.4%] aspect-square rounded-full border-[3px] border-white/40 pointer-events-none"
+            />
+            <div 
+              className="absolute left-1/2 -translate-x-1/2 w-[26.9%] overflow-hidden pointer-events-none"
+              style={{ bottom: '31.4%', height: '6.95%' }}
             >
-              {shot.isGoal && <span className="text-[16px] leading-none drop-shadow-[0_0_6px_rgba(250,204,21,0.8)] pointer-events-none">⚽</span>}
+              <div 
+                className="absolute top-0 left-0 w-full border-[3px] border-white/40 rounded-full pointer-events-none"
+                style={{ height: '500%' }}
+              />
             </div>
-          );
-        })}
-      </div>
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[59.3%] h-[31.4%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[26.9%] h-[10.5%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
+            <div className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white/60 rounded-full pointer-events-none" style={{ bottom: '20.95%' }} />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[10.7%] h-[3%] bg-black/40 border-x-2 border-t-2 border-white pointer-events-none" />
+            {filteredShots.map((shot: any, idx: number) => {
+              if (shot.top < 0 || shot.top > 100) return null;
 
-      {/* Stats Summary */}
-      <div className="flex justify-around items-center border-b dark:border-white/10 border-slate-200 pb-4">
-        <div className="flex flex-col items-center">
-          <span className="text-2xl font-bold dark:text-white text-slate-900">{totalShotsFiltered}</span>
-          <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">Shots</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <span className="text-2xl font-bold dark:text-white text-slate-900">{totalGoalsFiltered}</span>
-          <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">Goals</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <span className="text-2xl font-bold dark:text-white text-slate-900">{totalxG}</span>
-          <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">xG</span>
+              let sizeClass = 'w-[14px] h-[14px]';
+              if (shot.expectedGoals && shot.expectedGoals > 0.3) sizeClass = 'w-[18px] h-[18px]';
+              
+              const isOnTarget = shot.eventType === 'AttemptSaved' || shot.isOnTarget;
+
+              return (
+                <div
+                  key={idx}
+                  className={`absolute -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-[1.8] cursor-pointer ${
+                    shot.isGoal
+                      ? 'z-30 flex items-center justify-center'
+                      : `${sizeClass} rounded-full ${isOnTarget ? 'bg-[#d49aab] opacity-[0.65]' : 'bg-transparent border-[2px] border-[#d49aab] opacity-[0.65]'} z-10`
+                  }`}
+                  style={{ left: `${shot.left}%`, top: `${shot.top}%` }}
+                  title={shot.isGoal ? 'Goal' : shot.eventType || 'Miss/Saved'}
+                >
+                  {shot.isGoal && <span className="text-[17px] leading-none pointer-events-none drop-shadow-[0_4px_4px_rgba(0,0,0,0.85)] grayscale contrast-[1.2] brightness-110">⚽</span>}
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex justify-around items-center border-b dark:border-white/10 border-slate-200 pb-4">
+            <div className="flex flex-col items-center">
+              <span className="text-2xl font-bold dark:text-white text-slate-900">{totalShotsFiltered}</span>
+              <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">Shots</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-2xl font-bold dark:text-white text-slate-900">{totalGoalsFiltered}</span>
+              <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">Goals</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-2xl font-bold dark:text-white text-slate-900">{totalxG}</span>
+              <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">xG</span>
+            </div>
+          </div>
+          <div className="flex justify-center gap-6 text-[13px] font-medium dark:text-slate-300 text-slate-600">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[17px] leading-none drop-shadow-[0_3px_3px_rgba(0,0,0,0.6)] grayscale contrast-[1.2] brightness-110">⚽</span>
+              <span>Goal</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-[#d49aab] opacity-[0.65]"></div>
+              <span>On Target</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-transparent border-[2px] border-[#d49aab] opacity-[0.65]"></div>
+              <span>Miss/Block</span>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Legend */}
-      <div className="flex justify-center gap-6 text-[13px] font-medium dark:text-slate-300 text-slate-600">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[14px] leading-none drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]">⚽</span>
-          <span>Goal</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6] border-[1px] border-white shadow-md"></div>
-          <span>Saved</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444] border-[1px] border-white shadow-md"></div>
-          <span>Miss/Block</span>
-        </div>
-      </div>
-
-      {/* Filter Section */}
-      <div className="flex flex-col gap-3 mt-1">
-        <div className="flex items-center justify-between">
-          <h4 className="text-[15px] font-bold dark:text-white text-slate-900">Filter</h4>
-          {activeFilter && (
-            <button onClick={() => setActiveFilter(null)} className="text-[12px] font-semibold text-[#3B82F6] hover:underline">
-              Clear Filter
-            </button>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {Object.entries(filterCounts).map(([key, count]) => {
-            if (count === 0) return null;
-            const isActive = activeFilter === key;
-            return (
+      <div className="flex flex-col gap-6">
+        {matchesBox}
+        <div className="dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-6 shadow-inner flex flex-col gap-4">
+          <div className="flex items-center justify-between border-b dark:border-white/5 border-slate-200 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-4 rounded-full bg-[#34D399] shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
+              <h4 className="text-[13px] font-black dark:text-white text-slate-900 uppercase tracking-widest">Filter Shots</h4>
+            </div>
+            {activeFilter && (
               <button 
-                key={key}
-                onClick={() => setActiveFilter(isActive ? null : key)}
-                className={`px-3 py-1.5 rounded-full text-[13px] font-medium transition-all border ${
-                  isActive 
-                    ? 'dark:bg-white dark:text-black bg-slate-900 text-white border-transparent shadow-md scale-105' 
-                    : 'dark:bg-transparent dark:text-slate-300 dark:border-white/20 dark:hover:bg-white/10 bg-transparent text-slate-700 border-slate-300 hover:bg-slate-100'
-                }`}
+                onClick={() => setActiveFilter(null)} 
+                className="text-[11px] font-bold text-[#f43f5e] hover:text-[#e11d48] uppercase tracking-wider transition-colors px-2 py-1 rounded-md hover:bg-rose-500/10"
               >
-                {key} <span className={isActive ? 'opacity-70 ml-1 font-semibold' : 'opacity-60 ml-1'}>{count}</span>
+                Clear
               </button>
-            );
-          })}
+            )}
+          </div>
+          
+          <div className="flex flex-wrap gap-2.5">
+            {Object.entries(filterCounts).map(([key, count]) => {
+              if (count === 0) return null;
+              const isActive = activeFilter === key;
+              return (
+                <button 
+                  key={key}
+                  onClick={() => setActiveFilter(isActive ? null : key)}
+                  className={`group relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all duration-300 overflow-hidden ${
+                    isActive 
+                      ? 'text-white border-transparent shadow-[0_4px_12px_rgba(56,189,248,0.3)] scale-[1.02]' 
+                      : 'dark:text-gray-400 text-slate-600 dark:bg-white/5 bg-slate-200/50 border dark:border-white/5 border-slate-300/50 hover:dark:bg-white/10 hover:bg-slate-200 hover:dark:text-white hover:text-slate-900'
+                  }`}
+                >
+                  {isActive && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#38bdf8] to-[#3B82F6] z-0"></div>
+                  )}
+                  <span className="relative z-10">{key}</span>
+                  <span className={`relative z-10 flex items-center justify-center min-w-[18px] h-[18px] rounded-md text-[10px] px-1 ${
+                    isActive ? 'bg-black/20 text-white' : 'dark:bg-black/40 bg-white shadow-sm dark:text-gray-300 text-slate-500 group-hover:text-slate-700 dark:group-hover:text-white'
+                  }`}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -1070,15 +1126,15 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
         <div className="flex gap-8 font-bold text-sm tracking-wide uppercase dark:text-gray-400 text-slate-500">
           <span
             onClick={() => setActiveTab('overview')}
-            className={`cursor-pointer transition-colors ${activeTab === 'overview' ? 'dark:text-[#34D399] text-emerald-600 border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:dark:text-white text-slate-900 pb-4 -mb-[18px]'}`}
+            className={`cursor-pointer transition-colors ${activeTab === 'overview' ? 'dark:text-[#34D399] text-emerald-600 border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:dark:text-white dark:text-gray-400 text-slate-500 hover:text-slate-900 pb-4 -mb-[18px]'}`}
           >Overview</span>
           <span
             onClick={() => setActiveTab('detailed')}
-            className={`cursor-pointer transition-colors ${activeTab === 'detailed' ? 'dark:text-[#34D399] text-emerald-600 border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:dark:text-white text-slate-900 pb-4 -mb-[18px]'}`}
+            className={`cursor-pointer transition-colors ${activeTab === 'detailed' ? 'dark:text-[#34D399] text-emerald-600 border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:dark:text-white dark:text-gray-400 text-slate-500 hover:text-slate-900 pb-4 -mb-[18px]'}`}
           >Detailed Season Stats</span>
           <span
             onClick={() => setActiveTab('career')}
-            className={`cursor-pointer transition-colors ${activeTab === 'career' ? 'dark:text-[#34D399] text-emerald-600 border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:dark:text-white text-slate-900 pb-4 -mb-[18px]'}`}
+            className={`cursor-pointer transition-colors ${activeTab === 'career' ? 'dark:text-[#34D399] text-emerald-600 border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:dark:text-white dark:text-gray-400 text-slate-500 hover:text-slate-900 pb-4 -mb-[18px]'}`}
           >Career</span>
         </div>
       </div>
@@ -1723,32 +1779,51 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
           <div className="transition-opacity duration-300">
             {/* Top Graph Area (Matches) */}
             <div className="dark:bg-[#1a1c21] bg-white rounded-xl border dark:border-white/5 border-slate-200 p-6 mb-8 relative">
-              <div className={`grid grid-cols-1 ${hasDeepStats ? 'md:grid-cols-2' : ''} gap-8 pt-2`}>
-                {hasDeepStats && (
-                  <div className="flex flex-col">
-                    <h3 className="dark:text-white text-slate-900 font-bold text-center mb-4">Season Shot Map</h3>
-                    <ShotMapPitch playerId={id} position={position} totalGoals={Number(goals)} realShotmap={currentStats?.shotmap} />
-                  </div>
-                )}
-
-                <div className={`relative flex flex-col dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-6 shadow-2xl overflow-hidden group hover:-translate-y-1 transition-all duration-500 ${hasDeepStats ? 'border-l-4 border-l-[#60A5FA]' : 'max-w-md mx-auto w-full border-l-4 border-l-[#60A5FA]'}`}>
-                  {/* Background Blur */}
-                  <div className="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-[#60A5FA]/20 to-[#3B82F6]/20 rounded-full blur-[50px] opacity-30 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none" />
-                  
-                  <div className="flex items-center gap-3 mb-6 pb-4 border-b dark:border-white/5 border-slate-200 relative z-10">
-                    <div className="w-1.5 h-6 rounded-full bg-[#60A5FA] shadow-[0_0_10px_rgba(96,165,250,0.5)]" />
-                    <h3 className="dark:text-white text-slate-900 font-black text-base tracking-wide uppercase">Matches & Playtime</h3>
-                  </div>
-                  <div className="space-y-1.5 relative z-10">
-                    <StatRow label="Matches played" value={hasDeepStats ? extractTopStat('Matches') : selectedBasicStats?.appearances} />
-                    {hasDeepStats && <StatRow label="Started" value={extractTopStat('Started')} />}
-                    {hasDeepStats && <StatRow label="Minutes played" value={extractTopStat('Minutes')} />}
-                    <StatRow label="Rating" value={hasDeepStats ? extractTopStat('Rating') : selectedBasicStats?.rating?.rating} />
-                    {!hasDeepStats && <StatRow label="Goals" value={selectedBasicStats?.goals} />}
-                    {!hasDeepStats && <StatRow label="Assists" value={selectedBasicStats?.assists} />}
+              {hasDeepStats ? (
+                <div className="pt-2">
+                  <ShotMapPitch 
+                    playerId={id} 
+                    position={position} 
+                    totalGoals={Number(goals)} 
+                    realShotmap={currentStats?.shotmap} 
+                    matchesBox={
+                      <div className="relative flex flex-col dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-6 shadow-2xl overflow-hidden group hover:-translate-y-1 transition-all duration-500 border-l-4 border-l-[#60A5FA]">
+                        {/* Background Blur */}
+                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-[#60A5FA]/20 to-[#3B82F6]/20 rounded-full blur-[50px] opacity-30 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none" />
+                        
+                        <div className="flex items-center gap-3 mb-6 pb-4 border-b dark:border-white/5 border-slate-200 relative z-10">
+                          <div className="w-1.5 h-6 rounded-full bg-[#60A5FA] shadow-[0_0_10px_rgba(96,165,250,0.5)]" />
+                          <h3 className="dark:text-white text-slate-900 font-black text-base tracking-wide uppercase">Matches & Playtime</h3>
+                        </div>
+                        <div className="space-y-1.5 relative z-10">
+                          <StatRow label="Matches played" value={extractTopStat('Matches')} />
+                          <StatRow label="Started" value={extractTopStat('Started')} />
+                          <StatRow label="Minutes played" value={extractTopStat('Minutes')} />
+                          <StatRow label="Rating" value={extractTopStat('Rating')} />
+                        </div>
+                      </div>
+                    }
+                  />
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-8 pt-2">
+                  <div className="relative flex flex-col dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-6 shadow-2xl overflow-hidden group hover:-translate-y-1 transition-all duration-500 max-w-md mx-auto w-full border-l-4 border-l-[#60A5FA]">
+                    {/* Background Blur */}
+                    <div className="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-[#60A5FA]/20 to-[#3B82F6]/20 rounded-full blur-[50px] opacity-30 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none" />
+                    
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b dark:border-white/5 border-slate-200 relative z-10">
+                      <div className="w-1.5 h-6 rounded-full bg-[#60A5FA] shadow-[0_0_10px_rgba(96,165,250,0.5)]" />
+                      <h3 className="dark:text-white text-slate-900 font-black text-base tracking-wide uppercase">Matches & Playtime</h3>
+                    </div>
+                    <div className="space-y-1.5 relative z-10">
+                      <StatRow label="Matches played" value={selectedBasicStats?.appearances} />
+                      <StatRow label="Rating" value={selectedBasicStats?.rating?.rating} />
+                      <StatRow label="Goals" value={selectedBasicStats?.goals} />
+                      <StatRow label="Assists" value={selectedBasicStats?.assists} />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* 4 Column Data Grid */}
@@ -1760,47 +1835,47 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
             ) : hasDeepStats ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatColumn title="Shooting">
-                <StatRow label="Goals" value={extractStat('Shooting', 'Goals')} />
-                <StatRow label="xG" value={extractStat('Shooting', 'xG')} />
-                <StatRow label="xGOT" value={extractStat('Shooting', 'xGOT')} />
-                <StatRow label="Shots" value={extractStat('Shooting', 'Shots')} />
-                <StatRow label="Shots on target" value={extractStat('Shooting', 'Shots on target')} />
-                <StatRow label="Penalty goals" value={extractStat('Shooting', 'Penalty goals')} />
-                <StatRow label="xG excl. penalty" value={extractStat('Shooting', 'xG excl. penalty')} />
-                <StatRow label="Headed shots" value={extractStat('Shooting', 'Headed shots')} />
+                <StatTile label="Goals" value={extractStat('Shooting', 'Goals')} />
+                <StatTile label="xG" value={extractStat('Shooting', 'xG')} />
+                <StatTile label="xGOT" value={extractStat('Shooting', 'xGOT')} />
+                <StatTile label="Shots" value={extractStat('Shooting', 'Shots')} />
+                <StatTile label="Shots on target" value={extractStat('Shooting', 'Shots on target')} />
+                <StatTile label="Penalty goals" value={extractStat('Shooting', 'Penalty goals')} />
+                <StatTile label="xG excl. pen" value={extractStat('Shooting', 'xG excl. penalty')} />
+                <StatTile label="Headed shots" value={extractStat('Shooting', 'Headed shots')} />
               </StatColumn>
 
               <StatColumn title="Passing">
-                <StatRow label="Assists" value={extractStat('Passing', 'Assists')} />
-                <StatRow label="xA" value={extractStat('Passing', 'xA')} />
-                <StatRow label="Accurate passes" value={extractStat('Passing', 'Accurate passes')} />
-                <StatRow label="Pass accuracy" value={extractStat('Passing', 'Pass accuracy')} />
-                <StatRow label="Accurate long balls" value={extractStat('Passing', 'Accurate long balls')} />
-                <StatRow label="Long ball accuracy" value={extractStat('Passing', 'Long ball accuracy')} />
-                <StatRow label="Chances created" value={extractStat('Passing', 'Chances created')} />
-                <StatRow label="Big chances created" value={extractStat('Passing', 'Big chances created')} />
+                <StatTile label="Assists" value={extractStat('Passing', 'Assists')} />
+                <StatTile label="xA" value={extractStat('Passing', 'xA')} />
+                <StatTile label="Accurate passes" value={extractStat('Passing', 'Accurate passes')} />
+                <StatTile label="Pass accuracy" value={extractStat('Passing', 'Pass accuracy')} />
+                <StatTile label="Acc. long balls" value={extractStat('Passing', 'Accurate long balls')} />
+                <StatTile label="Long ball acc." value={extractStat('Passing', 'Long ball accuracy')} />
+                <StatTile label="Chances created" value={extractStat('Passing', 'Chances created')} />
+                <StatTile label="Big chances" value={extractStat('Passing', 'Big chances created')} />
               </StatColumn>
 
               <StatColumn title="Defending">
-                <StatRow label="Defensive actions" value={extractStat('Defending', 'Defensive actions')} />
-                <StatRow label="Tackles" value={extractStat('Defending', 'Tackles')} />
-                <StatRow label="Interceptions" value={extractStat('Defending', 'Interceptions')} />
-                <StatRow label="Recoveries" value={extractStat('Defending', 'Recoveries')} />
-                <StatRow label="Possession won final 3rd" value={extractStat('Defending', 'Possession won final 3rd')} />
-                <StatRow label="Dribbled past" value={extractStat('Defending', 'Dribbled past')} />
-                <StatRow label="Clean sheets" value={extractStat('Defending', 'Clean sheets')} />
-                <StatRow label="Goals conceded" value={extractStat('Defending', 'Goals conceded while on pitch')} />
+                <StatTile label="Def actions" value={extractStat('Defending', 'Defensive actions')} />
+                <StatTile label="Tackles" value={extractStat('Defending', 'Tackles')} />
+                <StatTile label="Interceptions" value={extractStat('Defending', 'Interceptions')} />
+                <StatTile label="Recoveries" value={extractStat('Defending', 'Recoveries')} />
+                <StatTile label="Poss won 3rd" value={extractStat('Defending', 'Possession won final 3rd')} />
+                <StatTile label="Dribbled past" value={extractStat('Defending', 'Dribbled past')} />
+                <StatTile label="Clean sheets" value={extractStat('Defending', 'Clean sheets')} />
+                <StatTile label="Goals conceded" value={extractStat('Defending', 'Goals conceded while on pitch')} />
               </StatColumn>
 
               <StatColumn title="Possession & Discipline">
-                <StatRow label="Dribbles" value={extractStat('Possession', 'Dribbles')} />
-                <StatRow label="Dribbles success rate" value={extractStat('Possession', 'Dribbles success rate')} />
-                <StatRow label="Touches" value={extractStat('Possession', 'Touches')} />
-                <StatRow label="Touches in opp box" value={extractStat('Possession', 'Touches in opposition box')} />
-                <StatRow label="Duels won" value={extractStat('Possession', 'Duels won')} />
-                <StatRow label="Aerials won" value={extractStat('Possession', 'Aerials won')} />
-                <StatRow label="Fouls committed" value={extractStat('Defending', 'Fouls committed')} />
-                <StatRow label="Yellow cards" value={extractStat('Discipline', 'Yellow cards')} />
+                <StatTile label="Dribbles" value={extractStat('Possession', 'Dribbles')} />
+                <StatTile label="Dribble success" value={extractStat('Possession', 'Dribbles success rate')} />
+                <StatTile label="Touches" value={extractStat('Possession', 'Touches')} />
+                <StatTile label="Touches in box" value={extractStat('Possession', 'Touches in opposition box')} />
+                <StatTile label="Duels won" value={extractStat('Possession', 'Duels won')} />
+                <StatTile label="Aerials won" value={extractStat('Possession', 'Aerials won')} />
+                <StatTile label="Fouls" value={extractStat('Defending', 'Fouls committed')} />
+                <StatTile label="Yellow cards" value={extractStat('Discipline', 'Yellow cards')} />
               </StatColumn>
             </div>
             ) : (
