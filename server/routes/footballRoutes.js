@@ -248,21 +248,34 @@ router.get('/fotmob-player-stats', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Missing parameters' });
         }
         
-        const url = `https://www.fotmob.com/players/${id}/player?seasonId=${encodeURIComponent(seasonId)}&tournamentId=${tournamentId}`;
+        const cacheKey = `/fotmob-player-stats/${id}/${seasonId}/${tournamentId}`;
+        const cached = await FotmobCache.findOne({ endpoint: cacheKey, cacheExpiry: { $gt: new Date() } });
+        if (cached) {
+            return res.json({ success: true, data: cached.data });
+        }
+
+        const url = `https://www.fotmob.com/api/data/playerStats?playerId=${id}&seasonId=${encodeURIComponent(seasonId)}&isFirstSeason=false`;
         const response = await axios.get(url, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
         });
         
-        const match = response.data.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
-        if (!match) return res.status(404).json({ success: false, message: 'Data not found' });
-        
-        const nextData = JSON.parse(match[1]);
-        const playerData = nextData?.props?.pageProps?.fallback?.[`player:${id}`];
-        if (!playerData || !playerData.firstSeasonStats) {
+        const statsData = response.data;
+        if (!statsData || Object.keys(statsData).length === 0) {
             return res.status(404).json({ success: false, message: 'Stats not found' });
         }
         
-        res.json({ success: true, data: playerData.firstSeasonStats });
+        await FotmobCache.findOneAndUpdate(
+            { endpoint: cacheKey },
+            { 
+                endpoint: cacheKey, 
+                data: statsData, 
+                cacheExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+                lastFetched: new Date()
+            },
+            { upsert: true, new: true }
+        );
+
+        res.json({ success: true, data: statsData });
     } catch (error) {
         console.error(`[Fotmob Player Stats Route] Error:`, error.message);
         res.status(500).json({ success: false, message: 'Failed to fetch fotmob player stats' });

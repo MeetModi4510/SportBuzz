@@ -86,3 +86,22 @@ export function useFotmobPlayerProfile(playerId: string | number | null) {
         refetchOnWindowFocus: false,
     });
 }
+
+const fetchFotmobPlayerTournamentStats = async (playerId: string | number, entryId: string, tournamentId: string | number): Promise<any> => {
+    const res = await fetch(`/api/football/fotmob-player-stats?id=${playerId}&seasonId=${encodeURIComponent(entryId)}&tournamentId=${tournamentId}`);
+    if (!res.ok) {
+        throw new Error('Failed to fetch fotmob player tournament stats');
+    }
+    const data = await res.json();
+    return data.data;
+};
+
+export function useFotmobPlayerTournamentStats(playerId: string | number | null, entryId: string | null, tournamentId: string | number | null) {
+    return useQuery({
+        queryKey: ['fotmobPlayerTournamentStats', playerId, entryId, tournamentId],
+        queryFn: () => fetchFotmobPlayerTournamentStats(playerId!, entryId!, tournamentId!),
+        enabled: !!playerId && !!entryId && !!tournamentId,
+        staleTime: 24 * 60 * 60 * 1000, // 24 hours caching
+        refetchOnWindowFocus: false,
+    });
+}

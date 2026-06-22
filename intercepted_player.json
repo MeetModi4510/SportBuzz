@@ -1,0 +1,324 @@
+{
+  "toggles": [
+    {
+      "name": "predictor-show-finished-match-stats",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-wc-league-background",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predictor-allow-delete-league",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-wc-team-background",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predictor-fulltime-label",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-enable-ttd-openads",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predictor-show-odds",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-livescores-past-midnight",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predictor-tbd-days-collapsed",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-wc-tv-guide",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-enable-ad-backfill",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-wc-livescore-background",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-potm-vote-giveaway-button",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predictor-hide-xmas-leagues-outside-of-xmas",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-new-transfer-center",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-wc-tv-guide-background",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-bracket-explorer",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predictor-invite-link-recovery",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predictor-settings-pill-icon",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-enable-livewrapped",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-enable-custom-gpt",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-wc-match-background",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predict-auth-alias",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-transfer-window",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predictor-bridge-timeout-error-page",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predictor-show-reminders-toggle",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-lineup-builder-app-promo",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predictor-allow-rename-league",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-front-page-late-night-matches",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-show-lineup-builder-promo",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "web-predictor-promo",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    },
+    {
+      "name": "predictor-show-reminders-popup",
+      "enabled": true,
+      "variant": {
+        "name": "disabled",
+        "enabled": false,
+        "payload": null
+      },
+      "impression_data": false
+    }
+  ]
+}

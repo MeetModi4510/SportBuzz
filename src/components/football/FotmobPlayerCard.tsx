@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { ChevronDown, Info, Activity, Star, Calendar, Loader2, Trophy } from 'lucide-react';
 import { usePlayerRecentMatches } from '../../hooks/football/usePlayerRecentMatches';
+import { useFotmobPlayerTournamentStats } from '../../hooks/useFootballSquads';
 
 const StatRow = ({ label, value, subValue, tooltip }: any) => (
   <div className="group/row flex justify-between items-center py-2 px-3 text-[13px] transition-all duration-300 rounded-xl hover:dark:bg-white/5 hover:bg-slate-200 hover:shadow-md cursor-default border border-transparent hover:dark:border-white/5 border-slate-200">
@@ -131,91 +132,106 @@ const StatColumn = ({ title, children }: any) => {
 };
 
 // Advanced 2D Shotmap Pitch Renderer
-const ShotMapPitch = ({ playerId, position, totalGoals = 1 }: any) => {
-  // Generate deterministic shot data based on playerId and total goals
+const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [] }: any) => {
   const shots = useMemo(() => {
+    if (realShotmap && realShotmap.length > 0) {
+      return realShotmap.map((s: any) => {
+        // Fotmob uses 105x68. Always attacking x=105.
+        // We draw a half-pitch (attacking bottom):
+        // Top is midfield (x=52.5), Bottom is goal (x=105).
+        // X maps to Top (0% to 100%)
+        // Y maps to Left (0% to 100%)
+        
+        let rawX = s.x;
+        let rawY = s.y;
+
+        // Normalize
+        const top = ((rawX - 52.5) / 52.5) * 100;
+        const left = (rawY / 68) * 100;
+
+        return {
+          left,
+          top,
+          isGoal: s.eventType === 'Goal',
+          eventType: s.eventType,
+          expectedGoals: s.expectedGoals
+        };
+      });
+    }
+
     const generated = [];
     const seedBase = parseInt(String(playerId).slice(0, 5)) || 12345;
-
-    // Number of shots based on goals (rough estimate)
     const numShots = Math.max(totalGoals * 5, 10);
 
     for (let i = 0; i < numShots; i++) {
       const seed = seedBase + i * 13;
       const isGoal = i < totalGoals;
-
-      // Adjust clustering based on position
-      let x, y;
-      if (position?.toLowerCase().includes('forward') || position?.toLowerCase().includes('striker')) {
-        // Closer to goal
-        x = 35 + (seed % 30); // 35 to 65 (center)
-        y = 70 + ((seed * 7) % 25); // 70 to 95 (close to goal)
-      } else {
-        // More spread out
-        x = 20 + (seed % 60);
-        y = 50 + ((seed * 7) % 40);
-      }
-
-      // Misses might be wider
-      if (!isGoal && seed % 3 === 0) {
-        x = x + (seed % 2 === 0 ? 15 : -15);
-      }
-
-      // Ensure within bounds
-      x = Math.max(5, Math.min(x, 95));
-      y = Math.max(5, Math.min(y, 95));
-
-      generated.push({ x, y, isGoal });
+      let left = 20 + (seed % 60);
+      let top = 40 + ((seed * 7) % 50); // Attacking bottom
+      if (!isGoal && seed % 3 === 0) left += (seed % 2 === 0 ? 15 : -15);
+      left = Math.max(5, Math.min(left, 95));
+      top = Math.max(5, Math.min(top, 95));
+      generated.push({ left, top, isGoal });
     }
     return generated;
-  }, [playerId, totalGoals, position]);
+  }, [playerId, totalGoals, position, realShotmap]);
 
   return (
-    <div className="relative w-full max-w-[320px] aspect-[3/4] bg-[#2d4d22] rounded-xl border-4 border-black/60 mx-auto overflow-hidden shadow-[inset_0_0_50px_rgba(0,0,0,0.5)] flex flex-col items-center">
+    <div className="relative w-full max-w-[360px] aspect-[68/52.5] bg-[#2E3C2E] border-4 border-black/80 rounded-t-xl mx-auto overflow-hidden shadow-2xl">
       {/* Grass Pattern */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,0.2) 20px, rgba(255,255,255,0.2) 40px)' }} />
+      <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.15) 10%, rgba(255,255,255,0.15) 20%)' }} />
 
-      {/* Pitch Lines */}
-      <div className="absolute inset-3 border-2 border-white/40 pointer-events-none" />
-      <div className="absolute top-1/2 left-3 right-3 border-t-2 border-white/40 pointer-events-none" />
+      {/* Halfway Line (Top) */}
+      <div className="absolute top-0 left-0 right-0 border-t-[3px] border-white/40 pointer-events-none" />
+      {/* Center Circle (Top Half) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[26.9%] aspect-square border-[3px] border-white/40 rounded-full pointer-events-none" />
 
-      {/* Center Circle */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border-2 border-white/40 pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white/40 rounded-full pointer-events-none" />
-
-      {/* Penalty Areas */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-40 h-24 border-2 border-white/40 border-t-0 pointer-events-none" />
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-40 h-24 border-2 border-white/40 border-b-0 pointer-events-none" />
-
-      {/* Goal Areas */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-16 h-8 border-2 border-white/40 border-t-0 pointer-events-none" />
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-16 h-8 border-2 border-white/40 border-b-0 pointer-events-none" />
-
-      {/* D Arcs */}
-      <div className="absolute top-[6.5rem] left-1/2 -translate-x-1/2 w-16 h-12 border-2 border-white/40 rounded-b-full border-t-0 pointer-events-none" />
-      <div className="absolute bottom-[6.5rem] left-1/2 -translate-x-1/2 w-16 h-12 border-2 border-white/40 rounded-t-full border-b-0 pointer-events-none" />
-
-      {/* 3D Goal Posts / Nets */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-black/20 border-x-[3px] border-b-[3px] border-white/90 rounded-b-md shadow-[0_5px_15px_rgba(255,255,255,0.15)] overflow-hidden flex justify-center pointer-events-none z-10 backdrop-blur-[1px]">
-        <div className="w-full h-full opacity-40" style={{ backgroundImage: 'linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff)', backgroundSize: '4px 4px', backgroundPosition: '0 0, 2px 2px' }} />
-      </div>
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-black/20 border-x-[3px] border-t-[3px] border-white/90 rounded-t-md shadow-[0_-5px_15px_rgba(255,255,255,0.15)] overflow-hidden flex justify-center pointer-events-none z-10 backdrop-blur-[1px]">
-        <div className="w-full h-full opacity-40" style={{ backgroundImage: 'linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff)', backgroundSize: '4px 4px', backgroundPosition: '0 0, 2px 2px' }} />
+      {/* D-Arc Wrapper */}
+      <div 
+        className="absolute left-1/2 -translate-x-1/2 w-[26.9%] overflow-hidden pointer-events-none"
+        style={{ bottom: '31.4%', height: '6.95%' }}
+      >
+        <div 
+          className="absolute top-0 left-0 w-full border-[3px] border-white/40 rounded-full pointer-events-none"
+          style={{ height: '500%' }}
+        />
       </div>
 
-      {shots.map((shot, idx) => (
-        <div
-          key={idx}
-          className={`absolute -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-[1.8] cursor-pointer ${shot.isGoal
-            ? 'w-5 h-5 z-20 flex items-center justify-center shadow-2xl'
-            : 'w-[11px] h-[11px] rounded-full bg-[#EF4444] border-[1.5px] border-black/50 z-10 opacity-90 shadow-md hover:bg-red-400'
+      {/* Penalty Box (Bottom) - 59.3% width, 31.4% height (16.5m/52.5m) */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[59.3%] h-[31.4%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
+
+      {/* Goal Box (Bottom) - 26.9% width, 10.5% height (5.5m/52.5m) */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[26.9%] h-[10.5%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
+
+      {/* Penalty Spot - 11m from bottom -> 20.95% */}
+      <div className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white/60 rounded-full pointer-events-none" style={{ bottom: '20.95%' }} />
+
+      {/* Goal Posts */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[10.7%] h-[3%] bg-black/40 border-x-2 border-t-2 border-white pointer-events-none" />
+
+      {/* Render Shots */}
+      {shots.map((shot: any, idx: number) => {
+        // Only render shots in attacking half
+        if (shot.top < 0 || shot.top > 100) return null;
+
+        let sizeClass = 'w-3 h-3';
+        if (shot.expectedGoals && shot.expectedGoals > 0.3) sizeClass = 'w-4 h-4';
+        
+        return (
+          <div
+            key={idx}
+            className={`absolute -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-[1.8] cursor-pointer shadow-md ${
+              shot.isGoal
+                ? 'w-5 h-5 z-20 flex items-center justify-center bg-white rounded-full ring-2 ring-black/20'
+                : `${sizeClass} rounded-full ${shot.eventType === 'AttemptSaved' ? 'bg-[#3B82F6]' : 'bg-[#EF4444]'} border-[1.5px] border-white z-10`
             }`}
-          style={{ left: `${shot.x}%`, top: `${100 - shot.y}%` }}
-          title={shot.isGoal ? 'Goal' : 'Miss/Saved'}
-        >
-          {shot.isGoal && <span className="text-[14px] leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">⚽</span>}
-        </div>
-      ))}
+            style={{ left: `${shot.left}%`, top: `${shot.top}%` }}
+            title={shot.isGoal ? 'Goal' : shot.eventType || 'Miss/Saved'}
+          >
+            {shot.isGoal && <span className="text-[13px] leading-none drop-shadow-sm pointer-events-none">⚽</span>}
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -786,14 +802,25 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
     statSeasons?.[0]?.tournaments?.[0] ? { ...statSeasons[0].tournaments[0], seasonName: statSeasons[0].seasonName } : null
   );
 
+  const isPrimaryTournament = selectedTournament?.tournamentId === statSeasons?.[0]?.tournaments?.[0]?.tournamentId && selectedTournament?.seasonName === statSeasons?.[0]?.seasonName;
+
+  const { data: fetchedStats, isLoading: isStatsLoading } = useFotmobPlayerTournamentStats(
+    id,
+    selectedTournament?.entryId || statSeasons?.[0]?.tournaments?.[0]?.entryId,
+    selectedTournament?.tournamentId || statSeasons?.[0]?.tournaments?.[0]?.tournamentId
+  );
+  
+  const currentStats = fetchedStats || (isPrimaryTournament ? firstSeasonStats : null);
+  const hasDeepStats = !!currentStats?.statsSection?.items?.length;
+
   const extractTopStat = (statTitle: string) => {
-    const items = firstSeasonStats?.topStatCard?.items || [];
+    const items = currentStats?.topStatCard?.items || [];
     const item = items.find((i: any) => i?.title?.toLowerCase() === statTitle.toLowerCase());
     return item?.statValue;
   };
 
   const extractStat = (categoryName: string, statTitle: string, applyFilter: boolean = true) => {
-    const categories = firstSeasonStats?.statsSection?.items || [];
+    const categories = currentStats?.statsSection?.items || [];
     const cat = categories.find((c: any) => c?.title?.toLowerCase() === categoryName.toLowerCase());
     const item = cat?.items?.find((i: any) => i?.title?.toLowerCase() === statTitle.toLowerCase());
     let rawValue = item?.statValue;
@@ -818,7 +845,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
     return rawValue;
   };
 
-  const isPrimaryTournament = selectedTournament?.tournamentId === statSeasons?.[0]?.tournaments?.[0]?.tournamentId && selectedTournament?.seasonName === statSeasons?.[0]?.seasonName;
+  // isPrimaryTournament is now defined above
 
   const getBasicStatsForSelected = () => {
     if (!selectedTournament || !careerHistory?.careerItems) return null;
@@ -836,7 +863,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
 
   const selectedBasicStats = getBasicStatsForSelected();
 
-  const goals = isPrimaryTournament 
+  const goals = hasDeepStats 
       ? (extractStat('Shooting', 'Goals') || extractTopStat('Goals') || 0)
       : (selectedBasicStats?.goals || 0);
 
@@ -955,7 +982,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
             </div>
 
             {/* Stat Filters */}
-            {isPrimaryTournament && (
+            {hasDeepStats && (
               <div className="flex items-center gap-1 dark:bg-[#1a1c21] bg-white p-1 rounded-lg border dark:border-white/5 border-slate-200 shadow-inner">
                 {(['Total', 'Per 90', 'Per match'] as const).map((filter) => (
                   <button
@@ -1564,15 +1591,15 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
           <div className="transition-opacity duration-300">
             {/* Top Graph Area (Matches) */}
             <div className="dark:bg-[#1a1c21] bg-white rounded-xl border dark:border-white/5 border-slate-200 p-6 mb-8 relative">
-              <div className={`grid grid-cols-1 ${isPrimaryTournament ? 'md:grid-cols-2' : ''} gap-8 pt-2`}>
-                {isPrimaryTournament && (
+              <div className={`grid grid-cols-1 ${hasDeepStats ? 'md:grid-cols-2' : ''} gap-8 pt-2`}>
+                {hasDeepStats && (
                   <div className="flex flex-col">
-                    <h3 className="dark:text-white text-slate-900 font-bold text-center mb-4">2D Simulated Shot Map</h3>
-                    <ShotMapPitch playerId={id} position={position} totalGoals={Number(goals)} />
+                    <h3 className="dark:text-white text-slate-900 font-bold text-center mb-4">Season Shot Map</h3>
+                    <ShotMapPitch playerId={id} position={position} totalGoals={Number(goals)} realShotmap={currentStats?.shotmap} />
                   </div>
                 )}
 
-                <div className={`relative flex flex-col dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-6 shadow-2xl overflow-hidden group hover:-translate-y-1 transition-all duration-500 ${isPrimaryTournament ? 'border-l-4 border-l-[#60A5FA]' : 'max-w-md mx-auto w-full border-l-4 border-l-[#60A5FA]'}`}>
+                <div className={`relative flex flex-col dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-6 shadow-2xl overflow-hidden group hover:-translate-y-1 transition-all duration-500 ${hasDeepStats ? 'border-l-4 border-l-[#60A5FA]' : 'max-w-md mx-auto w-full border-l-4 border-l-[#60A5FA]'}`}>
                   {/* Background Blur */}
                   <div className="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-[#60A5FA]/20 to-[#3B82F6]/20 rounded-full blur-[50px] opacity-30 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none" />
                   
@@ -1581,19 +1608,24 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                     <h3 className="dark:text-white text-slate-900 font-black text-base tracking-wide uppercase">Matches & Playtime</h3>
                   </div>
                   <div className="space-y-1.5 relative z-10">
-                    <StatRow label="Matches played" value={isPrimaryTournament ? extractTopStat('Matches') : selectedBasicStats?.appearances} />
-                    {isPrimaryTournament && <StatRow label="Started" value={extractTopStat('Started')} />}
-                    {isPrimaryTournament && <StatRow label="Minutes played" value={extractTopStat('Minutes')} />}
-                    <StatRow label="Rating" value={isPrimaryTournament ? extractTopStat('Rating') : selectedBasicStats?.rating?.rating} />
-                    {!isPrimaryTournament && <StatRow label="Goals" value={selectedBasicStats?.goals} />}
-                    {!isPrimaryTournament && <StatRow label="Assists" value={selectedBasicStats?.assists} />}
+                    <StatRow label="Matches played" value={hasDeepStats ? extractTopStat('Matches') : selectedBasicStats?.appearances} />
+                    {hasDeepStats && <StatRow label="Started" value={extractTopStat('Started')} />}
+                    {hasDeepStats && <StatRow label="Minutes played" value={extractTopStat('Minutes')} />}
+                    <StatRow label="Rating" value={hasDeepStats ? extractTopStat('Rating') : selectedBasicStats?.rating?.rating} />
+                    {!hasDeepStats && <StatRow label="Goals" value={selectedBasicStats?.goals} />}
+                    {!hasDeepStats && <StatRow label="Assists" value={selectedBasicStats?.assists} />}
                   </div>
                 </div>
               </div>
             </div>
 
             {/* 4 Column Data Grid */}
-            {isPrimaryTournament ? (
+            {isStatsLoading ? (
+              <div className="flex flex-col items-center justify-center p-12 dark:bg-[#1a1c21] bg-white rounded-xl border dark:border-white/5 border-slate-200">
+                <Loader2 className="w-8 h-8 text-[#34D399] animate-spin mb-4" />
+                <span className="dark:text-gray-400 text-slate-500 font-medium">Fetching tournament stats...</span>
+              </div>
+            ) : hasDeepStats ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatColumn title="Shooting">
                 <StatRow label="Goals" value={extractStat('Shooting', 'Goals')} />
@@ -1640,8 +1672,8 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
               </StatColumn>
             </div>
             ) : (
-              <div className="flex items-center justify-center p-8 dark:bg-[#1a1c21] bg-white rounded-xl border dark:border-white/5 border-slate-200">
-                 <span className="dark:text-gray-400 text-slate-500 font-medium">Deep stats (Shooting, Passing, Defending) are only available for the primary tournament ({statSeasons?.[0]?.tournaments?.[0]?.name}).</span>
+               <div className="flex items-center justify-center p-8 dark:bg-[#1a1c21] bg-white rounded-xl border dark:border-white/5 border-slate-200">
+                 <span className="dark:text-gray-400 text-slate-500 font-medium">Deep stats (Shooting, Passing, Defending) are not available for this tournament.</span>
               </div>
             )}
           </div>

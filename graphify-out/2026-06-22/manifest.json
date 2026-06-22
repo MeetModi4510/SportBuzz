@@ -100,8 +100,8 @@
     "semantic_hash": "cac197db51d775699234599a2a87f028"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\package.json": {
-    "mtime": 1782115501.2738278,
-    "ast_hash": "c6f9940fa8c0e2bf5aeaaebe698f6c10",
+    "mtime": 1781979101.075553,
+    "ast_hash": "ad07f930a247507707e19719733b0e86",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\postcss.config.js": {
@@ -545,8 +545,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\footballRoutes.js": {
-    "mtime": 1782115501.2843797,
-    "ast_hash": "6d450faa98a76151236b0fd23460e898",
+    "mtime": 1781980694.869034,
+    "ast_hash": "e00e58461f8d624cf1642ed6f8f65d88",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\routes\\leaderboardRoutes.js": {
@@ -635,7 +635,7 @@
     "semantic_hash": "130840b06e55e55f9969620291dbd3a1"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\server.js": {
-    "mtime": 1781985547.6192563,
+    "mtime": 1781166066.018726,
     "ast_hash": "61f1a12201876545b2461e5a3fefd2a2",
     "semantic_hash": "61f1a12201876545b2461e5a3fefd2a2"
   },
@@ -840,8 +840,8 @@
     "semantic_hash": "cb49df0f83a76c8978c53eaef8a35043"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\PlayerAnalysisPanel.tsx": {
-    "mtime": 1781984380.2771797,
-    "ast_hash": "b9b0834e52f4a81f129eda81132c1fdb",
+    "mtime": 1781283867.347335,
+    "ast_hash": "c15372a2a07274dab3ca84ea58723a89",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\PlayerCard.tsx": {
@@ -1435,8 +1435,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\PerformanceLab.tsx": {
-    "mtime": 1781984380.287466,
-    "ast_hash": "4056c4483a5cc10d3f0a048bdb813360",
+    "mtime": 1781629932.4161682,
+    "ast_hash": "c631925ef6a1f2dac41c17de58464cd7",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\PlayerProfilePage.tsx": {
@@ -1695,9 +1695,9 @@
     "semantic_hash": "7afecfa6a5ee64435d726fba7f1f17e8"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\vite.config.ts": {
-    "mtime": 1781984380.2927814,
-    "ast_hash": "9c6273a13df10a22d9ae4706938bcc0a",
-    "semantic_hash": ""
+    "mtime": 1781165451.1267424,
+    "ast_hash": "2d8cfc20f0934091c021f8dbf97edc78",
+    "semantic_hash": "2d8cfc20f0934091c021f8dbf97edc78"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\COMPLETE_CHECKLIST.md": {
     "mtime": 1781165447.3460307,
@@ -1783,6 +1783,131 @@
     "mtime": 1781166063.6971345,
     "ast_hash": "b0bc14dc7dfc23fdc0534323a650809f",
     "semantic_hash": "b0bc14dc7dfc23fdc0534323a650809f"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\1774236445453-1532.png": {
+    "mtime": 1781166063.7167275,
+    "ast_hash": "a9ec34d287d830ddc27d3e7e5f07db9a",
+    "semantic_hash": "a9ec34d287d830ddc27d3e7e5f07db9a"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\1774236462742-1532.png": {
+    "mtime": 1781166063.7265565,
+    "ast_hash": "a9ec34d287d830ddc27d3e7e5f07db9a",
+    "semantic_hash": "a9ec34d287d830ddc27d3e7e5f07db9a"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\1774237693425-1532.png": {
+    "mtime": 1781166063.735859,
+    "ast_hash": "a9ec34d287d830ddc27d3e7e5f07db9a",
+    "semantic_hash": "a9ec34d287d830ddc27d3e7e5f07db9a"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\1774237705453-1532.png": {
+    "mtime": 1781166063.744863,
+    "ast_hash": "a9ec34d287d830ddc27d3e7e5f07db9a",
+    "semantic_hash": "a9ec34d287d830ddc27d3e7e5f07db9a"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\1774238260183-1532.png": {
+    "mtime": 1781166063.7541037,
+    "ast_hash": "a9ec34d287d830ddc27d3e7e5f07db9a",
+    "semantic_hash": "a9ec34d287d830ddc27d3e7e5f07db9a"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\1774238669348-1532.png": {
+    "mtime": 1781166063.7675953,
+    "ast_hash": "a9ec34d287d830ddc27d3e7e5f07db9a",
+    "semantic_hash": "a9ec34d287d830ddc27d3e7e5f07db9a"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\1774240571138-1532.png": {
+    "mtime": 1781166063.778203,
+    "ast_hash": "a9ec34d287d830ddc27d3e7e5f07db9a",
+    "semantic_hash": "a9ec34d287d830ddc27d3e7e5f07db9a"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\1774240581546-1532.png": {
+    "mtime": 1781166063.7867475,
+    "ast_hash": "a9ec34d287d830ddc27d3e7e5f07db9a",
+    "semantic_hash": "a9ec34d287d830ddc27d3e7e5f07db9a"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\bumrah.png": {
+    "mtime": 1781166063.893186,
+    "ast_hash": "088f6f5eac8acfea1c8cdea8e7134d9f",
+    "semantic_hash": "088f6f5eac8acfea1c8cdea8e7134d9f"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\bumrah_new.png": {
+    "mtime": 1781166063.9252498,
+    "ast_hash": "5269f731234886d900866ab19124c76d",
+    "semantic_hash": "5269f731234886d900866ab19124c76d"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\bumrah_trending.png": {
+    "mtime": 1781166063.941798,
+    "ast_hash": "088f6f5eac8acfea1c8cdea8e7134d9f",
+    "semantic_hash": "088f6f5eac8acfea1c8cdea8e7134d9f"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\djokovic.png": {
+    "mtime": 1781166063.95331,
+    "ast_hash": "9a5969a16339ea620c394027bacc0700",
+    "semantic_hash": "9a5969a16339ea620c394027bacc0700"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\djokovic_new.png": {
+    "mtime": 1781166063.9678216,
+    "ast_hash": "088f6f5eac8acfea1c8cdea8e7134d9f",
+    "semantic_hash": "088f6f5eac8acfea1c8cdea8e7134d9f"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\djokovic_trending.png": {
+    "mtime": 1781166063.9793353,
+    "ast_hash": "9a5969a16339ea620c394027bacc0700",
+    "semantic_hash": "9a5969a16339ea620c394027bacc0700"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\haaland.png": {
+    "mtime": 1781166064.005896,
+    "ast_hash": "3e606064edd65d0a660bb41df8efac38",
+    "semantic_hash": "3e606064edd65d0a660bb41df8efac38"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\haaland_headshot.png": {
+    "mtime": 1781166064.0177393,
+    "ast_hash": "f8961cd85d7e66c59f7fd84b2391281a",
+    "semantic_hash": "f8961cd85d7e66c59f7fd84b2391281a"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\lebron.jpg": {
+    "mtime": 1781166064.02626,
+    "ast_hash": "a92f8c86797f2fda900015f6def00222",
+    "semantic_hash": "a92f8c86797f2fda900015f6def00222"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\lebron_new.png": {
+    "mtime": 1781166064.035286,
+    "ast_hash": "38a38950fbda6a2ef259af2eb20e6b63",
+    "semantic_hash": "38a38950fbda6a2ef259af2eb20e6b63"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\lebron_trending.jpg": {
+    "mtime": 1781166064.0448015,
+    "ast_hash": "a92f8c86797f2fda900015f6def00222",
+    "semantic_hash": "a92f8c86797f2fda900015f6def00222"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\mbappe.jpg": {
+    "mtime": 1781166064.0543272,
+    "ast_hash": "0713ebd751327ea35b8522ecb779f682",
+    "semantic_hash": "0713ebd751327ea35b8522ecb779f682"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\mbappe_headshot.png": {
+    "mtime": 1781166064.0648434,
+    "ast_hash": "1ac2b432c3e63a72c9a13d4ddbd0bec9",
+    "semantic_hash": "1ac2b432c3e63a72c9a13d4ddbd0bec9"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\mbappe_trending.png": {
+    "mtime": 1781166064.0763555,
+    "ast_hash": "c029e6429f4335bc8871e2e07b87a5c7",
+    "semantic_hash": "c029e6429f4335bc8871e2e07b87a5c7"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\messi_new.png": {
+    "mtime": 1781166064.1049094,
+    "ast_hash": "a0ef943c9ca2e1dae09a7e4a58a3adc5",
+    "semantic_hash": "a0ef943c9ca2e1dae09a7e4a58a3adc5"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\rohit_sharma.jpg": {
+    "mtime": 1781166064.1770103,
+    "ast_hash": "ee1eac591d311be752171d4e9a468439",
+    "semantic_hash": "ee1eac591d311be752171d4e9a468439"
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\virat_new.png": {
+    "mtime": 1781166064.1930335,
+    "ast_hash": "9926df87250f14809de0f675e5067f9e",
+    "semantic_hash": "9926df87250f14809de0f675e5067f9e"
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\teams\\1774333172079-Screenshot_20260324_114350_WhatsApp.jpg": {
     "mtime": 1781166064.218053,
@@ -3070,8 +3195,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\FootballHome.tsx": {
-    "mtime": 1781984380.2894735,
-    "ast_hash": "beff57c4701f4111e31e329568cd33b6",
+    "mtime": 1781283867.3634305,
+    "ast_hash": "42e81c0cd7041344f1ddbbdb330fac18",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\pages\\football\\MatchCenter.tsx": {
@@ -3090,8 +3215,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\services\\football\\footballApi.ts": {
-    "mtime": 1782115501.3206995,
-    "ast_hash": "721f421c3a76b13dd84cd972e52c5cc3",
+    "mtime": 1781344907.2360644,
+    "ast_hash": "a0afa8928800ea0d050584aa75706f95",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\types\\football\\index.ts": {
@@ -3102,6 +3227,21 @@
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\utils\\football\\cacheManager.ts": {
     "mtime": 1781166144.7400017,
     "ast_hash": "3be50b430420f29653c922320ccf14d9",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\A. Di Maria.jpeg": {
+    "mtime": 1781166063.808277,
+    "ast_hash": "7c847ba9a4f7914cd7d2c075b9a4e919",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\E. Martinez.jpeg": {
+    "mtime": 1781166063.9898493,
+    "ast_hash": "0e16ef3765f3c332d46056dff25b3a44",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\images\\players\\N. Molina.jpeg": {
+    "mtime": 1781166064.1484768,
+    "ast_hash": "9ed18c64108b29bb1d3cab098de06563",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballNewsSidebar.tsx": {
@@ -3205,8 +3345,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballStandings.tsx": {
-    "mtime": 1782115501.3043036,
-    "ast_hash": "53ec07b2d7c563b40c71b41988c58ad3",
+    "mtime": 1781292839.9878776,
+    "ast_hash": "81b0108684ae4a3f79ccd1fedfbfa0cb",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\football\\useTransfers.ts": {
@@ -3255,13 +3395,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballTopStats.tsx": {
-    "mtime": 1782115501.307993,
-    "ast_hash": "2bb63199c3c5355bcaf7e19f7664f094",
+    "mtime": 1781292839.9910684,
+    "ast_hash": "0af0b0f970e7fa47ac65484ebc14e47b",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\football\\useTopStats.ts": {
-    "mtime": 1782115501.315261,
-    "ast_hash": "5a7bae5553bc453adf15ba8ce9218a03",
+    "mtime": 1781292839.9975822,
+    "ast_hash": "913b379c417cc9b1ad40f8bbb6575d5c",
     "semantic_hash": ""
   },
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\find_img_cdn.mjs": {
@@ -4647,46 +4787,6 @@
   "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\messi_sofascore.png": {
     "mtime": 1781979180.6200588,
     "ast_hash": "c8550a9e149be5259fc289b57a8d33f1",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\public\\data\\national_teams_players.json": {
-    "mtime": 1781984959.9282658,
-    "ast_hash": "da7ed8e08b88b0a3464145e01cc8eca4",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\fotmobService.js": {
-    "mtime": 1782115501.2873917,
-    "ast_hash": "b2ff53e3ab1d8bb99842b6feee1aec99",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\server\\services\\imageQueueService.js": {
-    "mtime": 1781984380.2744143,
-    "ast_hash": "8d3ecf79226d591e36c4730c9e77eda6",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballPerformanceDashboard.tsx": {
-    "mtime": 1781984380.2771797,
-    "ast_hash": "4a97e02916051e45c53edda318b0195f",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballPerformanceLab.tsx": {
-    "mtime": 1782115501.297651,
-    "ast_hash": "9a57d0bf9269cdc1b856b1ff87d4e588",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FootballSidebar.tsx": {
-    "mtime": 1782115501.3006525,
-    "ast_hash": "e286f0e8f2ed59b84a2a5ee3a588da15",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\components\\football\\FotmobPlayerCard.tsx": {
-    "mtime": 1782115501.311718,
-    "ast_hash": "8e7bcc463da72ac0fe3b33319ba8d540",
-    "semantic_hash": ""
-  },
-  "C:\\Users\\PRANSHU PATEL\\OneDrive\\Desktop\\dev_scripts\\src\\hooks\\useFootballSquads.ts": {
-    "mtime": 1782115501.3184147,
-    "ast_hash": "31f3e0ec97568d3599922589c65a28fd",
     "semantic_hash": ""
   }
 }
