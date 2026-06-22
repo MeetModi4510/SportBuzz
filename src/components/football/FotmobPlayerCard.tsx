@@ -4,17 +4,17 @@ import { ChevronDown, Info, Activity, Star, Calendar, Loader2, Trophy } from 'lu
 import { usePlayerRecentMatches } from '../../hooks/football/usePlayerRecentMatches';
 
 const StatRow = ({ label, value, subValue, tooltip }: any) => (
-  <div className="group/row flex justify-between items-center py-2 px-3 text-[13px] transition-all duration-300 rounded-xl hover:bg-white/5 hover:shadow-md cursor-default border border-transparent hover:border-white/5">
-    <span className="text-gray-400 font-medium flex items-center gap-2 transition-colors group-hover/row:text-gray-200">
+  <div className="group/row flex justify-between items-center py-2 px-3 text-[13px] transition-all duration-300 rounded-xl hover:dark:bg-white/5 hover:bg-slate-200 hover:shadow-md cursor-default border border-transparent hover:dark:border-white/5 border-slate-200">
+    <span className="dark:text-gray-400 text-slate-500 font-medium flex items-center gap-2 transition-colors group-hover/row:text-gray-200">
       {label}
       {tooltip && <Info className="w-3.5 h-3.5 text-blue-400 opacity-50 group-hover/row:opacity-100 transition-opacity" />}
     </span>
     <div className="text-right flex items-center gap-2 relative">
-      <div className="absolute inset-0 bg-white/5 rounded-md opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 scale-110" />
-      <span className="text-white font-black font-mono text-[14px] relative z-10 transition-transform duration-300 group-hover/row:scale-110 group-hover/row:text-[#34D399]">
+      <div className="absolute inset-0 dark:bg-white/5 bg-slate-200 rounded-md opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 scale-110" />
+      <span className="dark:text-white text-slate-900 font-black font-mono text-[14px] relative z-10 transition-transform duration-300 group-hover/row:scale-110 group-hover/row:dark:text-[#34D399] text-emerald-600">
         {value !== undefined && value !== null ? value : '-'}
       </span>
-      {subValue && <span className="text-gray-500 text-[10px] font-bold relative z-10">({subValue})</span>}
+      {subValue && <span className="dark:text-gray-500 text-slate-600 text-[10px] font-bold relative z-10">({subValue})</span>}
     </div>
   </div>
 );
@@ -48,32 +48,32 @@ const CustomTooltip = ({ active, payload }: any) => {
 
     if (data.isTransferPoint) {
       return (
-        <div className="flex flex-col gap-3 bg-[#1a1c21]/95 border border-[#34D399]/40 rounded-xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-md min-w-[260px]">
-          <div className="flex justify-between items-center border-b border-white/10 pb-2">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Player Transfer</span>
-            <span className="text-xs font-bold text-white">
+        <div className="flex flex-col gap-3 dark:bg-[#1a1c21] bg-white/95 border border-[#34D399]/40 rounded-xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-md min-w-[260px]">
+          <div className="flex justify-between items-center border-b dark:border-white/10 border-slate-300 pb-2">
+            <span className="text-[10px] font-bold dark:text-gray-400 text-slate-500 uppercase tracking-widest">Player Transfer</span>
+            <span className="text-xs font-bold dark:text-white text-slate-900">
               {new Date(data.timestamp).toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
           </div>
           <div className="flex items-center justify-between py-1">
             <div className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center p-1">
+              <div className="w-10 h-10 rounded-full dark:bg-white/5 bg-slate-200 flex items-center justify-center p-1">
                 <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${data.fromTeamId}_xsmall.png`} className="w-full h-full object-contain" alt={data.fromTeamName} />
               </div>
-              <span className="text-[10px] font-bold text-gray-400 text-center w-24 truncate">{data.fromTeamName}</span>
+              <span className="text-[10px] font-bold dark:text-gray-400 text-slate-500 text-center w-24 truncate">{data.fromTeamName}</span>
             </div>
             <div className="flex flex-col items-center justify-center">
-              <span className="text-sm font-black text-[#34D399] bg-[#34D399]/10 rounded-full p-1.5 px-3">➔</span>
+              <span className="text-sm font-black dark:text-[#34D399] text-emerald-600 bg-[#34D399]/10 rounded-full p-1.5 px-3">➔</span>
             </div>
             <div className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center p-1">
+              <div className="w-10 h-10 rounded-full dark:bg-white/5 bg-slate-200 flex items-center justify-center p-1">
                 <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${data.toTeamId}_xsmall.png`} className="w-full h-full object-contain" alt={data.toTeamName} />
               </div>
-              <span className="text-[10px] font-bold text-white text-center w-24 truncate">{data.toTeamName}</span>
+              <span className="text-[10px] font-bold dark:text-white text-slate-900 text-center w-24 truncate">{data.toTeamName}</span>
             </div>
           </div>
           <div className="mt-1 flex justify-center bg-[#34D399]/10 border border-[#34D399]/20 rounded-lg py-2">
-            <span className="text-sm font-black text-[#34D399] tracking-wide">
+            <span className="text-sm font-black dark:text-[#34D399] text-emerald-600 tracking-wide">
               Value: €{(value / 1000000).toFixed(1)}M
             </span>
           </div>
@@ -82,7 +82,7 @@ const CustomTooltip = ({ active, payload }: any) => {
     }
 
     return (
-      <div className="flex items-center gap-3 bg-[#1a1c21] border border-white/10 rounded-full py-1.5 pl-2 pr-1.5 shadow-2xl">
+      <div className="flex items-center gap-3 dark:bg-[#1a1c21] bg-white border dark:border-white/10 border-slate-300 rounded-full py-1.5 pl-2 pr-1.5 shadow-2xl">
         <div className="flex items-center gap-2">
           <img
             src={`https://images.fotmob.com/image_resources/logo/teamlogo/${data.teamId}_xsmall.png`}
@@ -91,13 +91,13 @@ const CustomTooltip = ({ active, payload }: any) => {
           />
           <div className="flex flex-col justify-center">
             <span className="text-xs font-bold leading-none" style={{ color: teamColor }}>{data.teamName}</span>
-            <span className="text-gray-400 text-[10px] font-medium leading-none mt-1">
+            <span className="dark:text-gray-400 text-slate-500 text-[10px] font-medium leading-none mt-1">
               {new Date(data.timestamp).toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
           </div>
         </div>
         <div className="rounded-full px-3 py-1 ml-2" style={{ backgroundColor: teamColor }}>
-          <span className="text-white font-bold text-xs shadow-sm">
+          <span className="dark:text-white text-slate-900 font-bold text-xs shadow-sm">
             €{(value / 1000000).toFixed(1)}M
           </span>
         </div>
@@ -116,12 +116,12 @@ const StatColumn = ({ title, children }: any) => {
   if (title === 'Possession & Discipline') { gradient = 'from-[#FBBF24]/20 to-[#F59E0B]/5'; accent = 'bg-[#FBBF24]'; }
 
   return (
-    <div className="relative flex flex-col h-full bg-[#121316] rounded-2xl border border-white/5 p-5 shadow-2xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group overflow-hidden">
+    <div className="relative flex flex-col h-full dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-5 shadow-2xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group overflow-hidden">
       <div className={`absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br ${gradient} rounded-full blur-[50px] opacity-30 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none`} />
       
-      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5 relative z-10">
+      <div className="flex items-center gap-3 mb-6 pb-4 border-b dark:border-white/5 border-slate-200 relative z-10">
         <div className={`w-1.5 h-6 rounded-full ${accent} shadow-[0_0_10px_rgba(255,255,255,0.2)]`} />
-        <h3 className="text-white font-black text-base tracking-wide uppercase">{title}</h3>
+        <h3 className="dark:text-white text-slate-900 font-black text-base tracking-wide uppercase">{title}</h3>
       </div>
       <div className="space-y-1.5 flex-1 relative z-10">
         {children}
@@ -238,7 +238,7 @@ const PolarAreaChart = ({ data }: { data: any[] }) => {
             const angle = (Math.PI * 2 * j) / n + angleOffset;
             return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
           }).join(' ');
-          return <polygon key={`grid-${i}`} points={points} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={1} />;
+          return <polygon key={`grid-${i}`} points={points} fill="none" stroke="currentColor" className="dark:text-white/5 text-slate-200" strokeWidth={1} />;
         })}
 
         {/* Spokes */}
@@ -246,7 +246,7 @@ const PolarAreaChart = ({ data }: { data: any[] }) => {
           const angle = (Math.PI * 2 * j) / n + angleOffset;
           const x2 = cx + maxRadius * Math.cos(angle);
           const y2 = cy + maxRadius * Math.sin(angle);
-          return <line key={`spoke-${j}`} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(255,255,255,0.05)" strokeWidth={1} />;
+          return <line key={`spoke-${j}`} x1={cx} y1={cy} x2={x2} y2={y2} stroke="currentColor" className="dark:text-white/5 text-slate-200" strokeWidth={1} />;
         })}
 
         {/* Value Wedges (Triangles) */}
@@ -290,9 +290,9 @@ const PolarAreaChart = ({ data }: { data: any[] }) => {
 
           return (
             <g key={`label-${j}`} transform={`translate(${lx}, ${ly})`}>
-              <text textAnchor={anchor} fill="white" fontSize="24" fontWeight="900" className="drop-shadow-lg">
+              <text textAnchor={anchor} fill="currentColor" fontSize="24" fontWeight="900" className="dark:text-white text-slate-800 drop-shadow-md">
                 <tspan x="0" dy="-0.2em">{d.A}%</tspan>
-                <tspan x="0" dy="1.4em" fill="rgba(255,255,255,0.75)" fontSize="14" fontWeight="700">{d.subject}</tspan>
+                <tspan x="0" dy="1.4em" fill="currentColor" className="dark:text-white/75 text-slate-500" fontSize="14" fontWeight="700">{d.subject}</tspan>
               </text>
             </g>
           );
@@ -442,7 +442,7 @@ const getRatingStr = (ratingObj: any) => {
 
 const getRatingBadgeClass = (rating: string | number) => {
   const r = parseFloat(rating as string);
-  if (isNaN(r)) return 'text-gray-500 bg-white/5';
+  if (isNaN(r)) return 'dark:text-gray-500 text-slate-600 dark:bg-white/5 bg-slate-200';
   if (r >= 8.0) return 'text-[#10b981] bg-[#10b981]/10 border border-[#10b981]/20';
   if (r >= 7.0) return 'text-[#34d399] bg-[#34d399]/10 border border-[#34d399]/20';
   if (r >= 6.0) return 'text-[#fbbf24] bg-[#fbbf24]/10 border border-[#fbbf24]/20';
@@ -460,26 +460,26 @@ const SeasonCareerRow = ({ season }: { season: any }) => {
         onClick={() => season.tournamentStats?.length > 0 && setExpanded(!expanded)}
         className={`flex items-center justify-between py-2.5 px-4 ${season.tournamentStats?.length > 0 ? 'cursor-pointer hover:bg-white/[0.02]' : ''}`}
       >
-        <span className="text-white text-[13px] font-bold tracking-wide">{season.seasonName}</span>
+        <span className="dark:text-white text-slate-900 text-[13px] font-bold tracking-wide">{season.seasonName}</span>
         <div className="flex items-center justify-end w-[220px] sm:w-[380px] tabular-nums">
           <div className="w-[35px] sm:w-[50px] text-center text-gray-200 text-[13px] font-semibold">{season.appearances || '-'}</div>
           <div className="w-[35px] sm:w-[50px] text-center text-gray-200 text-[13px] font-semibold">{season.goals || '-'}</div>
           <div className="w-[35px] sm:w-[50px] text-center text-gray-200 text-[13px] font-semibold">{season.assists || '-'}</div>
           <div className="w-[50px] text-center hidden sm:flex justify-center items-center">
             {season.yellowCards > 0 ? (
-              <div className="flex items-center gap-1.5"><div className="w-2.5 h-3.5 bg-yellow-400 rounded-sm shadow-sm" /><span className="text-gray-300 text-[13px] font-bold">{season.yellowCards}</span></div>
-            ) : <span className="text-gray-500">-</span>}
+              <div className="flex items-center gap-1.5"><div className="w-2.5 h-3.5 bg-yellow-400 rounded-sm shadow-sm" /><span className="dark:text-gray-300 text-slate-700 text-[13px] font-bold">{season.yellowCards}</span></div>
+            ) : <span className="dark:text-gray-500 text-slate-600">-</span>}
           </div>
           <div className="w-[50px] text-center hidden sm:flex justify-center items-center">
             {season.redCards > 0 ? (
-              <div className="flex items-center gap-1.5"><div className="w-2.5 h-3.5 bg-red-500 rounded-sm shadow-sm" /><span className="text-gray-300 text-[13px] font-bold">{season.redCards}</span></div>
-            ) : <span className="text-gray-500">-</span>}
+              <div className="flex items-center gap-1.5"><div className="w-2.5 h-3.5 bg-red-500 rounded-sm shadow-sm" /><span className="dark:text-gray-300 text-slate-700 text-[13px] font-bold">{season.redCards}</span></div>
+            ) : <span className="dark:text-gray-500 text-slate-600">-</span>}
           </div>
           <div className="w-[50px] sm:w-[60px] flex justify-center">
             <span className={`px-2 py-0.5 rounded-md text-[12px] font-bold ${getRatingBadgeClass(displayRating)}`}>{displayRating}</span>
           </div>
           {season.tournamentStats?.length > 0 ? (
-            <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expanded ? 'rotate-180' : ''} absolute right-2 opacity-0 group-hover/season:opacity-100`} />
+            <ChevronDown className={`w-4 h-4 dark:text-gray-500 text-slate-600 transition-transform ${expanded ? 'rotate-180' : ''} absolute right-2 opacity-0 group-hover/season:opacity-100`} />
           ) : (
             <div className="w-4 h-4 absolute right-2"></div>
           )}
@@ -498,20 +498,20 @@ const SeasonCareerRow = ({ season }: { season: any }) => {
                   <div className="w-4 h-4 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
                     <img src={`https://images.fotmob.com/image_resources/logo/leaguelogo/${tourney.leagueId}.png`} className="w-full h-full object-contain" alt={tourney.leagueName} onError={(e: any) => e.target.style.display = 'none'} />
                   </div>
-                  <span className="text-gray-400 text-[12px] font-medium group-hover:text-gray-200 transition-colors">{tourney.leagueName}</span>
+                  <span className="dark:text-gray-400 text-slate-500 text-[12px] font-medium group-hover:text-gray-200 transition-colors">{tourney.leagueName}</span>
                 </div>
                 <div className="flex items-center justify-end w-[220px] sm:w-[380px] tabular-nums">
-                  <div className="w-[35px] sm:w-[50px] text-center text-gray-500 text-[12px] font-medium">{tourney.appearances || '-'}</div>
-                  <div className="w-[35px] sm:w-[50px] text-center text-gray-500 text-[12px] font-medium">{tourney.goals || '-'}</div>
-                  <div className="w-[35px] sm:w-[50px] text-center text-gray-500 text-[12px] font-medium">{tourneyAssists}</div>
+                  <div className="w-[35px] sm:w-[50px] text-center dark:text-gray-500 text-slate-600 text-[12px] font-medium">{tourney.appearances || '-'}</div>
+                  <div className="w-[35px] sm:w-[50px] text-center dark:text-gray-500 text-slate-600 text-[12px] font-medium">{tourney.goals || '-'}</div>
+                  <div className="w-[35px] sm:w-[50px] text-center dark:text-gray-500 text-slate-600 text-[12px] font-medium">{tourneyAssists}</div>
                   <div className="w-[50px] text-center hidden sm:flex justify-center items-center">
                     {tourney.yellowCards > 0 ? (
-                      <div className="flex items-center gap-1.5"><div className="w-2 h-2.5 bg-yellow-400 rounded-sm shadow-sm opacity-80" /><span className="text-gray-500 text-[12px] font-bold">{tourney.yellowCards}</span></div>
+                      <div className="flex items-center gap-1.5"><div className="w-2 h-2.5 bg-yellow-400 rounded-sm shadow-sm opacity-80" /><span className="dark:text-gray-500 text-slate-600 text-[12px] font-bold">{tourney.yellowCards}</span></div>
                     ) : <span className="text-gray-600">-</span>}
                   </div>
                   <div className="w-[50px] text-center hidden sm:flex justify-center items-center">
                     {tourney.redCards > 0 ? (
-                      <div className="flex items-center gap-1.5"><div className="w-2 h-2.5 bg-red-500 rounded-sm shadow-sm opacity-80" /><span className="text-gray-500 text-[12px] font-bold">{tourney.redCards}</span></div>
+                      <div className="flex items-center gap-1.5"><div className="w-2 h-2.5 bg-red-500 rounded-sm shadow-sm opacity-80" /><span className="dark:text-gray-500 text-slate-600 text-[12px] font-bold">{tourney.redCards}</span></div>
                     ) : <span className="text-gray-600">-</span>}
                   </div>
                   <div className="w-[50px] sm:w-[60px] flex justify-center">
@@ -543,7 +543,7 @@ const TeamCareerRow = ({ entry, seasonEntries }: { entry: any; seasonEntries?: a
         className={`flex items-center justify-between py-4 px-2 sm:px-4 hover:bg-white/[0.02] transition-colors rounded-xl group ${teamSeasons.length > 0 ? 'cursor-pointer' : ''}`}
       >
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center p-1.5 shadow-sm group-hover:scale-105 transition-transform">
+          <div className="w-10 h-10 rounded-full dark:bg-white/5 bg-slate-200 flex items-center justify-center p-1.5 shadow-sm group-hover:scale-105 transition-transform">
             <img
               src={`https://images.fotmob.com/image_resources/logo/teamlogo/${entry.teamId}_xsmall.png`}
               className="w-full h-full object-contain"
@@ -553,22 +553,22 @@ const TeamCareerRow = ({ entry, seasonEntries }: { entry: any; seasonEntries?: a
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-white font-bold text-base">{entry.team}</span>
+              <span className="dark:text-white text-slate-900 font-bold text-base">{entry.team}</span>
               {entry.transferType?.text && (
-                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white/10 text-gray-300 ml-2">
+                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider dark:bg-white/10 bg-slate-300 dark:text-gray-300 text-slate-700 ml-2">
                   {entry.transferType.text}
                 </span>
               )}
             </div>
-            <span className="text-gray-500 text-sm">{dateStr}</span>
+            <span className="dark:text-gray-500 text-slate-600 text-sm">{dateStr}</span>
           </div>
         </div>
         <div className="flex items-center justify-end w-[105px] sm:w-[150px] tabular-nums">
-          <div className="w-[35px] sm:w-[50px] text-center text-white font-bold text-[15px]">{entry.appearances || '-'}</div>
-          <div className="w-[35px] sm:w-[50px] text-center text-white font-bold text-[15px]">{entry.goals || '-'}</div>
-          <div className="w-[35px] sm:w-[50px] text-center text-white font-bold text-[15px]">{entry.assists || '-'}</div>
+          <div className="w-[35px] sm:w-[50px] text-center dark:text-white text-slate-900 font-bold text-[15px]">{entry.appearances || '-'}</div>
+          <div className="w-[35px] sm:w-[50px] text-center dark:text-white text-slate-900 font-bold text-[15px]">{entry.goals || '-'}</div>
+          <div className="w-[35px] sm:w-[50px] text-center dark:text-white text-slate-900 font-bold text-[15px]">{entry.assists || '-'}</div>
           {teamSeasons.length > 0 ? (
-            <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expanded ? 'rotate-180' : ''} absolute right-2 opacity-0 group-hover:opacity-100`} />
+            <ChevronDown className={`w-4 h-4 dark:text-gray-500 text-slate-600 transition-transform ${expanded ? 'rotate-180' : ''} absolute right-2 opacity-0 group-hover:opacity-100`} />
           ) : (
             <div className="w-4 h-4 absolute right-2"></div>
           )}
@@ -579,7 +579,7 @@ const TeamCareerRow = ({ entry, seasonEntries }: { entry: any; seasonEntries?: a
         <div className="pl-[56px] pr-2 sm:pr-4 pb-4 animate-in fade-in slide-in-from-top-2 duration-300 mt-2">
           {/* Header for Season columns */}
           <div className="flex items-center justify-end px-4 mb-2">
-            <div className="flex items-center justify-end w-[220px] sm:w-[380px] text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+            <div className="flex items-center justify-end w-[220px] sm:w-[380px] text-[10px] font-bold dark:text-gray-500 text-slate-600 uppercase tracking-widest">
               <div className="w-[35px] sm:w-[50px] text-center">App</div>
               <div className="w-[35px] sm:w-[50px] text-center">Gls</div>
               <div className="w-[35px] sm:w-[50px] text-center">Ast</div>
@@ -904,46 +904,46 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
   }, [profile.trophies]);
 
   return (
-    <div className="w-full max-w-6xl mx-auto bg-[#16181c] rounded-2xl border border-white/5 shadow-2xl overflow-hidden text-white font-sans flex flex-col mb-20 relative z-30">
+    <div className="w-full max-w-6xl mx-auto dark:bg-[#16181c] bg-white rounded-2xl border dark:border-white/5 border-slate-200 shadow-2xl overflow-hidden dark:text-white text-slate-900 font-sans flex flex-col mb-20 relative z-30">
 
       {/* Header Dropdowns */}
-      <div className="flex border-b border-white/5 px-6 py-4 bg-[#121316] items-center gap-6">
-        <div className="flex gap-8 font-bold text-sm tracking-wide uppercase text-gray-400">
+      <div className="flex border-b dark:border-white/5 border-slate-200 px-6 py-4 dark:bg-[#121316] bg-slate-50 items-center gap-6">
+        <div className="flex gap-8 font-bold text-sm tracking-wide uppercase dark:text-gray-400 text-slate-500">
           <span
             onClick={() => setActiveTab('overview')}
-            className={`cursor-pointer transition-colors ${activeTab === 'overview' ? 'text-[#34D399] border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:text-white pb-4 -mb-[18px]'}`}
+            className={`cursor-pointer transition-colors ${activeTab === 'overview' ? 'dark:text-[#34D399] text-emerald-600 border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:dark:text-white text-slate-900 pb-4 -mb-[18px]'}`}
           >Overview</span>
           <span
             onClick={() => setActiveTab('detailed')}
-            className={`cursor-pointer transition-colors ${activeTab === 'detailed' ? 'text-[#34D399] border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:text-white pb-4 -mb-[18px]'}`}
+            className={`cursor-pointer transition-colors ${activeTab === 'detailed' ? 'dark:text-[#34D399] text-emerald-600 border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:dark:text-white text-slate-900 pb-4 -mb-[18px]'}`}
           >Detailed Season Stats</span>
           <span
             onClick={() => setActiveTab('career')}
-            className={`cursor-pointer transition-colors ${activeTab === 'career' ? 'text-[#34D399] border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:text-white pb-4 -mb-[18px]'}`}
+            className={`cursor-pointer transition-colors ${activeTab === 'career' ? 'dark:text-[#34D399] text-emerald-600 border-b-2 border-[#34D399] pb-4 -mb-[18px]' : 'hover:dark:text-white text-slate-900 pb-4 -mb-[18px]'}`}
           >Career</span>
         </div>
       </div>
 
-      <div className="p-6 md:p-8 space-y-8 bg-[#16181c] min-h-[500px]">
+      <div className="p-6 md:p-8 space-y-8 dark:bg-[#16181c] bg-white min-h-[500px]">
 
         {/* League Dropdowns */}
         {activeTab === 'detailed' && (
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-6 relative z-30">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b dark:border-white/5 border-slate-200 pb-6 relative z-30">
             <div className="relative group">
-              <button className="flex items-center gap-3 px-4 py-2 bg-[#1f2126] border border-white/5 rounded-lg hover:bg-[#2a2c33] transition-colors cursor-pointer">
+              <button className="flex items-center gap-3 px-4 py-2 dark:bg-[#1f2126] bg-slate-100 border dark:border-white/5 border-slate-200 rounded-lg hover:dark:bg-[#2a2c33] hover:bg-slate-200 transition-colors cursor-pointer">
                 <span className="font-bold text-sm">{selectedTournament ? `${selectedTournament.seasonName} - ${selectedTournament.name}` : 'All Competitions'}</span>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
+                <ChevronDown className="w-4 h-4 dark:text-gray-500 text-slate-600" />
               </button>
-              <div className="absolute top-full left-0 mt-1 w-72 bg-[#1f2126] border border-white/5 rounded-lg shadow-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 max-h-[400px] overflow-y-auto custom-scrollbar">
+              <div className="absolute top-full left-0 mt-1 w-72 dark:bg-[#1f2126] bg-slate-100 border dark:border-white/5 border-slate-200 rounded-lg shadow-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 max-h-[400px] overflow-y-auto custom-scrollbar">
                 {statSeasons?.map((season: any) => (
                   <div key={season.seasonName}>
-                    <div className="px-4 py-2 bg-[#16181c] text-white/50 font-bold text-xs uppercase tracking-wider sticky top-0 z-10">
+                    <div className="px-4 py-2 dark:bg-[#16181c] bg-white dark:text-white text-slate-900/50 font-bold text-xs uppercase tracking-wider sticky top-0 z-10">
                       {season.seasonName}
                     </div>
                     {season.tournaments?.map((t: any) => (
                       <button
                         key={`${season.seasonName}-${t.tournamentId}`}
-                        className="w-full text-left px-4 py-3 hover:bg-white/5 text-sm font-semibold transition-colors cursor-pointer pl-6"
+                        className="w-full text-left px-4 py-3 hover:dark:bg-white/5 hover:bg-slate-200 text-sm font-semibold transition-colors cursor-pointer pl-6"
                         onClick={() => setSelectedTournament({ ...t, seasonName: season.seasonName })}
                       >
                         {t.name}
@@ -956,12 +956,12 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
 
             {/* Stat Filters */}
             {isPrimaryTournament && (
-              <div className="flex items-center gap-1 bg-[#1a1c21] p-1 rounded-lg border border-white/5 shadow-inner">
+              <div className="flex items-center gap-1 dark:bg-[#1a1c21] bg-white p-1 rounded-lg border dark:border-white/5 border-slate-200 shadow-inner">
                 {(['Total', 'Per 90', 'Per match'] as const).map((filter) => (
                   <button
                     key={filter}
                     onClick={() => setStatFilter(filter)}
-                    className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all duration-300 ${statFilter === filter ? 'bg-[#34D399] text-black shadow-md' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                    className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all duration-300 ${statFilter === filter ? 'bg-[#34D399] text-black shadow-md' : 'dark:text-gray-400 text-slate-500 hover:dark:text-white text-slate-900 hover:dark:bg-white/5 hover:bg-slate-200'}`}
                   >
                     {filter}
                   </button>
@@ -974,7 +974,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
         {activeTab === 'overview' ? (
           <div className={`transition-opacity duration-300 space-y-8`}>
             {/* Header Profile Section - Premium Overhaul */}
-            <div className="relative bg-[#0e1015] rounded-2xl border border-white/5 p-8 md:p-12 flex flex-col md:flex-row gap-10 items-center md:items-end overflow-hidden">
+            <div className="relative dark:bg-[#0e1015] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-8 md:p-12 flex flex-col md:flex-row gap-10 items-center md:items-end overflow-hidden">
               {/* Huge Team Logo Watermark */}
               {primaryTeam?.id && (
                 <>
@@ -989,7 +989,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
               {/* Profile Image with Glowing Ring */}
               <div className="relative shrink-0">
                 <div className="absolute inset-0 rounded-full blur-xl opacity-40" style={{ backgroundColor: primaryTeam?.teamColors?.color || '#34D399' }}></div>
-                <div className="w-36 h-36 rounded-full bg-[#1a1c21] border-4 flex items-center justify-center relative overflow-hidden z-10 shadow-2xl" style={{ borderColor: primaryTeam?.teamColors?.color || '#252830' }}>
+                <div className="w-36 h-36 rounded-full dark:bg-[#1a1c21] bg-white border-4 flex items-center justify-center relative overflow-hidden z-10 shadow-2xl" style={{ borderColor: primaryTeam?.teamColors?.color || '#252830' }}>
                   <img src={`https://images.fotmob.com/image_resources/playerimages/${id}.png`} alt={name} className="w-full h-full object-cover object-top" />
                 </div>
               </div>
@@ -998,11 +998,11 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
               <div className="flex flex-col flex-1 z-10 w-full text-center md:text-left justify-end">
                 <div className="flex flex-col md:flex-row md:items-end justify-between w-full gap-6">
                   <div>
-                    <h1 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70 tracking-tighter drop-shadow-xl mb-4">{name}</h1>
+                    <h1 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r dark:from-white dark:to-white/70 from-slate-900 to-slate-600 tracking-tighter drop-shadow-xl mb-4">{name}</h1>
 
                     <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 text-sm font-semibold">
                       {/* Team Badge */}
-                      <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-full backdrop-blur-md shadow-lg">
+                      <div className="flex items-center gap-3 dark:bg-white/5 bg-slate-200 border dark:border-white/10 border-slate-300 px-4 py-2 rounded-full backdrop-blur-md shadow-lg">
                         {primaryTeam?.id ? (
                           <img
                             src={`https://images.fotmob.com/image_resources/logo/teamlogo/${primaryTeam.id}_xsmall.png`}
@@ -1016,20 +1016,20 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                             alt={player?.cname || ''}
                           />
                         )}
-                        <span className="text-white font-bold">{primaryTeam?.name || player?.cname || mainLeague?.name || ''}</span>
+                        <span className="dark:text-white text-slate-900 font-bold">{primaryTeam?.name || player?.cname || mainLeague?.name || ''}</span>
                       </div>
 
                       {/* Position Badge */}
-                      <div className="flex items-center gap-2 bg-[#1a1c21] border border-white/10 px-4 py-2 rounded-full shadow-inner">
+                      <div className="flex items-center gap-2 dark:bg-[#1a1c21] bg-white border dark:border-white/10 border-slate-300 px-4 py-2 rounded-full shadow-inner">
                         <span className="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]" style={{ backgroundColor: primaryTeam?.teamColors?.color || '#34D399' }}></span>
-                        <span className="text-gray-300 font-bold uppercase tracking-wider text-[11px]">{primaryPos}</span>
+                        <span className="dark:text-gray-300 text-slate-700 font-bold uppercase tracking-wider text-[11px]">{primaryPos}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Right Side: Big Shirt Number Watermark */}
                   {shirt !== '-' && (
-                    <div className="hidden md:flex flex-col items-end opacity-20 hover:opacity-40 transition-opacity">
+                    <div className="hidden md:flex flex-col items-end dark:opacity-20 opacity-60 hover:opacity-40 transition-opacity">
                       <span className="text-[120px] font-black tracking-tighter leading-[0.8]" style={{ color: primaryTeam?.teamColors?.color || '#34D399' }}>#{shirt}</span>
                     </div>
                   )}
@@ -1038,10 +1038,10 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
             </div>
 
             {/* NEW: Identity Matrix & Position Mini-Pitch */}
-            <div className="flex flex-col lg:flex-row bg-[#1a1c21] rounded-2xl border border-white/5 overflow-hidden">
+            <div className="flex flex-col lg:flex-row dark:bg-[#1a1c21] bg-white rounded-2xl border dark:border-white/5 border-slate-200 overflow-hidden">
 
               {/* Premium Info Matrix - Ultra Clean & Minimal */}
-              <div className="flex-1 flex flex-col relative border-b lg:border-b-0 lg:border-r border-white/5 bg-[#1a1c21] overflow-hidden">
+              <div className="flex-1 flex flex-col relative border-b lg:border-b-0 lg:border-r dark:border-white/5 border-slate-200 dark:bg-[#1a1c21] bg-white overflow-hidden">
 
                 {/* Top Half: Hero */}
                 <div className="p-8 md:p-10 relative flex flex-col md:flex-row items-center gap-10 lg:gap-14">
@@ -1060,34 +1060,34 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
 
                   {/* Value */}
                   <div className="relative z-10 flex flex-col text-center md:text-left">
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center justify-center md:justify-start gap-2">
+                    <span className="text-[11px] font-bold dark:text-gray-400 text-slate-500 uppercase tracking-[0.2em] mb-2 flex items-center justify-center md:justify-start gap-2">
                       <span className="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.3)]" style={{ backgroundColor: primaryTeam?.teamColors?.color || '#34D399' }}></span>
                       Transfer Value
                     </span>
-                    <span className="text-6xl font-black text-white tracking-tighter drop-shadow-md">{transferValue}</span>
+                    <span className="text-6xl font-black dark:text-white text-slate-900 tracking-tighter drop-shadow-md">{transferValue}</span>
                   </div>
                 </div>
 
                 {/* Bottom Half: Stats List */}
-                <div className="bg-[#121316] p-8 md:px-10 border-t border-white/5 relative z-10 flex-1">
+                <div className="dark:bg-[#121316] bg-slate-50 p-8 md:px-10 border-t dark:border-white/5 border-slate-200 relative z-10 flex-1">
                   <div className="flex flex-wrap items-center justify-between gap-6 w-full">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Age</span>
-                      <span className="text-3xl font-black text-white">{age}</span>
+                      <span className="text-[10px] font-bold dark:text-gray-500 text-slate-600 uppercase tracking-[0.2em]">Age</span>
+                      <span className="text-3xl font-black dark:text-white text-slate-900">{age}</span>
                     </div>
-                    <div className="hidden md:block w-px h-12 bg-white/10"></div>
+                    <div className="hidden md:block w-px h-12 dark:bg-white/10 bg-slate-300"></div>
                     <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Height</span>
-                      <span className="text-3xl font-black text-white">{height}</span>
+                      <span className="text-[10px] font-bold dark:text-gray-500 text-slate-600 uppercase tracking-[0.2em]">Height</span>
+                      <span className="text-3xl font-black dark:text-white text-slate-900">{height}</span>
                     </div>
-                    <div className="hidden md:block w-px h-12 bg-white/10"></div>
+                    <div className="hidden md:block w-px h-12 dark:bg-white/10 bg-slate-300"></div>
                     <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Foot</span>
-                      <span className="text-3xl font-black text-white capitalize">{foot}</span>
+                      <span className="text-[10px] font-bold dark:text-gray-500 text-slate-600 uppercase tracking-[0.2em]">Foot</span>
+                      <span className="text-3xl font-black dark:text-white text-slate-900 capitalize">{foot}</span>
                     </div>
-                    <div className="hidden md:block w-px h-12 bg-white/10"></div>
+                    <div className="hidden md:block w-px h-12 dark:bg-white/10 bg-slate-300"></div>
                     <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Country</span>
+                      <span className="text-[10px] font-bold dark:text-gray-500 text-slate-600 uppercase tracking-[0.2em]">Country</span>
                       <div className="flex items-center gap-3">
                         {COUNTRY_CODES[country] && (
                           <img
@@ -1097,7 +1097,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                             onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
-                        <span className="text-3xl font-black text-white">{country}</span>
+                        <span className="text-3xl font-black dark:text-white text-slate-900">{country}</span>
                       </div>
                     </div>
                   </div>
@@ -1105,70 +1105,67 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
 
                 {/* Contract Footer */}
                 {contractEnd !== '-' && (
-                  <div className="bg-[#08080a] p-4 px-8 md:px-10 border-t border-white/5 flex items-center justify-between relative z-10">
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-gray-400" />
+                  <div className="dark:bg-[#08080a] bg-slate-100 p-4 px-8 md:px-10 border-t dark:border-white/5 border-slate-200 flex items-center justify-between relative z-10">
+                    <span className="text-[10px] font-bold dark:text-gray-500 text-slate-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                      <Calendar className="w-4 h-4 dark:text-gray-400 text-slate-500" />
                       Contract Expires
                     </span>
-                    <span className="text-xs font-bold text-white/90">{contractEnd}</span>
+                    <span className="text-xs font-bold dark:text-white text-slate-900/90">{contractEnd}</span>
                   </div>
                 )}
               </div>
 
               {/* Right: Position & Pitch */}
-              <div className="flex-1 p-6 lg:p-10 flex flex-col sm:flex-row gap-8 items-center sm:items-start justify-between bg-gradient-to-br from-[#16181d] to-[#121316]">
+              <div className="flex-1 p-6 lg:p-10 flex flex-col sm:flex-row gap-8 items-center sm:items-start justify-between bg-gradient-to-br dark:from-[#16181d] dark:to-[#121316] from-slate-100 to-slate-200">
                 <div className="flex flex-col flex-1 pt-2 w-full sm:w-auto">
                   <div className="flex items-center gap-3 mb-8">
                     <span className="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.3)]" style={{ backgroundColor: primaryTeam?.teamColors?.color || '#34D399' }}></span>
-                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Position Overview</h3>
+                    <h3 className="text-[10px] font-bold dark:text-gray-400 text-slate-500 uppercase tracking-[0.2em]">Position Overview</h3>
                   </div>
 
-                  <div className="space-y-1 mb-6 bg-white/5 p-5 rounded-2xl border border-white/5 shadow-inner">
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Primary Role</span>
-                    <span className="text-xl md:text-2xl font-black text-white tracking-tight block">{primaryPos}</span>
+                  <div className="space-y-1 mb-6 dark:bg-white/5 bg-slate-200 p-5 rounded-2xl border dark:border-white/5 border-slate-200 shadow-inner">
+                    <span className="text-[10px] font-bold dark:text-gray-500 text-slate-600 uppercase tracking-widest block mb-2">Primary Role</span>
+                    <span className="text-xl md:text-2xl font-black dark:text-white text-slate-900 tracking-tight block">{primaryPos}</span>
                   </div>
 
                   {otherPos !== '-' && (
                     <div className="space-y-1 p-5">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Other Roles</span>
-                      <span className="text-sm font-semibold text-gray-400 block leading-snug">{otherPos}</span>
+                      <span className="text-[10px] font-bold dark:text-gray-500 text-slate-600 uppercase tracking-widest block mb-2">Other Roles</span>
+                      <span className="text-sm font-semibold dark:text-gray-400 text-slate-500 block leading-snug">{otherPos}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Mini Pitch - Premium 3D Feel */}
                 <div
-                  className="w-[180px] sm:w-[160px] lg:w-[220px] aspect-[2/3] rounded-2xl border border-white/10 relative overflow-hidden flex-shrink-0 shadow-[0_10px_40px_rgba(0,0,0,0.6)] transform transition-transform duration-500 hover:scale-105"
-                  style={{
-                    background: 'linear-gradient(180deg, #1a1d24 0%, #13151a 100%)',
-                  }}
+                  className="w-[180px] sm:w-[160px] lg:w-[220px] aspect-[2/3] rounded-2xl border dark:border-white/10 border-slate-300 relative overflow-hidden flex-shrink-0 shadow-[0_10px_40px_rgba(0,0,0,0.6)] transform transition-transform duration-500 hover:scale-105 bg-gradient-to-b dark:from-[#1a1d24] dark:to-[#13151a] from-slate-200 to-slate-300"
                 >
                   {/* Grass Stripes Pattern */}
                   <div
                     className="absolute inset-0 opacity-40 pointer-events-none"
-                    style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.03) 10%, rgba(255,255,255,0.03) 20%)' }}
+                    style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(128,128,128,0.08) 10%, rgba(128,128,128,0.08) 20%)' }}
                   ></div>
 
                   {/* Inner Field Lines */}
-                  <div className="absolute inset-4 border-[1.5px] border-white/15 pointer-events-none rounded-md" />
-                  <div className="absolute top-1/2 left-4 right-4 border-t-[1.5px] border-white/15 pointer-events-none" />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full border-[1.5px] border-white/15 pointer-events-none" />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-white/30 pointer-events-none" />
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 w-24 h-12 border-[1.5px] border-white/15 border-t-0 pointer-events-none" />
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 w-10 h-4 border-[1.5px] border-white/15 border-t-0 pointer-events-none" />
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-24 h-12 border-[1.5px] border-white/15 border-b-0 pointer-events-none" />
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-10 h-4 border-[1.5px] border-white/15 border-b-0 pointer-events-none" />
-                  <div className="absolute top-16 left-1/2 -translate-x-1/2 w-10 h-5 border-[1.5px] border-white/15 border-t-0 rounded-b-full pointer-events-none" />
-                  <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-10 h-5 border-[1.5px] border-white/15 border-b-0 rounded-t-full pointer-events-none" />
+                  <div className="absolute inset-4 border-[1.5px] dark:border-white/15 border-slate-400/40 pointer-events-none rounded-md" />
+                  <div className="absolute top-1/2 left-4 right-4 border-t-[1.5px] dark:border-white/15 border-slate-400/40 pointer-events-none" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full border-[1.5px] dark:border-white/15 border-slate-400/40 pointer-events-none" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full dark:bg-white/30 bg-slate-400/60 pointer-events-none" />
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 w-24 h-12 border-[1.5px] dark:border-white/15 border-slate-400/40 border-t-0 pointer-events-none" />
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 w-10 h-4 border-[1.5px] dark:border-white/15 border-slate-400/40 border-t-0 pointer-events-none" />
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-24 h-12 border-[1.5px] dark:border-white/15 border-slate-400/40 border-b-0 pointer-events-none" />
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-10 h-4 border-[1.5px] dark:border-white/15 border-slate-400/40 border-b-0 pointer-events-none" />
+                  <div className="absolute top-16 left-1/2 -translate-x-1/2 w-10 h-5 border-[1.5px] dark:border-white/15 border-slate-400/40 border-t-0 rounded-b-full pointer-events-none" />
+                  <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-10 h-5 border-[1.5px] dark:border-white/15 border-slate-400/40 border-b-0 rounded-t-full pointer-events-none" />
 
                   {/* Dots */}
                   {pitchPositions.map((p: any, i: number) => {
                     const isMain = p.isMainPosition;
-                    const dotColor = isMain ? (primaryTeam?.teamColors?.color || '#34D399') : '#2c303a';
+                    const dotColor = isMain ? (primaryTeam?.teamColors?.color || '#34D399') : undefined;
                     return (
                       <div
                         key={i}
-                        className={`absolute -translate-x-1/2 -translate-y-1/2 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center justify-center transition-all duration-300 cursor-default ${isMain ? 'text-white z-20 scale-125 drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] border border-white/20' : 'text-gray-400 z-10 hover:scale-110 border border-white/10'}`}
+                        className={`absolute -translate-x-1/2 -translate-y-1/2 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center justify-center transition-all duration-300 cursor-default ${isMain ? 'dark:text-white text-slate-900 z-20 scale-125 drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] border dark:border-white/20 border-slate-400' : 'dark:text-gray-400 text-slate-600 dark:bg-[#2c303a] bg-slate-200/90 z-10 hover:scale-110 border dark:border-white/10 border-slate-400/50'}`}
                         style={{
                           left: `${p.pitchPositionData.right * 100}%`,
                           top: `${p.pitchPositionData.top * 100}%`,
@@ -1186,31 +1183,31 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
 
             {/* Transfer Value History Graph */}
             {marketValueData.length > 0 && (
-              <div className="bg-gradient-to-b from-[#181a1f] to-[#121316] rounded-[2rem] border border-white/10 p-6 md:p-8 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_10px_30px_rgba(0,0,0,0.5)]">
+              <div className="bg-gradient-to-b dark:from-[#181a1f] dark:to-[#121316] from-slate-200 to-slate-300 rounded-[2rem] border dark:border-white/10 border-slate-300 p-6 md:p-8 relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_10px_30px_rgba(0,0,0,0.5)]">
                 {/* Background Glow */}
                 <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#34D399]/5 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-8 relative z-10">
                   <div className="flex items-center gap-3">
-                    <div className="bg-white/5 border border-white/10 p-2 rounded-xl shadow-inner">
-                      <Activity className="w-5 h-5 text-[#34D399]" />
+                    <div className="dark:bg-white/5 bg-slate-200 border dark:border-white/10 border-slate-300 p-2 rounded-xl shadow-inner">
+                      <Activity className="w-5 h-5 dark:text-[#34D399] text-emerald-600" />
                     </div>
-                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
-                      Transfer value: <span className="text-white">{transferValue}</span>
+                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r dark:from-white dark:to-gray-400 from-slate-900 to-slate-500">
+                      Recent Transfer Value: <span className="dark:text-white text-slate-900">{transferValue}</span>
                     </h3>
                   </div>
                   {highestMarketValue && (
                     <div className="flex items-center gap-3 mt-1 sm:mt-0 sm:ml-auto">
-                      <div className="bg-[#2b2d32] border border-white/5 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-inner">
-                        <span className="text-gray-400 text-xs font-bold uppercase tracking-wider">Peak</span>
-                        <span className="text-white text-sm font-black">{highestValueFormatted}</span>
-                        <span className="text-[#34D399] text-xs font-bold">({highestValueDate})</span>
+                      <div className="dark:bg-[#2b2d32] bg-slate-200 border dark:border-white/5 border-slate-200 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-inner">
+                        <span className="dark:text-gray-400 text-slate-500 text-xs font-bold uppercase tracking-wider">Peak</span>
+                        <span className="dark:text-white text-slate-900 text-sm font-black">{highestValueFormatted}</span>
+                        <span className="dark:text-[#34D399] text-emerald-600 text-xs font-bold">({highestValueDate})</span>
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div className="bg-[#121316]/50 rounded-2xl p-4 pt-8 h-[320px] w-full relative z-10 border border-white/5 shadow-[inset_0_2px_15px_rgba(0,0,0,0.5)]">
+                <div className="dark:bg-[#121316] bg-slate-50/50 rounded-2xl p-4 pt-8 h-[320px] w-full relative z-10 border dark:border-white/5 border-slate-200 shadow-[inset_0_2px_15px_rgba(0,0,0,0.5)]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={marketValueData} margin={{ top: 45, right: 30, left: -15, bottom: 0 }}>
                       <defs>
@@ -1225,7 +1222,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                         </linearGradient>
                       </defs>
 
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="dark:text-white/[0.03] text-slate-400/20" />
 
                       <XAxis
                         dataKey="timestamp"
@@ -1244,8 +1241,9 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                           return tks;
                         })()}
                         tickFormatter={(val) => new Date(val).getFullYear().toString()}
-                        stroke="rgba(255,255,255,0.2)"
-                        tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 500 }}
+                        stroke="currentColor"
+                        className="dark:text-white/20 text-slate-400"
+                        tick={{ fill: 'currentColor', fontSize: 12, fontWeight: 500 }}
                         tickLine={false}
                         axisLine={false}
                         minTickGap={30}
@@ -1261,13 +1259,14 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                           return [0, step, step * 2, step * 3, maxVal];
                         })()}
                         tickFormatter={(val) => `€${(val / 1000000).toFixed(0)}M`}
-                        stroke="rgba(255,255,255,0.2)"
-                        tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 600 }}
+                        stroke="currentColor"
+                        className="dark:text-white/20 text-slate-400"
+                        tick={{ fill: 'currentColor', fontSize: 12, fontWeight: 600 }}
                         tickLine={false}
                         axisLine={false}
                       />
 
-                      <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.2)', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                      <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'currentColor', className: 'dark:text-white/20 text-slate-400', strokeWidth: 1, strokeDasharray: '4 4' }} />
 
                       <Area
                         type="monotone"
@@ -1290,40 +1289,40 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
               {/* Left Column */}
               <div className="space-y-8">
                 {/* Ratings Trend */}
-                <div className="bg-[#1a1c21] rounded-2xl border border-white/5 p-6 h-[312px] flex flex-col">
-                  <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2 shrink-0">
-                    <Activity className="w-5 h-5 text-[#34D399]" />
+                <div className="dark:bg-[#1a1c21] bg-white rounded-2xl border dark:border-white/5 border-slate-200 p-6 h-[312px] flex flex-col">
+                  <h3 className="text-lg font-bold dark:text-white text-slate-900 mb-6 flex items-center gap-2 shrink-0">
+                    <Activity className="w-5 h-5 dark:text-[#34D399] text-emerald-600" />
                     Recent Match Ratings
                   </h3>
                   <div className="flex-1 w-full flex items-center justify-center min-h-0">
                     {isMatchesLoading ? (
-                      <div className="flex flex-col items-center gap-3 text-gray-500">
-                        <Loader2 className="w-6 h-6 animate-spin text-[#34D399]" />
+                      <div className="flex flex-col items-center gap-3 dark:text-gray-500 text-slate-600">
+                        <Loader2 className="w-6 h-6 animate-spin dark:text-[#34D399] text-emerald-600" />
                         <span className="text-sm">Loading match ratings...</span>
                       </div>
                     ) : ratingsData.length === 0 ? (
-                      <div className="text-sm text-gray-500">No recent match ratings available.</div>
+                      <div className="text-sm dark:text-gray-500 text-slate-600">No recent match ratings available.</div>
                     ) : (
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={ratingsData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                          <XAxis dataKey="match" stroke="rgba(255,255,255,0.3)" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} tickLine={false} axisLine={false} />
-                          <YAxis domain={['auto', 'auto']} stroke="rgba(255,255,255,0.3)" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} tickLine={false} axisLine={false} width={30} />
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="dark:text-white/5 text-slate-400/30" />
+                          <XAxis dataKey="match" stroke="currentColor" className="dark:text-white/30 text-slate-400" tick={{ fill: 'currentColor', fontSize: 12 }} tickLine={false} axisLine={false} />
+                          <YAxis domain={['auto', 'auto']} stroke="currentColor" className="dark:text-white/30 text-slate-400" tick={{ fill: 'currentColor', fontSize: 12 }} tickLine={false} axisLine={false} width={30} />
                           <Tooltip
-                            cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }}
+                            cursor={{ stroke: 'currentColor', className: 'dark:text-white/10 text-slate-300', strokeWidth: 1 }}
                             content={({ active, payload, label }) => {
                               if (active && payload && payload.length) {
                                 const data = payload[0].payload;
                                 return (
-                                  <div className="bg-[#1f2126] border border-white/10 p-3 rounded-xl shadow-2xl min-w-[140px]">
-                                    <p className="text-gray-400 text-xs mb-2 font-medium uppercase tracking-wider">{label}</p>
-                                    <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/5">
+                                  <div className="dark:bg-[#1f2126] bg-slate-100 border dark:border-white/10 border-slate-300 p-3 rounded-xl shadow-2xl min-w-[140px]">
+                                    <p className="dark:text-gray-400 text-slate-500 text-xs mb-2 font-medium uppercase tracking-wider">{label}</p>
+                                    <div className="flex items-center gap-2 mb-2 pb-2 border-b dark:border-white/5 border-slate-200">
                                       <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${data.opponentId}_xsmall.png`} className="w-5 h-5 object-contain drop-shadow-md" alt="" onError={(e: any) => e.target.style.display = 'none'} />
-                                      <span className="text-white font-bold text-sm truncate max-w-[120px]">{data.opponentName}</span>
+                                      <span className="dark:text-white text-slate-900 font-bold text-sm truncate max-w-[120px]">{data.opponentName}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                      <span className="text-gray-400 text-xs font-medium">RATING</span>
-                                      <span className="text-[#34D399] font-black text-base">{data.rating.toFixed(1)}</span>
+                                      <span className="dark:text-gray-400 text-slate-500 text-xs font-medium">RATING</span>
+                                      <span className="dark:text-[#34D399] text-emerald-600 font-black text-base">{data.rating.toFixed(1)}</span>
                                     </div>
                                   </div>
                                 );
@@ -1334,14 +1333,15 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                           <Line
                             type="monotone"
                             dataKey="rating"
-                            stroke="rgba(255,255,255,0.15)"
+                            stroke="currentColor"
+                            className="dark:text-white/15 text-slate-500"
                             strokeWidth={2}
                             activeDot={(props: any) => {
                               const { cx, cy, payload } = props;
                               if (!cx || !cy) return null;
                               return (
                                 <g>
-                                  <circle cx={cx} cy={cy} r={14} fill="#1f2126" stroke="#34D399" strokeWidth={2} />
+                                  <circle cx={cx} cy={cy} r={14} className="dark:fill-[#1f2126] fill-slate-100" stroke="#34D399" strokeWidth={2} />
                                   <image
                                     href={`https://images.fotmob.com/image_resources/logo/teamlogo/${payload.teamId}_xsmall.png`}
                                     x={cx - 10}
@@ -1357,7 +1357,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                               if (!cx || !cy) return null;
                               return (
                                 <g>
-                                  <circle cx={cx} cy={cy} r={10} fill="#1a1c21" stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
+                                  <circle cx={cx} cy={cy} r={10} className="dark:fill-[#1a1c21] fill-white dark:stroke-white/10 stroke-slate-300" strokeWidth={1} />
                                   <image
                                     href={`https://images.fotmob.com/image_resources/logo/teamlogo/${payload.teamId}_xsmall.png`}
                                     x={cx - 7}
@@ -1376,23 +1376,23 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                 </div>
 
                 {/* Match Stats Table */}
-                <div className="bg-[#1a1c21] rounded-2xl border border-white/5 p-6">
-                  <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <div className="dark:bg-[#1a1c21] bg-white rounded-2xl border dark:border-white/5 border-slate-200 p-6">
+                  <h3 className="text-lg font-bold dark:text-white text-slate-900 mb-6 flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-blue-400" />
                     Match stats
                   </h3>
                   {isMatchesLoading ? (
-                    <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+                    <div className="flex flex-col items-center justify-center py-10 dark:text-gray-500 text-slate-600">
                       <Loader2 className="w-6 h-6 animate-spin text-blue-400 mb-3" />
                       <span className="text-sm">Loading matches...</span>
                     </div>
                   ) : !recentMatches || recentMatches.length === 0 ? (
-                    <div className="text-sm text-gray-500 py-10 text-center">No recent match stats available.</div>
+                    <div className="text-sm dark:text-gray-500 text-slate-600 py-10 text-center">No recent match stats available.</div>
                   ) : (
                     <div className="overflow-x-auto -mx-6 px-6">
                       <table className="w-full text-left text-sm whitespace-nowrap">
                         <thead>
-                          <tr className="text-gray-500 border-b border-white/5">
+                          <tr className="dark:text-gray-500 text-slate-600 border-b dark:border-white/5 border-slate-200">
                             <th className="pb-3 font-medium">Date</th>
                             <th className="pb-3 font-medium">Opponent</th>
                             <th className="pb-3 font-medium text-center">Result</th>
@@ -1413,7 +1413,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                             const teamScore = isHome ? m.homeScore : m.awayScore;
                             const oppScore = isHome ? m.awayScore : m.homeScore;
                             let resultChar = 'D';
-                            let resultColor = 'text-gray-400';
+                            let resultColor = 'dark:text-gray-400 text-slate-500';
                             if (teamScore > oppScore) { resultChar = 'W'; resultColor = 'text-green-400'; }
                             if (teamScore < oppScore) { resultChar = 'L'; resultColor = 'text-red-400'; }
 
@@ -1425,30 +1425,30 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                             else if (rating > 0) ratingBg = 'bg-[#ef4444]'; // Red
 
                             return (
-                              <tr key={m.id || i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                <td className="py-3 text-gray-400 font-medium">{dateStr}</td>
+                              <tr key={m.id || i} className="border-b dark:border-white/5 border-slate-200 hover:dark:bg-white/5 hover:bg-slate-200 transition-colors">
+                                <td className="py-3 dark:text-gray-400 text-slate-500 font-medium">{dateStr}</td>
                                 <td className="py-3">
                                   <div className="flex items-center gap-2">
                                     <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${m.opponentTeamId}_xsmall.png`} className="w-5 h-5 object-contain" alt="" onError={(e: any) => e.target.style.display = 'none'} />
-                                    <span className="text-white font-medium truncate max-w-[120px]">{m.opponentTeamName || m.opponentName}</span>
+                                    <span className="dark:text-white text-slate-900 font-medium truncate max-w-[120px]">{m.opponentTeamName || m.opponentName}</span>
                                   </div>
                                 </td>
                                 <td className="py-3 text-center">
                                   <span className={`font-black text-[13px] tracking-wide mr-1.5 ${resultColor}`}>{resultChar}</span>
-                                  <span className="text-white/70 font-medium">{teamScore} - {oppScore}</span>
+                                  <span className="dark:text-white text-slate-900/70 font-medium">{teamScore} - {oppScore}</span>
                                 </td>
-                                <td className="py-3 text-center text-gray-400 font-medium">{m.minutesPlayed || 0}</td>
-                                <td className={`py-3 text-center font-bold ${m.goals > 0 ? 'text-white' : 'text-white/20 font-medium'}`}>{m.goals || 0}</td>
-                                <td className={`py-3 text-center font-bold ${m.assists > 0 ? 'text-white' : 'text-white/20 font-medium'}`}>{m.assists || 0}</td>
-                                <td className={`py-3 text-center font-bold ${m.yellowCards > 0 ? 'text-yellow-400' : 'text-white/20 font-medium'}`}>{m.yellowCards || 0}</td>
-                                <td className={`py-3 text-center font-bold ${m.redCards > 0 ? 'text-red-500' : 'text-white/20 font-medium'}`}>{m.redCards || 0}</td>
+                                <td className="py-3 text-center dark:text-gray-400 text-slate-500 font-medium">{m.minutesPlayed || 0}</td>
+                                <td className={`py-3 text-center font-bold ${m.goals > 0 ? 'dark:text-white text-slate-900' : 'dark:text-white text-slate-900/20 font-medium'}`}>{m.goals || 0}</td>
+                                <td className={`py-3 text-center font-bold ${m.assists > 0 ? 'dark:text-white text-slate-900' : 'dark:text-white text-slate-900/20 font-medium'}`}>{m.assists || 0}</td>
+                                <td className={`py-3 text-center font-bold ${m.yellowCards > 0 ? 'text-yellow-400' : 'dark:text-white text-slate-900/20 font-medium'}`}>{m.yellowCards || 0}</td>
+                                <td className={`py-3 text-center font-bold ${m.redCards > 0 ? 'text-red-500' : 'dark:text-white text-slate-900/20 font-medium'}`}>{m.redCards || 0}</td>
                                 <td className="py-3 text-center">
                                   {rating > 0 ? (
-                                    <div className={`text-white text-xs font-black px-2.5 py-1 rounded-md ${ratingBg} inline-block shadow-sm`}>
+                                    <div className={`dark:text-white text-slate-900 text-xs font-black px-2.5 py-1 rounded-md ${ratingBg} inline-block shadow-sm`}>
                                       {rating.toFixed(1)}
                                     </div>
                                   ) : (
-                                    <span className="text-white/20 font-bold">-</span>
+                                    <span className="dark:text-white text-slate-900/20 font-bold">-</span>
                                   )}
                                 </td>
                               </tr>
@@ -1465,26 +1465,26 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
               <div className="lg:relative">
                 <div className="lg:absolute lg:inset-0 flex flex-col space-y-8 w-full h-full">
                   {/* Season Attributes */}
-                  <div className="bg-[#1a1c21] rounded-2xl border border-white/5 p-6 h-[312px]">
-                    <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                      <Star className="w-5 h-5 text-[#34D399]" />
+                  <div className="dark:bg-[#1a1c21] bg-white rounded-2xl border dark:border-white/5 border-slate-200 p-6 h-[312px]">
+                    <h3 className="text-lg font-bold dark:text-white text-slate-900 mb-2 flex items-center gap-2">
+                      <Star className="w-5 h-5 dark:text-[#34D399] text-emerald-600" />
                       Player Traits
                     </h3>
                     <div className="h-full w-full -mt-4 relative">
                       {radarData.length > 0 ? (
                         <PolarAreaChart data={radarData} />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-sm text-gray-500">No trait data available</div>
+                        <div className="w-full h-full flex items-center justify-center text-sm dark:text-gray-500 text-slate-600">No trait data available</div>
                       )}
                     </div>
                   </div>
 
                   {/* Trophies */}
-                  <div className="bg-[#1a1c21] rounded-2xl border border-white/5 p-6 flex-1 flex flex-col min-h-[500px] lg:min-h-0">
-                    <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2 shrink-0">
+                  <div className="dark:bg-[#1a1c21] bg-white rounded-2xl border dark:border-white/5 border-slate-200 p-6 flex-1 flex flex-col min-h-[500px] lg:min-h-0">
+                    <h3 className="text-lg font-bold dark:text-white text-slate-900 mb-6 flex items-center gap-2 shrink-0">
                       <Trophy className="w-5 h-5 text-yellow-400" />
                       Trophies
-                      {totalTrophies > 0 && <span className="text-gray-400 text-sm font-medium ml-1">({totalTrophies})</span>}
+                      {totalTrophies > 0 && <span className="dark:text-gray-400 text-slate-500 text-sm font-medium ml-1">({totalTrophies})</span>}
                     </h3>
 
                     {profile.trophies?.playerTrophies && profile.trophies.playerTrophies.length > 0 ? (
@@ -1493,7 +1493,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                         <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-2 scrollbar-thin shrink-0">
                           <button
                             onClick={() => setActiveTrophyTeam('all')}
-                            className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-all border ${activeTrophyTeam === 'all' ? 'bg-[#2a2c33] text-white border-white/10 shadow-md' : 'bg-transparent text-gray-500 border-transparent hover:bg-white/5 hover:text-gray-300'}`}
+                            className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-all border ${activeTrophyTeam === 'all' ? 'dark:bg-[#2a2c33] bg-slate-200 dark:text-white text-slate-900 dark:border-white/10 border-slate-300 shadow-md' : 'bg-transparent dark:text-gray-500 text-slate-600 border-transparent hover:dark:bg-white/5 hover:bg-slate-200 hover:dark:text-gray-300 text-slate-700'}`}
                           >
                             All Teams
                           </button>
@@ -1501,7 +1501,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                             <button
                               key={i}
                               onClick={() => setActiveTrophyTeam(team.teamId)}
-                              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-all border ${activeTrophyTeam === team.teamId ? 'bg-[#2a2c33] text-white border-white/10 shadow-md' : 'bg-transparent text-gray-500 border-transparent hover:bg-white/5 hover:text-gray-300'}`}
+                              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-all border ${activeTrophyTeam === team.teamId ? 'dark:bg-[#2a2c33] bg-slate-200 dark:text-white text-slate-900 dark:border-white/10 border-slate-300 shadow-md' : 'bg-transparent dark:text-gray-500 text-slate-600 border-transparent hover:dark:bg-white/5 hover:bg-slate-200 hover:dark:text-gray-300 text-slate-700'}`}
                             >
                               <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${team.teamId}_xsmall.png`} className="w-5 h-5 object-contain" alt="" onError={(e: any) => e.target.style.display = 'none'} />
                               {team.teamName}
@@ -1514,23 +1514,23 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                           {profile.trophies.playerTrophies
                             .filter((team: any) => activeTrophyTeam === 'all' || activeTrophyTeam === team.teamId)
                             .map((team: any, teamIdx: number) => (
-                              <div key={teamIdx} className="bg-[#121316] border border-white/5 rounded-2xl overflow-hidden">
+                              <div key={teamIdx} className="dark:bg-[#121316] bg-slate-50 border dark:border-white/5 border-slate-200 rounded-2xl overflow-hidden">
                                 {/* Team Header */}
-                                <div className="flex items-center gap-3 p-4 bg-white/5 border-b border-white/5">
-                                  <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center p-1.5 shrink-0">
+                                <div className="flex items-center gap-3 p-4 dark:bg-white/5 bg-slate-200 border-b dark:border-white/5 border-slate-200">
+                                  <div className="w-10 h-10 rounded-full dark:bg-white/5 bg-slate-200 flex items-center justify-center p-1.5 shrink-0">
                                     <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${team.teamId}_xsmall.png`} className="w-full h-full object-contain" alt="" onError={(e: any) => e.target.style.display = 'none'} />
                                   </div>
                                   <div>
-                                    <h4 className="text-white font-bold text-base leading-tight">{team.teamName}</h4>
-                                    <span className="text-gray-500 font-medium text-xs uppercase tracking-wider">{team.ccode}</span>
+                                    <h4 className="dark:text-white text-slate-900 font-bold text-base leading-tight">{team.teamName}</h4>
+                                    <span className="dark:text-gray-500 text-slate-600 font-medium text-xs uppercase tracking-wider">{team.ccode}</span>
                                   </div>
                                 </div>
                                 {/* Tournaments */}
                                 <div className="flex flex-col">
                                   {team.tournaments?.map((tour: any, tourIdx: number) => (
-                                    <div key={tourIdx} className="flex flex-wrap sm:flex-nowrap items-center gap-4 p-4 border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
+                                    <div key={tourIdx} className="flex flex-wrap sm:flex-nowrap items-center gap-4 p-4 border-b dark:border-white/5 border-slate-200 last:border-0 hover:dark:bg-white/5 hover:bg-slate-200 transition-colors">
                                       <div className="w-6 text-center shrink-0">
-                                        <span className="text-white font-black text-lg">{tour.seasonsWon?.length || 0}</span>
+                                        <span className="dark:text-white text-slate-900 font-black text-lg">{tour.seasonsWon?.length || 0}</span>
                                       </div>
                                       <div className="w-8 h-8 flex items-center justify-center shrink-0">
                                         {tour.leagueId > 0 && (
@@ -1538,8 +1538,8 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                                         )}
                                       </div>
                                       <div className="flex flex-wrap items-baseline gap-1.5 min-w-0 flex-1">
-                                        <span className="text-white font-bold text-sm">{tour.leagueName}</span>
-                                        <span className="text-gray-500 font-medium text-xs">
+                                        <span className="dark:text-white text-slate-900 font-bold text-sm">{tour.leagueName}</span>
+                                        <span className="dark:text-gray-500 text-slate-600 font-medium text-xs">
                                           ({tour.seasonsWon?.join(' · ')})
                                         </span>
                                       </div>
@@ -1551,7 +1551,7 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+                      <div className="flex items-center justify-center h-full dark:text-gray-500 text-slate-600 text-sm">
                         No trophy data available.
                       </div>
                     )}
@@ -1563,22 +1563,22 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
         ) : activeTab === 'detailed' ? (
           <div className="transition-opacity duration-300">
             {/* Top Graph Area (Matches) */}
-            <div className="bg-[#1a1c21] rounded-xl border border-white/5 p-6 mb-8 relative">
+            <div className="dark:bg-[#1a1c21] bg-white rounded-xl border dark:border-white/5 border-slate-200 p-6 mb-8 relative">
               <div className={`grid grid-cols-1 ${isPrimaryTournament ? 'md:grid-cols-2' : ''} gap-8 pt-2`}>
                 {isPrimaryTournament && (
                   <div className="flex flex-col">
-                    <h3 className="text-white font-bold text-center mb-4">2D Simulated Shot Map</h3>
+                    <h3 className="dark:text-white text-slate-900 font-bold text-center mb-4">2D Simulated Shot Map</h3>
                     <ShotMapPitch playerId={id} position={position} totalGoals={Number(goals)} />
                   </div>
                 )}
 
-                <div className={`relative flex flex-col bg-[#121316] rounded-2xl border border-white/5 p-6 shadow-2xl overflow-hidden group hover:-translate-y-1 transition-all duration-500 ${isPrimaryTournament ? 'border-l-4 border-l-[#60A5FA]' : 'max-w-md mx-auto w-full border-l-4 border-l-[#60A5FA]'}`}>
+                <div className={`relative flex flex-col dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-6 shadow-2xl overflow-hidden group hover:-translate-y-1 transition-all duration-500 ${isPrimaryTournament ? 'border-l-4 border-l-[#60A5FA]' : 'max-w-md mx-auto w-full border-l-4 border-l-[#60A5FA]'}`}>
                   {/* Background Blur */}
                   <div className="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-[#60A5FA]/20 to-[#3B82F6]/20 rounded-full blur-[50px] opacity-30 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none" />
                   
-                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5 relative z-10">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b dark:border-white/5 border-slate-200 relative z-10">
                     <div className="w-1.5 h-6 rounded-full bg-[#60A5FA] shadow-[0_0_10px_rgba(96,165,250,0.5)]" />
-                    <h3 className="text-white font-black text-base tracking-wide uppercase">Matches & Playtime</h3>
+                    <h3 className="dark:text-white text-slate-900 font-black text-base tracking-wide uppercase">Matches & Playtime</h3>
                   </div>
                   <div className="space-y-1.5 relative z-10">
                     <StatRow label="Matches played" value={isPrimaryTournament ? extractTopStat('Matches') : selectedBasicStats?.appearances} />
@@ -1640,20 +1640,20 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
               </StatColumn>
             </div>
             ) : (
-              <div className="flex items-center justify-center p-8 bg-[#1a1c21] rounded-xl border border-white/5">
-                 <span className="text-gray-400 font-medium">Deep stats (Shooting, Passing, Defending) are only available for the primary tournament ({statSeasons?.[0]?.tournaments?.[0]?.name}).</span>
+              <div className="flex items-center justify-center p-8 dark:bg-[#1a1c21] bg-white rounded-xl border dark:border-white/5 border-slate-200">
+                 <span className="dark:text-gray-400 text-slate-500 font-medium">Deep stats (Shooting, Passing, Defending) are only available for the primary tournament ({statSeasons?.[0]?.tournaments?.[0]?.name}).</span>
               </div>
             )}
           </div>
         ) : activeTab === 'career' ? (
           <div className="transition-opacity duration-300">
-            <div className="bg-[#16181c] rounded-2xl border border-white/5 p-4 sm:p-8">
+            <div className="dark:bg-[#16181c] bg-white rounded-2xl border dark:border-white/5 border-slate-200 p-4 sm:p-8">
 
               {/* Senior Career Section */}
               <div className="mb-12">
-                <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5 px-2 sm:px-4">
-                  <h3 className="text-lg font-bold text-white tracking-wide">Club career</h3>
-                  <div className="flex items-center justify-end w-[105px] sm:w-[150px] text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                <div className="flex items-center justify-between mb-4 pb-4 border-b dark:border-white/5 border-slate-200 px-2 sm:px-4">
+                  <h3 className="text-lg font-bold dark:text-white text-slate-900 tracking-wide">Club career</h3>
+                  <div className="flex items-center justify-end w-[105px] sm:w-[150px] text-[10px] font-bold dark:text-gray-500 text-slate-600 uppercase tracking-widest">
                     <div className="w-[35px] sm:w-[50px] text-center">App</div>
                     <div className="w-[35px] sm:w-[50px] text-center">Goals</div>
                     <div className="w-[35px] sm:w-[50px] text-center">Ast</div>
@@ -1671,16 +1671,16 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center text-gray-500 py-6">No club career data available.</div>
+                  <div className="text-center dark:text-gray-500 text-slate-600 py-6">No club career data available.</div>
                 )}
               </div>
 
               {/* National Team Section */}
               {careerHistory?.careerItems?.['national team']?.teamEntries?.length > 0 && (
                 <div>
-                  <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5 px-2 sm:px-4">
-                    <h3 className="text-lg font-bold text-white tracking-wide">National team</h3>
-                    <div className="flex items-center justify-end w-[105px] sm:w-[150px] text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                  <div className="flex items-center justify-between mb-4 pb-4 border-b dark:border-white/5 border-slate-200 px-2 sm:px-4">
+                    <h3 className="text-lg font-bold dark:text-white text-slate-900 tracking-wide">National team</h3>
+                    <div className="flex items-center justify-end w-[105px] sm:w-[150px] text-[10px] font-bold dark:text-gray-500 text-slate-600 uppercase tracking-widest">
                       <div className="w-[35px] sm:w-[50px] text-center">App</div>
                       <div className="w-[35px] sm:w-[50px] text-center">Gls</div>
                       <div className="w-[35px] sm:w-[50px] text-center">Ast</div>

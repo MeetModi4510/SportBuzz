@@ -10,6 +10,7 @@ interface SquadPlayer {
     role: string;
     number?: number;
     image?: string;
+    rating?: number;
     isCaptain?: boolean;
     isSubstitute?: boolean;
     matchStats?: any;
@@ -34,6 +35,7 @@ interface TeamInfo {
     shortName?: string;
     logo?: string;
     primaryColor?: string;
+    coach?: { name: string; image?: string };
 }
 
 interface FootballPitchLineupProps {
@@ -150,6 +152,23 @@ const derivePlayerPerformance = (p: SquadPlayer, currentMinute: number = 90) => 
             const outMin = events.substitution.outMinute || redCardMin || currentMinute;
             minutes = Math.max(0, outMin - inMin);
         }
+    }
+
+    if (p.rating !== undefined) {
+        return {
+            rating: p.rating,
+            minutesPlayed: minutes,
+            goals: events.goals,
+            assists: events.assists,
+            yellowCards: events.yellowCards,
+            redCards: events.redCards,
+            saves: events.saves,
+            fouls: events.fouls,
+            shotsOnTarget: events.shotsOnTarget,
+            substitutedIn: events.substitution?.inMinute,
+            substitutedOut: events.substitution?.outMinute,
+            isInjured: events.substitution?.isInjured || false,
+        };
     }
 
     // Weighted Performance Rating (Synthetic)
@@ -870,6 +889,7 @@ export function FootballPitchLineup({
                             <div>
                                 <h4 className="text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 mb-0.5">Home Contingent</h4>
                                 <h3 className="text-base font-black italic uppercase tracking-tighter text-white">{homeTeam.shortName || homeTeam.name}</h3>
+                                {homeTeam.coach && <p className="text-xs text-slate-400 mt-1 uppercase font-semibold tracking-wider flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-500"/> Manager: <span className="text-white font-black">{homeTeam.coach.name}</span></p>}
                             </div>
                         </div>
                         <div className="text-3xl font-black italic tracking-tighter text-white/10 group-hover:text-white/20 transition-colors uppercase">{homeFormation}</div>
@@ -886,6 +906,7 @@ export function FootballPitchLineup({
                             <div className="text-right">
                                 <h4 className="text-[10px] uppercase font-black tracking-[0.2em] text-red-500 mb-0.5">Away Contingent</h4>
                                 <h3 className="text-base font-black italic uppercase tracking-tighter text-white">{awayTeam.shortName || awayTeam.name}</h3>
+                                {awayTeam.coach && <p className="text-xs text-slate-400 mt-1 uppercase font-semibold tracking-wider flex items-center justify-end gap-1.5">Manager: <span className="text-white font-black">{awayTeam.coach.name}</span> <span className="w-1.5 h-1.5 rounded-full bg-red-500"/></p>}
                             </div>
                         </div>
                         <div className="text-3xl font-black italic tracking-tighter text-white/10 group-hover:text-white/20 transition-colors uppercase">{awayFormation}</div>

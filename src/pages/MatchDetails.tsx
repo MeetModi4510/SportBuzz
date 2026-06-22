@@ -8,6 +8,7 @@ import { useCricketMatchDetails, useCricketMatchSquads, useCricbuzzSummary, useC
 import { useQueryClient } from "@tanstack/react-query";
 import { useCricketDataMatch, useCricbuzzSquads } from "@/hooks/useCricketDataMatch";
 import { useMatchFieldData } from "@/hooks/useMatchFieldData";
+import { useFotmobLineups } from "@/hooks/football/useFotmobLineups";
 import { cn, formatScoreString, formatOversText } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -107,6 +108,8 @@ const MatchDetails = () => {
   const queryClient = useQueryClient();
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null);
+  const { data: fieldData } = useMatchFieldData(id);
+
   const [activeTab, setActiveTab] = useState('summary');
   const [activeInningsTab, setActiveInningsTab] = useState<number | 'preview'>(-1);
   const [activeInningsIndex, setActiveInningsIndex] = useState<number>(-1);
@@ -184,6 +187,8 @@ const MatchDetails = () => {
   const isNumeric = id && /^\d+$/.test(id);
   const isCricketMatch = id?.includes("cricket") || id?.startsWith("c") || isNumeric || (id && id.includes("-") && id.length > 20);
   const isFootballMatch = id?.startsWith("football-") || id?.startsWith("f") && !isCricketMatch;
+
+  const { lineupData: fotmobLineups } = useFotmobLineups(isCricketMatch ? undefined : id);
 
   // ── Cricket Hooks ──
   const {
@@ -1563,16 +1568,38 @@ const MatchDetails = () => {
                 <div className="bg-card border border-border rounded-[2.5rem] p-4 md:p-8 overflow-hidden relative">
                     <FootballPitchLineup 
                         homeTeam={{
-                            name: match.homeTeam?.name || "Team 1",
+                            name: match.homeTeam?.name || fotmobLineups?.homeTeam?.name || "Team 1",
                             logo: match.homeTeam?.logo,
-                            primaryColor: match.homeTeam?.primaryColor || '#2563eb'
+                            primaryColor: match.homeTeam?.primaryColor || '#2563eb',
+                            coach: fotmobLineups?.homeTeam?.coach ? { name: fotmobLineups.homeTeam.coach.name } : undefined
                         }}
                         awayTeam={{
-                            name: match.awayTeam?.name || "Team 2",
+                            name: match.awayTeam?.name || fotmobLineups?.awayTeam?.name || "Team 2",
                             logo: match.awayTeam?.logo,
-                            primaryColor: match.awayTeam?.primaryColor || '#ea580c'
+                            primaryColor: match.awayTeam?.primaryColor || '#ea580c',
+                            coach: fotmobLineups?.awayTeam?.coach ? { name: fotmobLineups.awayTeam.coach.name } : undefined
                         }}
-                        homePlayers={[
+                        homePlayers={
+                            fotmobLineups?.homeTeam?.starters ? [
+                                ...fotmobLineups.homeTeam.starters.map((p: any) => ({
+                                    id: p.id.toString(),
+                                    name: p.name,
+                                    role: p.positionId === 11 ? 'Goalkeeper' : p.positionId >= 12 && p.positionId <= 14 ? 'Defender' : p.positionId >= 15 && p.positionId <= 17 ? 'Midfielder' : 'Forward',
+                                    number: p.shirtNumber,
+                                    isSubstitute: false,
+                                    rating: p.rating,
+                                    events: summarizePlayerEvents(p.name, match?.events || [], parseInt(match.awayScore as string) || 0)
+                                })),
+                                ...(fotmobLineups.homeTeam.subs || []).map((p: any) => ({
+                                    id: p.id.toString(),
+                                    name: p.name,
+                                    role: p.positionId === 11 ? 'Goalkeeper' : p.positionId >= 12 && p.positionId <= 14 ? 'Defender' : p.positionId >= 15 && p.positionId <= 17 ? 'Midfielder' : 'Forward',
+                                    number: p.shirtNumber,
+                                    isSubstitute: true,
+                                    rating: p.rating,
+                                    events: summarizePlayerEvents(p.name, match?.events || [], parseInt(match.awayScore as string) || 0)
+                                }))
+                            ] : [
                             ...(match.lineups?.home?.startXI || match.lineups?.home?.startingXI || match.lineups?.home?.players || match.details?.lineups?.home?.startXI || match.details?.lineups?.home?.startingXI || match.details?.lineups?.home?.players || []).map((p: any) => {
                                 const isString = typeof p === 'string';
                                 const name = isString ? p : (p.player?.name || p.name || 'Unknown');
@@ -1600,7 +1627,27 @@ const MatchDetails = () => {
                                 };
                             })
                         ]}
-                        awayPlayers={[
+                        awayPlayers={
+                            fotmobLineups?.awayTeam?.starters ? [
+                                ...fotmobLineups.awayTeam.starters.map((p: any) => ({
+                                    id: p.id.toString(),
+                                    name: p.name,
+                                    role: p.positionId === 11 ? 'Goalkeeper' : p.positionId >= 12 && p.positionId <= 14 ? 'Defender' : p.positionId >= 15 && p.positionId <= 17 ? 'Midfielder' : 'Forward',
+                                    number: p.shirtNumber,
+                                    isSubstitute: false,
+                                    rating: p.rating,
+                                    events: summarizePlayerEvents(p.name, match?.events || [], parseInt(match.homeScore as string) || 0)
+                                })),
+                                ...(fotmobLineups.awayTeam.subs || []).map((p: any) => ({
+                                    id: p.id.toString(),
+                                    name: p.name,
+                                    role: p.positionId === 11 ? 'Goalkeeper' : p.positionId >= 12 && p.positionId <= 14 ? 'Defender' : p.positionId >= 15 && p.positionId <= 17 ? 'Midfielder' : 'Forward',
+                                    number: p.shirtNumber,
+                                    isSubstitute: true,
+                                    rating: p.rating,
+                                    events: summarizePlayerEvents(p.name, match?.events || [], parseInt(match.homeScore as string) || 0)
+                                }))
+                            ] : [
                             ...(match.lineups?.away?.startXI || match.lineups?.away?.startingXI || match.lineups?.away?.players || match.details?.lineups?.away?.startXI || match.details?.lineups?.away?.startingXI || match.details?.lineups?.away?.players || []).map((p: any) => {
                                 const isString = typeof p === 'string';
                                 const name = isString ? p : (p.player?.name || p.name || 'Unknown');
@@ -1628,8 +1675,8 @@ const MatchDetails = () => {
                                 };
                             })
                         ]}
-                        homeFormation={match.lineups?.home?.formation || match.details?.lineups?.home?.formation || '4-3-3'}
-                        awayFormation={match.lineups?.away?.formation || match.details?.lineups?.away?.formation || '4-3-3'}
+                        homeFormation={fotmobLineups?.homeTeam?.formation || match.lineups?.home?.formation || match.details?.lineups?.home?.formation || "4-4-2"}
+                        awayFormation={fotmobLineups?.awayTeam?.formation || match.lineups?.away?.formation || match.details?.lineups?.away?.formation || "4-3-3"}
                     />
                 </div>
               ) : (cbSquadsField.loading || matchInfoField.loading) ? (

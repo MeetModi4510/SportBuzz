@@ -3,14 +3,15 @@ import { useFootballSquads, useFotmobSquad, FootballPlayer, FotmobPlayer } from 
 
 interface FootballSidebarProps {
     activePlayerId: string | null;
+    initialTeamName?: string;
     onSelectPlayer: (player: FootballPlayer & { country: string }) => void;
 }
 
-export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSidebarProps) {
+export function FootballSidebar({ activePlayerId, initialTeamName, onSelectPlayer }: FootballSidebarProps) {
     const { data: squadData } = useFootballSquads();
     
     // Default to a popular team to start if available
-    const [selectedTeamName, setSelectedTeamName] = useState<string>('Argentina');
+    const [selectedTeamName, setSelectedTeamName] = useState<string>(initialTeamName || 'Argentina');
     const { data: fotmobPlayers, isLoading } = useFotmobSquad(selectedTeamName);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -44,7 +45,7 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                 <div className="relative z-30 w-fit flex-shrink-0">
                     <div 
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all shadow-lg h-[88px] min-w-[220px] w-fit"
+                        className="dark:bg-white/5 bg-slate-50 backdrop-blur-xl border dark:border-white/10 border-slate-200 rounded-2xl p-4 flex items-center justify-between cursor-pointer dark:hover:bg-white/10 hover:bg-slate-100 dark:hover:border-white/20 hover:border-slate-300 transition-all shadow-lg h-[88px] min-w-[220px] w-fit"
                     >
                         {selectedRegionObj ? (
                             <div className="flex items-center gap-4 pr-4">
@@ -53,15 +54,15 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                                 </div>
                                 <div>
                                     <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-0.5">National Squad</p>
-                                    <p className="text-white font-black text-base whitespace-nowrap">{selectedRegionObj.name}</p>
+                                    <p className="dark:text-white text-slate-800 font-black text-base whitespace-nowrap">{selectedRegionObj.name}</p>
                                 </div>
                             </div>
                         ) : (
                             <div className="flex items-center gap-4 pr-4">
-                                <div className="w-10 h-7 bg-slate-800 animate-pulse rounded-[4px]" />
+                                <div className="w-10 h-7 dark:bg-slate-800 bg-slate-200 animate-pulse rounded-[4px]" />
                                 <div>
-                                    <div className="w-20 h-3 bg-slate-800 animate-pulse mb-1 rounded" />
-                                    <div className="w-16 h-4 bg-slate-700 animate-pulse rounded" />
+                                    <div className="w-20 h-3 dark:bg-slate-800 bg-slate-200 animate-pulse mb-1 rounded" />
+                                    <div className="w-16 h-4 dark:bg-slate-700 bg-slate-300 animate-pulse rounded" />
                                 </div>
                             </div>
                         )}
@@ -71,7 +72,7 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                     </div>
 
                     {isDropdownOpen && (
-                        <div className="absolute top-full mt-3 left-0 w-full bg-[#0B1120]/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.7)] z-50 max-h-[400px] overflow-y-auto custom-scrollbar p-2">
+                        <div className="absolute top-full mt-3 left-0 w-full dark:bg-[#0B1120]/95 bg-white/95 backdrop-blur-3xl border dark:border-white/10 border-slate-200 rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.7)] z-50 max-h-[400px] overflow-y-auto custom-scrollbar p-2">
                             {regions.map(r => (
                                 <div 
                                     key={r.id}
@@ -79,12 +80,12 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                                         setSelectedTeamName(r.id);
                                         setIsDropdownOpen(false);
                                     }}
-                                    className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer hover:bg-white/10 transition-colors ${selectedTeamName === r.id ? 'bg-blue-500/15 border border-blue-500/30' : 'border border-transparent'}`}
+                                    className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer dark:hover:bg-white/10 hover:bg-slate-50 transition-colors ${selectedTeamName === r.id ? 'bg-blue-500/15 border border-blue-500/30' : 'border border-transparent'}`}
                                 >
                                     <div className="w-10 flex justify-center items-center flex-shrink-0">
                                         <img src={r.flag} alt={r.name} className="w-10 h-7 object-cover shadow-sm rounded-[4px]" />
                                     </div>
-                                    <span className={`font-bold text-sm tracking-wide whitespace-nowrap ${selectedTeamName === r.id ? 'text-blue-400' : 'text-slate-200'}`}>{r.name}</span>
+                                    <span className={`font-bold text-sm tracking-wide whitespace-nowrap ${selectedTeamName === r.id ? 'text-blue-400' : 'dark:text-slate-200 text-slate-700'}`}>{r.name}</span>
                                 </div>
                             ))}
                         </div>
@@ -95,7 +96,7 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                 <div className="flex-1 flex items-center gap-4 overflow-x-auto pb-4 pt-2 custom-scrollbar pr-4 hide-scrollbar">
                     {isLoading && (
                         <div className="flex items-center justify-center w-full h-[140px] text-zinc-500 gap-3">
-                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                            <div className="w-5 h-5 border-2 dark:border-white/20 border-slate-300 dark:border-t-white border-t-slate-800 rounded-full animate-spin"></div>
                             <span className="text-xs font-medium tracking-[0.2em] uppercase">Syncing Roster</span>
                         </div>
                     )}
@@ -148,10 +149,10 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                                                     onClick={() => onSelectPlayer({ ...player, country: selectedTeamName })}
                                                     className="group flex-shrink-0 flex flex-col items-center gap-3 w-[72px] md:w-[88px] cursor-pointer"
                                                 >
-                                                    <div className={`relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden transition-all duration-500 bg-[#0B1120] flex items-center justify-center ${
+                                                    <div className={`relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden transition-all duration-500 dark:bg-[#0B1120] bg-slate-100 flex items-center justify-center ${
                                                         isActive 
-                                                            ? 'ring-2 ring-white ring-offset-4 ring-offset-[#0A0A0B] shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-105 z-10' 
-                                                            : 'ring-1 ring-white/10 opacity-70 group-hover:opacity-100 group-hover:ring-white/30 group-hover:scale-105'
+                                                            ? 'ring-2 dark:ring-white ring-blue-500 dark:ring-offset-[#0A0A0B] ring-offset-white shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-105 z-10' 
+                                                            : 'ring-1 dark:ring-white/10 ring-slate-200 opacity-70 group-hover:opacity-100 dark:group-hover:ring-white/30 group-hover:ring-slate-300 group-hover:scale-105'
                                                     }`}>
                                                         {/* Blurred Flag Background */}
                                                         {selectedRegionObj && (
@@ -181,7 +182,7 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                                                                     }}
                                                                 />
                                                             ) : (
-                                                                <div className="w-full h-full flex items-center justify-center bg-black/40 text-white font-black text-xl tracking-widest drop-shadow-md">
+                                                                <div className="w-full h-full flex items-center justify-center dark:bg-black/40 bg-slate-200 dark:text-white text-slate-600 font-black text-xl tracking-widest drop-shadow-md">
                                                                     {(() => {
                                                                         const parts = player.name.split(' ');
                                                                         if (parts.length > 1) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
@@ -194,8 +195,8 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                                                         <div className="absolute bottom-0 w-full flex justify-center pb-1 z-20">
                                                             <div className={`px-2 py-[1px] rounded-full text-[9px] font-black backdrop-blur-md border ${
                                                                 isActive 
-                                                                    ? 'bg-white text-black border-white' 
-                                                                    : 'bg-black/60 border-white/20 text-white'
+                                                                    ? 'dark:bg-white bg-blue-500 dark:text-black text-white dark:border-white border-blue-500' 
+                                                                    : 'dark:bg-black/60 bg-white/80 dark:border-white/20 border-slate-200 dark:text-white text-slate-600'
                                                             }`}>
                                                                 {stableOVR}
                                                             </div>
@@ -203,7 +204,7 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                                                     </div>
                                                     
                                                     <span className={`text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-center w-full truncate transition-colors ${
-                                                        isActive ? 'text-white drop-shadow-md' : 'text-zinc-500 group-hover:text-zinc-300'
+                                                        isActive ? 'dark:text-white text-slate-800 drop-shadow-md' : 'text-zinc-500 dark:group-hover:text-zinc-300 group-hover:text-slate-800'
                                                     }`}>
                                                         {player.name.split(' ').pop()}
                                                     </span>
@@ -212,7 +213,7 @@ export function FootballSidebar({ activePlayerId, onSelectPlayer }: FootballSide
                                         })}
                                     </div>
                                     {groupIdx < groups.length - 1 && groups[groupIdx + 1].players.length > 0 && (
-                                        <div className="w-[1px] h-16 bg-white/[0.05] ml-2 mr-2 rounded-full shrink-0"></div>
+                                        <div className="w-[1px] h-16 dark:bg-white/[0.05] bg-slate-200 ml-2 mr-2 rounded-full shrink-0"></div>
                                     )}
                                 </React.Fragment>
                             );

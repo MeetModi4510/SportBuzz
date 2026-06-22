@@ -52,6 +52,7 @@
     "dotenv": "^17.2.3",
     "embla-carousel-react": "^8.6.0",
     "fotmob": "^2.4.1",
+    "framer-motion": "^12.40.0",
     "got-scraping": "^4.2.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.462.0",

@@ -504,7 +504,7 @@ export function FootballTopStats() {
                           : "text-muted-foreground/60 hover:text-foreground/80"
                       )}
                     >
-                      {label}
+                      {label.toLowerCase() === "fotmob rating" ? "Average rating" : label}
                     </button>
                   );
                 })

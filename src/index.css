@@ -398,3 +398,31 @@
   animation: spinY 5s linear infinite;
   transform-style: preserve-3d;
 }
+
+/* Premium Custom Horizontal Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-button {
+  display: none; /* Hide the ugly arrows */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: hsl(var(--foreground) / 0.05);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.3), transparent);
+  border-radius: 10px;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, hsl(var(--foreground) / 0.1), hsl(var(--foreground) / 0.5), hsl(var(--foreground) / 0.1));
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--foreground) / 0.3) transparent;
+}

@@ -47,15 +47,15 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                 <div className="relative z-30 w-fit flex-shrink-0">
                     <div 
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all shadow-lg h-[88px] min-w-[220px] w-fit"
+                        className="dark:bg-white/5 bg-slate-50 backdrop-blur-xl border dark:border-white/10 border-slate-200 rounded-2xl p-4 flex items-center justify-between cursor-pointer dark:hover:bg-white/10 hover:bg-slate-100 dark:hover:border-white/20 hover:border-slate-300 transition-all shadow-lg h-[88px] min-w-[220px] w-fit"
                     >
                         <div className="flex items-center gap-4 pr-4">
-                            <div className={`w-10 h-7 overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700/50 shadow-sm ${selectedRegionObj.name.toLowerCase().includes('west indies') ? "rounded-full p-0.5 bg-white/10 object-contain" : "rounded-[4px]"}`}>
+                            <div className={`w-10 h-7 overflow-hidden dark:bg-slate-800 bg-slate-200 flex items-center justify-center border dark:border-slate-700/50 border-slate-300 shadow-sm ${selectedRegionObj.name.toLowerCase().includes('west indies') ? "rounded-full p-0.5 dark:bg-white/10 bg-slate-300 object-contain" : "rounded-[4px]"}`}>
                                 <img src={selectedRegionObj.flag} alt="Region" className={`w-full h-full ${selectedRegionObj.name.toLowerCase().includes('west indies') ? 'object-contain' : 'object-cover'}`} />
                             </div>
                             <div>
-                                <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-0.5">National Squad</p>
-                                <p className="text-white font-black text-base whitespace-nowrap">{selectedRegionObj.name}</p>
+                                <p className="text-[10px] dark:text-slate-400 text-slate-500 font-bold tracking-widest uppercase mb-0.5">National Squad</p>
+                                <p className="dark:text-white text-slate-800 font-black text-base whitespace-nowrap">{selectedRegionObj.name}</p>
                             </div>
                         </div>
                         <svg className={`w-5 h-5 text-slate-400 transition-transform flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -64,7 +64,7 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                     </div>
 
                     {isDropdownOpen && (
-                        <div className="absolute top-full mt-3 left-0 w-full bg-[#0B1120]/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.7)] z-50 max-h-[400px] overflow-y-auto custom-scrollbar p-2">
+                        <div className="absolute top-full mt-3 left-0 w-full dark:bg-[#0B1120]/95 bg-white/95 backdrop-blur-3xl border dark:border-white/10 border-slate-200 rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.7)] dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.7)] shadow-xl z-50 max-h-[400px] overflow-y-auto custom-scrollbar p-2">
                             {regions.map(r => (
                                 <div 
                                     key={r.id}
@@ -72,12 +72,12 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                                         setSelectedTeam(r.id);
                                         setIsDropdownOpen(false);
                                     }}
-                                    className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer hover:bg-white/10 transition-colors ${selectedTeam === r.id ? 'bg-blue-500/15 border border-blue-500/30' : 'border border-transparent'}`}
+                                    className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer dark:hover:bg-white/10 hover:bg-slate-100 transition-colors ${selectedTeam === r.id ? 'dark:bg-blue-500/15 bg-blue-50 dark:border-blue-500/30 border-blue-200' : 'border border-transparent'}`}
                                 >
                                     <div className="w-8 flex justify-center items-center flex-shrink-0">
-                                        <img src={r.flag} alt={r.name} className={`w-8 h-5 object-cover shadow-sm ${r.name.toLowerCase().includes('west indies') ? "rounded-full bg-white/10" : "rounded-[3px]"}`} />
+                                        <img src={r.flag} alt={r.name} className={`w-8 h-5 object-cover shadow-sm ${r.name.toLowerCase().includes('west indies') ? "rounded-full dark:bg-white/10 bg-slate-200" : "rounded-[3px]"}`} />
                                     </div>
-                                    <span className={`font-bold text-sm tracking-wide whitespace-nowrap ${selectedTeam === r.id ? 'text-blue-400' : 'text-slate-200'}`}>{r.name}</span>
+                                    <span className={`font-bold text-sm tracking-wide whitespace-nowrap ${selectedTeam === r.id ? 'dark:text-blue-400 text-blue-600' : 'dark:text-slate-200 text-slate-700'}`}>{r.name}</span>
                                 </div>
                             ))}
                         </div>
@@ -139,8 +139,8 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                                                 >
                                                     <div className={`relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden transition-all duration-500 ${
                                                         isActive 
-                                                            ? 'ring-2 ring-white ring-offset-4 ring-offset-[#0A0A0B] shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-105 z-10' 
-                                                            : 'ring-1 ring-white/10 opacity-50 group-hover:opacity-100 group-hover:ring-white/30 group-hover:scale-105'
+                                                            ? 'ring-2 dark:ring-white ring-blue-500 ring-offset-4 dark:ring-offset-[#0A0A0B] ring-offset-white shadow-[0_0_30px_rgba(255,255,255,0.2)] dark:shadow-[0_0_30px_rgba(255,255,255,0.2)] shadow-blue-500/20 scale-105 z-10' 
+                                                            : 'ring-1 dark:ring-white/10 ring-slate-300 opacity-50 group-hover:opacity-100 dark:group-hover:ring-white/30 group-hover:ring-slate-400 group-hover:scale-105'
                                                     }`}>
                                                         {highResUrl ? (
                                                             <img 
@@ -149,7 +149,7 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                                                                 className="w-full h-full object-cover object-top" 
                                                             />
                                                         ) : (
-                                                            <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
+                                                            <div className="w-full h-full dark:bg-zinc-900 bg-slate-200 flex items-center justify-center">
                                                                 <svg className="w-8 h-8 text-zinc-700" fill="currentColor" viewBox="0 0 24 24">
                                                                     <path d="M12 14c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.315 0-10 1.672-10 5v1h20v-1c0-3.328-6.685-5-10-5z" />
                                                                 </svg>
@@ -159,8 +159,8 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                                                         <div className="absolute bottom-0 w-full flex justify-center pb-1">
                                                             <div className={`px-2 py-[1px] rounded-full text-[9px] font-black backdrop-blur-md border ${
                                                                 isActive 
-                                                                    ? 'bg-white text-black border-white' 
-                                                                    : 'bg-black/60 border-white/20 text-white'
+                                                                    ? 'dark:bg-white bg-blue-500 dark:text-black text-white dark:border-white border-blue-500' 
+                                                                    : 'dark:bg-black/60 bg-white/80 dark:border-white/20 border-slate-300 dark:text-white text-slate-800'
                                                             }`}>
                                                                 {stableOVR}
                                                             </div>
@@ -168,7 +168,7 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                                                     </div>
                                                     
                                                     <span className={`text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-center w-full truncate transition-colors ${
-                                                        isActive ? 'text-white drop-shadow-md' : 'text-zinc-500 group-hover:text-zinc-300'
+                                                        isActive ? 'dark:text-white text-slate-900 drop-shadow-md' : 'text-zinc-500 dark:group-hover:text-zinc-300 group-hover:text-slate-700'
                                                     }`}>
                                                         {player.name.split(' ').pop()}
                                                     </span>
@@ -177,7 +177,7 @@ export function CricketSidebar({ activePlayerId, onSelectPlayer }: CricketSideba
                                         })}
                                     </div>
                                     {groupIdx < groups.length - 1 && groups[groupIdx + 1].players.length > 0 && (
-                                        <div className="w-[1px] h-16 bg-white/[0.05] ml-2 mr-2 rounded-full shrink-0"></div>
+                                        <div className="w-[1px] h-16 dark:bg-white/[0.05] bg-slate-200 ml-2 mr-2 rounded-full shrink-0"></div>
                                     )}
                                 </React.Fragment>
                             );

@@ -309,12 +309,12 @@ export function FootballStandings() {
                 if (!teams) return null;
 
                 return (
-                  <div key={activeGroupData.leagueName} className="rounded-2xl border border-border bg-[#121316] backdrop-blur-sm overflow-hidden flex flex-col shadow-lg relative">
+                  <div key={activeGroupData.leagueName} className="rounded-2xl border border-border bg-card backdrop-blur-sm overflow-hidden flex flex-col shadow-lg relative">
                     {/* Subtle Top Gradient */}
                     <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
                     
                     {/* Group Header */}
-                    <div className="px-5 py-4 border-b border-border/50 bg-[#1A1C20] flex items-center justify-between">
+                    <div className="px-5 py-4 border-b border-border/50 bg-muted/20 flex items-center justify-between">
                       <span className="font-black text-foreground tracking-tight text-lg">{activeGroupData.leagueName}</span>
                       <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">
                         Top 2 Advance
@@ -324,7 +324,7 @@ export function FootballStandings() {
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
-                          <tr className="text-xs font-black text-muted-foreground/50 uppercase tracking-widest border-b border-border/30 bg-[#121316]">
+                          <tr className="text-xs font-black text-muted-foreground/50 uppercase tracking-widest border-b border-border/30 bg-muted/10">
                             <th className="pl-4 pr-3 py-3 text-left w-10">#</th>
                             <th className="px-3 py-3 text-left min-w-[150px]">Team</th>
                             <th className="px-3 py-3 text-center">PL</th>
@@ -399,7 +399,7 @@ export function FootballStandings() {
             </div>
             
             {/* World Cup Footer */}
-            <div className="px-5 py-4 rounded-2xl border border-border/50 bg-[#121316] flex flex-col xl:flex-row justify-between items-center gap-4 shadow-sm">
+            <div className="px-5 py-4 rounded-2xl border border-border/50 bg-card flex flex-col xl:flex-row justify-between items-center gap-4 shadow-sm">
               <div className="flex items-center gap-4 shrink-0">
                 <span className="flex items-center gap-2 text-[10px] sm:text-xs font-medium text-muted-foreground/80">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Advances to Knockout Stage

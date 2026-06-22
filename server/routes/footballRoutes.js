@@ -122,6 +122,85 @@ router.get('/proxy/*', async (req, res) => {
     }
 });
 
+// ─── FOTMOB MATCH DETAILS ──────────────────────────────────────────────────────
+router.get('/fotmob-matchDetails/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) return res.status(400).json({ success: false, message: 'Match ID is required' });
+        
+        const matchDetails = await fotmobService.fetchMatchDetails(id);
+        if (!matchDetails) {
+            return res.status(404).json({ success: false, message: 'Match details not found or failed to fetch' });
+        }
+        res.json({ success: true, data: matchDetails });
+    } catch (error) {
+        console.error(`Error in /fotmob-matchDetails/${req.params.id}:`, error);
+        res.status(500).json({ success: false, message: 'Server Error fetching fotmob match details' });
+    }
+});
+
+// ─── FOTMOB RESOLVE MATCH ID ──────────────────────────────────────────────────
+// GET /api/football/fotmob-resolveMatchId?homeTeam=Spain&awayTeam=Saudi%20Arabia
+router.get('/fotmob-resolveMatchId', async (req, res) => {
+    try {
+        const { homeTeam, awayTeam } = req.query;
+        if (!homeTeam || !awayTeam) {
+            return res.status(400).json({ success: false, message: 'homeTeam and awayTeam query params required' });
+        }
+
+        const term = encodeURIComponent(`${homeTeam} ${awayTeam}`);
+        const url = `https://apigw.fotmob.com/searchapi/suggest?term=${term}`;
+        console.log(`[FotmobResolve] Searching: ${url}`);
+
+        const response = await axios.get(url, {
+            headers: { 
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept': 'application/json'
+            },
+            timeout: 10000
+        });
+
+        const matchSuggest = response.data?.matchSuggest;
+        if (!matchSuggest || matchSuggest.length === 0) {
+            return res.status(404).json({ success: false, message: 'No match found on Fotmob' });
+        }
+
+        // Find the best match — prefer one with both team names
+        const homeNorm = homeTeam.toLowerCase();
+        const awayNorm = awayTeam.toLowerCase();
+        let bestMatch = null;
+        for (const group of matchSuggest) {
+            for (const opt of (group.options || [])) {
+                const p = opt.payload;
+                const hN = (p.homeName || '').toLowerCase();
+                const aN = (p.awayName || '').toLowerCase();
+                if ((hN.includes(homeNorm) || homeNorm.includes(hN)) &&
+                    (aN.includes(awayNorm) || awayNorm.includes(aN))) {
+                    bestMatch = p;
+                    break;
+                }
+            }
+            if (bestMatch) break;
+        }
+
+        // Fallback: just take first option
+        if (!bestMatch) {
+            bestMatch = matchSuggest[0]?.options?.[0]?.payload;
+        }
+
+        if (!bestMatch || !bestMatch.id) {
+            return res.status(404).json({ success: false, message: 'Could not resolve Fotmob match ID' });
+        }
+
+        console.log(`[FotmobResolve] Resolved to Fotmob match ID: ${bestMatch.id} (${bestMatch.homeName} vs ${bestMatch.awayName})`);
+        res.json({ success: true, fotmobMatchId: bestMatch.id, homeName: bestMatch.homeName, awayName: bestMatch.awayName });
+    } catch (error) {
+        console.error('[FotmobResolve] Error:', error.message);
+        res.status(500).json({ success: false, message: 'Error resolving Fotmob match ID' });
+    }
+});
+
+
 // ─── FOTMOB SQUAD DATA ───────────────────────────────────────────────────────
 router.get('/fotmob-squad/:countryName', async (req, res) => {
     try {
@@ -350,22 +429,28 @@ const TRANSFERS_API_HOST = 'free-api-live-football-data.p.rapidapi.com';
 const TRANSFERS_CACHE_MS = 2 * 24 * 60 * 60 * 1000; // 2 days
 
 const PRIORITY_CLUBS = [
-    // Premier League
-    'arsenal', 'aston villa', 'bournemouth', 'brentford', 'brighton', 'chelsea', 'crystal palace', 'everton', 'fulham', 'liverpool', 'man city', 'manchester city', 'man united', 'manchester united', 'newcastle', 'nottm forest', 'nottingham forest', 'tottenham', 'spurs', 'west ham', 'wolves',
-    // La Liga
-    'athletic club', 'atletico madrid', 'barcelona', 'real madrid', 'real sociedad', 'sevilla', 'valencia', 'villarreal', 'girona', 'betis',
-    // Serie A
-    'ac milan', 'inter', 'juventus', 'napoli', 'roma', 'lazio', 'atalanta', 'fiorentina', 'bologna',
-    // Bundesliga
-    'bayern munich', 'dortmund', 'bayer leverkusen', 'rb leipzig', 'eintracht frankfurt', 'stuttgart',
-    // Ligue 1
-    'psg', 'paris saint-germain', 'monaco', 'marseille', 'lyon', 'lille', 'lens',
-    // Others
-    'al nassr', 'al hilal', 'al ittihad', 'al ahli',
-    'inter miami', 'lafc', 'la galaxy',
-    'ajax', 'psv', 'feyenoord',
-    'porto', 'benfica', 'sporting cp', 'sporting lisbon',
-    'celtic', 'rangers', 'galatasaray', 'fenerbahce', 'besiktas'
+  // Premier League (First Division Only)
+  'arsenal', 'aston villa', 'bournemouth', 'brentford', 'brighton', 'chelsea', 'crystal palace', 'everton', 'fulham', 'liverpool', 'man city', 'manchester city', 'man united', 'manchester united', 'newcastle', 'nottm forest', 'nottingham forest', 'tottenham', 'spurs', 'west ham', 'wolves', 'leicester', 'southampton',
+  // La Liga (First Division Only)
+  'athletic club', 'atletico madrid', 'barcelona', 'real madrid', 'real sociedad', 'sevilla', 'valencia', 'villarreal', 'girona', 'betis', 'alaves', 'celta vigo', 'getafe', 'las palmas', 'mallorca', 'osasuna', 'rayo vallecano', 'valladolid', 'leganes', 'espanyol',
+  // Serie A (First Division Only)
+  'ac milan', 'inter', 'inter milan', 'juventus', 'napoli', 'roma', 'lazio', 'atalanta', 'fiorentina', 'bologna', 'torino', 'verona', 'genoa', 'lecce', 'udinese', 'empoli', 'cagliari', 'monza', 'como', 'parma', 'venezia',
+  // Bundesliga (First Division Only)
+  'bayern munich', 'bayern', 'dortmund', 'bayer leverkusen', 'leverkusen', 'rb leipzig', 'leipzig', 'eintracht frankfurt', 'stuttgart', 'freiburg', 'hoffenheim', 'werder bremen', 'wolfsburg', 'augsburg', 'mönchengladbach', 'monchengladbach', 'bochum', 'union berlin', 'mainz', 'st pauli', 'holstein kiel', 'heidenheim',
+  // Ligue 1 (First Division Only)
+  'psg', 'paris saint-germain', 'monaco', 'marseille', 'lyon', 'lille', 'lens', 'rennes', 'nice', 'reims', 'toulouse', 'strasbourg', 'montpellier', 'nantes', 'le havre', 'auxerre', 'angers', 'st etienne', 'brest',
+  // MLS
+  'inter miami', 'lafc', 'la galaxy', 'columbus crew', 'cincinnati', 'philadelphia union', 'seattle sounders', 'atlanta united', 'new york city fc', 'nycfc', 'new york red bulls', 'orlando city', 'nashville', 'portland timbers', 'portland hearts of pine', 'portland', 'houston dynamo', 'houston', 'real salt lake', 'sporting kansas city', 'dallas', 'austin', 'san jose earthquakes', 'toronto fc', 'montreal', 'vancouver whitecaps', 'chicago fire', 'colorado rapids', 'dc united', 'minnesota united', 'new england revolution', 'st. louis city', 'charlotte fc', 'san diego',
+  // Saudi Pro
+  'al nassr', 'al hilal', 'al ittihad', 'al ahli', 'al shabab', 'al taawoun', 'al ettifaq', 'al fateh', 'al wehda', 'al fayha', 'al riyadh', 'damac', 'al okhdood', 'al qadsiah', 'al kholood',
+  // Eredivisie
+  'ajax', 'psv', 'feyenoord', 'az alkmaar', 'twente', 'sparta rotterdam', 'utrecht', 'heerenveen', 'nec nijmegen', 'go ahead eagles', 'pec zwolle', 'almere city', 'heracles', 'rkc waalwijk', 'fortuna sittard', 'nac breda', 'willem ii', 'groningen',
+  // Belgian Pro League
+  'club brugge', 'anderlecht', 'union sg', 'antwerp', 'genk', 'gent', 'standard liege', 'mechelen', 'cercle brugge', 'charleroi', 'st truiden', 'westerlo', 'oh leuven', 'kortrijk', 'dender', 'beerschot',
+  // ISL
+  'mohun bagan', 'mumbai city', 'fc goa', 'odisha', 'kerala blasters', 'chennaiyin', 'northeast united', 'punjab fc', 'east bengal', 'bengaluru fc', 'jamshedpur', 'hyderabad', 'mohammedan',
+  // Others
+  'porto', 'benfica', 'sporting cp', 'sporting lisbon', 'celtic', 'rangers', 'galatasaray', 'fenerbahce', 'besiktas'
 ];
 
 async function fetchAndStoreTransfers() {
@@ -377,18 +462,32 @@ async function fetchAndStoreTransfers() {
         'x-rapidapi-host': TRANSFERS_API_HOST,
     };
 
-    // Fetch from both endpoints
-    const [allRes, mvRes] = await Promise.all([
-        axios.get(`https://${TRANSFERS_API_HOST}/football-get-all-transfers`, { params: { page: 1 }, headers, timeout: 10000 }).catch(e => { console.error('All transfers error:', e.message); return { data: null }; }),
-        axios.get(`https://${TRANSFERS_API_HOST}/football-get-market-value-transfers`, { params: { page: 1 }, headers, timeout: 10000 }).catch(e => { console.error('MV transfers error:', e.message); return { data: null }; })
-    ]);
+    const combined = [];
+    const delay = ms => new Promise(res => setTimeout(res, ms));
 
-    const allRaw = allRes.data?.response?.transfers || [];
-    const mvRaw = mvRes.data?.response?.transfers || [];
+    // Fetch 20 pages sequentially to avoid 429 Rate Limits and get a deep backlog
+    for (let page = 1; page <= 20; page++) {
+        try {
+            console.log(`[Transfers] Fetching page ${page} of 20...`);
+            const [allRes, mvRes] = await Promise.all([
+                axios.get(`https://${TRANSFERS_API_HOST}/football-get-all-transfers`, { params: { page }, headers, timeout: 15000 }).catch(e => { console.error(`All transfers P${page} error:`, e.message); return { data: null }; }),
+                axios.get(`https://${TRANSFERS_API_HOST}/football-get-market-value-transfers`, { params: { page }, headers, timeout: 15000 }).catch(e => { console.error(`MV transfers P${page} error:`, e.message); return { data: null }; })
+            ]);
 
-    const combined = [...(Array.isArray(allRaw) ? allRaw : []), ...(Array.isArray(mvRaw) ? mvRaw : [])];
+            const allRaw = allRes.data?.response?.transfers || [];
+            const mvRaw = mvRes.data?.response?.transfers || [];
 
-    if (combined.length === 0) throw new Error('Empty transfers response from API');
+            combined.push(...(Array.isArray(allRaw) ? allRaw : []));
+            combined.push(...(Array.isArray(mvRaw) ? mvRaw : []));
+
+            // Wait 1 second before requesting the next page to prevent 429 Too Many Requests
+            if (page < 20) await delay(1000);
+        } catch (err) {
+            console.error(`[Transfers] Failed loop on page ${page}:`, err.message);
+        }
+    }
+
+    if (combined.length === 0) throw new Error('Empty transfers response from API after all pages');
 
     // Deduplicate based on playerId + transferDate
     const uniqueTransfers = [];
@@ -1697,7 +1796,20 @@ router.get('/v3/image/team', async (req, res) => {
 // TheSportsDB Player Cutout
 router.get('/v3/image/player', async (req, res) => {
     try {
-        const { name } = req.query;
+        const { name, fotmobId } = req.query;
+        if (fotmobId) {
+            const fotmobUrl = `https://images.fotmob.com/image_resources/playerimages/${fotmobId}.png`;
+            try {
+                const imgRes = await axios.get(fotmobUrl, { responseType: 'arraybuffer', timeout: 5000 });
+                const base64 = Buffer.from(imgRes.data).toString('base64');
+                const contentType = imgRes.headers['content-type'] || 'image/png';
+                const dataUri = `data:${contentType};base64,${base64}`;
+                return res.json({ success: true, base64: dataUri, url: fotmobUrl });
+            } catch (e) {
+                return res.status(404).json({ success: false, message: 'Fotmob image not found' });
+            }
+        }
+        
         const imageUrl = await thesportsdbService.getPlayerCutout(name);
         if (imageUrl) {
             res.json({ success: true, url: imageUrl });

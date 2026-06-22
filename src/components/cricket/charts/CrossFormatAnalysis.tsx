@@ -22,15 +22,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         const title = isNumericLabel ? payload[0]?.payload?.name : (label || payload[0]?.payload?.name || 'Metric');
 
         return (
-            <div className="bg-[#09090b] border border-white/[0.1] p-4 rounded-xl shadow-2xl z-50">
+            <div className="dark:bg-[#09090b] bg-white border dark:border-white/[0.1] border-slate-200 p-4 rounded-xl shadow-2xl z-50">
                 <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-3">{title}</p>
                 {payload.map((entry: any, index: number) => {
                     if (entry.dataKey === 'bgTrack') return null;
                     return (
-                        <div key={index} className="flex items-center gap-3 text-sm font-medium text-white mb-2 last:mb-0">
+                        <div key={index} className="flex items-center gap-3 text-sm font-medium dark:text-white text-slate-800 mb-2 last:mb-0">
                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color || entry.payload?.fill || '#fff' }}></div>
-                            <span className="text-zinc-400">{entry.name}:</span>
-                            <span style={{ color: entry.color || entry.payload?.fill || '#fff' }}>{entry.value}</span>
+                            <span className="dark:text-zinc-400 text-zinc-600">{entry.name}:</span>
+                            <span style={{ color: entry.color || entry.payload?.fill || '#000' }}>{entry.value}</span>
                         </div>
                     );
                 })}
@@ -71,7 +71,7 @@ const GaugeChart = ({ format, value, color, max = 200 }: { format: string, value
                 </PieChart>
             </ResponsiveContainer>
             <div className="absolute flex flex-col items-center justify-center top-1/2 mt-1">
-                <span className="text-xl font-bold text-white">{value > 0 ? value.toFixed(1) : '-'}</span>
+                <span className="text-xl font-bold dark:text-white text-slate-800">{value > 0 ? value.toFixed(1) : '-'}</span>
                 <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mt-1 font-bold">{format}</span>
             </div>
         </div>
@@ -111,9 +111,9 @@ export function CrossFormatAnalysis({ stats, skillMode = 'batting' }: CrossForma
     const hasMilestones = data.some(d => d.fifties > 0 || d.hundreds > 0);
 
     return (
-        <div className="relative mt-8 pt-8 border-t border-white/[0.05]">
+        <div className="relative mt-8 pt-8 border-t dark:border-white/[0.05] border-slate-200">
             <div className="relative z-10 flex flex-col mb-8">
-                <h2 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 to-zinc-500 tracking-tight">Performance Matrix</h2>
+                <h2 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r dark:from-zinc-100 dark:to-zinc-500 from-slate-600 to-slate-900 tracking-tight">Performance Matrix</h2>
                 <p className="text-zinc-500 text-[10px] mt-1 font-bold tracking-[0.2em] uppercase">Cross-Format Visual Analysis</p>
             </div>
 
@@ -149,7 +149,7 @@ export function CrossFormatAnalysis({ stats, skillMode = 'batting' }: CrossForma
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 relative z-10">
                 {/* 1. Career Runs Distribution (Donut PieChart) */}
-                <div className="xl:col-span-1 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg">
+                <div className="xl:col-span-1 dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.03] border-slate-200 p-5 rounded-3xl relative overflow-hidden group shadow-lg">
                     <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-4 z-10 relative">{titleRuns}</h4>
                     <div className="h-64 relative flex justify-center items-center">
@@ -172,14 +172,14 @@ export function CrossFormatAnalysis({ stats, skillMode = 'batting' }: CrossForma
                             </PieChart>
                         </ResponsiveContainer>
                         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none">
-                            <span className="text-3xl font-bold text-white tracking-tight">{data.reduce((sum, d) => sum + d.runs, 0).toLocaleString()}</span>
+                            <span className="text-3xl font-bold dark:text-white text-slate-800 tracking-tight">{data.reduce((sum, d) => sum + d.runs, 0).toLocaleString()}</span>
                             <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Total</span>
                         </div>
                     </div>
                 </div>
 
                 {/* 2. Average Radial Rings */}
-                <div className="xl:col-span-1 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg">
+                <div className="xl:col-span-1 dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.03] border-slate-200 p-5 rounded-3xl relative overflow-hidden group shadow-lg">
                     <div className="absolute inset-0 bg-gradient-to-t from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-4 z-10 relative">{titleAvg}</h4>
                     <div className="h-64 relative flex justify-center items-center">
@@ -194,18 +194,18 @@ export function CrossFormatAnalysis({ stats, skillMode = 'batting' }: CrossForma
                             </RadialBarChart>
                         </ResponsiveContainer>
                         {/* Custom Legend */}
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none bg-black/40 p-2 rounded-full backdrop-blur-sm">
-                            <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">AVG</span>
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none dark:bg-black/40 bg-slate-100/80 p-2 rounded-full backdrop-blur-sm">
+                            <span className="text-[10px] dark:text-zinc-400 text-zinc-500 font-bold uppercase tracking-widest">AVG</span>
                         </div>
                     </div>
                 </div>
 
                 {/* 3. Strike Rate Dashboards */}
-                <div className="xl:col-span-2 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden shadow-lg">
+                <div className="xl:col-span-2 dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.03] border-slate-200 p-5 rounded-3xl relative overflow-hidden shadow-lg">
                     <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-6">{titleSR}</h4>
                     <div className="flex flex-col sm:flex-row justify-around gap-6 h-60">
                         {data.map((d, i) => (
-                            <div key={i} className="flex-1 bg-white/[0.01] rounded-2xl border border-white/[0.02] flex flex-col items-center justify-center p-4 relative overflow-hidden group">
+                            <div key={i} className="flex-1 dark:bg-white/[0.01] bg-slate-50 rounded-2xl border dark:border-white/[0.02] border-slate-200 flex flex-col items-center justify-center p-4 relative overflow-hidden group">
                                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 <div className="h-32 w-full mb-4">
                                     <GaugeChart format={d.name} value={d.sr} color={`url(#color${d.name})`} max={d.name === 'Test' ? 100 : 200} />
@@ -217,7 +217,7 @@ export function CrossFormatAnalysis({ stats, skillMode = 'batting' }: CrossForma
 
                 {/* 4. Milestone Frequency (RadarChart) */}
                 {hasMilestones && (
-                    <div className="xl:col-span-1 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg flex flex-col">
+                    <div className="xl:col-span-1 dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.03] border-slate-200 p-5 rounded-3xl relative overflow-hidden group shadow-lg flex flex-col">
                         <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-4 z-10 relative">Milestones (50s & 100s)</h4>
                         <div className="flex-1 min-h-[256px] h-64 relative">
@@ -237,20 +237,20 @@ export function CrossFormatAnalysis({ stats, skillMode = 'batting' }: CrossForma
 
                 {/* 5. Format Runs Distribution Hologram */}
                 {totalRunsAllFormats > 0 && (
-                    <div className="md:col-span-2 xl:col-span-3 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden shadow-lg flex flex-col md:flex-row items-center gap-6">
+                    <div className="md:col-span-2 xl:col-span-3 dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.03] border-slate-200 p-5 rounded-3xl relative overflow-hidden shadow-lg flex flex-col md:flex-row items-center gap-6">
                         <div className="flex-1 min-w-[200px]">
                             <h4 className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] mb-1">FORMAT DISTRIBUTION</h4>
                             <p className="text-[11px] text-zinc-400 mb-4">{isBowling ? 'Runs conceded across formats' : 'Runs scored across formats'}</p>
                             
                             <div className="flex flex-col gap-3 mt-6">
                                 {formatPieData.map((d, idx) => (
-                                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.03]">
+                                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl dark:bg-white/[0.02] bg-slate-50 border dark:border-white/[0.03] border-slate-200">
                                         <div className="flex items-center gap-3">
                                             <div className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: d.fill, color: d.fill }}></div>
-                                            <span className="text-xs text-white font-medium">{d.name}</span>
+                                            <span className="text-xs dark:text-white text-slate-800 font-medium">{d.name}</span>
                                         </div>
                                         <div className="text-right">
-                                            <span className="text-sm font-bold text-white">{d.value.toLocaleString()}</span>
+                                            <span className="text-sm font-bold dark:text-white text-slate-800">{d.value.toLocaleString()}</span>
                                             <span className="text-[10px] text-zinc-500 ml-2">({Math.round((d.value/totalRunsAllFormats)*100)}%)</span>
                                         </div>
                                     </div>
@@ -270,7 +270,7 @@ export function CrossFormatAnalysis({ stats, skillMode = 'batting' }: CrossForma
                                 </PieChart>
                             </ResponsiveContainer>
                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                <span className="text-4xl font-bold text-white tracking-tight">{totalRunsAllFormats.toLocaleString()}</span>
+                                <span className="text-4xl font-bold dark:text-white text-slate-800 tracking-tight">{totalRunsAllFormats.toLocaleString()}</span>
                                 <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-bold mt-2">Total {isBowling ? 'Conceded' : 'Runs'}</span>
                             </div>
                         </div>

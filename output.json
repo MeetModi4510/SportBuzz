@@ -1,0 +1,1269 @@
+{
+  "matchId": 4010196,
+  "lineupType": "standard",
+  "availableFilters": [
+    "match"
+  ],
+  "homeTeam": {
+    "id": 1933,
+    "name": "Başakşehir",
+    "rating": 7.23,
+    "formation": "4-3-3",
+    "starters": [
+      {
+        "id": 814153,
+        "optaId": "233743",
+        "name": "Muhammed Sengezer",
+        "positionId": 11,
+        "usualPlayingPositionId": 0,
+        "shirtNumber": "16",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.1,
+          "y": 0.5,
+          "height": 0.25,
+          "width": 0.2
+        },
+        "verticalLayout": {
+          "x": 0.5,
+          "y": 0.1,
+          "height": 0.2,
+          "width": 1
+        },
+        "performance": {
+          "rating": 7.2,
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Muhammed",
+        "lastName": "Sengezer",
+        "rankings": null
+      },
+      {
+        "id": 172887,
+        "optaId": "61572",
+        "name": "Junior Caicara",
+        "positionId": 32,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "80",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.357,
+          "y": 0.875,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.125,
+          "y": 0.357,
+          "height": 0.2,
+          "width": 0.25
+        },
+        "performance": {
+          "rating": 7.19,
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Junior",
+        "lastName": "Caicara",
+        "rankings": null
+      },
+      {
+        "id": 1057703,
+        "optaId": "420566",
+        "name": "Youssouf Ndayishimiye",
+        "positionId": 34,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "55",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.357,
+          "y": 0.625,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.375,
+          "y": 0.357,
+          "height": 0.2,
+          "width": 0.25
+        },
+        "performance": {
+          "rating": 8.04,
+          "events": [
+            {
+              "type": "assist",
+              "time": 1
+            }
+          ],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Youssouf",
+        "lastName": "Ndayishimiye",
+        "rankings": null
+      },
+      {
+        "id": 792653,
+        "optaId": "240864",
+        "name": "Ahmed Touba",
+        "positionId": 36,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "59",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.357,
+          "y": 0.375,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.625,
+          "y": 0.357,
+          "height": 0.2,
+          "width": 0.25
+        },
+        "performance": {
+          "rating": 7.65,
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Ahmed",
+        "lastName": "Touba",
+        "rankings": null
+      },
+      {
+        "id": 193057,
+        "optaId": "80499",
+        "name": "Hasan Ali Kaldirim",
+        "positionId": 38,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "3",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.357,
+          "y": 0.125,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.875,
+          "y": 0.357,
+          "height": 0.2,
+          "width": 0.25
+        },
+        "performance": {
+          "rating": 7.12,
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Hasan Ali",
+        "lastName": "Kaldirim",
+        "rankings": null
+      },
+      {
+        "id": 119839,
+        "optaId": "69440",
+        "name": "Danijel Aleksic",
+        "positionId": 73,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "8",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.613,
+          "y": 0.79,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.21,
+          "y": 0.613,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 6.54,
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Danijel",
+        "lastName": "Aleksic",
+        "rankings": null
+      },
+      {
+        "id": 38393,
+        "optaId": "39462",
+        "name": "Lucas Biglia",
+        "positionId": 75,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "20",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.613,
+          "y": 0.5,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.5,
+          "y": 0.613,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 7.86,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 76,
+              "type": "subOut",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Lucas",
+        "lastName": "Biglia",
+        "rankings": null
+      },
+      {
+        "id": 777103,
+        "optaId": "232092",
+        "name": "Berkay Özcan",
+        "positionId": 77,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "19",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.613,
+          "y": 0.21,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.79,
+          "y": 0.613,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 6.62,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 58,
+              "type": "subOut",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Berkay",
+        "lastName": "Özcan",
+        "rankings": null
+      },
+      {
+        "id": 186919,
+        "optaId": "78631",
+        "name": "Serdar Gürler",
+        "positionId": 103,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "7",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.87,
+          "y": 0.79,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.21,
+          "y": 0.87,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 9.04,
+          "events": [
+            {
+              "type": "goal",
+              "time": 57
+            },
+            {
+              "type": "goal",
+              "time": 71
+            }
+          ],
+          "substitutionEvents": [
+            {
+              "time": 76,
+              "type": "subOut",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": true
+        },
+        "firstName": "Serdar",
+        "lastName": "Gürler",
+        "rankings": null
+      },
+      {
+        "id": 27696,
+        "optaId": "20046",
+        "name": "Stefano Okaka Chuka",
+        "positionId": 105,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "77",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.87,
+          "y": 0.5,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.5,
+          "y": 0.87,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 6.4,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 58,
+              "type": "subOut",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Stefano Okaka",
+        "lastName": "Chuka",
+        "rankings": null
+      },
+      {
+        "id": 769169,
+        "optaId": "204744",
+        "name": "Mounir Chouiar",
+        "positionId": 107,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "11",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.87,
+          "y": 0.21,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.79,
+          "y": 0.87,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 7.29,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 82,
+              "type": "subOut",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Mounir",
+        "lastName": "Chouiar",
+        "rankings": null
+      }
+    ],
+    "coach": {
+      "id": 24217,
+      "name": "Emre Belözoglu",
+      "usualPlayingPositionId": null,
+      "primaryTeamName": "Başakşehir",
+      "performance": {
+        "events": []
+      },
+      "firstName": "Emre",
+      "lastName": "Belözoglu",
+      "primaryTeamId": 1933,
+      "isCoach": true
+    },
+    "subs": [
+      {
+        "id": 303059,
+        "optaId": "110504",
+        "name": "Bertrand Traoré",
+        "positionId": 0,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "9",
+        "isCaptain": false,
+        "performance": {
+          "rating": 7.6,
+          "events": [
+            {
+              "type": "goal",
+              "time": 90
+            }
+          ],
+          "substitutionEvents": [
+            {
+              "time": 58,
+              "type": "subIn",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Bertrand",
+        "lastName": "Traoré",
+        "rankings": null
+      },
+      {
+        "id": 352023,
+        "optaId": "120285",
+        "name": "Deniz Türüc",
+        "positionId": 0,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "23",
+        "isCaptain": false,
+        "performance": {
+          "rating": 6.38,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 58,
+              "type": "subIn",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Deniz",
+        "lastName": "Türüc",
+        "rankings": null
+      },
+      {
+        "id": 96250,
+        "optaId": "46323",
+        "name": "Mahmut Tekdemir",
+        "positionId": 0,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "21",
+        "isCaptain": false,
+        "performance": {
+          "rating": 6.58,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 76,
+              "type": "subIn",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Mahmut",
+        "lastName": "Tekdemir",
+        "rankings": null
+      },
+      {
+        "id": 744502,
+        "optaId": "226166",
+        "name": "Patryk Szysz",
+        "positionId": 0,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "18",
+        "isCaptain": false,
+        "performance": {
+          "rating": 7,
+          "events": [
+            {
+              "type": "assist",
+              "time": 1
+            }
+          ],
+          "substitutionEvents": [
+            {
+              "time": 76,
+              "type": "subIn",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Patryk",
+        "lastName": "Szysz",
+        "rankings": null
+      },
+      {
+        "id": 36378,
+        "optaId": "37605",
+        "name": "Mesut Özil",
+        "positionId": 0,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "10",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 82,
+              "type": "subIn",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Mesut",
+        "lastName": "Özil",
+        "rankings": null
+      },
+      {
+        "id": 1339815,
+        "optaId": "562534",
+        "name": "Batuhan Celik",
+        "positionId": 0,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "15",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Batuhan",
+        "lastName": "Celik",
+        "rankings": null
+      },
+      {
+        "id": 750056,
+        "optaId": "222329",
+        "name": "Leo Duarte",
+        "positionId": 0,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "5",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Leo",
+        "lastName": "Duarte",
+        "rankings": null
+      },
+      {
+        "id": 268257,
+        "optaId": "116536",
+        "name": "Lucas Lima",
+        "positionId": 0,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "60",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Lucas",
+        "lastName": "Lima",
+        "rankings": null
+      },
+      {
+        "id": 1116340,
+        "optaId": "499070",
+        "name": "Muhammet Arslantas",
+        "positionId": 0,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "34",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Muhammet",
+        "lastName": "Arslantas",
+        "rankings": null
+      },
+      {
+        "id": 303187,
+        "optaId": "80245",
+        "name": "Ömer Ali Sahiner",
+        "positionId": 0,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "42",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Ömer Ali",
+        "lastName": "Sahiner",
+        "rankings": null
+      },
+      {
+        "id": 310792,
+        "optaId": "151114",
+        "name": "Sener Özbayrakli",
+        "positionId": 0,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "2",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Sener",
+        "lastName": "Özbayrakli",
+        "rankings": null
+      },
+      {
+        "id": 95882,
+        "optaId": "45742",
+        "name": "Volkan Babacan",
+        "positionId": 0,
+        "usualPlayingPositionId": 0,
+        "shirtNumber": "1",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Volkan",
+        "lastName": "Babacan",
+        "rankings": null
+      }
+    ],
+    "unavailable": []
+  },
+  "awayTeam": {
+    "id": 8535,
+    "name": "Fiorentina",
+    "rating": 5.78,
+    "formation": "4-3-3",
+    "starters": [
+      {
+        "id": 553849,
+        "optaId": "156683",
+        "name": "Pierluigi Gollini",
+        "positionId": 11,
+        "usualPlayingPositionId": 0,
+        "shirtNumber": "95",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.1,
+          "y": 0.5,
+          "height": 0.25,
+          "width": 0.2
+        },
+        "verticalLayout": {
+          "x": 0.5,
+          "y": 0.1,
+          "height": 0.2,
+          "width": 1
+        },
+        "performance": {
+          "rating": 3.4,
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Pierluigi",
+        "lastName": "Gollini",
+        "rankings": null
+      },
+      {
+        "id": 519192,
+        "optaId": "178724",
+        "name": "Lorenzo Venuti",
+        "positionId": 32,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "23",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.357,
+          "y": 0.875,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.125,
+          "y": 0.357,
+          "height": 0.2,
+          "width": 0.25
+        },
+        "performance": {
+          "rating": 5.89,
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Lorenzo",
+        "lastName": "Venuti",
+        "rankings": null
+      },
+      {
+        "id": 593116,
+        "optaId": "172912",
+        "name": "Sofyan Amrabat",
+        "positionId": 34,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "34",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.357,
+          "y": 0.625,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.375,
+          "y": 0.357,
+          "height": 0.2,
+          "width": 0.25
+        },
+        "performance": {
+          "rating": 6.52,
+          "events": [
+            {
+              "type": "yellowCard",
+              "time": 1
+            }
+          ],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Sofyan",
+        "lastName": "Amrabat",
+        "rankings": null
+      },
+      {
+        "id": 768331,
+        "optaId": "223434",
+        "name": "Igor",
+        "positionId": 36,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "98",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.357,
+          "y": 0.375,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.625,
+          "y": 0.357,
+          "height": 0.2,
+          "width": 0.25
+        },
+        "performance": {
+          "rating": 6.38,
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "",
+        "lastName": "Igor",
+        "rankings": null
+      },
+      {
+        "id": 992025,
+        "optaId": "430847",
+        "name": "Aleksa Terzic",
+        "positionId": 38,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "15",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.357,
+          "y": 0.125,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.875,
+          "y": 0.357,
+          "height": 0.2,
+          "width": 0.25
+        },
+        "performance": {
+          "rating": 5.98,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 67,
+              "type": "subOut",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Aleksa",
+        "lastName": "Terzic",
+        "rankings": null
+      },
+      {
+        "id": 127460,
+        "optaId": "49417",
+        "name": "Giacomo Bonaventura",
+        "positionId": 73,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "5",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.613,
+          "y": 0.79,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.21,
+          "y": 0.613,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 6.5,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 78,
+              "type": "subOut",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Giacomo",
+        "lastName": "Bonaventura",
+        "rankings": null
+      },
+      {
+        "id": 577911,
+        "optaId": "182514",
+        "name": "Rolando Mandragora",
+        "positionId": 75,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "38",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.613,
+          "y": 0.5,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.5,
+          "y": 0.613,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 5.85,
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Rolando",
+        "lastName": "Mandragora",
+        "rankings": null
+      },
+      {
+        "id": 789243,
+        "optaId": "232066",
+        "name": "Youssef Maleh",
+        "positionId": 77,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "14",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.613,
+          "y": 0.21,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.79,
+          "y": 0.613,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 5.64,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 67,
+              "type": "subOut",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Youssef",
+        "lastName": "Maleh",
+        "rankings": null
+      },
+      {
+        "id": 637745,
+        "optaId": "199672",
+        "name": "Jonathan Ikoné",
+        "positionId": 103,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "11",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.87,
+          "y": 0.79,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.21,
+          "y": 0.87,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 4.83,
+          "events": [
+            {
+              "type": "secondYellow",
+              "time": 76
+            }
+          ],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Jonathan",
+        "lastName": "Ikoné",
+        "rankings": null
+      },
+      {
+        "id": 670948,
+        "optaId": "215241",
+        "name": "Arthur Cabral",
+        "positionId": 105,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "9",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.87,
+          "y": 0.5,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.5,
+          "y": 0.87,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 5.51,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 46,
+              "type": "subOut",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Arthur",
+        "lastName": "Cabral",
+        "rankings": null
+      },
+      {
+        "id": 212645,
+        "optaId": "57107",
+        "name": "Riccardo Saponara",
+        "positionId": 107,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "8",
+        "isCaptain": false,
+        "horizontalLayout": {
+          "x": 0.87,
+          "y": 0.21,
+          "height": 0.25,
+          "width": 0.257
+        },
+        "verticalLayout": {
+          "x": 0.79,
+          "y": 0.87,
+          "height": 0.2,
+          "width": 0.29
+        },
+        "performance": {
+          "rating": 6.13,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 78,
+              "type": "subOut",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Riccardo",
+        "lastName": "Saponara",
+        "rankings": null
+      }
+    ],
+    "coach": {
+      "id": 42581,
+      "name": "Vincenzo Italiano",
+      "usualPlayingPositionId": null,
+      "primaryTeamName": "Fiorentina",
+      "performance": {
+        "events": []
+      },
+      "firstName": "Vincenzo",
+      "lastName": "Italiano",
+      "primaryTeamId": 8535,
+      "isCoach": true
+    },
+    "subs": [
+      {
+        "id": 463291,
+        "optaId": "185533",
+        "name": "Luka Jovic",
+        "positionId": 0,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "7",
+        "isCaptain": false,
+        "performance": {
+          "rating": 5.67,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 46,
+              "type": "subIn",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Luka",
+        "lastName": "Jovic",
+        "rankings": null
+      },
+      {
+        "id": 451966,
+        "optaId": "218784",
+        "name": "Antonin Barak",
+        "positionId": 0,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "72",
+        "isCaptain": false,
+        "performance": {
+          "rating": 6.02,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 67,
+              "type": "subIn",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Antonin",
+        "lastName": "Barak",
+        "rankings": null
+      },
+      {
+        "id": 239350,
+        "optaId": "88432",
+        "name": "Cristiano Biraghi",
+        "positionId": 0,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "3",
+        "isCaptain": false,
+        "performance": {
+          "rating": 6.1,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 67,
+              "type": "subIn",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Cristiano",
+        "lastName": "Biraghi",
+        "rankings": null
+      },
+      {
+        "id": 317156,
+        "optaId": "116056",
+        "name": "Alfred Duncan",
+        "positionId": 0,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "32",
+        "isCaptain": false,
+        "performance": {
+          "rating": 6.04,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 78,
+              "type": "subIn",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Alfred",
+        "lastName": "Duncan",
+        "rankings": null
+      },
+      {
+        "id": 776940,
+        "optaId": "232061",
+        "name": "Christian Kouamé",
+        "positionId": 0,
+        "usualPlayingPositionId": 3,
+        "shirtNumber": "99",
+        "isCaptain": false,
+        "performance": {
+          "rating": 6.16,
+          "events": [],
+          "substitutionEvents": [
+            {
+              "time": 78,
+              "type": "subIn",
+              "reason": "tactical"
+            }
+          ],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Christian",
+        "lastName": "Kouamé",
+        "rankings": null
+      },
+      {
+        "id": 1228840,
+        "optaId": "530776",
+        "name": "Alessandro Bianco",
+        "positionId": 0,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "42",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Alessandro",
+        "lastName": "Bianco",
+        "rankings": null
+      },
+      {
+        "id": 1403328,
+        "optaId": "587833",
+        "name": "Costantino Favasuli",
+        "positionId": 0,
+        "usualPlayingPositionId": 2,
+        "shirtNumber": "40",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Costantino",
+        "lastName": "Favasuli",
+        "rankings": null
+      },
+      {
+        "id": 1217873,
+        "optaId": "522117",
+        "name": "Dimo Krastev",
+        "positionId": 0,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "44",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Dimo",
+        "lastName": "Krastev",
+        "rankings": null
+      },
+      {
+        "id": 935406,
+        "optaId": "215983",
+        "name": "Luca Ranieri",
+        "positionId": 0,
+        "usualPlayingPositionId": 1,
+        "shirtNumber": "16",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Luca",
+        "lastName": "Ranieri",
+        "rankings": null
+      },
+      {
+        "id": 822252,
+        "optaId": "246877",
+        "name": "Michele Cerofolini",
+        "positionId": 0,
+        "usualPlayingPositionId": 0,
+        "shirtNumber": "31",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Michele",
+        "lastName": "Cerofolini",
+        "rankings": null
+      },
+      {
+        "id": 281762,
+        "optaId": "79583",
+        "name": "Pietro Terracciano",
+        "positionId": 0,
+        "usualPlayingPositionId": 0,
+        "shirtNumber": "1",
+        "isCaptain": false,
+        "performance": {
+          "events": [],
+          "substitutionEvents": [],
+          "playerOfTheMatch": false
+        },
+        "firstName": "Pietro",
+        "lastName": "Terracciano",
+        "rankings": null
+      }
+    ],
+    "unavailable": []
+  }
+}

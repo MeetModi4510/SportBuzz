@@ -34,28 +34,27 @@ export const PRIORITY_LEAGUES = [
   21, // Friendlies - Men
 ];
 
-// Top clubs for filtering transfers since FotMob doesn't provide League IDs
+// Top clubs for filtering transfers — elite clubs only to keep Transfer Center fast and readable
 export const PRIORITY_CLUBS = [
-  // Premier League (First Division Only)
-  'arsenal', 'aston villa', 'bournemouth', 'brentford', 'brighton', 'chelsea', 'crystal palace', 'everton', 'fulham', 'liverpool', 'man city', 'manchester city', 'man united', 'manchester united', 'newcastle', 'nottm forest', 'nottingham forest', 'tottenham', 'spurs', 'west ham', 'wolves', 'leicester', 'southampton',
-  // La Liga (First Division Only)
-  'athletic club', 'atletico madrid', 'barcelona', 'real madrid', 'real sociedad', 'sevilla', 'valencia', 'villarreal', 'girona', 'betis', 'alaves', 'celta vigo', 'getafe', 'las palmas', 'mallorca', 'osasuna', 'rayo vallecano', 'valladolid', 'leganes', 'espanyol',
-  // Serie A (First Division Only)
-  'ac milan', 'inter', 'inter milan', 'juventus', 'napoli', 'roma', 'lazio', 'atalanta', 'fiorentina', 'bologna', 'torino', 'verona', 'genoa', 'lecce', 'udinese', 'empoli', 'cagliari', 'monza', 'como', 'parma', 'venezia',
-  // Bundesliga (First Division Only)
-  'bayern munich', 'bayern', 'dortmund', 'bayer leverkusen', 'leverkusen', 'rb leipzig', 'leipzig', 'eintracht frankfurt', 'stuttgart', 'freiburg', 'hoffenheim', 'werder bremen', 'wolfsburg', 'augsburg', 'mönchengladbach', 'monchengladbach', 'bochum', 'union berlin', 'mainz', 'st pauli', 'holstein kiel', 'heidenheim',
-  // Ligue 1 (First Division Only)
-  'psg', 'paris saint-germain', 'monaco', 'marseille', 'lyon', 'lille', 'lens', 'rennes', 'nice', 'reims', 'toulouse', 'strasbourg', 'montpellier', 'nantes', 'le havre', 'auxerre', 'angers', 'st etienne', 'brest',
-  // MLS
-  'inter miami', 'lafc', 'la galaxy', 'columbus crew', 'cincinnati', 'philadelphia union', 'seattle sounders', 'atlanta united', 'new york city fc', 'nycfc', 'new york red bulls', 'orlando city', 'nashville', 'portland timbers', 'portland hearts of pine', 'portland', 'houston dynamo', 'houston', 'real salt lake', 'sporting kansas city', 'dallas', 'austin', 'san jose earthquakes', 'toronto fc', 'montreal', 'vancouver whitecaps', 'chicago fire', 'colorado rapids', 'dc united', 'minnesota united', 'new england revolution', 'st. louis city', 'charlotte fc', 'san diego',
-  // Saudi Pro
-  'al nassr', 'al hilal', 'al ittihad', 'al ahli', 'al shabab', 'al taawoun', 'al ettifaq', 'al fateh', 'al wehda', 'al fayha', 'al riyadh', 'damac', 'al okhdood', 'al qadsiah', 'al kholood',
+  // Premier League — Big 6 + top clubs
+  'arsenal', 'aston villa', 'chelsea', 'liverpool', 'man city', 'manchester city',
+  'man united', 'manchester united', 'newcastle', 'tottenham', 'spurs', 'brighton',
+  // La Liga — Top clubs
+  'atletico madrid', 'barcelona', 'real madrid', 'real sociedad', 'sevilla', 'villarreal', 'athletic club',
+  // Serie A — Top clubs
+  'ac milan', 'inter', 'inter milan', 'juventus', 'napoli', 'roma', 'lazio', 'atalanta', 'fiorentina',
+  // Bundesliga — Top clubs
+  'bayern munich', 'dortmund', 'bayer leverkusen', 'rb leipzig', 'eintracht frankfurt', 'stuttgart',
+  // Ligue 1 — Top clubs
+  'psg', 'paris saint-germain', 'monaco', 'marseille', 'lyon', 'lille',
+  // Saudi Pro — Star clubs
+  'al nassr', 'al hilal', 'al ittihad', 'al ahli',
+  // MLS — Star teams
+  'inter miami', 'lafc', 'la galaxy',
   // Eredivisie
-  'ajax', 'psv', 'feyenoord', 'az alkmaar', 'twente', 'sparta rotterdam', 'utrecht', 'heerenveen', 'nec nijmegen', 'go ahead eagles', 'pec zwolle', 'almere city', 'heracles', 'rkc waalwijk', 'fortuna sittard', 'nac breda', 'willem ii', 'groningen',
-  // Belgian Pro League
-  'club brugge', 'anderlecht', 'union sg', 'antwerp', 'genk', 'gent', 'standard liege', 'mechelen', 'cercle brugge', 'charleroi', 'st truiden', 'westerlo', 'oh leuven', 'kortrijk', 'dender', 'beerschot',
-  // ISL
-  'mohun bagan', 'mumbai city', 'fc goa', 'odisha', 'kerala blasters', 'chennaiyin', 'northeast united', 'punjab fc', 'east bengal', 'bengaluru fc', 'jamshedpur', 'hyderabad', 'mohammedan'
+  'ajax', 'psv', 'feyenoord',
+  // Champions League mainstays
+  'porto', 'benfica', 'sporting cp', 'celtic', 'rangers', 'ajax',
 ];
 
 const isMensFootball = (match: FootballMatch) => {

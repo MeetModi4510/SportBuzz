@@ -16,6 +16,7 @@ interface PerformanceLabTabProps {
     awayTeamName?: string;
     matchStatus: string;
     matchData: any; 
+    fotmobData?: any;
 }
 
 interface SlantClashRowProps {
@@ -72,7 +73,7 @@ const SlantClashRow = ({ label, homeValue, awayValue, homeColor = "#0ea5e9", awa
     );
 };
 
-export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabProps) {
+export function PerformanceLabTab({ matchStatus, matchData, fotmobData }: PerformanceLabTabProps) {
     const [activeImpactTab, setActiveImpactTab] = useState('Attack Threat');
     if (!matchData) return null;
 
@@ -397,64 +398,81 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
     let matchLeadersTabs: Record<string, any[]> = {
         'Attack Threat': [],
         'Defensive Action': [],
+        'Distribution': [],
         'Discipline': []
     };
     try {
-        if (matchData?.rosters) {
-            let allPlayers: any[] = [];
-            matchData.rosters.forEach((r: any) => {
-                if (r.roster) {
-                    r.roster.forEach((p: any) => {
-                        allPlayers.push({
-                            ...p,
-                            teamName: r.team?.displayName || r.team?.name || 'Unknown',
-                            teamId: r.team?.id
-                        });
-                    });
-                }
-            });
+        if (fotmobData?.content?.playerStats) {
+            let allPlayers = Object.values(fotmobData.content.playerStats);
 
             const tabDefinitions = [
                 {
                     tabName: 'Attack Threat',
                     stats: [
-                        { key: 'totalGoals', label: 'Goals Scored' },
-                        { key: 'goalAssists', label: 'Assists' },
-                        { key: 'totalShots', label: 'Total Shots' },
-                        { key: 'shotsOnTarget', label: 'Shots On Target' },
-                        { key: 'offsides', label: 'Offsides' }
+                        { key: 'Goals', label: 'Goals Scored' },
+                        { key: 'Assists', label: 'Assists' },
+                        { key: 'Total shots', label: 'Total Shots' },
+                        { key: 'Shots on target', label: 'Shots On Target' },
+                        { key: 'Chances created', label: 'Chances Created' },
+                        { key: 'Touches in opposition box', label: 'Touches in Box' },
+                        { key: 'Successful dribbles', label: 'Dribbles Won' },
+                        { key: 'Offsides', label: 'Offsides' }
                     ]
                 },
                 {
                     tabName: 'Defensive Action',
                     stats: [
-                        { key: 'saves', label: 'Saves' },
-                        { key: 'foulsSuffered', label: 'Fouls Suffered' },
-                        { key: 'goalsConceded', label: 'Goals Conceded' }
+                        { key: 'Saves', label: 'Saves' },
+                        { key: 'Tackles won', label: 'Tackles Won' },
+                        { key: 'Interceptions', label: 'Interceptions' },
+                        { key: 'Clearances', label: 'Clearances' },
+                        { key: 'Blocks', label: 'Blocks' },
+                        { key: 'Aerial duels won', label: 'Aerials Won' },
+                        { key: 'Fouls won', label: 'Fouls Suffered' },
+                        { key: 'Goals conceded', label: 'Goals Conceded' }
+                    ]
+                },
+                {
+                    tabName: 'Distribution',
+                    stats: [
+                        { key: 'Touches', label: 'Touches' },
+                        { key: 'Accurate passes', label: 'Accurate Passes' },
+                        { key: 'Passes into final third', label: 'Passes to Final Third' },
+                        { key: 'Accurate long balls', label: 'Accurate Long Balls' },
+                        { key: 'Accurate crosses', label: 'Accurate Crosses' }
                     ]
                 },
                 {
                     tabName: 'Discipline',
                     stats: [
-                        { key: 'foulsCommitted', label: 'Fouls Committed' },
-                        { key: 'yellowCards', label: 'Yellow Cards' },
-                        { key: 'redCards', label: 'Red Cards' }
+                        { key: 'Fouls committed', label: 'Fouls Committed' },
+                        { key: 'Dispossessed', label: 'Possession Lost' },
+                        { key: 'Yellow card', label: 'Yellow Cards' },
+                        { key: 'Red card', label: 'Red Cards' }
                     ]
                 }
             ];
 
             tabDefinitions.forEach(tabDef => {
                 const groupedCategories = tabDef.stats.map(statTarget => {
-                    const playersWithStat = allPlayers.map(p => {
-                        const statObj = p.stats?.find((s: any) => s.name === statTarget.key);
-                        const val = statObj ? parseFloat(statObj.value || '0') : 0;
+                    const playersWithStat = allPlayers.map((p: any) => {
+                        let val = 0;
+                        if (p.stats && Array.isArray(p.stats)) {
+                            p.stats.forEach((category: any) => {
+                                if (category.stats && category.stats[statTarget.key]) {
+                                    const statValue = category.stats[statTarget.key]?.stat?.value;
+                                    val = parseFloat(statValue !== undefined && statValue !== null ? String(statValue) : '0');
+                                }
+                            });
+                        }
                         return {
-                            id: String(p.athlete?.id || ''),
-                            name: String(p.athlete?.shortName || p.athlete?.displayName || 'Unknown'),
-                            position: String(p.position?.abbreviation || 'N/A'),
+                            id: String(p.id || ''),
+                            name: String(p.name || 'Unknown'),
+                            position: 'N/A',
                             team: String(p.teamName),
                             teamId: String(p.teamId),
-                            value: val
+                            value: val,
+                            isFotmobId: true
                         };
                     }).filter(p => p.value > 0);
 
@@ -557,7 +575,7 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
                             <div key={p.id} className="flex items-center gap-5 bg-black/20 p-4 rounded-2xl border border-white/[0.08] transition-all hover:bg-[#0f0f11]  shadow-none">
                                 <div className="w-16 h-16 rounded-full bg-[#18181b]/50 border-2 border-white/[0.05] flex items-center justify-center overflow-hidden shrink-0 relative shadow-sm text-zinc-500">
                                     <img src={idx === 0 ? homeLogo : awayLogo} className="absolute inset-0 w-full h-full object-contain opacity-20 blur-[2px] scale-75" />
-                                    <LineupPlayerImage playerId={p.id} playerName={p.name} className="absolute inset-0 z-10 w-full h-full object-cover" />
+                                    <LineupPlayerImage playerId={p.id} playerName={p.name} isFotmobId={false} className="absolute inset-0 z-10 w-full h-full object-contain object-bottom scale-[1.15]" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
@@ -590,7 +608,7 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
                     </div>
                     {/* Tabs */}
                     <div className="flex flex-wrap gap-2 bg-black/40 p-1.5 rounded-xl border border-white/5 w-full md:w-auto">
-                        {['Attack Threat', 'Defensive Action', 'Discipline'].map(tab => (
+                        {['Attack Threat', 'Defensive Action', 'Distribution', 'Discipline'].map(tab => (
                             <button 
                                 key={tab}
                                 onClick={() => setActiveImpactTab(tab)}
@@ -603,41 +621,98 @@ export function PerformanceLabTab({ matchStatus, matchData }: PerformanceLabTabP
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
-                    {matchLeadersTabs[activeImpactTab]?.map((category: any, idx: number) => (
-                        <div key={idx} className="bg-zinc-900/40 border border-white/[0.04] p-5 rounded-2xl flex flex-col relative group/card hover:bg-zinc-900/60 transition-colors">
-                            <h4 className="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mb-5 flex items-center gap-2">
-                                <Activity className="w-3.5 h-3.5" /> {category.categoryName}
-                            </h4>
-                            <div className="space-y-4 flex-1">
-                                {category.players.map((player: any, pIdx: number) => {
-                                    const isHome = player.teamId === homeTeamObj?.id;
-                                    const teamColor = isHome ? '#0ea5e9' : '#f43f5e';
-                                    const barWidth = Math.max(5, (player.value / category.maxValue) * 100);
-                                    
-                                    return (
-                                    <div key={pIdx} className="flex items-center gap-4 group/row">
-                                        <div className="w-5 font-black text-xs text-zinc-600 opacity-60 text-right shrink-0">
-                                            #{pIdx + 1}
-                                        </div>
-                                        <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-black shrink-0 relative flex items-center justify-center text-zinc-500">
-                                            <img src={isHome ? homeLogo : awayLogo} className="absolute inset-0 w-full h-full object-contain opacity-20 blur-[1px] scale-75" />
-                                            <LineupPlayerImage playerId={player.id} playerName={player.name} className="absolute inset-0 z-10 w-full h-full object-cover" />
-                                        </div>
-                                        <div className="flex flex-col flex-1 min-w-0">
-                                            <div className="flex justify-between items-baseline mb-1.5">
-                                                <span className="text-sm font-bold text-zinc-200 truncate pr-2 group-hover/row:text-white transition-colors">{player.name}</span>
-                                                <span className="text-lg font-black drop-shadow-md" style={{ color: teamColor }}>{player.value}</span>
-                                            </div>
-                                            <div className="w-full h-1.5 bg-black/50 rounded-full overflow-hidden border border-white/[0.02]">
-                                                <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${barWidth}%`, backgroundColor: teamColor, boxShadow: `0 0 10px ${teamColor}80` }} />
-                                            </div>
+                    {matchLeadersTabs[activeImpactTab]?.map((category: any, idx: number) => {
+                        const fotmobHomeId = String(fotmobData?.content?.lineup?.homeTeam?.id || '');
+                        const mvp = category.players[0];
+                        if (!mvp) return null;
+                        
+                        const isHomeMVP = String(mvp.teamId) === fotmobHomeId;
+                        const mvpColor = isHomeMVP ? '#0ea5e9' : '#f43f5e';
+
+                        return (
+                        <div key={idx} className="bg-[#09090b] border border-white/[0.05] rounded-3xl relative group/card hover:border-white/10 transition-all duration-500 shadow-[0_8px_30px_rgb(0,0,0,0.5)] overflow-hidden h-[320px] flex flex-col">
+                            
+                            {/* Giant Watermark Value */}
+                            <div className="absolute -top-4 -right-2 text-[140px] font-black text-white/[0.02] leading-none pointer-events-none z-0 select-none font-mono tracking-tighter transition-transform duration-700 group-hover:scale-105 group-hover:-translate-x-2">
+                                {mvp.value}
+                            </div>
+
+                            {/* Category Title */}
+                            <div className="absolute top-4 left-4 z-30">
+                                <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 shadow-lg">
+                                    <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                                    <span className="text-[9px] font-black tracking-[0.2em] text-zinc-100 uppercase">{category.categoryName}</span>
+                                </div>
+                            </div>
+
+                            {/* MVP Hero Area */}
+                            <div className="relative flex-1 flex justify-center items-end z-10 overflow-hidden pt-12">
+                                {/* Team Logo / Flag Background */}
+                                <div className="absolute inset-0 z-0 opacity-20 group-hover:opacity-30 transition-all duration-700 flex justify-center items-center overflow-hidden">
+                                    <img 
+                                        src={`https://images.fotmob.com/image_resources/logo/teamlogo/${mvp.teamId}.png`} 
+                                        alt={mvp.team}
+                                        className="w-full h-full object-cover blur-[6px] scale-[1.8]"
+                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                    />
+                                </div>
+                                
+                                {/* Player Image Cutout */}
+                                <div className="w-44 h-44 mb-4 relative z-20 transform transition-transform duration-500 ease-out group-hover:scale-105">
+                                    <LineupPlayerImage playerId={mvp.id} playerName={mvp.name} isFotmobId={mvp.isFotmobId} className="w-full h-full object-contain object-bottom drop-shadow-[0_15px_15px_rgba(0,0,0,0.8)]" />
+                                </div>
+
+                                {/* Dark Fade for Text Legibility (reduced height and opacity) */}
+                                <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-[#09090b] to-transparent z-20 pointer-events-none" />
+
+                                {/* MVP Details Overlay */}
+                                <div className="absolute bottom-3 inset-x-4 flex items-end justify-between z-30">
+                                    <div className="flex flex-col min-w-0 pr-2">
+                                        <span className="text-xl font-black text-white drop-shadow-md truncate leading-none mb-1.5">{mvp.name}</span>
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-2 h-2 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: mvpColor, color: mvpColor }} />
+                                            <span className="text-[10px] font-black text-zinc-300 uppercase tracking-widest">{mvp.team}</span>
                                         </div>
                                     </div>
+                                    <div className="flex items-end shadow-2xl pl-2">
+                                        <span className="text-5xl font-black drop-shadow-[0_0_15px_rgba(0,0,0,0.8)] leading-none" style={{ color: mvpColor }}>{mvp.value}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Runner Ups Area */}
+                            <div className="h-[110px] bg-[#111113] border-t border-white/5 p-4 flex flex-col justify-center gap-3 z-30 relative">
+                                {category.players.slice(1).map((player: any, pIdx: number) => {
+                                    const isHome = String(player.teamId) === fotmobHomeId;
+                                    const teamColor = isHome ? '#0ea5e9' : '#f43f5e';
+                                    const barWidth = Math.max(2, (player.value / category.maxValue) * 100);
+                                    
+                                    return (
+                                        <div key={pIdx} className="flex items-center gap-3.5 relative group/row px-1">
+                                            <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 shrink-0 bg-[#0a0a0a]">
+                                                <LineupPlayerImage playerId={player.id} playerName={player.name} isFotmobId={player.isFotmobId} className="w-full h-full object-cover" />
+                                            </div>
+                                            <div className="flex flex-col min-w-0 flex-1 justify-center">
+                                                <div className="flex items-center justify-between mb-1.5">
+                                                    <span className="text-xs font-bold text-zinc-300 truncate pr-2 group-hover/row:text-white transition-colors">{player.name}</span>
+                                                    <span className="text-sm font-black drop-shadow-sm" style={{ color: teamColor }}>{player.value}</span>
+                                                </div>
+                                                <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden">
+                                                    <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${barWidth}%`, backgroundColor: teamColor, boxShadow: `0 0 5px ${teamColor}40` }} />
+                                                </div>
+                                            </div>
+                                        </div>
                                     );
                                 })}
+                                {category.players.length === 1 && (
+                                    <div className="flex items-center justify-center h-full opacity-30">
+                                        <span className="text-xs font-black uppercase tracking-widest text-zinc-500">No other players</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    ))}
+                        );
+                    })}
                     {(!matchLeadersTabs[activeImpactTab] || matchLeadersTabs[activeImpactTab].length === 0) && (
                         <div className="col-span-full py-16 flex flex-col items-center justify-center opacity-50">
                             <Info className="w-10 h-10 mb-4 text-zinc-600" />

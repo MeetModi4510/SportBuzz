@@ -33,6 +33,7 @@ import { footballApi } from "@/services/api";
 import { getSocket } from "@/services/socket";
 import { FootballPitchLineup } from "@/components/FootballPitchLineup";
 import { toast } from "sonner";
+import { useFotmobLineups } from "@/hooks/football/useFotmobLineups";
 
 export default function LiveFootballMatch() {
     const { id } = useParams();
@@ -41,6 +42,7 @@ export default function LiveFootballMatch() {
     const receivedSocketUpdate = useRef(false);
     const lastUpdateTimestamp = useRef<Date>(new Date());
     const [displayTime, setDisplayTime] = useState("00:00");
+    const { lineupData, loading: lineupLoading } = useFotmobLineups(id);
 
     const summarizePlayerEvents = (playerName: string, events: any[], teamGoalsConceded: number = 0) => {
         const playerEvents = {
@@ -1134,71 +1136,79 @@ export default function LiveFootballMatch() {
                         <Card className="bg-slate-900/40 border-slate-800 rounded-[4rem] p-12 border overflow-hidden relative group">
                             <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             
-                                <FootballPitchLineup 
-                                    homeTeam={{
-                                        name: match.homeTeam?.name || 'Home Team',
-                                        logo: match.homeTeam?.logo,
-                                        primaryColor: match.homeTeam?.primaryColor || '#2563eb'
-                                    }}
-                                    awayTeam={{
-                                        name: match.awayTeam?.name || 'Away Team',
-                                        logo: match.awayTeam?.logo,
-                                        primaryColor: match.awayTeam?.primaryColor || '#ea580c'
-                                    }}
-                                    homePlayers={[
-                                        ...(match.lineups?.home?.startingXI?.map((name: string) => {
-                                            const p = match.homeTeam?.players?.find((tp: any) => tp.name === name);
-                                            return { 
-                                                id: name, 
-                                                name, 
-                                                role: p?.role || 'Midfielder', 
-                                                number: p?.number, 
-                                                isSubstitute: false, 
-                                                isCaptain: p?.isCaptain,
-                                                events: summarizePlayerEvents(name, match.events, match.score?.away || 0)
-                                            };
-                                        }) || []),
-                                        ...(match.lineups?.home?.substitutes?.map((name: string) => {
-                                            const p = match.homeTeam?.players?.find((tp: any) => tp.name === name);
-                                            return { 
-                                                id: name, 
-                                                name, 
-                                                role: p?.role || 'Midfielder', 
-                                                number: p?.number, 
+                            {lineupLoading ? (
+                                    <div className="py-20 flex flex-col items-center justify-center text-slate-500 gap-4">
+                                        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                                        <p className="text-sm font-medium tracking-widest uppercase">Loading Lineups...</p>
+                                    </div>
+                                ) : lineupData ? (
+                                    <FootballPitchLineup 
+                                        homeTeam={{
+                                            name: match?.homeTeam?.name || lineupData.homeTeam?.name || 'Home Team',
+                                            logo: match?.homeTeam?.logo,
+                                            primaryColor: match?.homeTeam?.primaryColor || '#2563eb',
+                                            coach: lineupData.homeTeam?.coach ? { name: lineupData.homeTeam.coach.name } : undefined
+                                        }}
+                                        awayTeam={{
+                                            name: match?.awayTeam?.name || lineupData.awayTeam?.name || 'Away Team',
+                                            logo: match?.awayTeam?.logo,
+                                            primaryColor: match?.awayTeam?.primaryColor || '#ea580c',
+                                            coach: lineupData.awayTeam?.coach ? { name: lineupData.awayTeam.coach.name } : undefined
+                                        }}
+                                        homePlayers={[
+                                            ...(lineupData.homeTeam?.starters?.map((p: any) => ({
+                                                id: p.id.toString(),
+                                                name: p.name.first ? `${p.name.first} ${p.name.last}` : p.name,
+                                                role: p.positionStringShort || 'Midfielder',
+                                                number: p.shirt,
+                                                isSubstitute: false,
+                                                isCaptain: p.isCaptain || false,
+                                                rating: p.rating?.num || p.performance?.rating || undefined,
+                                                events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.away || 0)
+                                            })) || []),
+                                            ...(lineupData.homeTeam?.subs?.map((p: any) => ({
+                                                id: p.id.toString(),
+                                                name: p.name.first ? `${p.name.first} ${p.name.last}` : p.name,
+                                                role: p.positionStringShort || 'Midfielder',
+                                                number: p.shirt,
                                                 isSubstitute: true,
-                                                events: summarizePlayerEvents(name, match.events, match.score?.away || 0)
-                                            };
-                                        }) || [])
-                                    ].filter((p, i, self) => i === self.findIndex((t) => t.id === p.id))}
-                                    awayPlayers={[
-                                        ...(match.lineups?.away?.startingXI?.map((name: string) => {
-                                            const p = match.awayTeam?.players?.find((tp: any) => tp.name === name);
-                                            return { 
-                                                id: name, 
-                                                name, 
-                                                role: p?.role || 'Midfielder', 
-                                                number: p?.number, 
-                                                isSubstitute: false, 
-                                                isCaptain: p?.isCaptain,
-                                                events: summarizePlayerEvents(name, match.events, match.score?.home || 0)
-                                            };
-                                        }) || []),
-                                        ...(match.lineups?.away?.substitutes?.map((name: string) => {
-                                            const p = match.awayTeam?.players?.find((tp: any) => tp.name === name);
-                                            return { 
-                                                id: name, 
-                                                name, 
-                                                role: p?.role || 'Midfielder', 
-                                                number: p?.number, 
+                                                isCaptain: p.isCaptain || false,
+                                                rating: p.rating?.num || p.performance?.rating || undefined,
+                                                events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.away || 0)
+                                            })) || [])
+                                        ]}
+                                        awayPlayers={[
+                                            ...(lineupData.awayTeam?.starters?.map((p: any) => ({
+                                                id: p.id.toString(),
+                                                name: p.name.first ? `${p.name.first} ${p.name.last}` : p.name,
+                                                role: p.positionStringShort || 'Midfielder',
+                                                number: p.shirt,
+                                                isSubstitute: false,
+                                                isCaptain: p.isCaptain || false,
+                                                rating: p.rating?.num || p.performance?.rating || undefined,
+                                                events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.home || 0)
+                                            })) || []),
+                                            ...(lineupData.awayTeam?.subs?.map((p: any) => ({
+                                                id: p.id.toString(),
+                                                name: p.name.first ? `${p.name.first} ${p.name.last}` : p.name,
+                                                role: p.positionStringShort || 'Midfielder',
+                                                number: p.shirt,
                                                 isSubstitute: true,
-                                                events: summarizePlayerEvents(name, match.events, match.score?.home || 0)
-                                            };
-                                        }) || [])
-                                    ].filter((p, i, self) => i === self.findIndex((t) => t.id === p.id))}
-                                    homeFormation={match.lineups?.home?.formation || '4-4-2'}
-                                    awayFormation={match.lineups?.away?.formation || '4-4-2'}
-                                    currentMinute={match.timer?.currentMinute || 0}
-                                />
+                                                isCaptain: p.isCaptain || false,
+                                                rating: p.rating?.num || p.performance?.rating || undefined,
+                                                events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.home || 0)
+                                            })) || [])
+                                        ]}
+                                        homeFormation={lineupData.homeTeam?.formation || match?.lineups?.home?.formation || '4-4-2'}
+                                        awayFormation={lineupData.awayTeam?.formation || match?.lineups?.away?.formation || '4-4-2'}
+                                        currentMinute={match?.timer?.currentMinute || 90}
+                                    />
+                                ) : (
+                                    <div className="py-20 flex flex-col items-center justify-center text-slate-500 gap-4">
+                                        <AlertCircle className="w-8 h-8 opacity-50" />
+                                        <p className="text-sm font-medium tracking-widest uppercase">Lineups not available yet</p>
+                                    </div>
+                                )}
                         </Card>
                     </TabsContent>
                 </Tabs>

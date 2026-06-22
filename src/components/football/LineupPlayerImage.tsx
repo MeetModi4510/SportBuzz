@@ -6,6 +6,7 @@ interface LineupPlayerImageProps {
     playerName: string;
     className?: string;
     fallbackInitials?: string;
+    isFotmobId?: boolean;
 }
 
 // ─── In-memory cache so each player is only fetched once per session ────────
@@ -34,7 +35,7 @@ async function acquireToken() {
 }
 
 function releaseToken() {
-    // Add a small delay between tokens to strictly respect API rate limits (e.g. max 3 requests per second)
+    // Add a small delay between tokens to strictly respect API rate limits (e.g. max 5 requests per second)
     setTimeout(() => {
         if (requestQueue.length > 0) {
             const next = requestQueue.shift()!;
@@ -42,36 +43,86 @@ function releaseToken() {
         } else {
             activeRequests--;
         }
-    }, 350);
+    }, 300);
 }
 
-async function fetchPlayerImage(playerName: string): Promise<string | null> {
-    const key = playerName.toLowerCase().trim();
+// ─── LocalStorage Cache with 2-hour TTL ────────
+const CACHE_PREFIX = 'fotmob_img_';
+const CACHE_TTL_MS = 2 * 60 * 60 * 1000;
+const CACHE_VERSION = 'v3'; // bump this to invalidate all cached images
+const CACHE_VERSION_KEY = 'fotmob_img_cache_version';
 
-    // Return from cache immediately, BUT ONLY if it's a valid URL.
+// Auto-clear on version mismatch (runs once per session)
+if (typeof window !== 'undefined') {
+    const storedVersion = localStorage.getItem(CACHE_VERSION_KEY);
+    if (storedVersion !== CACHE_VERSION) {
+        Object.keys(localStorage)
+            .filter(k => k.startsWith(CACHE_PREFIX))
+            .forEach(k => localStorage.removeItem(k));
+        localStorage.setItem(CACHE_VERSION_KEY, CACHE_VERSION);
+        console.log('[LineupPlayerImage] Cache cleared for version', CACHE_VERSION);
+    }
+}
+
+
+function getCachedImage(key: string): string | null {
+    try {
+        const item = localStorage.getItem(CACHE_PREFIX + key);
+        if (!item) return null;
+        const parsed = JSON.parse(item);
+        if (Date.now() - parsed.timestamp > CACHE_TTL_MS) {
+            localStorage.removeItem(CACHE_PREFIX + key);
+            return null;
+        }
+        return parsed.data;
+    } catch {
+        return null;
+    }
+}
+
+function setCachedImage(key: string, data: string) {
+    try {
+        localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({
+            timestamp: Date.now(),
+            data
+        }));
+    } catch (e) {
+        console.warn('LocalStorage cache full or error', e);
+    }
+}
+
+async function fetchPlayerImage(playerName: string, playerId: string | number, isFotmobIdExplicit?: boolean): Promise<string | null> {
+    const key = playerId.toString() + '_' + playerName.toLowerCase().trim() + (isFotmobIdExplicit ? '_fotmob' : '');
+
+    // 1. LocalStorage Cache (For Base64 Fotmob images)
+    const localCached = getCachedImage(key);
+    if (localCached) return localCached;
+
+    // 2. Memory Cache (For traditional URLs)
     if (imageCache.has(key) && imageCache.get(key) !== null) {
         return imageCache.get(key)!;
     }
 
-    // If there's already a pending request for this player, reuse it
     if (pendingRequests.has(key)) return pendingRequests.get(key)!;
 
     const promise = (async () => {
         await acquireToken();
         try {
-            // Hit our backend proxy instead of TheSportsDB directly!
-            const res = await axios.get(
-                `${API_BASE}/api/football/v3/image/player?name=${encodeURIComponent(playerName)}`,
-                { timeout: 8000 }
-            );
+            const isFotmob = isFotmobIdExplicit !== undefined ? isFotmobIdExplicit : /^\d+$/.test(playerId.toString());
+            const endpoint = isFotmob
+                ? `${API_BASE}/api/football/v3/image/player?fotmobId=${playerId}`
+                : `${API_BASE}/api/football/v3/image/player?name=${encodeURIComponent(playerName)}`;
 
-            // Our proxy returns { url: "..." } or { url: null }
-            if (res.data && res.data.url) {
+            const res = await axios.get(endpoint, { timeout: 8000 });
+
+            if (res.data && res.data.base64) {
+                setCachedImage(key, res.data.base64);
+                return res.data.base64;
+            } else if (res.data && res.data.url) {
                 imageCache.set(key, res.data.url);
                 return res.data.url;
             }
 
-            // Don't permanently cache null to allow future retries
             return null;
         } catch {
             return null;
@@ -86,30 +137,47 @@ async function fetchPlayerImage(playerName: string): Promise<string | null> {
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
-export const LineupPlayerImage = ({ playerId, playerName, className, fallbackInitials }: LineupPlayerImageProps) => {
+export const LineupPlayerImage = ({ playerId, playerName, className, fallbackInitials, isFotmobId }: LineupPlayerImageProps) => {
+    const key = playerId.toString() + '_' + playerName.toLowerCase().trim() + (isFotmobId ? '_fotmob' : '');
+    
     const [imgUrl, setImgUrl] = useState<string | null>(() => {
-        // Check cache synchronously on first render
-        const cached = imageCache.get(playerName.toLowerCase().trim());
-        return cached || null;
+        const localCached = getCachedImage(key);
+        if (localCached) return localCached;
+        const memCached = imageCache.get(key);
+        return memCached || null;
     });
     const [hasError, setHasError] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         let isMounted = true;
-        const key = playerName.toLowerCase().trim();
+        const key = playerId.toString() + '_' + playerName.toLowerCase().trim();
 
-        // 1. Force ESPN for known problematic names from TheSportsDB
-        if (FORCE_ESPN_NAMES.includes(key)) {
+        // 1. FotMob ID: Direct URL is highly reliable
+        if (isFotmobId) {
+            setImgUrl(`https://images.fotmob.com/image_resources/playerimages/${playerId}.png`);
+            setLoading(false);
+            return;
+        }
+
+        // 2. Force ESPN for known problematic names from TheSportsDB
+        if (FORCE_ESPN_NAMES.includes(playerName.toLowerCase().trim())) {
             setImgUrl(`https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${playerId}.png`);
             setLoading(false);
             return;
         }
 
-        // 2. Already cached successfully
+        // 3. Already cached successfully locally
+        const localCached = getCachedImage(key);
+        if (localCached) {
+            setImgUrl(localCached);
+            setLoading(false);
+            return;
+        }
+
+        // 4. Already cached in memory
         if (imageCache.has(key) && imageCache.get(key) !== null) {
             const cached = imageCache.get(key);
-            console.log(`⚡ [CACHED SportsDB] ${playerName}`);
             setImgUrl(cached!);
             setLoading(false);
             return;
@@ -120,39 +188,44 @@ export const LineupPlayerImage = ({ playerId, playerName, className, fallbackIni
         setLoading(true);
 
         // Fetch with our built-in throttler
-        fetchPlayerImage(playerName).then(url => {
+        fetchPlayerImage(playerName, playerId, isFotmobId).then(url => {
             if (!isMounted) return;
             if (url) {
-                console.log(`✅ [SportsDB API] ${playerName}`);
                 setImgUrl(url);
             } else {
                 const fallback = `https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${playerId}.png`;
-                console.log(`🔄 [ESPN API Fallback] ${playerName}`);
                 setImgUrl(fallback);
             }
             setLoading(false);
         }).catch(() => {
             if (!isMounted) return;
             const fallback = `https://a.espncdn.com/combiner/i?img=/i/headshots/soccer/players/full/${playerId}.png`;
-            console.log(`🔄 [ESPN API Fallback] ${playerName}`);
             setImgUrl(fallback);
             setLoading(false);
         });
 
         return () => { isMounted = false; };
-    }, [playerName]);
+    }, [playerName, playerId, isFotmobId]);
 
-    // If it's loading, or no image found, render absolutely nothing!
-    // This perfectly allows the parent component's background (like the blue/red circle AND the jersey number) to show through naturally without any overlapping divs!
-    if (!imgUrl || hasError) {
-        return null;
+    // Render fallback initials if there's an error and fallbackInitials is provided
+    if (hasError) {
+        if (fallbackInitials) {
+            return (
+                <div className={`flex items-center justify-center font-black text-white/50 bg-[#111] w-full h-full ${className || ''}`}>
+                    {fallbackInitials}
+                </div>
+            );
+        }
+        return null; // Return null if no fallback is configured, allowing parent backgrounds to show
     }
+
+    if (!imgUrl) return null;
 
     return (
         <img 
             src={imgUrl} 
             alt={playerName}
-            className={`w-full h-full object-cover object-top scale-[1.15] translate-y-1 ${className || ''}`}
+            className={`w-full h-full object-cover object-top ${className || ''}`}
             onError={() => setHasError(true)}
         />
     );

@@ -11,8 +11,8 @@ export function PerformanceTrend({ data, skillMode = 'batting' }: PerformanceTre
         if (active && payload && payload.length) {
             const row = payload[0].payload;
             return (
-                <div className="bg-[#0B1120] border border-slate-700 p-3 rounded-lg shadow-xl">
-                    <p className="text-white font-bold mb-1">{label} {row.opp ? `vs ${row.opp}` : ''}</p>
+                <div className="dark:bg-[#0B1120] bg-white border dark:border-slate-700 border-slate-200 p-3 rounded-lg shadow-xl">
+                    <p className="dark:text-white text-slate-900 font-bold mb-1">{label} {row.opp ? `vs ${row.opp}` : ''}</p>
                     <p className="text-blue-400 font-semibold">
                         {skillMode === 'batting' ? 'Score: ' : 'Wickets: '}
                         {row.raw ? row.raw : row.runs}
@@ -24,7 +24,7 @@ export function PerformanceTrend({ data, skillMode = 'batting' }: PerformanceTre
     };
 
     return (
-        <div className="bg-[#141A25] p-6 rounded-2xl border border-blue-500/10 shadow-lg mb-6">
+        <div className="dark:bg-[#141A25] bg-white p-6 rounded-2xl border dark:border-blue-500/10 border-slate-200 shadow-lg mb-6">
             <div className="flex items-center gap-2 mb-6">
                 <div className="p-2 bg-emerald-500/10 rounded-full">
                     <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -32,8 +32,8 @@ export function PerformanceTrend({ data, skillMode = 'batting' }: PerformanceTre
                     </svg>
                 </div>
                 <div>
-                    <h3 className="text-white font-semibold">Performance Trend</h3>
-                    <p className="text-slate-400 text-xs">
+                    <h3 className="dark:text-white text-slate-900 font-semibold">Performance Trend</h3>
+                    <p className="dark:text-slate-400 text-slate-500 text-xs">
                         {skillMode === 'batting' ? 'Runs scored over recent matches' : 'Wickets taken over recent matches'}
                     </p>
                 </div>

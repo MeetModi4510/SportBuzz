@@ -1,3 +1,4 @@
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { SportFilter } from "@/components/SportFilter";
@@ -45,11 +46,16 @@ import {
   Zap,
   BarChart3,
   Loader2,
-  GitCompare
+  GitCompare,
+  ArrowLeft
 } from "lucide-react";
 
 const PerformanceLab = () => {
-  const [activeSport, setActiveSport] = useState<Sport | "all">("cricket");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const state = location.state as { targetPlayerId?: string; targetPlayerName?: string; targetTeamName?: string; fromMatchUrl?: string } | null;
+  
+  const [activeSport, setActiveSport] = useState<Sport | "all">(state?.targetPlayerId ? "football" : "cricket");
   const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
 
   const filteredPlayers =
@@ -77,7 +83,16 @@ const PerformanceLab = () => {
 
         <main className="container mx-auto px-4 py-8 space-y-8">
           {/* Header */}
-          <section className="text-center space-y-4 py-6">
+          <section className="text-center space-y-4 py-6 relative">
+            {state?.fromMatchUrl && (
+              <button 
+                onClick={() => navigate(state.fromMatchUrl!)}
+                className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white rounded-xl transition-colors shadow-lg"
+              >
+                <ArrowLeft size={18} />
+                <span className="font-semibold text-sm">Back to Match</span>
+              </button>
+            )}
             <div className="inline-flex items-center gap-3 px-4 py-2 bg-primary/10 rounded-full">
               <Zap className="text-primary" size={20} />
               <span className="text-sm font-medium text-primary uppercase tracking-wide">
@@ -139,7 +154,7 @@ const PerformanceLab = () => {
                 </div>
               ) : activeSport === "football" ? (
                 <div className="min-h-[900px] border border-border rounded-xl">
-                   <FootballPerformanceDashboard />
+                   <FootballPerformanceDashboard initialState={state} />
                 </div>
               ) : (
                 <PlayerAnalysisPanel activeSport={activeSport} />

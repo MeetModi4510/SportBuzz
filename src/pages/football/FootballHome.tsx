@@ -52,7 +52,7 @@ export default function FootballHome() {
 
         if (transferFilter === "loans") return t.onLoan;
         if (transferFilter === "free_transfers") return feeText?.toLowerCase() === "free transfer";
-        if (transferFilter === "free_agents") return t.fromClubId === 2 || t.toClubId === 2 || t.fromClub.toLowerCase().includes('free agent') || t.toClub.toLowerCase().includes('free agent');
+        if (transferFilter === "free_agents") return t.fromClubId === 2 || t.toClubId === 2 || t.fromClub.toLowerCase().includes('free agent') || t.toClub.toLowerCase().includes('free agent') || t.fromClub.toLowerCase().includes('without') || t.toClub.toLowerCase().includes('without') || t.fromClub.toLowerCase().includes('retired') || t.toClub.toLowerCase().includes('retired');
         if (transferFilter === "contracts") return typeText === "contract";
         if (transferFilter === "contract_extensions") return t.contractExtension;
         if (transferFilter === "transfers") return !t.onLoan && feeText?.toLowerCase() !== "free transfer" && !t.contractExtension && typeText !== "contract";
@@ -72,7 +72,8 @@ export default function FootballHome() {
       return 0;
     });
 
-    return result;
+    // Cap at 40 to keep marquee performant and readable
+    return result.slice(0, 40);
   }, [recentTransfers, transferFilter, transferSort]);
 
   const isCustomTransferView = transferFilter !== "all" || transferSort !== "newest";
@@ -138,6 +139,11 @@ export default function FootballHome() {
                   <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-[#00c6ff] to-blue-400">
                     Transfer Center.
                   </h2>
+                  {processedTransfers.length > 0 && (
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#00c6ff]/60 bg-[#00c6ff]/10 border border-[#00c6ff]/20 px-2 py-0.5 rounded-full">
+                      {processedTransfers.length} moves
+                    </span>
+                  )}
                 </div>
               </div>
               
@@ -170,7 +176,10 @@ export default function FootballHome() {
               </div>
             ) : (
               <div className={isCustomTransferView ? "flex overflow-x-auto gap-6 pb-6 pt-4 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0" : "relative overflow-hidden w-full group py-4 -mx-4 px-4 md:mx-0 md:px-0"}>
-                <div className={isCustomTransferView ? "flex gap-6" : "flex w-max animate-[marquee_300s_linear_infinite] hover:[animation-play-state:paused] gap-6"}>
+                <div
+                  className={isCustomTransferView ? "flex gap-6" : "flex w-max gap-6 animate-marquee hover:[animation-play-state:paused]"}
+                  style={!isCustomTransferView ? { animationDuration: `${Math.max(60, processedTransfers.length * 5)}s` } : undefined}
+                >
                   {isCustomTransferView ? (
                     processedTransfers.map((transfer, idx) => (
                       <div key={idx} className="snap-start shrink-0">

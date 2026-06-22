@@ -213,6 +213,49 @@ class FotmobService {
       return null;
     }
   }
+
+  async fetchMatchDetails(matchId) {
+    try {
+      const cachePath = path.join(CACHE_DIR, `match_${matchId}.json`);
+
+      // 1. Check cache (5 min TTL for match details)
+      if (fs.existsSync(cachePath)) {
+        const stats = fs.statSync(cachePath);
+        if (Date.now() - stats.mtimeMs < 5 * 60 * 1000) {
+          console.log(`[FotmobService] Returning cached match data for ID ${matchId}`);
+          return JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+        }
+      }
+
+      // 2. Use the direct Fotmob JSON API (no puppeteer needed)
+      const apiUrl = `https://www.fotmob.com/api/data/matchDetails?matchId=${matchId}`;
+      console.log(`[FotmobService] Fetching from Fotmob API: ${apiUrl}`);
+      
+      const response = await axios.get(apiUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'application/json',
+          'Referer': 'https://www.fotmob.com/',
+        },
+        timeout: 15000
+      });
+
+      const matchData = response.data;
+      
+      if (!matchData || !matchData.content) {
+        throw new Error(`No valid match data returned for ID ${matchId}`);
+      }
+
+      // 3. Cache and return
+      fs.writeFileSync(cachePath, JSON.stringify(matchData, null, 2), 'utf8');
+      console.log(`[FotmobService] Cached match data for ID ${matchId}`);
+
+      return matchData;
+    } catch (error) {
+      console.error(`[FotmobService] Error fetching match data for ID ${matchId}:`, error.message);
+      return null;
+    }
+  }
 }
 
 export const fotmobService = new FotmobService();

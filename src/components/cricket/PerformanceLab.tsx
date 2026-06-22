@@ -50,7 +50,7 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
 
     if (!activePlayerId) {
         return (
-            <div className="flex-1 flex flex-col items-center justify-center border border-white/10 rounded-[2.5rem] bg-white/[0.02] backdrop-blur-[60px] text-slate-500 min-h-[600px] shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] relative overflow-hidden group w-full z-20">
+            <div className="flex-1 flex flex-col items-center justify-center border dark:border-white/10 border-slate-200 rounded-[2.5rem] dark:bg-white/[0.02] bg-white/50 backdrop-blur-[60px] dark:text-slate-500 text-slate-500 min-h-[600px] shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] relative overflow-hidden group w-full z-20">
                 <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 
                 {/* Glowing Radar Background */}
@@ -59,14 +59,14 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                 <div className="relative flex items-center justify-center mb-10">
                     <div className="absolute w-40 h-40 border border-fuchsia-500/30 rounded-full animate-[ping_3s_ease-in-out_infinite]"></div>
                     <div className="absolute w-56 h-56 border border-cyan-500/20 rounded-full animate-[ping_3s_ease-in-out_infinite_0.5s]"></div>
-                    <div className="w-24 h-24 bg-white/5 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/20 shadow-[0_0_40px_rgba(59,130,246,0.5)] transform rotate-3 group-hover:rotate-0 transition-transform duration-500 relative z-10">
-                        <svg className="w-12 h-12 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-24 h-24 dark:bg-white/5 bg-white/50 backdrop-blur-xl rounded-full flex items-center justify-center border dark:border-white/20 border-blue-500/20 shadow-[0_0_40px_rgba(59,130,246,0.5)] transform rotate-3 group-hover:rotate-0 transition-transform duration-500 relative z-10">
+                        <svg className="w-12 h-12 text-cyan-500 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v1m6 11h2m-6 0h-8v4h8v-4zm-4-8a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                     </div>
                 </div>
-                <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 tracking-tighter drop-shadow-lg relative z-10">The Command Center</h2>
-                <p className="text-sm mt-4 text-slate-300 max-w-sm text-center leading-relaxed font-bold uppercase tracking-[0.2em] relative z-10">Select a player from the roster rail above to initialize deep analytics</p>
+                <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r dark:from-cyan-400 dark:to-blue-500 from-cyan-600 to-blue-700 tracking-tighter drop-shadow-lg relative z-10">The Command Center</h2>
+                <p className="text-sm mt-4 dark:text-slate-300 text-slate-600 max-w-sm text-center leading-relaxed font-bold uppercase tracking-[0.2em] relative z-10">Select a player from the roster rail above to initialize deep analytics</p>
             </div>
         );
     }
@@ -139,9 +139,9 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
         <div className="flex-1 flex flex-col z-10 w-full px-4 lg:px-12 pb-16">
             
             {/* TOP HEADER: Player Identity */}
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-8 pb-10 mb-8 border-b border-white/[0.05]">
+            <div className="flex flex-col md:flex-row items-center md:items-end gap-8 pb-10 mb-8 border-b dark:border-white/[0.05] border-slate-200">
                 {/* Small Crisp Avatar */}
-                <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl overflow-hidden bg-[#0A0A0B] border border-white/[0.08] shadow-2xl flex-shrink-0 relative group">
+                <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl overflow-hidden dark:bg-[#0A0A0B] bg-slate-100 border dark:border-white/[0.08] border-slate-200 shadow-2xl flex-shrink-0 relative group">
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     {crispImageUrl ? (
                         <img src={crispImageUrl} alt={activePlayer?.name} className="w-full h-full object-cover object-top" />
@@ -157,37 +157,37 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                     <span className="text-zinc-500 text-[10px] font-bold tracking-[0.3em] uppercase">
                         {playerData.team || 'International'}
                     </span>
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none">
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black dark:text-white text-slate-900 tracking-tight leading-none">
                         {playerData.name}
                     </h1>
                     <div className="flex flex-wrap justify-center md:justify-start items-center gap-3 mt-2">
-                        <div className="px-4 py-2 bg-white/[0.02] border border-white/[0.05] rounded-lg text-white font-bold text-sm flex items-center gap-2 shadow-sm">
+                        <div className="px-4 py-2 dark:bg-white/[0.02] bg-white border dark:border-white/[0.05] border-slate-200 rounded-lg dark:text-white text-slate-800 font-bold text-sm flex items-center gap-2 shadow-sm">
                             <span className="text-zinc-500 text-[9px] uppercase tracking-widest">OVR</span>
                             {stableOVR}
                         </div>
-                        <div className="px-4 py-2 bg-white/[0.02] border border-white/[0.05] rounded-lg text-zinc-300 font-medium text-sm shadow-sm">
+                        <div className="px-4 py-2 dark:bg-white/[0.02] bg-white border dark:border-white/[0.05] border-slate-200 rounded-lg dark:text-zinc-300 text-slate-600 font-medium text-sm shadow-sm">
                             {playerData.profileInfo?.role || activePlayer?.role || 'Batter'}
                         </div>
                     </div>
                 </div>
 
                 {/* Toggles */}
-                <div className="flex bg-white/[0.02] border border-white/[0.05] rounded-xl p-1 shadow-lg w-full md:w-auto mt-6 md:mt-0">
+                <div className="flex dark:bg-white/[0.02] bg-slate-100 border dark:border-white/[0.05] border-slate-200 rounded-xl p-1 shadow-lg w-full md:w-auto mt-6 md:mt-0">
                     <button 
                         onClick={() => setSkillMode('profile')}
-                        className={`flex-1 md:w-28 py-3 rounded-lg text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 ${skillMode === 'profile' ? 'bg-white text-black shadow-md' : 'text-zinc-500 hover:text-white'}`}
+                        className={`flex-1 md:w-28 py-3 rounded-lg text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 ${skillMode === 'profile' ? 'dark:bg-white bg-blue-500 dark:text-black text-white shadow-md' : 'text-zinc-500 dark:hover:text-white hover:text-slate-800'}`}
                     >
                         Profile
                     </button>
                     <button 
                         onClick={() => setSkillMode('batting')}
-                        className={`flex-1 md:w-28 py-3 rounded-lg text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 ${skillMode === 'batting' ? 'bg-white text-black shadow-md' : 'text-zinc-500 hover:text-white'}`}
+                        className={`flex-1 md:w-28 py-3 rounded-lg text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 ${skillMode === 'batting' ? 'dark:bg-white bg-blue-500 dark:text-black text-white shadow-md' : 'text-zinc-500 dark:hover:text-white hover:text-slate-800'}`}
                     >
                         Batting
                     </button>
                     <button 
                         onClick={() => setSkillMode('bowling')}
-                        className={`flex-1 md:w-28 py-3 rounded-lg text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 ${skillMode === 'bowling' ? 'bg-white text-black shadow-md' : 'text-zinc-500 hover:text-white'}`}
+                        className={`flex-1 md:w-28 py-3 rounded-lg text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 ${skillMode === 'bowling' ? 'dark:bg-white bg-blue-500 dark:text-black text-white shadow-md' : 'text-zinc-500 dark:hover:text-white hover:text-slate-800'}`}
                     >
                         Bowling
                     </button>
@@ -199,7 +199,7 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                 {skillMode !== 'profile' ? (
                     <div className="flex flex-col gap-16">
                         {/* Format Tabs & Live */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-white/[0.08] pb-4 gap-4">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b dark:border-white/[0.08] border-slate-200 pb-4 gap-4">
                             <div className="flex gap-8 overflow-x-auto hide-scrollbar w-full sm:w-auto">
                                 {(['test', 'odi', 't20i', 'ipl', 'all'] as Format[]).map(format => (
                                     <button
@@ -207,8 +207,8 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                                         onClick={() => setActiveFormat(format)}
                                         className={`pb-4 -mb-4 text-[11px] font-bold tracking-[0.2em] uppercase transition-all duration-300 border-b-2 whitespace-nowrap ${
                                             activeFormat === format 
-                                                ? 'border-white text-white' 
-                                                : 'border-transparent text-zinc-600 hover:text-zinc-300'
+                                                ? 'dark:border-white border-blue-500 dark:text-white text-blue-600' 
+                                                : 'border-transparent text-zinc-600 dark:hover:text-zinc-300 hover:text-slate-800'
                                         }`}
                                     >
                                         {format}
@@ -226,7 +226,7 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                             {detailedStatsList.slice(0, 5).map((stat, idx) => (
                                 <div key={idx} className="flex flex-col gap-3">
                                     <span className="text-zinc-600 text-[10px] uppercase tracking-[0.2em] font-bold">{stat.label}</span>
-                                    <span className="text-4xl lg:text-5xl font-black text-white tracking-tight">{stat.value || '-'}</span>
+                                    <span className="text-4xl lg:text-5xl font-black dark:text-white text-slate-800 tracking-tight">{stat.value || '-'}</span>
                                 </div>
                             ))}
                         </div>
@@ -246,13 +246,13 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                         </div>
                         
                         {/* Detailed Stats Panel (Full Width Row) */}
-                        <div className="pt-8 border-t border-white/[0.05]">
+                        <div className="pt-8 border-t dark:border-white/[0.05] border-slate-200">
                             <h3 className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-8">Detailed Career Stats</h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
                                 {detailedStatsList.slice(5).map((stat, idx) => (
-                                    <div key={idx} className="flex flex-col gap-3 border-b md:border-b-0 border-white/[0.05] pb-4 md:pb-0">
+                                    <div key={idx} className="flex flex-col gap-3 border-b md:border-b-0 dark:border-white/[0.05] border-slate-200 pb-4 md:pb-0">
                                         <span className="text-[11px] text-zinc-500 font-medium tracking-widest uppercase">{stat.label}</span>
-                                        <span className="text-2xl font-black text-white leading-none">{stat.value || '-'}</span>
+                                        <span className="text-2xl font-black dark:text-white text-slate-800 leading-none">{stat.value || '-'}</span>
                                     </div>
                                 ))}
                             </div>
@@ -265,9 +265,9 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                         
                         {/* Opposition Stats */}
                         {playerData.vsOpposition && playerData.vsOpposition.length > 0 && (
-                            <div className="pt-8 border-t border-white/[0.05]">
+                            <div className="pt-8 border-t dark:border-white/[0.05] border-slate-200">
                                 <h3 className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-8">Vs Opposition</h3>
-                                <div className="bg-white/[0.02] border border-white/[0.05] rounded-[2rem] p-8">
+                                <div className="dark:bg-white/[0.02] bg-slate-50 border dark:border-white/[0.05] border-slate-200 rounded-[2rem] p-8">
                                     <OppositionStats data={playerData.vsOpposition} />
                                 </div>
                             </div>
@@ -280,44 +280,44 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                             <div>
                                 <h3 className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-6">Identity Matrix</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                                    <div className="bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg flex items-center gap-4">
+                                    <div className="dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.03] border-slate-200 p-5 rounded-3xl relative overflow-hidden group shadow-lg flex items-center gap-4">
                                         <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         <div className="p-3 bg-white/[0.02] rounded-2xl border border-white/[0.05] text-indigo-400 group-hover:text-indigo-300 transition-colors">
                                             <Calendar className="w-5 h-5" />
                                         </div>
                                         <div>
                                             <span className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold block mb-1">Born</span>
-                                            <span className="text-sm font-bold text-white tracking-wide">{playerData.profileInfo?.born || 'N/A'}</span>
+                                            <span className="text-sm font-bold dark:text-white text-slate-800 tracking-wide">{playerData.profileInfo?.born || 'N/A'}</span>
                                         </div>
                                     </div>
-                                    <div className="bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg flex items-center gap-4">
+                                    <div className="dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.03] border-slate-200 p-5 rounded-3xl relative overflow-hidden group shadow-lg flex items-center gap-4">
                                         <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         <div className="p-3 bg-white/[0.02] rounded-2xl border border-white/[0.05] text-emerald-400 group-hover:text-emerald-300 transition-colors">
                                             <MapPin className="w-5 h-5" />
                                         </div>
                                         <div>
                                             <span className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold block mb-1">Birth Place</span>
-                                            <span className="text-sm font-bold text-white tracking-wide">{playerData.profileInfo?.birthPlace || 'N/A'}</span>
+                                            <span className="text-sm font-bold dark:text-white text-slate-800 tracking-wide">{playerData.profileInfo?.birthPlace || 'N/A'}</span>
                                         </div>
                                     </div>
-                                    <div className="bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg flex items-center gap-4">
+                                    <div className="dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.03] border-slate-200 p-5 rounded-3xl relative overflow-hidden group shadow-lg flex items-center gap-4">
                                         <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         <div className="p-3 bg-white/[0.02] rounded-2xl border border-white/[0.05] text-amber-400 group-hover:text-amber-300 transition-colors">
                                             <Activity className="w-5 h-5" />
                                         </div>
                                         <div>
                                             <span className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold block mb-1">Batting Style</span>
-                                            <span className="text-sm font-bold text-white tracking-wide">{playerData.profileInfo?.battingStyle || 'N/A'}</span>
+                                            <span className="text-sm font-bold dark:text-white text-slate-800 tracking-wide">{playerData.profileInfo?.battingStyle || 'N/A'}</span>
                                         </div>
                                     </div>
-                                    <div className="bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.03] p-5 rounded-3xl relative overflow-hidden group shadow-lg flex items-center gap-4">
+                                    <div className="dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.03] border-slate-200 p-5 rounded-3xl relative overflow-hidden group shadow-lg flex items-center gap-4">
                                         <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         <div className="p-3 bg-white/[0.02] rounded-2xl border border-white/[0.05] text-rose-400 group-hover:text-rose-300 transition-colors">
                                             <Target className="w-5 h-5" />
                                         </div>
                                         <div>
                                             <span className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold block mb-1">Bowling Style</span>
-                                            <span className="text-sm font-bold text-white tracking-wide">{playerData.profileInfo?.bowlingStyle || 'N/A'}</span>
+                                            <span className="text-sm font-bold dark:text-white text-slate-800 tracking-wide">{playerData.profileInfo?.bowlingStyle || 'N/A'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -332,12 +332,12 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                                     .filter(Boolean);
                                 if (teamsList.length === 0) return null;
                                 return (
-                                    <div className="pt-8 border-t border-white/[0.05]">
+                                    <div className="pt-8 border-t dark:border-white/[0.05] border-slate-200">
                                         <h3 className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-6">Teams</h3>
                                         <div className="flex flex-wrap gap-3">
                                             {teamsList.map((team: string, idx: number) => (
-                                                <span key={idx} className="relative overflow-hidden px-4 py-2 bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/[0.08] rounded-xl text-xs font-bold text-zinc-300 shadow-sm hover:border-white/[0.2] hover:text-white transition-all duration-300 cursor-default group">
-                                                    <span className="absolute inset-0 bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                                                <span key={idx} className="relative overflow-hidden px-4 py-2 bg-gradient-to-br dark:from-white/[0.03] from-slate-100 dark:to-white/[0.01] to-slate-50 border dark:border-white/[0.08] border-slate-200 rounded-xl text-xs font-bold dark:text-zinc-300 text-slate-600 shadow-sm dark:hover:border-white/[0.2] hover:border-slate-300 dark:hover:text-white hover:text-slate-900 transition-all duration-300 cursor-default group">
+                                                    <span className="absolute inset-0 dark:bg-white/[0.02] bg-black/[0.02] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                                                     {team}
                                                 </span>
                                             ))}
@@ -370,38 +370,38 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                                 if (validRankings.length === 0) return null;
 
                                 return (
-                                    <div className="pt-8 border-t border-white/[0.05]">
+                                    <div className="pt-8 border-t dark:border-white/[0.05] border-slate-200">
                                         <h3 className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-6">ICC Rankings</h3>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                                             {validRankings.map((ranking: any, idx: number) => {
                                                 const rankNum = parseInt(ranking.rank);
-                                                let gradient = "from-zinc-800 to-zinc-900";
+                                                let gradient = "dark:from-zinc-800 dark:to-zinc-900 from-slate-200 to-slate-300";
                                                 let shadow = "shadow-none";
-                                                let textGrad = "from-zinc-100 to-zinc-400";
+                                                let textGrad = "dark:from-zinc-100 dark:to-zinc-400 from-slate-500 to-slate-800";
                                                 if (!isNaN(rankNum)) {
                                                     if (rankNum <= 3) {
                                                         gradient = "from-amber-500/10 to-amber-700/5";
                                                         shadow = "shadow-[0_0_20px_rgba(245,158,11,0.05)]";
-                                                        textGrad = "from-amber-200 to-yellow-500";
+                                                        textGrad = "from-amber-400 to-yellow-600 dark:from-amber-200 dark:to-yellow-500";
                                                     } else if (rankNum <= 10) {
                                                         gradient = "from-slate-400/10 to-slate-600/5";
-                                                        textGrad = "from-slate-200 to-slate-400";
+                                                        textGrad = "from-slate-500 to-slate-700 dark:from-slate-200 dark:to-slate-400";
                                                     } else if (rankNum <= 20) {
                                                         gradient = "from-orange-500/10 to-orange-800/5";
-                                                        textGrad = "from-orange-200 to-orange-400";
+                                                        textGrad = "from-orange-400 to-orange-600 dark:from-orange-200 dark:to-orange-400";
                                                     }
                                                 }
 
                                                 return (
-                                                    <div key={idx} className={`relative flex flex-col gap-2 bg-[#0B0D14]/80 backdrop-blur-md border border-white/[0.05] p-6 rounded-3xl overflow-hidden group ${shadow} transition-all duration-500 hover:scale-[1.02] hover:border-white/[0.1]`}>
+                                                    <div key={idx} className={`relative flex flex-col gap-2 dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.05] border-slate-200 p-6 rounded-3xl overflow-hidden group ${shadow} transition-all duration-500 hover:scale-[1.02] dark:hover:border-white/[0.1] hover:border-slate-300`}>
                                                         <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-50`}></div>
                                                         <div className="absolute -top-10 -right-10 w-24 h-24 bg-white/[0.02] rounded-full blur-2xl group-hover:bg-white/[0.04] transition-colors"></div>
                                                         <span className="text-[9px] text-zinc-500 font-bold tracking-[0.2em] uppercase z-10">{ranking.category} • {ranking.format}</span>
                                                         <div className="flex items-end gap-3 z-10 mt-2">
                                                             <span className={`text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b ${textGrad} leading-none tracking-tighter`}>#{ranking.rank}</span>
                                                             <div className="mb-2 flex flex-col">
-                                                                {ranking.trend === 'up' && <span className="text-emerald-400 text-xs font-black tracking-widest drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]">▲ {ranking.trendVal}</span>}
-                                                                {ranking.trend === 'down' && <span className="text-red-400 text-xs font-black tracking-widest drop-shadow-[0_0_5px_rgba(248,113,113,0.5)]">▼ {ranking.trendVal}</span>}
+                                                                {ranking.trend === 'up' && <span className="text-emerald-500 dark:text-emerald-400 text-xs font-black tracking-widest drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]">▲ {ranking.trendVal}</span>}
+                                                                {ranking.trend === 'down' && <span className="text-red-500 dark:text-red-400 text-xs font-black tracking-widest drop-shadow-[0_0_5px_rgba(248,113,113,0.5)]">▼ {ranking.trendVal}</span>}
                                                             </div>
                                                         </div>
                                                     </div>

@@ -17,6 +17,9 @@ import { cn } from "../../lib/utils";
 import { Helmet } from "react-helmet-async";
 import { PlayerProfileDialog } from "../../components/PlayerProfileDialog";
 import { Player } from "../../data/types";
+import { useFotmobLineups } from "../../hooks/football/useFotmobLineups";
+import { PlayerMatchStatsModal } from "../../components/football/PlayerMatchStatsModal";
+import { useQuery } from "@tanstack/react-query";
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
@@ -100,6 +103,14 @@ export default function MatchCenter() {
   const [activeStatCategory, setActiveStatCategory] = useState("all");
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
+  const [selectedMatchPlayer, setSelectedMatchPlayer] = useState<any>(null);
+  const [isPlayerMatchStatsModalOpen, setIsPlayerMatchStatsModalOpen] = useState(false);
+
+  const handleFotmobPlayerClick = async (p: any, teamColor: string, teamId: number, teamName: string) => {
+    setSelectedMatchPlayer({ ...p, teamColor, teamId, teamName });
+    setIsPlayerMatchStatsModalOpen(true);
+  };
+
   const handlePlayerClick = (p: any, teamId: string) => {
     const goals = getStatValue(p.stats, "totalGoals");
     const assists = getStatValue(p.stats, "goalAssists");
@@ -171,6 +182,25 @@ export default function MatchCenter() {
     checkFav();
   }, [id]);
 
+  // Move hooks to top level, safely extracting needed dependencies
+  const header = matchData?.header;
+  const comp = header?.competitions?.[0];
+  const homeTeamObj = comp?.competitors?.find((c: any) => c.homeAway === 'home');
+  const awayTeamObj = comp?.competitors?.find((c: any) => c.homeAway === 'away');
+  
+  const homeTeam = homeTeamObj?.team || {};
+  const awayTeam = awayTeamObj?.team || {};
+  const espnHomeTeamName = homeTeam.name || homeTeam.displayName || homeTeam.shortDisplayName || "Home";
+  const espnAwayTeamName = awayTeam.name || awayTeam.displayName || awayTeam.shortDisplayName || "Away";
+
+  const { lineupData: fotmobLineups, fotmobMatchId, matchDetails: fotmobMatchDetails } = useFotmobLineups(espnHomeTeamName, espnAwayTeamName, true);
+
+  // We already fetched match details in useFotmobLineups, so we can just extract the player stats directly!
+  const fetchedPlayerStats = fotmobMatchDetails?.content?.playerStats?.[selectedMatchPlayer?.id] || null;
+  const isPlayerMatchStatsLoading = false;
+
+  console.log("MatchCenter debug: starting render. id:", id, "isLoading:", isLoading, "matchData:", !!matchData);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
@@ -200,6 +230,7 @@ export default function MatchCenter() {
   }
 
   if (error || !matchData) {
+    console.log("MatchCenter debug: rendering Match Not Found due to error or !matchData. error:", !!error, "matchData:", !!matchData);
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
@@ -217,15 +248,25 @@ export default function MatchCenter() {
     );
   }
 
-  const header = matchData.header;
-  if (!header || !header.competitions || header.competitions.length === 0) return null;
+  console.log("MatchCenter debug: header exists?", !!header, "competitions:", header?.competitions?.length);
+  if (!header || !header.competitions || header.competitions.length === 0) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+            <Info className="w-8 h-8 text-red-500" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground mb-2">Match Data Unavailable</h2>
+          <p className="text-muted-foreground mb-6">We couldn't load the complete details for this match.</p>
+          <button onClick={() => navigate('/football')} className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-semibold transition-colors">
+            Back to Matches
+          </button>
+        </div>
+      </div>
+    );
+  }
   
-  const comp = header.competitions[0];
-  const homeTeamObj = comp.competitors.find((c: any) => c.homeAway === 'home');
-  const awayTeamObj = comp.competitors.find((c: any) => c.homeAway === 'away');
-  
-  const homeTeam = homeTeamObj?.team || {};
-  const awayTeam = awayTeamObj?.team || {};
   const status = comp.status?.type?.detail || "Scheduled";
   const statusState = comp.status?.type?.state || "pre"; // pre, in, post
   const date = comp.date || "";
@@ -327,25 +368,68 @@ export default function MatchCenter() {
     );
   };
 
-  const renderPitchPlayer = (p: any, teamColor: string, teamId: string) => {
-    const rating = generateRating(p.athlete.id);
-    const goals = getStatValue(p.stats, "totalGoals");
-    const assists = getStatValue(p.stats, "goalAssists");
-    const yellowCards = getStatValue(p.stats, "yellowCards");
-    const redCards = getStatValue(p.stats, "redCards");
+  const renderPitchPlayer = (p: any, teamColor: string, teamId: string, isFotmob = false, teamName?: string) => {
+    // For Fotmob players: p has { id, name, shirtNumber, rating, ... }
+    // For ESPN players: p has { athlete: { id, displayName }, jersey, stats, ... }
+    
+    let finalPlayerId = isFotmob ? p.id : p.athlete?.id;
+    let finalIsFotmob = isFotmob;
+    const jersey = isFotmob ? p.shirtNumber : p.jersey;
+    let rating = isFotmob ? (p.rating ? p.rating.toFixed(1) : null) : generateRating(finalPlayerId);
+    
+    // Cross-reference ESPN player with FotMob lineups to get the accurate FotMob ID for headshots
+    if (!isFotmob && fotmobLineups) {
+      const fotmobTeam = homeTeam.id === teamId ? fotmobLineups.homeTeam : fotmobLineups.awayTeam;
+      const matchingStarter = fotmobTeam.starters?.find((s: any) => s.shirtNumber?.toString() === jersey?.toString());
+      if (matchingStarter) {
+        finalPlayerId = matchingStarter.id;
+        finalIsFotmob = true;
+        if (matchingStarter.rating) rating = matchingStarter.rating.toFixed(1);
+      }
+    }
+
+    let playerNameRaw = isFotmob ? p.name : p.athlete?.displayName;
+    if (typeof playerNameRaw === 'object' && playerNameRaw !== null) {
+      playerNameRaw = playerNameRaw.name || playerNameRaw.fullName || `${playerNameRaw.firstName || ''} ${playerNameRaw.lastName || ''}`.trim() || 'Unknown';
+    }
+    const playerName = String(playerNameRaw || 'Unknown');
+    const goals = isFotmob ? 0 : getStatValue(p.stats, "totalGoals");
+    const assists = isFotmob ? 0 : getStatValue(p.stats, "goalAssists");
+    const yellowCards = isFotmob ? 0 : getStatValue(p.stats, "yellowCards");
+    const redCards = isFotmob ? 0 : getStatValue(p.stats, "redCards");
     const isRedCarded = redCards > 0;
     
     return (
       <div 
-        key={p.athlete.id} 
-        onClick={() => handlePlayerClick(p, teamId)}
-        className={cn("flex flex-col items-center justify-center w-20 md:w-24 group z-10 transition-transform hover:scale-110 relative cursor-pointer", isRedCarded && "opacity-50 grayscale")}
+        key={p.athlete?.id || p.id} 
+        onClick={() => {
+          if (finalIsFotmob) {
+            handleFotmobPlayerClick({ ...p, id: finalPlayerId, isFotmobPlayer: true }, teamColor, parseInt(teamId), teamName || p.teamName);
+          } else {
+            handlePlayerClick(p, teamId);
+          }
+        }}
+        className={`flex flex-col items-center justify-center w-20 md:w-24 group z-10 transition-transform hover:scale-110 relative cursor-pointer ${isRedCarded ? 'opacity-50 grayscale' : ''}`}
       >
         <div className="relative mt-0.5">
           <div className="relative w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-sm font-bold shadow-[0_4px_12px_rgba(0,0,0,0.6)] border-[3px] overflow-hidden bg-secondary" style={{ borderColor: teamColor }}>
-            <span className="absolute inset-0 flex items-center justify-center text-muted-foreground font-black text-xl z-0 drop-shadow-md">{p.jersey}</span>
-            <LineupPlayerImage playerId={p.athlete.id} playerName={p.athlete.displayName} className="absolute inset-0 w-full h-full object-cover z-10 bg-secondary" />
+            <span className="absolute inset-0 flex items-center justify-center text-muted-foreground font-black text-xl z-0 drop-shadow-md">{jersey}</span>
+            <LineupPlayerImage playerId={finalPlayerId} playerName={playerName} isFotmobId={finalIsFotmob} className="absolute inset-0 w-full h-full object-cover z-10 bg-secondary" />
           </div>
+
+          {/* Rating Badge */}
+          {rating && (
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-30">
+              <div
+                className={`transform -skew-x-12 px-2.5 py-[1px] border-b-[2px] border-r-[2px] border-black/40 shadow-xl ${parseFloat(rating) >= 9 ? 'bg-gradient-to-br from-[#a855f7] to-[#ec4899] shadow-[0_4px_12px_rgba(236,72,153,0.5)]' : parseFloat(rating) >= 8 ? 'bg-[#10b981] shadow-[0_4px_10px_rgba(16,185,129,0.4)]' : parseFloat(rating) >= 7 ? 'bg-[#34d399] shadow-[0_4px_10px_rgba(52,211,153,0.3)]' : parseFloat(rating) >= 6 ? 'bg-[#fbbf24] shadow-[0_4px_10px_rgba(251,191,36,0.3)]' : 'bg-[#ef4444] shadow-[0_4px_10px_rgba(239,68,68,0.3)]'}`}
+                style={{ minWidth: '2.5rem' }}
+              >
+                <div className={`transform skew-x-12 text-[11px] font-black tracking-widest text-center drop-shadow-md ${parseFloat(rating) >= 6 && parseFloat(rating) < 7 ? 'text-[#1a1b1c]' : 'text-white'}`}>
+                  {rating}
+                </div>
+              </div>
+            </div>
+          )}
 
           {goals > 0 && (
             <div className="absolute -top-1.5 -left-1.5 z-30 flex items-center justify-center w-6 h-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" title={`Goal (${goals})`}>
@@ -368,7 +452,7 @@ export default function MatchCenter() {
             </div>
           )}
 
-          {(p.subbedOut || p.subbedIn) && (
+          {!isFotmob && (p.subbedOut || p.subbedIn) && (
             <div className="absolute top-1/2 -translate-y-1/2 -left-2.5 flex flex-col gap-1 z-30">
                {p.subbedOut && <div className="bg-red-500 rounded-full border-[1.5px] border-white shadow-md p-0.5" title="Subbed Out"><ArrowDown className="w-2.5 h-2.5 md:w-3 md:h-3 text-white stroke-[3]" /></div>}
                {p.subbedIn && <div className="bg-emerald-500 rounded-full border-[1.5px] border-white shadow-md p-0.5" title="Subbed In"><ArrowUp className="w-2.5 h-2.5 md:w-3 md:h-3 text-white stroke-[3]" /></div>}
@@ -376,10 +460,10 @@ export default function MatchCenter() {
           )}
         </div>
         
-        <div className="mt-1.5 text-[11px] md:text-xs text-white/90 font-bold tracking-wide text-center truncate w-full z-20 drop-shadow-[0_2px_2px_rgba(0,0,0,1)] px-1">
+        <div className="mt-3.5 text-[11px] md:text-xs text-white/90 font-bold tracking-wide text-center truncate w-full z-20 drop-shadow-[0_2px_2px_rgba(0,0,0,1)] px-1">
           {(() => {
-            const parts = p.athlete.displayName.trim().split(/\s+/);
-            if (parts.length <= 1) return p.athlete.displayName;
+            const parts = playerName.trim().split(/\s+/);
+            if (parts.length <= 1) return playerName;
             return `${parts[0][0].toUpperCase()}.${parts.slice(1).join(' ')}`;
           })()}
         </div>
@@ -393,19 +477,44 @@ export default function MatchCenter() {
     const assists = getStatValue(p.stats, "goalAssists");
     const yellowCards = getStatValue(p.stats, "yellowCards");
     const redCards = getStatValue(p.stats, "redCards");
+
+    // Match with FotMob lineup by jersey number to get the correct FotMob ID for image fetching
+    let fotmobId: number | undefined;
+    let fotmobRating: any = undefined;
+    if (fotmobLineups) {
+      const fotmobTeam = homeTeam.id === teamId ? fotmobLineups.homeTeam : fotmobLineups.awayTeam;
+      const matchingSub = fotmobTeam.subs.find((sub: any) => sub.shirtNumber?.toString() === p.jersey?.toString());
+      if (matchingSub) {
+        fotmobId = matchingSub.id;
+        fotmobRating = matchingSub.rating;
+      }
+    }
+
+    const tName = homeTeam.id === teamId ? espnHomeTeamName : espnAwayTeamName;
     
     return (
       <div 
         key={p.athlete.id} 
-        onClick={() => handlePlayerClick(p, teamId)}
-        className="flex items-center gap-3 py-2 border-b border-border/10 last:border-0 hover:bg-white/5 transition-colors px-2 -mx-2 rounded-md cursor-pointer"
+        onClick={() => {
+          if (fotmobId) {
+            handleFotmobPlayerClick({ ...p, id: fotmobId, isFotmobPlayer: true }, teamColor, parseInt(teamId), tName);
+          } else {
+            handlePlayerClick(p, teamId);
+          }
+        }}
+        className="flex items-center gap-4 py-2 border-b border-border/10 last:border-0 hover:bg-white/5 transition-colors px-2 -mx-2 rounded-md cursor-pointer"
       >
         <div className="w-5 text-right shrink-0">
-          <span className="text-xs font-mono font-semibold text-muted-foreground">{p.jersey}</span>
+          <span className="text-sm font-mono font-semibold text-muted-foreground">{p.jersey}</span>
         </div>
-        <div className="relative w-8 h-8 rounded-full bg-secondary/30 flex items-center justify-center font-bold text-xs border-[2px] overflow-hidden shrink-0 shadow-sm" style={{ borderColor: teamColor }}>
+        <div className="relative w-11 h-11 rounded-full bg-secondary/30 flex items-center justify-center font-bold text-xs border-[2px] overflow-hidden shrink-0 shadow-sm" style={{ borderColor: teamColor }}>
           <span className="absolute z-0">{p.jersey}</span>
-          <LineupPlayerImage playerId={p.athlete.id} playerName={p.athlete.displayName} className="absolute inset-0 w-full h-full object-cover z-10 bg-background" />
+          <LineupPlayerImage 
+            playerId={fotmobId || p.athlete.id} 
+            playerName={p.athlete.displayName} 
+            isFotmobId={!!fotmobId}
+            className="absolute inset-0 w-full h-full object-cover z-10 bg-background" 
+          />
         </div>
         <div className="flex flex-col flex-1 min-w-0 justify-center">
           <span className="font-semibold text-sm tracking-tight text-foreground truncate leading-tight">
@@ -417,12 +526,21 @@ export default function MatchCenter() {
           </span>
           <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground mt-0.5">{p.position?.name || "Sub"}</span>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {goals > 0 && <span title="Goal" className="text-xs drop-shadow-md">⚽</span>}
-          {assists > 0 && <span title="Assist" className="text-xs drop-shadow-md">👟</span>}
-          {yellowCards > 0 && <div className="w-2.5 h-3.5 bg-[#FFCC00] shadow-sm rounded-sm" />}
-          {redCards > 0 && <div className="w-2.5 h-3.5 bg-[#FF3333] shadow-sm rounded-sm" />}
-          {p.subbedIn && <ArrowUp className="w-3.5 h-3.5 text-emerald-500" />}
+        <div className="flex items-center gap-2.5 shrink-0 ml-2">
+          {fotmobRating && (
+            <div className={`transform -skew-x-12 px-2 py-[1px] border-b-[2px] border-r-[2px] border-black/20 shadow-md ${parseFloat(fotmobRating) >= 9 ? 'bg-gradient-to-br from-[#a855f7] to-[#ec4899] text-white' : parseFloat(fotmobRating) >= 8 ? 'bg-[#10b981] text-white' : parseFloat(fotmobRating) >= 7 ? 'bg-[#34d399] text-white' : parseFloat(fotmobRating) >= 6 ? 'bg-[#fbbf24] text-[#1a1b1c]' : 'bg-[#ef4444] text-white'}`}>
+              <div className="transform skew-x-12 text-[11px] font-black text-center tracking-widest drop-shadow-sm">
+                {fotmobRating.toFixed(1)}
+              </div>
+            </div>
+          )}
+          <div className="flex items-center gap-1.5">
+            {goals > 0 && <span title="Goal" className="text-xs drop-shadow-md">⚽</span>}
+            {assists > 0 && <span title="Assist" className="text-xs drop-shadow-md">👟</span>}
+            {yellowCards > 0 && <div className="w-2.5 h-3.5 bg-[#FFCC00] shadow-sm rounded-sm border border-yellow-600/50" />}
+            {redCards > 0 && <div className="w-2.5 h-3.5 bg-[#FF3333] shadow-sm rounded-sm border border-red-800/50" />}
+            {p.subbedIn && <ArrowUp className="w-3.5 h-3.5 text-emerald-500 stroke-[3]" />}
+          </div>
         </div>
       </div>
     );
@@ -1235,28 +1353,62 @@ export default function MatchCenter() {
                     <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 w-20 md:w-28 h-8 md:h-10 border-[2px] border-white/30 border-b-0 drop-shadow-[0_0_2px_rgba(255,255,255,0.4)]" />
 
                     {/* Players Container */}
-                    <div className="absolute inset-0 flex flex-col m-1 md:m-2 mx-4 md:mx-8 py-2 md:py-4">
-                      {/* Away Team (Top Half) */}
-                      <div className="flex-1 flex flex-col justify-evenly pb-4 md:pb-6">
-                        {awayRows.map((row, idx) => (
-                          <div key={`away-row-${idx}`} className="flex justify-around items-center w-full">
-                            {row.map(item => renderPitchPlayer(item, awayTeamColor, awayTeam.id))}
+                    {fotmobLineups?.awayTeam?.starters || fotmobLineups?.homeTeam?.starters ? (
+                      <div className="absolute inset-0">
+                        {/* Fotmob Absolute Positioning */}
+                        {fotmobLineups?.awayTeam?.starters && fotmobLineups.awayTeam.starters.map((p: any) => (
+                          <div 
+                            key={`fotmob-away-${p.id}`} 
+                            className="absolute"
+                            style={{
+                              top: `${2 + (p.verticalLayout?.y ?? 0.1) * 50}%`,
+                              left: `${(p.verticalLayout?.x ?? 0.5) * 100}%`,
+                              transform: 'translate(-50%, -50%)',
+                              zIndex: 20
+                            }}
+                          >
+                            {renderPitchPlayer(p, awayTeamColor, String(fotmobLineups.awayTeam.id), true, fotmobLineups.awayTeam.name)}
+                          </div>
+                        ))}
+                        {fotmobLineups?.homeTeam?.starters && fotmobLineups.homeTeam.starters.map((p: any) => (
+                          <div 
+                            key={`fotmob-home-${p.id}`} 
+                            className="absolute"
+                            style={{
+                              bottom: `${2 + (p.verticalLayout?.y ?? 0.1) * 50}%`, 
+                              left: `${(1 - (p.verticalLayout?.x ?? 0.5)) * 100}%`,
+                              transform: 'translate(-50%, 50%)',
+                              zIndex: 20
+                            }}
+                          >
+                            {renderPitchPlayer(p, homeTeamColor, String(fotmobLineups.homeTeam.id), true, fotmobLineups.homeTeam.name)}
                           </div>
                         ))}
                       </div>
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col m-1 md:m-2 mx-4 md:mx-8 py-2 md:py-4">
+                        {/* Away Team (Top Half) */}
+                        <div className="flex-1 flex flex-col justify-evenly pb-4 md:pb-6">
+                          {awayRows.map((row, idx) => (
+                            <div key={`away-row-${idx}`} className="flex justify-around items-center w-full">
+                              {row.map(item => renderPitchPlayer(item, awayTeamColor, awayTeam.id))}
+                            </div>
+                          ))}
+                        </div>
 
-                      {/* Spacer between halves */}
-                      <div className="h-0 shrink-0" />
+                        {/* Spacer between halves */}
+                        <div className="h-0 shrink-0" />
 
-                      {/* Home Team (Bottom Half) */}
-                      <div className="flex-1 flex flex-col justify-evenly pt-4 md:pt-6">
-                        {[...homeRows].reverse().map((row, idx) => (
-                          <div key={`home-row-${idx}`} className="flex justify-around items-center w-full">
-                            {[...row].reverse().map(item => renderPitchPlayer(item, homeTeamColor, homeTeam.id))}
-                          </div>
-                        ))}
+                        {/* Home Team (Bottom Half) */}
+                        <div className="flex-1 flex flex-col justify-evenly pt-4 md:pt-6">
+                          {[...homeRows].reverse().map((row, idx) => (
+                            <div key={`home-row-${idx}`} className="flex justify-around items-center w-full">
+                              {[...row].reverse().map(item => renderPitchPlayer(item, homeTeamColor, homeTeam.id))}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Home Team Header (Bottom) */}
@@ -1285,14 +1437,18 @@ export default function MatchCenter() {
                         {homeSubs.length === 0 && <p className="text-xs text-muted-foreground py-2">No substitutes.</p>}
                       </div>
                     </div>
-                    {homeCoach && (
+                    {(fotmobLineups?.homeTeam?.coach || homeCoach) && (
                       <div className="bg-secondary/20 p-4 rounded-2xl border border-border/40 flex items-center gap-4 mt-auto">
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
-                          <Users className="w-6 h-6 text-primary" />
+                        <div className="w-12 h-12 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center shrink-0 border border-primary/20">
+                          {fotmobLineups?.homeTeam?.coach ? (
+                             <img src={`https://images.fotmob.com/image_resources/playerimages/${fotmobLineups.homeTeam.coach.id}.png`} onError={(e: any) => e.target.src = 'https://www.fotmob.com/_next/static/media/player_fallback.b8f72535.png'} className="w-full h-full object-cover bg-secondary object-top" />
+                          ) : (
+                             <Users className="w-6 h-6 text-primary" />
+                          )}
                         </div>
                         <div>
                           <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-0.5">Manager</p>
-                          <p className="font-medium text-sm">{homeCoach.fullName || homeCoach.firstName + ' ' + homeCoach.lastName}</p>
+                          <p className="font-medium text-sm text-foreground">{fotmobLineups?.homeTeam?.coach?.name || homeCoach?.fullName || homeCoach?.firstName + ' ' + homeCoach?.lastName}</p>
                         </div>
                       </div>
                     )}
@@ -1310,14 +1466,18 @@ export default function MatchCenter() {
                         {awaySubs.length === 0 && <p className="text-xs text-muted-foreground py-2 md:text-right">No substitutes.</p>}
                       </div>
                     </div>
-                    {awayCoach && (
+                    {(fotmobLineups?.awayTeam?.coach || awayCoach) && (
                       <div className="bg-secondary/20 p-4 rounded-2xl border border-border/40 flex items-center gap-4 md:flex-row-reverse md:text-right mt-auto">
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
-                          <Users className="w-6 h-6 text-primary" />
+                        <div className="w-12 h-12 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center shrink-0 border border-primary/20">
+                           {fotmobLineups?.awayTeam?.coach ? (
+                             <img src={`https://images.fotmob.com/image_resources/playerimages/${fotmobLineups.awayTeam.coach.id}.png`} onError={(e: any) => e.target.src = 'https://www.fotmob.com/_next/static/media/player_fallback.b8f72535.png'} className="w-full h-full object-cover bg-secondary object-top" />
+                           ) : (
+                             <Users className="w-6 h-6 text-primary" />
+                           )}
                         </div>
                         <div>
                           <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-0.5">Manager</p>
-                          <p className="font-medium text-sm">{awayCoach.fullName || awayCoach.firstName + ' ' + awayCoach.lastName}</p>
+                          <p className="font-medium text-sm text-foreground">{fotmobLineups?.awayTeam?.coach?.name || awayCoach?.fullName || awayCoach?.firstName + ' ' + awayCoach?.lastName}</p>
                         </div>
                       </div>
                     )}
@@ -1340,6 +1500,7 @@ export default function MatchCenter() {
                        ['post', 'finished', 'ft'].includes(matchData.header?.competitions?.[0]?.status?.type?.state?.toLowerCase()) ? 'finished' : 'upcoming'
                     }
                     matchData={matchData}
+                    fotmobData={fotmobMatchDetails}
                  />
               )}
             </TabsContent>
@@ -1349,11 +1510,26 @@ export default function MatchCenter() {
 
       </main>
       
-      <PlayerProfileDialog
-        player={selectedPlayer}
-        isOpen={!!selectedPlayer}
-        onClose={() => setSelectedPlayer(null)}
-      />
+      {selectedPlayer && (
+        <PlayerProfileDialog
+          player={selectedPlayer}
+          isOpen={!!selectedPlayer}
+          onClose={() => setSelectedPlayer(null)}
+        />
+      )}
+
+      {selectedMatchPlayer && (
+        <PlayerMatchStatsModal
+          isOpen={isPlayerMatchStatsModalOpen}
+          onClose={() => setIsPlayerMatchStatsModalOpen(false)}
+          player={selectedMatchPlayer}
+          teamId={selectedMatchPlayer.teamId}
+          teamName={selectedMatchPlayer.teamName}
+          teamColor={selectedMatchPlayer.teamColor}
+          playerStats={fetchedPlayerStats}
+          isLoading={isPlayerMatchStatsLoading}
+        />
+      )}
     </div>
   );
 }
