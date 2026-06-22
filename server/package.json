@@ -42,7 +42,6 @@
         "puppeteer-extra": "^3.3.6",
         "puppeteer-extra-plugin-stealth": "^2.11.2",
         "puppeteer-real-browser": "^1.4.4",
-        "socket.io": "^4.8.3",
-        "vite_react_shadcn_ts": "file:.."
+        "socket.io": "^4.8.3"
     }
 }
