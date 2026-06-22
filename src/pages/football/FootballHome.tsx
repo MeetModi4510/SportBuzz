@@ -139,11 +139,6 @@ export default function FootballHome() {
                   <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-[#00c6ff] to-blue-400">
                     Transfer Center.
                   </h2>
-                  {processedTransfers.length > 0 && (
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#00c6ff]/60 bg-[#00c6ff]/10 border border-[#00c6ff]/20 px-2 py-0.5 rounded-full">
-                      {processedTransfers.length} moves
-                    </span>
-                  )}
                 </div>
               </div>
               
