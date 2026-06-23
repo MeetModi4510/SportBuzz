@@ -2,9 +2,17 @@ import axios from 'axios';
 import { Match } from '@/data/types';
 import { mapApiMatchToModel } from './cricketMapper';
 
-const API_URL = import.meta.env.VITE_API_URL 
-    ? import.meta.env.VITE_API_URL 
-    : (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
+let API_URL = import.meta.env.VITE_API_URL || '';
+if (import.meta.env.PROD) {
+    // Force /api in production to use vercel.json rewrites, ignoring any mistaken localhost env vars
+    if (!API_URL || API_URL.includes('localhost') || API_URL.includes('127.0.0.1')) {
+        API_URL = '/api';
+    }
+} else {
+    if (!API_URL) {
+        API_URL = 'http://localhost:5000/api';
+    }
+}
 
 // Create axios instance
 const api = axios.create({

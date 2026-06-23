@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react';
 import { TrendingPlayerData } from '../../hooks/football/useTrendingPlayers';
 import { X, User, Star, Target, Zap, Shield, Swords, Activity, ShieldCheck } from 'lucide-react';
-
-const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+let BACKEND_URL = import.meta.env.VITE_API_URL || '';
+if (import.meta.env.PROD) {
+    if (!BACKEND_URL || BACKEND_URL.includes('localhost') || BACKEND_URL.includes('127.0.0.1')) {
+        BACKEND_URL = '/api';
+    }
+} else {
+    if (!BACKEND_URL) {
+        BACKEND_URL = 'http://localhost:5000/api';
+    }
+}
 
 const StatRow = ({ label, value }: { label: string, value: string | number }) => (
   <div className="flex justify-between items-center py-2.5 border-b border-white/5 last:border-0 gap-3">

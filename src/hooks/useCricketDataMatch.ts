@@ -24,7 +24,14 @@ export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean
         try {
             // Use the scraped summary endpoint — this reliably identifies the match by its
             // Cricbuzz numeric ID without any slug-redirect issues that /info had.
-            const BACKEND = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            let BACKEND = import.meta.env.VITE_API_URL || '';
+            if (import.meta.env.PROD) {
+                if (!BACKEND || BACKEND.includes('localhost') || BACKEND.includes('127.0.0.1')) {
+                    BACKEND = '/api';
+                }
+            } else {
+                if (!BACKEND) BACKEND = 'http://localhost:5000/api';
+            }
             const response = await fetch(`${BACKEND}/cricket/scraped/match/${matchId}/summary`);
             const json = await response.json();
             const raw = json?.data;
@@ -107,7 +114,14 @@ export const useCricbuzzSquads = (matchId: string | number | undefined, enabled:
     const { data: squads, isLoading: squadsLoading, error } = useQuery({
         queryKey: ['cricket', 'squads', matchId],
         queryFn: async () => {
-            const BACKEND = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            let BACKEND = import.meta.env.VITE_API_URL || '';
+            if (import.meta.env.PROD) {
+                if (!BACKEND || BACKEND.includes('localhost') || BACKEND.includes('127.0.0.1')) {
+                    BACKEND = '/api';
+                }
+            } else {
+                if (!BACKEND) BACKEND = 'http://localhost:5000/api';
+            }
             const res = await fetch(`${BACKEND}/cricket/scraped/match/${matchId}/squads`);
             if (!res.ok) throw new Error('Network response was not ok');
             const json = await res.json();
