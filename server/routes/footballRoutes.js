@@ -481,22 +481,18 @@ router.get('/fotmob-stats/:leagueId', async (req, res) => {
 });
 // ─── LATEST TRANSFERS ─────────────────────────────────────────────────────────
 // Serves transfers from MongoDB cache (2-hour TTL).
-import { scrapeLatestTransfers, scrapeTopTransfers } from '../services/transfermarktScraper.js';
+import { scrapeFotmobTransfers } from '../services/fotmobTransfersScraper.js';
 
 const TRANSFERS_CACHE_MS = 2 * 60 * 60 * 1000; // 2 hours
 
 async function updateTransfersCache() {
     const combined = [];
     
-    // Fetch from transfermarkt service
-    console.log('[Transfers] Scraping latest transfers (15 pages)...');
-    const latest = await scrapeLatestTransfers(15);
+    // Fetch from Fotmob service
+    console.log('[Transfers] Scraping latest transfers from FotMob...');
+    const fotmobTransfers = await scrapeFotmobTransfers();
     
-    console.log('[Transfers] Scraping top transfers (top 40)...');
-    const top = await scrapeTopTransfers(40);
-    
-    combined.push(...latest);
-    combined.push(...top);
+    combined.push(...fotmobTransfers);
 
     if (combined.length === 0) throw new Error('Empty transfers response from scraper');
 
@@ -543,7 +539,7 @@ async function updateTransfersCache() {
         // Only wipe old records AFTER we have confirmed new data — prevents data loss if scraper is blocked
         await FootballTransfer.deleteMany({});
         await FootballTransfer.insertMany(docs);
-        console.log(`[Transfers] Stored ${docs.length} transfers from Transfermarkt.`);
+        console.log(`[Transfers] Stored ${docs.length} transfers from FotMob.`);
     } else {
         console.warn('[Transfers] Scraper returned 0 docs — keeping existing data in DB to avoid data loss.');
     }
@@ -575,7 +571,7 @@ router.get('/transfers', async (req, res) => {
         }
 
         // 2. Cache miss – fetch, persist, respond
-        console.log('[Transfers] Cache expired or empty – fetching from Transfermarkt…');
+        console.log('[Transfers] Cache expired or empty – fetching from FotMob…');
         const { rows, lastFetched } = await updateTransfersCache();
 
         return res.json({
@@ -616,6 +612,16 @@ router.get('/transfers', async (req, res) => {
         console.warn('[Transfers] Startup seed failed (non-fatal):', err.message);
     }
 })();
+
+// Start a background silent updater that runs every 2 hours
+setInterval(async () => {
+    try {
+        console.log('[Transfers] Running scheduled background update (every 2 hours)...');
+        await updateTransfersCache();
+    } catch (err) {
+        console.error('[Transfers] Scheduled background update failed:', err.message);
+    }
+}, TRANSFERS_CACHE_MS);
 
 // ─── Real Football Data (Hybrid: AllSportsApi2 + Football-Data.org) ───
 

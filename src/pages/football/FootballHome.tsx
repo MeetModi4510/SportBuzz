@@ -13,7 +13,7 @@ import { useTrendingPlayers, TrendingPlayerData } from "../../hooks/football/use
 import { TrendingPlayerCard } from "../../components/football/TrendingPlayerCard";
 import { TrendingPlayerModal } from "../../components/football/TrendingPlayerModal";
 
-import { Loader2, ArrowRightLeft, TrendingUp } from "lucide-react";
+import { Loader2, ArrowRightLeft, TrendingUp, ChevronDown } from "lucide-react";
 import { useWorldCupTheme } from "../../hooks/football/useWorldCupTheme";
 
 type TransferFilter = "all" | "transfers" | "loans" | "free_transfers" | "free_agents" | "contracts" | "contract_extensions";
@@ -22,6 +22,8 @@ type TransferSort = "newest" | "highest_fee";
 export default function FootballHome() {
   const [transferFilter, setTransferFilter] = useState<TransferFilter>("all");
   const [transferSort, setTransferSort] = useState<TransferSort>("newest");
+  const [transferLeague, setTransferLeague] = useState<string>("all");
+  const [isLeagueDropdownOpen, setIsLeagueDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const isWorldCup = useWorldCupTheme();
 
@@ -55,6 +57,11 @@ export default function FootballHome() {
       });
     }
 
+    // Filter by League
+    if (transferLeague !== "all") {
+      result = result.filter(t => String(t.leagueId) === transferLeague);
+    }
+
     // Sort
     result.sort((t_a, t_b) => {
       if (transferSort === "newest") {
@@ -67,11 +74,11 @@ export default function FootballHome() {
       return 0;
     });
 
-    // Cap at 40 to keep marquee performant and readable
-    return result.slice(0, 40);
-  }, [recentTransfers, transferFilter, transferSort]);
+    // Cap at 50 to keep marquee performant and readable
+    return result.slice(0, 50);
+  }, [recentTransfers, transferFilter, transferSort, transferLeague]);
 
-  const isCustomTransferView = transferFilter !== "all" || transferSort !== "newest";
+  const isCustomTransferView = transferFilter !== "all" || transferSort !== "newest" || transferLeague !== "all";
 
   return (
     <>
@@ -151,6 +158,66 @@ export default function FootballHome() {
                 <div className="flex p-1 bg-secondary/60 backdrop-blur-xl rounded-full border border-border/50 shadow-inner">
                   <button onClick={() => setTransferSort("newest")} className={`px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferSort === 'newest' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Newest First</button>
                   <button onClick={() => setTransferSort("highest_fee")} className={`px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferSort === 'highest_fee' ? 'bg-[#d4af37] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Highest Fee</button>
+                </div>
+
+                {/* League Filter - Premium Custom Dropdown */}
+                <div className="relative">
+                  <div 
+                    onClick={() => setIsLeagueDropdownOpen(!isLeagueDropdownOpen)}
+                    className="flex items-center gap-2 px-4 py-1.5 bg-secondary/60 hover:bg-secondary/80 backdrop-blur-xl rounded-full border border-border/50 shadow-inner cursor-pointer transition-all duration-300"
+                  >
+                    <span className="text-[11px] font-bold tracking-wide uppercase text-foreground">
+                      {(() => {
+                        const list = [
+                          { id: 'all', name: 'All Leagues' },
+                          { id: '47', name: 'Premier League' },
+                          { id: '87', name: 'La Liga' },
+                          { id: '53', name: 'Ligue 1' },
+                          { id: '54', name: 'Bundesliga' },
+                          { id: '55', name: 'Serie A' },
+                          { id: '130', name: 'MLS' },
+                          { id: '536', name: 'Saudi Pro League' },
+                          { id: '40', name: 'Belgian Pro League' },
+                          { id: '57', name: 'Eredivisie' },
+                          { id: '9435', name: 'ISL' },
+                        ];
+                        return list.find(l => l.id === transferLeague)?.name || 'All Leagues';
+                      })()}
+                    </span>
+                    <ChevronDown size={14} className={`text-muted-foreground transition-transform duration-300 ${isLeagueDropdownOpen ? 'rotate-180' : ''}`} />
+                  </div>
+
+                  {isLeagueDropdownOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setIsLeagueDropdownOpen(false)} />
+                      <div className="absolute right-0 mt-2 w-48 py-2 bg-background/95 backdrop-blur-xl border border-border/60 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col gap-0.5">
+                        {[
+                          { id: 'all', name: 'All Leagues' },
+                          { id: '47', name: 'Premier League' },
+                          { id: '87', name: 'La Liga' },
+                          { id: '53', name: 'Ligue 1' },
+                          { id: '54', name: 'Bundesliga' },
+                          { id: '55', name: 'Serie A' },
+                          { id: '130', name: 'MLS' },
+                          { id: '536', name: 'Saudi Pro League' },
+                          { id: '40', name: 'Belgian Pro League' },
+                          { id: '57', name: 'Eredivisie' },
+                          { id: '9435', name: 'ISL' },
+                        ].map(league => (
+                          <div 
+                            key={league.id}
+                            onClick={() => {
+                              setTransferLeague(league.id);
+                              setIsLeagueDropdownOpen(false);
+                            }}
+                            className={`px-4 py-2 mx-1 rounded-xl text-[11px] font-bold tracking-wide uppercase cursor-pointer transition-colors flex items-center ${transferLeague === league.id ? 'bg-[#00c6ff]/15 text-[#00c6ff]' : 'text-muted-foreground hover:bg-foreground/5 hover:text-foreground'}`}
+                          >
+                            {league.name}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

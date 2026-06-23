@@ -194,7 +194,7 @@ export const footballApi = {
   },
 
   async getRecentTransfers(forceRefresh = false): Promise<TransfersResponse> {
-    const cacheKey = 'recent_transfers_v5';
+    const cacheKey = 'recent_transfers_v6';
 
     if (!forceRefresh) {
       const cached = cacheManager.get<TransfersResponse>(cacheKey);
@@ -235,7 +235,8 @@ export const footballApi = {
           onLoan: t.onLoan,
           fromDate: t.transferDate,
           toDate: null,
-          marketValue: t.marketValue
+          marketValue: t.marketValue,
+          leagueId: t.leagueId
         };
       });
 

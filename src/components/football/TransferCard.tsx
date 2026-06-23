@@ -182,7 +182,7 @@ export function TransferCard({ transferData }: TransferCardProps) {
             src={transferData.playerImage!}
             alt={transferData.name}
             referrerPolicy="no-referrer"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
+            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom', display: 'block', transform: 'scale(1.30)', transformOrigin: 'bottom center' }}
             onError={(e) => {
               const t = e.target as HTMLImageElement;
               if (hasFotmobId) t.src = fotmobUrl;
@@ -193,7 +193,7 @@ export function TransferCard({ transferData }: TransferCardProps) {
           <img
             src={fotmobUrl}
             alt={transferData.name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
+            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom', display: 'block', transform: 'scale(1.30)', transformOrigin: 'bottom center' }}
             onError={() => setImgError(true)}
           />
         ) : (
@@ -229,7 +229,7 @@ export function TransferCard({ transferData }: TransferCardProps) {
               {transferData.name}
             </h3>
             <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 900, color: accentLight, letterSpacing: '-0.01em', lineHeight: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 900, color: accentLight, letterSpacing: '-0.01em', lineHeight: 1, textTransform: 'capitalize' }}>
                 {displayFee}
               </div>
               {marketValueDisplay && (
@@ -240,17 +240,36 @@ export function TransferCard({ transferData }: TransferCardProps) {
             </div>
           </div>
 
-          {/* Position chip */}
-          {transferData.position?.label && (
-            <span style={{
-              display: 'inline-block', alignSelf: 'flex-start',
-              fontSize: 8.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
-              color: chipColor, background: chipBg, border: `1px solid ${chipBorder}`,
-              borderRadius: 5, padding: '2px 6px', marginBottom: 7,
-            }}>
-              {transferData.position.label}
-            </span>
-          )}
+          {/* Position and League chips */}
+          <div style={{ display: 'flex', gap: 6, marginBottom: 7, flexWrap: 'wrap' }}>
+            {transferData.position?.label && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center',
+                fontSize: 8.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                color: chipColor, background: chipBg, border: `1px solid ${chipBorder}`,
+                borderRadius: 5, padding: '2px 6px',
+              }}>
+                {transferData.position.label}
+              </span>
+            )}
+            {transferData.leagueId && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center',
+                fontSize: 8.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)', background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', border: `1px solid ${stripBorder}`,
+                borderRadius: 5, padding: '2px 6px',
+              }}>
+                {(() => {
+                  const map: Record<string, string> = {
+                    '47': 'Premier League', '87': 'La Liga', '53': 'Ligue 1',
+                    '54': 'Bundesliga', '55': 'Serie A', '130': 'MLS',
+                    '536': 'Saudi Pro', '40': 'Belgian Pro', '57': 'Eredivisie', '9435': 'ISL',
+                  };
+                  return map[String(transferData.leagueId)] || 'Transfer';
+                })()}
+              </span>
+            )}
+          </div>
 
           {/* Date row */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
