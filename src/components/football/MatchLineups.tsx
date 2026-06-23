@@ -114,28 +114,28 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
     return 'bg-red-500 text-white border-red-700';
   };
 
-  const renderEventIcons = (playerId: number, teamId: number) => {
+  const renderEventIcons = (playerId: number, teamId: number, isPitch: boolean = false) => {
     const playerEvents = events.filter(e => e.team.id === teamId && (e.player.id === playerId || (e.assist && e.assist.id === playerId)));
     
     if (playerEvents.length === 0) return null;
 
     return (
-      <div className="flex items-center gap-1.5 flex-wrap">
+      <div className={isPitch ? "flex flex-col gap-0.5" : "flex items-center gap-1.5 flex-wrap"}>
         {playerEvents.map((e, idx) => {
           if (e.type === "Goal") {
             if (e.player.id === playerId) {
-              return <span key={idx} title="Goal" className="text-xs leading-none drop-shadow-md">⚽</span>;
+              return <span key={idx} title="Goal" className={`${isPitch ? 'text-[14px]' : 'text-xs'} leading-none drop-shadow-md`}>⚽</span>;
             } else if (e.assist && e.assist.id === playerId) {
-              return <span key={idx} title="Assist" className="text-xs leading-none drop-shadow-md">👟</span>;
+              return <span key={idx} title="Assist" className={`${isPitch ? 'text-[14px]' : 'text-xs'} leading-none drop-shadow-md`}>👟</span>;
             }
           }
           if (e.type === "Card") {
-            if (e.detail === "Yellow Card") return <div key={idx} className="w-2.5 h-3.5 bg-[#FFCC00] shadow-sm" title="Yellow Card" />;
-            if (e.detail === "Red Card") return <div key={idx} className="w-2.5 h-3.5 bg-[#FF3333] shadow-sm" title="Red Card" />;
+            if (e.detail === "Yellow Card") return <div key={idx} className={`${isPitch ? 'w-2.5 h-3.5' : 'w-2.5 h-3.5'} bg-[#FFCC00] shadow-sm rounded-[1px] border border-black/20`} title="Yellow Card" />;
+            if (e.detail === "Red Card") return <div key={idx} className={`${isPitch ? 'w-2.5 h-3.5' : 'w-2.5 h-3.5'} bg-[#FF3333] shadow-sm rounded-[1px] border border-black/20`} title="Red Card" />;
           }
           if (e.type === "subst") {
-            if (e.player.id === playerId) return <span key={idx} title="Subbed Out" className="flex items-center justify-center w-4 h-4 rounded-full bg-red-500 shadow-sm"><ArrowDown className="w-3 h-3 text-black stroke-[3]" /></span>;
-            if (e.assist && e.assist.id === playerId) return <span key={idx} title="Subbed In" className="flex items-center justify-center w-4 h-4 rounded-full bg-green-500 shadow-sm"><ArrowUp className="w-3 h-3 text-black stroke-[3]" /></span>;
+            if (e.player.id === playerId) return <span key={idx} title="Subbed Out" className={`flex items-center justify-center ${isPitch ? 'w-4 h-4' : 'w-4 h-4'} rounded-full bg-red-500 shadow-sm border border-white/50`}><ArrowDown className="w-3 h-3 text-white stroke-[3]" /></span>;
+            if (e.assist && e.assist.id === playerId) return <span key={idx} title="Subbed In" className={`flex items-center justify-center ${isPitch ? 'w-4 h-4' : 'w-4 h-4'} rounded-full bg-green-500 shadow-sm border border-white/50`}><ArrowUp className="w-3 h-3 text-white stroke-[3]" /></span>;
           }
           return null;
         })}
@@ -207,20 +207,20 @@ export function MatchLineups({ lineups, homeTeam, awayTeam, events = [], playerS
   const renderPlayer = (item: any, isHome: boolean) => {
     const rating = getPlayerRating(item.player.id);
     const teamId = isHome ? homeTeam.id : awayTeam.id;
-    const eventIcons = renderEventIcons(item.player.id, teamId);
+    const eventIcons = renderEventIcons(item.player.id, teamId, true);
 
     return (
       <div key={item.player.id} className="flex flex-col items-center justify-center w-16 md:w-20 group z-10 transition-transform hover:scale-110 relative">
-        {eventIcons && (
-          <div className="mb-0.5 bg-black/60 backdrop-blur-md rounded-full px-1.5 py-0.5 border border-white/10 scale-90 z-30">
-            {eventIcons}
-          </div>
-        )}
         <div className="relative">
           <div className={`relative w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xs md:text-sm font-bold font-display shadow-xl border-[3px] overflow-hidden ${isHome ? 'bg-blue-600 text-white border-blue-400/80' : 'bg-red-600 text-white border-red-400/80'}`}>
             <span className="absolute z-0">{item.player.number}</span>
             <LineupPlayerImage playerId={item.player.id} playerName={item.player.name} className="absolute inset-0 z-10" />
           </div>
+          {eventIcons && (
+            <div className="absolute -top-1 -right-2 z-30">
+              {eventIcons}
+            </div>
+          )}
           {rating && (
             <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded-sm border shadow-lg z-20 ${getRatingColor(rating)}`}>
               {rating}

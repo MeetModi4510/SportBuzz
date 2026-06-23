@@ -393,11 +393,22 @@ export default function MatchCenter() {
       playerNameRaw = playerNameRaw.name || playerNameRaw.fullName || `${playerNameRaw.firstName || ''} ${playerNameRaw.lastName || ''}`.trim() || 'Unknown';
     }
     const playerName = String(playerNameRaw || 'Unknown');
-    const goals = isFotmob ? 0 : getStatValue(p.stats, "totalGoals");
-    const assists = isFotmob ? 0 : getStatValue(p.stats, "goalAssists");
-    const yellowCards = isFotmob ? 0 : getStatValue(p.stats, "yellowCards");
-    const redCards = isFotmob ? 0 : getStatValue(p.stats, "redCards");
+    let goals = 0, assists = 0, yellowCards = 0, redCards = 0;
+    if (isFotmob && p.events) {
+       goals = p.events.filter((e: any) => e.type?.toLowerCase().includes('goal')).length;
+       assists = p.events.filter((e: any) => e.type?.toLowerCase().includes('assist')).length;
+       yellowCards = p.events.filter((e: any) => e.type?.toLowerCase().includes('yellow')).length;
+       redCards = p.events.filter((e: any) => e.type?.toLowerCase() === 'redcard' || e.type?.toLowerCase() === 'yellowred').length;
+    } else if (!isFotmob) {
+       goals = getStatValue(p.stats, "totalGoals");
+       assists = getStatValue(p.stats, "goalAssists");
+       yellowCards = getStatValue(p.stats, "yellowCards");
+       redCards = getStatValue(p.stats, "redCards");
+    }
     const isRedCarded = redCards > 0;
+    
+    const subbedOut = isFotmob ? (p.substitutionEvents?.some((e: any) => e.type?.toLowerCase().includes('out'))) : p.subbedOut;
+    const subbedIn = isFotmob ? (p.substitutionEvents?.some((e: any) => e.type?.toLowerCase().includes('in'))) : p.subbedIn;
     
     return (
       <div 
@@ -452,10 +463,10 @@ export default function MatchCenter() {
             </div>
           )}
 
-          {!isFotmob && (p.subbedOut || p.subbedIn) && (
+          {(subbedOut || subbedIn) && (
             <div className="absolute top-1/2 -translate-y-1/2 -left-2.5 flex flex-col gap-1 z-30">
-               {p.subbedOut && <div className="bg-red-500 rounded-full border-[1.5px] border-white shadow-md p-0.5" title="Subbed Out"><ArrowDown className="w-2.5 h-2.5 md:w-3 md:h-3 text-white stroke-[3]" /></div>}
-               {p.subbedIn && <div className="bg-emerald-500 rounded-full border-[1.5px] border-white shadow-md p-0.5" title="Subbed In"><ArrowUp className="w-2.5 h-2.5 md:w-3 md:h-3 text-white stroke-[3]" /></div>}
+               {subbedOut && <div className="bg-red-500 rounded-full border-[1.5px] border-white shadow-md p-0.5" title="Subbed Out"><ArrowDown className="w-2.5 h-2.5 md:w-3 md:h-3 text-white stroke-[3]" /></div>}
+               {subbedIn && <div className="bg-emerald-500 rounded-full border-[1.5px] border-white shadow-md p-0.5" title="Subbed In"><ArrowUp className="w-2.5 h-2.5 md:w-3 md:h-3 text-white stroke-[3]" /></div>}
             </div>
           )}
         </div>
