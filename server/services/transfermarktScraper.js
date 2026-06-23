@@ -9,35 +9,69 @@ function tmProxy(url) {
   return `/api/football/tm-img-proxy?url=${encodeURIComponent(cleanUrl)}`;
 }
 
-const targetLeagues = [
-  'Premier League', 'LaLiga', 'Ligue 1', 'Bundesliga', 'Serie A',
-  'Major League Soccer', 'Saudi Pro League', 'Jupiler Pro League',
-  'Eredivisie', 'Indian Super League', 'Liga Portugal', 'Süper Lig', 'Scottish Premiership'
+// ── Exact-match leagues ───────────────────────────────────────────────────
+// These names are TOO GENERIC to use substring matching — "Premier League"
+// would also match "Azerbaijan Premier League", "Armenian Premier League" etc.
+// So we require the FULL league name to be exactly one of these strings.
+const EXACT_LEAGUES = new Set([
+  'premier league',    // England ONLY — not Azerbaijan/Armenia/Wales/etc.
+  'ligue 1',           // France ONLY
+  '1. bundesliga',     // Germany ONLY
+  'bundesliga',        // Germany fallback
+  'eredivisie',        // Netherlands ONLY
+]);
+
+// ── Substring-match leagues ────────────────────────────────────────────────
+// These names are unique enough that a substring match is safe.
+const INCLUDES_LEAGUES = [
+  'laliga',               // Spain
+  'la liga',              // Spain alternate
+  'major league soccer',  // USA/Canada
+  'saudi pro league',     // Saudi Arabia
+  'jupiler pro league',   // Belgium
+  'indian super league',  // India
+];
+
+// Known false positives — reject even if they match a whitelist entry
+const EXCLUDED_PATTERNS = [
+  'liga pro',          // Ecuador's LigaPro — contains "serie a" in full name
+  'serie b',           // Italian 2nd division
+  'serie c',           // Italian 3rd division
+  'bundesliga 2',      // German 2nd division
+  '2. bundesliga',     // German 2nd division
+  'ligue 2',           // French 2nd division
+  'laliga2',           // Spanish 2nd division
+  'la liga 2',         // Spanish 2nd division alternate
+  'challenger',        // Belgian 2nd division
+  'nisa',              // US lower division
+  'usl',               // US lower division
+  'liga mx',           // Mexico
+  'primeira liga',     // Portugal
+  'super lig',         // Turkey
+  'scottish',          // Scotland
+  'u21', 'u23', 'u19', 'u18', // Youth leagues
+  'reserves', 'ii',    // Reserve teams
 ];
 
 function isTargetLeague(leagueName) {
   if (!leagueName) return false;
   const name = leagueName.trim().toLowerCase();
-  
-  // Blacklist second division / lower division / youth leagues
-  const blacklist = [
-    '2.', ' 2', 'serie b', 'championship', 'laliga2', 'ligue 2', 
-    'league one', 'league two', '3.', 'primavera', 'reserves', 'u21', 'u19', 'u18'
-  ];
-  
-  if (blacklist.some(b => name.includes(b))) {
-    return false;
-  }
-  
-  // If it's explicitly in our known top list, accept it immediately
-  if (targetLeagues.some(l => name.includes(l.toLowerCase()))) return true;
-  
-  // If it doesn't contain a blacklist term, and we're just avoiding 2nd divisions, we can return true
-  // to "just keep first division leagues" as the user requested.
-  return true;
+
+  // Step 1: Reject known false-positive patterns first
+  if (EXCLUDED_PATTERNS.some(p => name.includes(p))) return false;
+
+  // Step 2: Italian Serie A — must be exact to avoid "Liga Pro Serie A" (Ecuador)
+  if (name === 'serie a' || name === 'serie a tim') return true;
+
+  // Step 3: Generic names — EXACT match only (prevents e.g. "Azerbaijan Premier League")
+  if (EXACT_LEAGUES.has(name)) return true;
+
+  // Step 4: Unique names — substring match is safe
+  return INCLUDES_LEAGUES.some(l => name.includes(l));
 }
 
 function inrToEur(str) {
+
     if (!str || typeof str !== 'string' || !str.includes('₹')) {
         if (!str) return 0;
         // Check if it's "free transfer" or "-"
