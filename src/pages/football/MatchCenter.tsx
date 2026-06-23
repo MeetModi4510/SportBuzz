@@ -356,10 +356,15 @@ export default function MatchCenter() {
           }
           
           const time = g.clock?.displayValue || g.time || "";
+          const isOwnGoal = g.type?.text?.toLowerCase().includes('own goal') || g.text?.toLowerCase().includes('own goal');
           
           return (
             <div key={i} className={cn("flex items-center gap-2 text-xs", isHome ? "flex-row" : "flex-row-reverse")}>
-               <span className="font-semibold text-foreground/90">{scorer} {assist && <span className="text-muted-foreground font-normal ml-1">({assist})</span>}</span>
+               <span className="font-semibold text-foreground/90">
+                 {scorer} 
+                 {isOwnGoal && <span className="text-red-500 font-bold ml-1">(OG)</span>} 
+                 {assist && !isOwnGoal && <span className="text-muted-foreground font-normal ml-1">({assist})</span>}
+               </span>
                <span className="text-[10px] text-emerald-500 font-bold">{time}</span>
             </div>
           );
@@ -405,6 +410,16 @@ export default function MatchCenter() {
        yellowCards = getStatValue(p.stats, "yellowCards");
        redCards = getStatValue(p.stats, "redCards");
     }
+
+    const ownGoals = keyEvents.filter((evt: any) => {
+        const isOG = evt.type?.text?.toLowerCase().includes("own goal") || evt.text?.toLowerCase().includes("own goal");
+        if (!isOG) return false;
+        const participantName = evt.participants?.[0]?.athlete?.displayName;
+        if (participantName && (participantName === playerNameRaw || participantName === playerName)) return true;
+        if (evt.text && (evt.text.includes(playerName) || (typeof playerNameRaw === 'string' && evt.text.includes(playerNameRaw)))) return true;
+        return false;
+    }).length;
+
     const isRedCarded = redCards > 0;
     
     const subbedOut = isFotmob ? (p.substitutionEvents?.some((e: any) => e.type?.toLowerCase().includes('out'))) : p.subbedOut;
@@ -456,6 +471,12 @@ export default function MatchCenter() {
             </div>
           )}
 
+          {ownGoals > 0 && (
+            <div className="absolute -top-1.5 -left-6 z-30 flex items-center justify-center bg-red-500 rounded border border-white/20 shadow-sm px-1 py-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" title={`Own Goal (${ownGoals})`}>
+              <span className="text-[8px] md:text-[9px] font-black text-white tracking-widest leading-none">OG</span>
+            </div>
+          )}
+
           {(yellowCards > 0 || redCards > 0) && (
             <div className="absolute top-1/2 -translate-y-1/2 -right-2 flex flex-col gap-0.5 z-30 drop-shadow-[0_2px_3px_rgba(0,0,0,0.8)]">
                {yellowCards > 0 && <div className="w-2.5 h-3.5 bg-[#FFCC00] shadow-sm rounded-none border border-black/20" title="Yellow Card" />}
@@ -488,6 +509,15 @@ export default function MatchCenter() {
     const assists = getStatValue(p.stats, "goalAssists");
     const yellowCards = getStatValue(p.stats, "yellowCards");
     const redCards = getStatValue(p.stats, "redCards");
+
+    const ownGoals = keyEvents.filter((evt: any) => {
+        const isOG = evt.type?.text?.toLowerCase().includes("own goal") || evt.text?.toLowerCase().includes("own goal");
+        if (!isOG) return false;
+        const participantName = evt.participants?.[0]?.athlete?.displayName;
+        if (participantName && participantName === p.athlete.displayName) return true;
+        if (evt.text && evt.text.includes(p.athlete.displayName)) return true;
+        return false;
+    }).length;
 
     // Match with FotMob lineup by jersey number to get the correct FotMob ID for image fetching
     let fotmobId: number | undefined;
@@ -546,6 +576,11 @@ export default function MatchCenter() {
             </div>
           )}
           <div className="flex items-center gap-1.5">
+            {ownGoals > 0 && (
+              <div className="flex items-center justify-center bg-red-500 px-1 py-0.5 rounded shadow-sm" title="Own Goal">
+                <span className="text-[8px] font-black text-white leading-none tracking-widest">OG</span>
+              </div>
+            )}
             {goals > 0 && <span title="Goal" className="text-xs drop-shadow-md">⚽</span>}
             {assists > 0 && <span title="Assist" className="text-xs drop-shadow-md">👟</span>}
             {yellowCards > 0 && <div className="w-2.5 h-3.5 bg-[#FFCC00] shadow-sm rounded-sm border border-yellow-600/50" />}
@@ -1075,6 +1110,17 @@ export default function MatchCenter() {
                               isHome = false;
                           }
 
+                          const isOwnGoal = evt.type?.text?.toLowerCase().includes("own goal") || evt.text?.toLowerCase().includes("own goal");
+                          if (isOwnGoal) {
+                              if (isHome) {
+                                  isHome = false;
+                                  isAway = true;
+                              } else if (isAway) {
+                                  isHome = true;
+                                  isAway = false;
+                              }
+                          }
+
                           const isNeutral = !isHome && !isAway;
                           
                           const isGoal = evt.type?.text?.toLowerCase().includes("goal");
@@ -1136,7 +1182,8 @@ export default function MatchCenter() {
                             <div className={cn(
                               "relative p-4 md:p-6 rounded-3xl transition-all w-full md:max-w-[85%]",
                               isGoal 
-                                ? (align === "left" ? "bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.15)]" 
+                                ? (isOwnGoal ? "bg-gradient-to-br from-red-500/10 to-transparent border border-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.15)]"
+                                   : align === "left" ? "bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.15)]" 
                                    : align === "right" ? "bg-gradient-to-bl from-blue-500/10 to-transparent border border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.15)]" 
                                    : "bg-white/[0.05] border border-white/20")
                                 : "bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04]",

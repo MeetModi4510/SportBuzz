@@ -116,12 +116,13 @@ export function FootballNewsSidebar() {
         )}
       </div>
 
-      {/* Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {displayedNews.map((item: any, idx: number) => {
-          // In a 5-item layout: 1st spans 2 cols, rest span 1 col.
-          // This perfectly fills a 3x2 grid.
-          const isFeatured = idx === 0;
+      {/* News Wall */}
+      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
+        {news.slice(0, 12).map((item: any, idx: number) => {
+          // Staggered heights to create a true masonry wall effect
+          const heights = ["h-[280px]", "h-[380px]", "h-[460px]", "h-[320px]"];
+          const heightClass = heights[idx % heights.length];
+          const isLarge = heightClass === "h-[460px]" || heightClass === "h-[380px]";
 
           return (
             <div
@@ -132,9 +133,10 @@ export function FootballNewsSidebar() {
                 }
               }}
               className={`
-                group relative flex flex-col justify-between overflow-hidden rounded-[24px] bg-[#0c0c0c] border border-border/[0.08] 
-                transition-all duration-500 cursor-pointer hover:border-border/[0.15] hover:shadow-2xl hover:shadow-black/50 hover:-translate-y-0.5
-                ${isFeatured ? "md:col-span-2 lg:col-span-2 min-h-[340px]" : "min-h-[260px]"}
+                group relative flex flex-col justify-between overflow-hidden rounded-[24px] bg-[#111] border border-white/10 
+                shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]
+                transition-all duration-500 cursor-pointer hover:border-white/20 hover:shadow-2xl hover:shadow-[#8b5cf6]/15 hover:-translate-y-1
+                break-inside-avoid mb-5 ${heightClass}
               `}
             >
               {/* Background Image & Premium Gradient Mask */}
@@ -143,23 +145,19 @@ export function FootballNewsSidebar() {
                   <img 
                     src={item.imageUrl} 
                     alt={item.title}
-                    className="w-full h-full object-cover opacity-40 group-hover:opacity-50 group-hover:scale-105 transition-all duration-700 ease-out"
+                    className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-700 ease-out"
                   />
-                  {/* Two-stop gradient to ensure text readability while maintaining depth */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c0c0c] via-[#0c0c0c]/80 to-[#0c0c0c]/10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-[#111]/80 to-transparent" />
                 </div>
               ) : (
-                <div className="absolute inset-0 z-0 bg-gradient-to-br from-foreground/[0.03] to-transparent opacity-50" />
+                <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#8b5cf6]/10 to-[#111] opacity-50" />
               )}
 
               {/* Content Container */}
-              <div className="relative z-10 flex flex-col h-full p-6 md:p-8">
-                {/* Header (Source) */}
-                <div className="flex items-center justify-between mb-4">
-
-                  
-                  {/* Subtle top-right icon appearing on hover */}
-                  <div className="w-8 h-8 rounded-full bg-foreground/10 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0 border border-border/50">
+              <div className="relative z-10 flex flex-col h-full p-6">
+                {/* Top right icon */}
+                <div className="flex items-center justify-end mb-4">
+                  <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 border border-white/10">
                     <ArrowUpRight size={14} className="text-white" />
                   </div>
                 </div>
@@ -169,22 +167,22 @@ export function FootballNewsSidebar() {
                 {/* Typography Block */}
                 <div className="space-y-3 mt-4">
                   <h3 className={`
-                    font-semibold text-white/95 group-hover:text-white transition-colors duration-300 drop-shadow-sm
-                    ${isFeatured ? "text-2xl md:text-3xl leading-[1.25]" : "text-lg leading-snug"}
+                    font-bold text-white/95 group-hover:text-white transition-colors duration-300 drop-shadow-lg
+                    ${isLarge ? "text-xl md:text-2xl leading-tight" : "text-lg leading-snug line-clamp-4"}
                   `}>
                     {item.title}
                   </h3>
                   
-                  {isFeatured && (
-                    <p className="text-white/50 text-sm md:text-base leading-relaxed line-clamp-2 max-w-2xl font-light">
+                  {isLarge && item.summary && (
+                    <p className="text-white/60 text-sm leading-relaxed line-clamp-2 font-light">
                       {item.summary}
                     </p>
                   )}
 
                   {/* Footer (Time) */}
-                  <div className="flex items-center gap-1.5 pt-3">
-                    <Clock size={12} className="text-white/60" />
-                    <span className="text-xs text-white/80 font-medium tracking-wide">
+                  <div className="flex items-center gap-2 pt-3 opacity-80 group-hover:opacity-100 transition-opacity">
+                    <Clock size={12} className="text-[#8b5cf6]" />
+                    <span className="text-xs text-white/70 font-medium tracking-wide">
                       {timeAgo(item.publishedAt || item.gmtTime)}
                     </span>
                   </div>
