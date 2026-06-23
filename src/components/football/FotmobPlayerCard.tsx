@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
-import { ChevronDown, Info, Activity, Star, Calendar, Loader2, Trophy } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Info, Activity, Star, Calendar, Loader2, Trophy } from 'lucide-react';
 import { usePlayerRecentMatches } from '../../hooks/football/usePlayerRecentMatches';
 import { useFotmobPlayerTournamentStats } from '../../hooks/useFootballSquads';
 
@@ -181,25 +181,193 @@ const StatColumn = ({ title, children }: any) => {
   );
 };
 
+
+// --- Match Detail Card (Right Column) ---
+const MatchDetailCard = ({ activeShot, onPrev, onNext }: any) => {
+  if (!activeShot) return null;
+
+  // Calculate dynamic scaling for Mini Goalpost
+  let miniNetZoomRatio = 1;
+  let miniNetLeft = 50;
+  let miniNetBottom = 50;
+  
+  if (activeShot) {
+    if (activeShot.onGoalShot) {
+      miniNetZoomRatio = activeShot.onGoalShot.zoomRatio || 1;
+      miniNetLeft = (activeShot.onGoalShot.x / 2.0) * 100;
+      miniNetBottom = (activeShot.onGoalShot.y / 0.6666667) * 100;
+    } else if (activeShot.goalCrossedY) {
+      const offsetY = activeShot.goalCrossedY - 34;
+      const requiredViewWidth = Math.max(7.32, Math.abs(offsetY) * 2 * 1.2); 
+      miniNetZoomRatio = 7.32 / requiredViewWidth;
+      miniNetLeft = ((offsetY + requiredViewWidth / 2) / requiredViewWidth) * 100;
+      if (activeShot.goalCrossedZ) {
+        miniNetBottom = (activeShot.goalCrossedZ / 2.44) * 100 * miniNetZoomRatio; 
+      } else {
+        miniNetBottom = 10 * miniNetZoomRatio;
+      }
+    }
+  }
+
+  return (
+    <div className="flex flex-col dark:bg-[#121316] bg-[#1a1b1e] rounded-2xl border dark:border-white/5 border-slate-800 shadow-xl overflow-hidden w-full">
+      {/* Header: Match Navigation */}
+      <div className="flex items-center justify-between px-4 py-3 border-b dark:border-white/5 border-slate-700/50">
+        <button onClick={onPrev} className="p-2 rounded-full hover:dark:bg-white/10 hover:bg-slate-700 transition-colors shrink-0">
+          <ChevronLeft className="w-5 h-5 dark:text-white text-slate-200" />
+        </button>
+        
+        <div className="flex items-center justify-center gap-3 flex-1 min-w-0">
+          {activeShot.homeTeamName && activeShot.awayTeamName ? (
+            <>
+              <div className="flex items-center justify-end gap-2 flex-1 min-w-0">
+                {activeShot.homeTeamId ? (
+                  <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${activeShot.homeTeamId}.png`} alt={activeShot.homeTeamName} className="w-6 h-6 object-contain shrink-0" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }} />
+                ) : null}
+                <div className={`w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-white shrink-0 ${activeShot.homeTeamId ? 'hidden' : ''}`}>
+                  {activeShot.homeTeamName?.substring(0,1)}
+                </div>
+              </div>
+              
+              <span className="text-base font-black text-white shrink-0 mx-1">{activeShot.homeScore} - {activeShot.awayScore}</span>
+              
+              <div className="flex items-center justify-start gap-2 flex-1 min-w-0">
+                {activeShot.awayTeamId ? (
+                  <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${activeShot.awayTeamId}.png`} alt={activeShot.awayTeamName} className="w-6 h-6 object-contain shrink-0" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }} />
+                ) : null}
+                <div className={`w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-white shrink-0 ${activeShot.awayTeamId ? 'hidden' : ''}`}>
+                  {activeShot.awayTeamName?.substring(0,1)}
+                </div>
+              </div>
+            </>
+          ) : (
+            <span className="text-sm font-bold text-slate-300">Shot Context</span>
+          )}
+        </div>
+        
+        <button onClick={onNext} className="p-2 rounded-full hover:dark:bg-white/10 hover:bg-slate-700 transition-colors shrink-0">
+          <ChevronRight className="w-5 h-5 dark:text-white text-slate-200" />
+        </button>
+      </div>
+
+      <div className="flex flex-row p-5 gap-4 items-center">
+        {/* Left Stats */}
+        <div className="flex flex-col gap-4 flex-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-400">Minute</span>
+            <span className="text-sm font-bold text-white">{activeShot.min}{activeShot.minAdded ? `+${activeShot.minAdded}` : ''}'</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-400">Shot type</span>
+            <span className="text-sm font-bold text-white capitalize">{activeShot.shotType?.replace(/([A-Z])/g, ' $1').trim()}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-400">Situation</span>
+            <span className="text-sm font-bold text-white capitalize">{activeShot.situation?.replace(/([A-Z])/g, ' $1').trim()}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-400">Result</span>
+            <span className="text-sm font-bold text-white">{activeShot.isGoal ? 'Goal' : (activeShot.eventType === 'AttemptSaved' ? 'Saved' : 'Miss')}</span>
+          </div>
+        </div>
+
+        {/* Right Mini Net Graphic */}
+        <div className="flex flex-col w-[120px]">
+          <div className="relative w-full aspect-[24/8] border-[1px] border-white/20 border-b-0 rounded-t-sm flex flex-col justify-end overflow-visible bg-[#1e1f23]">
+            
+            {/* The scaled Net */}
+            <div 
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 border-[1px] border-white/60 border-b-0 transition-all duration-300"
+              style={{ 
+                width: `${miniNetZoomRatio * 100}%`, 
+                height: `${miniNetZoomRatio * 100}%` 
+              }}
+            >
+              {/* Square Grid Pattern matching Fotmob exactly */}
+              <div className="absolute inset-0 z-0">
+                <svg width="100%" height="100%" viewBox="0 0 100 33.33" preserveAspectRatio="none" className="opacity-[0.35]">
+                  <line x1="0" y1="8.33" x2="100" y2="8.33" stroke="white" strokeWidth="0.5" />
+                  <line x1="0" y1="16.66" x2="100" y2="16.66" stroke="white" strokeWidth="0.5" />
+                  <line x1="0" y1="25" x2="100" y2="25" stroke="white" strokeWidth="0.5" />
+                  <line x1="12.5" y1="0" x2="12.5" y2="33.33" stroke="white" strokeWidth="0.5" />
+                  <line x1="25" y1="0" x2="25" y2="33.33" stroke="white" strokeWidth="0.5" />
+                  <line x1="37.5" y1="0" x2="37.5" y2="33.33" stroke="white" strokeWidth="0.5" />
+                  <line x1="50" y1="0" x2="50" y2="33.33" stroke="white" strokeWidth="0.5" />
+                  <line x1="62.5" y1="0" x2="62.5" y2="33.33" stroke="white" strokeWidth="0.5" />
+                  <line x1="75" y1="0" x2="75" y2="33.33" stroke="white" strokeWidth="0.5" />
+                  <line x1="87.5" y1="0" x2="87.5" y2="33.33" stroke="white" strokeWidth="0.5" />
+                </svg>
+              </div>
+            </div>
+            
+            {(activeShot.onGoalShot || activeShot.isGoal || activeShot.isOnTarget || activeShot.eventType === 'Miss') && (
+              <div 
+                className="absolute z-20 flex items-center justify-center transition-all duration-300"
+                style={{ 
+                  left: `${miniNetLeft}%`, 
+                  bottom: `${miniNetBottom}%`,
+                  transform: 'translate(-50%, 50%)',
+                  width: '14px',
+                  height: '14px'
+                }}
+              >
+                {activeShot.isGoal ? (
+                  <span className="text-[13px] leading-none pointer-events-none grayscale contrast-[1.25] brightness-110 drop-shadow-md absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[46%] z-30">⚽</span>
+                ) : (
+                  <div className="w-[9px] h-[9px] rounded-full bg-[#c2768d] shadow-[0_0_8px_rgba(194,118,141,0.8)] border-[1.5px] border-white z-20" />
+                )}
+              </div>
+            )}
+          </div>
+          <div className="flex justify-between mt-2 px-1">
+            <div className="flex flex-col items-center">
+              <span className="text-xs font-black text-white">{activeShot.expectedGoals > 0 ? activeShot.expectedGoals.toFixed(2) : '-'}</span>
+              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">xG</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-xs font-black text-white">{activeShot.expectedGoalsOnTarget > 0 ? activeShot.expectedGoalsOnTarget.toFixed(2) : '-'}</span>
+              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">xGOT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Advanced 2D Shotmap Pitch Renderer
-const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], matchesBox }: any) => {
+const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], allMatches = [], playerTeamId, matchesBox }: any) => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [activeShotIndex, setActiveShotIndex] = useState<number>(-1);
+  const [viewMode, setViewMode] = useState<'pitch' | 'goal'>('pitch');
 
   const rawShots = useMemo(() => {
     if (realShotmap && realShotmap.length > 0) {
       return realShotmap.map((s: any) => {
-        // Fotmob uses 105x68. Always attacking x=105.
-        // We draw a half-pitch (attacking bottom):
-        // Top is midfield (x=52.5), Bottom is goal (x=105).
-        // X maps to Top (0% to 100%)
-        // Y maps to Left (0% to 100%)
-        
         let rawX = s.x;
         let rawY = s.y;
-
-        // Normalize
         const top = ((rawX - 52.5) / 52.5) * 100;
         const left = (rawY / 68) * 100;
+
+        let derivedHomeTeamId = s.match?.homeTeamId || s.match?.home?.id;
+        let derivedAwayTeamId = s.match?.awayTeamId || s.match?.away?.id;
+        let derivedHomeTeamName = s.match?.homeTeamName || s.homeTeamName;
+        let derivedAwayTeamName = s.match?.awayTeamName || s.awayTeamName;
+
+        const matchContext = allMatches?.find((m: any) => m.id === s.matchId);
+        if (!derivedHomeTeamId && matchContext) {
+           if (matchContext.isHomeTeam) {
+             derivedHomeTeamId = playerTeamId || s.teamId; 
+             derivedAwayTeamId = matchContext.opponentTeamId || matchContext.opponent?.id;
+             derivedHomeTeamName = matchContext.homeTeamName || 'Home';
+             derivedAwayTeamName = matchContext.opponentTeamName || matchContext.opponentName || 'Away';
+           } else {
+             derivedHomeTeamId = matchContext.opponentTeamId || matchContext.opponent?.id;
+             derivedAwayTeamId = playerTeamId || s.teamId;
+             derivedHomeTeamName = matchContext.opponentTeamName || matchContext.opponentName || 'Home';
+             derivedAwayTeamName = matchContext.awayTeamName || 'Away';
+           }
+        }
 
         return {
           left,
@@ -207,10 +375,27 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], ma
           isGoal: s.eventType === 'Goal',
           eventType: s.eventType,
           expectedGoals: s.expectedGoals || 0,
+          expectedGoalsOnTarget: s.expectedGoalsOnTarget || 0,
           situation: s.situation,
           shotType: s.shotType,
           isFromInsideBox: s.isFromInsideBox,
-          isOnTarget: s.isOnTarget
+          isOnTarget: (s.eventType === 'AttemptSaved' && !s.isBlocked) || s.eventType === 'Goal', // for "On target %" text
+          isOnTargetRaw: s.isOnTarget === true, // raw Fotmob API field — drives visual filled/hollow
+          onGoalShot: s.onGoalShot,
+          matchId: s.matchId,
+          homeTeamName: derivedHomeTeamName,
+          awayTeamName: derivedAwayTeamName,
+          homeTeamId: derivedHomeTeamId,
+          awayTeamId: derivedAwayTeamId,
+          homeScore: s.match?.homeScore || s.homeScore || (matchContext?.isHomeTeam ? matchContext?.homeScore : matchContext?.awayScore) || 0,
+          awayScore: s.match?.awayScore || s.awayScore || (matchContext?.isHomeTeam ? matchContext?.awayScore : matchContext?.homeScore) || 0,
+          min: s.min,
+          minAdded: s.minAdded,
+          goalCrossedY: s.goalCrossedY,
+          goalCrossedZ: s.goalCrossedZ,
+          blockedX: s.blockedX,
+          blockedY: s.blockedY,
+          isBlocked: s.isBlocked
         };
       });
     }
@@ -223,7 +408,7 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], ma
       const seed = seedBase + i * 13;
       const isGoal = i < totalGoals;
       let left = 20 + (seed % 60);
-      let top = 40 + ((seed * 7) % 50); // Attacking bottom
+      let top = 40 + ((seed * 7) % 50); 
       if (!isGoal && seed % 3 === 0) left += (seed % 2 === 0 ? 15 : -15);
       left = Math.max(5, Math.min(left, 95));
       top = Math.max(5, Math.min(top, 95));
@@ -233,16 +418,26 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], ma
 
       generated.push({ 
         left, top, isGoal, 
-        eventType: isGoal ? 'Goal' : (seed % 2 === 0 ? 'AttemptSaved' : 'Miss'),
+        eventType: isGoal ? 'Goal' : ((seed % 100 < 28) ? 'AttemptSaved' : 'Miss'),
         expectedGoals: (seed % 100) / 100,
+        expectedGoalsOnTarget: isGoal ? (seed % 80 + 20) / 100 : 0,
         situation: situations[seed % situations.length],
         shotType: shotTypes[seed % shotTypes.length],
         isFromInsideBox: top > 68.6 && left > 20 && left < 80,
-        isOnTarget: isGoal || seed % 2 === 0
+        isOnTarget: isGoal || (seed % 100 < 28), // for "On target %" text
+        isOnTargetRaw: isGoal || (seed % 100 < 28), // for visual circle fill
+        homeTeamName: 'Los Angeles FC',
+        awayTeamName: 'Inter Miami CF',
+        homeTeamId: 10222, // LAFC
+        awayTeamId: 8650,  // Inter Miami
+        homeScore: 3,
+        awayScore: 0,
+        min: 45 + (seed % 45),
+        onGoalShot: isGoal || seed % 2 === 0 ? { x: (seed % 200) / 100, y: (seed % 67) / 100 } : undefined
       });
     }
     return generated;
-  }, [playerId, totalGoals, position, realShotmap]);
+  }, [playerId, totalGoals, position, realShotmap, allMatches, playerTeamId]);
 
   const filterCounts = useMemo(() => {
     const counts: Record<string, number> = {
@@ -283,135 +478,352 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], ma
     });
   }, [rawShots, activeFilter]);
 
+  useEffect(() => {
+    if (filteredShots.length > 0) {
+      setActiveShotIndex(0);
+    } else {
+      setActiveShotIndex(-1);
+    }
+  }, [filteredShots]);
+
   const totalxG = filteredShots.reduce((acc: number, s: any) => acc + (s.expectedGoals || 0), 0).toFixed(2);
   const totalGoalsFiltered = filteredShots.filter((s: any) => s.isGoal).length;
   const totalShotsFiltered = filteredShots.length;
 
+  const activeShot = activeShotIndex >= 0 && activeShotIndex < filteredShots.length ? filteredShots[activeShotIndex] : null;
+
+  // Calculate trajectory target based on absolute coordinates for Pitch View
+  let trajectoryX = 50;
+  let trajectoryY = 100;
+  let blockBarHalfX = 0;
+  let blockBarHalfY = 0;
+
+  if (activeShot) {
+    if (activeShot.isBlocked && activeShot.blockedY && activeShot.blockedX) {
+      trajectoryX = (activeShot.blockedY / 68) * 100;
+      trajectoryY = ((activeShot.blockedX - 52.5) / 52.5) * 100;
+      
+      const dx = trajectoryX - activeShot.left;
+      const dy = trajectoryY - activeShot.top;
+      const dxPhys = dx * 4;
+      const dyPhys = dy * 3;
+      const len = Math.sqrt(dxPhys*dxPhys + dyPhys*dyPhys) || 1;
+      
+      const pxPhys = -dyPhys / len;
+      const pyPhys = dxPhys / len;
+      
+      const barSize = 1.5; 
+      blockBarHalfX = (pxPhys * barSize) / 4;
+      blockBarHalfY = (pyPhys * barSize) / 3;
+    } else if (activeShot.goalCrossedY) {
+      trajectoryX = (activeShot.goalCrossedY / 68) * 100;
+    } else if (activeShot.onGoalShot) {
+      trajectoryX = 45 + (activeShot.onGoalShot.x / 2) * 10;
+    } else if (!activeShot.isGoal && !activeShot.isOnTarget) {
+      trajectoryX = activeShot.left < 50 ? 42 : 58;
+    }
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-      <div className="flex flex-col">
-        <h3 className="dark:text-white text-slate-900 font-bold text-center mb-4">Season Shot Map</h3>
-        <div className="w-full max-w-sm mx-auto flex flex-col gap-6">
-          <div className="relative w-full aspect-[4/3] rounded-t-[2rem] rounded-b-lg overflow-hidden border-4 dark:border-white/10 border-slate-300 shadow-2xl bg-gradient-to-b dark:from-[#22522c] dark:to-[#13361a] from-[#2a6839] to-[#1e4a29]">
-            <div 
-              className="absolute inset-0 opacity-40 pointer-events-none"
-              style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.05) 10%, rgba(255,255,255,0.05) 20%)' }}
-            ></div>
-            <div 
-              className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[31.4%] aspect-square rounded-full border-[3px] border-white/40 pointer-events-none"
-            />
-            <div 
-              className="absolute left-1/2 -translate-x-1/2 w-[26.9%] overflow-hidden pointer-events-none"
-              style={{ bottom: '31.4%', height: '6.95%' }}
-            >
+    <div className="flex flex-col gap-8 w-full">
+      <div className="flex flex-col lg:flex-row gap-8">
+        
+        {/* LEFT COLUMN: Main Vis Container */}
+        <div className="flex flex-col flex-1 dark:bg-[#1a1b1e] bg-[#f8f9fa] rounded-3xl p-6 relative">
+          
+          {/* Header & Toggle */}
+          <div className="flex items-center justify-between mb-8 z-20">
+            <div>
+              <h3 className="dark:text-white text-slate-900 font-extrabold text-[16px] tracking-wide">Season shot map</h3>
+              <p className="text-sm dark:text-slate-400 text-slate-500 font-medium mt-1">On target: {((filteredShots.filter((s: any) => s.isOnTarget).length / Math.max(1, filteredShots.length)) * 100).toFixed(0)}%</p>
+            </div>
+            
+            <div className="flex items-center bg-[#25272e] rounded-full p-1 border border-white/10 shadow-inner">
+              <button 
+                onClick={() => setViewMode('pitch')}
+                className={`p-1.5 rounded-full transition-all duration-300 ${viewMode === 'pitch' ? 'bg-[#c2768d] text-white shadow-md scale-105' : 'text-gray-400 hover:text-white'}`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              <button 
+                onClick={() => setViewMode('goal')}
+                className={`p-1.5 rounded-full transition-all duration-300 ${viewMode === 'goal' ? 'bg-[#c2768d] text-white shadow-md scale-105' : 'text-gray-400 hover:text-white'}`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M5 9h14"/><path d="M5 15h14"/><path d="M12 3v18"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="relative w-full mx-auto min-h-[380px] flex flex-col justify-center">
+            
+            {/* VIEW 1: PITCH (All Shots) */}
+            <div className={`absolute inset-x-0 transition-opacity duration-500 ${viewMode === 'pitch' ? 'opacity-100 z-10 relative' : 'opacity-0 pointer-events-none z-0 absolute'}`}>
               <div 
-                className="absolute top-0 left-0 w-full border-[3px] border-white/40 rounded-full pointer-events-none"
-                style={{ height: '500%' }}
-              />
-            </div>
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[59.3%] h-[31.4%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[26.9%] h-[10.5%] border-[3px] border-white/40 border-b-0 pointer-events-none" />
-            <div className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white/60 rounded-full pointer-events-none" style={{ bottom: '20.95%' }} />
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[10.7%] h-[3%] bg-black/40 border-x-2 border-t-2 border-white pointer-events-none" />
-            {filteredShots.map((shot: any, idx: number) => {
-              if (shot.top < 0 || shot.top > 100) return null;
-
-              let sizeClass = 'w-[14px] h-[14px]';
-              if (shot.expectedGoals && shot.expectedGoals > 0.3) sizeClass = 'w-[18px] h-[18px]';
-              
-              const isOnTarget = shot.eventType === 'AttemptSaved' || shot.isOnTarget;
-
-              return (
-                <div
-                  key={idx}
-                  className={`absolute -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-[1.8] cursor-pointer ${
-                    shot.isGoal
-                      ? 'z-30 flex items-center justify-center'
-                      : `${sizeClass} rounded-full ${isOnTarget ? 'bg-[#d49aab] opacity-[0.65]' : 'bg-transparent border-[2px] border-[#d49aab] opacity-[0.65]'} z-10`
-                  }`}
-                  style={{ left: `${shot.left}%`, top: `${shot.top}%` }}
-                  title={shot.isGoal ? 'Goal' : shot.eventType || 'Miss/Saved'}
-                >
-                  {shot.isGoal && <span className="text-[17px] leading-none pointer-events-none drop-shadow-[0_4px_4px_rgba(0,0,0,0.85)] grayscale contrast-[1.2] brightness-110">⚽</span>}
+                className="relative w-full max-w-[500px] mx-auto aspect-[4/3] rounded-[1.5rem] overflow-hidden shadow-xl"
+                style={{
+                  background: 'repeating-linear-gradient(to bottom, #2d6b38, #2d6b38 11.11%, #276031 11.11%, #276031 22.22%)'
+                }}
+              >
+                {/* Pitch Lines */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[31.4%] aspect-square rounded-full border-[2px] border-white/30 pointer-events-none" />
+                <div className="absolute left-1/2 -translate-x-1/2 w-[26.9%] overflow-hidden pointer-events-none" style={{ bottom: '31.4%', height: '6.95%' }}>
+                  <div className="absolute top-0 left-0 w-full border-[2px] border-white/30 rounded-full pointer-events-none" style={{ height: '500%' }} />
                 </div>
-              );
-            })}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[59.3%] h-[31.4%] border-[2px] border-white/30 border-b-0 pointer-events-none rounded-t-xl" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[26.9%] h-[10.5%] border-[2px] border-white/30 border-b-0 pointer-events-none rounded-t-lg" />
+                
+                {/* Goal Box */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[10.7%] h-[2.5%] border-x-[2px] border-t-[2px] border-white pointer-events-none z-10" />
+                
+                {activeShot && (
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
+                    <line 
+                      x1={`${activeShot.left}%`} 
+                      y1={`${activeShot.top}%`} 
+                      x2={`${trajectoryX}%`} 
+                      y2={`${trajectoryY}%`} 
+                      stroke="#ef4444" 
+                      strokeWidth="2.5" 
+                    />
+                    {activeShot.isBlocked && blockBarHalfX !== 0 && (
+                      <line 
+                        x1={`${trajectoryX - blockBarHalfX}%`} 
+                        y1={`${trajectoryY - blockBarHalfY}%`} 
+                        x2={`${trajectoryX + blockBarHalfX}%`} 
+                        y2={`${trajectoryY + blockBarHalfY}%`} 
+                        stroke="#ef4444" 
+                        strokeWidth="2.5" 
+                      />
+                    )}
+                  </svg>
+                )}
+
+                {filteredShots.map((shot: any, idx: number) => {
+                  if (shot.top < 0 || shot.top > 100) return null;
+                  const isActive = activeShotIndex === idx;
+                  // DEFINITIVE RULE (Matches Image 2 exactly):
+                  // Filled = AttemptSaved AND NOT Blocked (keeper saves)
+                  // Hollow = Miss, Post, AND Blocked shots
+                  // Goal   = ball emoji
+                  const isOnTarget = shot.isOnTarget && !shot.isGoal;
+                  
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => setActiveShotIndex(idx)}
+                      className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer flex items-center justify-center ${isActive ? 'z-40' : (shot.isGoal ? 'z-30' : 'z-10')}`}
+                      style={{ 
+                        left: `${shot.left}%`, 
+                        top: `${shot.top}%`,
+                      }}
+                    >
+                      <div className={`relative flex items-center justify-center ${shot.isGoal ? '' : 'rounded-full'} ${shot.isGoal ? '' : (isOnTarget ? 'w-[14px] h-[14px] bg-[#c2768d]' : 'w-[14px] h-[14px] bg-transparent border-[2.5px] border-[#c2768d]')}`}>
+                        {shot.isGoal && (
+                          <span className="text-[14px] leading-none pointer-events-none grayscale contrast-[1.25] brightness-110 drop-shadow-md">⚽</span>
+                        )}
+                      </div>
+                      
+                      {isActive && (
+                        <div className="absolute inset-0 rounded-full border-[3px] border-[#ef4444] shadow-[0_0_15px_rgba(239,68,68,0.9)] scale-[1.6] pointer-events-none bg-[#ef4444]/30" />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* VIEW 2: BIG GOALPOST (All Shots on Target) */}
+            <div className={`absolute inset-x-0 transition-opacity duration-500 ${viewMode === 'goal' ? 'opacity-100 z-10 relative' : 'opacity-0 pointer-events-none z-0 absolute'} flex flex-col items-center justify-center`}>
+              
+              {/* Card Container for Goalpost */}
+              <div className="relative w-full max-w-[500px] aspect-[5/3] bg-[#222225] rounded-xl overflow-hidden flex flex-col mt-6 border dark:border-white/5 border-slate-800">
+                
+                {/* Ground Fill */}
+                <div className="absolute bottom-0 left-0 right-0 h-[25%] bg-[#222225]" />
+                
+                {/* Ground Line spanning full width */}
+                <div className="absolute bottom-[25%] left-0 right-0 h-[1.5px] bg-[#44464a] z-0" />
+
+                {/* Goal Box (Strict 3:1 coordinate system matching exact bounds) */}
+                <div className="absolute bottom-[25%] left-[8.333%] w-[83.333%] aspect-[3/1] overflow-visible z-10">
+                  
+                  {/* Exact SVG Grid */}
+                  <div className="absolute inset-0 z-0 pointer-events-none">
+                    <svg width="100%" height="100%" viewBox="0 0 300 100" preserveAspectRatio="none" className="overflow-visible">
+                      {/* Back Net Frame (Indented by 15px/15% to look correct) */}
+                      <path d="M15,15 L285,15 L285,100 L15,100 Z" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      
+                      {/* Horizontal Net Lines */}
+                      <path d="M15,36.25 L285,36.25" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M15,57.5 L285,57.5" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M15,78.75 L285,78.75" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      
+                      {/* Vertical Net Lines */}
+                      <path d="M45,15 L45,100" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M75,15 L75,100" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M105,15 L105,100" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M135,15 L135,100" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M165,15 L165,100" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M195,15 L195,100" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M225,15 L225,100" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M255,15 L255,100" fill="none" stroke="#44464a" strokeWidth="2"/>
+
+                      {/* Side & Top Diagonals */}
+                      <path d="M0,0 L15,15" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M300,0 L285,15" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M0,100 L15,100" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M300,100 L285,100" fill="none" stroke="#44464a" strokeWidth="2"/>
+
+                      {/* Top Net Diagonals */}
+                      <path d="M45,15 L33.3,0" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M75,15 L66.6,0" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M105,15 L100,0" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M135,15 L133.3,0" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M165,15 L166.6,0" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M195,15 L200,0" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M225,15 L233.3,0" fill="none" stroke="#44464a" strokeWidth="2"/>
+                      <path d="M255,15 L266.6,0" fill="none" stroke="#44464a" strokeWidth="2"/>
+
+                      {/* Front Posts and Crossbar */}
+                      <path d="M0,0 L300,0 L300,100" fill="none" stroke="#77787c" strokeWidth="4"/>
+                      <path d="M0,0 L0,100" fill="none" stroke="#77787c" strokeWidth="4"/>
+                    </svg>
+                  </div>
+                  
+                  {/* Markers rendered exactly on coordinate grid */}
+                  {filteredShots.map((shot: any, idx: number) => {
+                    if (!shot.onGoalShot && !shot.isGoal && !shot.isOnTarget) return null;
+                    
+                    const isActive = activeShotIndex === idx;
+                    
+                    // Direct mathematical mapping: width represents 0..2, height represents 0..0.666
+                    const xPercent = shot.onGoalShot ? (shot.onGoalShot.x / 2.0) * 100 : 50;
+                    const yPercent = shot.onGoalShot ? (shot.onGoalShot.y / 0.6666667) * 100 : 50;
+
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => setActiveShotIndex(idx)}
+                        className={`absolute cursor-pointer flex items-center justify-center ${isActive ? 'z-40' : (shot.isGoal ? 'z-30' : 'z-20')}`}
+                        style={{ 
+                          left: `${xPercent}%`, 
+                          bottom: `${yPercent}%`,
+                          transform: 'translate(-50%, 50%)', // Centers the container directly on coordinates
+                          width: '26px', // Container size accommodates highlight ring
+                          height: '26px'
+                        }}
+                      >
+                        {/* 1. The Highlight Ring (Centered, crisp, proportional) */}
+                        {isActive && (
+                          <div className="absolute inset-0 rounded-full border-[2px] border-[#ff4b4b] pointer-events-none z-50" />
+                        )}
+                        
+                        {/* 2. The Shot Marker (18x18 uniform size) */}
+                        <div className="relative flex items-center justify-center w-[18px] h-[18px] z-30">
+                          {shot.isGoal ? (
+                            <span className="text-[17px] leading-none pointer-events-none grayscale contrast-[1.25] brightness-110 drop-shadow-md absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[46%] z-30">⚽</span>
+                          ) : (
+                            // Solid Pink Circle
+                            <div className="w-full h-full rounded-full bg-[#c2768d] opacity-[0.85] shadow-sm relative z-20" />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
           </div>
-          <div className="flex justify-around items-center border-b dark:border-white/10 border-slate-200 pb-4">
-            <div className="flex flex-col items-center">
-              <span className="text-2xl font-bold dark:text-white text-slate-900">{totalShotsFiltered}</span>
-              <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">Shots</span>
+
+          {/* Footer Stats for Left Column */}
+          <div className="flex flex-col mt-auto pt-8">
+            <div className="flex justify-around items-center">
+              <div className="flex flex-col items-center gap-1.5">
+                <span className="text-[26px] font-black dark:text-white text-slate-900 leading-none">{totalShotsFiltered}</span>
+                <span className="text-[11px] font-bold dark:text-slate-400 text-slate-500">Shots</span>
+              </div>
+              <div className="flex flex-col items-center gap-1.5">
+                <span className="text-[26px] font-black dark:text-white text-slate-900 leading-none">{totalGoalsFiltered}</span>
+                <span className="text-[11px] font-bold dark:text-slate-400 text-slate-500">Goals</span>
+              </div>
+              <div className="flex flex-col items-center gap-1.5">
+                <span className="text-[26px] font-black dark:text-white text-slate-900 leading-none">{totalxG}</span>
+                <span className="text-[11px] font-bold dark:text-slate-400 text-slate-500">xG</span>
+              </div>
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-2xl font-bold dark:text-white text-slate-900">{totalGoalsFiltered}</span>
-              <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">Goals</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-2xl font-bold dark:text-white text-slate-900">{totalxG}</span>
-              <span className="text-[13px] font-medium dark:text-slate-400 text-slate-500">xG</span>
-            </div>
-          </div>
-          <div className="flex justify-center gap-6 text-[13px] font-medium dark:text-slate-300 text-slate-600">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[17px] leading-none drop-shadow-[0_3px_3px_rgba(0,0,0,0.6)] grayscale contrast-[1.2] brightness-110">⚽</span>
-              <span>Goal</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-[#d49aab] opacity-[0.65]"></div>
-              <span>On Target</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-transparent border-[2px] border-[#d49aab] opacity-[0.65]"></div>
-              <span>Miss/Block</span>
+            
+            <div className="w-full h-[1px] dark:bg-white/5 bg-slate-200 my-6"></div>
+            
+            <div className="flex justify-center gap-8 text-[11px] font-bold dark:text-slate-200 text-slate-700">
+              <div className="flex items-center gap-2.5">
+                <span className="text-[15px] leading-none grayscale contrast-[1.25] brightness-110 drop-shadow-md">⚽</span>
+                <span>Goal</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <div className="w-3.5 h-3.5 rounded-full bg-[#c2768d]"></div>
+                <span>On Target</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <div className="w-3.5 h-3.5 rounded-full bg-transparent border-[2.5px] border-[#c2768d]"></div>
+                <span>Miss/Block</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="flex flex-col gap-6">
-        {matchesBox}
-        <div className="dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-6 shadow-inner flex flex-col gap-4">
-          <div className="flex items-center justify-between border-b dark:border-white/5 border-slate-200 pb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-4 rounded-full bg-[#34D399] shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
-              <h4 className="text-[13px] font-black dark:text-white text-slate-900 uppercase tracking-widest">Filter Shots</h4>
+        
+        {/* RIGHT COLUMN: Controls & Match Detail */}
+        <div className="flex flex-col gap-6 flex-1 xl:max-w-[380px]">
+          
+          {/* Top Card: Match Detail (ALWAYS VISIBLE) */}
+          <MatchDetailCard 
+            activeShot={activeShot} 
+            onPrev={() => setActiveShotIndex((prev) => (prev > 0 ? prev - 1 : filteredShots.length - 1))}
+            onNext={() => setActiveShotIndex((prev) => (prev < filteredShots.length - 1 ? prev + 1 : 0))}
+          />
+
+          {/* Filter Shots */}
+          <div className="dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-6 shadow-inner flex flex-col gap-4">
+            <div className="flex items-center justify-between border-b dark:border-white/5 border-slate-200 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-4 rounded-full bg-[#f43f5e] shadow-[0_0_8px_rgba(244,63,94,0.5)]" />
+                <h4 className="text-[13px] font-black dark:text-white text-slate-900 uppercase tracking-widest">Filter</h4>
+              </div>
+              {activeFilter && (
+                <button 
+                  onClick={() => setActiveFilter(null)} 
+                  className="text-[11px] font-bold text-[#f43f5e] hover:text-[#e11d48] uppercase tracking-wider transition-colors px-2 py-1 rounded-md hover:bg-rose-500/10"
+                >
+                  Clear
+                </button>
+              )}
             </div>
-            {activeFilter && (
-              <button 
-                onClick={() => setActiveFilter(null)} 
-                className="text-[11px] font-bold text-[#f43f5e] hover:text-[#e11d48] uppercase tracking-wider transition-colors px-2 py-1 rounded-md hover:bg-rose-500/10"
-              >
-                Clear
-              </button>
-            )}
+            
+            <div className="flex flex-wrap gap-2.5">
+              {Object.entries(filterCounts).map(([key, count]) => {
+                if (count === 0) return null;
+                const isActive = activeFilter === key;
+                return (
+                  <button 
+                    key={key}
+                    onClick={() => setActiveFilter(isActive ? null : key)}
+                    className={`group relative flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all duration-300 overflow-hidden ${
+                      isActive 
+                        ? 'text-white border-transparent shadow-[0_4px_12px_rgba(244,63,94,0.3)] scale-[1.02] bg-[#f43f5e]' 
+                        : 'dark:text-gray-300 text-slate-600 bg-transparent border dark:border-white/10 border-slate-300 hover:dark:bg-white/10 hover:bg-slate-200'
+                    }`}
+                  >
+                    <span className="relative z-10">{key}</span>
+                    <span className={`relative z-10 font-black ${isActive ? 'text-white' : 'dark:text-white text-slate-900'}`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
           
-          <div className="flex flex-wrap gap-2.5">
-            {Object.entries(filterCounts).map(([key, count]) => {
-              if (count === 0) return null;
-              const isActive = activeFilter === key;
-              return (
-                <button 
-                  key={key}
-                  onClick={() => setActiveFilter(isActive ? null : key)}
-                  className={`group relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all duration-300 overflow-hidden ${
-                    isActive 
-                      ? 'text-white border-transparent shadow-[0_4px_12px_rgba(56,189,248,0.3)] scale-[1.02]' 
-                      : 'dark:text-gray-400 text-slate-600 dark:bg-white/5 bg-slate-200/50 border dark:border-white/5 border-slate-300/50 hover:dark:bg-white/10 hover:bg-slate-200 hover:dark:text-white hover:text-slate-900'
-                  }`}
-                >
-                  {isActive && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#38bdf8] to-[#3B82F6] z-0"></div>
-                  )}
-                  <span className="relative z-10">{key}</span>
-                  <span className={`relative z-10 flex items-center justify-center min-w-[18px] h-[18px] rounded-md text-[10px] px-1 ${
-                    isActive ? 'bg-black/20 text-white' : 'dark:bg-black/40 bg-white shadow-sm dark:text-gray-300 text-slate-500 group-hover:text-slate-700 dark:group-hover:text-white'
-                  }`}>
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          {matchesBox}
         </div>
       </div>
     </div>
@@ -1785,7 +2197,9 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                     playerId={id} 
                     position={position} 
                     totalGoals={Number(goals)} 
-                    realShotmap={currentStats?.shotmap} 
+                    realShotmap={currentStats?.shotmap}
+                      allMatches={recentMatches}
+                      playerTeamId={primaryTeam?.id} 
                     matchesBox={
                       <div className="relative flex flex-col dark:bg-[#121316] bg-slate-50 rounded-2xl border dark:border-white/5 border-slate-200 p-6 shadow-2xl overflow-hidden group hover:-translate-y-1 transition-all duration-500 border-l-4 border-l-[#60A5FA]">
                         {/* Background Blur */}
