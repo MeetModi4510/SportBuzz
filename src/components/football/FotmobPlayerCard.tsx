@@ -617,9 +617,9 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], al
                         top: `${shot.top}%`,
                       }}
                     >
-                      <div className={`relative flex items-center justify-center ${shot.isGoal ? '' : 'rounded-full'} ${shot.isGoal ? '' : (isOnTarget ? 'w-[14px] h-[14px] bg-[#c2768d]' : 'w-[14px] h-[14px] bg-transparent border-[2.5px] border-[#c2768d]')}`}>
+                      <div className={`relative flex items-center justify-center rounded-full ${isOnTarget && !shot.isGoal ? 'w-[14px] h-[14px] bg-[#c2768d]' : 'w-[14px] h-[14px] bg-transparent'} ${!shot.isGoal && !isOnTarget ? 'border-[2.5px] border-[#c2768d]' : ''}`}>
                         {shot.isGoal && (
-                          <span className="text-[14px] leading-none pointer-events-none grayscale contrast-[1.25] brightness-110 drop-shadow-md">⚽</span>
+                          <span className="text-[14px] leading-none pointer-events-none grayscale contrast-[1.25] brightness-110 drop-shadow-md absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[46%] z-30">⚽</span>
                         )}
                       </div>
                       
