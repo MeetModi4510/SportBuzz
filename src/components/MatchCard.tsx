@@ -27,7 +27,7 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
   // Socket listener for live updates
   useEffect(() => {
     if (match.sport === 'cricket' && match.status === 'live') {
-      const socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const socketUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5000');
       const newSocket = io(socketUrl, {
         path: '/socket.io/',
         transports: ['websocket', 'polling'],
