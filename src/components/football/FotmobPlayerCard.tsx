@@ -572,8 +572,10 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], al
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[59.3%] h-[31.4%] border-[2px] border-white/30 border-b-0 pointer-events-none rounded-t-xl" />
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[26.9%] h-[10.5%] border-[2px] border-white/30 border-b-0 pointer-events-none rounded-t-lg" />
                 
-                {/* Goal Box */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[10.7%] h-[2.5%] border-x-[2px] border-t-[2px] border-white pointer-events-none z-10" />
+                {/* Goal Net */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[10.7%] h-[3%] border-[3px] border-b-0 border-white pointer-events-none z-10 bg-black/10 shadow-[inset_0_2px_8px_rgba(0,0,0,0.4)] overflow-hidden">
+                   <div className="absolute inset-0 opacity-40" style={{ backgroundSize: '4px 4px', backgroundImage: 'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)' }} />
+                </div>
                 
                 {activeShot && (
                   <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
