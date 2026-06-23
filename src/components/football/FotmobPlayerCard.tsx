@@ -549,13 +549,20 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], al
                 onClick={() => setViewMode('pitch')}
                 className={`relative z-10 w-10 h-8 flex items-center justify-center shrink-0 rounded-full transition-colors duration-300 ${viewMode === 'pitch' ? 'text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
               >
-                <svg className="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="5" width="20" height="14" rx="2" strokeWidth="2" />
+                  <path d="M12 5v14M2 9h3v6H2M22 9h-3v6h3" strokeWidth="1.5" />
+                  <circle cx="12" cy="12" r="2.5" strokeWidth="1.5" />
+                </svg>
               </button>
               <button 
                 onClick={() => setViewMode('goal')}
                 className={`relative z-10 w-10 h-8 flex items-center justify-center shrink-0 rounded-full transition-colors duration-300 ${viewMode === 'goal' ? 'text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
               >
-                <svg className="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M5 9h14"/><path d="M5 15h14"/><path d="M12 3v18"/></svg>
+                <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 21V7c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v14" strokeWidth="2.5" />
+                  <path d="M8 5v16M12 5v16M16 5v16M3 10h18M3 16h18" strokeWidth="1" strokeOpacity="0.5" />
+                </svg>
               </button>
             </div>
           </div>
@@ -700,13 +707,20 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], al
                   
                   {/* Markers rendered exactly on coordinate grid */}
                   {filteredShots.map((shot: any, idx: number) => {
-                    if (!shot.onGoalShot && !shot.isGoal && !shot.isOnTarget) return null;
+                    if (!shot.onGoalShot && !shot.goalCrossedY && !shot.isGoal && !shot.isOnTarget) return null;
                     
                     const isActive = activeShotIndex === idx;
                     
-                    // Direct mathematical mapping: width represents 0..2, height represents 0..0.666
-                    const xPercent = shot.onGoalShot ? (shot.onGoalShot.x / 2.0) * 100 : 50;
-                    const yPercent = shot.onGoalShot ? (shot.onGoalShot.y / 0.6666667) * 100 : 50;
+                    let xPercent = 50;
+                    let yPercent = 50;
+                    
+                    if (shot.goalCrossedY) {
+                      xPercent = ((37.66 - shot.goalCrossedY) / 7.32) * 100;
+                      yPercent = shot.goalCrossedZ ? (shot.goalCrossedZ / 2.44) * 100 : 10;
+                    } else if (shot.onGoalShot) {
+                      xPercent = (shot.onGoalShot.x / 2.0) * 100;
+                      yPercent = (shot.onGoalShot.y / 0.6666667) * 100;
+                    }
 
                     return (
                       <div
@@ -731,8 +745,7 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], al
                           {shot.isGoal ? (
                             <span className="text-[17px] leading-none pointer-events-none grayscale contrast-[1.25] brightness-110 drop-shadow-md absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[46%] z-30">⚽</span>
                           ) : (
-                            // Solid Pink Circle
-                            <div className="w-full h-full rounded-full bg-[#c2768d] opacity-[0.85] shadow-sm relative z-20" />
+                            <div className={`w-full h-full rounded-full relative z-20 ${shot.isOnTarget ? 'bg-[#c2768d] opacity-[0.85] shadow-sm' : 'bg-transparent border-[3px] border-[#c2768d]'}`} />
                           )}
                         </div>
                       </div>
@@ -745,7 +758,7 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], al
           </div>
 
           {/* Footer Stats for Left Column */}
-          <div className="flex flex-col mt-auto pt-8">
+          <div className="flex flex-col mt-12">
             <div className="flex justify-around items-center">
               <div className="flex flex-col items-center gap-1.5">
                 <span className="text-[26px] font-black dark:text-white text-slate-900 leading-none">{totalShotsFiltered}</span>
