@@ -163,7 +163,7 @@ const PerformanceLab = () => {
 
             {/* Player Comparison Tab */}
             <TabsContent value="comparison" className="space-y-8 animate-fade-in">
-              <PlayerComparison />
+              <PlayerComparison activeSport={activeSport} />
             </TabsContent>
 
             {/* Team Comparison Tab */}

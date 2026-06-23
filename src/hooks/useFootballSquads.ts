@@ -87,6 +87,25 @@ export function useFotmobPlayerProfile(playerId: string | number | null) {
     });
 }
 
+const fetchFotmobPlayerProfileByName = async (playerName: string): Promise<any> => {
+    const res = await fetch(`/api/football/fotmob-player-by-name/${encodeURIComponent(playerName)}`);
+    if (!res.ok) {
+        throw new Error('Failed to fetch fotmob player profile by name');
+    }
+    const data = await res.json();
+    return data.data;
+};
+
+export function useFotmobPlayerProfileByName(playerName: string | null | undefined) {
+    return useQuery({
+        queryKey: ['fotmobPlayerProfileByName', playerName],
+        queryFn: () => fetchFotmobPlayerProfileByName(playerName!),
+        enabled: !!playerName,
+        staleTime: 24 * 60 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
+}
+
 const fetchFotmobPlayerTournamentStats = async (playerId: string | number, entryId: string, tournamentId: string | number): Promise<any> => {
     const res = await fetch(`/api/football/fotmob-player-stats?id=${playerId}&seasonId=${encodeURIComponent(entryId)}&tournamentId=${tournamentId}`);
     if (!res.ok) {

@@ -21,6 +21,8 @@ import {
     ResponsiveContainer,
     AreaChart,
     Area,
+    LineChart,
+    Line,
     Legend,
 } from "recharts";
 import {
@@ -37,11 +39,14 @@ import {
     X,
     Swords,
     BarChart3,
-    Loader2
+    Loader2,
+    Info
 } from "lucide-react";
 
 import { usePlayerBattingStats } from '@/hooks/usePlayerBattingStats';
 import { usePerformanceLabPlayerStats, usePerformanceLabSquad, usePerformanceLabSquads } from '@/hooks/usePerformanceLab';
+import { usePlayerRecentMatches } from '@/hooks/football/usePlayerRecentMatches';
+import { useFootballSquads, useFotmobPlayerProfile, useFotmobPlayerProfileByName, useFotmobPlayerTournamentStats } from '@/hooks/useFootballSquads';
 import { getCricbuzzPlayerId } from '@/data/cricbuzzPlayerIds';
 import type { BattingFormatKey } from '@/types/playerBattingTypes';
 import { FORMAT_COLORS, FORMAT_LABELS } from '@/utils/playerStatsTransformer';
@@ -105,6 +110,91 @@ const getFlagUrl = (countryName: string) => {
     return `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
 };
 
+const CustomPlayerDot = (props: any) => {
+    const { cx, cy, value, stroke, playerInfo, payload, teamIdKey } = props;
+    if (value === undefined || value === null) return null;
+    
+    let imgUrl = null;
+    
+    const teamId = teamIdKey && payload ? payload[teamIdKey] : null;
+    if (teamId) {
+        imgUrl = `https://images.fotmob.com/image_resources/logo/teamlogo/${teamId}_xsmall.png`;
+    } else if (playerInfo?.countryFlag?.startsWith('http')) {
+        imgUrl = playerInfo.countryFlag;
+    } else if (playerInfo?.country) {
+        imgUrl = getFlagUrl(playerInfo.country);
+    }
+    
+    return (
+        <g transform={`translate(${cx}, ${cy})`} className="z-50 pointer-events-none hover:scale-110 transition-transform cursor-pointer">
+            <circle cx="0" cy="0" r="15" fill="#121316" stroke={stroke} strokeWidth="2" opacity="0.9" />
+            {imgUrl ? (
+                <image href={imgUrl} x="-10" y="-10" height="20" width="20" preserveAspectRatio="xMidYMid slice"/>
+            ) : (
+                <text x="0" y="0" textAnchor="middle" dominantBaseline="central" fontSize="10" fill="white" fontWeight="900">{playerInfo?.name?.charAt(0) || ''}</text>
+            )}
+        </g>
+    );
+};
+
+const CustomGraphTooltip = ({ active, payload, label, selectedSport, statCategory }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-[#0a0f1e] border border-white/10 rounded-xl p-3 shadow-2xl min-w-[200px]">
+                <p className="font-black text-white/50 text-xs mb-2 uppercase tracking-widest">{label}</p>
+                
+                <div className="space-y-3">
+                    {payload.map((entry: any, i: number) => {
+                        const isPlayerA = entry.dataKey === 'A';
+                        const oppName = isPlayerA ? entry.payload.oppA : entry.payload.oppB;
+                        const oppId = isPlayerA ? entry.payload.oppIdA : entry.payload.oppIdB;
+                        const result = isPlayerA ? entry.payload.resultA : entry.payload.resultB;
+                        const isHome = isPlayerA ? entry.payload.isHomeA : entry.payload.isHomeB;
+                        
+                        let valText = "";
+                        if (selectedSport === 'football') {
+                            valText = `${(Number(entry.value) / 10).toFixed(1)} Rating`;
+                        } else {
+                            valText = `${entry.value} ${statCategory === 'batting' ? 'Runs' : 'Wickets/Rating'}`;
+                        }
+
+                        return (
+                            <div key={i} className="flex flex-col gap-1">
+                                <div className="flex items-center justify-between gap-4">
+                                    <span className="font-bold text-sm" style={{ color: entry.color }}>
+                                        {entry.name}
+                                    </span>
+                                    <span className="font-black text-white">
+                                        {valText}
+                                    </span>
+                                </div>
+                                {selectedSport === 'football' && oppName && (
+                                    <div className="flex items-center gap-1.5 text-xs text-white/60 bg-white/5 rounded-md px-2 py-1">
+                                        <span className="font-medium">{isHome ? 'vs' : '@'}</span>
+                                        {oppId && (
+                                            <img 
+                                                src={`https://images.fotmob.com/image_resources/logo/teamlogo/${oppId}_xsmall.png`} 
+                                                className="w-3.5 h-3.5 object-contain" 
+                                                alt=""
+                                                onError={(e: any) => e.target.style.display = 'none'}
+                                            />
+                                        )}
+                                        <span className="font-bold truncate max-w-[100px] text-white/80">{oppName}</span>
+                                        {result && (
+                                            <span className="ml-auto font-black text-[10px] tracking-wider border-l border-white/10 pl-1.5">{result}</span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    }
+    return null;
+};
+
 // ─── Components ──────────────────────────────────────────────────
 function SectionCard({
     icon,
@@ -145,22 +235,39 @@ function SectionCard({
     );
 }
 
-const FormIndicator = ({ form }: { form: number[] }) => {
+const FormIndicator = ({ form, matches, sport }: { form: number[], matches?: any[], sport?: string }) => {
+    let items: string[] = [];
+
+    if (sport === 'football' && matches && matches.length > 0) {
+        items = matches.slice(0, 5).map((m: any) => {
+            const isHome = m.isHomeTeam;
+            const teamScore = isHome ? m.homeScore : m.awayScore;
+            const oppScore = isHome ? m.awayScore : m.homeScore;
+            if (teamScore > oppScore) return 'W';
+            if (teamScore < oppScore) return 'L';
+            return 'D';
+        }).reverse();
+    } else {
+        items = form.slice(-5).map(val => val > 80 ? 'W' : 'L');
+    }
+
     return (
         <div className="flex gap-1.5">
-            {form.slice(-5).map((val, i) => {
-                const isWin = val > 80;
+            {items.map((res, i) => {
+                let bgClass = "bg-slate-800/50 border-slate-700 text-slate-500";
+                if (res === 'W') bgClass = "bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]";
+                if (res === 'D') bgClass = "bg-yellow-500/20 border-yellow-500/50 text-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.3)]";
+                if (res === 'L') bgClass = "bg-rose-500/20 border-rose-500/50 text-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.3)]";
+
                 return (
                     <div 
                         key={i}
                         className={cn(
                             "w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black border transition-all",
-                            isWin 
-                                ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]" 
-                                : "bg-slate-800/50 border-slate-700 text-slate-500"
+                            bgClass
                         )}
                     >
-                        {isWin ? "W" : "L"}
+                        {res}
                     </div>
                 );
             })}
@@ -195,7 +302,9 @@ function PlayerSelectorHUD({
                 countries.set(p.country, p.countryFlag);
             }
         });
-        return Array.from(countries.entries()).map(([name, flag]) => ({ name, flag }));
+        return Array.from(countries.entries())
+            .map(([name, flag]) => ({ name, flag }))
+            .sort((a, b) => a.name.localeCompare(b.name));
     }, [players]);
 
     const filteredPlayers = useMemo(() => {
@@ -205,6 +314,38 @@ function PlayerSelectorHUD({
             return matchesSearch && matchesCountry;
         });
     }, [players, searchQuery, selectedCountry]);
+
+    const groupedPlayers = useMemo(() => {
+        const groups: Record<string, AnalysisPlayer[]> = {};
+        filteredPlayers.forEach(p => {
+            let roleCategory = p.role || 'Other';
+            const r = roleCategory.toLowerCase();
+            
+            if (r.includes('goalkeeper') || r.includes('keeper')) roleCategory = 'Goalkeepers';
+            else if (r.includes('defender')) roleCategory = 'Defenders';
+            else if (r.includes('midfielder')) roleCategory = 'Midfielders';
+            else if (r.includes('forward') || r.includes('attacker') || r.includes('striker') || r.includes('winger')) roleCategory = 'Attackers';
+            else if (r.includes('batsman') || r.includes('batter')) roleCategory = 'Batsmen';
+            else if (r.includes('bowler')) roleCategory = 'Bowlers';
+            else if (r.includes('allrounder') || r.includes('all-rounder')) roleCategory = 'All-Rounders';
+            else roleCategory = 'Other';
+
+            if (!groups[roleCategory]) groups[roleCategory] = [];
+            groups[roleCategory].push(p);
+        });
+
+        // Desired order for both football and cricket
+        const order = ['Goalkeepers', 'Defenders', 'Midfielders', 'Attackers', 'Batsmen', 'All-Rounders', 'Bowlers', 'Wicket Keepers', 'Other'];
+        
+        return Object.entries(groups).sort(([a], [b]) => {
+            const indexA = order.indexOf(a);
+            const indexB = order.indexOf(b);
+            if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+            if (indexA !== -1) return -1;
+            if (indexB !== -1) return 1;
+            return a.localeCompare(b);
+        });
+    }, [filteredPlayers]);
 
     return (
         <div className={cn("relative group/hud", open ? "z-[150]" : "z-10")}>
@@ -231,7 +372,22 @@ function PlayerSelectorHUD({
                             "ring-2 ring-white/5 group-hover/hud:ring-white/10"
                         )}>
                             {current?.photo ? (
-                                <img src={current.photo} alt={current.name} className="w-full h-full object-cover scale-[1.02] group-hover/hud:scale-110 transition-transform duration-500 ease-out" />
+                                <img 
+                                    src={current.photo} 
+                                    alt={current.name} 
+                                    className="w-full h-full object-cover scale-[1.02] group-hover/hud:scale-110 transition-transform duration-500 ease-out" 
+                                    onError={(e) => {
+                                        (e.target as HTMLElement).style.display = 'none';
+                                        const parent = (e.target as HTMLElement).parentElement;
+                                        if (parent && !parent.querySelector('.fallback-text')) {
+                                            const fallback = document.createElement('div');
+                                            fallback.className = 'fallback-text w-full h-full flex items-center justify-center text-2xl font-bold text-white/50';
+                                            const parts = current.name.split(' ');
+                                            fallback.innerText = parts.length > 1 ? (parts[0][0] + parts[parts.length-1][0]).toUpperCase() : current.name.substring(0, 2).toUpperCase();
+                                            parent.appendChild(fallback);
+                                        }
+                                    }}
+                                />
                             ) : (
                                 <span className="text-2xl font-bold text-white/50">{current?.name.charAt(0)}</span>
                             )}
@@ -247,6 +403,8 @@ function PlayerSelectorHUD({
                         <div className={cn("flex items-center gap-2.5 opacity-80", side === "right" && "flex-row-reverse")}>
                             {getFlagUrl(current?.country || "") ? (
                                 <img src={getFlagUrl(current?.country || "")!} alt={current?.country} className="w-5 h-3.5 object-cover rounded-[2px]" />
+                            ) : current?.countryFlag?.startsWith('http') ? (
+                                <img src={current.countryFlag} alt={current?.country} className="w-5 h-3.5 object-cover rounded-[2px]" />
                             ) : current?.countryFlag ? (
                                 <span className="text-sm shrink-0">{current.countryFlag}</span>
                             ) : null}
@@ -316,6 +474,8 @@ function PlayerSelectorHUD({
                                 >
                                     {getFlagUrl(c.name) ? (
                                         <img src={getFlagUrl(c.name)!} alt={c.name} className="w-4 h-3 object-cover rounded-sm" />
+                                    ) : c.flag?.startsWith('http') ? (
+                                        <img src={c.flag} alt={c.name} className="w-4 h-3 object-cover rounded-sm" />
                                     ) : (
                                         <span>{c.flag}</span>
                                     )}
@@ -325,43 +485,73 @@ function PlayerSelectorHUD({
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-2 relative z-10">
-                        {filteredPlayers.length > 0 ? filteredPlayers.map((p) => (
-                            <button
-                                key={p.id}
-                                onClick={() => {
-                                    onChange(p.id);
-                                    setOpen(false);
-                                }}
-                                className={cn(
-                                    "relative flex items-center gap-4 p-4 rounded-2xl transition-all group/item",
-                                    p.id === selectedId ? "bg-primary/20 border border-primary/30" : "hover:bg-white/5 border border-transparent"
-                                )}
-                            >
-                                <div className="w-12 h-12 rounded-xl bg-slate-900 overflow-hidden shrink-0 border border-white/10">
-                                    {p.photo ? (
-                                        <img src={p.photo} alt={p.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-xs font-bold text-white">{p.name.charAt(0)}</div>
-                                    )}
-                                </div>
-                                <div className="flex-1 min-w-0 text-left">
-                                    <span className="font-black text-white text-sm block uppercase tracking-tight truncate">{p.name}</span>
-                                    <div className="flex items-center gap-2">
-                                        {getFlagUrl(p.country) ? (
-                                            <img src={getFlagUrl(p.country)!} alt={p.country} className="w-4 h-3 object-cover rounded-sm" />
-                                        ) : (
-                                            <span className="text-lg">{p.countryFlag}</span>
-                                        )}
-                                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Rating: {p.overallRating}</span>
+                    <div className="flex flex-col gap-6 relative z-10">
+                        {groupedPlayers.length > 0 ? groupedPlayers.map(([category, categoryPlayers]) => (
+                            <div key={category} className="flex flex-col gap-2">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
+                                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
+                                        {category}
                                     </div>
+                                    <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
                                 </div>
-                                {p.id === selectedId && <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_#3b82f6]" />}
-                            </button>
+                                <div className="grid grid-cols-1 gap-2">
+                                    {categoryPlayers.map((p) => (
+                                        <button
+                                            key={p.id}
+                                            onClick={() => {
+                                                onChange(p.id);
+                                                setOpen(false);
+                                            }}
+                                            className={cn(
+                                                "relative flex items-center gap-4 p-4 rounded-2xl transition-all group/item",
+                                                p.id === selectedId ? "bg-primary/20 border border-primary/30" : "hover:bg-white/5 border border-transparent"
+                                            )}
+                                        >
+                                            <div className="w-12 h-12 rounded-xl bg-slate-900 overflow-hidden shrink-0 border border-white/10">
+                                                {p.photo && (selectedCountry || searchQuery) ? (
+                                                    <img 
+                                                        src={p.photo} 
+                                                        alt={p.name} 
+                                                        loading="lazy"
+                                                        className="w-full h-full object-cover" 
+                                                        onError={(e) => {
+                                                            (e.target as HTMLElement).style.display = 'none';
+                                                            const parent = (e.target as HTMLElement).parentElement;
+                                                            if (parent && !parent.querySelector('.fallback-text')) {
+                                                                const fallback = document.createElement('div');
+                                                                fallback.className = 'fallback-text w-full h-full flex items-center justify-center text-xs font-bold text-white';
+                                                                const parts = p.name.split(' ');
+                                                                fallback.innerText = parts.length > 1 ? (parts[0][0] + parts[parts.length-1][0]).toUpperCase() : p.name.substring(0, 2).toUpperCase();
+                                                                parent.appendChild(fallback);
+                                                            }
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-xs font-bold text-white">{p.name.charAt(0)}</div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0 text-left">
+                                                <span className="font-black text-white text-sm block uppercase tracking-tight truncate">{p.name}</span>
+                                                <div className="flex items-center gap-2">
+                                                    {getFlagUrl(p.country) ? (
+                                                        <img src={getFlagUrl(p.country)!} alt={p.country} className="w-4 h-3 object-cover rounded-sm" />
+                                                    ) : p.countryFlag?.startsWith('http') ? (
+                                                        <img src={p.countryFlag} alt={p.country} className="w-4 h-3 object-cover rounded-sm" />
+                                                    ) : (
+                                                        <span className="text-lg">{p.countryFlag}</span>
+                                                    )}
+                                                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Rating: {p.overallRating}</span>
+                                                </div>
+                                            </div>
+                                            {p.id === selectedId && <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_#3b82f6]" />}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         )) : (
-                            <div className="py-8 text-center bg-slate-950/20 rounded-2xl border border-dashed border-white/5">
-                                <Search className="mx-auto text-slate-800 mb-2" size={24} />
-                                <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">No athletes found</p>
+                            <div className="py-10 text-center text-slate-500 font-bold">
+                                No players found matching your search.
                             </div>
                         )}
                     </div>
@@ -372,10 +562,20 @@ function PlayerSelectorHUD({
 }
 
 // ─── Main Component ──────────────────────────────────────────────
-export const PlayerComparison = () => {
-    const [selectedSport, setSelectedSport] = useState<AnalysisSport>("cricket");
+export const PlayerComparison = ({ activeSport = "cricket" }: { activeSport?: "cricket" | "football" | "all" }) => {
+    const [selectedSport, setSelectedSport] = useState<AnalysisSport>(
+        (activeSport === "all" ? "cricket" : activeSport) as AnalysisSport
+    );
     const [playerAId, setPlayerAId] = useState<string>("");
     const [playerBId, setPlayerBId] = useState<string>("");
+
+    useEffect(() => {
+        if (activeSport === "cricket" || activeSport === "football") {
+            setSelectedSport(activeSport as AnalysisSport);
+            setPlayerAId("");
+            setPlayerBId("");
+        }
+    }, [activeSport]);
 
     const CRICKET_TEAMS = useMemo(() => [
         'india-2', 'australia-4', 'england-9', 'south-africa-11', 'new-zealand-13', 'pakistan-3',
@@ -383,6 +583,7 @@ export const PlayerComparison = () => {
         'scotland-23', 'netherlands-24', 'nepal-72'
     ], []);
     const squadQueries = usePerformanceLabSquads(selectedSport === 'cricket' ? CRICKET_TEAMS : []);
+    const { data: footballSquadData } = useFootballSquads();
     const [squadFilters, setSquadFilters] = useState<string[]>([]);
     
     const toggleSquadFilter = (teamId: string) => {
@@ -431,13 +632,91 @@ export const PlayerComparison = () => {
                     });
                 });
             });
-            return players;
+            return players.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (selectedSport === 'football' && footballSquadData) {
+            const analysisMap = new Map();
+            (ANALYSIS_PLAYERS['football'] || []).forEach((p: any) => {
+                analysisMap.set(p.name, p);
+            });
+
+            const players: any[] = [];
+            Object.values(footballSquadData).forEach((squad: any) => {
+                const meta = { name: squad?.teamInfo?.name || '', iso: squad?.teamInfo?.logo || '' };
+                squad?.players?.forEach((p: any) => {
+                    const idSum = String(p.id).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                    const stableOVR = (idSum % 16) + 78;
+                    const existingAnalysis = analysisMap.get(p.name);
+                    players.push({
+                        id: String(p.id),
+                        name: p.name,
+                        country: meta.name,
+                        countryFlag: meta.iso, // logo URL
+                        role: existingAnalysis?.role || p.position || 'Player',
+                        photo: `/api/football/fotmob-player-image-by-name/${encodeURIComponent(p.name)}`,
+                        overallRating: existingAnalysis?.overallRating || stableOVR,
+                        attributes: existingAnalysis?.attributes || {
+                            Pace: 75 + (idSum % 20),
+                            Shooting: 70 + (idSum % 25),
+                            Passing: 70 + (idSum % 20),
+                            Dribbling: 75 + (idSum % 15),
+                            Defending: 60 + (idSum % 30),
+                            Physical: 65 + (idSum % 25),
+                            Clutch: 70 + (idSum % 25),
+                        },
+                        formTrend: existingAnalysis?.formTrend || [
+                            60 + (idSum % 40),
+                            50 + (idSum % 50),
+                            70 + (idSum % 30),
+                            55 + (idSum % 45),
+                            65 + (idSum % 35)
+                        ],
+                        detailedStats: existingAnalysis?.detailedStats || {
+                            'Goals': idSum % 25,
+                            'Assists': idSum % 15,
+                            'Matches Played': 30 + (idSum % 10),
+                            'Shot Accuracy %': 60 + (idSum % 30),
+                            'Pass Accuracy %': 70 + (idSum % 25),
+                            'Tackles Won': 10 + (idSum % 40),
+                            'Interceptions': 5 + (idSum % 20),
+                            'Clean Sheets': idSum % 12
+                        }
+                    });
+                });
+            });
+            return players.sort((a, b) => a.name.localeCompare(b.name));
         }
         return ANALYSIS_PLAYERS[selectedSport] || [];
-    }, [selectedSport, squadQueries, squadFilters]);
+    }, [selectedSport, squadQueries, squadFilters, footballSquadData]);
 
     const playerA = sportPlayers.find(p => p.id === playerAId || String(p.id) === String(playerAId)) || null;
-    const playerB = sportPlayers.find(p => p.id === playerBId || String(p.id) === String(playerBId)) || null;
+    const playerB = useMemo(() => sportPlayers.find(p => p.id === playerBId) || sportPlayers[1], [sportPlayers, playerBId]);
+
+    const { data: profileA } = useFotmobPlayerProfileByName(selectedSport === 'football' ? playerA?.name : null);
+    const { data: profileB } = useFotmobPlayerProfileByName(selectedSport === 'football' ? playerB?.name : null);
+
+    const fotmobIdA = profileA?.id || null;
+    const fotmobIdB = profileB?.id || null;
+
+    const getFallbackSeasonId = (seasonName: string | undefined, tournamentId: string | number | undefined) => {
+        if (!seasonName || !tournamentId) return undefined;
+        const yearMatch = seasonName.match(/^(\d{4})/);
+        return yearMatch ? `${yearMatch[1]}-${tournamentId}` : `${seasonName}-${tournamentId}`;
+    };
+
+    const tournamentA = profileA?.statSeasons?.[0]?.tournaments?.[0];
+    const tournamentB = profileB?.statSeasons?.[0]?.tournaments?.[0];
+
+    const { data: fotmobStatsA } = useFotmobPlayerTournamentStats(
+        fotmobIdA,
+        tournamentA?.entryId || getFallbackSeasonId(profileA?.statSeasons?.[0]?.seasonName, tournamentA?.tournamentId),
+        tournamentA?.tournamentId
+    );
+    
+    const { data: fotmobStatsB } = useFotmobPlayerTournamentStats(
+        fotmobIdB,
+        tournamentB?.entryId || getFallbackSeasonId(profileB?.statSeasons?.[0]?.seasonName, tournamentB?.tournamentId),
+        tournamentB?.tournamentId
+    );
 
     const [apiFormat, setApiFormat] = useState<BattingFormatKey>('all');
     const [statCategory, setStatCategory] = useState<'batting'|'bowling'>('batting');
@@ -450,6 +729,12 @@ export const PlayerComparison = () => {
 
     const { data: deepStatsA, isLoading: loadingDeepA } = usePerformanceLabPlayerStats(cricbuzzIdA, playerA?.name || "");
     const { data: deepStatsB, isLoading: loadingDeepB } = usePerformanceLabPlayerStats(cricbuzzIdB, playerB?.name || "");
+
+    const { data: fotmobRecentA } = usePlayerRecentMatches(selectedSport === 'football' ? playerA?.name : undefined);
+    const { data: fotmobRecentB } = usePlayerRecentMatches(selectedSport === 'football' ? playerB?.name : undefined);
+
+    const recentMatchesA_football = (fotmobRecentA && fotmobRecentA.length > 0) ? fotmobRecentA : profileA?.recentMatches;
+    const recentMatchesB_football = (fotmobRecentB && fotmobRecentB.length > 0) ? fotmobRecentB : profileB?.recentMatches;
 
     const formatA = selectedSport === 'cricket' && statsA ? statsA[apiFormat] : null;
     const formatB = selectedSport === 'cricket' && statsB ? statsB[apiFormat] : null;
@@ -495,7 +780,58 @@ export const PlayerComparison = () => {
         return isNaN(r) ? 0 : r;
     };
 
+    const extractFootballRatings = (matches: any[]) => {
+        if (!matches || matches.length === 0) return [];
+        return [...matches]
+            .map((m: any) => {
+                let r = 0;
+                if (m.ratingProps) {
+                    r = parseFloat(m.ratingProps.num || m.ratingProps.rating || '0');
+                } else if (m.rating) {
+                    r = parseFloat(typeof m.rating === 'object' ? m.rating.rating : m.rating);
+                }
+                const result = m.homeScore !== undefined ? `${m.homeScore} - ${m.awayScore}` : '';
+                return {
+                    rating: (!isNaN(r) && r > 0) ? r * 10 : null,
+                    teamId: m.teamId,
+                    opponentId: m.opponentTeamId,
+                    opponentName: m.opponentTeamName || m.opponentName,
+                    result,
+                    isHome: m.isHomeTeam,
+                };
+            })
+            .filter((m: any) => m.rating !== null)
+            .slice(0, 10)
+            .reverse();
+    };
+
     const formData = Array.from({ length: 10 }).map((_, i) => {
+        if (selectedSport === 'football') {
+             const ratingsA = extractFootballRatings(recentMatchesA_football || []);
+             const ratingsB = extractFootballRatings(recentMatchesB_football || []);
+             
+             const idxA = ratingsA.length - 10 + i;
+             const idxB = ratingsB.length - 10 + i;
+             
+             const matchA = idxA >= 0 && idxA < ratingsA.length ? ratingsA[idxA] : null;
+             const matchB = idxB >= 0 && idxB < ratingsB.length ? ratingsB[idxB] : null;
+             
+             return {
+                 match: `M${i + 1}`,
+                 A: matchA?.rating ?? null,
+                 B: matchB?.rating ?? null,
+                 teamIdA: matchA?.teamId,
+                 teamIdB: matchB?.teamId,
+                 oppA: matchA?.opponentName,
+                 oppIdA: matchA?.opponentId,
+                 resultA: matchA?.result,
+                 isHomeA: matchA?.isHome,
+                 oppB: matchB?.opponentName,
+                 oppIdB: matchB?.opponentId,
+                 resultB: matchB?.result,
+                 isHomeB: matchB?.isHome,
+             };
+        }
         return {
             match: `M${i + 1}`,
             A: getStatSafe(recentMatchesA, playerA?.formTrend || [], i),
@@ -537,6 +873,44 @@ export const PlayerComparison = () => {
             }
         }
 
+        if (selectedSport === 'football') {
+            const extractVal = (statsData: any, category: string, title: string, finalFallback: number) => {
+                if (statsData?.topStatCard?.items) {
+                    const topItem = statsData.topStatCard.items.find((i: any) => i.title?.toLowerCase() === title.toLowerCase());
+                    if (topItem && topItem.statValue !== undefined && topItem.statValue !== null) {
+                        const parsed = parseFloat(topItem.statValue);
+                        if (!isNaN(parsed)) return parsed;
+                    }
+                }
+                if (statsData?.statsSection?.items) {
+                    const cat = statsData.statsSection.items.find((c: any) => c.title?.toLowerCase() === category.toLowerCase());
+                    if (cat?.items) {
+                        const item = cat.items.find((i: any) => i.title?.toLowerCase() === title.toLowerCase());
+                        if (item && item.statValue !== undefined && item.statValue !== null) {
+                            const parsed = parseFloat(item.statValue);
+                            if (!isNaN(parsed)) return parsed;
+                        }
+                    }
+                }
+                return finalFallback;
+            };
+
+        if (playerA && playerB && (fotmobStatsA || fotmobStatsB)) {
+            const aPlayer = ANALYSIS_PLAYERS['football']?.find((p: any) => p.name === playerA?.name) || playerA;
+            const bPlayer = ANALYSIS_PLAYERS['football']?.find((p: any) => p.name === playerB?.name) || playerB;
+
+            return [
+                { label: 'Goals', valA: extractVal(fotmobStatsA, '', 'Goals', playerA?.detailedStats?.['Goals'] ?? aPlayer?.detailedStats?.['Goals'] ?? 0), valB: extractVal(fotmobStatsB, '', 'Goals', playerB?.detailedStats?.['Goals'] ?? bPlayer?.detailedStats?.['Goals'] ?? 0) },
+                { label: 'Assists', valA: extractVal(fotmobStatsA, '', 'Assists', playerA?.detailedStats?.['Assists'] ?? aPlayer?.detailedStats?.['Assists'] ?? 0), valB: extractVal(fotmobStatsB, '', 'Assists', playerB?.detailedStats?.['Assists'] ?? bPlayer?.detailedStats?.['Assists'] ?? 0) },
+                { label: 'Matches', valA: extractVal(fotmobStatsA, '', 'Matches', aPlayer?.detailedStats?.['Appearances'] ?? 0), valB: extractVal(fotmobStatsB, '', 'Matches', bPlayer?.detailedStats?.['Appearances'] ?? 0) },
+                { label: 'Shots/90', valA: extractVal(fotmobStatsA, 'Attacking', 'Shots on target', aPlayer?.detailedStats?.['Shots/90'] ?? 0), valB: extractVal(fotmobStatsB, 'Attacking', 'Shots on target', bPlayer?.detailedStats?.['Shots/90'] ?? 0) },
+                { label: 'Pass %', valA: extractVal(fotmobStatsA, 'Passing', 'Passes accurate', aPlayer?.detailedStats?.['Pass Accuracy %'] ?? 0), valB: extractVal(fotmobStatsB, 'Passing', 'Passes accurate', bPlayer?.detailedStats?.['Pass Accuracy %'] ?? 0) },
+                { label: 'Tackles', valA: extractVal(fotmobStatsA, 'Defending', 'Tackles won', aPlayer?.detailedStats?.['Tackles Won'] ?? 0), valB: extractVal(fotmobStatsB, 'Defending', 'Tackles won', bPlayer?.detailedStats?.['Tackles Won'] ?? 0) },
+                { label: 'Intercepts', valA: extractVal(fotmobStatsA, 'Defending', 'Interceptions', aPlayer?.detailedStats?.['Interceptions'] ?? 0), valB: extractVal(fotmobStatsB, 'Defending', 'Interceptions', bPlayer?.detailedStats?.['Interceptions'] ?? 0) },
+                { label: 'Clean Sht', valA: extractVal(fotmobStatsA, 'Defending', 'Clean sheets', aPlayer?.detailedStats?.['Clean Sheets'] ?? 0), valB: extractVal(fotmobStatsB, 'Defending', 'Clean sheets', bPlayer?.detailedStats?.['Clean Sheets'] ?? 0) },
+            ];
+        }
+
         if (playerA && playerB) {
             return Object.keys(playerA.detailedStats || {}).map(key => ({
                 label: key,
@@ -545,6 +919,9 @@ export const PlayerComparison = () => {
             }));
         }
         
+        return [];
+        }
+
         return [];
     }, [selectedSport, deepStatsA, deepStatsB, apiFormat, statCategory, playerA, playerB]);
 
@@ -589,6 +966,347 @@ export const PlayerComparison = () => {
             { label: "Win Probability", valA: `${winA}%`, valB: `${100 - winA}%`, icon: <TrendingUp size={14} /> },
         ];
     }, [selectedSport, deepStatsA, deepStatsB, apiFormat, statCategory, playerA, playerB]);
+
+    if (selectedSport === 'football') {
+        const isReady = playerA && playerB;
+
+        const getPositionAbbr = (role: string, primaryPos: string) => {
+            const p = (primaryPos || role || 'ATT').toLowerCase();
+            if (p.includes('striker') || p.includes('center forward')) return 'ST';
+            if (p.includes('right winger')) return 'RW';
+            if (p.includes('left winger')) return 'LW';
+            if (p.includes('forward')) return 'CF';
+            if (p.includes('attacking mid')) return 'CAM';
+            if (p.includes('defensive mid')) return 'CDM';
+            if (p.includes('center mid') || p.includes('midfielder')) return 'CM';
+            if (p.includes('center back') || p.includes('defender')) return 'CB';
+            if (p.includes('right back')) return 'RB';
+            if (p.includes('left back')) return 'LB';
+            if (p.includes('keeper')) return 'GK';
+            return p.substring(0, 3).toUpperCase();
+        };
+
+        const getFutAttributes = (p: any) => {
+            const seed = p?.name?.length || 5;
+            const base = p?.overallRating || 85;
+            return [
+                { label: 'PAC', val: p?.attributes?.Pace || Math.min(99, base - 5 + (seed % 10)) },
+                { label: 'SHO', val: p?.attributes?.Shooting || Math.min(99, base - 2 + (seed % 8)) },
+                { label: 'PAS', val: p?.attributes?.Passing || Math.min(99, base - 4 + (seed % 7)) },
+                { label: 'DRI', val: p?.attributes?.Dribbling || Math.min(99, base - 3 + (seed % 9)) },
+                { label: 'DEF', val: p?.attributes?.Defending || Math.min(99, base - 20 + (seed % 15)) },
+                { label: 'PHY', val: p?.attributes?.Physical || Math.min(99, base - 10 + (seed % 12)) },
+            ];
+        };
+
+        const FutCard = ({ player, profile, stats, isA }: { player: any, profile: any, stats: any[], isA: boolean }) => {
+            const theme = isA ? 'from-[#fef08a] via-[#ca8a04] to-[#713f12]' : 'from-[#fecdd3] via-[#e11d48] to-[#881337]';
+            const textColor = isA ? 'text-[#fef08a]' : 'text-[#fecdd3]';
+            const borderColor = isA ? 'border-[#ca8a04]' : 'border-[#e11d48]';
+
+            const photoUrl = player?.photo || `https://images.fotmob.com/image_resources/playerimages/${profile?.id}.png`;
+
+            return (
+                <div className="relative w-[280px] md:w-[320px] aspect-[2/3] group transition-transform duration-500 hover:scale-105 hover:z-50 drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-10 mx-auto">
+                    {/* Outer Glow */}
+                    <div className={cn("absolute inset-0 blur-3xl opacity-40 transition-opacity duration-500 group-hover:opacity-80 bg-gradient-to-br", theme)} />
+                    
+                    {/* The Shield Body */}
+                    <div className={cn("w-full h-full relative bg-gradient-to-br p-[3px] shadow-2xl", theme)} style={{ clipPath: "polygon(20% 0%, 80% 0%, 100% 8%, 100% 80%, 50% 100%, 0% 80%, 0% 8%)" }}>
+                        <div className="w-full h-full bg-gradient-to-b from-[#1a1a1a] via-[#111] to-[#050505] relative overflow-hidden flex flex-col items-center pt-8" style={{ clipPath: "polygon(20% 0%, 80% 0%, 100% 8%, 100% 80%, 50% 100%, 0% 80%, 0% 8%)" }}>
+                            {/* Card Texture */}
+                            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30 mix-blend-overlay" />
+                            <div className={cn("absolute top-0 w-full h-1/2 bg-gradient-to-b opacity-20 pointer-events-none", theme)} />
+                            
+                            {/* Top Section */}
+                            <div className="w-full flex justify-center px-4 relative z-10">
+                                {/* Rating & Flag */}
+                                <div className="absolute left-6 top-0 flex flex-col items-center">
+                                    <span className={cn("text-4xl md:text-5xl font-black tracking-tighter drop-shadow-md", textColor)}>{player.overallRating || 88}</span>
+                                    <span className="text-sm font-bold text-white/80 mt-1 uppercase tracking-wider">{getPositionAbbr(player.role, profile?.primaryPosition)}</span>
+                                    
+                                    {/* Nation Flag */}
+                                    {(() => {
+                                        const countryInfo = profile?.playerInformation?.find((i: any) => i.title === 'Country');
+                                        const countryCode = countryInfo?.countryCode; // e.g., 'ARG'
+                                        const aPlayer = ANALYSIS_PLAYERS['football']?.find((p: any) => p.name === player?.name);
+                                        
+                                        if (countryCode) {
+                                            return <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${countryCode.toLowerCase()}.png`} className="w-8 h-auto mt-3 shadow-md" alt="Flag" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />;
+                                        } else if (aPlayer?.countryFlag) {
+                                            return <span className="text-2xl mt-2 drop-shadow-md">{aPlayer.countryFlag}</span>;
+                                        }
+                                        return null;
+                                    })()}
+
+                                    {/* Club Logo */}
+                                    {(() => {
+                                        const teamId = profile?.primaryTeam?.teamId;
+                                        if (teamId) {
+                                            return <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${teamId}.png`} className="w-8 h-8 object-contain mt-3 shadow-md drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" alt="Club" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />;
+                                        }
+                                        return null;
+                                    })()}
+                                </div>
+                                
+                                {/* Photo */}
+                                <div className={cn("w-32 h-32 md:w-36 md:h-36 rounded-full border-4 overflow-hidden bg-black relative ml-8 shadow-[0_0_30px_rgba(0,0,0,0.8)] flex items-center justify-center", borderColor)}>
+                                    <img 
+                                        src={photoUrl} 
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).style.display = 'none';
+                                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                                        }}
+                                        className="w-full h-full object-cover" 
+                                        alt={player.name} 
+                                    />
+                                    <div className="hidden w-full h-full flex items-center justify-center text-5xl font-black text-white/30">{player.name[0]}</div>
+                                </div>
+                            </div>
+                            
+                            {/* Name */}
+                            <div className="w-full text-center mt-4 px-4 relative z-10">
+                                <h2 className={cn("text-xl md:text-2xl font-black uppercase tracking-widest border-b pb-2", textColor, borderColor)}>
+                                    {player.name}
+                                </h2>
+                            </div>
+                            
+                            {/* Stats Grid */}
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-4 w-full px-8 relative z-10">
+                                {stats.map((s: any, i: number) => (
+                                    <div key={i} className="flex items-center justify-between">
+                                        <span className={cn("text-xl md:text-2xl font-black", textColor)}>{s.val}</span>
+                                        <span className="text-[10px] md:text-xs font-bold text-white/60 uppercase tracking-wider">{s.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {/* Bottom Decal */}
+                            <div className="absolute bottom-6 w-full flex justify-center opacity-30">
+                                <div className={cn("h-px w-24 bg-gradient-to-r", theme)} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const mappedStatsA = getFutAttributes(playerA);
+        const mappedStatsB = getFutAttributes(playerB);
+
+        return (
+            <div className="space-y-0 animate-fade-in text-white w-full relative font-sans overflow-hidden min-h-[1000px]">
+                {/* Massive Pitch Background */}
+                <div className="absolute inset-0 bg-[#061e0e] -z-30" />
+                <div className="absolute inset-0 opacity-15 -z-20 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(255,255,255,1) 80px, rgba(255,255,255,1) 160px)' }} />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#020a05] via-transparent to-[#020a05] opacity-90 -z-10 pointer-events-none" />
+                
+                {/* Pitch Linings */}
+                <div className="absolute inset-4 md:inset-8 border-[3px] border-white/20 -z-10 pointer-events-none rounded-lg" />
+                <div className="absolute top-1/2 left-0 right-0 h-[3px] bg-white/20 -z-10 -translate-y-1/2 pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] border-[3px] border-white/20 rounded-full -z-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-white/20 rounded-full -z-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+
+                <div className="max-w-[1400px] mx-auto pb-24 px-4 pt-12 relative z-10">
+                    
+                    {/* Header Selectors */}
+                    <div className="grid md:grid-cols-[1fr,auto,1fr] gap-6 md:gap-16 items-center bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl relative z-50">
+                        <div className="w-full">
+                            <PlayerSelectorHUD players={sportPlayers} selectedId={playerAId} onChange={setPlayerAId} accentColor="#eab308" side="left" />
+                        </div>
+                        <div className="flex items-center justify-center">
+                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#111] to-black border border-white/10 flex items-center justify-center shadow-inner">
+                                <Swords size={24} className="text-white/50" />
+                            </div>
+                        </div>
+                        <div className="w-full">
+                            <PlayerSelectorHUD players={sportPlayers} selectedId={playerBId} onChange={setPlayerBId} accentColor="#e11d48" side="right" />
+                        </div>
+                    </div>
+
+                    {!isReady && (
+                        <div className="text-center py-40">
+                            <h2 className="text-4xl md:text-6xl font-black tracking-widest uppercase text-white/10 drop-shadow-xl">Tactical Analysis</h2>
+                        </div>
+                    )}
+
+                    {isReady && (
+                        <>
+                            {/* FUT CARDS */}
+                            <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-32 mt-20 mb-20 relative z-30">
+                                <FutCard player={playerA} profile={profileA} stats={mappedStatsA} isA={true} />
+                                <div className="text-6xl font-black italic text-white/20 hidden md:block">VS</div>
+                                <FutCard player={playerB} profile={profileB} stats={mappedStatsB} isA={false} />
+                            </div>
+
+                            {/* LOCKER ROOM HUD */}
+                            <div className="grid lg:grid-cols-2 gap-8 relative z-20">
+                                {/* Tactical Radar */}
+                                <div className="bg-[#0b1410]/80 backdrop-blur-md border border-emerald-900/50 rounded-3xl p-8 shadow-2xl relative overflow-hidden group">
+                                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/black-mamba.png')] opacity-20 mix-blend-overlay pointer-events-none" />
+                                    
+                                    <h3 className="text-sm font-black text-emerald-500 uppercase tracking-[0.3em] flex items-center justify-center gap-4 border-b border-emerald-900/50 pb-4 mb-8">
+                                        <Target size={18} /> Tactical Radar
+                                    </h3>
+                                    
+                                    <div className="w-full h-[400px] flex items-center justify-center drop-shadow-2xl">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                                                <PolarGrid stroke="#10b981" strokeOpacity={0.2} />
+                                                <PolarAngleAxis dataKey="attribute" tick={{ fill: 'rgba(16,185,129,0.8)', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }} />
+                                                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                                                <Radar name={playerA.name} dataKey="A" stroke="#eab308" strokeWidth={3} fill="#eab308" fillOpacity={0.2} activeDot={{ r: 6, fill: '#fff', stroke: '#eab308', strokeWidth: 3 }} />
+                                                <Radar name={playerB.name} dataKey="B" stroke="#e11d48" strokeWidth={3} fill="#e11d48" fillOpacity={0.2} activeDot={{ r: 6, fill: '#fff', stroke: '#e11d48', strokeWidth: 3 }} />
+                                                <Tooltip content={(props: any) => <CustomGraphTooltip {...props} selectedSport={selectedSport} />} />
+                                            </RadarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+
+                                {/* Form Curve */}
+                                <div className="bg-[#0b1410]/80 backdrop-blur-md border border-emerald-900/50 rounded-3xl p-8 shadow-2xl relative overflow-hidden group">
+                                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/black-mamba.png')] opacity-20 mix-blend-overlay pointer-events-none" />
+                                    
+                                    <h3 className="text-sm font-black text-emerald-500 uppercase tracking-[0.3em] flex items-center justify-center gap-4 border-b border-emerald-900/50 pb-4 mb-8">
+                                        <Activity size={18} /> Form Curve
+                                    </h3>
+                                    
+                                    <div className="flex justify-between items-center mb-8 bg-[#040806] p-4 rounded-2xl border border-emerald-900/30">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-[#eab308]">{playerA.name}</span>
+                                            <FormIndicator form={playerA.formTrend} matches={recentMatchesA_football} sport={selectedSport} />
+                                        </div>
+                                        <div className="w-px h-10 bg-emerald-900/50" />
+                                        <div className="flex flex-col items-center gap-2">
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-[#e11d48]">{playerB.name}</span>
+                                            <FormIndicator form={playerB.formTrend} matches={recentMatchesB_football} sport={selectedSport} />
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="w-full h-[300px]">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={formData} margin={{ top: 20, right: 30, left: -20, bottom: 0 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(16,185,129,0.1)" vertical={false} />
+                                                <XAxis dataKey="match" tick={{ fill: 'rgba(16,185,129,0.5)', fontSize: 10, fontWeight: 900 }} axisLine={false} tickLine={false} dy={10} />
+                                                <YAxis domain={[0, 10]} tick={{ fill: 'rgba(16,185,129,0.5)', fontSize: 10, fontWeight: 900 }} axisLine={false} tickLine={false} />
+                                                <Tooltip content={(props: any) => <CustomGraphTooltip {...props} selectedSport={selectedSport} />} cursor={{ stroke: 'rgba(16,185,129,0.3)', strokeWidth: 1 }} />
+                                                
+                                                <Line type="monotone" dataKey="A" stroke="#eab308" strokeWidth={4} dot={<CustomPlayerDot playerInfo={playerA} stroke="#eab308" teamIdKey="oppIdA" />} activeDot={{ r: 8, fill: "#fff", stroke: "#eab308", strokeWidth: 3 }} />
+                                                <Line type="monotone" dataKey="B" stroke="#e11d48" strokeWidth={4} dot={<CustomPlayerDot playerInfo={playerB} stroke="#e11d48" teamIdKey="oppIdB" />} activeDot={{ r: 8, fill: "#fff", stroke: "#e11d48", strokeWidth: 3 }} />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* CAREER STATS PANEL */}
+                            <div className="mt-8 mb-20 bg-[#050907]/90 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden group z-20">
+                                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
+                                
+                                <h3 className="text-sm font-black text-white/40 uppercase tracking-[0.4em] flex items-center justify-center gap-4 mb-16">
+                                    <BarChart3 size={18} className="text-emerald-500" /> Career Overview
+                                </h3>
+
+                                {/* Head to Head Header */}
+                                <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8 mb-16 relative border-b border-white/5 pb-12">
+                                    {/* Player A */}
+                                    <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left w-full md:w-auto">
+                                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] overflow-hidden bg-gradient-to-br from-[#eab308]/30 to-black border border-[#eab308]/40 shadow-[0_0_40px_rgba(234,179,8,0.15)] p-1.5 transition-transform duration-500 hover:scale-105 hover:-rotate-3">
+                                            <div className="w-full h-full rounded-[1.6rem] overflow-hidden bg-black/50 backdrop-blur-md">
+                                                <img 
+                                                    src={playerA?.photo} 
+                                                    alt={playerA?.name} 
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png';
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60 drop-shadow-sm">{playerA.name}</span>
+                                            <span className="text-[#eab308] font-black tracking-[0.3em] uppercase text-xs md:text-sm mt-2">{playerA.role || 'Player'}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 -bottom-6 w-12 h-12 bg-[#0a110e] border border-white/10 rounded-full items-center justify-center text-xs font-black italic text-white/30 z-10 shadow-xl">VS</div>
+
+                                    {/* Player B */}
+                                    <div className="flex flex-col md:flex-row-reverse items-center gap-6 text-center md:text-right w-full md:w-auto">
+                                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] overflow-hidden bg-gradient-to-bl from-[#e11d48]/30 to-black border border-[#e11d48]/40 shadow-[0_0_40px_rgba(225,29,72,0.15)] p-1.5 transition-transform duration-500 hover:scale-105 hover:rotate-3">
+                                            <div className="w-full h-full rounded-[1.6rem] overflow-hidden bg-black/50 backdrop-blur-md">
+                                                <img 
+                                                    src={playerB?.photo} 
+                                                    alt={playerB?.name} 
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png';
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-bl from-white to-white/60 drop-shadow-sm">{playerB.name}</span>
+                                            <span className="text-[#e11d48] font-black tracking-[0.3em] uppercase text-xs md:text-sm mt-2">{playerB.role || 'Player'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Comparison Bars */}
+                                <div className="max-w-4xl mx-auto space-y-8">
+                                    {statComparison.map((stat, i) => {
+                                        const numA = parseFloat(stat.valA as string) || 0;
+                                        const numB = parseFloat(stat.valB as string) || 0;
+                                        const max = Math.max(numA, numB) || 1;
+                                        const pctA = (numA / max) * 100;
+                                        const pctB = (numB / max) * 100;
+                                        const isAWinner = numA > numB;
+                                        const isBWinner = numB > numA;
+                                        const isTie = numA === numB && numA !== 0;
+
+                                        return (
+                                            <div key={i} className="flex flex-col gap-3 group/row">
+                                                <div className="flex justify-between items-center text-sm md:text-base font-black uppercase tracking-widest px-2">
+                                                    <span className={`w-20 md:w-24 text-right transition-colors duration-300 ${isAWinner ? 'text-[#eab308] text-xl md:text-2xl drop-shadow-[0_0_10px_rgba(234,179,8,0.5)]' : isTie ? 'text-white/80' : 'text-white/30'}`}>
+                                                        {stat.valA}
+                                                    </span>
+                                                    <span className="text-white/40 text-[10px] md:text-xs px-4 text-center group-hover/row:text-white/80 transition-colors duration-300">
+                                                        {stat.label}
+                                                    </span>
+                                                    <span className={`w-20 md:w-24 text-left transition-colors duration-300 ${isBWinner ? 'text-[#e11d48] text-xl md:text-2xl drop-shadow-[0_0_10px_rgba(225,29,72,0.5)]' : isTie ? 'text-white/80' : 'text-white/30'}`}>
+                                                        {stat.valB}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-center items-center gap-3 md:gap-6">
+                                                    <div className="flex-1 h-3 md:h-4 bg-black/40 rounded-l-full overflow-hidden flex justify-end shadow-inner border-y border-l border-white/5 relative">
+                                                        <div 
+                                                            className="h-full bg-gradient-to-l from-[#eab308] to-[#ca8a04]/20 rounded-l-full transition-all duration-1000 ease-out relative overflow-hidden" 
+                                                            style={{ width: `${pctA}%` }}
+                                                        >
+                                                            {isAWinner && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-shimmer" />}
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-white/10" />
+                                                    <div className="flex-1 h-3 md:h-4 bg-black/40 rounded-r-full overflow-hidden flex justify-start shadow-inner border-y border-r border-white/5 relative">
+                                                        <div 
+                                                            className="h-full bg-gradient-to-r from-[#e11d48] to-[#be123c]/20 rounded-r-full transition-all duration-1000 ease-out relative overflow-hidden" 
+                                                            style={{ width: `${pctB}%` }}
+                                                        >
+                                                            {isBWinner && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-full animate-shimmer" />}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 animate-fade-in overflow-visible pb-20">
@@ -748,45 +1466,35 @@ export const PlayerComparison = () => {
                     </div>
                 </SectionCard>
 
-                {/* Area Chart: Performance Trend */}
+                {/* Line Chart: Performance Trend */}
                 <SectionCard icon={<Activity size={24} />} title="Form Trend Analysis">
                     <div className="h-[400px]">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={formData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                                <defs>
-                                    <linearGradient id="colorA" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor={PLAYER_A_COLOR} stopOpacity={0.3}/>
-                                        <stop offset="95%" stopColor={PLAYER_A_COLOR} stopOpacity={0}/>
-                                    </linearGradient>
-                                    <linearGradient id="colorB" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor={PLAYER_B_COLOR} stopOpacity={0.3}/>
-                                        <stop offset="95%" stopColor={PLAYER_B_COLOR} stopOpacity={0}/>
-                                    </linearGradient>
-                                </defs>
+                            <LineChart data={formData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                                <XAxis dataKey="match" tick={{ fill: "#64748b", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
-                                <YAxis domain={[0, 'auto']} tick={{ fill: "#64748b", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
-                                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value) => [`${value} ${statCategory === 'batting' ? 'Runs' : 'Wickets'}`, '']} />
-                                <Area
+                                <XAxis dataKey="match" tick={{ fill: "#64748b", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} dy={10} />
+                                <YAxis domain={[0, 'auto']} tick={{ fill: "#64748b", fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} dx={-10} tickFormatter={(val) => selectedSport === 'football' ? (val / 10).toString() : val} />
+                                <Tooltip content={<CustomGraphTooltip selectedSport={selectedSport} statCategory={statCategory} />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 2 }} />
+                                <Line
                                     type="monotone"
                                     dataKey="A"
                                     stroke={PLAYER_A_COLOR}
-                                    fillOpacity={1}
-                                    fill="url(#colorA)"
-                                    strokeWidth={4}
+                                    strokeWidth={3}
                                     name={playerA.name}
+                                    dot={<CustomPlayerDot playerInfo={playerA} stroke={PLAYER_A_COLOR} teamIdKey="teamIdA" />}
+                                    activeDot={{ r: 16, strokeWidth: 2, fill: PLAYER_A_COLOR, stroke: "#fff" }}
                                 />
-                                <Area
+                                <Line
                                     type="monotone"
                                     dataKey="B"
                                     stroke={PLAYER_B_COLOR}
-                                    fillOpacity={1}
-                                    fill="url(#colorB)"
-                                    strokeWidth={4}
+                                    strokeWidth={3}
                                     name={playerB.name}
+                                    dot={<CustomPlayerDot playerInfo={playerB} stroke={PLAYER_B_COLOR} teamIdKey="teamIdB" />}
+                                    activeDot={{ r: 16, strokeWidth: 2, fill: PLAYER_B_COLOR, stroke: "#fff" }}
                                 />
                                 <Legend wrapperStyle={{ paddingTop: '20px', fontWeight: 900, fontSize: '12px' }} />
-                            </AreaChart>
+                            </LineChart>
                         </ResponsiveContainer>
                     </div>
                 </SectionCard>
@@ -799,7 +1507,7 @@ export const PlayerComparison = () => {
                     <div className="flex flex-col md:flex-row justify-between items-center gap-8 py-8 border-b border-white/5">
                         <div className="flex flex-col items-center gap-4">
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{playerA.name} Recent Form</span>
-                            <FormIndicator form={playerA.formTrend} />
+                            <FormIndicator form={playerA.formTrend} matches={recentMatchesA_football} sport={selectedSport} />
                         </div>
                         <div className="text-center">
                             <Swords size={32} className="text-primary opacity-20 mx-auto mb-4" />
@@ -807,7 +1515,7 @@ export const PlayerComparison = () => {
                         </div>
                         <div className="flex flex-col items-center gap-4">
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Recent Form {playerB.name}</span>
-                            <FormIndicator form={playerB.formTrend} />
+                            <FormIndicator form={playerB.formTrend} matches={recentMatchesB_football} sport={selectedSport} />
                         </div>
                     </div>
 
@@ -856,6 +1564,85 @@ export const PlayerComparison = () => {
                                     segmentsA = Math.round(((valA as number) / maxVal) * 20);
                                     segmentsB = Math.round(((valB as number) / maxVal) * 20);
                                 }
+                            }
+
+                            if (selectedSport === 'football') {
+                                let ratioA = 50;
+                                if (!stat.isString) {
+                                    const numA = valA as number;
+                                    const numB = valB as number;
+                                    if (numA === 0 && numB === 0) {
+                                        ratioA = 50;
+                                    } else if (stat.lowerIsBetter) {
+                                        ratioA = (numB / (numA + numB)) * 100;
+                                    } else {
+                                        ratioA = (numA / (numA + numB)) * 100;
+                                    }
+                                    ratioA = Math.max(5, Math.min(95, ratioA));
+                                }
+
+                                return (
+                                    <div key={i} className="py-6 px-4 md:px-12 relative group overflow-hidden bg-gradient-to-r from-[#031B0F] via-[#062c18] to-[#031B0F] my-6 rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.6)] border border-emerald-900/40 hover:border-emerald-500/40 transition-all duration-500">
+                                        {/* Pitch Markings Overlay */}
+                                        <div className="absolute inset-0 pointer-events-none opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-700">
+                                            {/* Pitch lines */}
+                                            <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[2px] bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]" />
+                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border-[2px] border-white shadow-[0_0_15px_rgba(255,255,255,0.5)]" />
+                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+                                            {/* Penalty boxes */}
+                                            <div className="absolute top-1/4 bottom-1/4 left-0 w-32 border-[2px] border-l-0 border-white shadow-[0_0_15px_rgba(255,255,255,0.5)]" />
+                                            <div className="absolute top-1/4 bottom-1/4 right-0 w-32 border-[2px] border-r-0 border-white shadow-[0_0_15px_rgba(255,255,255,0.5)]" />
+                                        </div>
+
+                                        <div className="flex flex-col gap-6 relative z-10">
+                                            {/* Stat Values & Label */}
+                                            <div className="flex justify-between items-end px-2 md:px-6">
+                                                <span className={cn(
+                                                    "text-4xl md:text-5xl font-black tabular-nums tracking-tighter transition-all duration-500 drop-shadow-md",
+                                                    aWins ? "text-emerald-400" : "text-emerald-800/80"
+                                                )} style={aWins ? { textShadow: '0 0 25px rgba(52,211,153,0.6)' } : {}}>{stat.valA}</span>
+                                                
+                                                <div className="flex flex-col items-center gap-1 mb-2">
+                                                    <span className="text-[11px] md:text-sm font-black text-emerald-100 uppercase tracking-[0.4em] text-center shadow-lg bg-black/30 px-6 py-2 rounded-full border border-white/10 backdrop-blur-md">
+                                                        {stat.label}
+                                                    </span>
+                                                </div>
+                                                
+                                                <span className={cn(
+                                                    "text-4xl md:text-5xl font-black tabular-nums tracking-tighter transition-all duration-500 drop-shadow-md",
+                                                    bWins ? "text-emerald-400" : "text-emerald-800/80"
+                                                )} style={bWins ? { textShadow: '0 0 25px rgba(52,211,153,0.6)' } : {}}>{stat.valB}</span>
+                                            </div>
+
+                                            {/* Tug of War / Possession Track Container */}
+                                            <div className="relative w-full h-12 md:h-14 flex items-center">
+                                                {/* The Track */}
+                                                <div className="relative w-full h-4 md:h-5 bg-[#010a05] rounded-full shadow-[inset_0_4px_8px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden">
+                                                    <div 
+                                                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-800 via-emerald-500 to-emerald-400 rounded-l-full transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]" 
+                                                        style={{ width: `${ratioA}%` }} 
+                                                    />
+                                                    <div 
+                                                        className="absolute inset-y-0 right-0 bg-gradient-to-l from-rose-800 via-rose-500 to-rose-400 rounded-r-full transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]" 
+                                                        style={{ width: `${100 - ratioA}%` }} 
+                                                    />
+                                                </div>
+                                                
+                                                {/* The Football Icon sitting on the track */}
+                                                <div 
+                                                    className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] z-20 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-[#f8fafc] rounded-full shadow-[0_10px_25px_rgba(0,0,0,0.9)] border-4 border-[#031B0F]"
+                                                    style={{ left: `${ratioA}%` }}
+                                                >
+                                                    <div className="w-6 h-6 md:w-7 md:h-7 text-slate-900 drop-shadow-sm">
+                                                        <svg viewBox="0 0 24 24" fill="currentColor">
+                                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.61 14.85l-1.61-2.42-1.61 2.42-2.74-1.22 1.4-2.81-2.18-2.22 3.01-.66 1.12-2.67 1.12 2.67 3.01.66-2.18 2.22 1.4 2.81-2.74 1.22z"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
                             }
 
                             return (

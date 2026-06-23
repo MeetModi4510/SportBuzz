@@ -52,6 +52,14 @@ router.get('/player-image', async (req, res) => {
         const { name } = req.query;
         if (!name) return res.status(400).json({ error: "Missing ?name= parameter" });
 
+        const cacheKey = `/player-image/${name.toLowerCase()}`;
+        const cached = await FotmobCache.findOne({ endpoint: cacheKey, cacheExpiry: { $gt: new Date() } });
+        if (cached && cached.data && cached.data.url) {
+            return res.redirect(cached.data.url);
+        }
+
+        let imageUrl = null;
+
         // 1. Try ESPN Search API (Incredible quality, huge transparent cutouts, no Cloudflare, extremely fast JSON API)
         try {
             const espnSearchUrl = `https://site.web.api.espn.com/apis/search/v2?query=${encodeURIComponent(name)}&limit=5&type=player`;
@@ -61,9 +69,9 @@ router.get('/player-image', async (req, res) => {
             if (players && players.length > 0) {
                 const soccerPlayer = players.find(p => p.sport === 'soccer' || p.link?.web?.includes('/soccer/'));
                 if (soccerPlayer && soccerPlayer.image?.default) {
-                    return res.redirect(soccerPlayer.image.default);
+                    imageUrl = soccerPlayer.image.default;
                 } else if (players[0].image?.default) {
-                    return res.redirect(players[0].image.default);
+                    imageUrl = players[0].image.default;
                 }
             }
         } catch (e) {
@@ -71,31 +79,52 @@ router.get('/player-image', async (req, res) => {
         }
 
         // 2. Try FotMob Search API (Fast, extremely reliable, high quality transparent cutouts)
-        try {
-            const fotmobRes = await axios.get(`https://pub.fotmob.com/searchapi/suggest?term=${encodeURIComponent(name)}`, { timeout: 3000 });
-            const suggestions = fotmobRes.data?.squadMemberSuggest?.[0]?.options;
-            if (suggestions && suggestions.length > 0) {
-                const fotmobId = suggestions[0].payload?.id;
-                if (fotmobId) return res.redirect(`https://images.fotmob.com/image_resources/playerimages/${fotmobId}.png`);
+        if (!imageUrl) {
+            try {
+                const fotmobRes = await axios.get(`https://pub.fotmob.com/searchapi/suggest?term=${encodeURIComponent(name)}`, { timeout: 3000 });
+                const suggestions = fotmobRes.data?.squadMemberSuggest?.[0]?.options;
+                if (suggestions && suggestions.length > 0) {
+                    const fotmobId = suggestions[0].payload?.id;
+                    if (fotmobId) imageUrl = `https://images.fotmob.com/image_resources/playerimages/${fotmobId}.png`;
+                }
+            } catch (e) {
+                console.warn(`FotMob search failed for ${name}`);
             }
-        } catch (e) {
-            console.warn(`FotMob search failed for ${name}`);
         }
 
         // 3. Fallback to TheSportsDB API
-        try {
-            const tsdbRes = await axios.get(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`, { timeout: 3000 });
-            const players = tsdbRes.data?.player;
-            if (players && players.length > 0) {
-                const imageUrl = players[0].strCutout || players[0].strThumb || players[0].strRender;
-                if (imageUrl) return res.redirect(imageUrl);
+        if (!imageUrl) {
+            try {
+                const tsdbRes = await axios.get(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`, { timeout: 3000 });
+                const players = tsdbRes.data?.player;
+                if (players && players.length > 0) {
+                    imageUrl = players[0].strCutout || players[0].strThumb || players[0].strRender;
+                }
+            } catch (e) {
+                console.warn(`TSDB search failed for ${name}`);
             }
-        } catch (e) {
-            console.warn(`TSDB search failed for ${name}`);
         }
 
         // 4. Ultimate Fallback: generic silhouette
-        res.redirect('https://www.thesportsdb.com/images/media/player/thumb/generic.png');
+        if (!imageUrl) {
+            imageUrl = 'https://www.thesportsdb.com/images/media/player/thumb/generic.png';
+        }
+
+        // Cache the result for 24 hours
+        if (imageUrl) {
+            await FotmobCache.findOneAndUpdate(
+                { endpoint: cacheKey },
+                { 
+                    endpoint: cacheKey, 
+                    data: { url: imageUrl }, 
+                    cacheExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+                    lastFetched: new Date()
+                },
+                { upsert: true, new: true }
+            ).catch(err => console.warn(`Failed to cache image url for ${name}`, err.message));
+        }
+
+        res.redirect(imageUrl);
     } catch (error) {
         res.redirect('https://www.thesportsdb.com/images/media/player/thumb/generic.png');
     }
@@ -296,6 +325,44 @@ router.get('/fotmob-player/:id', async (req, res) => {
     } catch (error) {
         console.error(`[Fotmob Player Route] Error:`, error.message);
         res.status(500).json({ success: false, message: 'Failed to fetch fotmob player' });
+    }
+});
+
+router.get('/fotmob-player-by-name/:playerName', async (req, res) => {
+    try {
+        const { playerName } = req.params;
+        const playerInfo = await fotmobService.resolvePlayerId(playerName);
+        if (!playerInfo || !playerInfo.id) {
+            return res.status(404).json({ success: false, message: 'Player not found on Fotmob' });
+        }
+        
+        const player = await fotmobService.fetchPlayerData(playerInfo.id);
+        if (!player) {
+            return res.status(404).json({ success: false, message: 'Player data not found' });
+        }
+        
+        // Ensure ID is attached for frontend photo fetching
+        player.id = playerInfo.id;
+        
+        res.json({ success: true, data: player });
+    } catch (error) {
+        console.error(`[Fotmob Player By Name Route] Error:`, error.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch fotmob player by name' });
+    }
+});
+
+// GET /api/football/fotmob-player-image-by-name/:playerName
+router.get('/fotmob-player-image-by-name/:playerName', async (req, res) => {
+    try {
+        const { playerName } = req.params;
+        const playerInfo = await fotmobService.resolvePlayerId(playerName);
+        if (playerInfo && playerInfo.id) {
+            return res.redirect(`https://images.fotmob.com/image_resources/playerimages/${playerInfo.id}.png`);
+        }
+        // Fallback transparent image
+        return res.redirect('https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png');
+    } catch (error) {
+        return res.redirect('https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png');
     }
 });
 
