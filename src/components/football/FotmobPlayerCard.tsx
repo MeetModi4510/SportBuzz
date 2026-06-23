@@ -538,16 +538,22 @@ const ShotMapPitch = ({ playerId, position, totalGoals = 1, realShotmap = [], al
               <p className="text-sm dark:text-slate-400 text-slate-500 font-medium mt-1">On target: {((filteredShots.filter((s: any) => s.isOnTarget).length / Math.max(1, filteredShots.length)) * 100).toFixed(0)}%</p>
             </div>
             
-            <div className="flex items-center bg-[#25272e] rounded-full p-1 border border-white/10 shadow-inner">
+            <div className="flex items-center bg-[#25272e] rounded-full p-1.5 border border-white/10 shadow-inner gap-1.5 relative">
+              <div 
+                className="absolute top-1.5 bottom-1.5 w-10 bg-[#c2768d] rounded-full shadow-md transition-all duration-300 ease-out z-0"
+                style={{ 
+                  transform: viewMode === 'pitch' ? 'translateX(0)' : 'translateX(46px)',
+                }}
+              />
               <button 
                 onClick={() => setViewMode('pitch')}
-                className={`w-8 h-8 flex items-center justify-center shrink-0 rounded-full transition-all duration-300 ${viewMode === 'pitch' ? 'bg-[#c2768d] text-white shadow-md scale-105' : 'text-gray-400 hover:text-white'}`}
+                className={`relative z-10 w-10 h-8 flex items-center justify-center shrink-0 rounded-full transition-colors duration-300 ${viewMode === 'pitch' ? 'text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
               >
                 <svg className="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
               <button 
                 onClick={() => setViewMode('goal')}
-                className={`w-8 h-8 flex items-center justify-center shrink-0 rounded-full transition-all duration-300 ${viewMode === 'goal' ? 'bg-[#c2768d] text-white shadow-md scale-105' : 'text-gray-400 hover:text-white'}`}
+                className={`relative z-10 w-10 h-8 flex items-center justify-center shrink-0 rounded-full transition-colors duration-300 ${viewMode === 'goal' ? 'text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
               >
                 <svg className="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M5 9h14"/><path d="M5 15h14"/><path d="M12 3v18"/></svg>
               </button>
