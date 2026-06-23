@@ -1,0 +1,1 @@
+const fs = require('fs'); const data = JSON.parse(fs.readFileSync('fotmob_next.json', 'utf8')); function findPath(obj, path='') { if(typeof obj === 'string' && obj.includes('Mbappe')) console.log(path + ': ' + obj.substring(0, 50)); else if(obj && typeof obj === 'object') { for(let k in obj) { findPath(obj[k], path + '.' + k); } } } findPath(data);

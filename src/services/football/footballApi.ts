@@ -255,7 +255,7 @@ export const footballApi = {
   },
 
   async getGlobalNews(forceRefresh = false): Promise<any[]> {
-    const cacheKey = 'global_news';
+    const cacheKey = 'global_news_v2';
     if (!forceRefresh) {
       const cached = cacheManager.get<any[]>(cacheKey);
       if (cached && cached.length > 0) return cached;
@@ -291,6 +291,16 @@ export const footballApi = {
       return response?.data || [];
     } catch (error) {
       console.error(`Failed to fetch recent matches for player: ${playerName}`, error);
+      return [];
+    }
+  },
+
+  async getNewsArticle(url: string): Promise<string[]> {
+    try {
+      const response: any = await api.post('/football/news-article', { url });
+      return response?.data || [];
+    } catch (error) {
+      console.error("Failed to fetch news article", error);
       return [];
     }
   }

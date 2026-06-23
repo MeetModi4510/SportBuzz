@@ -1,0 +1,1 @@
+const https = require('https'); const fs = require('fs'); https.get('https://www.fotmob.com/news', {headers: {'User-Agent': 'Mozilla/5.0'}}, (res) => { let data = ''; res.on('data', c => data+=c); res.on('end', () => { const m = data.match(/<script id="__NEXT_DATA__" type="application\/json">(.+?)<\/script>/); if(m) fs.writeFileSync('fotmob_next.json', m[1]); }) })

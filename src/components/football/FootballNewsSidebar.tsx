@@ -1,4 +1,4 @@
-import { useFootballNews } from "../../hooks/football/useFootballQueries";
+import { useFootballNews, useFootballNewsDetail } from "../../hooks/football/useFootballQueries";
 import { Loader2, Globe, ChevronRight, ArrowUpRight, Clock } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -69,6 +69,11 @@ export function FootballNewsSidebar() {
   const { data: apiNews, isLoading } = useFootballNews();
   const [isViewAllOpen, setIsViewAllOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<any | null>(null);
+
+  // Fetch full article when an item is selected
+  const { data: articleContent, isLoading: isArticleLoading } = useFootballNewsDetail(
+    selectedArticle?.page?.url || null
+  );
 
   const rawNews = apiNews && apiNews.length > 0 ? apiNews : FALLBACK_NEWS;
   const news = [...rawNews].sort((a, b) => {
@@ -267,21 +272,71 @@ export function FootballNewsSidebar() {
         </DialogContent>
       </Dialog>
 
-      {/* Article Iframe Modal */}
+      {/* Article Modal (Native Render instead of iframe) */}
       <Dialog open={!!selectedArticle} onOpenChange={(open) => !open && setSelectedArticle(null)}>
-        <DialogContent className="sm:max-w-[800px] border-border bg-[#050505] rounded-2xl p-0 overflow-hidden shadow-2xl">
-          <DialogTitle className="sr-only">{selectedArticle?.title || 'Football Article'}</DialogTitle>
-          <DialogDescription className="sr-only">Full article content.</DialogDescription>
-          <div className="w-full h-[70vh] md:h-[80vh] bg-[#050505]">
-            {selectedArticle && (
-              <iframe 
-                src={selectedArticle.page?.url?.startsWith('/') ? `https://www.fotmob.com${selectedArticle.page.url}` : selectedArticle.page?.url} 
-                className="w-full h-full border-0 bg-transparent" 
-                title="Football News Article"
-                sandbox="allow-same-origin allow-scripts allow-popups"
-              />
-            )}
-          </div>
+        <DialogContent className="sm:max-w-[800px] border-border bg-[#0a0a0a]/95 backdrop-blur-3xl rounded-[32px] max-h-[85vh] overflow-y-auto p-6 md:p-10 shadow-2xl">
+          {selectedArticle && (
+            <>
+              <DialogTitle className="text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-4">
+                {selectedArticle.title}
+              </DialogTitle>
+              <DialogDescription className="sr-only">Full article content.</DialogDescription>
+              
+              <div className="flex items-center gap-3 mb-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/10 border border-border/50">
+                  {selectedArticle.sourceIconUrl ? (
+                    <img src={selectedArticle.sourceIconUrl} alt={selectedArticle.source} className="w-4 h-4 object-contain" />
+                  ) : (
+                    <Globe size={14} className="text-muted-foreground" />
+                  )}
+                  <span className="text-xs font-bold tracking-widest uppercase text-white/90">
+                    {selectedArticle.source}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Clock size={14} />
+                  <span className="text-sm font-medium">
+                    {timeAgo(selectedArticle.publishedAt || selectedArticle.gmtTime)}
+                  </span>
+                </div>
+              </div>
+
+              {selectedArticle.imageUrl && (
+                <div className="w-full h-64 md:h-96 rounded-2xl overflow-hidden mb-8 relative">
+                  <img src={selectedArticle.imageUrl} alt="Article Header" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent opacity-80" />
+                </div>
+              )}
+
+              <div className="w-full min-h-[30vh]">
+                {isArticleLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-4">
+                    <Loader2 className="w-8 h-8 animate-spin text-[#8b5cf6]" />
+                    <p className="text-muted-foreground animate-pulse">Extracting article content...</p>
+                  </div>
+                ) : articleContent && articleContent.length > 0 ? (
+                  <div className="space-y-6 text-base md:text-lg text-foreground/90 leading-relaxed font-serif text-justify px-2 md:px-6">
+                    {articleContent.map((paragraph: string, idx: number) => (
+                      <p key={idx} className="tracking-wide">{paragraph}</p>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center gap-4">
+                    <Globe className="w-12 h-12 text-muted-foreground/30" />
+                    <p className="text-muted-foreground">Unable to cleanly extract this article.</p>
+                    <a 
+                      href={selectedArticle.page?.url?.startsWith('/') ? `https://www.fotmob.com${selectedArticle.page.url}` : selectedArticle.page?.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 mt-4 px-6 py-3 rounded-full bg-[#8b5cf6]/10 text-[#8b5cf6] font-medium hover:bg-[#8b5cf6]/20 transition-colors"
+                    >
+                      Read Original Source <ArrowUpRight size={16} />
+                    </a>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
