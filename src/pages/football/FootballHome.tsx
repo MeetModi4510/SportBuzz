@@ -8,6 +8,7 @@ import { TransferCard } from "../../components/football/TransferCard";
 import { FootballNewsSidebar } from "../../components/football/FootballNewsSidebar";
 import { FootballStandings } from "../../components/football/FootballStandings";
 import { FootballTopStats } from "../../components/football/FootballTopStats";
+import { FifaRankingsTable } from "../../components/football/FifaRankingsTable";
 import { useRecentTransfers } from "../../hooks/football/useFootballQueries";
 import { useTrendingPlayers, TrendingPlayerData } from "../../hooks/football/useTrendingPlayers";
 import { TrendingPlayerCard } from "../../components/football/TrendingPlayerCard";
@@ -16,7 +17,7 @@ import { TrendingPlayerModal } from "../../components/football/TrendingPlayerMod
 import { Loader2, ArrowRightLeft, TrendingUp, ChevronDown } from "lucide-react";
 import { useWorldCupTheme } from "../../hooks/football/useWorldCupTheme";
 
-type TransferFilter = "all" | "transfers" | "loans" | "free_transfers" | "free_agents" | "contracts" | "contract_extensions";
+type TransferFilter = "all" | "popular" | "transfers" | "loans" | "free_transfers" | "free_agents" | "contracts" | "contract_extensions";
 type TransferSort = "newest" | "highest_fee";
 
 export default function FootballHome() {
@@ -42,7 +43,9 @@ export default function FootballHome() {
     let result = [...recentTransfers.data];
 
     // Filter
-    if (transferFilter !== "all") {
+    if (transferFilter === "popular") {
+      result = result.filter(t => t.isPopular);
+    } else if (transferFilter !== "all") {
       result = result.filter(t => {
         const feeText = typeof t.fee === 'string' ? t.fee : t.fee?.feeText;
         const typeText = typeof t.transferType === 'string' ? t.transferType : t.transferType?.localizationKey;
@@ -57,8 +60,8 @@ export default function FootballHome() {
       });
     }
 
-    // Filter by League
-    if (transferLeague !== "all") {
+    // Filter by League (ignore for popular transfers, as they are global)
+    if (transferLeague !== "all" && transferFilter !== "popular") {
       result = result.filter(t => String(t.leagueId) === transferLeague);
     }
 
@@ -147,6 +150,7 @@ export default function FootballHome() {
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex p-1 bg-secondary/60 backdrop-blur-xl rounded-full border border-border/50 overflow-x-auto max-w-full hide-scrollbar flex-nowrap shadow-inner">
                   <button onClick={() => setTransferFilter("all")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'all' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>All</button>
+                  <button onClick={() => setTransferFilter("popular")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'popular' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Popular Transfers</button>
                   <button onClick={() => setTransferFilter("transfers")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'transfers' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Transfers</button>
                   <button onClick={() => setTransferFilter("loans")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'loans' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Loans</button>
                   <button onClick={() => setTransferFilter("free_transfers")} className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase transition-all duration-300 ${transferFilter === 'free_transfers' ? 'bg-[#00c6ff] text-background shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'}`}>Free Transfers</button>
@@ -266,6 +270,9 @@ export default function FootballHome() {
           <section className="space-y-6">
             <FootballNewsSidebar />
           </section>
+
+          {/* ─── FIFA Rankings ────────────────────────────────── */}
+          <FifaRankingsTable />
 
           {/* ─── Trending Players ─────────────────────────────── */}
           <section className="space-y-6">

@@ -384,7 +384,8 @@ export async function getFootballNewsArticle(url) {
             const isPromo = lowerText.includes('sign up') || 
                             lowerText.includes('subscribe') || 
                             lowerText.includes('exclusive stats') ||
-                            lowerText.includes('updates from');
+                            lowerText.includes('updates from') ||
+                            lowerText.includes('preferred source');
                             
             if (text.length > 50 && !lowerText.includes('copyright') && !isPromo) {
                 paragraphs.push(text);

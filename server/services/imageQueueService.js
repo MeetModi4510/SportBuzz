@@ -7,7 +7,7 @@ class ImageQueueService {
   constructor() {
     this.queue = [];
     this.isProcessing = false;
-    this.delayMs = 2000;
+    this.delayMs = 3000;
     this.pendingRequests = new Map();
   }
 

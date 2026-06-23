@@ -20,6 +20,7 @@ const footballTransferSchema = new mongoose.Schema({
     leagueId:          { type: String }, // Used to mark "Priority" or left empty
     onLoan:            { type: Boolean, default: false },
     contractExtension: { type: Boolean, default: false },
+    isPopular:         { type: Boolean, default: false },
     cacheExpiry:       { type: Date, required: true },
     lastFetched:       { type: Date, default: Date.now },
 }, { timestamps: true });

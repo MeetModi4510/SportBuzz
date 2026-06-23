@@ -1,0 +1,31 @@
+{
+  "name": "Mauro Icardi",
+  "playerId": 282770,
+  "position": {
+    "label": "ST",
+    "key": "striker_short"
+  },
+  "transferDate": "2026-06-23T18:06:36Z",
+  "transferText": [
+    null,
+    null,
+    null
+  ],
+  "fromClub": "Galatasaray",
+  "fromClubFullName": "Galatasaray",
+  "fromClubId": 8637,
+  "toClub": "Free agent",
+  "toClubFullName": "Free agent",
+  "toClubId": 2,
+  "fee": null,
+  "amountEuroEstimated": null,
+  "transferType": {
+    "text": "contract",
+    "localizationKey": "contract"
+  },
+  "contractExtension": false,
+  "onLoan": false,
+  "fromDate": "2026-07-01T00:00:00Z",
+  "toDate": null,
+  "marketValue": 2089745
+}

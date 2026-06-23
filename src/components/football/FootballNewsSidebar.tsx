@@ -156,16 +156,7 @@ export function FootballNewsSidebar() {
               <div className="relative z-10 flex flex-col h-full p-6 md:p-8">
                 {/* Header (Source) */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/10 backdrop-blur-md border border-border/50">
-                    {item.sourceIconUrl ? (
-                      <img src={item.sourceIconUrl} alt={item.source} className="w-3.5 h-3.5 object-contain" />
-                    ) : (
-                      <Globe size={12} className="text-muted-foreground" />
-                    )}
-                    <span className="text-[10px] font-bold tracking-widest uppercase text-white/90">
-                      {item.source}
-                    </span>
-                  </div>
+
                   
                   {/* Subtle top-right icon appearing on hover */}
                   <div className="w-8 h-8 rounded-full bg-foreground/10 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0 border border-border/50">
@@ -243,11 +234,7 @@ export function FootballNewsSidebar() {
 
                   <div className="relative z-10 flex flex-col h-full p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-foreground/5 backdrop-blur-md border border-border/50">
-                        <span className="text-[9px] font-bold tracking-widest uppercase text-white/80">
-                          {item.source}
-                        </span>
-                      </div>
+
                       <ArrowUpRight size={14} className="text-white/40 group-hover:text-white/80 transition-colors" />
                     </div>
                     
@@ -283,16 +270,7 @@ export function FootballNewsSidebar() {
               <DialogDescription className="sr-only">Full article content.</DialogDescription>
               
               <div className="flex items-center gap-3 mb-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/10 border border-border/50">
-                  {selectedArticle.sourceIconUrl ? (
-                    <img src={selectedArticle.sourceIconUrl} alt={selectedArticle.source} className="w-4 h-4 object-contain" />
-                  ) : (
-                    <Globe size={14} className="text-muted-foreground" />
-                  )}
-                  <span className="text-xs font-bold tracking-widest uppercase text-white/90">
-                    {selectedArticle.source}
-                  </span>
-                </div>
+
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <Clock size={14} />
                   <span className="text-sm font-medium">

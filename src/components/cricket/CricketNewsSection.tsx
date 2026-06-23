@@ -104,9 +104,7 @@ export const CricketNewsSection = () => {
                 <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
                   {featuredArticle.snippet}
                 </p>
-                <p className="text-xs font-semibold text-muted-foreground mt-2 uppercase tracking-wide">
-                  Via {featuredArticle.source}
-                </p>
+
               </div>
             </div>
           )}
@@ -121,7 +119,7 @@ export const CricketNewsSection = () => {
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{article.source}</span>
+
                     <div className="flex items-center gap-1 text-[11px] text-muted-foreground font-medium">
                       <Clock size={12} />
                       {article.timestamp}
@@ -156,7 +154,7 @@ export const CricketNewsSection = () => {
       <DialogContent className="sm:max-w-[700px] border-border/50 bg-background/95 backdrop-blur-xl rounded-3xl max-h-[85vh] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
         <DialogHeader className="space-y-4">
           <div className="flex items-center justify-between mt-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">{selectedArticle?.source}</span>
+
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground font-medium bg-secondary/50 px-3 py-1 rounded-full border border-border/50">
               <Clock size={14} />
               {selectedArticle?.timestamp}
@@ -229,7 +227,7 @@ export const CricketNewsSection = () => {
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-2.5 py-1 rounded-full truncate max-w-[100px]">{article.source}</span>
+
                   <div className="flex items-center gap-1 text-[11px] text-muted-foreground font-medium whitespace-nowrap">
                     <Clock size={12} />
                     {article.timestamp}

@@ -138,7 +138,13 @@ export function TransferCard({ transferData }: TransferCardProps) {
     !String(transferData.playerId).startsWith('/') &&
     !String(transferData.playerId).startsWith('http') &&
     !isNaN(Number(transferData.playerId));
+
   const fotmobUrl = `https://images.fotmob.com/image_resources/playerimages/${transferData.playerId}.png`;
+  
+  let finalPlayerImage = transferData.playerImage;
+  if (!finalPlayerImage && hasFotmobId) {
+    finalPlayerImage = fotmobUrl;
+  }
 
   const fromLogoSrc = transferData.fromClubLogo || (transferData.fromClubId > 0 ? `https://images.fotmob.com/image_resources/logo/teamlogo/${transferData.fromClubId}.png` : '');
   const toLogoSrc   = transferData.toClubLogo   || (transferData.toClubId   > 0 ? `https://images.fotmob.com/image_resources/logo/teamlogo/${transferData.toClubId}.png`   : '');
@@ -178,8 +184,8 @@ export function TransferCard({ transferData }: TransferCardProps) {
       <div style={{ width: 108, flexShrink: 0, position: 'relative', overflow: 'hidden' }}>
         {hasTmImage ? (
           <img
-            key={transferData.playerImage}
-            src={transferData.playerImage!}
+            key={finalPlayerImage}
+            src={finalPlayerImage!}
             alt={transferData.name}
             referrerPolicy="no-referrer"
             style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom', display: 'block', transform: 'scale(1.30)', transformOrigin: 'bottom center' }}

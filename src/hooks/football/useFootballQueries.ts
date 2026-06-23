@@ -66,3 +66,12 @@ export const useFootballNewsDetail = (url: string | null) => {
     staleTime: 60 * 60 * 1000, // 1 hour
   });
 };
+
+export const useFifaRankings = () => {
+  return useQuery({
+    queryKey: ['football', 'fifa-rankings'],
+    queryFn: () => footballApi.getFifaRankings(),
+    ...NO_AUTO_REFETCH,
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+  });
+};

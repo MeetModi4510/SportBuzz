@@ -510,6 +510,7 @@ router.get('/fotmob-stats/:leagueId', async (req, res) => {
         
         const json = JSON.parse(nextData);
         const playersStats = json.props?.pageProps?.stats?.players;
+        const teamsStats = json.props?.pageProps?.stats?.teams;
         
         if (!playersStats || !Array.isArray(playersStats)) {
             return res.status(404).json({ success: false, message: 'Could not find player stats' });
@@ -541,20 +542,44 @@ router.get('/fotmob-stats/:leagueId', async (req, res) => {
                 results.push({ header: statGroup.header, data: statGroup.topThree || [] });
             }
         }
+
+        const teamResults = [];
+        if (teamsStats && Array.isArray(teamsStats)) {
+            for (const statGroup of teamsStats) {
+                if (statGroup.fetchAllUrl) {
+                    try {
+                        const fetchUrl = statGroup.fetchAllUrl.startsWith('http') ? statGroup.fetchAllUrl : `https://data.fotmob.com${statGroup.fetchAllUrl}`;
+                        const statRes = await axios.get(fetchUrl, {
+                            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+                        });
+                        teamResults.push({
+                            header: statGroup.header,
+                            data: statRes.data?.TopLists?.[0]?.StatList || []
+                        });
+                    } catch (e) {
+                        console.warn(`[FotMob Scraper] Failed to fetch full stats for team ${statGroup.header}:`, e.message);
+                        teamResults.push({ header: statGroup.header, data: statGroup.topThree || [] });
+                    }
+                    await delay(400);
+                } else {
+                    teamResults.push({ header: statGroup.header, data: statGroup.topThree || [] });
+                }
+            }
+        }
         
         // Save to cache
         await FotmobCache.findOneAndUpdate(
             { endpoint: cacheKey },
             { 
                 endpoint: cacheKey, 
-                data: results, 
+                data: { players: results, teams: teamResults }, 
                 cacheExpiry: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
                 lastFetched: new Date()
             },
             { upsert: true, new: true }
         );
 
-        res.json({ success: true, data: results });
+        res.json({ success: true, data: { players: results, teams: teamResults } });
     } catch (err) {
         console.error('[FotMob Scraper] Error:', err.message);
         res.status(500).json({ success: false, message: 'Failed to fetch stats' });
@@ -612,6 +637,7 @@ async function updateTransfersCache() {
         leagueId:          t.leagueId || '',
         onLoan:            t.onLoan || false,
         contractExtension: t.contractExtension || false,
+        isPopular:         t.isPopular || false,
         cacheExpiry,
         lastFetched:       now,
     }));
@@ -1933,4 +1959,56 @@ router.get('/v3/image/player', async (req, res) => {
     }
 });
 
+// FIFA Men's Rankings
+router.get('/fifa-rankings/men', async (req, res) => {
+    try {
+        const cacheKey = '/fifa-rankings/men';
+        // Check cache (valid for 24 hours)
+        const cached = await FotmobCache.findOne({ endpoint: cacheKey, cacheExpiry: { $gt: new Date() } });
+        if (cached) {
+            return res.json({ success: true, data: cached.data });
+        }
+
+        // Fetch latest period ID
+        const periodRes = await axios.get('https://www.fotmob.com/api/data/fifarankings/period?gender=men', {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
+        });
+        
+        if (!periodRes.data || !periodRes.data.length) {
+            return res.status(404).json({ success: false, message: 'Could not fetch ranking periods' });
+        }
+        
+        const latestPeriodId = periodRes.data[0].periodId;
+
+        // Fetch rankings for that period
+        const rankingRes = await axios.get(`https://www.fotmob.com/api/data/fifarankings/ranking?gender=men&periodId=${latestPeriodId}`, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
+        });
+
+        if (!rankingRes.data || !Array.isArray(rankingRes.data)) {
+            return res.status(404).json({ success: false, message: 'Could not fetch rankings' });
+        }
+
+        const rankings = rankingRes.data;
+
+        // Save to cache (24 hours expiry)
+        await FotmobCache.findOneAndUpdate(
+            { endpoint: cacheKey },
+            {
+                data: rankings,
+                cacheExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                lastFetched: new Date()
+            },
+            { upsert: true }
+        );
+
+        res.json({ success: true, data: rankings });
+    } catch (error) {
+        console.error('[FIFA Rankings] Error:', error.message);
+        res.status(500).json({ success: false, message: 'Error fetching FIFA rankings' });
+    }
+});
+
 export default router;
+
+// touch

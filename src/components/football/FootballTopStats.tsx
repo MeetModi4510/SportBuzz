@@ -272,7 +272,7 @@ function TeamStatList({ rows }: { rows: TeamStat[] }) {
               {/* Grayscale Squared Avatar */}
               <div className="shrink-0 flex items-center justify-center rounded-lg w-12 h-12 md:w-14 md:h-14 shadow-lg shadow-black/40 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 bg-foreground/5 p-1.5 border border-border/50">
                 {t.teamBadgeUrl ? (
-                  <img src={teamBadgeUrl(t.teamBadgeUrl)} alt={t.teamName} className="w-full h-full object-contain scale-110 group-hover:scale-100 transition-transform duration-700 drop-shadow-lg" />
+                  <img src={t.teamBadgeUrl.length < 10 ? (FEDERATION_LOGOS[t.teamName] || `https://images.fotmob.com/image_resources/logo/teamlogo/${t.teamBadgeUrl}.png`) : teamBadgeUrl(t.teamBadgeUrl)} alt={t.teamName} className="w-full h-full object-contain scale-110 group-hover:scale-100 transition-transform duration-700 drop-shadow-lg" />
                 ) : (
                   <Shield size={20} className="text-muted-foreground/40" />
                 )}
@@ -356,7 +356,7 @@ export function FootballTopStats() {
 
   // Filter rows to current tab + type
   const playerRows = (data?.players || []).filter((p) => p.statTyp === playerTyp).slice(0, 10);
-  const teamRows   = (data?.teams   || []).filter((t) => t.statTyp === teamTyp);
+  const teamRows   = (data?.teams   || []).filter((t) => t.statTyp === teamTyp).slice(0, 10);
 
   const playerTypes = data?.isFotmob && data.fotmobTabs ? data.fotmobTabs : Object.entries(PLAYER_STAT_LABELS);
   const teamTypes   = Object.entries(TEAM_STAT_LABELS);

@@ -38,6 +38,7 @@ export interface NewTransferData {
   toDate: string | null;
   marketValue: number | null;
   leagueId?: string | number;
+  isPopular?: boolean;
 }
 
 export interface LatestTransfersResponse {

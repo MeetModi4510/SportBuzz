@@ -236,7 +236,8 @@ export const footballApi = {
           fromDate: t.transferDate,
           toDate: null,
           marketValue: t.marketValue,
-          leagueId: t.leagueId
+          leagueId: t.leagueId,
+          isPopular: t.isPopular
         };
       });
 
@@ -301,6 +302,16 @@ export const footballApi = {
       return response?.data || [];
     } catch (error) {
       console.error("Failed to fetch news article", error);
+      return [];
+    }
+  },
+
+  async getFifaRankings(): Promise<any[]> {
+    try {
+      const response: any = await api.get('/football/fifa-rankings/men');
+      return response?.data || [];
+    } catch (error) {
+      console.error("Failed to fetch FIFA rankings", error);
       return [];
     }
   }

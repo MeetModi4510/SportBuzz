@@ -137,31 +137,8 @@ export const NewsSection = () => {
                       <div className="flex items-center justify-between">
                         <SportIcon sport={news.sport} size={16} />
                         <div className="flex items-center gap-2">
-                          {(news as any).isLive && news.sport !== 'football' && (
-                            <div className="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full">
-                              <span className="text-[9px] font-bold text-blue-400">
-                                {(news as any).source || 'LIVE'}
-                              </span>
-                              <span className="text-[9px] font-bold text-blue-400/50 ml-0.5 animate-pulse">
-                                • NEW
-                              </span>
-                            </div>
-                          )}
-                          {(news as any).isLive && news.sport === 'football' && (
-                            <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-                              {(news as any).sourceIconUrl && (
-                                <img src={(news as any).sourceIconUrl} className="w-3 h-3 object-contain" alt="" />
-                              )}
-                              <span className="text-[9px] font-bold text-emerald-400">
-                                {(news as any).sourceStr || 'NEW'}
-                              </span>
-                              {(news as any).sourceStr && (
-                                <span className="text-[9px] font-bold text-emerald-400/50 ml-0.5 animate-pulse">
-                                  • NEW
-                                </span>
-                              )}
-                            </div>
-                          )}
+
+
                           <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium bg-secondary/50 px-2 py-0.5 rounded-full border border-border/50">
                             <Clock size={12} />
                             {news.timestamp}
@@ -204,11 +181,7 @@ export const NewsSection = () => {
             <div className="flex items-center justify-between mt-2">
               <div className="flex items-center gap-2">
                 <SportIcon sport={selectedArticle?.sport || 'cricket'} size={24} />
-                {(selectedArticle as any)?.isLive && selectedArticle?.sport !== 'football' && (
-                  <span className="text-[10px] font-bold text-green-400 bg-green-500/15 border border-green-500/25 px-2 py-0.5 rounded-full">
-                    LIVE • Cricbuzz
-                  </span>
-                )}
+
                 {(selectedArticle as any)?.isLive && selectedArticle?.sport === 'football' && (
                   <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/25 px-2 py-0.5 rounded-full">
                     NEW • Football Daily
@@ -264,13 +237,10 @@ export const NewsSection = () => {
                   {cricketContent.map((paragraph, idx) => (
                     <p key={idx}>{paragraph}</p>
                   ))}
-                  <div className="mt-6 pt-4 border-t border-border/50 text-xs text-muted-foreground">
-                    Source: {(selectedArticle as any).source || 'Cricbuzz'}
-                  </div>
                 </div>
               ) : (
                 <div className="mt-4 p-4 rounded-xl bg-blue-500/5 border border-blue-500/20 text-sm text-blue-400/80 text-center">
-                  📰 Source: Cricbuzz — Full article available on Cricbuzz.com
+                  📰 Full article available on the original site
                 </div>
               )
             ) : (selectedArticle as any)?.isLive && selectedArticle?.sport === 'football' ? (
@@ -283,11 +253,7 @@ export const NewsSection = () => {
                   {footballContent.map((paragraph: string, idx: number) => (
                     <p key={idx}>{paragraph}</p>
                   ))}
-                  <div className="mt-6 pt-4 border-t border-border/50 text-xs flex justify-end">
-                    <a href={(selectedArticle as any).pageUrl?.startsWith('/') ? `https://www.fotmob.com${(selectedArticle as any).pageUrl}` : (selectedArticle as any).pageUrl} target="_blank" rel="noopener noreferrer" className="text-[#8b5cf6] hover:underline flex items-center gap-1">
-                      Read Original <ChevronRight size={12} />
-                    </a>
-                  </div>
+
                 </div>
               ) : (
                 <div className="mt-4 p-4 rounded-xl bg-[#8b5cf6]/5 border border-[#8b5cf6]/20 text-sm text-[#8b5cf6]/80 text-center">

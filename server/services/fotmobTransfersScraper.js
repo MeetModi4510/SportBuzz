@@ -35,6 +35,21 @@ async function fetchLeagueTransfers(leagueId) {
     }
 }
 
+async function fetchPopularTransfers() {
+    try {
+        const url = `https://www.fotmob.com/api/data/transfers?orderBy=lastModified&page=1&minFeeCurrency=EUR&transferType=top`;
+        const response = await axios.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+        });
+        return response.data?.transfers || [];
+    } catch (error) {
+        console.error(`[Fotmob Scraper] Failed to fetch popular transfers:`, error.message);
+        return [];
+    }
+}
+
 export async function scrapeFotmobTransfers() {
     console.log('[Fotmob Scraper] Starting fetch across all targeted leagues...');
     const allTransfers = [];
@@ -43,7 +58,16 @@ export async function scrapeFotmobTransfers() {
     // Fetch in parallel for speed
     const fetchPromises = LEAGUES.map(async (league) => {
         const transfers = await fetchLeagueTransfers(league.id);
-        
+        processTransfers(transfers, league.id, false);
+    });
+
+    // Also fetch popular transfers using Puppeteer
+    const { fetchFotmobRumors } = await import('./fotmobPuppeteerScraper.js');
+    const popularPromise = fetchFotmobRumors().then(transfers => {
+        processTransfers(transfers, 'popular', true);
+    });
+
+    function processTransfers(transfers, leagueId, isPopular) {
         for (const t of transfers) {
             const key = `${t.playerId}_${t.transferDate}`;
             if (!seen.has(key)) {
@@ -61,37 +85,44 @@ export async function scrapeFotmobTransfers() {
                 }
 
                 // Fotmob indicates loan/free in feeText or transferType
-                const feeText = t.fee?.feeText || '';
-                const onLoan = feeText.toLowerCase().includes('loan') || t.transferType?.text?.toLowerCase().includes('loan');
+                const feeText = t.fee?.feeText || t.fee?.localizedFeeText || '';
+                const onLoan = feeText.toLowerCase().includes('loan') || t.transferType?.text?.toLowerCase().includes('loan') || t.transferType?.localizationKey?.toLowerCase().includes('loan');
 
                 allTransfers.push({
                     playerId: t.playerId,
                     name: t.name,
                     playerImage,
                     position: t.position || { label: '', key: '' },
-                    fromClub: t.fromClub,
-                    fromClubFullName: t.fromClubFullName,
+                    fromClub: t.fromClub || t.fromClubFullName,
+                    fromClubFullName: t.fromClubFullName || t.fromClub,
                     fromClubId: t.fromClubId,
                     fromClubLogo,
-                    toClub: t.toClub,
-                    toClubFullName: t.toClubFullName,
+                    toClub: t.toClub || t.toClubFullName,
+                    toClubFullName: t.toClubFullName || t.toClub,
                     toClubId: t.toClubId,
                     toClubLogo,
                     transferDate: t.transferDate,
                     fee: feeText,
                     feeValue,
-                    transferType: t.transferType?.text || '',
+                    transferType: t.transferType?.text || t.transferType?.localizationKey || '',
                     marketValue: t.marketValue || 0,
-                    leagueId: league.id,
+                    leagueId: leagueId,
                     onLoan,
-                    contractExtension: false // Fotmob doesn't explicitly flag this in the same way, but keeping it for schema
+                    contractExtension: false,
+                    isPopular
                 });
+            } else if (isPopular) {
+                // If we already saw this transfer but now we know it's popular, update the flag
+                const existing = allTransfers.find(x => `${x.playerId}_${x.transferDate}` === key);
+                if (existing) {
+                    existing.isPopular = true;
+                }
             }
         }
-    });
+    }
 
-    await Promise.all(fetchPromises);
-    
+    await Promise.all([...fetchPromises, popularPromise]);
+
     // Sort combined globally by newest first
     allTransfers.sort((a, b) => new Date(b.transferDate) - new Date(a.transferDate));
     

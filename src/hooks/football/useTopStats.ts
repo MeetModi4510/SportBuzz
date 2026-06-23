@@ -58,10 +58,15 @@ async function fetchTopStats(leagueId: number): Promise<TopStatsResponse> {
     const json = await res.json();
     
     let players: PlayerStat[] = [];
+    let teams: TeamStat[] = [];
     let fotmobTabs: [string, string][] = [];
     
-    if (json.data && Array.isArray(json.data)) {
-      json.data.forEach((group: any, index: number) => {
+    // Handle both old array format (players only) and new object format { players, teams }
+    const playersData = Array.isArray(json.data) ? json.data : json.data?.players;
+    const teamsData = json.data?.teams;
+    
+    if (playersData && Array.isArray(playersData)) {
+      playersData.forEach((group: any, index: number) => {
         const statTyp = index + 100; // Unique stat type
         fotmobTabs.push([statTyp.toString(), group.header]);
         
@@ -90,13 +95,47 @@ async function fetchTopStats(leagueId: number): Promise<TopStatsResponse> {
       });
     }
 
+    if (teamsData && Array.isArray(teamsData)) {
+      teamsData.forEach((group: any, index: number) => {
+        // Find matching TEAM_STAT_LABELS by mapping header to statTyp
+        // FotMob headers: "Goals per match" -> map to 10 (Goals Scored) etc.
+        let statTyp = index + 200; // default generic
+        const headerLower = group.header?.toLowerCase() || '';
+        if (headerLower.includes('goals per match') || headerLower === 'goals') statTyp = 10;
+        else if (headerLower.includes('conceded')) statTyp = 7;
+        else if (headerLower.includes('possession')) statTyp = 1;
+        else if (headerLower.includes('shots')) statTyp = 21;
+        else if (headerLower.includes('passes')) statTyp = 22;
+        else if (headerLower.includes('clean sheets')) statTyp = 16;
+        else if (headerLower.includes('cards') || headerLower.includes('fouls')) statTyp = 23;
+
+        if (group.data && Array.isArray(group.data)) {
+          group.data.forEach((t: any) => {
+            teams.push({
+              _id: `${statTyp}-${t.TeamId}`,
+              leagueId: 77,
+              leagueName: "World Cup",
+              statTyp: statTyp,
+              rank: t.Rank,
+              teamName: t.ParticipantName,
+              teamId: t.TeamId?.toString() || "",
+              statValue: t.StatValue?.toString() || "",
+              statPerGame: t.SubStatValue ? t.SubStatValue.toString() : "",
+              teamBadgeUrl: t.TeamId?.toString() || "",
+              lastFetched: new Date().toISOString()
+            });
+          });
+        }
+      });
+    }
+
     return {
       success: true,
       fromCache: false,
       leagueId: 77,
       lastFetched: new Date().toISOString(),
       players,
-      teams: [],
+      teams,
       isFotmob: true,
       fotmobTabs
     };
