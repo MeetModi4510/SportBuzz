@@ -56,3 +56,13 @@ export const useFootballNews = () => {
     staleTime: 30 * 60 * 1000, // 30 minutes
   });
 };
+
+export const useFootballNewsDetail = (url: string | null) => {
+  return useQuery({
+    queryKey: ['football', 'newsDetail_v2', url],
+    queryFn: () => url ? footballApi.getNewsArticle(url) : Promise.resolve([]),
+    enabled: !!url,
+    ...NO_AUTO_REFETCH,
+    staleTime: 60 * 60 * 1000, // 1 hour
+  });
+};

@@ -6,6 +6,7 @@
  */
 
 import axios from 'axios';
+import * as cheerio from 'cheerio';
 
 const RAPID_API_HOST = 'sofascore.p.rapidapi.com';
 const RAPID_BASE = `https://${RAPID_API_HOST}`;
@@ -318,16 +319,20 @@ export async function getFootballLiveNews() {
     }
 
     try {
-        const res = await axios.get('https://fotmob-api.p.rapidapi.com/api/v1/news/trending?ccode3=USA', {
-            headers: {
-                'x-rapidapi-key': process.env.football_news,
-                'x-rapidapi-host': 'fotmob-api.p.rapidapi.com'
-            },
-            timeout: 10000
-        });
+        const headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' };
         
-        // Ensure data is array from items
-        const newsData = Array.isArray(res.data?.items) ? res.data.items : [];
+        // Fetch page 1 (latest) and page 2 (for "show more" functionality)
+        const [page1Res, page2Res] = await Promise.all([
+            axios.get('https://www.fotmob.com/api/worldnews?page=1', { headers, timeout: 10000 }),
+            axios.get('https://www.fotmob.com/api/worldnews?page=2', { headers, timeout: 10000 })
+        ]);
+        
+        const page1Data = Array.isArray(page1Res.data) ? page1Res.data : [];
+        const page2Data = Array.isArray(page2Res.data) ? page2Res.data : [];
+        
+        // Combine arrays and ensure it's sorted timeline fashion (latest first)
+        let newsData = [...page1Data, ...page2Data];
+        newsData.sort((a, b) => new Date(b.gmtTime).getTime() - new Date(a.gmtTime).getTime());
         
         cache[cacheKey] = { data: newsData, timestamp: Date.now() };
         return newsData;
@@ -338,6 +343,63 @@ export async function getFootballLiveNews() {
         return [];
     }
 }
+
+export async function getFootballNewsArticle(url) {
+    if (!url) return [];
+    const cacheKey = `football_news_article_${url}`;
+    if (cache[cacheKey] && (Date.now() - cache[cacheKey].timestamp) < 24 * 60 * 60 * 1000) {
+        return cache[cacheKey].data;
+    }
+
+    try {
+        const headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' };
+        let targetUrl = url.startsWith('/') ? `https://www.fotmob.com${url}` : url;
+
+        // If it's a FotMob embed URL, we need to extract the actual external source URL
+        if (targetUrl.includes('fotmob.com/embed/news/')) {
+            try {
+                const { data: embedData } = await axios.get(targetUrl, { headers, timeout: 8000 });
+                const $ = cheerio.load(embedData);
+                const nextDataStr = $('#__NEXT_DATA__').html();
+                if (nextDataStr) {
+                    const nextData = JSON.parse(nextDataStr);
+                    if (nextData.props?.pageProps?.data?.src) {
+                        targetUrl = nextData.props.pageProps.data.src;
+                    }
+                }
+            } catch (e) {
+                console.warn('[Football News Article] Failed to unwrap FotMob embed URL', e.message);
+            }
+        }
+
+        // Fetch the actual article (whether it's the external site or direct link)
+        const { data: articleHtml } = await axios.get(targetUrl, { headers, timeout: 8000 });
+        const $ = cheerio.load(articleHtml);
+
+        const paragraphs = [];
+        $('p').each((i, el) => {
+            const text = $(el).text().trim();
+            const lowerText = text.toLowerCase();
+            // Filter out short UI elements, copyright notices, and generic nav/promo text
+            const isPromo = lowerText.includes('sign up') || 
+                            lowerText.includes('subscribe') || 
+                            lowerText.includes('exclusive stats') ||
+                            lowerText.includes('updates from');
+                            
+            if (text.length > 50 && !lowerText.includes('copyright') && !isPromo) {
+                paragraphs.push(text);
+            }
+        });
+
+        cache[cacheKey] = { data: paragraphs, timestamp: Date.now() };
+        return paragraphs;
+    } catch (err) {
+        console.error('[Football News Article] Error fetching article:', err.message);
+        if (cache[cacheKey]) return cache[cacheKey].data;
+        return [];
+    }
+}
+
 
 export function clearCache() {
     for (const key of Object.keys(cache)) {

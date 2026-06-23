@@ -36,7 +36,7 @@ import {
     deleteMatch
 } from '../controllers/footballMatchController.js';
 import { protect } from '../middleware/authMiddleware.js';
-import { getDashboardMatches, getCategorizedMatches, getMatchDetail, getGlobalFootballNews, getFootballLiveNews, clearCache } from '../services/footballDataService.js';
+import { getDashboardMatches, getCategorizedMatches, getMatchDetail, getGlobalFootballNews, getFootballLiveNews, clearCache, getFootballNewsArticle } from '../services/footballDataService.js';
 import livescore6Service from '../services/livescore6Service.js';
 import * as espnService from '../services/espnService.js';
 import { fotmobService } from '../services/fotmobService.js';
@@ -180,6 +180,20 @@ router.get('/fotmob-matchDetails/:id', async (req, res) => {
     } catch (error) {
         console.error(`Error in /fotmob-matchDetails/${req.params.id}:`, error);
         res.status(500).json({ success: false, message: 'Server Error fetching fotmob match details' });
+    }
+});
+
+// ─── NEWS ARTICLE ────────────────────────────────────────────────────────────
+router.post('/news-article', async (req, res) => {
+    try {
+        const { url } = req.body;
+        if (!url) return res.status(400).json({ success: false, message: 'URL is required' });
+        
+        const paragraphs = await getFootballNewsArticle(url);
+        res.json({ success: true, data: paragraphs });
+    } catch (error) {
+        console.error('News Article Error:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch news article', message: error.message, stack: error.stack });
     }
 });
 

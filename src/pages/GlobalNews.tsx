@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Helmet } from "react-helmet-async";
-import { Clock, ChevronLeft } from 'lucide-react';
+import { Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { mockNewsData, type NewsItem } from '@/data/mockNewsData';
 import { useCricketNews, type CricketNewsItem, useCricketNewsDetail } from '@/hooks/useCricketNews';
 import { useFootballNews, type FootballNewsItem } from '@/hooks/useFootballNews';
+import { useFootballNewsDetail } from '@/hooks/football/useFootballQueries';
 import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -26,6 +27,10 @@ const GlobalNews = () => {
   const { news: liveFootball, loading: footballLoading } = useFootballNews();
   const { content: cricketContent, loading: cricketContentLoading } = useCricketNewsDetail(
     selectedArticle?.sport === 'cricket' ? selectedArticle.id : null
+  );
+
+  const { data: footballContent, isLoading: footballContentLoading } = useFootballNewsDetail(
+    selectedArticle?.sport === 'football' ? (selectedArticle as any).pageUrl : null
   );
 
   // Non-cricket/football mock news (tennis, basketball etc.)
@@ -213,6 +218,18 @@ const GlobalNews = () => {
                 </div>
               )}
 
+              {/* Modal Image Header for Football News */}
+              {(selectedArticle as any)?.isLive && selectedArticle?.sport === 'football' && (selectedArticle as any).imageUrl && (
+                <div className="w-full h-48 md:h-56 overflow-hidden rounded-xl border border-border/10 mb-4 relative">
+                  <img 
+                    src={(selectedArticle as any).imageUrl!} 
+                    alt="" 
+                    className="w-full h-full object-cover" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+                </div>
+              )}
+
               {(selectedArticle as any)?.isLive && selectedArticle?.sport === 'cricket' ? (
                 cricketContentLoading ? (
                   <div className="py-8 flex justify-center">
@@ -233,14 +250,29 @@ const GlobalNews = () => {
                   </div>
                 )
               ) : (selectedArticle as any)?.isLive && selectedArticle?.sport === 'football' ? (
-                <div className="w-full h-[60vh] md:h-[70vh] rounded-xl overflow-hidden border border-border/20 bg-background">
-                  <iframe 
-                    src={(selectedArticle as any).pageUrl?.startsWith('/') ? `https://www.fotmob.com${(selectedArticle as any).pageUrl}` : (selectedArticle as any).pageUrl} 
-                    className="w-full h-full border-0 bg-background" 
-                    title="Football News Article"
-                    sandbox="allow-same-origin allow-scripts allow-popups"
-                  />
-                </div>
+                footballContentLoading ? (
+                  <div className="py-8 flex justify-center">
+                    <div className="w-6 h-6 border-2 border-[#8b5cf6] border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : footballContent && footballContent.length > 0 ? (
+                  <div className="space-y-4 text-sm md:text-base text-foreground/90 leading-relaxed font-serif text-justify">
+                    {footballContent.map((paragraph: string, idx: number) => (
+                      <p key={idx}>{paragraph}</p>
+                    ))}
+                    <div className="mt-6 pt-4 border-t border-border/50 text-xs flex justify-end">
+                      <a href={(selectedArticle as any).pageUrl?.startsWith('/') ? `https://www.fotmob.com${(selectedArticle as any).pageUrl}` : (selectedArticle as any).pageUrl} target="_blank" rel="noopener noreferrer" className="text-[#8b5cf6] hover:underline flex items-center gap-1">
+                        Read Original <ChevronRight size={12} />
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-4 p-4 rounded-xl bg-[#8b5cf6]/5 border border-[#8b5cf6]/20 text-sm text-[#8b5cf6]/80 text-center">
+                    📰 Source: {(selectedArticle as any).sourceStr || 'External Site'} — 
+                    <a href={(selectedArticle as any).pageUrl?.startsWith('/') ? `https://www.fotmob.com${(selectedArticle as any).pageUrl}` : (selectedArticle as any).pageUrl} target="_blank" rel="noopener noreferrer" className="underline ml-1">
+                      Read full article here
+                    </a>
+                  </div>
+                )
               ) : (
                 <>
                   <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
