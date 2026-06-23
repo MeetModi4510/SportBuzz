@@ -38,10 +38,13 @@ export const useUpcomingFootballMatches = () => {
 
 export const useRecentTransfers = () => {
   return useQuery({
-    queryKey: ['football', 'transfers'],
-    queryFn: () => footballApi.getRecentTransfers(false),
-    ...NO_AUTO_REFETCH,
-    staleTime: 6 * 60 * 60 * 1000, // 6 hours
+    queryKey: ['football', 'transfers', 'v2'],
+    queryFn: () => footballApi.getRecentTransfers(true),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: true,
+    retry: 1,
+    staleTime: 2 * 60 * 60 * 1000, // 2 hours — match server cache TTL
   });
 };
 
