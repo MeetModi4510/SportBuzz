@@ -37,6 +37,7 @@ export interface NewTransferData {
   fromDate: string | null;
   toDate: string | null;
   marketValue: number | null;
+  leagueId?: string | number;
 }
 
 export interface LatestTransfersResponse {

@@ -14,6 +14,8 @@ export interface FotmobPlayer {
     rating: number | undefined;
     countryCode: string;
     verticalLayout?: { x: number; y: number; height: number; width: number; } | null;
+    events?: any[];
+    substitutionEvents?: any[];
 }
 
 export interface FotmobLineupTeam {
@@ -41,6 +43,8 @@ function mapPlayer(p: any): FotmobPlayer {
         rating: p.performance?.rating ?? undefined,
         countryCode: p.countryCode || '',
         verticalLayout: p.verticalLayout || null,
+        events: p.performance?.events || [],
+        substitutionEvents: p.performance?.substitutionEvents || [],
     };
 }
 
