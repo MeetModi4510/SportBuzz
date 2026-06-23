@@ -515,9 +515,6 @@ async function updateTransfersCache() {
     const cacheExpiry = new Date(Date.now() + TRANSFERS_CACHE_MS);
     const now = new Date();
 
-    // Wipe stale records before bulk-inserting fresh ones
-    await FootballTransfer.deleteMany({});
-
     const docs = uniqueTransfers.map(t => ({
         transferId:        `${t.playerId}_${t.transferDate}`,
         playerId:          t.playerId,
@@ -543,9 +540,14 @@ async function updateTransfersCache() {
     }));
 
     if (docs.length > 0) {
+        // Only wipe old records AFTER we have confirmed new data — prevents data loss if scraper is blocked
+        await FootballTransfer.deleteMany({});
         await FootballTransfer.insertMany(docs);
         console.log(`[Transfers] Stored ${docs.length} transfers from Transfermarkt.`);
+    } else {
+        console.warn('[Transfers] Scraper returned 0 docs — keeping existing data in DB to avoid data loss.');
     }
+
     
     return { rows: docs, lastFetched: now };
 }
