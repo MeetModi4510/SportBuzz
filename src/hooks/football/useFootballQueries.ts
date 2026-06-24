@@ -38,7 +38,7 @@ export const useUpcomingFootballMatches = () => {
 
 export const useRecentTransfers = () => {
   return useQuery({
-    queryKey: ['football', 'transfers', 'v2'],
+    queryKey: ['football', 'transfers', 'v3'],
     queryFn: () => footballApi.getRecentTransfers(true),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

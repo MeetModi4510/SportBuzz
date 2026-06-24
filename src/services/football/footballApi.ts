@@ -194,7 +194,7 @@ export const footballApi = {
   },
 
   async getRecentTransfers(forceRefresh = false): Promise<TransfersResponse> {
-    const cacheKey = 'recent_transfers_v6';
+    const cacheKey = 'recent_transfers_v7';
 
     if (!forceRefresh) {
       const cached = cacheManager.get<TransfersResponse>(cacheKey);
