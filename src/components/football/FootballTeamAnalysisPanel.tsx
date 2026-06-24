@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FootballTeamLogo } from './FootballTeamLogo';
 import { Search, Loader2, Trophy, BarChart3, Users, Activity, Medal, Star, AlertCircle, Heart } from 'lucide-react';
 import { useFotmobTeam } from '@/hooks/football/useFotmobTeam';
+import { useFotmobLeague } from '@/hooks/football/useFotmobLeague';
 import { favoritesApi } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { TeamOverviewDashboard } from './TeamOverviewDashboard';
@@ -11,6 +12,13 @@ import { TeamPlayerStatsView } from './TeamPlayerStatsView';
 import { TeamStatsView } from './TeamStatsView';
 import { TeamTableView } from './TeamTableView';
 import { TeamTrophiesView } from './TeamTrophiesView';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const TABS = ['Overview', 'Table', 'Fixtures', 'Squad', 'Player stats', 'Team stats', 'Trophies', 'News'];
 
@@ -40,8 +48,18 @@ const TEAMS_BY_CONFEDERATION = [
 // Helper to get total teams (should be 48)
 const totalTeamsCount = TEAMS_BY_CONFEDERATION.reduce((acc, conf) => acc + conf.teams.length, 0);
 
+const LEAGUES = [
+  { id: null, name: 'International', logo: null },
+  { id: 47, name: 'Premier League', logo: 'https://images.fotmob.com/image_resources/logo/leaguelogo/47.png' },
+  { id: 87, name: 'La Liga', logo: 'https://images.fotmob.com/image_resources/logo/leaguelogo/87.png' },
+  { id: 55, name: 'Serie A', logo: 'https://images.fotmob.com/image_resources/logo/leaguelogo/55.png' },
+  { id: 54, name: 'Bundesliga', logo: 'https://images.fotmob.com/image_resources/logo/leaguelogo/54.png' },
+  { id: 53, name: 'Ligue 1', logo: 'https://images.fotmob.com/image_resources/logo/leaguelogo/53.png' }
+];
+
 export function FootballTeamAnalysisPanel({ initialTeam }: { initialTeam?: string }) {
   const [selectedTeam, setSelectedTeam] = useState<string | null>(initialTeam || null);
+  const [selectedLeagueId, setSelectedLeagueId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('Overview');
   const [isFavorite, setIsFavorite] = useState(false);
@@ -50,6 +68,7 @@ export function FootballTeamAnalysisPanel({ initialTeam }: { initialTeam?: strin
   const { toast } = useToast();
   
   const { data: teamData, isLoading, error } = useFotmobTeam(selectedTeam);
+  const { data: leagueData, isLoading: isLeagueLoading } = useFotmobLeague(selectedLeagueId);
 
   React.useEffect(() => {
     if (!selectedTeam) return;
@@ -60,7 +79,7 @@ export function FootballTeamAnalysisPanel({ initialTeam }: { initialTeam?: strin
         // The API returns { isFavorite: boolean, favoriteId: string } or similar based on our update
         // We'll also pass type='team' in the check if we had query params, but since the route is just /check/:id, let's just use get() and find it.
         // Wait, favoritesApi.check doesn't take query params easily without modifying it. Let's just fetch all favorites and find it.
-        const allFavs = await favoritesApi.get();
+        const allFavs = await favoritesApi.get() as any;
         if (allFavs.success) {
           const fav = allFavs.data.find((f: any) => f.type === 'team' && f.itemId === selectedTeam);
           if (fav) {
@@ -90,17 +109,18 @@ export function FootballTeamAnalysisPanel({ initialTeam }: { initialTeam?: strin
         toast({ title: 'Removed from Favorites' });
       } else {
         const teamLogoUrl = `https://images.fotmob.com/image_resources/logo/teamlogo/${teamData?.details?.id || ''}.png`;
+        const teamName = teamData?.details?.name || selectedTeam;
         const res = await favoritesApi.add({
           type: 'team',
           itemId: selectedTeam,
-          name: selectedTeam,
+          name: teamName,
           sport: 'football',
           image: teamData?.details?.id ? teamLogoUrl : undefined
-        });
+        }) as any;
         if (res.success) {
           setIsFavorite(true);
           setFavoriteId(res.data._id);
-          toast({ title: 'Added to Favorites', description: `${selectedTeam} has been saved.` });
+          toast({ title: 'Added to Favorites', description: `${teamName} has been saved.` });
         }
       }
     } catch (e) {
@@ -125,14 +145,18 @@ export function FootballTeamAnalysisPanel({ initialTeam }: { initialTeam?: strin
           <div className="absolute top-0 right-0 p-32 bg-primary/5 blur-3xl rounded-full" />
           
           <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-foreground/5 flex items-center justify-center p-4 shadow-inner shrink-0 relative z-10 border border-border/50">
-            <FootballTeamLogo name={selectedTeam} logo={null} className="w-24 h-24 md:w-32 md:h-32" />
+            <FootballTeamLogo 
+              name={teamData?.details?.name || selectedTeam} 
+              logo={teamData?.details?.id ? `https://images.fotmob.com/image_resources/logo/teamlogo/${teamData.details.id}.png` : null} 
+              className="w-24 h-24 md:w-32 md:h-32" 
+            />
           </div>
 
           <div className="flex-1 text-center md:text-left relative z-10">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground mb-2">{selectedTeam}</h2>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground mb-2">{teamData?.details?.name || selectedTeam}</h2>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-4">
               <span className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest rounded-full">
-                <Trophy size={14} /> National Team
+                <Trophy size={14} /> {selectedLeagueId ? 'Club Team' : 'National Team'}
               </span>
               <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-widest rounded-full">
                 <Activity size={14} className="animate-pulse" /> Active
@@ -215,17 +239,49 @@ export function FootballTeamAnalysisPanel({ initialTeam }: { initialTeam?: strin
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full mb-4">
             <Star className="w-4 h-4 text-primary" fill="currentColor" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-primary">World Cup Edition</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-primary">World Cup & League Edition</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-black font-display tracking-tight text-foreground">
+          <h2 className="text-3xl md:text-4xl font-black font-display tracking-tight text-foreground mb-4">
             Select a Team
           </h2>
-          <p className="text-muted-foreground text-sm font-medium tracking-wide mt-2">
-            Explore deep analytics for all {totalTeamsCount} major national teams.
-          </p>
+          <div className="flex items-center gap-3 z-10">
+            <Select
+              value={selectedLeagueId === null ? 'international' : selectedLeagueId.toString()}
+              onValueChange={(val) => {
+                setSelectedLeagueId(val === 'international' ? null : Number(val));
+                setSearchQuery('');
+              }}
+            >
+              <SelectTrigger className="w-[220px] h-12 bg-background border border-border/60 hover:border-primary/50 text-foreground text-sm font-bold tracking-wide rounded-xl outline-none cursor-pointer transition-all shadow-sm">
+                <SelectValue placeholder="Select League" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border border-border/60 rounded-xl shadow-2xl">
+                {LEAGUES.map((league) => (
+                  <SelectItem 
+                    key={league.name} 
+                    value={league.id === null ? 'international' : league.id.toString()}
+                    className="cursor-pointer font-semibold text-sm py-3 px-4 focus:bg-primary/10 focus:text-primary transition-colors data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary"
+                  >
+                    <div className="flex items-center gap-3">
+                      {league.logo ? (
+                        <div className="w-7 h-7 rounded-full bg-white border border-border/30 flex items-center justify-center p-1 shadow-sm shrink-0">
+                          <img src={league.logo} alt={league.name} className="w-5 h-5 object-contain" />
+                        </div>
+                      ) : (
+                        <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shadow-sm shrink-0">
+                          <Trophy size={14} className="text-primary" />
+                        </div>
+                      )}
+                      <span>{league.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <div className="relative w-full md:w-80 group">
+        <div className="relative w-full md:w-80 group mt-4 md:mt-0">
           <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
             <Search size={18} className="text-muted-foreground group-focus-within:text-primary transition-colors" />
           </div>
@@ -239,49 +295,88 @@ export function FootballTeamAnalysisPanel({ initialTeam }: { initialTeam?: strin
         </div>
       </div>
 
-      {/* Grid of Teams Grouped by Confederation */}
+      {/* Grid of Teams Grouped by Confederation (International) or League Teams */}
       <div className="space-y-12">
-        {TEAMS_BY_CONFEDERATION.map((confederation) => {
-          const filteredTeams = confederation.teams.filter(team => 
-            team.toLowerCase().includes(searchQuery.toLowerCase())
-          );
+        {selectedLeagueId === null ? (
+          TEAMS_BY_CONFEDERATION.map((confederation) => {
+            const filteredTeams = confederation.teams.filter(team => 
+              team.toLowerCase().includes(searchQuery.toLowerCase())
+            );
 
-          if (filteredTeams.length === 0) return null;
+            if (filteredTeams.length === 0) return null;
 
-          return (
-            <div key={confederation.region} className="space-y-6">
-              <div className="flex items-center gap-4">
-                <h3 className="text-lg font-black uppercase tracking-widest text-foreground">
-                  {confederation.region}
-                </h3>
-                <div className="flex-1 h-px bg-border/40" />
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest bg-foreground/5 px-2 py-1 rounded">
-                  {filteredTeams.length} Teams
-                </span>
+            return (
+              <div key={confederation.region} className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-lg font-black uppercase tracking-widest text-foreground">
+                    {confederation.region}
+                  </h3>
+                  <div className="flex-1 h-px bg-border/40" />
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest bg-foreground/5 px-2 py-1 rounded">
+                    {filteredTeams.length} Teams
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4">
+                  {filteredTeams.map((team) => (
+                    <button
+                      key={team}
+                      onClick={() => setSelectedTeam(team)}
+                      className="group relative flex flex-col items-center justify-center p-4 bg-card border border-border/40 hover:border-primary/50 hover:bg-primary/5 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden text-center"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      
+                      <div className="w-14 h-14 md:w-16 md:h-16 mb-3 p-1.5 bg-foreground/5 group-hover:bg-background rounded-full flex items-center justify-center transition-colors shadow-inner relative z-10">
+                         <FootballTeamLogo name={team} logo={null} size="md" className="w-10 h-10 md:w-12 md:h-12" />
+                      </div>
+                      
+                      <span className="text-xs md:text-sm font-bold text-foreground/80 group-hover:text-foreground tracking-wide relative z-10 transition-colors">
+                        {team}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4">
-                {filteredTeams.map((team) => (
-                  <button
-                    key={team}
-                    onClick={() => setSelectedTeam(team)}
-                    className="group relative flex flex-col items-center justify-center p-4 bg-card border border-border/40 hover:border-primary/50 hover:bg-primary/5 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden text-center"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    
-                    <div className="w-14 h-14 md:w-16 md:h-16 mb-3 p-1.5 bg-foreground/5 group-hover:bg-background rounded-full flex items-center justify-center transition-colors shadow-inner relative z-10">
-                       <FootballTeamLogo name={team} logo={null} size="md" className="w-10 h-10 md:w-12 md:h-12" />
-                    </div>
-                    
-                    <span className="text-xs md:text-sm font-bold text-foreground/80 group-hover:text-foreground tracking-wide relative z-10 transition-colors">
-                      {team}
-                    </span>
-                  </button>
-                ))}
-              </div>
+            );
+          })
+        ) : (
+          isLeagueLoading ? (
+            <div className="flex justify-center p-12">
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
             </div>
-          );
-        })}
+          ) : leagueData?.teams ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4">
+              {leagueData.teams
+                .filter(team => team.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                .map((team) => (
+                <button
+                  key={team.id}
+                  onClick={() => setSelectedTeam(team.id.toString())}
+                  className="group relative flex flex-col items-center justify-center p-4 bg-card border border-border/40 hover:border-primary/50 hover:bg-primary/5 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden text-center"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  
+                  <div className="w-14 h-14 md:w-16 md:h-16 mb-3 p-1.5 bg-foreground/5 group-hover:bg-background rounded-full flex items-center justify-center transition-colors shadow-inner relative z-10">
+                     <img 
+                       src={`https://images.fotmob.com/image_resources/logo/teamlogo/${team.id}.png`} 
+                       alt={team.name} 
+                       className="w-10 h-10 md:w-12 md:h-12 object-contain"
+                       loading="lazy"
+                     />
+                  </div>
+                  
+                  <span className="text-xs md:text-sm font-bold text-foreground/80 group-hover:text-foreground tracking-wide relative z-10 transition-colors">
+                    {team.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center p-12 text-muted-foreground">
+              Failed to load league teams.
+            </div>
+          )
+        )}
       </div>
     </div>
   );

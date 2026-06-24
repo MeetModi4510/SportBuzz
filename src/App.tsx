@@ -45,6 +45,7 @@ import FootballPlayerProfile from "./pages/football/FootballPlayerProfile";
 import FootballHome from "./pages/football/FootballHome";
 import MatchCenter from "./pages/football/MatchCenter";
 import PlayerProfile from "./pages/football/PlayerProfile";
+import FootballLeagueOverview from "./pages/football/FootballLeagueOverview";
 import CricketHome from "./pages/cricket/CricketHome";
 import NotFound from "./pages/NotFound";
 
@@ -236,6 +237,7 @@ const App = () => {
               <Route path="/football/match/result/:id" element={<FootballMatchResult />} />
               <Route path="/football/team/:id" element={<ProtectedRoute><FootballTeamProfile /></ProtectedRoute>} />
               <Route path="/football/player/:teamId/:playerName" element={<ProtectedRoute><FootballPlayerProfile /></ProtectedRoute>} />
+              <Route path="/football/league/:id" element={<ProtectedRoute><FootballLeagueOverview /></ProtectedRoute>} />
 
               {/* Auction Routes */}
               <Route path="/auctions" element={<ProtectedRoute><AuctionList /></ProtectedRoute>} />

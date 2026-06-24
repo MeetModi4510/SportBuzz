@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Activity, Target } from 'lucide-react';
+import { Calendar, MapPin, Activity, Target, Heart } from 'lucide-react';
+import { favoritesApi } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 import { usePerformanceLabPlayerStats } from '../../hooks/usePerformanceLab';
 import { StatGrid } from './StatGrid';
 import { PerformanceTrend } from './charts/PerformanceTrend';
@@ -43,10 +45,69 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
     const activePlayerId = activePlayer?.espnId;
     const activePlayerName = activePlayer?.name || '';
     
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteId, setFavoriteId] = useState<string | null>(null);
+    const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+    const { toast } = useToast();
+    
     const { data: playerData, isLoading, error } = usePerformanceLabPlayerStats(activePlayerId, activePlayerName);
 
     const idSum = activePlayerId ? activePlayerId.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0) : 0;
     const stableOVR = activePlayerId ? (idSum % 16) + 80 : 90;
+
+    useEffect(() => {
+        if (!activePlayerName) return;
+        
+        const checkFav = async () => {
+            try {
+                const allFavs = await favoritesApi.get();
+                if (allFavs.success) {
+                    const fav = allFavs.data.find((f: any) => f.type === 'player' && f.name === activePlayerName);
+                    if (fav) {
+                        setIsFavorite(true);
+                        setFavoriteId(fav._id);
+                    } else {
+                        setIsFavorite(false);
+                        setFavoriteId(null);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to check favorite status', e);
+            }
+        };
+        checkFav();
+    }, [activePlayerName]);
+
+    const toggleFavorite = async () => {
+        if (!activePlayerName) return;
+        setIsTogglingFavorite(true);
+        
+        try {
+            if (isFavorite && favoriteId) {
+                await favoritesApi.remove(favoriteId);
+                setIsFavorite(false);
+                setFavoriteId(null);
+                toast({ title: 'Removed from Favorites' });
+            } else {
+                const res = await favoritesApi.add({
+                    type: 'player',
+                    itemId: activePlayerId || activePlayerName,
+                    name: activePlayerName,
+                    sport: 'cricket',
+                    image: activePlayer?.imageUrl
+                });
+                if (res.success) {
+                    setIsFavorite(true);
+                    setFavoriteId(res.data._id);
+                    toast({ title: 'Added to Favorites', description: `${activePlayerName} has been saved.` });
+                }
+            }
+        } catch (e) {
+            toast({ title: 'Error', description: 'Failed to update favorites', variant: 'destructive' });
+        } finally {
+            setIsTogglingFavorite(false);
+        }
+    };
 
     if (!activePlayerId) {
         return (
@@ -168,6 +229,18 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                         <div className="px-4 py-2 dark:bg-white/[0.02] bg-white border dark:border-white/[0.05] border-slate-200 rounded-lg dark:text-zinc-300 text-slate-600 font-medium text-sm shadow-sm">
                             {playerData.profileInfo?.role || activePlayer?.role || 'Batter'}
                         </div>
+                        <button 
+                            onClick={toggleFavorite}
+                            disabled={isTogglingFavorite}
+                            className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-lg border transition-all ${
+                                isFavorite 
+                                    ? 'bg-rose-500/10 text-rose-500 border-rose-500/20 hover:bg-rose-500/20' 
+                                    : 'dark:bg-white/[0.02] bg-white dark:border-white/[0.05] border-slate-200 dark:text-zinc-300 text-slate-600 hover:bg-slate-100 dark:hover:bg-white/[0.05]'
+                            }`}
+                        >
+                            <Heart size={14} fill={isFavorite ? "currentColor" : "none"} className={isTogglingFavorite ? "animate-pulse" : ""} />
+                            {isFavorite ? 'Saved' : 'Favorite'}
+                        </button>
                     </div>
                 </div>
 

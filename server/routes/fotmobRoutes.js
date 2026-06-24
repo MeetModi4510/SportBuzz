@@ -1,5 +1,5 @@
 import express from 'express';
-import { getFotmobTeam, targetTeams } from '../services/fotmobScraper.js';
+import { getFotmobTeam, getFotmobLeague, targetTeams } from '../services/fotmobScraper.js';
 
 const router = express.Router();
 
@@ -32,6 +32,27 @@ router.get('/team/:identifier', async (req, res) => {
     }
   } catch (error) {
     console.error('FotMob Route Error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get league data by ID
+router.get('/league/:id', async (req, res) => {
+  try {
+    const leagueId = parseInt(req.params.id);
+    if (isNaN(leagueId)) {
+      return res.status(400).json({ success: false, message: 'Invalid league ID' });
+    }
+
+    const leagueData = await getFotmobLeague(leagueId);
+    
+    if (leagueData) {
+      res.json({ success: true, data: leagueData });
+    } else {
+      res.status(500).json({ success: false, message: 'Failed to fetch league data' });
+    }
+  } catch (error) {
+    console.error('FotMob League Route Error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

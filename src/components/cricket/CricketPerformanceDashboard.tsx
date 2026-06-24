@@ -1,9 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CricketSidebar } from './CricketSidebar';
 import { PerformanceLab } from './PerformanceLab';
 
-export function CricketPerformanceDashboard() {
-    const [activePlayer, setActivePlayer] = useState<any>(null);
+export function CricketPerformanceDashboard({ initialState }: { initialState?: any }) {
+    const [activePlayer, setActivePlayer] = useState<any>(
+        initialState?.targetPlayerId ? { espnId: initialState.targetPlayerId, name: initialState.targetPlayerName } : null
+    );
+
+    useEffect(() => {
+        if (initialState?.targetPlayerId) {
+            setActivePlayer({ 
+                espnId: initialState.targetPlayerId, 
+                name: initialState.targetPlayerName
+            });
+        }
+    }, [initialState]);
 
     const handleSelectPlayer = (player: any) => {
         setActivePlayer(player);

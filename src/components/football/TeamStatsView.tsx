@@ -21,7 +21,7 @@ export function TeamStatsView({ data }: { data: any }) {
       {teamStats.map((statCategory: any, idx: number) => (
         <div key={idx} className="bg-card border border-border/40 rounded-[2rem] p-6 relative group hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-[0_8px_30px_rgb(var(--primary),0.1)] flex flex-col">
           <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-6 flex items-center gap-2">
-            {statCategory.header}
+            {statCategory.header.toLowerCase() === 'fotmob rating' ? 'Average Rating' : statCategory.header}
           </h3>
           
           <div className="space-y-2 flex-1">

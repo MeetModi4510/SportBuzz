@@ -174,20 +174,20 @@ const PerformanceLab = () => {
             <TabsContent value="players" className="space-y-8 animate-fade-in pt-4">
               {activeSport === "cricket" ? (
                 <div className="min-h-[900px] border border-border rounded-xl">
-                   <CricketPerformanceDashboard />
+                   <CricketPerformanceDashboard initialState={state} />
                 </div>
               ) : activeSport === "football" ? (
                 <div className="min-h-[900px] border border-border rounded-xl">
                    <FootballPerformanceDashboard initialState={state} />
                 </div>
               ) : (
-                <PlayerAnalysisPanel activeSport={activeSport} />
+                <PlayerAnalysisPanel activeSport={activeSport as any} />
               )}
             </TabsContent>
 
             {/* Player Comparison Tab */}
             <TabsContent value="comparison" className="space-y-8 animate-fade-in">
-              <PlayerComparison activeSport={activeSport} />
+              <PlayerComparison activeSport={activeSport as any} />
             </TabsContent>
 
             {/* Team Comparison Tab */}

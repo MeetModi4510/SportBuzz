@@ -1,8 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
-import { ChevronDown, ChevronLeft, ChevronRight, Info, Activity, Star, Calendar, Loader2, Trophy } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Info, Activity, Star, Calendar, Loader2, Trophy, Heart } from 'lucide-react';
 import { usePlayerRecentMatches } from '../../hooks/football/usePlayerRecentMatches';
 import { useFotmobPlayerTournamentStats } from '../../hooks/useFootballSquads';
+import { favoritesApi } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
 const StatRow = ({ label, value, subValue, tooltip }: any) => {
   const isNumber = !isNaN(Number(value)) && value !== '-';
@@ -1233,6 +1235,10 @@ const TeamCareerRow = ({ entry, seasonEntries }: { entry: any; seasonEntries?: a
 export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: any }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'detailed' | 'career'>('overview');
   const [activeTrophyTeam, setActiveTrophyTeam] = useState<number | 'all'>('all');
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState<string | null>(null);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+  const { toast } = useToast();
 
   if (!profile) return null;
 
@@ -1241,6 +1247,59 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
 
   const { data: fetchedMatches, isLoading: isMatchesLoading } = usePlayerRecentMatches(name);
   const recentMatches = fetchedMatches && fetchedMatches.length > 0 ? fetchedMatches : espnRecentMatches;
+
+  useEffect(() => {
+    if (!name) return;
+    const checkFav = async () => {
+        try {
+            const allFavs = await favoritesApi.get();
+            if (allFavs.success) {
+                const fav = allFavs.data.find((f: any) => f.type === 'player' && f.name === name);
+                if (fav) {
+                    setIsFavorite(true);
+                    setFavoriteId(fav._id);
+                } else {
+                    setIsFavorite(false);
+                    setFavoriteId(null);
+                }
+            }
+        } catch (e) {
+            console.error('Failed to check favorite status', e);
+        }
+    };
+    checkFav();
+  }, [name]);
+
+  const toggleFavorite = async () => {
+      if (!name) return;
+      setIsTogglingFavorite(true);
+      
+      try {
+          if (isFavorite && favoriteId) {
+              await favoritesApi.remove(favoriteId);
+              setIsFavorite(false);
+              setFavoriteId(null);
+              toast({ title: 'Removed from Favorites' });
+          } else {
+              const res = await favoritesApi.add({
+                  type: 'player',
+                  itemId: id || name,
+                  name: name,
+                  sport: 'football',
+                  image: `https://images.fotmob.com/image_resources/playerimages/${id}.png`
+              });
+              if (res.success) {
+                  setIsFavorite(true);
+                  setFavoriteId(res.data._id);
+                  toast({ title: 'Added to Favorites', description: `${name} has been saved.` });
+              }
+          }
+      } catch (e) {
+          toast({ title: 'Error', description: 'Failed to update favorites', variant: 'destructive' });
+      } finally {
+          setIsTogglingFavorite(false);
+      }
+  };
 
   const extractInfo = (title: string) => {
     const item = playerInformation?.find((p: any) => p?.title?.toLowerCase() === title.toLowerCase());
@@ -1672,6 +1731,20 @@ export const FotmobPlayerCard = ({ profile, player }: { profile: any, player?: a
                         <span className="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]" style={{ backgroundColor: primaryTeam?.teamColors?.color || '#34D399' }}></span>
                         <span className="dark:text-gray-300 text-slate-700 font-bold uppercase tracking-wider text-[11px]">{primaryPos}</span>
                       </div>
+
+                      {/* Favorite Button */}
+                      <button 
+                        onClick={toggleFavorite}
+                        disabled={isTogglingFavorite}
+                        className={`flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold uppercase tracking-wider rounded-full border transition-all ${
+                            isFavorite 
+                                ? 'bg-rose-500/10 text-rose-500 border-rose-500/20 hover:bg-rose-500/20' 
+                                : 'dark:bg-[#1a1c21] bg-white dark:border-white/10 border-slate-300 dark:text-gray-300 text-slate-700 hover:bg-slate-100 dark:hover:bg-white/5 shadow-inner'
+                        }`}
+                      >
+                        <Heart size={14} fill={isFavorite ? "currentColor" : "none"} className={isTogglingFavorite ? "animate-pulse" : ""} />
+                        {isFavorite ? 'Saved' : 'Favorite'}
+                      </button>
                     </div>
                   </div>
 

@@ -7,6 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/Navbar";
 import { useEspnMatchDetail } from "@/hooks/football/useEspnQueries";
+import { usePlayerProfile } from "@/hooks/usePlayerProfile";
+import { useFotmobPlayerProfile } from "@/hooks/useFootballSquads";
+import { motion } from "framer-motion";
 
 // Mapping for country flags
 const COUNTRY_CODES: Record<string, string> = {
@@ -114,6 +117,7 @@ interface Favorite {
   itemId?: string;
   name?: string;
   image?: string;
+  status?: string;
 }
 
 const TABS = [
@@ -275,6 +279,91 @@ function FavoriteTeamCard({ team, onRemove, navigate }: { team: Favorite, onRemo
   );
 }
 
+function AthleteInfoData({ sport, itemId }: { sport: string, itemId?: string }) {
+  const isCricket = sport === 'cricket';
+  const isFootball = sport === 'football';
+
+  const { data: cricketProfile, isLoading: isCricketLoading } = usePlayerProfile(isCricket ? itemId || null : null);
+  const { data: footballProfile, isLoading: isFootballLoading } = useFotmobPlayerProfile(isFootball ? Number(itemId) || null : null);
+
+  if (isCricketLoading || isFootballLoading) {
+    return (
+      <div className="flex items-center justify-center gap-2 mt-2 border-t border-border/30 pt-4 pb-1 opacity-50">
+        <Loader2 size={12} className="animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  let role = 'Player';
+  let team = 'Unknown';
+
+  if (isCricket && cricketProfile) {
+    role = cricketProfile.role || 'Player';
+    team = cricketProfile.intlTeam || 'Unknown';
+  } else if (isFootball && footballProfile) {
+    role = footballProfile.primaryPosition || footballProfile.positionDescription?.primaryPosition?.label || 'Player';
+    team = footballProfile.primaryTeam?.teamName || 'Unknown';
+  }
+
+  return (
+    <div className="flex items-start gap-4 w-full justify-center mt-2 border-t border-border/30 pt-3">
+      <div className="flex flex-col items-center flex-1 min-w-0">
+        <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest w-full text-center">Team</span>
+        <span className="text-[10px] leading-tight mt-0.5 font-black text-foreground uppercase tracking-wider w-full text-center break-words">{team}</span>
+      </div>
+      <div className="w-px h-6 bg-border/50 shrink-0 self-center"></div>
+      <div className="flex flex-col items-center flex-1 min-w-0">
+        <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest w-full text-center">Role</span>
+        <span className="text-[10px] leading-tight mt-0.5 font-black text-[#d4af37] uppercase tracking-wider w-full text-center break-words">{role}</span>
+      </div>
+    </div>
+  );
+}
+
+function FavoritePlayerCard({ player, onRemove, navigate }: { player: Favorite, onRemove: (id: string) => void, navigate: any }) {
+  return (
+    <div
+      onClick={() => navigate('/performance-lab', { state: { targetPlayerId: player.itemId, targetPlayerName: player.name, targetTab: 'players', targetSport: player.sport } })}
+      className="group flex flex-col bg-card hover:bg-accent/5 border border-border/50 hover:border-border rounded-2xl p-5 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-foreground/5 text-[10px] font-bold uppercase tracking-widest text-foreground/80">
+          <User size={12} className="text-primary" />
+          {player.sport}
+        </span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(player._id);
+          }}
+          className="p-2 rounded-full hover:bg-rose-500/10 text-rose-500 transition-colors"
+        >
+          <Heart size={16} fill="currentColor" />
+        </button>
+      </div>
+      
+      <div className="flex flex-col items-center justify-center gap-3 py-4">
+        {player.image ? (
+          <img src={player.image} alt={player.name} className="w-20 h-20 object-cover rounded-full border-2 border-border/50 shadow-[0_0_15px_rgba(0,0,0,0.2)] group-hover:scale-110 transition-transform duration-500" />
+        ) : (
+          <div className="w-20 h-20 rounded-full bg-foreground/5 flex items-center justify-center border-2 border-border/50 group-hover:scale-110 transition-transform duration-500">
+             <User size={32} className="text-muted-foreground/40" />
+          </div>
+        )}
+        
+        <div className="flex flex-col items-center gap-1.5 mt-2 w-full">
+          <h3 className="text-lg font-black text-foreground text-center line-clamp-1 group-hover:text-[#d4af37] transition-colors">{player.name}</h3>
+          <AthleteInfoData sport={player.sport} itemId={player.itemId} />
+        </div>
+
+        <div className="mt-3 text-[10px] font-black uppercase tracking-widest text-[#d4af37] flex items-center gap-1 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+          View Analysis <span className="text-lg leading-none">&rarr;</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Favorites() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -287,7 +376,7 @@ export default function Favorites() {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const response = await favoritesApi.get();
+        const response = await favoritesApi.get() as any;
         if (response.success) {
           setFavorites(response.data);
         }
@@ -339,6 +428,12 @@ export default function Favorites() {
       (item.name?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  const filteredPlayers = favorites.filter(
+    (item) => item.type === 'player' && 
+      (activeSport === "all" || item.sport === activeSport) &&
+      (item.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
@@ -377,18 +472,21 @@ export default function Favorites() {
                 </h1>
               </div>
               <p className="text-sm text-muted-foreground mt-2 font-medium tracking-wide uppercase">
-                {favorites.length} {favorites.length === 1 ? "match" : "matches"} saved
+                {activeTab === 'matches' && `${filteredMatches.length} ${filteredMatches.length === 1 ? "match" : "matches"} saved`}
+                {activeTab === 'teams' && `${filteredTeams.length} ${filteredTeams.length === 1 ? "team" : "teams"} saved`}
+                {activeTab === 'players' && `${filteredPlayers.length} ${filteredPlayers.length === 1 ? "player" : "players"} saved`}
+                {activeTab === 'leagues' && `0 leagues saved`}
               </p>
             </div>
 
-            {favorites.length > 0 && activeTab === 'matches' && (
+            {favorites.length > 0 && (
               <div className="relative w-full md:w-72 group">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <Search size={16} className="text-muted-foreground group-focus-within:text-[#d4af37] transition-colors" />
                 </div>
                 <input
                   type="text"
-                  placeholder="Search matches..."
+                  placeholder={`Search ${activeTab}...`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-foreground/[0.02] border-b border-border hover:border-foreground/30 focus:border-[#d4af37] text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all rounded-t-md"
@@ -415,19 +513,26 @@ export default function Favorites() {
             ))}
           </div>
 
-          {activeTab === 'matches' && favorites.length > 0 && (
-            <div className="flex items-center gap-2 mb-8 overflow-x-auto scrollbar-hide pb-2">
+          {favorites.length > 0 && (
+            <div className="flex items-center gap-1.5 mb-8 overflow-x-auto scrollbar-hide bg-card/50 backdrop-blur-md p-1.5 rounded-xl border border-border/30 w-fit shadow-sm relative">
               {['all', 'football', 'cricket', 'basketball', 'tennis'].map((sport) => (
                 <button
                   key={sport}
                   onClick={() => setActiveSport(sport)}
-                  className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap shrink-0 border ${
+                  className={`px-5 py-2.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap shrink-0 relative z-10 ${
                     activeSport === sport
-                      ? 'bg-foreground text-background border-foreground shadow-md'
-                      : 'bg-transparent text-muted-foreground border-border/50 hover:border-foreground/30 hover:text-foreground'
+                      ? 'text-background'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  {sport === 'all' ? 'All Sports' : sport}
+                  {activeSport === sport && (
+                    <motion.div 
+                      layoutId="activeSportFilter" 
+                      className="absolute inset-0 bg-foreground rounded-lg -z-10" 
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className="relative z-20">{sport === 'all' ? 'All Sports' : sport}</span>
                 </button>
               ))}
             </div>
@@ -487,10 +592,33 @@ export default function Favorites() {
                 ))}
               </div>
             )
+          ) : activeTab === 'players' ? (
+            filteredPlayers.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+                <div className="w-16 h-16 mb-4 flex items-center justify-center rounded-2xl bg-foreground/5 border border-border/50">
+                  <User className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">No favorite players yet</h3>
+                <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-6">
+                  Keep track of your favorite players.
+                </p>
+                <button
+                  onClick={() => navigate("/performance-lab")}
+                  className="px-6 py-2.5 bg-foreground text-background text-sm font-bold uppercase tracking-wider rounded-full hover:bg-foreground/90 transition-colors"
+                >
+                  Browse Players
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-6">
+                {filteredPlayers.map((player) => (
+                  <FavoritePlayerCard key={player._id} player={player} onRemove={removeFavorite} navigate={navigate} />
+                ))}
+              </div>
+            )
           ) : (
             <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
               <div className="w-16 h-16 mb-4 flex items-center justify-center rounded-2xl bg-foreground/5 border border-border/50">
-                {activeTab === 'players' && <User className="w-6 h-6 text-muted-foreground" />}
                 {activeTab === 'leagues' && <Medal className="w-6 h-6 text-muted-foreground" />}
               </div>
               <h3 className="text-lg font-bold text-foreground mb-2">

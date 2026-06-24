@@ -1,9 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
     Star, TrendingUp, Target, Award, Zap, Flame,
     Calendar, BarChart3, Trophy, Shield, Swords, Activity,
-    RefreshCw, Wifi, AlertTriangle, Loader2, Compass,
+    RefreshCw, Wifi, AlertTriangle, Loader2, Compass, Heart,
 } from "lucide-react";
 import {
     ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
@@ -21,6 +21,8 @@ import type { BattingFormatKey, PlayerBattingFormat } from '@/types/playerBattin
 import type { BowlingFormatKey, PlayerBowlingFormat } from '@/types/playerBowlingTypes';
 import { FORMAT_LABELS, FORMAT_COLORS, generateChartData, generateFormatBoundaryData, generateFormatRadarData } from '@/utils/playerStatsTransformer';
 import { BOWLING_FORMAT_COLORS, BOWLING_FORMAT_LABELS, generateBowlingChartData, generateBowlingFormatRadarData, generateBowlingDerivedStats } from '@/utils/playerBowlingStatsTransformer';
+import { favoritesApi } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
 type StatsView = 'batting' | 'bowling';
 
@@ -950,6 +952,10 @@ export const PlayerAnalysisPanel = ({ activeSport }: { activeSport: AnalysisSpor
     const [apiBattingFormat, setApiBattingFormat] = useState<BattingFormatKey>('odi');
     const [statsView, setStatsView] = useState<StatsView>('batting');
     const [showCountrySelect, setShowCountrySelect] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteId, setFavoriteId] = useState<string | null>(null);
+    const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+    const { toast } = useToast();
 
     const allPlayers = ANALYSIS_PLAYERS[activeSport];
 
@@ -986,6 +992,61 @@ export const PlayerAnalysisPanel = ({ activeSport }: { activeSport: AnalysisSpor
     // We update the hook to use displayPlayer instead of finding it again
     const selectedPlayer = displayPlayer;
     const sportConfig = SPORT_LABELS[activeSport];
+
+    useEffect(() => {
+        if (!selectedPlayer) return;
+        
+        const checkFav = async () => {
+            try {
+                const allFavs = await favoritesApi.get();
+                if (allFavs.success) {
+                    const fav = allFavs.data.find((f: any) => f.type === 'player' && f.itemId === selectedPlayer.id);
+                    if (fav) {
+                        setIsFavorite(true);
+                        setFavoriteId(fav._id);
+                    } else {
+                        setIsFavorite(false);
+                        setFavoriteId(null);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to check favorite status', e);
+            }
+        };
+        checkFav();
+    }, [selectedPlayer.id]);
+
+    const toggleFavorite = async () => {
+        if (!selectedPlayer) return;
+        setIsTogglingFavorite(true);
+        
+        try {
+            if (isFavorite && favoriteId) {
+                await favoritesApi.remove(favoriteId);
+                setIsFavorite(false);
+                setFavoriteId(null);
+                toast({ title: 'Removed from Favorites' });
+            } else {
+                const playerPhoto = PLAYER_PHOTOS[selectedPlayer.id];
+                const res = await favoritesApi.add({
+                    type: 'player',
+                    itemId: selectedPlayer.id,
+                    name: selectedPlayer.name,
+                    sport: activeSport,
+                    image: playerPhoto
+                });
+                if (res.success) {
+                    setIsFavorite(true);
+                    setFavoriteId(res.data._id);
+                    toast({ title: 'Added to Favorites', description: `${selectedPlayer.name} has been saved.` });
+                }
+            }
+        } catch (e) {
+            toast({ title: 'Error', description: 'Failed to update favorites', variant: 'destructive' });
+        } finally {
+            setIsTogglingFavorite(false);
+        }
+    };
 
     const radarData = useMemo(() =>
         Object.entries(selectedPlayer.attributes).map(([key, value]) => ({ attribute: key, value, fullMark: 100 })),
@@ -1219,7 +1280,22 @@ export const PlayerAnalysisPanel = ({ activeSport }: { activeSport: AnalysisSpor
                                             {getCountryFlagImg(selectedPlayer.country, "w-8 h-[22px] object-cover rounded-[3px] shadow-sm")}
                                         </div>
                                     </h2>
-                                    <p className="text-sm text-muted-foreground mt-0.5">{selectedPlayer.role} • {selectedPlayer.country}</p>
+                                    <div className="flex items-center gap-3 mt-1.5">
+                                        <p className="text-sm text-muted-foreground">{selectedPlayer.role} • {selectedPlayer.country}</p>
+                                        <button 
+                                            onClick={toggleFavorite}
+                                            disabled={isTogglingFavorite}
+                                            className={cn(
+                                                "flex items-center gap-1.5 px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-full border transition-all",
+                                                isFavorite 
+                                                    ? "bg-rose-500/10 text-rose-500 border-rose-500/20 hover:bg-rose-500/20" 
+                                                    : "bg-background/20 text-muted-foreground border-border hover:bg-background/40 hover:text-foreground"
+                                            )}
+                                        >
+                                            <Heart size={12} fill={isFavorite ? "currentColor" : "none"} className={isTogglingFavorite ? "animate-pulse" : ""} />
+                                            {isFavorite ? 'Saved' : 'Favorite'}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div className="text-right">

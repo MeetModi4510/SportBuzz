@@ -26,6 +26,16 @@ if (fs.existsSync(CACHE_FILE)) {
   }
 }
 
+const LEAGUES_CACHE_FILE = path.join(__dirname, '../cache/fotmob_leagues.json');
+let leaguesCache = {};
+if (fs.existsSync(LEAGUES_CACHE_FILE)) {
+  try {
+    leaguesCache = JSON.parse(fs.readFileSync(LEAGUES_CACHE_FILE, 'utf8'));
+  } catch (e) {
+    console.error("Error reading fotmob leagues cache", e);
+  }
+}
+
 const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 
 // Queue State
@@ -155,6 +165,83 @@ export async function getFotmobTeam(teamId) {
     await delay(2000);
     isPausedForPriority = false;
   }
+}
+
+export async function getFotmobLeague(leagueId) {
+  const cached = leaguesCache[leagueId];
+  // TEMPORARILY IGNORE CACHE TO FETCH NEW STRUCTURE
+  if (false && cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+    return cached.data;
+  }
+
+  console.log(`[League Scraper] Fetching league ${leagueId} on-demand...`);
+  let browser = null;
+  try {
+    browser = await puppeteer.launch({ 
+      headless: "new", 
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    });
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36');
+    
+    await page.goto(`https://www.fotmob.com/leagues/${leagueId}/overview/league`, { waitUntil: 'domcontentloaded', timeout: 45000 });
+    
+    // Wait for the __NEXT_DATA__ element explicitly
+    await page.waitForSelector('#__NEXT_DATA__', { timeout: 15000 }).catch(() => {});
+    
+    const nextDataJson = await page.evaluate(() => {
+      const script = document.getElementById('__NEXT_DATA__');
+      return script ? script.innerText : null;
+    });
+
+    if (nextDataJson) {
+      const data = JSON.parse(nextDataJson);
+      const props = data.props?.pageProps;
+      
+      if (props) {
+        const leagueData = { 
+          tabs: props.tabs,
+          details: props.details,
+          table: props.table,
+          transfers: props.transfers,
+          overview: props.overview,
+          stats: props.stats,
+          fixtures: props.fixtures,
+          playoff: props.playoff,
+          seasons: props.seasons,
+          teams: [] // backward compatibility
+        };
+
+        // backward compatibility for old format: extract basic teams info if table exists
+        if (props.table && props.table[0] && props.table[0].data && props.table[0].data.table) {
+          leagueData.teams = props.table[0].data.table.all.map(row => ({
+            id: row.id,
+            name: row.name,
+            played: row.played,
+            points: row.pts
+          }));
+        }
+
+        leaguesCache[leagueId] = {
+          data: leagueData,
+          timestamp: Date.now()
+        };
+        fs.writeFileSync(LEAGUES_CACHE_FILE, JSON.stringify(leaguesCache, null, 2));
+        return leagueData;
+      }
+    }
+  } catch (error) {
+    console.error(`Error scraping league ${leagueId}:`, error.message);
+  } finally {
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (e) {
+        console.error(`Failed to gracefully close browser for league ${leagueId}:`, e.message);
+      }
+    }
+  }
+  return null;
 }
 
 // Start queue

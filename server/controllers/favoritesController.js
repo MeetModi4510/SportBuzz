@@ -115,11 +115,15 @@ export const removeFavorite = asyncHandler(async (req, res) => {
     await favorite.deleteOne();
 
     // Log activity
+    const activityDesc = favorite.type === 'match'
+        ? `Removed ${favorite.teams?.team1} vs ${favorite.teams?.team2} from favorites`
+        : `Removed ${favorite.name} from favorites`;
+
     await Activity.create({
         userId: req.user.id,
         type: 'favorite_remove',
-        description: `Removed ${favorite.teams.team1} vs ${favorite.teams.team2} from favorites`,
-        metadata: { matchId: favorite.matchId }
+        description: activityDesc,
+        metadata: favorite.type === 'match' ? { matchId: favorite.matchId } : { type: favorite.type, itemId: favorite.itemId }
     });
 
     res.json({

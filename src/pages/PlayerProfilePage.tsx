@@ -6,7 +6,7 @@ import { getTeamAcronym } from "@/lib/utils";
 import { ANALYSIS_PLAYERS, AnalysisPlayer, AnalysisSport } from "@/data/playerAnalysisData";
 import {
     Trophy, ArrowLeft, Camera, Compass, Database, Target, User as UserIcon, Zap, CircleDot, ChevronRight, Activity, TrendingUp, Shield, Sparkles,
-    Sword, ShieldAlert, ZapIcon, BarChart3, Star, Globe, Clock, Briefcase, Medal, Home, RefreshCw, Wifi, AlertTriangle, Loader2
+    Sword, ShieldAlert, ZapIcon, BarChart3, Star, Globe, Clock, Briefcase, Medal, Home, RefreshCw, Wifi, AlertTriangle, Loader2, Heart
 } from "lucide-react";
 import { WagonWheel } from '../components/WagonWheel';
 import { usePlayerBattingStatsByName } from '@/hooks/usePlayerBattingStats';
@@ -60,7 +60,7 @@ const getFlagUrl = (countryName: string) => {
     if (!code) return null;
     return `https://flagcdn.com/w80/${code}.png`;
 };
-import { playerApi } from "@/services/api";
+import { playerApi, favoritesApi } from "@/services/api";
 import { toast } from "sonner";
 import { PlayerRole } from "@/data/scoringTypes";
 
@@ -153,6 +153,9 @@ const PlayerProfilePage = () => {
     const [playerDetailTab, setPlayerDetailTab] = useState<DetailTab>(urlTab || "traits");
     const [playerStatsFormat, setPlayerStatsFormat] = useState<string>("All");
     const [apiBattingFormat, setApiBattingFormat] = useState<BattingFormatKey>('odi');
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteId, setFavoriteId] = useState<string | null>(null);
+    const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
 
     // ── Dynamic Cricbuzz Batting Stats (lazy loaded, 15-min cache) ──
     const {
@@ -173,6 +176,68 @@ const PlayerProfilePage = () => {
         if (!apiBattingStats) return null;
         return apiBattingStats[apiBattingFormat] || null;
     }, [apiBattingStats, apiBattingFormat]);
+
+    useEffect(() => {
+        if (!selectedPlayer) return;
+        
+        const checkFav = async () => {
+            try {
+                const allFavs = await favoritesApi.get();
+                if (allFavs.success) {
+                    const fav = allFavs.data.find((f: any) => f.type === 'player' && f.name === selectedPlayer.name);
+                    if (fav) {
+                        setIsFavorite(true);
+                        setFavoriteId(fav._id);
+                    } else {
+                        setIsFavorite(false);
+                        setFavoriteId(null);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to check favorite status', e);
+            }
+        };
+        checkFav();
+    }, [selectedPlayer?.name]);
+
+    const toggleFavorite = async () => {
+        if (!selectedPlayer) return;
+        setIsTogglingFavorite(true);
+        
+        try {
+            if (isFavorite && favoriteId) {
+                await favoritesApi.remove(favoriteId);
+                setIsFavorite(false);
+                setFavoriteId(null);
+                toast.success('Removed from Favorites');
+            } else {
+                let imageUrl = selectedPlayer.photo ? getImageUrl(selectedPlayer.photo) : undefined;
+                if (!imageUrl) {
+                    // Try to get photo from ANALYSIS_PLAYERS fallback if possible
+                    const mockPlayer = Object.values(ANALYSIS_PLAYERS).flat().find(p => p.name === selectedPlayer.name);
+                    if (mockPlayer && mockPlayer.photo) {
+                         imageUrl = mockPlayer.photo;
+                    }
+                }
+                const res = await favoritesApi.add({
+                    type: 'player',
+                    itemId: selectedPlayer._id || selectedPlayer.name,
+                    name: selectedPlayer.name,
+                    sport: playerSport,
+                    image: imageUrl
+                });
+                if (res.success) {
+                    setIsFavorite(true);
+                    setFavoriteId(res.data._id);
+                    toast.success('Added to Favorites');
+                }
+            }
+        } catch (e) {
+            toast.error('Failed to update favorites');
+        } finally {
+            setIsTogglingFavorite(false);
+        }
+    };
 
     // Auto-select first available format when API data arrives
     useEffect(() => {
@@ -396,6 +461,18 @@ const PlayerProfilePage = () => {
                                             <span className="px-5 py-1.5 bg-slate-800 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-slate-700">
                                                 ID: {selectedPlayer._id?.toUpperCase() || 'N/A'}
                                             </span>
+                                            <button 
+                                                onClick={toggleFavorite}
+                                                disabled={isTogglingFavorite}
+                                                className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] rounded-full border transition-all ${
+                                                    isFavorite 
+                                                        ? 'bg-rose-500/10 text-rose-500 border-rose-500/20 hover:bg-rose-500/20' 
+                                                        : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 hover:text-white'
+                                                }`}
+                                            >
+                                                <Heart size={14} fill={isFavorite ? "currentColor" : "none"} className={isTogglingFavorite ? "animate-pulse" : ""} />
+                                                {isFavorite ? 'Saved' : 'Favorite'}
+                                            </button>
                                         </div>
 
                                         <h2 className="text-4xl md:text-6xl font-black text-white tracking-widest uppercase mb-4 drop-shadow-lg">
