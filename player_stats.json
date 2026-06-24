@@ -1,1 +1,4778 @@
-{"CompId":"65","CompN":"Premier League","CompD":"England","CompUrlName":"premier-league","CompST":"England","Cnm":"England","CnmT":"england","Feed":{"Id":"cp:65","Items":["cp:65-a:1781276994646","cp:65-a:3454544","cp:65-a:3455816","cp:65-a:3455804","cp:65-a:3455802"]},"Stat":[{"Typ":1,"Plrs":[{"Pnm":"Erling Haaland","Aid":"15419","Pid":"15419","Fn":"Erling","Ln":"Haaland","Pnt":"erling-haaland","imageUrl":"29179241.png","Rnk":1,"Tid":"12633","Tnm":"Manchester City","Scrs":{"1":"27"},"Img":"enet/8456.png"},{"Pnm":"Igor Thiago","Aid":"31368","Pid":"31368","Fn":"Igor","Ln":"Thiago","Pnt":"igor-thiago","imageUrl":"19409389.png","Rnk":2,"Tid":"2865","Tnm":"Brentford","Scrs":{"1":"22"},"Img":"enet/9937.png"},{"Pnm":"Antoine Semenyo","Aid":"37399","Pid":"37399","Fn":"Antoine","Ln":"Semenyo","Pnt":"antoine-semenyo","imageUrl":"29194724.png","Rnk":3,"Tid":"12633","Tnm":"Manchester City","Scrs":{"1":"17"},"Img":"enet/8456.png"},{"Pnm":"Ollie Watkins","Aid":"30503","Pid":"30503","Fn":"Ollie","Ln":"Watkins","Pnt":"ollie-watkins","imageUrl":"29110623.png","Rnk":4,"Tid":"3863","Tnm":"Aston Villa","Scrs":{"1":"16"},"Img":"teambadge/aston-villa-2024.png"},{"Pnm":"Morgan Gibbs-White","Aid":"1697","Pid":"1697","Fn":"Morgan","Ln":"Gibbs-White","Pnt":"morgan-gibbs-white","imageUrl":"29175220.png","Rnk":5,"Tid":"3060","Tnm":"Nottingham Forest","Scrs":{"1":"15"},"Img":"enet/10203.png"}]},{"Typ":3,"Plrs":[{"Pnm":"Bruno Fernandes","Aid":"27772","Pid":"27772","Fn":"Bruno","Ln":"Fernandes","Pnt":"bruno-fernandes","imageUrl":"43124203.png","Rnk":1,"Tid":"2810","Tnm":"Manchester United","Scrs":{"3":"21"},"Img":"enet/10260.png"},{"Pnm":"Rayan Cherki","Aid":"2307","Pid":"2307","Fn":"Rayan","Ln":"Cherki","Pnt":"rayan-cherki","imageUrl":"49056279.png","Rnk":2,"Tid":"12633","Tnm":"Manchester City","Scrs":{"3":"12"},"Img":"enet/8456.png"},{"Pnm":"Jarrod Bowen","Aid":"29266","Pid":"29266","Fn":"Jarrod","Ln":"Bowen","Pnt":"jarrod-bowen","imageUrl":"29125842.png","Rnk":3,"Tid":"252","Tnm":"West Ham United","Scrs":{"3":"11"},"Img":"enet/8654.png"},{"Pnm":"Erling Haaland","Aid":"15419","Pid":"15419","Fn":"Erling","Ln":"Haaland","Pnt":"erling-haaland","imageUrl":"29179241.png","Rnk":4,"Tid":"12633","Tnm":"Manchester City","Scrs":{"3":"8"},"Img":"enet/8456.png"},{"Pnm":"James Garner","Aid":"1615","Pid":"1615","Fn":"James","Ln":"Garner","Pnt":"james-garner","imageUrl":"28115831.png","Rnk":5,"Tid":"2917","Tnm":"Everton","Scrs":{"3":"7"},"Img":"enet/8668.png"}]},{"Typ":4,"Plrs":[{"Pnm":"Wesley Fofana","Aid":"22678","Pid":"22678","Fn":"Wesley","Ln":"Fofana","Pnt":"wesley-fofana","imageUrl":"49037900.png","Rnk":1,"Tid":"2881","Tnm":"Chelsea","Scrs":{"4":"2"},"Img":"enet/8455.png"},{"Pnm":"Cristian Romero","Aid":"26063","Pid":"26063","Fn":"Cristian","Ln":"Romero","Pnt":"cristian-romero","imageUrl":"14130029.png","Rnk":1,"Tid":"3339","Tnm":"Tottenham Hotspur","Scrs":{"4":"2"},"Img":"teambadge/tottenham-hotspur-2024.png"},{"Pnm":"Emmanuel Agbadou","Aid":"19694","Pid":"19694","Fn":"Emmanuel","Ln":"Agbadou","Pnt":"emmanuel-agbadou","imageUrl":"12078577.png","Rnk":3,"Tid":"2985","Tnm":"Wolves","Scrs":{"4":"1"},"Img":"enet/8602.png"},{"Pnm":"Joachim Andersen","Aid":"31702","Pid":"31702","Fn":"Joachim","Ln":"Andersen","Pnt":"joachim-andersen","imageUrl":"27069975.png","Rnk":3,"Tid":"2872","Tnm":"Fulham","Scrs":{"4":"1"},"Img":"enet/9879.png"},{"Pnm":"Daniel Ballard","Aid":"33520","Pid":"33520","Fn":"Daniel","Ln":"Ballard","Pnt":"daniel-ballard","imageUrl":"28110835.png","Rnk":3,"Tid":"2949","Tnm":"Sunderland","Scrs":{"4":"1"},"Img":"enet/8472.png"}]},{"Typ":6,"Plrs":[{"Pnm":"André","Aid":"5525","Pid":"5525","Ln":"André","Snm":"André","Pnt":"andre","imageUrl":"19375640.png","Rnk":1,"Tid":"2985","Tnm":"Wolves","Scrs":{"6":"12"},"Img":"enet/8602.png"},{"Pnm":"James Garner","Aid":"1615","Pid":"1615","Fn":"James","Ln":"Garner","Pnt":"james-garner","imageUrl":"28115831.png","Rnk":1,"Tid":"2917","Tnm":"Everton","Scrs":{"6":"12"},"Img":"enet/8668.png"},{"Pnm":"Moisés Caicedo","Aid":"21192","Pid":"21192","Fn":"Moisés","Ln":"Caicedo","Pnt":"moises-caicedo","imageUrl":"86078360.png","Rnk":3,"Tid":"2881","Tnm":"Chelsea","Scrs":{"6":"11"},"Img":"enet/8455.png"},{"Pnm":"Yerson Mosquera","Aid":"21159","Pid":"21159","Fn":"Yerson","Ln":"Mosquera","Pnt":"yerson-mosquera","imageUrl":"76065062.png","Rnk":3,"Tid":"2985","Tnm":"Wolves","Scrs":{"6":"11"},"Img":"enet/8602.png"},{"Pnm":"Ethan Ampadu","Aid":"15744","Pid":"15744","Fn":"Ethan","Ln":"Ampadu","Pnt":"ethan-ampadu","imageUrl":"29175064.png","Rnk":5,"Tid":"3143","Tnm":"Leeds United","Scrs":{"6":"10"},"Img":"enet/8463.png"}]},{"Typ":8,"Plrs":[{"Pnm":"Erling Haaland","Aid":"15419","Pid":"15419","Fn":"Erling","Ln":"Haaland","Pnt":"erling-haaland","imageUrl":"29179241.png","Rnk":1,"Tid":"12633","Tnm":"Manchester City","Scrs":{"8":"59"},"Img":"enet/8456.png"},{"Pnm":"Igor Thiago","Aid":"31368","Pid":"31368","Fn":"Igor","Ln":"Thiago","Pnt":"igor-thiago","imageUrl":"19409389.png","Rnk":2,"Tid":"2865","Tnm":"Brentford","Scrs":{"8":"43"},"Img":"enet/9937.png"},{"Pnm":"Antoine Semenyo","Aid":"37399","Pid":"37399","Fn":"Antoine","Ln":"Semenyo","Pnt":"antoine-semenyo","imageUrl":"29194724.png","Rnk":3,"Tid":"12633","Tnm":"Manchester City","Scrs":{"8":"41"},"Img":"enet/8456.png"},{"Pnm":"Ollie Watkins","Aid":"30503","Pid":"30503","Fn":"Ollie","Ln":"Watkins","Pnt":"ollie-watkins","imageUrl":"29110623.png","Rnk":4,"Tid":"3863","Tnm":"Aston Villa","Scrs":{"8":"38"},"Img":"teambadge/aston-villa-2024.png"},{"Pnm":"Matheus Cunha","Aid":"18924","Pid":"18924","Fn":"Matheus","Ln":"Cunha","Pnt":"matheus-cunha","imageUrl":"19334410.png","Rnk":5,"Tid":"2810","Tnm":"Manchester United","Scrs":{"8":"35"},"Img":"enet/10260.png"}]}]}
+{
+  "teamId": "6706",
+  "primaryLeagueId": 77,
+  "primarySeasonId": "24254",
+  "players": [
+    {
+      "header": "Top scorer",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 5,
+        "stat": {
+          "name": "goals",
+          "value": 5,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/goals.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 5,
+          "stat": {
+            "name": "goals",
+            "value": 5,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 1,
+      "name": "goals",
+      "localizedTitleId": "goals_title",
+      "category": "Top Stat"
+    },
+    {
+      "header": "Assists",
+      "participant": {
+        "id": 812652,
+        "name": "Facundo Medina",
+        "rank": 57,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 1,
+        "stat": {
+          "name": "goal_assist",
+          "value": 1,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/goal_assist.json",
+      "topThree": [
+        {
+          "id": 812652,
+          "name": "Facundo Medina",
+          "rank": 57,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "goal_assist",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 841672,
+          "name": "Nicolás González",
+          "rank": 72,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "goal_assist",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 324578,
+          "name": "Rodrigo De Paul",
+          "rank": 72,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "goal_assist",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 2,
+      "name": "goal_assist",
+      "localizedTitleId": "goal_assist_title",
+      "category": "Top Stat"
+    },
+    {
+      "header": "Goals + Assists",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 5,
+        "stat": {
+          "name": "_goals_and_goal_assist",
+          "value": 5,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/_goals_and_goal_assist.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 5,
+          "stat": {
+            "name": "_goals_and_goal_assist",
+            "value": 5,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 841672,
+          "name": "Nicolás González",
+          "rank": 100,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "_goals_and_goal_assist",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 812652,
+          "name": "Facundo Medina",
+          "rank": 129,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "_goals_and_goal_assist",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 3,
+      "name": "_goals_and_goal_assist",
+      "localizedTitleId": "goals_and_assists",
+      "category": "Top Stat"
+    },
+    {
+      "header": "FotMob rating",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 9.18,
+        "stat": {
+          "name": "rating",
+          "value": 9.18,
+          "format": "fraction",
+          "fractions": 2
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/rating.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 9.18,
+          "stat": {
+            "name": "rating",
+            "value": 9.18,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 72,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 7.67,
+          "stat": {
+            "name": "rating",
+            "value": 7.67,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 847983,
+          "name": "Lisandro Martínez",
+          "rank": 89,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 7.62,
+          "stat": {
+            "name": "rating",
+            "value": 7.62,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 4,
+      "name": "rating",
+      "localizedTitleId": "rating_title",
+      "category": "Top Stat"
+    },
+    {
+      "header": "Minutes played",
+      "participant": {
+        "id": 831489,
+        "name": "Alexis Mac Allister",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 180,
+        "stat": {
+          "name": "mins_played",
+          "value": 180,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/mins_played.json",
+      "topThree": [
+        {
+          "id": 831489,
+          "name": "Alexis Mac Allister",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 180,
+          "stat": {
+            "name": "mins_played",
+            "value": 180,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 268375,
+          "name": "Emiliano Martínez",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 180,
+          "stat": {
+            "name": "mins_played",
+            "value": 180,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 180,
+          "stat": {
+            "name": "mins_played",
+            "value": 180,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 5,
+      "name": "mins_played",
+      "localizedTitleId": "minutes_played",
+      "category": "Top Stat"
+    },
+    {
+      "header": "Goals per 90",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 2.65,
+        "stat": {
+          "name": "goals_per_90",
+          "value": 2.65,
+          "format": "fraction",
+          "fractions": 2
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/goals_per_90.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 2.65,
+          "stat": {
+            "name": "goals_per_90",
+            "value": 2.65,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 11,
+      "name": "goals_per_90",
+      "localizedTitleId": "goals_per_90_title",
+      "category": "Attacking"
+    },
+    {
+      "header": "Expected goals (xG)",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 2,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 2.6,
+        "stat": {
+          "name": "expected_goals",
+          "value": 2.6,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/expected_goals.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 2,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 2.6,
+          "stat": {
+            "name": "expected_goals",
+            "value": 2.6,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 974753,
+          "name": "Julián Álvarez",
+          "rank": 97,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.4,
+          "stat": {
+            "name": "expected_goals",
+            "value": 0.4,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 841672,
+          "name": "Nicolás González",
+          "rank": 120,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.3,
+          "stat": {
+            "name": "expected_goals",
+            "value": 0.3,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 12,
+      "name": "expected_goals",
+      "localizedTitleId": "expected_goals",
+      "category": "Attacking"
+    },
+    {
+      "header": "Expected goals (xG) per 90",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 3,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 1.36,
+        "stat": {
+          "name": "expected_goals_per_90",
+          "value": 1.36,
+          "format": "fraction",
+          "fractions": 2
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/expected_goals_per_90.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 3,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1.36,
+          "stat": {
+            "name": "expected_goals_per_90",
+            "value": 1.36,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 690230,
+          "name": "Lautaro Martínez",
+          "rank": 161,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.09,
+          "stat": {
+            "name": "expected_goals_per_90",
+            "value": 0.09,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 174,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.08,
+          "stat": {
+            "name": "expected_goals_per_90",
+            "value": 0.08,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 13,
+      "name": "expected_goals_per_90",
+      "localizedTitleId": "expected_goals_per_90",
+      "category": "Attacking"
+    },
+    {
+      "header": "Expected goals on target (xGOT)",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 3.1,
+        "stat": {
+          "name": "expected_goalsontarget",
+          "value": 3.1,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/expected_goalsontarget.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 3.1,
+          "stat": {
+            "name": "expected_goalsontarget",
+            "value": 3.1,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 974753,
+          "name": "Julián Álvarez",
+          "rank": 112,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.3,
+          "stat": {
+            "name": "expected_goalsontarget",
+            "value": 0.3,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 690230,
+          "name": "Lautaro Martínez",
+          "rank": 112,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.3,
+          "stat": {
+            "name": "expected_goalsontarget",
+            "value": 0.3,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 14,
+      "name": "expected_goalsontarget",
+      "localizedTitleId": "expected_goals_on_target_variant",
+      "category": "Attacking"
+    },
+    {
+      "header": "Shots on target per 90",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 4.2,
+        "stat": {
+          "name": "ontarget_scoring_att",
+          "value": 4.2,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/ontarget_scoring_att.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 4.2,
+          "stat": {
+            "name": "ontarget_scoring_att",
+            "value": 4.2,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 690230,
+          "name": "Lautaro Martínez",
+          "rank": 86,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.8,
+          "stat": {
+            "name": "ontarget_scoring_att",
+            "value": 0.8,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 831489,
+          "name": "Alexis Mac Allister",
+          "rank": 139,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.5,
+          "stat": {
+            "name": "ontarget_scoring_att",
+            "value": 0.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 15,
+      "name": "ontarget_scoring_att",
+      "localizedTitleId": "shots_on_target_per_90",
+      "category": "Attacking"
+    },
+    {
+      "header": "Shots per 90",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 2,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 6.9,
+        "stat": {
+          "name": "total_scoring_att",
+          "value": 6.9,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/total_scoring_att.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 2,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 6.9,
+          "stat": {
+            "name": "total_scoring_att",
+            "value": 6.9,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 831489,
+          "name": "Alexis Mac Allister",
+          "rank": 189,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "total_scoring_att",
+            "value": 1,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 189,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "total_scoring_att",
+            "value": 1,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 16,
+      "name": "total_scoring_att",
+      "localizedTitleId": "shots_per_90",
+      "category": "Attacking"
+    },
+    {
+      "header": "Accurate passes per 90",
+      "participant": {
+        "id": 789066,
+        "name": "Cristian Romero",
+        "rank": 38,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 72.9,
+        "stat": {
+          "name": "accurate_pass",
+          "value": 72.9,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/accurate_pass.json",
+      "topThree": [
+        {
+          "id": 789066,
+          "name": "Cristian Romero",
+          "rank": 38,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 72.9,
+          "stat": {
+            "name": "accurate_pass",
+            "value": 72.9,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 847983,
+          "name": "Lisandro Martínez",
+          "rank": 53,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 66.5,
+          "stat": {
+            "name": "accurate_pass",
+            "value": 66.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 67,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 63,
+          "stat": {
+            "name": "accurate_pass",
+            "value": 63,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 17,
+      "name": "accurate_pass",
+      "localizedTitleId": "accurate_pass_per_90",
+      "category": "Attacking"
+    },
+    {
+      "header": "Big chances created",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 17,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 2,
+        "stat": {
+          "name": "big_chance_created",
+          "value": 2,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/big_chance_created.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 17,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 2,
+          "stat": {
+            "name": "big_chance_created",
+            "value": 2,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 18,
+      "name": "big_chance_created",
+      "localizedTitleId": "big_chance_created_team_title",
+      "category": "Attacking"
+    },
+    {
+      "header": "Chances created",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 50,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 4,
+        "stat": {
+          "name": "total_att_assist",
+          "value": 4,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/total_att_assist.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 50,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 4,
+          "stat": {
+            "name": "total_att_assist",
+            "value": 4,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 174,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 2,
+          "stat": {
+            "name": "total_att_assist",
+            "value": 2,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 841672,
+          "name": "Nicolás González",
+          "rank": 276,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "total_att_assist",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 19,
+      "name": "total_att_assist",
+      "localizedTitleId": "chances_created",
+      "category": "Attacking"
+    },
+    {
+      "header": "Accurate long balls per 90",
+      "participant": {
+        "id": 1137705,
+        "name": "Enzo Fernández",
+        "rank": 114,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 2.5,
+        "stat": {
+          "name": "accurate_long_balls",
+          "value": 2.5,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/accurate_long_balls.json",
+      "topThree": [
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 114,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 2.5,
+          "stat": {
+            "name": "accurate_long_balls",
+            "value": 2.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 831489,
+          "name": "Alexis Mac Allister",
+          "rank": 193,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1.5,
+          "stat": {
+            "name": "accurate_long_balls",
+            "value": 1.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 224,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1.1,
+          "stat": {
+            "name": "accurate_long_balls",
+            "value": 1.1,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 20,
+      "name": "accurate_long_balls",
+      "localizedTitleId": "accurate_long_balls_title",
+      "category": "Attacking"
+    },
+    {
+      "header": "Expected assist (xA)",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 31,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 0.6,
+        "stat": {
+          "name": "expected_assists",
+          "value": 0.6,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/expected_assists.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 31,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.6,
+          "stat": {
+            "name": "expected_assists",
+            "value": 0.6,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 847983,
+          "name": "Lisandro Martínez",
+          "rank": 131,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.2,
+          "stat": {
+            "name": "expected_assists",
+            "value": 0.2,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 812652,
+          "name": "Facundo Medina",
+          "rank": 183,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.1,
+          "stat": {
+            "name": "expected_assists",
+            "value": 0.1,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 21,
+      "name": "expected_assists",
+      "localizedTitleId": "expected_assists",
+      "category": "Attacking"
+    },
+    {
+      "header": "Expected assist (xA) per 90",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 41,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 0.3,
+        "stat": {
+          "name": "expected_assists_per_90",
+          "value": 0.3,
+          "format": "fraction",
+          "fractions": 2
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/expected_assists_per_90.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 41,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.3,
+          "stat": {
+            "name": "expected_assists_per_90",
+            "value": 0.3,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 847983,
+          "name": "Lisandro Martínez",
+          "rank": 127,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.11,
+          "stat": {
+            "name": "expected_assists_per_90",
+            "value": 0.11,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 209,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.05,
+          "stat": {
+            "name": "expected_assists_per_90",
+            "value": 0.05,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 22,
+      "name": "expected_assists_per_90",
+      "localizedTitleId": "expected_assists_per_90",
+      "category": "Attacking"
+    },
+    {
+      "header": "xG + xA per 90",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 1.66,
+        "stat": {
+          "name": "_expected_goals_and_expected_assists_per_90",
+          "value": 1.66,
+          "format": "fraction",
+          "fractions": 2
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/_expected_goals_and_expected_assists_per_90.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1.66,
+          "stat": {
+            "name": "_expected_goals_and_expected_assists_per_90",
+            "value": 1.66,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 225,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.14,
+          "stat": {
+            "name": "_expected_goals_and_expected_assists_per_90",
+            "value": 0.14,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 690230,
+          "name": "Lautaro Martínez",
+          "rank": 251,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.11,
+          "stat": {
+            "name": "_expected_goals_and_expected_assists_per_90",
+            "value": 0.11,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 23,
+      "name": "_expected_goals_and_expected_assists_per_90",
+      "localizedTitleId": "xg_and_xa_per_90",
+      "category": "Attacking"
+    },
+    {
+      "header": "Successful dribbles per 90",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 68,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 1.6,
+        "stat": {
+          "name": "won_contest",
+          "value": 1.6,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/won_contest.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 68,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1.6,
+          "stat": {
+            "name": "won_contest",
+            "value": 1.6,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 726345,
+          "name": "Nahuel Molina",
+          "rank": 92,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1.3,
+          "stat": {
+            "name": "won_contest",
+            "value": 1.3,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 324578,
+          "name": "Rodrigo De Paul",
+          "rank": 210,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.5,
+          "stat": {
+            "name": "won_contest",
+            "value": 0.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 24,
+      "name": "won_contest",
+      "localizedTitleId": "won_contest_per_90",
+      "category": "Attacking"
+    },
+    {
+      "header": "Big chances missed",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 25,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 1,
+        "stat": {
+          "name": "big_chance_missed",
+          "value": 1,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/big_chance_missed.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 25,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "big_chance_missed",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 974753,
+          "name": "Julián Álvarez",
+          "rank": 38,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "big_chance_missed",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 841672,
+          "name": "Nicolás González",
+          "rank": 38,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "big_chance_missed",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 25,
+      "name": "big_chance_missed",
+      "localizedTitleId": "big_chance_missed_title",
+      "category": "Attacking"
+    },
+    {
+      "header": "Penalties won",
+      "participant": {
+        "id": 690230,
+        "name": "Lautaro Martínez",
+        "rank": 2,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 1,
+        "stat": {
+          "name": "penalty_won",
+          "value": 1,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/penalty_won.json",
+      "topThree": [
+        {
+          "id": 690230,
+          "name": "Lautaro Martínez",
+          "rank": 2,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "penalty_won",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 26,
+      "name": "penalty_won",
+      "localizedTitleId": "penalty_won_title",
+      "category": "Attacking"
+    },
+    {
+      "header": "Defensive actions per 90",
+      "participant": {
+        "id": 789066,
+        "name": "Cristian Romero",
+        "rank": 77,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 8.5,
+        "stat": {
+          "name": "defensive_contributions",
+          "value": 8.5,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/defensive_contributions.json",
+      "topThree": [
+        {
+          "id": 789066,
+          "name": "Cristian Romero",
+          "rank": 77,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 8.5,
+          "stat": {
+            "name": "defensive_contributions",
+            "value": 8.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 847983,
+          "name": "Lisandro Martínez",
+          "rank": 99,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 7.5,
+          "stat": {
+            "name": "defensive_contributions",
+            "value": 7.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 812652,
+          "name": "Facundo Medina",
+          "rank": 129,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 6.8,
+          "stat": {
+            "name": "defensive_contributions",
+            "value": 6.8,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 27,
+      "name": "defensive_contributions",
+      "localizedTitleId": "defensive_actions_per_90",
+      "category": "Defending"
+    },
+    {
+      "header": "Tackles per 90",
+      "participant": {
+        "id": 955271,
+        "name": "Thiago Almada",
+        "rank": 32,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 3.8,
+        "stat": {
+          "name": "total_tackle",
+          "value": 3.8,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/total_tackle.json",
+      "topThree": [
+        {
+          "id": 955271,
+          "name": "Thiago Almada",
+          "rank": 32,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 3.8,
+          "stat": {
+            "name": "total_tackle",
+            "value": 3.8,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 53,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 3,
+          "stat": {
+            "name": "total_tackle",
+            "value": 3,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 812652,
+          "name": "Facundo Medina",
+          "rank": 85,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 2.6,
+          "stat": {
+            "name": "total_tackle",
+            "value": 2.6,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 28,
+      "name": "total_tackle",
+      "localizedTitleId": "tackle_per_90",
+      "category": "Defending"
+    },
+    {
+      "header": "Interceptions per 90",
+      "participant": {
+        "id": 726345,
+        "name": "Nahuel Molina",
+        "rank": 50,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 2,
+        "stat": {
+          "name": "interception",
+          "value": 2,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/interception.json",
+      "topThree": [
+        {
+          "id": 726345,
+          "name": "Nahuel Molina",
+          "rank": 50,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 2,
+          "stat": {
+            "name": "interception",
+            "value": 2,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 831489,
+          "name": "Alexis Mac Allister",
+          "rank": 85,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1.5,
+          "stat": {
+            "name": "interception",
+            "value": 1.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 85,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1.5,
+          "stat": {
+            "name": "interception",
+            "value": 1.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 29,
+      "name": "interception",
+      "localizedTitleId": "interception_title",
+      "category": "Defending"
+    },
+    {
+      "header": "Clearances per 90",
+      "participant": {
+        "id": 847983,
+        "name": "Lisandro Martínez",
+        "rank": 43,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 5.5,
+        "stat": {
+          "name": "effective_clearance",
+          "value": 5.5,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/effective_clearance.json",
+      "topThree": [
+        {
+          "id": 847983,
+          "name": "Lisandro Martínez",
+          "rank": 43,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 5.5,
+          "stat": {
+            "name": "effective_clearance",
+            "value": 5.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 789066,
+          "name": "Cristian Romero",
+          "rank": 74,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 4.6,
+          "stat": {
+            "name": "effective_clearance",
+            "value": 4.6,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 812652,
+          "name": "Facundo Medina",
+          "rank": 138,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 3.1,
+          "stat": {
+            "name": "effective_clearance",
+            "value": 3.1,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 30,
+      "name": "effective_clearance",
+      "localizedTitleId": "effective_clearance_per_90",
+      "category": "Defending"
+    },
+    {
+      "header": "Blocks per 90",
+      "participant": {
+        "id": 789066,
+        "name": "Cristian Romero",
+        "rank": 73,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 0.7,
+        "stat": {
+          "name": "outfielder_block",
+          "value": 0.7,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/outfielder_block.json",
+      "topThree": [
+        {
+          "id": 789066,
+          "name": "Cristian Romero",
+          "rank": 73,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.7,
+          "stat": {
+            "name": "outfielder_block",
+            "value": 0.7,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 812652,
+          "name": "Facundo Medina",
+          "rank": 105,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.5,
+          "stat": {
+            "name": "outfielder_block",
+            "value": 0.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 31,
+      "name": "outfielder_block",
+      "localizedTitleId": "outfielder_block_title",
+      "category": "Defending"
+    },
+    {
+      "header": "Recoveries per 90",
+      "participant": {
+        "id": 1137705,
+        "name": "Enzo Fernández",
+        "rank": 44,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 7,
+        "stat": {
+          "name": "ball_recovery",
+          "value": 7,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/ball_recovery.json",
+      "topThree": [
+        {
+          "id": 1137705,
+          "name": "Enzo Fernández",
+          "rank": 44,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 7,
+          "stat": {
+            "name": "ball_recovery",
+            "value": 7,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 955271,
+          "name": "Thiago Almada",
+          "rank": 78,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 6.1,
+          "stat": {
+            "name": "ball_recovery",
+            "value": 6.1,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 324578,
+          "name": "Rodrigo De Paul",
+          "rank": 146,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 5.2,
+          "stat": {
+            "name": "ball_recovery",
+            "value": 5.2,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 32,
+      "name": "ball_recovery",
+      "localizedTitleId": "recoveries_per_90",
+      "category": "Defending"
+    },
+    {
+      "header": "Possession won final 3rd per 90",
+      "participant": {
+        "id": 30981,
+        "name": "Lionel Messi",
+        "rank": 140,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 0.5,
+        "stat": {
+          "name": "poss_won_att_3rd",
+          "value": 0.5,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/poss_won_att_3rd.json",
+      "topThree": [
+        {
+          "id": 30981,
+          "name": "Lionel Messi",
+          "rank": 140,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.5,
+          "stat": {
+            "name": "poss_won_att_3rd",
+            "value": 0.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 831489,
+          "name": "Alexis Mac Allister",
+          "rank": 156,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.5,
+          "stat": {
+            "name": "poss_won_att_3rd",
+            "value": 0.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 34,
+      "name": "poss_won_att_3rd",
+      "localizedTitleId": "poss_won_att_3rd_per_90",
+      "category": "Defending"
+    },
+    {
+      "header": "Clean sheets",
+      "participant": {
+        "id": 268375,
+        "name": "Emiliano Martínez",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 2,
+        "stat": {
+          "name": "clean_sheet",
+          "value": 2,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/clean_sheet.json",
+      "topThree": [
+        {
+          "id": 268375,
+          "name": "Emiliano Martínez",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 2,
+          "stat": {
+            "name": "clean_sheet",
+            "value": 2,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 35,
+      "name": "clean_sheet",
+      "localizedTitleId": "clean_sheet_title",
+      "category": "Goalkeeping"
+    },
+    {
+      "header": "Save percentage",
+      "participant": {
+        "id": 268375,
+        "name": "Emiliano Martínez",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 100,
+        "stat": {
+          "name": "_save_percentage",
+          "value": 100,
+          "format": "percent",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/_save_percentage.json",
+      "topThree": [
+        {
+          "id": 268375,
+          "name": "Emiliano Martínez",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 100,
+          "stat": {
+            "name": "_save_percentage",
+            "value": 100,
+            "format": "percent",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 36,
+      "name": "_save_percentage",
+      "localizedTitleId": "save_percentage",
+      "category": "Goalkeeping"
+    },
+    {
+      "header": "Saves per 90",
+      "participant": {
+        "id": 268375,
+        "name": "Emiliano Martínez",
+        "rank": 51,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 0.5,
+        "stat": {
+          "name": "saves",
+          "value": 0.5,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/saves.json",
+      "topThree": [
+        {
+          "id": 268375,
+          "name": "Emiliano Martínez",
+          "rank": 51,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0.5,
+          "stat": {
+            "name": "saves",
+            "value": 0.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 37,
+      "name": "saves",
+      "localizedTitleId": "saves_per_90",
+      "category": "Goalkeeping"
+    },
+    {
+      "header": "Goals prevented",
+      "participant": {
+        "id": 268375,
+        "name": "Emiliano Martínez",
+        "rank": 24,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 0,
+        "stat": {
+          "name": "_goals_prevented",
+          "value": 0,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/_goals_prevented.json",
+      "topThree": [
+        {
+          "id": 268375,
+          "name": "Emiliano Martínez",
+          "rank": 24,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 0,
+          "stat": {
+            "name": "_goals_prevented",
+            "value": 0,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 38,
+      "name": "_goals_prevented",
+      "localizedTitleId": "goals_prevented",
+      "category": "Goalkeeping"
+    },
+    {
+      "header": "Fouls committed per 90",
+      "participant": {
+        "id": 690230,
+        "name": "Lautaro Martínez",
+        "rank": 18,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 3,
+        "stat": {
+          "name": "fouls",
+          "value": 3,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/fouls.json",
+      "topThree": [
+        {
+          "id": 690230,
+          "name": "Lautaro Martínez",
+          "rank": 18,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 3,
+          "stat": {
+            "name": "fouls",
+            "value": 3,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 831489,
+          "name": "Alexis Mac Allister",
+          "rank": 68,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 2,
+          "stat": {
+            "name": "fouls",
+            "value": 2,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 789066,
+          "name": "Cristian Romero",
+          "rank": 68,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 2,
+          "stat": {
+            "name": "fouls",
+            "value": 2,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 40,
+      "name": "fouls",
+      "localizedTitleId": "fouls_committed_per_90",
+      "category": "Discipline"
+    },
+    {
+      "header": "Yellow cards",
+      "participant": {
+        "id": 812652,
+        "name": "Facundo Medina",
+        "rank": 4,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "teamName": "Argentina",
+        "value": 1,
+        "stat": {
+          "name": "yellow_card",
+          "value": 1,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/yellow_card.json",
+      "topThree": [
+        {
+          "id": 812652,
+          "name": "Facundo Medina",
+          "rank": 4,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "yellow_card",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 237606,
+          "name": "Leandro Paredes",
+          "rank": 4,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "teamName": "Argentina",
+          "value": 1,
+          "stat": {
+            "name": "yellow_card",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 41,
+      "name": "yellow_card",
+      "localizedTitleId": "yellow_cards",
+      "category": "Discipline"
+    }
+  ],
+  "teams": [
+    {
+      "header": "FotMob rating",
+      "localizedTitleId": "rating_team_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 6,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 7.23,
+        "stat": {
+          "name": "rating_team",
+          "value": 7.23,
+          "format": "fraction",
+          "fractions": 2
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/rating_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "France",
+          "rank": 1,
+          "ccode": "FRA",
+          "teamId": 6723,
+          "value": 7.56,
+          "stat": {
+            "name": "rating_team",
+            "value": 7.56,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#365b98",
+            "lightMode": "#26406A",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Germany",
+          "rank": 2,
+          "ccode": "GER",
+          "teamId": 8570,
+          "value": 7.43,
+          "stat": {
+            "name": "rating_team",
+            "value": 7.43,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#ffffff",
+            "lightMode": "#464646",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 6,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 7.23,
+          "stat": {
+            "name": "rating_team",
+            "value": 7.23,
+            "format": "fraction",
+            "fractions": 2
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 43,
+      "stat": "rating_team",
+      "category": "Top Stat"
+    },
+    {
+      "header": "Goals per match",
+      "localizedTitleId": "goals_team_match_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 10,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 2.5,
+        "stat": {
+          "name": "goals_team_match",
+          "value": 2.5,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/goals_team_match.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Germany",
+          "rank": 1,
+          "ccode": "GER",
+          "teamId": 8570,
+          "value": 4.5,
+          "stat": {
+            "name": "goals_team_match",
+            "value": 4.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#ffffff",
+            "lightMode": "#464646",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Canada",
+          "rank": 2,
+          "ccode": "CAN",
+          "teamId": 5810,
+          "value": 3.5,
+          "stat": {
+            "name": "goals_team_match",
+            "value": 3.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#C50011",
+            "lightMode": "#C50011",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 10,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 2.5,
+          "stat": {
+            "name": "goals_team_match",
+            "value": 2.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 44,
+      "stat": "goals_team_match",
+      "category": "Top Stat"
+    },
+    {
+      "header": "Goals conceded per match",
+      "localizedTitleId": "goals_conceded_team_match_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 1,
+        "teamId": 6706,
+        "value": 0,
+        "stat": {
+          "name": "goals_conceded_team_match",
+          "value": 0,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/goals_conceded_team_match.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 1,
+          "teamId": 6706,
+          "value": 0,
+          "stat": {
+            "name": "goals_conceded_team_match",
+            "value": 0,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Spain",
+          "rank": 1,
+          "teamId": 6720,
+          "value": 0,
+          "stat": {
+            "name": "goals_conceded_team_match",
+            "value": 0,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#c62035",
+            "lightMode": "#c62035",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Mexico",
+          "rank": 1,
+          "teamId": 6710,
+          "value": 0,
+          "stat": {
+            "name": "goals_conceded_team_match",
+            "value": 0,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#00634b",
+            "lightMode": "#00634b",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 45,
+      "stat": "goals_conceded_team_match",
+      "category": "Top Stat"
+    },
+    {
+      "header": "Average possession",
+      "localizedTitleId": "possession_percentage_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 27,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 50.7,
+        "stat": {
+          "name": "possession_percentage_team",
+          "value": 50.7,
+          "format": "percent",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/possession_percentage_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Turkiye",
+          "rank": 1,
+          "ccode": "TUR",
+          "teamId": 6595,
+          "value": 75,
+          "stat": {
+            "name": "possession_percentage_team",
+            "value": 75,
+            "format": "percent",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#d71c00",
+            "lightMode": "#d71c00",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Portugal",
+          "rank": 2,
+          "ccode": "POR",
+          "teamId": 8361,
+          "value": 70.7,
+          "stat": {
+            "name": "possession_percentage_team",
+            "value": 70.7,
+            "format": "percent",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#ab0027",
+            "lightMode": "#ab0027",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 27,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 50.7,
+          "stat": {
+            "name": "possession_percentage_team",
+            "value": 50.7,
+            "format": "percent",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 46,
+      "stat": "possession_percentage_team",
+      "category": "Top Stat"
+    },
+    {
+      "header": "Clean sheets",
+      "localizedTitleId": "clean_sheet_team_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 2,
+        "stat": {
+          "name": "clean_sheet_team",
+          "value": 2,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/clean_sheet_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 2,
+          "stat": {
+            "name": "clean_sheet_team",
+            "value": 2,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Ghana",
+          "rank": 1,
+          "ccode": "GHA",
+          "teamId": 6714,
+          "value": 2,
+          "stat": {
+            "name": "clean_sheet_team",
+            "value": 2,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#ffffff",
+            "lightMode": "#100f10",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Mexico",
+          "rank": 1,
+          "ccode": "MEX",
+          "teamId": 6710,
+          "value": 2,
+          "stat": {
+            "name": "clean_sheet_team",
+            "value": 2,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#00634b",
+            "lightMode": "#00634b",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 48,
+      "stat": "clean_sheet_team",
+      "category": "Top Stat"
+    },
+    {
+      "header": "Expected goals",
+      "localizedTitleId": "expected_goals",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 10,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 3.6,
+        "stat": {
+          "name": "expected_goals_team",
+          "value": 3.6,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/expected_goals_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Germany",
+          "rank": 1,
+          "ccode": "GER",
+          "teamId": 8570,
+          "value": 6.1,
+          "stat": {
+            "name": "expected_goals_team",
+            "value": 6.1,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#ffffff",
+            "lightMode": "#464646",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Canada",
+          "rank": 2,
+          "ccode": "CAN",
+          "teamId": 5810,
+          "value": 5.8,
+          "stat": {
+            "name": "expected_goals_team",
+            "value": 5.8,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#C50011",
+            "lightMode": "#C50011",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 10,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 3.6,
+          "stat": {
+            "name": "expected_goals_team",
+            "value": 3.6,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 50,
+      "stat": "expected_goals_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "xG difference",
+      "localizedTitleId": "xg_diff_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 7,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 2.8,
+        "stat": {
+          "name": "_xg_diff_team",
+          "value": 2.8,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/_xg_diff_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Canada",
+          "rank": 1,
+          "ccode": "CAN",
+          "teamId": 5810,
+          "value": 4.6,
+          "stat": {
+            "name": "_xg_diff_team",
+            "value": 4.6,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#C50011",
+            "lightMode": "#C50011",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Germany",
+          "rank": 2,
+          "ccode": "GER",
+          "teamId": 8570,
+          "value": 4.5,
+          "stat": {
+            "name": "_xg_diff_team",
+            "value": 4.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#ffffff",
+            "lightMode": "#464646",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 7,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 2.8,
+          "stat": {
+            "name": "_xg_diff_team",
+            "value": 2.8,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 51,
+      "stat": "_xg_diff_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "Shots on target per match",
+      "localizedTitleId": "ontarget_scoring_att_team_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 15,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 5.5,
+        "stat": {
+          "name": "ontarget_scoring_att_team",
+          "value": 5.5,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/ontarget_scoring_att_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Germany",
+          "rank": 1,
+          "ccode": "GER",
+          "teamId": 8570,
+          "value": 9.5,
+          "stat": {
+            "name": "ontarget_scoring_att_team",
+            "value": 9.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#ffffff",
+            "lightMode": "#464646",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Ecuador",
+          "rank": 2,
+          "ccode": "ECU",
+          "teamId": 6707,
+          "value": 8,
+          "stat": {
+            "name": "ontarget_scoring_att_team",
+            "value": 8,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#ECD743",
+            "lightMode": "#e29b00",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 15,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 5.5,
+          "stat": {
+            "name": "ontarget_scoring_att_team",
+            "value": 5.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 52,
+      "stat": "ontarget_scoring_att_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "Big chances",
+      "localizedTitleId": "big_chance",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 23,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 4,
+        "stat": {
+          "name": "big_chance_team",
+          "value": 4,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/big_chance_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Germany",
+          "rank": 1,
+          "ccode": "GER",
+          "teamId": 8570,
+          "value": 11,
+          "stat": {
+            "name": "big_chance_team",
+            "value": 11,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#ffffff",
+            "lightMode": "#464646",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Norway",
+          "rank": 2,
+          "ccode": "NOR",
+          "teamId": 8492,
+          "value": 10,
+          "stat": {
+            "name": "big_chance_team",
+            "value": 10,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#b53032",
+            "lightMode": "#b53032",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 23,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 4,
+          "stat": {
+            "name": "big_chance_team",
+            "value": 4,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 53,
+      "stat": "big_chance_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "Big chances missed",
+      "localizedTitleId": "big_chance_missed_team_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 16,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 3,
+        "stat": {
+          "name": "big_chance_missed_team",
+          "value": 3,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/big_chance_missed_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "England",
+          "rank": 1,
+          "ccode": "ENG",
+          "teamId": 8491,
+          "value": 7,
+          "stat": {
+            "name": "big_chance_missed_team",
+            "value": 7,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#FFFFFF",
+            "lightMode": "#6FA3E6",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Ecuador",
+          "rank": 2,
+          "ccode": "ECU",
+          "teamId": 6707,
+          "value": 7,
+          "stat": {
+            "name": "big_chance_missed_team",
+            "value": 7,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#ECD743",
+            "lightMode": "#e29b00",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 16,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 3,
+          "stat": {
+            "name": "big_chance_missed_team",
+            "value": 3,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 54,
+      "stat": "big_chance_missed_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "Accurate passes per match",
+      "localizedTitleId": "accurate_pass_team_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 10,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 499,
+        "stat": {
+          "name": "accurate_pass_team",
+          "value": 499,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/accurate_pass_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Spain",
+          "rank": 1,
+          "ccode": "ESP",
+          "teamId": 6720,
+          "value": 701,
+          "stat": {
+            "name": "accurate_pass_team",
+            "value": 701,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#c62035",
+            "lightMode": "#c62035",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Portugal",
+          "rank": 2,
+          "ccode": "POR",
+          "teamId": 8361,
+          "value": 642.5,
+          "stat": {
+            "name": "accurate_pass_team",
+            "value": 642.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#ab0027",
+            "lightMode": "#ab0027",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 10,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 499,
+          "stat": {
+            "name": "accurate_pass_team",
+            "value": 499,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 55,
+      "stat": "accurate_pass_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "Accurate long balls per match",
+      "localizedTitleId": "accurate_long_balls_team_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 40,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 14.5,
+        "stat": {
+          "name": "accurate_long_balls_team",
+          "value": 14.5,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/accurate_long_balls_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Portugal",
+          "rank": 1,
+          "ccode": "POR",
+          "teamId": 8361,
+          "value": 31.5,
+          "stat": {
+            "name": "accurate_long_balls_team",
+            "value": 31.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#ab0027",
+            "lightMode": "#ab0027",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Senegal",
+          "rank": 2,
+          "ccode": "SEN",
+          "teamId": 6395,
+          "value": 31,
+          "stat": {
+            "name": "accurate_long_balls_team",
+            "value": 31,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#ffffff",
+            "lightMode": "#0c954e",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 40,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 14.5,
+          "stat": {
+            "name": "accurate_long_balls_team",
+            "value": 14.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 56,
+      "stat": "accurate_long_balls_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "Accurate crosses per match",
+      "localizedTitleId": "accurate_cross_team_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 45,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 1,
+        "stat": {
+          "name": "accurate_cross_team",
+          "value": 1,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/accurate_cross_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Uruguay",
+          "rank": 1,
+          "ccode": "URU",
+          "teamId": 5796,
+          "value": 10,
+          "stat": {
+            "name": "accurate_cross_team",
+            "value": 10,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#79b8e1",
+            "lightMode": "#6eadd6",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Canada",
+          "rank": 2,
+          "ccode": "CAN",
+          "teamId": 5810,
+          "value": 9,
+          "stat": {
+            "name": "accurate_cross_team",
+            "value": 9,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#C50011",
+            "lightMode": "#C50011",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 45,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 1,
+          "stat": {
+            "name": "accurate_cross_team",
+            "value": 1,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 57,
+      "stat": "accurate_cross_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "Penalties awarded",
+      "localizedTitleId": "penalty_won_team_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 6,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 1,
+        "stat": {
+          "name": "penalty_won_team",
+          "value": 1,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/penalty_won_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Switzerland",
+          "rank": 1,
+          "ccode": "SUI",
+          "teamId": 6717,
+          "value": 2,
+          "stat": {
+            "name": "penalty_won_team",
+            "value": 2,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#DD4145",
+            "lightMode": "#DD4145",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Austria",
+          "rank": 2,
+          "ccode": "AUT",
+          "teamId": 8255,
+          "value": 1,
+          "stat": {
+            "name": "penalty_won_team",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#c90211",
+            "lightMode": "#c90211",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 6,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 1,
+          "stat": {
+            "name": "penalty_won_team",
+            "value": 1,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 58,
+      "stat": "penalty_won_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "Touches in opposition box",
+      "localizedTitleId": "touches_opp_box",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 33,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 31,
+        "stat": {
+          "name": "touches_in_opp_box_team",
+          "value": 31,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/touches_in_opp_box_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Canada",
+          "rank": 1,
+          "ccode": "CAN",
+          "teamId": 5810,
+          "value": 134,
+          "stat": {
+            "name": "touches_in_opp_box_team",
+            "value": 134,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#C50011",
+            "lightMode": "#C50011",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Turkiye",
+          "rank": 2,
+          "ccode": "TUR",
+          "teamId": 6595,
+          "value": 101,
+          "stat": {
+            "name": "touches_in_opp_box_team",
+            "value": 101,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#d71c00",
+            "lightMode": "#d71c00",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 33,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 31,
+          "stat": {
+            "name": "touches_in_opp_box_team",
+            "value": 31,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 59,
+      "stat": "touches_in_opp_box_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "Corners",
+      "localizedTitleId": "corners",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 45,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 3,
+        "stat": {
+          "name": "corner_taken_team",
+          "value": 3,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/corner_taken_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Canada",
+          "rank": 1,
+          "ccode": "CAN",
+          "teamId": 5810,
+          "value": 28,
+          "stat": {
+            "name": "corner_taken_team",
+            "value": 28,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#C50011",
+            "lightMode": "#C50011",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Uruguay",
+          "rank": 2,
+          "ccode": "URU",
+          "teamId": 5796,
+          "value": 25,
+          "stat": {
+            "name": "corner_taken_team",
+            "value": 25,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#79b8e1",
+            "lightMode": "#6eadd6",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 45,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 3,
+          "stat": {
+            "name": "corner_taken_team",
+            "value": 3,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 60,
+      "stat": "corner_taken_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "Set piece goals",
+      "localizedTitleId": "set_piece_goals",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 21,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 0,
+        "stat": {
+          "name": "_set_piece_goals_team",
+          "value": 0,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/_set_piece_goals_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Algeria",
+          "rank": 1,
+          "ccode": "ALG",
+          "teamId": 6317,
+          "value": 2,
+          "stat": {
+            "name": "_set_piece_goals_team",
+            "value": 2,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#ffffff",
+            "lightMode": "#00977B",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Bosnia and Herzegovina",
+          "rank": 2,
+          "ccode": "BIH",
+          "teamId": 10106,
+          "value": 2,
+          "stat": {
+            "name": "_set_piece_goals_team",
+            "value": 2,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#027EB0",
+            "lightMode": "#027EB0",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 21,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 0,
+          "stat": {
+            "name": "_set_piece_goals_team",
+            "value": 0,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 61,
+      "stat": "_set_piece_goals_team",
+      "category": "Attacking"
+    },
+    {
+      "header": "xG conceded",
+      "localizedTitleId": "expected_goals_conceded",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 2,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 0.8,
+        "stat": {
+          "name": "expected_goals_conceded_team",
+          "value": 0.8,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/expected_goals_conceded_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Spain",
+          "rank": 1,
+          "ccode": "ESP",
+          "teamId": 6720,
+          "value": 0.3,
+          "stat": {
+            "name": "expected_goals_conceded_team",
+            "value": 0.3,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#c62035",
+            "lightMode": "#c62035",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 2,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 0.8,
+          "stat": {
+            "name": "expected_goals_conceded_team",
+            "value": 0.8,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Switzerland",
+          "rank": 3,
+          "ccode": "SUI",
+          "teamId": 6717,
+          "value": 0.8,
+          "stat": {
+            "name": "expected_goals_conceded_team",
+            "value": 0.8,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#DD4145",
+            "lightMode": "#DD4145",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 62,
+      "stat": "expected_goals_conceded_team",
+      "category": "Defending"
+    },
+    {
+      "header": "Interceptions per match",
+      "localizedTitleId": "interception_team_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 19,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 9,
+        "stat": {
+          "name": "interception_team",
+          "value": 9,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/interception_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "USA",
+          "rank": 1,
+          "ccode": "USA",
+          "teamId": 6713,
+          "value": 14.5,
+          "stat": {
+            "name": "interception_team",
+            "value": 14.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#ffffff",
+            "lightMode": "#293664",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Cape Verde",
+          "rank": 2,
+          "ccode": "CPV",
+          "teamId": 5888,
+          "value": 14,
+          "stat": {
+            "name": "interception_team",
+            "value": 14,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#0059bb",
+            "lightMode": "#004bab",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 19,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 9,
+          "stat": {
+            "name": "interception_team",
+            "value": 9,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 63,
+      "stat": "interception_team",
+      "category": "Defending"
+    },
+    {
+      "header": "Tackles per match",
+      "localizedTitleId": "tackle_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 1,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 24,
+        "stat": {
+          "name": "total_tackle_team",
+          "value": 24,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/total_tackle_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 1,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 24,
+          "stat": {
+            "name": "total_tackle_team",
+            "value": 24,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Paraguay",
+          "rank": 2,
+          "ccode": "PAR",
+          "teamId": 6724,
+          "value": 23,
+          "stat": {
+            "name": "total_tackle_team",
+            "value": 23,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#EE3F2D",
+            "lightMode": "#EE3F2D",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Germany",
+          "rank": 3,
+          "ccode": "GER",
+          "teamId": 8570,
+          "value": 22.5,
+          "stat": {
+            "name": "total_tackle_team",
+            "value": 22.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#ffffff",
+            "lightMode": "#464646",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 64,
+      "stat": "total_tackle_team",
+      "category": "Defending"
+    },
+    {
+      "header": "Clearances per match",
+      "localizedTitleId": "effective_clearance_team_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 17,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 26,
+        "stat": {
+          "name": "effective_clearance_team",
+          "value": 26,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/effective_clearance_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Bosnia and Herzegovina",
+          "rank": 1,
+          "ccode": "BIH",
+          "teamId": 10106,
+          "value": 53,
+          "stat": {
+            "name": "effective_clearance_team",
+            "value": 53,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#027EB0",
+            "lightMode": "#027EB0",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Cape Verde",
+          "rank": 2,
+          "ccode": "CPV",
+          "teamId": 5888,
+          "value": 47,
+          "stat": {
+            "name": "effective_clearance_team",
+            "value": 47,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#0059bb",
+            "lightMode": "#004bab",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 17,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 26,
+          "stat": {
+            "name": "effective_clearance_team",
+            "value": 26,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 65,
+      "stat": "effective_clearance_team",
+      "category": "Defending"
+    },
+    {
+      "header": "Possession won final 3rd per match",
+      "localizedTitleId": "poss_won_att_3rd_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 35,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 2,
+        "stat": {
+          "name": "poss_won_att_3rd_team",
+          "value": 2,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/poss_won_att_3rd_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Spain",
+          "rank": 1,
+          "ccode": "ESP",
+          "teamId": 6720,
+          "value": 8.5,
+          "stat": {
+            "name": "poss_won_att_3rd_team",
+            "value": 8.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#c62035",
+            "lightMode": "#c62035",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "France",
+          "rank": 2,
+          "ccode": "FRA",
+          "teamId": 6723,
+          "value": 7,
+          "stat": {
+            "name": "poss_won_att_3rd_team",
+            "value": 7,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#365b98",
+            "lightMode": "#26406A",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 35,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 2,
+          "stat": {
+            "name": "poss_won_att_3rd_team",
+            "value": 2,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 66,
+      "stat": "poss_won_att_3rd_team",
+      "category": "Defending"
+    },
+    {
+      "header": "Saves per match",
+      "localizedTitleId": "saves_title",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 48,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 0.5,
+        "stat": {
+          "name": "saves_team",
+          "value": 0.5,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/saves_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Curacao",
+          "rank": 1,
+          "ccode": "CUW",
+          "teamId": 287981,
+          "value": 9.5,
+          "stat": {
+            "name": "saves_team",
+            "value": 9.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#2162BC",
+            "lightMode": "#2162BC",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Saudi Arabia",
+          "rank": 2,
+          "ccode": "KSA",
+          "teamId": 7795,
+          "value": 7,
+          "stat": {
+            "name": "saves_team",
+            "value": 7,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#009075",
+            "lightMode": "#16615B",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 48,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 0.5,
+          "stat": {
+            "name": "saves_team",
+            "value": 0.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 69,
+      "stat": "saves_team",
+      "category": "Defending"
+    },
+    {
+      "header": "Fouls per match",
+      "localizedTitleId": "fouls_per_match",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 11,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 13,
+        "stat": {
+          "name": "fk_foul_lost_team",
+          "value": 13,
+          "format": "fraction",
+          "fractions": 1
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/fk_foul_lost_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Bosnia and Herzegovina",
+          "rank": 1,
+          "ccode": "BIH",
+          "teamId": 10106,
+          "value": 19,
+          "stat": {
+            "name": "fk_foul_lost_team",
+            "value": 19,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#027EB0",
+            "lightMode": "#027EB0",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Haiti",
+          "rank": 2,
+          "ccode": "HAI",
+          "teamId": 5934,
+          "value": 18.5,
+          "stat": {
+            "name": "fk_foul_lost_team",
+            "value": 18.5,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#4273C2",
+            "lightMode": "#4273C2",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 11,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 13,
+          "stat": {
+            "name": "fk_foul_lost_team",
+            "value": 13,
+            "format": "fraction",
+            "fractions": 1
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 70,
+      "stat": "fk_foul_lost_team",
+      "category": "Discipline"
+    },
+    {
+      "header": "Yellow cards",
+      "localizedTitleId": "yellow_cards",
+      "participant": {
+        "id": 0,
+        "name": "Argentina",
+        "rank": 24,
+        "ccode": "ARG",
+        "teamId": 6706,
+        "value": 2,
+        "stat": {
+          "name": "total_yel_card_team",
+          "value": 2,
+          "format": "number",
+          "fractions": 0
+        }
+      },
+      "fetchAllUrl": "https://data.fotmob.com/stats/77/season/24254/total_yel_card_team.json",
+      "topThree": [
+        {
+          "id": 0,
+          "name": "Paraguay",
+          "rank": 1,
+          "ccode": "PAR",
+          "teamId": 6724,
+          "value": 6,
+          "stat": {
+            "name": "total_yel_card_team",
+            "value": 6,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#EE3F2D",
+            "lightMode": "#EE3F2D",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Bosnia and Herzegovina",
+          "rank": 2,
+          "ccode": "BIH",
+          "teamId": 10106,
+          "value": 5,
+          "stat": {
+            "name": "total_yel_card_team",
+            "value": 5,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#027EB0",
+            "lightMode": "#027EB0",
+            "fontDarkMode": "rgba(255, 255, 255, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        },
+        {
+          "id": 0,
+          "name": "Argentina",
+          "rank": 24,
+          "ccode": "ARG",
+          "teamId": 6706,
+          "value": 2,
+          "stat": {
+            "name": "total_yel_card_team",
+            "value": 2,
+            "format": "number",
+            "fractions": 0
+          },
+          "teamColors": {
+            "darkMode": "#98CEF0",
+            "lightMode": "#63addf",
+            "fontDarkMode": "rgba(29, 29, 29, 1.0)",
+            "fontLightMode": "rgba(255, 255, 255, 1.0)"
+          }
+        }
+      ],
+      "order": 71,
+      "stat": "total_yel_card_team",
+      "category": "Discipline"
+    }
+  ],
+  "tournamentId": "24254",
+  "tournamentSeasons": [
+    {
+      "name": "World Cup 2026",
+      "season": "2026",
+      "leagueName": "World Cup",
+      "tournamentId": "24254",
+      "parentLeagueId": "77"
+    },
+    {
+      "name": "World Cup 2022",
+      "season": "2022",
+      "leagueName": "World Cup",
+      "tournamentId": "15338",
+      "parentLeagueId": "77"
+    },
+    {
+      "name": "World Cup 2018",
+      "season": "2018",
+      "leagueName": "World Cup",
+      "tournamentId": "9731",
+      "parentLeagueId": "77"
+    },
+    {
+      "name": "Copa America 2024",
+      "season": "2024",
+      "leagueName": "Copa America",
+      "tournamentId": "22518",
+      "parentLeagueId": "44"
+    },
+    {
+      "name": "Copa America 2021",
+      "season": "2021",
+      "leagueName": "Copa America",
+      "tournamentId": "15148",
+      "parentLeagueId": "44"
+    },
+    {
+      "name": "Copa America 2019",
+      "season": "2019",
+      "leagueName": "Copa America",
+      "tournamentId": "13572",
+      "parentLeagueId": "44"
+    },
+    {
+      "name": "Copa America 2016",
+      "season": "2016",
+      "leagueName": "Copa America",
+      "tournamentId": "10093",
+      "parentLeagueId": "44"
+    },
+    {
+      "name": "World Cup Qualification CONMEBOL 2023/2025",
+      "season": "2023/2025",
+      "leagueName": "World Cup Qualification CONMEBOL",
+      "tournamentId": "19198",
+      "parentLeagueId": "10199"
+    },
+    {
+      "name": "World Cup Qualification CONMEBOL 2020/2022",
+      "season": "2020/2022",
+      "leagueName": "World Cup Qualification CONMEBOL",
+      "tournamentId": "17257",
+      "parentLeagueId": "10199"
+    },
+    {
+      "name": "World Cup Qualification CONMEBOL 2015/2017",
+      "season": "2015/2017",
+      "leagueName": "World Cup Qualification CONMEBOL",
+      "tournamentId": "17256",
+      "parentLeagueId": "10199"
+    },
+    {
+      "name": "World Cup Qualification CONMEBOL 2011/2013",
+      "season": "2011/2013",
+      "leagueName": "World Cup Qualification CONMEBOL",
+      "tournamentId": "17255",
+      "parentLeagueId": "10199"
+    }
+  ]
+}

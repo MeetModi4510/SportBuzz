@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FootballSidebar } from './FootballSidebar';
 import { FootballPerformanceLab } from './FootballPerformanceLab';
 import { FootballPlayer } from '../../hooks/useFootballSquads';
@@ -7,6 +7,16 @@ export function FootballPerformanceDashboard({ initialState }: { initialState?: 
     const [activePlayer, setActivePlayer] = useState<(FootballPlayer & { country: string }) | null>(
         initialState?.targetPlayerId ? { id: initialState.targetPlayerId, name: initialState.targetPlayerName, country: initialState.targetTeamName } as any : null
     );
+
+    useEffect(() => {
+        if (initialState?.targetPlayerId) {
+            setActivePlayer({ 
+                id: initialState.targetPlayerId, 
+                name: initialState.targetPlayerName, 
+                country: initialState.targetTeamName 
+            } as any);
+        }
+    }, [initialState]);
 
     const handleSelectPlayer = (player: FootballPlayer & { country: string }) => {
         setActivePlayer(player);

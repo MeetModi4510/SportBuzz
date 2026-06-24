@@ -17,6 +17,7 @@ import authRoutes from './routes/authRoutes.js';
 import activityRoutes from './routes/activityRoutes.js';
 import cricketRoutes from './routes/cricketRoutes.js';
 import footballRoutes from './routes/footballRoutes.js';
+import fotmobRoutes from './routes/fotmobRoutes.js';
 import featuredRoutes from './routes/featuredRoutes.js';
 import stateMatchesRoutes from './routes/stateMatchesRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -143,6 +144,7 @@ app.use('/api/activity', activityRoutes);
 app.use('/api/cricket', cricketRoutes);
 
 app.use('/api/football', footballRoutes);
+app.use('/api/fotmob', fotmobRoutes);
 app.use('/api/featured', featuredRoutes);
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);

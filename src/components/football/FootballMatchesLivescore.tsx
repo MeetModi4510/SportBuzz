@@ -24,18 +24,19 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
   const { data: liveData, isLoading: liveLoading, refetch: refetchLive, isFetching: liveFetching } =
     useEspnLiveMatches(true);
 
-  // Upcoming: only enabled when user clicks "Upcoming" OR on dashboard (for fallback)
-  const { data: upcomingData, isLoading: upcomingLoading, refetch: refetchUpcoming, isFetching: upcomingFetching } =
-    useEspnUpcomingMatches(filter === 'upcoming' || variant === 'dashboard');
-
-  // Recent: only enabled when user clicks "Recent" OR on dashboard (for fallback)
-  const { data: recentData, isLoading: recentLoading, refetch: refetchRecent, isFetching: recentFetching } =
-    useEspnRecentMatches(filter === 'recent' || variant === 'dashboard');
-
-  // ─── Derived state ────────────────────────────────────────────────────
   const liveMatches  = liveData?.data     || [];
   const hasLive      = liveMatches.length > 0;
+  const needsFallback = variant === 'dashboard' || (filter === 'live' && liveData && !hasLive);
 
+  // Upcoming: only enabled when user clicks "Upcoming" OR on dashboard/hub for fallback
+  const { data: upcomingData, isLoading: upcomingLoading, refetch: refetchUpcoming, isFetching: upcomingFetching } =
+    useEspnUpcomingMatches(filter === 'upcoming' || !!needsFallback);
+
+  // Recent: only enabled when user clicks "Recent" OR on dashboard/hub for fallback
+  const { data: recentData, isLoading: recentLoading, refetch: refetchRecent, isFetching: recentFetching } =
+    useEspnRecentMatches(filter === 'recent' || !!needsFallback);
+
+  // ─── Derived state ────────────────────────────────────────────────────
   const handleManualRefresh = () => {
     refetchLive();
     if (filter === 'upcoming' || variant === 'dashboard') refetchUpcoming();
@@ -44,9 +45,11 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
 
   const isRefreshing = liveFetching || upcomingFetching || recentFetching;
   
+  const isLoadingFallback = liveData && !hasLive && (upcomingLoading || recentLoading);
+  
   const isLoading = variant === 'dashboard'
-    ? (liveLoading || (liveMatches.length === 0 && (upcomingLoading || recentLoading)))
-    : ((filter === 'live'     && liveLoading) ||
+    ? (liveLoading || isLoadingFallback)
+    : ((filter === 'live'     && (liveLoading || isLoadingFallback)) ||
        (filter === 'upcoming' && upcomingLoading) ||
        (filter === 'recent'   && recentLoading));
 
@@ -123,7 +126,17 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
   } else {
     // Hub variant
     if (filter === 'live') {
-      if (hasLive) sections = [{ title: 'Live Matches', matches: liveMatches }];
+      if (hasLive) {
+        sections = [{ title: 'Live Matches', matches: liveMatches }];
+      } else if (!liveLoading) {
+        // Fall back to showing a mix of recent + upcoming when nothing is live
+        const recent   = (recentData?.data   || []).slice(0, 2);
+        const upcoming = (upcomingData?.data || []).slice(0, 2);
+        const combined = [...recent, ...upcoming];
+        if (combined.length > 0) {
+          sections = [{ title: 'Featured Matches', matches: combined }];
+        }
+      }
     } else if (filter === 'upcoming') {
       const allMatches = upcomingData?.data || [];
       

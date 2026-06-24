@@ -26,21 +26,26 @@ export const getFavorites = asyncHandler(async (req, res) => {
  * @access  Private
  */
 export const addFavorite = asyncHandler(async (req, res) => {
-    const { matchId, sport, teams, date, venue, status } = req.body;
+    const { type = 'match', itemId, name, image, matchId, sport, teams, date, venue, status } = req.body;
 
     // Check if already favorited
-    const existing = await Favorite.findOne({
-        userId: req.user.id,
-        matchId
-    });
+    let existingQuery = { userId: req.user.id, type };
+    if (type === 'match') existingQuery.matchId = matchId;
+    else existingQuery.itemId = itemId;
+
+    const existing = await Favorite.findOne(existingQuery);
 
     if (existing) {
         res.status(400);
-        throw new Error('Match is already in favorites');
+        throw new Error(`${type} is already in favorites`);
     }
 
     const favorite = await Favorite.create({
         userId: req.user.id,
+        type,
+        itemId,
+        name,
+        image,
         matchId,
         sport,
         teams,
@@ -50,11 +55,15 @@ export const addFavorite = asyncHandler(async (req, res) => {
     });
 
     // Log activity
+    const activityDesc = type === 'match' 
+        ? `Added ${teams?.team1} vs ${teams?.team2} to favorites`
+        : `Added ${name} to favorites`;
+
     await Activity.create({
         userId: req.user.id,
         type: 'favorite_add',
-        description: `Added ${teams.team1} vs ${teams.team2} to favorites`,
-        metadata: { matchId, sport }
+        description: activityDesc,
+        metadata: { type, itemId, matchId, sport }
     });
 
     // Check for first favorite achievement
@@ -125,16 +134,20 @@ export const removeFavorite = asyncHandler(async (req, res) => {
  * @access  Private
  */
 export const checkFavorite = asyncHandler(async (req, res) => {
-    const favorite = await Favorite.findOne({
-        userId: req.user.id,
-        matchId: req.params.matchId
-    });
+    const { type = 'match', itemId } = req.query;
+    
+    let query = { userId: req.user.id, type: type };
+    if (type === 'match') {
+        query.matchId = req.params.id;
+    } else {
+        query.itemId = req.params.id;
+    }
+
+    const favorite = await Favorite.findOne(query);
 
     res.json({
         success: true,
-        data: {
-            isFavorited: !!favorite,
-            favoriteId: favorite?._id
-        }
+        isFavorite: !!favorite,
+        favoriteId: favorite?._id
     });
 });

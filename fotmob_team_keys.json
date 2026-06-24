@@ -1,0 +1,141 @@
+{
+  "keys": [
+    "tabs",
+    "allAvailableSeasons",
+    "details",
+    "seostr",
+    "QAData",
+    "table",
+    "transfers",
+    "overview",
+    "stats",
+    "fixtures",
+    "squad",
+    "history",
+    "utc"
+  ],
+  "overview": [
+    "season",
+    "selectedSeason",
+    "table",
+    "topPlayers",
+    "venue",
+    "coachHistory",
+    "overviewFixtures",
+    "nextMatch",
+    "lastMatch",
+    "teamForm",
+    "hasOngoingMatch",
+    "previousFixturesUrl",
+    "teamColors",
+    "lastLineupStats",
+    "newsSummary",
+    "featuredArticle",
+    "squad",
+    "transfers"
+  ],
+  "details": {
+    "id": 8302,
+    "type": "team",
+    "name": "Sevilla",
+    "latestSeason": "2025/2026",
+    "shortName": "Sevilla",
+    "country": "ESP",
+    "gender": "male",
+    "faqJSONLD": {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "When is Sevilla's next match?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sevilla's next match is at 15:00 BST on Sun, 19 Jul 2026 against Cracovia."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where is Sevilla's stadium?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sevilla stadium is located in Sevilla and is called Estadio Ramón Sánchez Pizjuán."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the capacity of Estadio Ramón Sánchez Pizjuán?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The capacity for Estadio Ramón Sánchez Pizjuán is 42714."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When was Estadio Ramón Sánchez Pizjuán opened?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Estadio Ramón Sánchez Pizjuán opened in 1958."
+          }
+        }
+      ]
+    },
+    "sportsTeamJSONLD": {
+      "@context": "https://schema.org",
+      "@type": "SportsTeam",
+      "name": "Sevilla",
+      "sport": "Football/Soccer",
+      "gender": "https://schema.org/Male",
+      "logo": "https://images.fotmob.com/image_resources/logo/teamlogo/8302.png",
+      "url": "https://www.fotmob.com/teams/8302/overview/sevilla",
+      "athlete": [],
+      "location": {
+        "@type": "Place",
+        "name": "Estadio Ramón Sánchez Pizjuán",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "Spain",
+          "addressLocality": "Sevilla"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "37.384045627",
+          "longitude": "-5.970591903"
+        }
+      },
+      "memberOf": {
+        "@type": "SportsOrganization",
+        "name": "LaLiga",
+        "url": "https://www.fotmob.com/leagues/87/overview/laliga"
+      }
+    },
+    "breadcrumbJSONLD": {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.fotmob.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "LaLiga",
+          "item": "https://www.fotmob.com/leagues/87/overview/laliga"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Sevilla",
+          "item": "https://www.fotmob.com/teams/8302/overview/sevilla"
+        }
+      ]
+    },
+    "canSyncCalendar": true,
+    "primaryLeagueId": 87,
+    "primaryLeagueName": "LaLiga",
+    "seopath": "sevilla"
+  }
+}

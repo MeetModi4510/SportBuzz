@@ -7,6 +7,7 @@ import { PlayerComparison } from "@/components/PlayerComparison";
 import { PlayerAnalysisPanel } from "@/components/PlayerAnalysisPanel";
 import { TeamComparisonPanel } from "@/components/TeamComparisonPanel";
 import { VenueAnalysisPanel } from "@/components/VenueAnalysisPanel";
+import { FootballTeamAnalysisPanel } from "@/components/football/FootballTeamAnalysisPanel";
 import { SportIcon } from "@/components/SportIcon";
 import { players, teams, venues } from "@/data/mockData";
 import { Sport } from "@/data/types";
@@ -53,10 +54,24 @@ import {
 const PerformanceLab = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as { targetPlayerId?: string; targetPlayerName?: string; targetTeamName?: string; fromMatchUrl?: string } | null;
+  const state = location.state as { targetPlayerId?: string; targetPlayerName?: string; targetTeamName?: string; targetTab?: string; targetSport?: Sport; fromMatchUrl?: string } | null;
   
-  const [activeSport, setActiveSport] = useState<Sport | "all">(state?.targetPlayerId ? "football" : "cricket");
+  const [activeSport, setActiveSport] = useState<Sport | "all">(state?.targetSport || (state?.targetPlayerId ? "football" : "cricket"));
+  const [activeTab, setActiveTab] = useState<string>(state?.targetTab || "players");
   const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
+
+  useEffect(() => {
+    if (state?.targetTab) setActiveTab(state.targetTab);
+    if (state?.targetSport) setActiveSport(state.targetSport);
+    if (state?.targetPlayerId) {
+      const p = players.find(p => String(p.id) === String(state.targetPlayerId));
+      if (p) setSelectedPlayer(p);
+    } else if (state?.targetPlayerName) {
+      const p = players.find(p => p.name.toLowerCase().includes(state.targetPlayerName!.toLowerCase()));
+      if (p) setSelectedPlayer(p);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [state]);
 
   const filteredPlayers =
     activeSport === "all"
@@ -108,12 +123,12 @@ const PerformanceLab = () => {
           </section>
 
           {/* Sport Filter Header */}
-          <div className="flex justify-end mb-6">
+          <div className="flex justify-start mb-6">
             <SportFilter activeSport={activeSport} onSportChange={setActiveSport} />
           </div>
 
           {/* Main Tabs */}
-          <Tabs defaultValue="players" className="w-full space-y-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
             <div className="flex justify-between items-end border-b border-border/40">
               <TabsList className="w-full justify-start bg-transparent p-0 rounded-none h-12 gap-6 overflow-x-auto hide-scrollbar border-0">
                 <TabsTrigger
@@ -137,6 +152,15 @@ const PerformanceLab = () => {
                   <Target size={16} />
                   Team Comparison
                 </TabsTrigger>
+                {activeSport === "football" && (
+                  <TabsTrigger
+                    value="team_analysis"
+                    className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
+                  >
+                    <BarChart3 size={16} />
+                    Team Analysis
+                  </TabsTrigger>
+                )}
                 <TabsTrigger
                   value="venues"
                   className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
@@ -170,6 +194,13 @@ const PerformanceLab = () => {
             <TabsContent value="teams" className="space-y-6 animate-fade-in">
               <TeamComparisonPanel />
             </TabsContent>
+
+            {/* Team Analysis Tab (Football Only) */}
+            {activeSport === "football" && (
+              <TabsContent value="team_analysis" className="space-y-6 animate-fade-in pt-4">
+                <FootballTeamAnalysisPanel initialTeam={state?.targetTeamName} />
+              </TabsContent>
+            )}
 
             {/* Venue Analysis Tab */}
             <TabsContent value="venues" className="space-y-6 animate-fade-in">

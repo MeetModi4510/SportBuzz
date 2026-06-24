@@ -1,6 +1,6 @@
 import { useFootballNews, useFootballNewsDetail } from "../../hooks/football/useFootballQueries";
 import { Loader2, Globe, ChevronRight, ArrowUpRight, Clock } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 // Curated fallback news when the API returns nothing
@@ -85,6 +85,12 @@ export function FootballNewsSidebar() {
   // Take first 5 for the Bento grid layout
   const displayedNews = news.slice(0, 5);
 
+  const randomizedHeights = useMemo(() => {
+    // A wider range of heights (from short to very tall rectangles) to create a distinct, staggered masonry wall effect
+    const options = ["h-[260px]", "h-[380px]", "h-[480px]", "h-[320px]", "h-[420px]", "h-[300px]", "h-[440px]", "h-[280px]"];
+    return Array.from({ length: 20 }, () => options[Math.floor(Math.random() * options.length)]);
+  }, [news]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -119,10 +125,9 @@ export function FootballNewsSidebar() {
       {/* News Wall */}
       <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
         {news.slice(0, 12).map((item: any, idx: number) => {
-          // Staggered heights to create a true masonry wall effect
-          const heights = ["h-[280px]", "h-[380px]", "h-[460px]", "h-[320px]"];
-          const heightClass = heights[idx % heights.length];
-          const isLarge = heightClass === "h-[460px]" || heightClass === "h-[380px]";
+          // Dynamically staggered heights for a true random masonry wall effect
+          const heightClass = randomizedHeights[idx % randomizedHeights.length];
+          const isLarge = ["h-[380px]", "h-[420px]", "h-[440px]", "h-[480px]"].includes(heightClass);
 
           return (
             <div

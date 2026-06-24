@@ -78,3 +78,4 @@ server/data/
 !README_IMPLEMENTATION.md
 
 public/data/fotmob_cache/
+server/cache/puppeteer_profile/

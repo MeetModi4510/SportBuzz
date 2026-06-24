@@ -16,7 +16,7 @@ router.route('/')
     .get(getFavorites)
     .post(addFavorite);
 
-router.get('/check/:matchId', checkFavorite);
+router.get('/check/:id', checkFavorite);
 
 router.delete('/:id', removeFavorite);
 

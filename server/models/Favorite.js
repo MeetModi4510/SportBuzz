@@ -6,9 +6,22 @@ const favoriteSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    matchId: {
+    type: {
         type: String,
-        required: true
+        enum: ['match', 'team', 'player', 'league'],
+        default: 'match'
+    },
+    itemId: {
+        type: String
+    },
+    name: {
+        type: String
+    },
+    image: {
+        type: String
+    },
+    matchId: {
+        type: String
     },
     sport: {
         type: String,
@@ -16,16 +29,14 @@ const favoriteSchema = new mongoose.Schema({
         enum: ['cricket', 'football', 'basketball', 'tennis']
     },
     teams: {
-        team1: { type: String, required: true },
-        team2: { type: String, required: true }
+        team1: { type: String },
+        team2: { type: String }
     },
     date: {
-        type: Date,
-        required: true
+        type: Date
     },
     venue: {
-        type: String,
-        required: true
+        type: String
     },
     status: {
         type: String,
@@ -36,8 +47,8 @@ const favoriteSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Compound index to prevent duplicate favorites
-favoriteSchema.index({ userId: 1, matchId: 1 }, { unique: true });
+// Compound index to prevent duplicate favorites per user
+favoriteSchema.index({ userId: 1, type: 1, matchId: 1, itemId: 1 }, { unique: true });
 
 const Favorite = mongoose.model('Favorite', favoriteSchema);
 
