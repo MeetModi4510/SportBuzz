@@ -169,12 +169,12 @@ function PlayerStatList({ rows }: { rows: PlayerStat[] }) {
 
   return (
     <div className="flex flex-col gap-2 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
-      {rows.map((p) => {
+      {rows.map((p, index) => {
         return (
           <div key={p._id} className="group relative flex items-center py-1 transition-transform duration-500 hover:translate-x-3 cursor-default">
             {/* Giant Watermark Rank */}
             <div className="absolute left-0 -translate-x-3 top-1/2 -translate-y-1/2 text-[80px] md:text-[100px] font-black text-foreground/[0.1] z-0 select-none pointer-events-none tracking-tighter leading-none group-hover:text-foreground/[0.15] group-hover:-translate-y-[55%] transition-all duration-500">
-              {p.rank}
+              {index + 1}
             </div>
 
             {/* Content Layer */}
@@ -257,13 +257,13 @@ function TeamStatList({ rows }: { rows: TeamStat[] }) {
     return <p className="text-center text-muted-foreground/60 text-sm py-8 font-light">No data available.</p>;
 
   return (
-    <div className="flex flex-col gap-2">
-      {rows.map((t) => {
+    <div className="flex flex-col gap-2 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
+      {rows.map((t, index) => {
         return (
           <div key={t._id} className="group relative flex items-center py-1 transition-transform duration-500 hover:translate-x-3 cursor-default">
             {/* Giant Watermark Rank */}
             <div className="absolute left-0 -translate-x-3 top-1/2 -translate-y-1/2 text-[80px] md:text-[100px] font-black text-foreground/[0.1] z-0 select-none pointer-events-none tracking-tighter leading-none group-hover:text-foreground/[0.15] group-hover:-translate-y-[55%] transition-all duration-500">
-              {t.rank}
+              {index + 1}
             </div>
 
             {/* Content Layer */}
