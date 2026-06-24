@@ -1,6 +1,30 @@
 import React from 'react';
-import { Trophy, Star, MapPin, Users, Target, Activity, Clock, ShieldAlert, Award, ChevronRight } from 'lucide-react';
+import { Trophy, Star, Users, Target, Activity, Clock, ShieldAlert, Award, ChevronRight } from 'lucide-react';
 import type { FotmobTeamData } from '@/hooks/football/useFotmobTeam';
+
+const StadiumIcon = ({ className }: { className?: string }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    {/* Outer Field */}
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    {/* Center Line */}
+    <line x1="12" y1="4" x2="12" y2="20" />
+    {/* Center Circle */}
+    <circle cx="12" cy="12" r="3" />
+    {/* Left Penalty Area */}
+    <path d="M2 8h4v8H2" />
+    {/* Right Penalty Area */}
+    <path d="M22 8h-4v8h4" />
+  </svg>
+);
 
 interface TeamOverviewDashboardProps {
   data: FotmobTeamData;
@@ -39,9 +63,9 @@ export function TeamOverviewDashboard({ data }: TeamOverviewDashboardProps) {
               <Activity className="w-4 h-4 text-primary" /> Recent Form
             </h3>
             
-            <div className="flex items-center justify-between gap-2 md:gap-4 w-full pb-4 pt-8 px-2 relative h-40">
+            <div className="flex items-center justify-between gap-4 w-full pb-6 pt-12 px-4 relative h-48">
               {/* Central Baseline */}
-              <div className="absolute left-0 right-0 top-[60%] h-px bg-border/60 pointer-events-none" />
+              <div className="absolute left-0 right-0 top-[50%] h-px bg-border/60 pointer-events-none" />
               
               {formArray.map((match: any, i) => {
                 const isWin = match.result === 1;
@@ -49,42 +73,37 @@ export function TeamOverviewDashboard({ data }: TeamOverviewDashboardProps) {
                 const isLoss = match.result === -1;
                 
                 return (
-                  <div key={i} className="flex flex-col items-center justify-end shrink-0 group/bar cursor-pointer relative h-full w-12 z-10">
+                  <div key={i} className="flex flex-col items-center justify-center shrink-0 group/bar cursor-pointer relative h-full w-8 z-10">
                     
-                    {/* Hover Tooltip */}
-                    <div className="absolute opacity-0 group-hover/bar:opacity-100 group-hover/bar:-translate-y-2 bottom-full mb-2 bg-background/95 backdrop-blur-md border border-border px-4 py-2.5 rounded-2xl whitespace-nowrap z-50 pointer-events-none transition-all duration-300 flex flex-col items-center shadow-xl">
+                    {/* Hover Tooltip Fixed Positioning */}
+                    <div className="absolute opacity-0 group-hover/bar:opacity-100 group-hover/bar:-translate-y-2 bottom-[85%] left-1/2 -translate-x-1/2 mb-2 bg-background/95 backdrop-blur-md border border-border px-4 py-2.5 rounded-2xl whitespace-nowrap z-50 pointer-events-none transition-all duration-300 flex flex-col items-center shadow-xl">
                       <span className="text-[9px] font-black tracking-widest text-muted-foreground uppercase mb-1.5">{match.tournamentName}</span>
                       <div className="flex items-center gap-3">
                         <span className="font-bold text-xs">{match.tooltipText?.homeTeam || match.home?.name}</span>
-                        <span className="font-black text-sm text-foreground bg-foreground/5 px-2 py-0.5 rounded-md">{match.score}</span>
+                        <span className={`font-black text-sm px-2 py-0.5 rounded-md ${isWin ? 'bg-emerald-500/10 text-emerald-500' : isDraw ? 'bg-slate-500/10 text-slate-400' : 'bg-rose-500/10 text-rose-500'}`}>{match.score}</span>
                         <span className="font-bold text-xs">{match.tooltipText?.awayTeam || match.away?.name}</span>
                       </div>
                     </div>
 
                     {/* Opposition Logo */}
-                    <img 
-                      src={match.imageUrl} 
-                      className={`w-6 h-6 object-contain absolute z-20 transition-transform duration-300 group-hover/bar:scale-125 ${
-                        isWin ? 'bottom-[calc(60%+36px)]' : 
-                        isDraw ? 'bottom-[calc(60%+6px)]' : 
-                        'bottom-[calc(60%+6px)]'
-                      }`} 
-                      alt="Opponent" 
-                    />
-
-                    {/* Bar */}
-                    <div className="w-3 rounded-full relative flex items-center justify-center transition-all duration-500 ease-out overflow-hidden bg-background/5" style={{ height: '100%' }}>
-                      {isWin && (
-                        <div className="absolute bottom-[40%] w-full bg-gradient-to-t from-emerald-500/80 to-emerald-400 rounded-t-sm shadow-[0_0_10px_rgba(16,185,129,0.3)] group-hover/bar:brightness-110" style={{ height: '30px' }} />
-                      )}
-                      {isLoss && (
-                        <div className="absolute top-[60%] w-full bg-gradient-to-b from-rose-500/80 to-rose-400 rounded-b-sm shadow-[0_0_10px_rgba(244,63,94,0.3)] group-hover/bar:brightness-110" style={{ height: '30px' }} />
-                      )}
-                      {isDraw && (
-                        <div className="absolute top-[60%] -translate-y-1/2 w-full bg-slate-500/80 h-[4px] rounded-sm shadow-sm group-hover/bar:brightness-110" />
-                      )}
+                    <div className={`absolute z-20 w-8 h-8 rounded-full bg-background border border-border/40 p-1 flex items-center justify-center shadow-md transition-transform duration-300 group-hover/bar:scale-125 ${
+                      isWin ? 'bottom-[calc(50%+42px)]' : 
+                      isDraw ? 'bottom-[calc(50%+16px)]' : 
+                      'top-[calc(50%+42px)]'
+                    }`}>
+                      <img src={match.imageUrl} className="w-full h-full object-contain drop-shadow-sm" alt="Opponent" />
                     </div>
 
+                    {/* Clean Bars */}
+                    {isWin && (
+                      <div className="absolute bottom-[50%] w-4 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-[2px] shadow-[0_0_10px_rgba(16,185,129,0.4)] group-hover/bar:brightness-110 transition-all duration-300" style={{ height: '36px' }} />
+                    )}
+                    {isLoss && (
+                      <div className="absolute top-[50%] w-4 bg-gradient-to-b from-rose-500 to-rose-400 rounded-b-[2px] shadow-[0_0_10px_rgba(244,63,94,0.4)] group-hover/bar:brightness-110 transition-all duration-300" style={{ height: '36px' }} />
+                    )}
+                    {isDraw && (
+                      <div className="absolute top-[50%] -translate-y-1/2 w-4 h-4 bg-slate-400 rounded-[2px] shadow-sm group-hover/bar:brightness-110 transition-all duration-300" />
+                    )}
                   </div>
                 );
               })}
@@ -94,42 +113,72 @@ export function TeamOverviewDashboard({ data }: TeamOverviewDashboardProps) {
 
         {/* Next Match Ticket */}
         {overview.nextMatch && (
-          <div className="lg:col-span-5 bg-gradient-to-b from-primary/10 to-transparent border border-primary/20 p-6 md:p-8 rounded-[2rem] shadow-sm flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
+          <div className="lg:col-span-5 relative bg-gradient-to-br from-card to-card/50 border border-border/40 rounded-[2rem] shadow-sm overflow-hidden group">
             
-            <div className="flex items-center justify-between mb-6 relative z-10">
-              <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-                <Clock className="w-4 h-4" /> Next Fixture
-              </h3>
-              {overview.nextMatch.tournament?.name && (
-                <span className="text-[10px] font-bold text-muted-foreground bg-foreground/5 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                  {overview.nextMatch.tournament.name}
-                </span>
-              )}
+            {/* Background Massive Logos for Texture */}
+            <div className="absolute -left-16 -top-16 w-64 h-64 opacity-[0.03] pointer-events-none transition-transform duration-700 group-hover:scale-110">
+               <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${overview.nextMatch.home.id}.png`} className="w-full h-full object-cover" />
             </div>
-            
-            <div className="flex items-center justify-between mt-auto relative z-10">
-              <div className="flex flex-col items-center gap-3 w-1/3">
-                 <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${overview.nextMatch.home.id}.png`} className="w-14 h-14 md:w-16 md:h-16 object-contain drop-shadow-lg group-hover:scale-110 transition-transform" alt="Home" />
-                 <span className="text-xs font-bold text-center line-clamp-2">{overview.nextMatch.home.name}</span>
+            <div className="absolute -right-16 -bottom-16 w-64 h-64 opacity-[0.03] pointer-events-none transition-transform duration-700 group-hover:scale-110">
+               <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${overview.nextMatch.away.id}.png`} className="w-full h-full object-cover" />
+            </div>
+
+            {/* Glowing Accent */}
+            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
+
+            <div className="p-6 md:p-8 flex flex-col h-full relative z-10">
+              
+              {/* Header */}
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.1)]">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">Up Next</span>
+                </div>
+                {overview.nextMatch.tournament?.name && (
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-foreground/5 px-2.5 py-1 rounded-full">
+                    {overview.nextMatch.tournament.name}
+                  </span>
+                )}
               </div>
               
-              <div className="flex flex-col items-center justify-center px-4 w-1/3">
-                 <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">VS</span>
-                 <div className="bg-background/80 backdrop-blur-md px-4 py-2 rounded-xl border border-border/50 shadow-sm text-center flex flex-col items-center gap-0.5">
-                   <span className="text-xs md:text-sm font-bold text-foreground block whitespace-nowrap">
-                      {new Date(overview.nextMatch.status.utcTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                   </span>
-                   <span className="text-[10px] font-bold text-muted-foreground uppercase">
-                      {new Date(overview.nextMatch.status.utcTime).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                   </span>
-                 </div>
+              {/* Teams & Score */}
+              <div className="flex items-center justify-center mt-auto pb-2">
+                {/* Home */}
+                <div className="flex flex-col items-center gap-4 flex-1 relative z-10">
+                   <div className="relative group/logo">
+                     <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover/logo:opacity-100 transition-opacity duration-500" />
+                     <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${overview.nextMatch.home.id}.png`} className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-[0_10px_15px_rgba(0,0,0,0.2)] group-hover/logo:scale-110 transition-transform duration-500 relative z-10" alt="Home" />
+                   </div>
+                   <span className="text-sm font-black text-foreground text-center line-clamp-1 tracking-wide">{overview.nextMatch.home.name}</span>
+                </div>
+                
+                {/* VS or Date */}
+                <div className="flex flex-col items-center justify-center px-2 flex-[0.8] relative z-20">
+                   <div className="relative flex flex-col items-center justify-center w-full">
+                     {/* Dynamic Slash Background */}
+                     <div className="absolute w-[2px] h-24 bg-gradient-to-b from-transparent via-border to-transparent rotate-[25deg]" />
+                     
+                     <div className="bg-background/90 backdrop-blur-md px-5 py-3 rounded-2xl border border-border/50 shadow-xl flex flex-col items-center gap-1">
+                       <span className="text-xs md:text-sm font-black text-foreground whitespace-nowrap tracking-wider">
+                          {new Date(overview.nextMatch.status.utcTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }).toUpperCase()}
+                       </span>
+                       <span className="text-[10px] font-bold text-primary uppercase tracking-widest">
+                          {new Date(overview.nextMatch.status.utcTime).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                       </span>
+                     </div>
+                   </div>
+                </div>
+                
+                {/* Away */}
+                <div className="flex flex-col items-center gap-4 flex-1 relative z-10">
+                   <div className="relative group/logo">
+                     <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover/logo:opacity-100 transition-opacity duration-500" />
+                     <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${overview.nextMatch.away.id}.png`} className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-[0_10px_15px_rgba(0,0,0,0.2)] group-hover/logo:scale-110 transition-transform duration-500 relative z-10" alt="Away" />
+                   </div>
+                   <span className="text-sm font-black text-foreground text-center line-clamp-1 tracking-wide">{overview.nextMatch.away.name}</span>
+                </div>
               </div>
-              
-              <div className="flex flex-col items-center gap-3 w-1/3">
-                 <img src={`https://images.fotmob.com/image_resources/logo/teamlogo/${overview.nextMatch.away.id}.png`} className="w-14 h-14 md:w-16 md:h-16 object-contain drop-shadow-lg group-hover:scale-110 transition-transform" alt="Away" />
-                 <span className="text-xs font-bold text-center line-clamp-2">{overview.nextMatch.away.name}</span>
-              </div>
+
             </div>
           </div>
         )}
@@ -239,7 +288,7 @@ export function TeamOverviewDashboard({ data }: TeamOverviewDashboardProps) {
         {overview.venue?.widget && (
           <div className="bg-card/40 hover:bg-card border border-border/40 p-6 rounded-[2rem] flex items-center gap-6 transition-colors group">
             <div className="w-16 h-16 rounded-2xl bg-foreground/5 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
-              <MapPin className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
+              <StadiumIcon className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
             </div>
             <div className="flex-1">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Home Stadium</p>
