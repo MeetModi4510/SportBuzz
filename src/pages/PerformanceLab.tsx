@@ -8,6 +8,7 @@ import { PlayerAnalysisPanel } from "@/components/PlayerAnalysisPanel";
 import { TeamComparisonPanel } from "@/components/TeamComparisonPanel";
 import { VenueAnalysisPanel } from "@/components/VenueAnalysisPanel";
 import { FootballTeamAnalysisPanel } from "@/components/football/FootballTeamAnalysisPanel";
+import { CricketTeamAnalysisPanel } from "@/components/cricket/CricketTeamAnalysisPanel";
 import { SportIcon } from "@/components/SportIcon";
 import { players, teams, venues } from "@/data/mockData";
 import { Sport } from "@/data/types";
@@ -146,21 +147,12 @@ const PerformanceLab = () => {
                   Player VS Player
                 </TabsTrigger>
                 <TabsTrigger
-                  value="teams"
+                  value="team_analysis"
                   className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
                 >
-                  <Target size={16} />
-                  Team Comparison
+                  <BarChart3 size={16} />
+                  Team Analysis
                 </TabsTrigger>
-                {activeSport === "football" && (
-                  <TabsTrigger
-                    value="team_analysis"
-                    className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
-                  >
-                    <BarChart3 size={16} />
-                    Team Analysis
-                  </TabsTrigger>
-                )}
                 <TabsTrigger
                   value="venues"
                   className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent flex items-center gap-2"
@@ -190,17 +182,14 @@ const PerformanceLab = () => {
               <PlayerComparison activeSport={activeSport as any} />
             </TabsContent>
 
-            {/* Team Comparison Tab */}
-            <TabsContent value="teams" className="space-y-6 animate-fade-in">
-              <TeamComparisonPanel />
-            </TabsContent>
-
-            {/* Team Analysis Tab (Football Only) */}
-            {activeSport === "football" && (
-              <TabsContent value="team_analysis" className="space-y-6 animate-fade-in pt-4">
+            {/* Team Analysis Tab */}
+            <TabsContent value="team_analysis" className="space-y-6 animate-fade-in pt-4">
+              {activeSport === "football" ? (
                 <FootballTeamAnalysisPanel initialTeam={state?.targetTeamName} />
-              </TabsContent>
-            )}
+              ) : (
+                <CricketTeamAnalysisPanel />
+              )}
+            </TabsContent>
 
             {/* Venue Analysis Tab */}
             <TabsContent value="venues" className="space-y-6 animate-fade-in">

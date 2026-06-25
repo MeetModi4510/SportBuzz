@@ -14,6 +14,7 @@ const __dirname = path.dirname(__filename);
 const router = express.Router();
 import { fetchTeamLogo, fetchLiveMatchesScraped, fetchRecentMatchesScraped, fetchUpcomingMatchesScraped, fetchMatchDetailScraped, fetchMatchSquadsScraped, fetchBallMap, fetchPartnershipGraph } from '../services/cricbuzzScraperService.js';
 import { getLocalMatchInfo, getLocalMatchScorecard, getLocalMatchSquads, getLocalMatchSummary, getLocalMatchCommentary } from '../services/localIplMapper.js';
+import { getTeamAnalytics } from '../services/cricsheetService.js';
 import axios from 'axios';
 
 // ─── STAGGERED TEAM LOGO PROXY ───────────────────────────────────────────────
@@ -543,7 +544,25 @@ router.get('/player-info/:id', async (req, res) => {
 
 // ─── PERFORMANCE LAB (STEALTH SCRAPER & IN-MEMORY CACHING) ──────────
 
+// ─── PERFORMANCE LAB (STEALTH SCRAPER & IN-MEMORY CACHING) ──────────
+
 import { fetchTeamSquad, fetchPlayerDeepStats } from '../services/cricbuzzScraperService.js';
+
+// GET /api/cricket/team-analysis/:teamId
+// Uses Cricsheet Service to lazy-load, aggregate, and cache Deep Dive Analytics
+router.get('/team-analysis/:teamId', async (req, res) => {
+    try {
+        const teamId = req.params.teamId;
+        const format = req.query.format || 't20i'; // t20i, odi, test, all
+        
+        // Lazy loads data: checks cache, if missing -> downloads, parses, and caches
+        const data = await getTeamAnalytics(teamId, format);
+        res.json({ status: 'success', data });
+    } catch (error) {
+        console.error("Error fetching team analytics:", error);
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+});
 
 // Local Memory Cache (1 Hour TTL)
 const memCache = new Map();

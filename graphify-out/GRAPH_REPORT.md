@@ -1,16 +1,16 @@
-# Graph Report - dev_scripts  (2026-06-22)
+# Graph Report - dev_scripts  (2026-06-25)
 
 ## Corpus Check
-- 718 files · ~2,025,789 words
+- 844 files · ~4,496,436 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 7431 nodes · 10204 edges · 677 communities (587 shown, 90 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 58 edges (avg confidence: 0.8)
+- 12509 nodes · 15332 edges · 1086 communities (994 shown, 92 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 79 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `bb15492d`
+- Built from commit: `e2af219f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -72,6 +72,7 @@
 - [[_COMMUNITY_Community 54|Community 54]]
 - [[_COMMUNITY_Community 56|Community 56]]
 - [[_COMMUNITY_Community 57|Community 57]]
+- [[_COMMUNITY_Community 58|Community 58]]
 - [[_COMMUNITY_Community 59|Community 59]]
 - [[_COMMUNITY_Community 60|Community 60]]
 - [[_COMMUNITY_Community 61|Community 61]]
@@ -152,6 +153,7 @@
 - [[_COMMUNITY_Community 209|Community 209]]
 - [[_COMMUNITY_Community 210|Community 210]]
 - [[_COMMUNITY_Community 211|Community 211]]
+- [[_COMMUNITY_Community 212|Community 212]]
 - [[_COMMUNITY_Community 213|Community 213]]
 - [[_COMMUNITY_Community 215|Community 215]]
 - [[_COMMUNITY_Community 216|Community 216]]
@@ -498,75 +500,453 @@
 - [[_COMMUNITY_Community 657|Community 657]]
 - [[_COMMUNITY_Community 659|Community 659]]
 - [[_COMMUNITY_Community 660|Community 660]]
+- [[_COMMUNITY_Community 665|Community 665]]
+- [[_COMMUNITY_Community 677|Community 677]]
+- [[_COMMUNITY_Community 678|Community 678]]
+- [[_COMMUNITY_Community 679|Community 679]]
+- [[_COMMUNITY_Community 680|Community 680]]
+- [[_COMMUNITY_Community 681|Community 681]]
+- [[_COMMUNITY_Community 682|Community 682]]
+- [[_COMMUNITY_Community 683|Community 683]]
+- [[_COMMUNITY_Community 684|Community 684]]
+- [[_COMMUNITY_Community 685|Community 685]]
+- [[_COMMUNITY_Community 686|Community 686]]
+- [[_COMMUNITY_Community 687|Community 687]]
+- [[_COMMUNITY_Community 688|Community 688]]
+- [[_COMMUNITY_Community 689|Community 689]]
+- [[_COMMUNITY_Community 690|Community 690]]
+- [[_COMMUNITY_Community 691|Community 691]]
+- [[_COMMUNITY_Community 692|Community 692]]
+- [[_COMMUNITY_Community 693|Community 693]]
+- [[_COMMUNITY_Community 694|Community 694]]
+- [[_COMMUNITY_Community 695|Community 695]]
+- [[_COMMUNITY_Community 696|Community 696]]
+- [[_COMMUNITY_Community 697|Community 697]]
+- [[_COMMUNITY_Community 698|Community 698]]
+- [[_COMMUNITY_Community 699|Community 699]]
+- [[_COMMUNITY_Community 700|Community 700]]
+- [[_COMMUNITY_Community 701|Community 701]]
+- [[_COMMUNITY_Community 702|Community 702]]
+- [[_COMMUNITY_Community 703|Community 703]]
+- [[_COMMUNITY_Community 704|Community 704]]
+- [[_COMMUNITY_Community 705|Community 705]]
+- [[_COMMUNITY_Community 706|Community 706]]
+- [[_COMMUNITY_Community 707|Community 707]]
+- [[_COMMUNITY_Community 708|Community 708]]
+- [[_COMMUNITY_Community 709|Community 709]]
+- [[_COMMUNITY_Community 710|Community 710]]
+- [[_COMMUNITY_Community 711|Community 711]]
+- [[_COMMUNITY_Community 712|Community 712]]
+- [[_COMMUNITY_Community 713|Community 713]]
+- [[_COMMUNITY_Community 714|Community 714]]
+- [[_COMMUNITY_Community 715|Community 715]]
+- [[_COMMUNITY_Community 716|Community 716]]
+- [[_COMMUNITY_Community 717|Community 717]]
+- [[_COMMUNITY_Community 718|Community 718]]
+- [[_COMMUNITY_Community 719|Community 719]]
+- [[_COMMUNITY_Community 720|Community 720]]
+- [[_COMMUNITY_Community 721|Community 721]]
+- [[_COMMUNITY_Community 722|Community 722]]
+- [[_COMMUNITY_Community 723|Community 723]]
+- [[_COMMUNITY_Community 724|Community 724]]
+- [[_COMMUNITY_Community 725|Community 725]]
+- [[_COMMUNITY_Community 726|Community 726]]
+- [[_COMMUNITY_Community 727|Community 727]]
+- [[_COMMUNITY_Community 728|Community 728]]
+- [[_COMMUNITY_Community 729|Community 729]]
+- [[_COMMUNITY_Community 730|Community 730]]
+- [[_COMMUNITY_Community 731|Community 731]]
+- [[_COMMUNITY_Community 732|Community 732]]
+- [[_COMMUNITY_Community 733|Community 733]]
+- [[_COMMUNITY_Community 734|Community 734]]
+- [[_COMMUNITY_Community 735|Community 735]]
+- [[_COMMUNITY_Community 736|Community 736]]
+- [[_COMMUNITY_Community 737|Community 737]]
+- [[_COMMUNITY_Community 738|Community 738]]
+- [[_COMMUNITY_Community 739|Community 739]]
+- [[_COMMUNITY_Community 740|Community 740]]
+- [[_COMMUNITY_Community 741|Community 741]]
+- [[_COMMUNITY_Community 742|Community 742]]
+- [[_COMMUNITY_Community 743|Community 743]]
+- [[_COMMUNITY_Community 744|Community 744]]
+- [[_COMMUNITY_Community 745|Community 745]]
+- [[_COMMUNITY_Community 746|Community 746]]
+- [[_COMMUNITY_Community 747|Community 747]]
+- [[_COMMUNITY_Community 748|Community 748]]
+- [[_COMMUNITY_Community 749|Community 749]]
+- [[_COMMUNITY_Community 750|Community 750]]
+- [[_COMMUNITY_Community 751|Community 751]]
+- [[_COMMUNITY_Community 752|Community 752]]
+- [[_COMMUNITY_Community 753|Community 753]]
+- [[_COMMUNITY_Community 754|Community 754]]
+- [[_COMMUNITY_Community 755|Community 755]]
+- [[_COMMUNITY_Community 756|Community 756]]
+- [[_COMMUNITY_Community 757|Community 757]]
+- [[_COMMUNITY_Community 758|Community 758]]
+- [[_COMMUNITY_Community 759|Community 759]]
+- [[_COMMUNITY_Community 760|Community 760]]
+- [[_COMMUNITY_Community 761|Community 761]]
+- [[_COMMUNITY_Community 762|Community 762]]
+- [[_COMMUNITY_Community 763|Community 763]]
+- [[_COMMUNITY_Community 764|Community 764]]
+- [[_COMMUNITY_Community 765|Community 765]]
+- [[_COMMUNITY_Community 766|Community 766]]
+- [[_COMMUNITY_Community 767|Community 767]]
+- [[_COMMUNITY_Community 768|Community 768]]
+- [[_COMMUNITY_Community 769|Community 769]]
+- [[_COMMUNITY_Community 770|Community 770]]
+- [[_COMMUNITY_Community 771|Community 771]]
+- [[_COMMUNITY_Community 772|Community 772]]
+- [[_COMMUNITY_Community 773|Community 773]]
+- [[_COMMUNITY_Community 774|Community 774]]
+- [[_COMMUNITY_Community 775|Community 775]]
+- [[_COMMUNITY_Community 776|Community 776]]
+- [[_COMMUNITY_Community 777|Community 777]]
+- [[_COMMUNITY_Community 778|Community 778]]
+- [[_COMMUNITY_Community 779|Community 779]]
+- [[_COMMUNITY_Community 780|Community 780]]
+- [[_COMMUNITY_Community 781|Community 781]]
+- [[_COMMUNITY_Community 782|Community 782]]
+- [[_COMMUNITY_Community 783|Community 783]]
+- [[_COMMUNITY_Community 784|Community 784]]
+- [[_COMMUNITY_Community 785|Community 785]]
+- [[_COMMUNITY_Community 786|Community 786]]
+- [[_COMMUNITY_Community 787|Community 787]]
+- [[_COMMUNITY_Community 788|Community 788]]
+- [[_COMMUNITY_Community 789|Community 789]]
+- [[_COMMUNITY_Community 790|Community 790]]
+- [[_COMMUNITY_Community 791|Community 791]]
+- [[_COMMUNITY_Community 792|Community 792]]
+- [[_COMMUNITY_Community 793|Community 793]]
+- [[_COMMUNITY_Community 794|Community 794]]
+- [[_COMMUNITY_Community 795|Community 795]]
+- [[_COMMUNITY_Community 796|Community 796]]
+- [[_COMMUNITY_Community 797|Community 797]]
+- [[_COMMUNITY_Community 798|Community 798]]
+- [[_COMMUNITY_Community 799|Community 799]]
+- [[_COMMUNITY_Community 800|Community 800]]
+- [[_COMMUNITY_Community 801|Community 801]]
+- [[_COMMUNITY_Community 802|Community 802]]
+- [[_COMMUNITY_Community 803|Community 803]]
+- [[_COMMUNITY_Community 804|Community 804]]
+- [[_COMMUNITY_Community 805|Community 805]]
+- [[_COMMUNITY_Community 806|Community 806]]
+- [[_COMMUNITY_Community 807|Community 807]]
+- [[_COMMUNITY_Community 808|Community 808]]
+- [[_COMMUNITY_Community 809|Community 809]]
+- [[_COMMUNITY_Community 810|Community 810]]
+- [[_COMMUNITY_Community 811|Community 811]]
+- [[_COMMUNITY_Community 812|Community 812]]
+- [[_COMMUNITY_Community 813|Community 813]]
+- [[_COMMUNITY_Community 814|Community 814]]
+- [[_COMMUNITY_Community 815|Community 815]]
+- [[_COMMUNITY_Community 816|Community 816]]
+- [[_COMMUNITY_Community 817|Community 817]]
+- [[_COMMUNITY_Community 818|Community 818]]
+- [[_COMMUNITY_Community 819|Community 819]]
+- [[_COMMUNITY_Community 820|Community 820]]
+- [[_COMMUNITY_Community 821|Community 821]]
+- [[_COMMUNITY_Community 822|Community 822]]
+- [[_COMMUNITY_Community 823|Community 823]]
+- [[_COMMUNITY_Community 824|Community 824]]
+- [[_COMMUNITY_Community 825|Community 825]]
+- [[_COMMUNITY_Community 826|Community 826]]
+- [[_COMMUNITY_Community 827|Community 827]]
+- [[_COMMUNITY_Community 828|Community 828]]
+- [[_COMMUNITY_Community 829|Community 829]]
+- [[_COMMUNITY_Community 830|Community 830]]
+- [[_COMMUNITY_Community 831|Community 831]]
+- [[_COMMUNITY_Community 832|Community 832]]
+- [[_COMMUNITY_Community 833|Community 833]]
+- [[_COMMUNITY_Community 834|Community 834]]
+- [[_COMMUNITY_Community 835|Community 835]]
+- [[_COMMUNITY_Community 836|Community 836]]
+- [[_COMMUNITY_Community 837|Community 837]]
+- [[_COMMUNITY_Community 838|Community 838]]
+- [[_COMMUNITY_Community 839|Community 839]]
+- [[_COMMUNITY_Community 840|Community 840]]
+- [[_COMMUNITY_Community 841|Community 841]]
+- [[_COMMUNITY_Community 842|Community 842]]
+- [[_COMMUNITY_Community 843|Community 843]]
+- [[_COMMUNITY_Community 844|Community 844]]
+- [[_COMMUNITY_Community 845|Community 845]]
+- [[_COMMUNITY_Community 846|Community 846]]
+- [[_COMMUNITY_Community 847|Community 847]]
+- [[_COMMUNITY_Community 848|Community 848]]
+- [[_COMMUNITY_Community 849|Community 849]]
+- [[_COMMUNITY_Community 850|Community 850]]
+- [[_COMMUNITY_Community 851|Community 851]]
+- [[_COMMUNITY_Community 852|Community 852]]
+- [[_COMMUNITY_Community 853|Community 853]]
+- [[_COMMUNITY_Community 854|Community 854]]
+- [[_COMMUNITY_Community 855|Community 855]]
+- [[_COMMUNITY_Community 856|Community 856]]
+- [[_COMMUNITY_Community 857|Community 857]]
+- [[_COMMUNITY_Community 858|Community 858]]
+- [[_COMMUNITY_Community 859|Community 859]]
+- [[_COMMUNITY_Community 860|Community 860]]
+- [[_COMMUNITY_Community 861|Community 861]]
+- [[_COMMUNITY_Community 862|Community 862]]
+- [[_COMMUNITY_Community 863|Community 863]]
+- [[_COMMUNITY_Community 864|Community 864]]
+- [[_COMMUNITY_Community 865|Community 865]]
+- [[_COMMUNITY_Community 866|Community 866]]
+- [[_COMMUNITY_Community 867|Community 867]]
+- [[_COMMUNITY_Community 868|Community 868]]
+- [[_COMMUNITY_Community 869|Community 869]]
+- [[_COMMUNITY_Community 870|Community 870]]
+- [[_COMMUNITY_Community 871|Community 871]]
+- [[_COMMUNITY_Community 872|Community 872]]
+- [[_COMMUNITY_Community 873|Community 873]]
+- [[_COMMUNITY_Community 874|Community 874]]
+- [[_COMMUNITY_Community 875|Community 875]]
+- [[_COMMUNITY_Community 876|Community 876]]
+- [[_COMMUNITY_Community 877|Community 877]]
+- [[_COMMUNITY_Community 878|Community 878]]
+- [[_COMMUNITY_Community 879|Community 879]]
+- [[_COMMUNITY_Community 880|Community 880]]
+- [[_COMMUNITY_Community 881|Community 881]]
+- [[_COMMUNITY_Community 882|Community 882]]
+- [[_COMMUNITY_Community 883|Community 883]]
+- [[_COMMUNITY_Community 884|Community 884]]
+- [[_COMMUNITY_Community 885|Community 885]]
+- [[_COMMUNITY_Community 886|Community 886]]
+- [[_COMMUNITY_Community 887|Community 887]]
+- [[_COMMUNITY_Community 888|Community 888]]
+- [[_COMMUNITY_Community 889|Community 889]]
+- [[_COMMUNITY_Community 890|Community 890]]
+- [[_COMMUNITY_Community 891|Community 891]]
+- [[_COMMUNITY_Community 892|Community 892]]
+- [[_COMMUNITY_Community 893|Community 893]]
+- [[_COMMUNITY_Community 894|Community 894]]
+- [[_COMMUNITY_Community 895|Community 895]]
+- [[_COMMUNITY_Community 896|Community 896]]
+- [[_COMMUNITY_Community 897|Community 897]]
+- [[_COMMUNITY_Community 898|Community 898]]
+- [[_COMMUNITY_Community 899|Community 899]]
+- [[_COMMUNITY_Community 900|Community 900]]
+- [[_COMMUNITY_Community 901|Community 901]]
+- [[_COMMUNITY_Community 902|Community 902]]
+- [[_COMMUNITY_Community 903|Community 903]]
+- [[_COMMUNITY_Community 904|Community 904]]
+- [[_COMMUNITY_Community 905|Community 905]]
+- [[_COMMUNITY_Community 906|Community 906]]
+- [[_COMMUNITY_Community 907|Community 907]]
+- [[_COMMUNITY_Community 908|Community 908]]
+- [[_COMMUNITY_Community 909|Community 909]]
+- [[_COMMUNITY_Community 910|Community 910]]
+- [[_COMMUNITY_Community 911|Community 911]]
+- [[_COMMUNITY_Community 912|Community 912]]
+- [[_COMMUNITY_Community 913|Community 913]]
+- [[_COMMUNITY_Community 914|Community 914]]
+- [[_COMMUNITY_Community 915|Community 915]]
+- [[_COMMUNITY_Community 916|Community 916]]
+- [[_COMMUNITY_Community 917|Community 917]]
+- [[_COMMUNITY_Community 918|Community 918]]
+- [[_COMMUNITY_Community 919|Community 919]]
+- [[_COMMUNITY_Community 920|Community 920]]
+- [[_COMMUNITY_Community 921|Community 921]]
+- [[_COMMUNITY_Community 922|Community 922]]
+- [[_COMMUNITY_Community 923|Community 923]]
+- [[_COMMUNITY_Community 924|Community 924]]
+- [[_COMMUNITY_Community 925|Community 925]]
+- [[_COMMUNITY_Community 926|Community 926]]
+- [[_COMMUNITY_Community 927|Community 927]]
+- [[_COMMUNITY_Community 928|Community 928]]
+- [[_COMMUNITY_Community 929|Community 929]]
+- [[_COMMUNITY_Community 930|Community 930]]
+- [[_COMMUNITY_Community 931|Community 931]]
+- [[_COMMUNITY_Community 932|Community 932]]
+- [[_COMMUNITY_Community 933|Community 933]]
+- [[_COMMUNITY_Community 934|Community 934]]
+- [[_COMMUNITY_Community 935|Community 935]]
+- [[_COMMUNITY_Community 936|Community 936]]
+- [[_COMMUNITY_Community 937|Community 937]]
+- [[_COMMUNITY_Community 938|Community 938]]
+- [[_COMMUNITY_Community 939|Community 939]]
+- [[_COMMUNITY_Community 940|Community 940]]
+- [[_COMMUNITY_Community 941|Community 941]]
+- [[_COMMUNITY_Community 942|Community 942]]
+- [[_COMMUNITY_Community 943|Community 943]]
+- [[_COMMUNITY_Community 944|Community 944]]
+- [[_COMMUNITY_Community 945|Community 945]]
+- [[_COMMUNITY_Community 946|Community 946]]
+- [[_COMMUNITY_Community 947|Community 947]]
+- [[_COMMUNITY_Community 948|Community 948]]
+- [[_COMMUNITY_Community 949|Community 949]]
+- [[_COMMUNITY_Community 950|Community 950]]
+- [[_COMMUNITY_Community 951|Community 951]]
+- [[_COMMUNITY_Community 952|Community 952]]
+- [[_COMMUNITY_Community 953|Community 953]]
+- [[_COMMUNITY_Community 954|Community 954]]
+- [[_COMMUNITY_Community 955|Community 955]]
+- [[_COMMUNITY_Community 956|Community 956]]
+- [[_COMMUNITY_Community 957|Community 957]]
+- [[_COMMUNITY_Community 958|Community 958]]
+- [[_COMMUNITY_Community 959|Community 959]]
+- [[_COMMUNITY_Community 960|Community 960]]
+- [[_COMMUNITY_Community 961|Community 961]]
+- [[_COMMUNITY_Community 962|Community 962]]
+- [[_COMMUNITY_Community 963|Community 963]]
+- [[_COMMUNITY_Community 964|Community 964]]
+- [[_COMMUNITY_Community 965|Community 965]]
+- [[_COMMUNITY_Community 966|Community 966]]
+- [[_COMMUNITY_Community 967|Community 967]]
+- [[_COMMUNITY_Community 968|Community 968]]
+- [[_COMMUNITY_Community 969|Community 969]]
+- [[_COMMUNITY_Community 970|Community 970]]
+- [[_COMMUNITY_Community 971|Community 971]]
+- [[_COMMUNITY_Community 972|Community 972]]
+- [[_COMMUNITY_Community 973|Community 973]]
+- [[_COMMUNITY_Community 974|Community 974]]
+- [[_COMMUNITY_Community 975|Community 975]]
+- [[_COMMUNITY_Community 976|Community 976]]
+- [[_COMMUNITY_Community 977|Community 977]]
+- [[_COMMUNITY_Community 978|Community 978]]
+- [[_COMMUNITY_Community 979|Community 979]]
+- [[_COMMUNITY_Community 980|Community 980]]
+- [[_COMMUNITY_Community 981|Community 981]]
+- [[_COMMUNITY_Community 982|Community 982]]
+- [[_COMMUNITY_Community 983|Community 983]]
+- [[_COMMUNITY_Community 984|Community 984]]
+- [[_COMMUNITY_Community 985|Community 985]]
+- [[_COMMUNITY_Community 986|Community 986]]
+- [[_COMMUNITY_Community 987|Community 987]]
+- [[_COMMUNITY_Community 988|Community 988]]
+- [[_COMMUNITY_Community 989|Community 989]]
+- [[_COMMUNITY_Community 990|Community 990]]
+- [[_COMMUNITY_Community 991|Community 991]]
+- [[_COMMUNITY_Community 992|Community 992]]
+- [[_COMMUNITY_Community 993|Community 993]]
+- [[_COMMUNITY_Community 994|Community 994]]
+- [[_COMMUNITY_Community 995|Community 995]]
+- [[_COMMUNITY_Community 996|Community 996]]
+- [[_COMMUNITY_Community 997|Community 997]]
+- [[_COMMUNITY_Community 998|Community 998]]
+- [[_COMMUNITY_Community 999|Community 999]]
+- [[_COMMUNITY_Community 1000|Community 1000]]
+- [[_COMMUNITY_Community 1001|Community 1001]]
+- [[_COMMUNITY_Community 1002|Community 1002]]
+- [[_COMMUNITY_Community 1003|Community 1003]]
+- [[_COMMUNITY_Community 1004|Community 1004]]
+- [[_COMMUNITY_Community 1005|Community 1005]]
+- [[_COMMUNITY_Community 1006|Community 1006]]
+- [[_COMMUNITY_Community 1007|Community 1007]]
+- [[_COMMUNITY_Community 1008|Community 1008]]
+- [[_COMMUNITY_Community 1009|Community 1009]]
+- [[_COMMUNITY_Community 1010|Community 1010]]
+- [[_COMMUNITY_Community 1011|Community 1011]]
+- [[_COMMUNITY_Community 1012|Community 1012]]
+- [[_COMMUNITY_Community 1013|Community 1013]]
+- [[_COMMUNITY_Community 1014|Community 1014]]
+- [[_COMMUNITY_Community 1015|Community 1015]]
+- [[_COMMUNITY_Community 1016|Community 1016]]
+- [[_COMMUNITY_Community 1017|Community 1017]]
+- [[_COMMUNITY_Community 1018|Community 1018]]
+- [[_COMMUNITY_Community 1019|Community 1019]]
+- [[_COMMUNITY_Community 1020|Community 1020]]
+- [[_COMMUNITY_Community 1021|Community 1021]]
+- [[_COMMUNITY_Community 1022|Community 1022]]
+- [[_COMMUNITY_Community 1023|Community 1023]]
+- [[_COMMUNITY_Community 1024|Community 1024]]
+- [[_COMMUNITY_Community 1025|Community 1025]]
+- [[_COMMUNITY_Community 1026|Community 1026]]
+- [[_COMMUNITY_Community 1027|Community 1027]]
+- [[_COMMUNITY_Community 1028|Community 1028]]
+- [[_COMMUNITY_Community 1029|Community 1029]]
+- [[_COMMUNITY_Community 1030|Community 1030]]
+- [[_COMMUNITY_Community 1031|Community 1031]]
+- [[_COMMUNITY_Community 1032|Community 1032]]
+- [[_COMMUNITY_Community 1033|Community 1033]]
+- [[_COMMUNITY_Community 1034|Community 1034]]
+- [[_COMMUNITY_Community 1035|Community 1035]]
+- [[_COMMUNITY_Community 1036|Community 1036]]
+- [[_COMMUNITY_Community 1037|Community 1037]]
+- [[_COMMUNITY_Community 1038|Community 1038]]
+- [[_COMMUNITY_Community 1039|Community 1039]]
+- [[_COMMUNITY_Community 1040|Community 1040]]
+- [[_COMMUNITY_Community 1041|Community 1041]]
+- [[_COMMUNITY_Community 1042|Community 1042]]
+- [[_COMMUNITY_Community 1043|Community 1043]]
+- [[_COMMUNITY_Community 1044|Community 1044]]
+- [[_COMMUNITY_Community 1045|Community 1045]]
+- [[_COMMUNITY_Community 1048|Community 1048]]
+- [[_COMMUNITY_Community 1050|Community 1050]]
+- [[_COMMUNITY_Community 1051|Community 1051]]
+- [[_COMMUNITY_Community 1055|Community 1055]]
+- [[_COMMUNITY_Community 1057|Community 1057]]
+- [[_COMMUNITY_Community 1058|Community 1058]]
+- [[_COMMUNITY_Community 1065|Community 1065]]
+- [[_COMMUNITY_Community 1072|Community 1072]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `TournamentPrefixes` - 353 edges
-2. `TournamentPrefixes` - 242 edges
-3. `TournamentPrefixes` - 230 edges
-4. `TournamentPrefixes` - 230 edges
-5. `cn()` - 158 edges
-6. `LeagueMapping` - 87 edges
-7. `logo` - 48 edges
-8. `$` - 48 edges
-9. `Button` - 47 edges
-10. `Card` - 47 edges
+2. `TournamentPrefixes` - 353 edges
+3. `TournamentPrefixes` - 353 edges
+4. `TournamentPrefixes` - 353 edges
+5. `TournamentPrefixes` - 353 edges
+6. `TournamentPrefixes` - 242 edges
+7. `TournamentPrefixes` - 230 edges
+8. `TournamentPrefixes` - 230 edges
+9. `cn()` - 163 edges
+10. `LeagueMapping` - 87 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `mapApiMatchToModel()` --calls--> `hasMeaningfulScores()`  [INFERRED]
-  src/services/cricketMapper.ts → server/controllers/featuredController.js
-- `TournamentManager()` --calls--> `groupPlayersByRole()`  [INFERRED]
-  TM.tsx → src/components/FootballPitchLineup.tsx
-- `updatePointsTable()` --calls--> `oversToDecimal()`  [INFERRED]
-  server/controllers/matchController.js → src/lib/cricketUtils.ts
-- `testMatchScrape()` --calls--> `$`  [INFERRED]
-  server/test_all_matches.mjs → server/parse_cheerio.js
-- `test()` --calls--> `$`  [INFERRED]
-  server/test_cricbuzz_debug.mjs → server/parse_cheerio.js
+- `fetchStandings()` --calls--> `fetch()`  [INFERRED]
+  src/components/football/FootballStandings.tsx → server/test_fotmob_nextdata.mjs
+- `fetchTopStats()` --calls--> `fetch()`  [INFERRED]
+  src/hooks/football/useTopStats.ts → server/test_fotmob_nextdata.mjs
+- `fetchFotmobPlayerProfileByName()` --calls--> `fetch()`  [INFERRED]
+  src/hooks/useFootballSquads.ts → server/test_fotmob_nextdata.mjs
+- `fetchFotmobSquad()` --calls--> `fetch()`  [INFERRED]
+  src/hooks/useFootballSquads.ts → server/test_fotmob_nextdata.mjs
+- `fetchMatches()` --calls--> `fetch()`  [INFERRED]
+  fetch_stats.mjs → server/test_fotmob_nextdata.mjs
 
 ## Import Cycles
 - 1-file cycle: `src/data/achievements.ts -> src/data/achievements.ts`
 
-## Communities (677 total, 90 thin omitted)
+## Communities (1086 total, 92 thin omitted)
 
 ### Community 0 - "Football Match Controller"
 Cohesion: 0.11
-Nodes (34): cache, clearCache(), computeStatusLine(), FD_CUP_CODES, FD_INTL_CODES, FD_LEAGUE_CODES, fetchCurrentSeasons(), fetchLastMatches() (+26 more)
+Nodes (35): cache, clearCache(), computeStatusLine(), FD_CUP_CODES, FD_INTL_CODES, FD_LEAGUE_CODES, fetchCurrentSeasons(), fetchLastMatches() (+27 more)
 
 ### Community 1 - "UI Utils and NavLink"
 Cohesion: 0.06
-Nodes (34): AuditLogs(), FootballTournamentManager(), MatchManager(), PlatformSettings(), PlayerManager(), TeamManager(), TournamentManager(), BATTING_CATEGORIES (+26 more)
+Nodes (19): AuditLogs(), FootballTournamentManager(), MatchManager(), PlatformSettings(), PlayerManager(), TeamManager(), TournamentManager(), UserManager() (+11 more)
 
 ### Community 2 - "Admin Audit & Settings"
-Cohesion: 0.08
-Nodes (35): LogEntry, AdvancedSearchProps, SearchFilters, ChartData, DataVisualizationProps, EmptyState(), EmptyStateProps, PaginationProps (+27 more)
+Cohesion: 0.07
+Nodes (38): LogEntry, AuctionControlProps, AdvancedSearchProps, SearchFilters, ChartData, DataVisualizationProps, EmptyState(), EmptyStateProps (+30 more)
 
 ### Community 3 - "Admin Edit Team Dialog"
 Cohesion: 0.01
 Nodes (353): TournamentPrefixes, 10007, 10022, 10043, 10046, 10056, 10059, 10075 (+345 more)
 
 ### Community 4 - "Player Analysis Panel"
-Cohesion: 0.10
-Nodes (20): API_FORMAT_TABS, CHART_TOOLTIP, COUNTRY_CODES, CricketPanels(), getCountryFlagImg(), getTeamColor(), PIE_COLORS, PLAYER_PHOTOS (+12 more)
+Cohesion: 0.07
+Nodes (43): API_FORMAT_TABS, CHART_TOOLTIP, COUNTRY_CODES, CricketPanels(), getCountryFlagImg(), getTeamColor(), PIE_COLORS, PLAYER_PHOTOS (+35 more)
 
 ### Community 5 - "Package Dependencies"
 Cohesion: 0.03
 Nodes (61): dependencies, axios, canvas-confetti, class-variance-authority, clsx, cmdk, date-fns, dotenv (+53 more)
 
 ### Community 6 - "Loading Skeletons"
-Cohesion: 0.07
-Nodes (28): useIsMobile(), Separator, Sidebar, SidebarContent, SidebarContext, SidebarFooter, SidebarGroup, SidebarGroupAction (+20 more)
+Cohesion: 0.06
+Nodes (29): useIsMobile(), Separator, Sidebar, SidebarContent, SidebarContext, SidebarFooter, SidebarGroup, SidebarGroupAction (+21 more)
 
 ### Community 7 - "Admin Player Manager"
-Cohesion: 0.08
-Nodes (42): EditTeamDialog(), PRESET_COLORS, ROLES, MatchManagerProps, ROLES, DetailTab, MatchFilter, PRESET_COLORS (+34 more)
+Cohesion: 0.07
+Nodes (50): EditTeamDialog(), PRESET_COLORS, ROLES, MatchManagerProps, ROLES, DetailTab, MatchFilter, PRESET_COLORS (+42 more)
 
 ### Community 8 - "Venue Analysis Panel"
 Cohesion: 0.07
 Nodes (30): CHART_TOOLTIP, PIE_COLORS, SPORT_CONFIG, BasketballVenueStats, bernabeu, CricketVenueStats, cryptoArena, FootballVenueStats (+22 more)
 
 ### Community 9 - "Activity & Cricket Controller"
-Cohesion: 0.06
-Nodes (34): initializePassport(), getAchievements, getActivityHistory, getActivitySummary, clearCache, getAllMatches, getLiveMatches, getMatchScorecard (+26 more)
+Cohesion: 0.08
+Nodes (26): initializePassport(), getAchievements, getActivityHistory, getActivitySummary, getMatchSquads, getPreferences, getProfile, getUserStats (+18 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.10
@@ -577,8 +957,8 @@ Cohesion: 0.08
 Nodes (24): devDependencies, autoprefixer, axios, cheerio, concurrently, eslint, @eslint/js, eslint-plugin-react-hooks (+16 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.10
-Nodes (30): extractMatches(), fetchCricbuzz(), fetchScraper(), getCricketMatchMini(), getCricketMatchScorecard(), getLiveCricketMatches(), getMatchDetailDynamic(), getRecentCricketMatches() (+22 more)
+Cohesion: 0.13
+Nodes (22): extractMatches(), fetchCricbuzz(), fetchScraper(), getCricketMatchMini(), getCricketMatchScorecard(), getLiveCricketMatches(), getMatchDetailDynamic(), getPerformanceLabPlayerStats() (+14 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.15
@@ -586,11 +966,11 @@ Nodes (17): emitScoreUpdate(), getIO(), initSocket(), createMatch, deleteMatch, 
 
 ### Community 14 - "Community 14"
 Cohesion: 0.05
-Nodes (38): author, dependencies, axios, bcryptjs, cheerio, cors, cricbuzz-scraper, dotenv (+30 more)
+Nodes (43): author, dependencies, axios, bcryptjs, cheerio, cloudscraper, cors, cricbuzz-scraper (+35 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.08
-Nodes (21): FootballPerformanceDashboard(), ActivePlayerLab(), FootballPerformanceLab(), FootballPerformanceLabProps, FootballSidebar(), FootballSidebarProps, COUNTRY_CODES, FotmobPlayerCard() (+13 more)
+Cohesion: 0.09
+Nodes (16): COUNTRY_CODE_MAP, CustomPlayerDot(), getFlagUrl(), PlayerComparison(), PlayerSelectorHUD(), SectionCard(), TOOLTIP_STYLE, COUNTRY_CODES (+8 more)
 
 ### Community 16 - "Community 16"
 Cohesion: 0.40
@@ -605,28 +985,28 @@ Cohesion: 0.01
 Nodes (242): TournamentPrefixes, 10007, 10022, 10043, 10046, 10056, 10059, 10075 (+234 more)
 
 ### Community 19 - "Community 19"
-Cohesion: 0.21
-Nodes (13): extraEnglandPlayers, extraNZPlayers, extraPakistanPlayers, extraSAPlayers, afghanistanPlayers, bangladeshPlayers, sriLankaPlayers, westIndiesPlayers (+5 more)
+Cohesion: 0.08
+Nodes (27): COUNTRY_ISO, CountrySelectHUD(), CountryTeam, PIE_COLORS, SectionCard(), SPORT_STAT_KEYS, StatComparisonSegment(), TeamComparisonPanel() (+19 more)
 
 ### Community 20 - "Community 20"
-Cohesion: 0.13
-Nodes (10): Ball, ballSchema, Match, matchSchema, __dirname, __filename, migratePlayersIfNeeded(), normalizePlayer() (+2 more)
+Cohesion: 0.09
+Nodes (17): createTeam, getTeamById, getTeams, updateTeam, Ball, ballSchema, Match, matchSchema (+9 more)
 
 ### Community 21 - "Community 21"
 Cohesion: 0.04
-Nodes (43): BatsmanStats, BowlerStats, EXTRAS_COLORS, LabProps, OverStats, TOOLTIP_STYLE, buildScorecardFromBalls(), DetailTab (+35 more)
+Nodes (45): BatsmanStats, BowlerStats, EXTRAS_COLORS, LabProps, OverStats, TOOLTIP_STYLE, buildScorecardFromBalls(), DetailTab (+37 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.09
-Nodes (23): Category, CATEGORY_API_MAP, COUNTRY_SHORT_NAMES, CricketRankings(), Format, FORMAT_API_MAP, formatLastUpdated(), MEDAL_STYLES (+15 more)
+Cohesion: 0.10
+Nodes (22): Category, CATEGORY_API_MAP, COUNTRY_SHORT_NAMES, CricketRankings(), FORMAT_API_MAP, formatLastUpdated(), MEDAL_STYLES, mockPlayerRankings (+14 more)
 
 ### Community 23 - "Community 23"
 Cohesion: 0.09
 Nodes (21): compilerOptions, allowImportingTsExtensions, baseUrl, isolatedModules, jsx, lib, module, moduleDetection (+13 more)
 
 ### Community 24 - "Community 24"
-Cohesion: 0.12
-Nodes (17): test(), test(), commentaryCache, computeAllBowlingStats(), computeAllStats(), extractJsonObjects(), fetchLiveMatchesScraped(), fetchMatchDetailScraped() (+9 more)
+Cohesion: 0.08
+Nodes (24): cricketTeamSchema, __dirname, __filename, memCache, router, teamLogoQueue, commentaryCache, extractJsonObjects() (+16 more)
 
 ### Community 25 - "Community 25"
 Cohesion: 0.01
@@ -645,8 +1025,8 @@ Cohesion: 0.12
 Nodes (16): aliases, components, hooks, lib, ui, utils, rsc, $schema (+8 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.10
-Nodes (20): derivePlayerPerformance(), distributePlayersToRows(), FootballPitchLineupProps, getRatingColor(), getRowYPositions(), parseFormation(), PitchField(), PlayerNode() (+12 more)
+Cohesion: 0.16
+Nodes (9): fetchPlayerImage(), FORCE_ESPN_NAMES, getCachedImage(), imageCache, LineupPlayerImageProps, pendingRequests, processQueue(), queue (+1 more)
 
 ### Community 30 - "Community 30"
 Cohesion: 0.20
@@ -661,12 +1041,12 @@ Cohesion: 0.05
 Nodes (42): data, matchInfo, matchScore, inningsId, overs, runs, wickets, currBatTeamId (+34 more)
 
 ### Community 33 - "Community 33"
-Cohesion: 0.17
-Nodes (11): Cnm, CnmT, CompD, CompId, CompN, CompST, CompUrlName, Feed (+3 more)
+Cohesion: 0.11
+Nodes (18): Cnm, CnmT, CompD, CompId, CompN, CompST, CompUrlName, Feed (+10 more)
 
 ### Community 34 - "Community 34"
 Cohesion: 0.07
-Nodes (24): BatsmanData, BowlerData, COLORS, CricketPerformanceLab(), CricketPerformanceLabProps, ExtrasData, FOWData, INNINGS_COLORS (+16 more)
+Nodes (23): BatsmanData, BowlerData, COLORS, CricketPerformanceLab(), CricketPerformanceLabProps, ExtrasData, FOWData, INNINGS_COLORS (+15 more)
 
 ### Community 35 - "Community 35"
 Cohesion: 0.17
@@ -689,8 +1069,8 @@ Cohesion: 0.17
 Nodes (10): checkPlayerInTournament, createPlayer, getPlayerMatchup, getPlayerStats, searchPlayers, updatePlayerPhoto, Player, playerSchema (+2 more)
 
 ### Community 40 - "Community 40"
-Cohesion: 0.11
-Nodes (10): User, userSchema, __dirname, __filename, __dirname, __filename, __dirname, __filename (+2 more)
+Cohesion: 0.13
+Nodes (8): User, userSchema, __dirname, __filename, __dirname, __filename, __dirname, __filename
 
 ### Community 41 - "Community 41"
 Cohesion: 0.17
@@ -701,16 +1081,16 @@ Cohesion: 0.02
 Nodes (87): LeagueMapping, 10015, 10022, 10023, 10024, 10028, 10033, 10034 (+79 more)
 
 ### Community 43 - "Community 43"
-Cohesion: 0.09
-Nodes (35): Player, SortConfig, SortField, SortOrder, UserData, AuctionControl(), AuctionControlProps, ConfirmModalProps (+27 more)
+Cohesion: 0.07
+Nodes (37): Player, SortConfig, SortField, SortOrder, UserData, AuctionControl(), ConfirmModalProps, Notification (+29 more)
 
 ### Community 44 - "Community 44"
 Cohesion: 0.14
 Nodes (12): Carousel, CarouselApi, CarouselContent, CarouselContext, CarouselContextProps, CarouselItem, CarouselNext, CarouselOptions (+4 more)
 
 ### Community 45 - "Community 45"
-Cohesion: 0.14
-Nodes (26): PlayerComparison(), CRICBUZZ_PLAYER_ID_MAP, getCricbuzzPlayerId(), getCricbuzzPlayerIdByName(), usePlayerBattingStats(), usePlayerBattingStatsByName(), UsePlayerBattingStatsResult, TeamBattingStatsResult (+18 more)
+Cohesion: 0.15
+Nodes (25): CRICBUZZ_PLAYER_ID_MAP, getCricbuzzPlayerId(), getCricbuzzPlayerIdByName(), usePlayerBattingStats(), usePlayerBattingStatsByName(), UsePlayerBattingStatsResult, TeamBattingStatsResult, getPlayerBattingStats() (+17 more)
 
 ### Community 46 - "Community 46"
 Cohesion: 0.07
@@ -729,24 +1109,24 @@ Cohesion: 0.15
 Nodes (22): overSeparator, overSeparator, overSeparator, playerId, playerName, playerScore, playerId, playerName (+14 more)
 
 ### Community 50 - "Community 50"
-Cohesion: 0.13
-Nodes (12): COUNTRY_ISO, CountrySelectHUD(), CountryTeam, PIE_COLORS, SectionCard(), SPORT_STAT_KEYS, StatComparisonSegment(), TeamComparisonPanel() (+4 more)
+Cohesion: 0.01
+Nodes (353): TournamentPrefixes, 10007, 10022, 10043, 10046, 10056, 10059, 10075 (+345 more)
 
 ### Community 51 - "Community 51"
-Cohesion: 0.18
-Nodes (7): ChartConfig, ChartContainer, ChartContext, ChartContextProps, ChartLegendContent, ChartTooltipContent, THEMES
+Cohesion: 0.01
+Nodes (353): TournamentPrefixes, 10007, 10022, 10043, 10046, 10056, 10059, 10075 (+345 more)
 
 ### Community 52 - "Community 52"
-Cohesion: 0.05
-Nodes (41): CountryCodes, Language, Participants, TournamentTemplates, ENG, GRL, INT, INT-2 (+33 more)
+Cohesion: 0.08
+Nodes (24): TournamentTemplates, 10096, 10195, 10196, 10197, 10198, 10199, 10200 (+16 more)
 
 ### Community 53 - "Community 53"
 Cohesion: 0.16
 Nodes (12): deletePlayer(), deleteUser(), getPlayers(), getStats(), getUsers(), updateUserRole(), adminOnly(), Tournament (+4 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.07
-Nodes (43): Creator, creators, CreatorsSection(), SocialLinks, LiveBadge(), LiveBadgeProps, LiveTicker(), MatchCard() (+35 more)
+Cohesion: 0.06
+Nodes (52): Creator, creators, CreatorsSection(), SocialLinks, LiveBadge(), LiveBadgeProps, LiveTicker(), MatchCard() (+44 more)
 
 ### Community 56 - "Community 56"
 Cohesion: 0.22
@@ -757,8 +1137,8 @@ Cohesion: 0.09
 Nodes (21): bench, alt, aspect, h, imageId, imageType, priority, src (+13 more)
 
 ### Community 59 - "Community 59"
-Cohesion: 0.07
-Nodes (33): name, @type, @context, itemListElement, @type, meta, @context, mainEntity (+25 more)
+Cohesion: 0.10
+Nodes (21): name, @type, @type, unitText, value, personJSONLD, name, @type (+13 more)
 
 ### Community 60 - "Community 60"
 Cohesion: 0.25
@@ -816,6 +1196,10 @@ Nodes (3): checkExternalAPI(), checkLocalEndpoint(), run()
 Cohesion: 0.05
 Nodes (38): ✅ Admin Dashboard (100%), ✅ Advanced Search (100%), 🎯 ALL FEATURES IMPLEMENTED, ✅ Authentication & Security (100%), 🏆 Complete Feature Implementation, 📚 Comprehensive Documentation, ✅ Dark Theme (100%), 💾 Data Management (+30 more)
 
+### Community 90 - "Community 90"
+Cohesion: 0.10
+Nodes (14): fetchMatches(), fetchFotmobPlayerProfile(), fetchFotmobPlayerTournamentStats(), fetchNationalTeams(), post(), testAuth(), scrapeFotmobPlayer(), extractJsonObjects() (+6 more)
+
 ### Community 159 - "Community 159"
 Cohesion: 0.05
 Nodes (38): 1. **Authentication & User Management**, 2. **Gamification & Competitions**, 3. **User Content & Favorites**, 4. **Advanced Features**, 5. **Admin Dashboard (`/admin`)**, 6. **Enhanced Navigation**, 7. **Protected Routes**, Admin Access (+30 more)
@@ -845,12 +1229,12 @@ Cohesion: 0.14
 Nodes (13): name, private, scripts, build, build:dev, dev, dev:local, lint (+5 more)
 
 ### Community 167 - "Community 167"
-Cohesion: 0.16
-Nodes (23): usePlayerBowlingStats(), usePlayerBowlingStatsByName(), UsePlayerBowlingStatsResult, getPlayerBowlingStats(), BowlingChartData, BowlingFormatBarDataPoint, BowlingFormatKey, BowlingGroupedBarDataPoint (+15 more)
+Cohesion: 0.01
+Nodes (353): TournamentPrefixes, 10007, 10022, 10043, 10046, 10056, 10059, 10075 (+345 more)
 
 ### Community 172 - "Community 172"
 Cohesion: 0.06
-Nodes (41): addMatchEvent, createMatch, deleteMatch, finalizeMatch, getMatchById, updateMatchLineups, updateTimer, addTeamToTournament (+33 more)
+Nodes (43): addMatchEvent, createMatch, deleteMatch, finalizeMatch, getMatchById, updateMatchLineups, updateTimer, addTeamToTournament (+35 more)
 
 ### Community 173 - "Community 173"
 Cohesion: 0.18
@@ -865,16 +1249,16 @@ Cohesion: 0.18
 Nodes (10): Cnm, CnmT, CompD, CompId, CompN, CompUrlName, Feed, Id (+2 more)
 
 ### Community 176 - "Community 176"
-Cohesion: 0.13
-Nodes (11): Notification, TournamentTickerMatch, LeaderboardEntry, UserStats, api, customMatchApi, favoritesApi, leaderboardApi (+3 more)
+Cohesion: 0.01
+Nodes (353): TournamentPrefixes, 10007, 10022, 10043, 10046, 10056, 10059, 10075 (+345 more)
 
 ### Community 178 - "Community 178"
 Cohesion: 0.17
 Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
 
 ### Community 180 - "Community 180"
-Cohesion: 0.08
-Nodes (24): COUNTRY_CODES, FEDERATION_LOGOS, FootballTopStats(), FOTMOB_MAJOR_CATEGORIES, PlayerAvatar(), TeamBadge(), PLAYER_STAT_LABELS, playerPhotoUrl() (+16 more)
+Cohesion: 0.05
+Nodes (55): FifaRankingsTable(), TeamLogo(), footballApi, FootballHome(), Tab, TransferFilter, TransferSort, FootballMatchCard() (+47 more)
 
 ### Community 181 - "Community 181"
 Cohesion: 0.18
@@ -890,7 +1274,7 @@ Nodes (4): getLiveMatchId(), headers, main(), test()
 
 ### Community 187 - "Community 187"
 Cohesion: 0.20
-Nodes (10): Argentina, players, teamInfo, Curaçao, players, teamInfo, Spain, players (+2 more)
+Nodes (10): Algeria, players, teamInfo, Curaçao, players, teamInfo, Spain, players (+2 more)
 
 ### Community 188 - "Community 188"
 Cohesion: 0.67
@@ -901,12 +1285,12 @@ Cohesion: 0.67
 Nodes (3): headers, main(), test()
 
 ### Community 192 - "Community 192"
-Cohesion: 0.18
-Nodes (11): ballMetric, bowlerDetails, commText, commType, event, inningsId, matchId, overSeparator (+3 more)
+Cohesion: 0.17
+Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
 
 ### Community 194 - "Community 194"
-Cohesion: 0.04
-Nodes (67): PlayerCardProps, PlayerProfileDialog(), PlayerProfileDialogProps, TeamLogo(), TeamLogoProps, teams, Player, FootballMatchCardProps (+59 more)
+Cohesion: 0.05
+Nodes (49): TeamLogo(), TeamLogoProps, TransfersResponse, FootballMatchCardProps, badgeCache, FootballTeamLogo(), FootballTeamLogoProps, pendingBadgeRequests (+41 more)
 
 ### Community 195 - "Community 195"
 Cohesion: 0.20
@@ -922,11 +1306,11 @@ Nodes (21): name, @type, @type, unitText, value, personJSONLD, name, @type (+13 
 
 ### Community 198 - "Community 198"
 Cohesion: 0.02
-Nodes (93): MinimalCricketCard(), MinimalCricketCardProps, NavItem(), NavLink, NavLinkCompatProps, VenueAnalysisPanel(), WorldCupHero(), WorldCupHeroProps (+85 more)
+Nodes (94): MinimalCricketCard(), MinimalCricketCardProps, NavItem(), NavLink, NavLinkCompatProps, VenueAnalysisPanel(), WorldCupHero(), WorldCupHeroProps (+86 more)
 
 ### Community 199 - "Community 199"
 Cohesion: 0.04
-Nodes (59): norm(), CricketPlayerImage(), CricketPlayerImageProps, memoryCache, persistCache(), processQueue(), QueueItem, resolveQueue (+51 more)
+Nodes (59): CricketPlayerImage(), CricketPlayerImageProps, memoryCache, persistCache(), processQueue(), QueueItem, resolveQueue, derivePlayerPerformance() (+51 more)
 
 ### Community 200 - "Community 200"
 Cohesion: 0.12
@@ -942,19 +1326,19 @@ Nodes (10): createEventNews(), createMatchReportNews(), getTournamentNews, Footb
 
 ### Community 206 - "Community 206"
 Cohesion: 0.20
-Nodes (10): Algeria, players, teamInfo, Belgium, players, teamInfo, Iran, players (+2 more)
+Nodes (10): Argentina, players, teamInfo, Belgium, players, teamInfo, Iran, players (+2 more)
 
 ### Community 207 - "Community 207"
 Cohesion: 0.23
 Nodes (6): cache, formatDateParam(), getRecentMatches(), getUpcomingMatches(), TOP_LEAGUES, test()
 
 ### Community 208 - "Community 208"
-Cohesion: 0.12
-Nodes (12): AttributeRadar(), AttributeRadarProps, CrossFormatAnalysis(), CrossFormatAnalysisProps, OppositionStats(), OppositionStatsProps, PerformanceTrend(), PerformanceTrendProps (+4 more)
+Cohesion: 0.09
+Nodes (19): AttributeRadar(), AttributeRadarProps, CrossFormatAnalysis(), CrossFormatAnalysisProps, OppositionStats(), OppositionStatsProps, PerformanceTrend(), PerformanceTrendProps (+11 more)
 
 ### Community 209 - "Community 209"
-Cohesion: 0.04
-Nodes (57): footballApiClient, internalApiClient, transfersApiClient, CacheItem, cacheManager, footballApi, PRIORITY_CLUBS, PRIORITY_LEAGUES (+49 more)
+Cohesion: 0.12
+Nodes (16): footballApiClient, internalApiClient, transfersApiClient, CacheItem, cacheManager, PRIORITY_CLUBS, PRIORITY_LEAGUES, MOCK_LIVE_MATCHES (+8 more)
 
 ### Community 210 - "Community 210"
 Cohesion: 0.08
@@ -964,9 +1348,13 @@ Nodes (24): TournamentTemplates, 10096, 10195, 10196, 10197, 10198, 10199, 10200
 Cohesion: 0.47
 Nodes (7): cache, getFromCache(), getHeaders(), getLiveMatches(), getMatchDetail(), getMatchesByDate(), setCache()
 
+### Community 212 - "Community 212"
+Cohesion: 0.02
+Nodes (87): LeagueMapping, 10015, 10022, 10023, 10024, 10028, 10033, 10034 (+79 more)
+
 ### Community 215 - "Community 215"
-Cohesion: 0.10
-Nodes (27): Action, ActionType, actionTypes, addToRemoveQueue(), dispatch(), genId(), listeners, memoryState (+19 more)
+Cohesion: 0.04
+Nodes (53): FootballLeagueOverview(), FootballTeamAnalysisPanel(), LEAGUES, TABS, TEAMS_BY_CONFEDERATION, totalTeamsCount, TeamFixturesView(), TeamFixturesViewProps (+45 more)
 
 ### Community 216 - "Community 216"
 Cohesion: 0.83
@@ -978,15 +1366,15 @@ Nodes (24): TournamentTemplates, 10096, 10195, 10196, 10197, 10198, 10199, 10200
 
 ### Community 234 - "Community 234"
 Cohesion: 0.21
-Nodes (16): DisplayNewsItem, getCricketImageUrl(), NewsSection(), CricketNewsSection(), getImageUrl(), mockNewsData, NewsItem, CricketNewsItem (+8 more)
+Nodes (17): DisplayNewsItem, getCricketImageUrl(), NewsSection(), CricketNewsSection(), getImageUrl(), mockNewsData, NewsItem, useFootballNewsDetail() (+9 more)
 
 ### Community 235 - "Community 235"
 Cohesion: 0.17
 Nodes (9): FormControl, FormDescription, FormFieldContext, FormFieldContextValue, FormItem, FormItemContext, FormItemContextValue, FormLabel (+1 more)
 
 ### Community 236 - "Community 236"
-Cohesion: 0.10
-Nodes (16): cricketTeamSchema, __dirname, __filename, memCache, router, teamLogoQueue, fetchBallMap(), fetchMatchSquadsScraped() (+8 more)
+Cohesion: 0.47
+Nodes (4): fetchPlayerDeepStats(), fetchTeamSquad(), generateAttributeRadar(), generateScoringZones()
 
 ### Community 237 - "Community 237"
 Cohesion: 0.67
@@ -1013,8 +1401,8 @@ Cohesion: 0.09
 Nodes (22): currBatTeamId, endDate, isFantasyEnabled, isForecastEnabled, isTimeAnnounced, isTournament, matchDesc, matchFormat (+14 more)
 
 ### Community 293 - "Community 293"
-Cohesion: 0.29
-Nodes (7): balls, fours, id, name, runs, sixes, batsmanStriker
+Cohesion: 0.12
+Nodes (16): balls, fours, id, name, runs, sixes, teamId, teamScore (+8 more)
 
 ### Community 294 - "Community 294"
 Cohesion: 0.09
@@ -1025,12 +1413,12 @@ Cohesion: 0.13
 Nodes (21): overSeparator, overSeparator, playerId, playerName, playerScore, playerId, playerName, playerScore (+13 more)
 
 ### Community 296 - "Community 296"
-Cohesion: 0.18
-Nodes (9): __dirname, __filename, cricbuzzService, convertUTCtoIST(), cricketService, __dirname, enrichMatch(), __filename (+1 more)
+Cohesion: 0.14
+Nodes (14): clearCache, getAllMatches, getLiveMatches, getMatchScorecard, getPlayerAnalysis, getRecentMatches, getTeamComparison, getUpcomingMatches (+6 more)
 
 ### Community 298 - "Community 298"
-Cohesion: 0.13
-Nodes (17): COUNTRY_CODE_MAP, getFlagUrl(), PlayerSelectorHUD(), SectionCard(), TOOLTIP_STYLE, CricketPerformanceDashboard(), CricketSidebar(), CricketSidebarProps (+9 more)
+Cohesion: 0.02
+Nodes (87): LeagueMapping, 10015, 10022, 10023, 10024, 10028, 10033, 10034 (+79 more)
 
 ### Community 300 - "Community 300"
 Cohesion: 0.17
@@ -1041,16 +1429,16 @@ Cohesion: 0.17
 Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
 
 ### Community 304 - "Community 304"
-Cohesion: 0.17
-Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
+Cohesion: 0.18
+Nodes (11): ballMetric, bowlerDetails, commText, commType, event, inningsId, matchId, overSeparator (+3 more)
 
 ### Community 305 - "Community 305"
 Cohesion: 0.17
 Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
 
 ### Community 306 - "Community 306"
-Cohesion: 0.14
-Nodes (18): batsmanDetails, batsmanDetails, ballMetric, batsmanDetails, bowlerDetails, commText, commType, event (+10 more)
+Cohesion: 0.17
+Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
 
 ### Community 307 - "Community 307"
 Cohesion: 0.18
@@ -1062,7 +1450,7 @@ Nodes (18): marketValues, player:30981, values, coachStats, dataProvider, gender
 
 ### Community 309 - "Community 309"
 Cohesion: 0.11
-Nodes (19): timezone, utcTime, data, coachStats, contractEnd, dataProvider, gender, id (+11 more)
+Nodes (18): data, coachStats, dataProvider, gender, id, injuryInformation, internationalDuty, isCaptain (+10 more)
 
 ### Community 313 - "Community 313"
 Cohesion: 0.15
@@ -1077,8 +1465,8 @@ Cohesion: 0.17
 Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
 
 ### Community 316 - "Community 316"
-Cohesion: 0.10
-Nodes (22): marketValues, trophies, player:30981, values, coachStats, dataProvider, gender, id (+14 more)
+Cohesion: 0.11
+Nodes (18): marketValues, player:30981, values, coachStats, dataProvider, gender, id, injuryInformation (+10 more)
 
 ### Community 317 - "Community 317"
 Cohesion: 0.22
@@ -1117,24 +1505,24 @@ Cohesion: 0.13
 Nodes (15): matchInfo, currBatTeamId, endDate, isTimeAnnounced, matchDesc, matchFormat, matchId, seriesEndDt (+7 more)
 
 ### Community 327 - "Community 327"
-Cohesion: 0.18
-Nodes (11): ballMetric, batsmanDetails, commText, commType, event, inningsId, matchId, overSeparator (+3 more)
+Cohesion: 0.15
+Nodes (17): batsmanDetails, batsmanDetails, batsmanDetails, ballMetric, batsmanDetails, commText, commType, event (+9 more)
 
 ### Community 328 - "Community 328"
 Cohesion: 0.08
 Nodes (29): batsmanDetails, batsmanDetails, ballMetric, batsmanDetails, bowlerDetails, commText, commType, event (+21 more)
 
 ### Community 330 - "Community 330"
-Cohesion: 0.10
-Nodes (20): CountryCodes, Language, Participants, ENG, GRL, INT, INT-2, KIR (+12 more)
+Cohesion: 0.12
+Nodes (17): CountryCodes, Language, Participants, ENG, GRL, INT, INT-2, KIR (+9 more)
 
 ### Community 332 - "Community 332"
 Cohesion: 0.17
 Nodes (12): ballMetric, batsmanDetails, bowlerDetails, commText, commType, event, inningsId, matchId (+4 more)
 
 ### Community 333 - "Community 333"
-Cohesion: 0.11
-Nodes (19): ballMetric, bowlerDetails, commText, commType, event, inningsId, matchId, teamName (+11 more)
+Cohesion: 0.20
+Nodes (10): ballMetric, bowlerDetails, commText, commType, event, inningsId, matchId, teamName (+2 more)
 
 ### Community 334 - "Community 334"
 Cohesion: 0.17
@@ -1152,6 +1540,10 @@ Nodes (3): extractJsonObjects(), generateArtifact(), getMatches()
 Cohesion: 0.83
 Nodes (3): countMatches(), extractJsonObjects(), run()
 
+### Community 340 - "Community 340"
+Cohesion: 0.02
+Nodes (87): LeagueMapping, 10015, 10022, 10023, 10024, 10028, 10033, 10034 (+79 more)
+
 ### Community 346 - "Community 346"
 Cohesion: 0.04
 Nodes (29): $, commentary, html, testMatchScrape(), testMatchScrape(), testMatchScrape(), test(), testRankingsBumrah() (+21 more)
@@ -1159,6 +1551,10 @@ Nodes (29): $, commentary, html, testMatchScrape(), testMatchScrape(), testMatch
 ### Community 354 - "Community 354"
 Cohesion: 0.22
 Nodes (9): series, endDate, id, name, odiSeriesResult, seriesFolder, startDate, t20SeriesResult (+1 more)
+
+### Community 362 - "Community 362"
+Cohesion: 0.25
+Nodes (4): BROWSER_HEADERS, resolveSlug(), scorecardCache, scrapeScorecard()
 
 ### Community 370 - "Community 370"
 Cohesion: 0.10
@@ -1211,6 +1607,10 @@ Nodes (4): umpire2, country, id, name
 ### Community 382 - "Community 382"
 Cohesion: 0.50
 Nodes (4): umpire3, country, id, name
+
+### Community 387 - "Community 387"
+Cohesion: 0.02
+Nodes (87): LeagueMapping, 10015, 10022, 10023, 10024, 10028, 10033, 10034 (+79 more)
 
 ### Community 388 - "Community 388"
 Cohesion: 0.26
@@ -1372,6 +1772,14 @@ Nodes (4): umpire2, country, id, name
 Cohesion: 0.50
 Nodes (4): umpire3, country, id, name
 
+### Community 447 - "Community 447"
+Cohesion: 0.04
+Nodes (46): addressCountry, addressLocality, @type, @context, itemListElement, @type, details, breadcrumbJSONLD (+38 more)
+
+### Community 449 - "Community 449"
+Cohesion: 0.11
+Nodes (28): FootballMatchesLivescore(), FootballMatchesLivescoreProps, getTeamColor(), LivescoreMatchCard(), LivescoreMatchCardProps, MatchLike, resolveLogo(), TEAM_COLORS (+20 more)
+
 ### Community 450 - "Community 450"
 Cohesion: 0.33
 Nodes (9): inningsId, overs, runs, wickets, matchScore, team1Score, team2Score, inngs1 (+1 more)
@@ -1380,9 +1788,21 @@ Nodes (9): inningsId, overs, runs, wickets, matchScore, team1Score, team2Score, 
 Cohesion: 0.10
 Nodes (19): birthDate, timezone, utcTime, coachStats, dataProvider, gender, id, injuryInformation (+11 more)
 
+### Community 452 - "Community 452"
+Cohesion: 0.07
+Nodes (30): A Zampa, AG Wharf, Ahsan Raza, AT Carey, BJ Dwarshuis, C Connolly, C Green, JP Inglis (+22 more)
+
 ### Community 453 - "Community 453"
 Cohesion: 0.43
 Nodes (8): venueInfo, venueInfo, city, ground, id, latitude, longitude, timezone
+
+### Community 454 - "Community 454"
+Cohesion: 0.07
+Nodes (28): A Capsey, AC Jayangani, AE Jones, BMSM Kumari, CA Polosak, CE Dean, DN Wyatt, DR Gibson (+20 more)
+
+### Community 455 - "Community 455"
+Cohesion: 0.07
+Nodes (28): A Canning, A Dalzell, A Hunter, A Lister, A Tector, AK Maguire, AN Kelly, C Abel (+20 more)
 
 ### Community 456 - "Community 456"
 Cohesion: 0.67
@@ -1392,6 +1812,10 @@ Nodes (3): Bosnia-Herzegovina, players, teamInfo
 Cohesion: 0.38
 Nodes (7): positionDescription, positionDescription, nonPrimaryPositions, positions, primaryPosition, key, label
 
+### Community 459 - "Community 459"
+Cohesion: 0.07
+Nodes (28): A Dercksen, A Gardner, A Khaka, A King, A Sutherland, BL Mooney, C La Borde, CL Tryon (+20 more)
+
 ### Community 460 - "Community 460"
 Cohesion: 0.53
 Nodes (6): mainLeague, leagueId, leagueName, season, stats, mainLeague
@@ -1399,6 +1823,10 @@ Nodes (6): mainLeague, leagueId, leagueName, season, stats, mainLeague
 ### Community 461 - "Community 461"
 Cohesion: 0.60
 Nodes (5): relatedLinksData, relatedLinksData, mensNationalTeam, teammates, womensNationalTeam
+
+### Community 462 - "Community 462"
+Cohesion: 0.07
+Nodes (28): AA Alleyne, AC Kerr, ASS Fletcher, AY Harris, BG Illing, BM Halliday, DJS Dottin, GE Plimmer (+20 more)
 
 ### Community 469 - "Community 469"
 Cohesion: 0.60
@@ -1426,7 +1854,7 @@ Nodes (4): timezone, utcTime, birthDate, birthDate
 
 ### Community 475 - "Community 475"
 Cohesion: 0.11
-Nodes (19): timezone, utcTime, coachStats, contractEnd, dataProvider, gender, id, injuryInformation (+11 more)
+Nodes (19): timezone, utcTime, birthDate, coachStats, dataProvider, gender, id, injuryInformation (+11 more)
 
 ### Community 476 - "Community 476"
 Cohesion: 0.67
@@ -1439,6 +1867,10 @@ Nodes (3): Canada, players, teamInfo
 ### Community 478 - "Community 478"
 Cohesion: 0.67
 Nodes (3): Cape Verde, players, teamInfo
+
+### Community 480 - "Community 480"
+Cohesion: 0.07
+Nodes (28): B de Leede, C de Lange, Dilara Akter, Eloise Sheridan, F Overdijk, Fariha Trisna, Gayathri Venugopal, HDJ Siegers (+20 more)
 
 ### Community 486 - "Community 486"
 Cohesion: 0.67
@@ -1556,13 +1988,17 @@ Nodes (3): United States, players, teamInfo
 Cohesion: 0.67
 Nodes (3): Uzbekistan, players, teamInfo
 
+### Community 518 - "Community 518"
+Cohesion: 0.16
+Nodes (7): FootballTransfer, footballTransferSchema, updateTransfersCache(), populateDB(), fetchFotmobRumors(), LEAGUES, scrapeFotmobTransfers()
+
 ### Community 519 - "Community 519"
 Cohesion: 0.11
-Nodes (18): data, coachStats, dataProvider, gender, id, injuryInformation, internationalDuty, isCaptain (+10 more)
+Nodes (19): timezone, utcTime, data, birthDate, coachStats, dataProvider, gender, id (+11 more)
 
 ### Community 520 - "Community 520"
-Cohesion: 0.18
-Nodes (15): TrendingPlayers(), TrendingPlayersProps, CricketTrendingPlayers(), MEDAL, PlayerAvatar(), PlayerFlag(), PlayerProfileModal(), TrendingCard() (+7 more)
+Cohesion: 0.13
+Nodes (20): TrendingPlayers(), TrendingPlayersProps, CricketTrendingPlayers(), MEDAL, PlayerAvatar(), PlayerFlag(), PlayerProfileModal(), TrendingCard() (+12 more)
 
 ### Community 521 - "Community 521"
 Cohesion: 0.14
@@ -1601,8 +2037,8 @@ Cohesion: 0.12
 Nodes (17): firstSeasonStats, heatmap, keeperShotmap, sectionOrder, shotmap, statsSection, topStatCard, coordinates (+9 more)
 
 ### Community 530 - "Community 530"
-Cohesion: 0.12
-Nodes (17): CountryCodes, Language, Participants, ENG, GRL, INT, INT-2, KIR (+9 more)
+Cohesion: 0.10
+Nodes (20): CountryCodes, Language, Participants, ENG, GRL, INT, INT-2, KIR (+12 more)
 
 ### Community 531 - "Community 531"
 Cohesion: 0.13
@@ -1837,8 +2273,8 @@ Cohesion: 0.17
 Nodes (12): id, isGoalkeeper, name, optaId, positionId, shirtNumber, shotmap, stats (+4 more)
 
 ### Community 589 - "Community 589"
-Cohesion: 0.17
-Nodes (12): matchFacts, countryCode, highlights, insights, matchId, playerOfTheMatch, preReview, QAData (+4 more)
+Cohesion: 0.10
+Nodes (21): matchFacts, events, eventTypes, ongoing, penaltyShootoutEvents, countryCode, events, highlights (+13 more)
 
 ### Community 590 - "Community 590"
 Cohesion: 0.21
@@ -1933,8 +2369,8 @@ Cohesion: 0.20
 Nodes (10): awayTeamGoals, awayTeamRedCards, homeTeamGoals, homeTeamRedCards, header, events, teams, Al Tambakti (+2 more)
 
 ### Community 613 - "Community 613"
-Cohesion: 0.20
-Nodes (10): status, cancelled, finished, numberOfAwayRedCards, numberOfHomeRedCards, ongoing, scoreStr, started (+2 more)
+Cohesion: 0.11
+Nodes (18): firstExtraHalfStarted, firstHalfEnded, firstHalfStarted, gameEnded, secondExtraHalfStarted, secondHalfEnded, secondHalfStarted, status (+10 more)
 
 ### Community 614 - "Community 614"
 Cohesion: 0.20
@@ -1957,36 +2393,36 @@ Cohesion: 0.22
 Nodes (9): addedTime, basePeriod, long, longKey, maxTime, penalties, short, shortKey (+1 more)
 
 ### Community 619 - "Community 619"
-Cohesion: 0.25
-Nodes (8): firstExtraHalfStarted, firstHalfEnded, firstHalfStarted, gameEnded, secondExtraHalfStarted, secondHalfEnded, secondHalfStarted, halfs
+Cohesion: 0.07
+Nodes (28): A Reddy, Aliya Riaz, Ayesha Zafar, BS Fulmali, CA Polosak, DB Sharma, Eloise Sheridan, Fatima Sana (+20 more)
 
 ### Community 620 - "Community 620"
 Cohesion: 0.25
 Nodes (8): Stadium, capacity, city, country, lat, long, name, surface
 
 ### Community 621 - "Community 621"
-Cohesion: 0.48
-Nodes (5): createTeam, getTeamById, getTeams, updateTeam, router
+Cohesion: 0.07
+Nodes (28): A Suwanchonrathi, AS Guha, C Sutthiruang, DAL Paramitha, Humaira Farah, K Winda Prastini, KS Kasse, L Qiao (+20 more)
 
 ### Community 622 - "Community 622"
 Cohesion: 0.38
 Nodes (7): positionDescription, positionDescription, nonPrimaryPositions, positions, primaryPosition, key, label
 
 ### Community 623 - "Community 623"
-Cohesion: 0.29
-Nodes (7): Attendance, legInfo, Match Date, isDateCorrect, timezone, utcTime, infoBox
+Cohesion: 0.11
+Nodes (19): Attendance, legInfo, Match Date, Referee, Tournament, isDateCorrect, timezone, utcTime (+11 more)
 
 ### Community 624 - "Community 624"
-Cohesion: 0.29
-Nodes (7): Tournament, id, leagueName, link, parentLeagueId, round, roundName
+Cohesion: 0.07
+Nodes (28): Afia Amin, ATS Silva, ER Oza, H Hotchandani, Iqra Sahar, Joyleen Kaur, KC Thompson, KY Chan (+20 more)
 
 ### Community 625 - "Community 625"
 Cohesion: 0.38
 Nodes (7): positionDescription, positionDescription, nonPrimaryPositions, positions, primaryPosition, key, label
 
 ### Community 626 - "Community 626"
-Cohesion: 0.33
-Nodes (5): notableMatches:en:USA, matches, fallback, props, pageProps
+Cohesion: 0.22
+Nodes (8): Language, Participants, /api/translationmapping?locale=en, notableMatches:en:USA, matches, fallback, props, pageProps
 
 ### Community 627 - "Community 627"
 Cohesion: 0.53
@@ -2021,12 +2457,12 @@ Cohesion: 0.40
 Nodes (5): mainLeague, leagueId, leagueName, season, stats
 
 ### Community 635 - "Community 635"
-Cohesion: 0.40
-Nodes (5): events, eventTypes, ongoing, penaltyShootoutEvents, events
+Cohesion: 0.07
+Nodes (28): AS Guha, D Wulandari, DAL Paramitha, Humaira Farah, Iqra Sahar, Joyleen Kaur, KS Kasse, KY Chan (+20 more)
 
 ### Community 636 - "Community 636"
-Cohesion: 0.40
-Nodes (5): Referee, country, countryCode, imgUrl, text
+Cohesion: 0.07
+Nodes (28): A Suwanchonrathi, Afia Amin, ATS Silva, C Sutthiruang, ER Oza, H Hotchandani, KC Thompson, L Keny (+20 more)
 
 ### Community 637 - "Community 637"
 Cohesion: 0.40
@@ -2041,8 +2477,8 @@ Cohesion: 0.60
 Nodes (5): traits, traits, items, key, title
 
 ### Community 640 - "Community 640"
-Cohesion: 0.67
-Nodes (4): timezone, utcTime, birthDate, birthDate
+Cohesion: 0.07
+Nodes (28): AJ Hosein, BA King, BKG Mendis, Christopher Taylor, D Madushanka, DK Butler, E Malinga, JO Holder (+20 more)
 
 ### Community 641 - "Community 641"
 Cohesion: 0.50
@@ -2069,12 +2505,12 @@ Cohesion: 0.50
 Nodes (4): traits, items, key, title
 
 ### Community 647 - "Community 647"
-Cohesion: 0.50
-Nodes (4): matchInsightsConfig, hasBettingInsight, languages, urlTemplate
+Cohesion: 0.07
+Nodes (28): AJ Hosein, BA King, BKG Mendis, Christopher Taylor, DK Butler, DN Wellalage, E Malinga, K Mishara (+20 more)
 
 ### Community 648 - "Community 648"
-Cohesion: 0.67
-Nodes (4): timezone, utcTime, birthDate, birthDate
+Cohesion: 0.07
+Nodes (28): AJ Hosein, AWJ Auguste, BA King, BKG Mendis, Christopher Taylor, DK Butler, DN Wellalage, E Malinga (+20 more)
 
 ### Community 649 - "Community 649"
 Cohesion: 0.67
@@ -2083,6 +2519,10 @@ Nodes (4): timezone, utcTime, contractEnd, contractEnd
 ### Community 650 - "Community 650"
 Cohesion: 0.67
 Nodes (4): trophies, trophies, coachTrophies, playerTrophies
+
+### Community 651 - "Community 651"
+Cohesion: 0.22
+Nodes (5): FotmobCache, fotmobCacheSchema, test(), test(), test()
 
 ### Community 652 - "Community 652"
 Cohesion: 0.67
@@ -2100,25 +2540,1477 @@ Nodes (3): contractEnd, timezone, utcTime
 Cohesion: 0.67
 Nodes (3): trophies, coachTrophies, playerTrophies
 
+### Community 665 - "Community 665"
+Cohesion: 0.07
+Nodes (28): Akhil Kumar, Ali Nadeem, AR Maddela, Ehsan Adil, GSNFG Jayasuriya, H Grewal, H Thaker, Harmeet Singh (+20 more)
+
+### Community 677 - "Community 677"
+Cohesion: 0.07
+Nodes (27): CE Bennett, CG Benjamin, CWJ Allison, DJ Bell-Drummond, FJ Klaassen, G Stewart, HZ Finch, JB Lintott (+19 more)
+
+### Community 678 - "Community 678"
+Cohesion: 0.07
+Nodes (27): AM Green, BGF Green, CE Bennett, CWJ Allison, D Elgar, JA Porter, JDM Evison, JH Davey (+19 more)
+
+### Community 679 - "Community 679"
+Cohesion: 0.07
+Nodes (27): AM Smith, AM Tribe, BI Kellaway, CA Ingram, CB Cooke, DC Goodman, DP Hughes, HT Crocombe (+19 more)
+
+### Community 680 - "Community 680"
+Cohesion: 0.07
+Nodes (27): AM Vaughan, ARJ Ogborne, BA Hutton, BT Slater, C Overton, DY Pennington, F O'Neill, FW McCann (+19 more)
+
+### Community 681 - "Community 681"
+Cohesion: 0.07
+Nodes (27): AW Finch, B Swanepoel, BBA Geddes, BL D'Oliveira, BMJ Allison, CM Falconer, DA Cosker, DH Lategan (+19 more)
+
+### Community 682 - "Community 682"
+Cohesion: 0.07
+Nodes (27): A Gupta, A Pusthay, Ahmadullah Shinwari, Akhil Arjunan, Akhter Pacha Sher, Amjad Sher, Bilal Munir, Chaudhary Akram (+19 more)
+
+### Community 683 - "Community 683"
+Cohesion: 0.08
+Nodes (26): AZ Lees, BA Raine, BR McDermott, CF Parkinson, CN Ackermann, DG Bedingham, G Clark, GP Balderson (+18 more)
+
+### Community 684 - "Community 684"
+Cohesion: 0.08
+Nodes (26): AJ Hose, AW Finch, BL D'Oliveira, BMJ Allison, BW Sanderson, CA Lynn, CG Harrison, Chris Watts (+18 more)
+
+### Community 685 - "Community 685"
+Cohesion: 0.08
+Nodes (26): AGH Orr, BC Brown, D Potgieter, DJ Millns, DP Sibley, DW Lawrence, FS Organ, J Clark (+18 more)
+
+### Community 686 - "Community 686"
+Cohesion: 0.08
+Nodes (26): A Lyth, AL Davies, BJ Webster, BM Cliff, CJ White, DM Bess, DR Mousley, EG Barnard (+18 more)
+
+### Community 687 - "Community 687"
+Cohesion: 0.08
+Nodes (26): CG Harrison, Chris Watts, CT Bancroft, DJ Ahmed, GA Bartlett, GL van Buuren, Hassan Adnan, HNA Conway (+18 more)
+
+### Community 688 - "Community 688"
+Cohesion: 0.08
+Nodes (26): AC Harris, AJ Swann, AM Foreman, BJ Dawkins, BR McDermott, CG Benjamin, DJ Bell-Drummond, Ekansh Singh (+18 more)
+
+### Community 689 - "Community 689"
+Cohesion: 0.08
+Nodes (26): AZ Lees, BA Raine, BD Guest, BS McKinney, BW Aitchison, CF Parkinson, CP Jewell, D Olivier (+18 more)
+
+### Community 690 - "Community 690"
+Cohesion: 0.08
+Nodes (26): A Stonehouse, A Surenkumar, AJ Freeborn, C Pavely, DL Collins, E Jones, E Threlkeld, EL Lamb (+18 more)
+
+### Community 691 - "Community 691"
+Cohesion: 0.08
+Nodes (26): A Griffiths, A Learoyd, A Norgrove, A Wellington, B Willis, C Skelton, EM McCaughan, F Sweet (+18 more)
+
+### Community 692 - "Community 692"
+Cohesion: 0.08
+Nodes (26): A Gupta, A Randhawa, Ahmadullah Shinwari, AJ Parmar, Akhter Pacha Sher, Baseer Khan, Bilal Zalmai, Chaudhary Akram (+18 more)
+
+### Community 693 - "Community 693"
+Cohesion: 0.08
+Nodes (26): A Dhabe, A Mundra, A Pusthay, Abdul Naser Baluch, Amjad Sher, Awais Ahmad, Bilal Munir, DB Lakhani (+18 more)
+
+### Community 694 - "Community 694"
+Cohesion: 0.08
+Nodes (26): A Adekunle, A Ikuzwe, AA Balogun, AN Igihozo, B Murekatete, C Chukwuonye, C Uwase, E Sandy (+18 more)
+
+### Community 695 - "Community 695"
+Cohesion: 0.08
+Nodes (26): A Lumbe, AA Kawirawira, AC Sabino, C Bwanali, DI Dusabemungu, E Chiralile, L Agatha, L Cardoso (+18 more)
+
+### Community 696 - "Community 696"
+Cohesion: 0.08
+Nodes (26): A Ikuzwe, AC Sabino, AN Igihozo, B Murekatete, C Uwase, CS Nascimento, EC Muller, F Utagushimaninde (+18 more)
+
+### Community 697 - "Community 697"
+Cohesion: 0.08
+Nodes (26): A Adekunle, A Lumbe, AA Kawirawira, B Kasinja, C Chukwuonye, DI Dusabemungu, E Chiralile, E Sandy (+18 more)
+
+### Community 698 - "Community 698"
+Cohesion: 0.08
+Nodes (26): A Ikuzwe, A Lumbe, AN Igihozo, B Kasinja, C Bwanali, C Uwase, E Chiralile, F Irakoze (+18 more)
+
+### Community 699 - "Community 699"
+Cohesion: 0.08
+Nodes (25): CountryCodes, Language, Participants, Shortened, Words, ENG, GRL, INT (+17 more)
+
+### Community 700 - "Community 700"
+Cohesion: 0.08
+Nodes (25): A Dowse, A Glen, BAM Heath, E Gray, E Windsor, EI MacGregor, EK Marlow, F Miller (+17 more)
+
+### Community 701 - "Community 701"
+Cohesion: 0.08
+Nodes (25): A Cranstone, AN Davidson-Richards, AZ Monaghan, CN Phillips, CR Knott, D Gregory, E Claridge, E Jones (+17 more)
+
+### Community 702 - "Community 702"
+Cohesion: 0.08
+Nodes (25): A Dhabe, A Mundra, A Pusthay, Abdul Naser Baluch, Amjad Sher, Awais Ahmad, DB Lakhani, Faheem Nellancheri (+17 more)
+
+### Community 703 - "Community 703"
+Cohesion: 0.08
+Nodes (25): A Randhawa, Ahmadullah Shinwari, Akhter Pacha Sher, Baseer Khan, Bilal Zalmai, Chaudhary Akram, D Asghar, Faridullah Shams (+17 more)
+
+### Community 704 - "Community 704"
+Cohesion: 0.08
+Nodes (25): A Dhabe, A Mundra, A Randhawa, Abdul Naser Baluch, Awais Ahmad, Baseer Khan, Bilal Zalmai, Faridullah Shams (+17 more)
+
+### Community 705 - "Community 705"
+Cohesion: 0.08
+Nodes (24): TournamentTemplates, 10096, 10195, 10196, 10197, 10198, 10199, 10200 (+16 more)
+
+### Community 706 - "Community 706"
+Cohesion: 0.08
+Nodes (24): TournamentTemplates, 10096, 10195, 10196, 10197, 10198, 10199, 10200 (+16 more)
+
+### Community 707 - "Community 707"
+Cohesion: 0.08
+Nodes (24): TournamentTemplates, 10096, 10195, 10196, 10197, 10198, 10199, 10200 (+16 more)
+
+### Community 708 - "Community 708"
+Cohesion: 0.08
+Nodes (24): TournamentTemplates, 10096, 10195, 10196, 10197, 10198, 10199, 10200 (+16 more)
+
+### Community 709 - "Community 709"
+Cohesion: 0.08
+Nodes (23): amountEuroEstimated, contractExtension, fee, fromClub, fromClubFullName, fromClubId, fromDate, marketValue (+15 more)
+
+### Community 710 - "Community 710"
+Cohesion: 0.09
+Nodes (23): A Adekunle, C Chukwuonye, CS Nascimento, E Sandy, EC Muller, F Eseigbe, H Mbam, JC Bieni (+15 more)
+
+### Community 711 - "Community 711"
+Cohesion: 0.09
+Nodes (23): A Aikenhead, A Le Ray, A Merritt, CM Greechan, D Fisher, E Bourgaize, E Duffy, E Millington (+15 more)
+
+### Community 712 - "Community 712"
+Cohesion: 0.09
+Nodes (23): A Aikenhead, A Le Ray, A Merritt, CM Greechan, D Fisher, E Bourgaize, E Duffy, E Millington (+15 more)
+
+### Community 713 - "Community 713"
+Cohesion: 0.17
+Nodes (17): FootballPerformanceDashboard(), ActivePlayerLab(), FootballPerformanceLab(), FootballPerformanceLabProps, FootballSidebar(), FootballSidebarProps, fetchFotmobPlayerProfileByName(), fetchFotmobSquad() (+9 more)
+
+### Community 714 - "Community 714"
+Cohesion: 0.12
+Nodes (16): info, balls_per_over, city, dates, gender, match_type, match_type_number, officials (+8 more)
+
+### Community 715 - "Community 715"
+Cohesion: 0.12
+Nodes (16): info, balls_per_over, city, dates, gender, match_type, match_type_number, officials (+8 more)
+
+### Community 716 - "Community 716"
+Cohesion: 0.12
+Nodes (16): info, balls_per_over, city, dates, gender, match_type, match_type_number, officials (+8 more)
+
+### Community 717 - "Community 717"
+Cohesion: 0.12
+Nodes (16): info, balls_per_over, city, dates, gender, match_type, match_type_number, officials (+8 more)
+
+### Community 718 - "Community 718"
+Cohesion: 0.12
+Nodes (16): info, balls_per_over, city, dates, gender, match_type, match_type_number, officials (+8 more)
+
+### Community 719 - "Community 719"
+Cohesion: 0.12
+Nodes (16): info, balls_per_over, city, dates, gender, match_type, match_type_number, officials (+8 more)
+
+### Community 720 - "Community 720"
+Cohesion: 0.21
+Nodes (13): router, CACHE_FILE, delay(), __dirname, __filename, getFotmobLeague(), getFotmobTeam(), LEAGUES_CACHE_FILE (+5 more)
+
+### Community 721 - "Community 721"
+Cohesion: 0.13
+Nodes (15): info, balls_per_over, city, dates, gender, match_type, match_type_number, missing (+7 more)
+
+### Community 722 - "Community 722"
+Cohesion: 0.13
+Nodes (15): info, balls_per_over, city, dates, gender, match_type, match_type_number, missing (+7 more)
+
+### Community 723 - "Community 723"
+Cohesion: 0.13
+Nodes (15): info, balls_per_over, city, dates, gender, match_type, match_type_number, missing (+7 more)
+
+### Community 724 - "Community 724"
+Cohesion: 0.22
+Nodes (12): Team, Venue, countryFlags, enhanceMatchWithScorecard(), getMatchStatus(), getMatchTypeDisplay(), getTeamColor(), getTeamFlag() (+4 more)
+
+### Community 725 - "Community 725"
+Cohesion: 0.14
+Nodes (14): CountryCodes, ENG, GRL, INT, INT-2, KIR, MON, NIR (+6 more)
+
+### Community 726 - "Community 726"
+Cohesion: 0.14
+Nodes (14): CountryCodes, ENG, GRL, INT, INT-2, KIR, MON, NIR (+6 more)
+
+### Community 727 - "Community 727"
+Cohesion: 0.14
+Nodes (14): CountryCodes, ENG, GRL, INT, INT-2, KIR, MON, NIR (+6 more)
+
+### Community 728 - "Community 728"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 729 - "Community 729"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 730 - "Community 730"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 731 - "Community 731"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 732 - "Community 732"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 733 - "Community 733"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 734 - "Community 734"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, officials, overs (+6 more)
+
+### Community 735 - "Community 735"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, officials, overs (+6 more)
+
+### Community 736 - "Community 736"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 737 - "Community 737"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 738 - "Community 738"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 739 - "Community 739"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 740 - "Community 740"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 741 - "Community 741"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 742 - "Community 742"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 743 - "Community 743"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 744 - "Community 744"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 745 - "Community 745"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 746 - "Community 746"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 747 - "Community 747"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 748 - "Community 748"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 749 - "Community 749"
+Cohesion: 0.14
+Nodes (14): info, balls_per_over, city, dates, gender, match_type, match_type_number, overs (+6 more)
+
+### Community 750 - "Community 750"
+Cohesion: 0.14
+Nodes (14): CountryCodes, ENG, GRL, INT, INT-2, KIR, MON, NIR (+6 more)
+
+### Community 751 - "Community 751"
+Cohesion: 0.15
+Nodes (13): Shortened, 1677, 1838, 1839, 1841, 1842, 1926, 1942 (+5 more)
+
+### Community 752 - "Community 752"
+Cohesion: 0.15
+Nodes (13): info, balls_per_over, city, dates, gender, match_type, overs, player_of_match (+5 more)
+
+### Community 753 - "Community 753"
+Cohesion: 0.15
+Nodes (13): info, balls_per_over, city, dates, gender, match_type, outcome, registry (+5 more)
+
+### Community 754 - "Community 754"
+Cohesion: 0.15
+Nodes (13): info, balls_per_over, city, dates, gender, match_type, outcome, registry (+5 more)
+
+### Community 755 - "Community 755"
+Cohesion: 0.15
+Nodes (13): Shortened, 1677, 1838, 1839, 1841, 1842, 1926, 1942 (+5 more)
+
+### Community 756 - "Community 756"
+Cohesion: 0.17
+Nodes (11): meta, src, notableMatches:en:USA, imageUrl, ogUrl, title, matches, data (+3 more)
+
+### Community 757 - "Community 757"
+Cohesion: 0.21
+Nodes (12): @context, itemListElement, @type, meta, @context, mainEntity, @type, breadcrumbJSONLD (+4 more)
+
+### Community 758 - "Community 758"
+Cohesion: 0.17
+Nodes (12): Shortened, 1677, 1838, 1839, 1841, 1842, 1926, 1942 (+4 more)
+
+### Community 759 - "Community 759"
+Cohesion: 0.17
+Nodes (12): info, balls_per_over, city, dates, gender, match_type, overs, registry (+4 more)
+
+### Community 760 - "Community 760"
+Cohesion: 0.17
+Nodes (12): info, balls_per_over, city, dates, gender, match_type, overs, registry (+4 more)
+
+### Community 761 - "Community 761"
+Cohesion: 0.17
+Nodes (12): info, balls_per_over, city, dates, gender, match_type, overs, registry (+4 more)
+
+### Community 762 - "Community 762"
+Cohesion: 0.17
+Nodes (12): info, balls_per_over, city, dates, gender, match_type, overs, registry (+4 more)
+
+### Community 763 - "Community 763"
+Cohesion: 0.18
+Nodes (10): Language, Participants, Words, /api/translationmapping?locale=en, /api/worldnews?lang=en\u0026page=1, notableMatches:en:USA, matches, fallback (+2 more)
+
+### Community 764 - "Community 764"
+Cohesion: 0.18
+Nodes (11): info, balls_per_over, city, dates, gender, match_type, registry, season (+3 more)
+
+### Community 765 - "Community 765"
+Cohesion: 0.18
+Nodes (11): info, balls_per_over, city, dates, gender, match_type, registry, season (+3 more)
+
+### Community 766 - "Community 766"
+Cohesion: 0.18
+Nodes (11): info, balls_per_over, city, dates, gender, match_type, registry, season (+3 more)
+
+### Community 767 - "Community 767"
+Cohesion: 0.18
+Nodes (11): info, balls_per_over, city, dates, gender, match_type, registry, season (+3 more)
+
+### Community 768 - "Community 768"
+Cohesion: 0.18
+Nodes (11): info, balls_per_over, city, dates, gender, match_type, registry, season (+3 more)
+
+### Community 769 - "Community 769"
+Cohesion: 0.18
+Nodes (11): info, balls_per_over, city, dates, gender, match_type, registry, season (+3 more)
+
+### Community 770 - "Community 770"
+Cohesion: 0.18
+Nodes (11): info, balls_per_over, city, dates, gender, match_type, registry, season (+3 more)
+
+### Community 771 - "Community 771"
+Cohesion: 0.25
+Nodes (6): run(), EXACT_LEAGUES, EXCLUDED_PATTERNS, INCLUDES_LEAGUES, scrapeLatestTransfers(), scrapeTopTransfers()
+
+### Community 772 - "Community 772"
+Cohesion: 0.24
+Nodes (7): LatestTransfersResponse, TransferFee, TransferPosition, TransferType, transfersApi, transfersApiClient, NO_AUTO_REFETCH
+
+### Community 773 - "Community 773"
+Cohesion: 0.20
+Nodes (9): Language, Participants, Words, /api/translationmapping?locale=en, notableMatches:en:USA, matches, fallback, props (+1 more)
+
+### Community 774 - "Community 774"
+Cohesion: 0.20
+Nodes (9): Language, Participants, Words, /api/translationmapping?locale=en, notableMatches:en:USA, matches, fallback, props (+1 more)
+
+### Community 775 - "Community 775"
+Cohesion: 0.22
+Nodes (6): MainLayoutProps, discoverItems, mainNavItems, Sidebar(), SidebarProps, topLeagues
+
+### Community 776 - "Community 776"
+Cohesion: 0.25
+Nodes (6): BATTING_CATEGORIES, BOWLING_CATEGORIES, FIELDING_CATEGORIES, MEDAL, MVP_CATEGORIES, Props
+
+### Community 777 - "Community 777"
+Cohesion: 0.38
+Nodes (5): test(), test(), computeAllBowlingStats(), computeAllStats(), fetchPlayerDeepStats()
+
+### Community 778 - "Community 778"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 779 - "Community 779"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 780 - "Community 780"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 781 - "Community 781"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 782 - "Community 782"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 783 - "Community 783"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 784 - "Community 784"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 785 - "Community 785"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 786 - "Community 786"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 787 - "Community 787"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 788 - "Community 788"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 789 - "Community 789"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 790 - "Community 790"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 791 - "Community 791"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 792 - "Community 792"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 793 - "Community 793"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 794 - "Community 794"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 795 - "Community 795"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 796 - "Community 796"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 797 - "Community 797"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 798 - "Community 798"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 799 - "Community 799"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 800 - "Community 800"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 801 - "Community 801"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 802 - "Community 802"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 803 - "Community 803"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 804 - "Community 804"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 805 - "Community 805"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 806 - "Community 806"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 807 - "Community 807"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 808 - "Community 808"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 809 - "Community 809"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 810 - "Community 810"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 811 - "Community 811"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 812 - "Community 812"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 813 - "Community 813"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 814 - "Community 814"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 815 - "Community 815"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 816 - "Community 816"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 817 - "Community 817"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 818 - "Community 818"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 819 - "Community 819"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 820 - "Community 820"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 821 - "Community 821"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 822 - "Community 822"
+Cohesion: 0.33
+Nodes (5): innings, meta, created, data_version, revision
+
+### Community 823 - "Community 823"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 824 - "Community 824"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 825 - "Community 825"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 826 - "Community 826"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 827 - "Community 827"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 828 - "Community 828"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 829 - "Community 829"
+Cohesion: 0.40
+Nodes (5): wickets, outcome, by, method, winner
+
+### Community 830 - "Community 830"
+Cohesion: 0.40
+Nodes (5): innings, runs, outcome, by, winner
+
+### Community 831 - "Community 831"
+Cohesion: 0.40
+Nodes (5): innings, runs, outcome, by, winner
+
+### Community 832 - "Community 832"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 833 - "Community 833"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 834 - "Community 834"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 835 - "Community 835"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 836 - "Community 836"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 837 - "Community 837"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 838 - "Community 838"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 839 - "Community 839"
+Cohesion: 0.40
+Nodes (5): officials, match_referees, reserve_umpires, tv_umpires, umpires
+
+### Community 840 - "Community 840"
+Cohesion: 0.40
+Nodes (5): runs, outcome, by, method, winner
+
+### Community 841 - "Community 841"
+Cohesion: 0.40
+Nodes (3): __dirname, __filename, cricbuzzService
+
+### Community 842 - "Community 842"
+Cohesion: 0.67
+Nodes (4): timezone, utcTime, contractEnd, contractEnd
+
+### Community 843 - "Community 843"
+Cohesion: 0.67
+Nodes (4): trophies, trophies, coachTrophies, playerTrophies
+
+### Community 844 - "Community 844"
+Cohesion: 0.67
+Nodes (4): timezone, utcTime, contractEnd, contractEnd
+
+### Community 845 - "Community 845"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 846 - "Community 846"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 847 - "Community 847"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 848 - "Community 848"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 849 - "Community 849"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 850 - "Community 850"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 851 - "Community 851"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 852 - "Community 852"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 853 - "Community 853"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 854 - "Community 854"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 855 - "Community 855"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 856 - "Community 856"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 857 - "Community 857"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 858 - "Community 858"
+Cohesion: 0.50
+Nodes (4): officials, match_referees, tv_umpires, umpires
+
+### Community 859 - "Community 859"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 860 - "Community 860"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 861 - "Community 861"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 862 - "Community 862"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 863 - "Community 863"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 864 - "Community 864"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 865 - "Community 865"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 866 - "Community 866"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 867 - "Community 867"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 868 - "Community 868"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 869 - "Community 869"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 870 - "Community 870"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 871 - "Community 871"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 872 - "Community 872"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 873 - "Community 873"
+Cohesion: 0.50
+Nodes (4): group, match_number, name, event
+
+### Community 874 - "Community 874"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 875 - "Community 875"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 876 - "Community 876"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 877 - "Community 877"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 878 - "Community 878"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 879 - "Community 879"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 880 - "Community 880"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 881 - "Community 881"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 882 - "Community 882"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 883 - "Community 883"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 884 - "Community 884"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 885 - "Community 885"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 886 - "Community 886"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 887 - "Community 887"
+Cohesion: 0.50
+Nodes (4): officials, match_referees, reserve_umpires, umpires
+
+### Community 888 - "Community 888"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 889 - "Community 889"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 890 - "Community 890"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 891 - "Community 891"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 892 - "Community 892"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 893 - "Community 893"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 894 - "Community 894"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 895 - "Community 895"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 896 - "Community 896"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 897 - "Community 897"
+Cohesion: 0.50
+Nodes (4): wickets, outcome, by, winner
+
+### Community 898 - "Community 898"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 899 - "Community 899"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 900 - "Community 900"
+Cohesion: 0.50
+Nodes (4): runs, outcome, by, winner
+
+### Community 907 - "Community 907"
+Cohesion: 0.67
+Nodes (3): players, England, Sri Lanka
+
+### Community 908 - "Community 908"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 909 - "Community 909"
+Cohesion: 0.67
+Nodes (3): players, Ireland, Scotland
+
+### Community 910 - "Community 910"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 911 - "Community 911"
+Cohesion: 0.67
+Nodes (3): players, Australia, South Africa
+
+### Community 912 - "Community 912"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 913 - "Community 913"
+Cohesion: 0.67
+Nodes (3): players, New Zealand, West Indies
+
+### Community 914 - "Community 914"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 915 - "Community 915"
+Cohesion: 0.67
+Nodes (3): players, Bangladesh, Netherlands
+
+### Community 916 - "Community 916"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 917 - "Community 917"
+Cohesion: 0.67
+Nodes (3): players, India, Pakistan
+
+### Community 918 - "Community 918"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 919 - "Community 919"
+Cohesion: 0.67
+Nodes (3): group, name, event
+
+### Community 920 - "Community 920"
+Cohesion: 0.67
+Nodes (3): players, Essex, Kent
+
+### Community 921 - "Community 921"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 922 - "Community 922"
+Cohesion: 0.67
+Nodes (3): group, name, event
+
+### Community 923 - "Community 923"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 924 - "Community 924"
+Cohesion: 0.67
+Nodes (3): players, Durham, Lancashire
+
+### Community 925 - "Community 925"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 926 - "Community 926"
+Cohesion: 0.67
+Nodes (3): group, name, event
+
+### Community 927 - "Community 927"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 928 - "Community 928"
+Cohesion: 0.67
+Nodes (3): players, Northamptonshire, Worcestershire
+
+### Community 929 - "Community 929"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 930 - "Community 930"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 931 - "Community 931"
+Cohesion: 0.67
+Nodes (3): players, Hampshire, Surrey
+
+### Community 932 - "Community 932"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 933 - "Community 933"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 934 - "Community 934"
+Cohesion: 0.67
+Nodes (3): players, Warwickshire, Yorkshire
+
+### Community 935 - "Community 935"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 936 - "Community 936"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 937 - "Community 937"
+Cohesion: 0.67
+Nodes (3): players, Essex, Leicestershire
+
+### Community 938 - "Community 938"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 939 - "Community 939"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 940 - "Community 940"
+Cohesion: 0.67
+Nodes (3): players, Glamorgan, Sussex
+
+### Community 941 - "Community 941"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 942 - "Community 942"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 943 - "Community 943"
+Cohesion: 0.67
+Nodes (3): players, Nottinghamshire, Somerset
+
+### Community 944 - "Community 944"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 945 - "Community 945"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 946 - "Community 946"
+Cohesion: 0.67
+Nodes (3): players, Gloucestershire, Northamptonshire
+
+### Community 947 - "Community 947"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 948 - "Community 948"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 949 - "Community 949"
+Cohesion: 0.67
+Nodes (3): players, Kent, Lancashire
+
+### Community 950 - "Community 950"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 951 - "Community 951"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 952 - "Community 952"
+Cohesion: 0.67
+Nodes (3): players, Middlesex, Worcestershire
+
+### Community 953 - "Community 953"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 954 - "Community 954"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 955 - "Community 955"
+Cohesion: 0.67
+Nodes (3): players, Derbyshire, Durham
+
+### Community 956 - "Community 956"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 957 - "Community 957"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 958 - "Community 958"
+Cohesion: 0.67
+Nodes (3): players, Durham, Essex
+
+### Community 959 - "Community 959"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 960 - "Community 960"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 961 - "Community 961"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 962 - "Community 962"
+Cohesion: 0.67
+Nodes (3): players, Lancashire, Warwickshire
+
+### Community 963 - "Community 963"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 964 - "Community 964"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 965 - "Community 965"
+Cohesion: 0.67
+Nodes (3): players, Surrey, The Blaze
+
+### Community 966 - "Community 966"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 967 - "Community 967"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 968 - "Community 968"
+Cohesion: 0.67
+Nodes (3): officials, match_referees, umpires
+
+### Community 969 - "Community 969"
+Cohesion: 0.67
+Nodes (3): players, Hampshire, Somerset
+
+### Community 970 - "Community 970"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 971 - "Community 971"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 972 - "Community 972"
+Cohesion: 0.67
+Nodes (3): players, Australia, Bangladesh
+
+### Community 973 - "Community 973"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 974 - "Community 974"
+Cohesion: 0.67
+Nodes (3): name, stage, event
+
+### Community 975 - "Community 975"
+Cohesion: 0.67
+Nodes (3): players, Indonesia, Thailand
+
+### Community 976 - "Community 976"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 977 - "Community 977"
+Cohesion: 0.67
+Nodes (3): name, stage, event
+
+### Community 978 - "Community 978"
+Cohesion: 0.67
+Nodes (3): players, Hong Kong, United Arab Emirates
+
+### Community 979 - "Community 979"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 980 - "Community 980"
+Cohesion: 0.67
+Nodes (3): name, stage, event
+
+### Community 981 - "Community 981"
+Cohesion: 0.67
+Nodes (3): players, Hong Kong, Indonesia
+
+### Community 982 - "Community 982"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 983 - "Community 983"
+Cohesion: 0.67
+Nodes (3): name, stage, event
+
+### Community 984 - "Community 984"
+Cohesion: 0.67
+Nodes (3): players, Thailand, United Arab Emirates
+
+### Community 985 - "Community 985"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 986 - "Community 986"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 987 - "Community 987"
+Cohesion: 0.67
+Nodes (3): players, Sri Lanka, West Indies
+
+### Community 988 - "Community 988"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 989 - "Community 989"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 990 - "Community 990"
+Cohesion: 0.67
+Nodes (3): players, Sri Lanka, West Indies
+
+### Community 991 - "Community 991"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 992 - "Community 992"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 993 - "Community 993"
+Cohesion: 0.67
+Nodes (3): players, Sri Lanka, West Indies
+
+### Community 994 - "Community 994"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 995 - "Community 995"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 996 - "Community 996"
+Cohesion: 0.67
+Nodes (3): players, Canada, United States of America
+
+### Community 997 - "Community 997"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 998 - "Community 998"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 999 - "Community 999"
+Cohesion: 0.67
+Nodes (3): players, Finland, Sweden
+
+### Community 1000 - "Community 1000"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1001 - "Community 1001"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 1002 - "Community 1002"
+Cohesion: 0.67
+Nodes (3): players, Austria, Norway
+
+### Community 1003 - "Community 1003"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1004 - "Community 1004"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 1005 - "Community 1005"
+Cohesion: 0.67
+Nodes (3): players, Finland, Norway
+
+### Community 1006 - "Community 1006"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1007 - "Community 1007"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 1008 - "Community 1008"
+Cohesion: 0.67
+Nodes (3): players, Austria, Sweden
+
+### Community 1009 - "Community 1009"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1010 - "Community 1010"
+Cohesion: 0.67
+Nodes (3): name, stage, event
+
+### Community 1011 - "Community 1011"
+Cohesion: 0.67
+Nodes (3): players, Austria, Norway
+
+### Community 1012 - "Community 1012"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1013 - "Community 1013"
+Cohesion: 0.67
+Nodes (3): name, stage, event
+
+### Community 1014 - "Community 1014"
+Cohesion: 0.67
+Nodes (3): players, Finland, Sweden
+
+### Community 1015 - "Community 1015"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1016 - "Community 1016"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 1017 - "Community 1017"
+Cohesion: 0.67
+Nodes (3): officials, reserve_umpires, umpires
+
+### Community 1018 - "Community 1018"
+Cohesion: 0.67
+Nodes (3): players, Nigeria, Rwanda
+
+### Community 1019 - "Community 1019"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1020 - "Community 1020"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 1021 - "Community 1021"
+Cohesion: 0.67
+Nodes (3): officials, reserve_umpires, umpires
+
+### Community 1022 - "Community 1022"
+Cohesion: 0.67
+Nodes (3): players, Brazil, Malawi
+
+### Community 1023 - "Community 1023"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1024 - "Community 1024"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 1025 - "Community 1025"
+Cohesion: 0.67
+Nodes (3): officials, reserve_umpires, umpires
+
+### Community 1026 - "Community 1026"
+Cohesion: 0.67
+Nodes (3): players, Brazil, Rwanda
+
+### Community 1027 - "Community 1027"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1028 - "Community 1028"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 1029 - "Community 1029"
+Cohesion: 0.67
+Nodes (3): officials, reserve_umpires, umpires
+
+### Community 1030 - "Community 1030"
+Cohesion: 0.67
+Nodes (3): players, Malawi, Nigeria
+
+### Community 1031 - "Community 1031"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1032 - "Community 1032"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 1033 - "Community 1033"
+Cohesion: 0.67
+Nodes (3): players, Brazil, Nigeria
+
+### Community 1034 - "Community 1034"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1035 - "Community 1035"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 1036 - "Community 1036"
+Cohesion: 0.67
+Nodes (3): officials, reserve_umpires, umpires
+
+### Community 1037 - "Community 1037"
+Cohesion: 0.67
+Nodes (3): players, Malawi, Rwanda
+
+### Community 1038 - "Community 1038"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1039 - "Community 1039"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 1040 - "Community 1040"
+Cohesion: 0.67
+Nodes (3): players, Guernsey, Jersey
+
+### Community 1041 - "Community 1041"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
+### Community 1042 - "Community 1042"
+Cohesion: 0.67
+Nodes (3): match_number, name, event
+
+### Community 1043 - "Community 1043"
+Cohesion: 0.67
+Nodes (3): players, Guernsey, Jersey
+
+### Community 1044 - "Community 1044"
+Cohesion: 0.67
+Nodes (3): toss, decision, winner
+
 ## Knowledge Gaps
-- **4597 isolated node(s):** `branch`, `path`, `parentBranch`, `createdAt`, `remote` (+4592 more)
+- **8975 isolated node(s):** `branch`, `path`, `parentBranch`, `createdAt`, `remote` (+8970 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **90 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **92 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `mapApiMatchToModel()` connect `Community 199` to `Community 176`, `Community 35`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
-- **Why does `hasMeaningfulScores()` connect `Community 35` to `Community 199`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
-- **Why does `cn()` connect `Community 198` to `UI Utils and NavLink`, `Admin Audit & Settings`, `Player Analysis Panel`, `Loading Skeletons`, `Admin Player Manager`, `Community 520`, `Venue Analysis Panel`, `Community 22`, `Community 31`, `Community 34`, `Community 298`, `Community 43`, `Community 44`, `Community 45`, `Community 176`, `Community 50`, `Community 51`, `Community 180`, `Community 54`, `Community 194`, `Community 199`, `Community 209`, `Community 215`, `Community 234`, `Community 235`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+- **Why does `mapApiMatchToModel()` connect `Community 449` to `Admin Audit & Settings`, `Community 35`, `Community 199`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `hasMeaningfulScores()` connect `Community 35` to `Community 449`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `cn()` connect `Community 198` to `Admin Audit & Settings`, `Player Analysis Panel`, `Loading Skeletons`, `Admin Player Manager`, `Community 520`, `Venue Analysis Panel`, `Community 775`, `Community 15`, `Community 19`, `Community 22`, `Community 31`, `Community 34`, `Community 43`, `Community 44`, `Community 180`, `Community 54`, `Community 449`, `Community 194`, `Community 199`, `Community 215`, `Community 234`, `Community 235`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **What connects `branch`, `path`, `parentBranch` to the rest of the system?**
-  _4597 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _8975 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Football Match Controller` be split into smaller, more focused modules?**
-  _Cohesion score 0.11092436974789915 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10634920634920635 - nodes in this community are weakly interconnected._
 - **Should `UI Utils and NavLink` be split into smaller, more focused modules?**
-  _Cohesion score 0.0553116769095698 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06282051282051282 - nodes in this community are weakly interconnected._
 - **Should `Admin Audit & Settings` be split into smaller, more focused modules?**
-  _Cohesion score 0.07549634273772204 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07277167277167278 - nodes in this community are weakly interconnected._

@@ -31,3 +31,18 @@ export function usePerformanceLabPlayerStats(espnId: string | null, playerName: 
         refetchOnWindowFocus: true,
     });
 }
+
+export function useCricketTeamAnalytics(teamId: string, format: string, isTriggered: boolean) {
+    return useQuery({
+        queryKey: ['cricketTeamAnalytics', teamId, format],
+        queryFn: async () => {
+            const response = await fetch(`/api/cricket/team-analysis/${teamId}?format=${format}`);
+            const json = await response.json();
+            if (json.status !== 'success') throw new Error(json.message);
+            return json.data;
+        },
+        enabled: isTriggered, // Lazy loading trigger
+        staleTime: 24 * 60 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
+}
