@@ -1,8 +1,5 @@
-import puppeteer from 'puppeteer-extra';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import axios from 'axios';
 import fs from 'fs';
-
-puppeteer.use(StealthPlugin());
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -66,31 +63,18 @@ async function scrapeTeam(teamId, isOnDemand = false) {
     }
     isScraping = true;
   }
-  let browser = null;
+  
   try {
-    browser = await puppeteer.launch({ 
-      headless: "new", 
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    const res = await axios.get(`https://www.fotmob.com/teams/${teamId}/overview/team`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+      },
+      timeout: 15000
     });
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36');
     
-    try {
-      await page.goto(`https://www.fotmob.com/teams/${teamId}/overview/team`, { waitUntil: 'domcontentloaded', timeout: 45000 });
-    } catch (e) {
-      console.warn(`[Warning] goto timeout for team ${teamId}, but will try to read data anyway.`);
-    }
-    
-    // Wait for the __NEXT_DATA__ element explicitly
-    await page.waitForSelector('#__NEXT_DATA__', { timeout: 15000 }).catch(() => {});
-    
-    const nextDataJson = await page.evaluate(() => {
-      const script = document.getElementById('__NEXT_DATA__');
-      return script ? script.innerText : null;
-    });
-
-    if (nextDataJson) {
-      const data = JSON.parse(nextDataJson);
+    const match = res.data.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]+?)<\/script>/);
+    if (match) {
+      const data = JSON.parse(match[1]);
       const teamData = data.props?.pageProps?.fallback[`team-${teamId}`];
       if (teamData) {
         teamsCache[teamId] = {
@@ -104,13 +88,6 @@ async function scrapeTeam(teamId, isOnDemand = false) {
   } catch (error) {
     console.error(`Error scraping team ${teamId}:`, error.message);
   } finally {
-    if (browser) {
-      try {
-        await browser.close();
-      } catch (e) {
-        console.error(`Failed to gracefully close browser for ${teamId}:`, e.message);
-      }
-    }
     if (!isOnDemand) {
       isScraping = false;
     }
@@ -169,33 +146,22 @@ export async function getFotmobTeam(teamId) {
 
 export async function getFotmobLeague(leagueId) {
   const cached = leaguesCache[leagueId];
-  // TEMPORARILY IGNORE CACHE TO FETCH NEW STRUCTURE
-  if (false && cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+  if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
     return cached.data;
   }
 
   console.log(`[League Scraper] Fetching league ${leagueId} on-demand...`);
-  let browser = null;
   try {
-    browser = await puppeteer.launch({ 
-      headless: "new", 
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    const res = await axios.get(`https://www.fotmob.com/leagues/${leagueId}/overview/league`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+      },
+      timeout: 15000
     });
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36');
     
-    await page.goto(`https://www.fotmob.com/leagues/${leagueId}/overview/league`, { waitUntil: 'domcontentloaded', timeout: 45000 });
-    
-    // Wait for the __NEXT_DATA__ element explicitly
-    await page.waitForSelector('#__NEXT_DATA__', { timeout: 15000 }).catch(() => {});
-    
-    const nextDataJson = await page.evaluate(() => {
-      const script = document.getElementById('__NEXT_DATA__');
-      return script ? script.innerText : null;
-    });
-
-    if (nextDataJson) {
-      const data = JSON.parse(nextDataJson);
+    const match = res.data.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]+?)<\/script>/);
+    if (match) {
+      const data = JSON.parse(match[1]);
       const props = data.props?.pageProps;
       
       if (props) {
@@ -232,14 +198,6 @@ export async function getFotmobLeague(leagueId) {
     }
   } catch (error) {
     console.error(`Error scraping league ${leagueId}:`, error.message);
-  } finally {
-    if (browser) {
-      try {
-        await browser.close();
-      } catch (e) {
-        console.error(`Failed to gracefully close browser for league ${leagueId}:`, e.message);
-      }
-    }
   }
   return null;
 }
