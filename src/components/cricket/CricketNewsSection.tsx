@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
-  : 'http://localhost:5000';
+  : (import.meta.env.PROD ? '' : 'http://localhost:5000');
 
 const getImageUrl = (imageId: string | null) => {
   if (!imageId) return null;

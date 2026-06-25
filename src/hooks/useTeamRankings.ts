@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
-  : 'http://localhost:5000';
+  : (import.meta.env.PROD ? '' : 'http://localhost:5000');
 
 export type RankingFormat = 'odi' | 'test' | 't20';
 

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
-  : 'http://localhost:5000';
+  : (import.meta.env.PROD ? '' : 'http://localhost:5000');
 
 const STALE_30_MIN = {
   refetchOnWindowFocus: false,

@@ -17,7 +17,7 @@ const FORCE_ESPN_NAMES = ['gavi', 'pedri', 'rodri'];
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
-  : 'http://localhost:5000';
+  : (import.meta.env.PROD ? '' : 'http://localhost:5000');
 
 // ─── Concurrency Limiter to prevent 429 Rate Limits from API ──────────────
 const CONCURRENCY_LIMIT = 1;

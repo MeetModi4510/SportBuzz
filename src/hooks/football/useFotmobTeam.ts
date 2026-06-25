@@ -91,7 +91,7 @@ export function useFotmobTeam(identifier: string | null) {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://localhost:5000/api/fotmob/team/${encodeURIComponent(identifier!)}`);
+        const response = await fetch(`${import.meta.env.PROD ? "" : (import.meta.env.PROD ? "" : "http://localhost:5000")}/api/fotmob/team/${encodeURIComponent(identifier!)}`);
         const json = await response.json();
         
         if (isMounted) {

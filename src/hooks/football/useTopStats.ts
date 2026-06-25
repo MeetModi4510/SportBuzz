@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 export const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
-  : 'http://localhost:5000';
+  : (import.meta.env.PROD ? '' : 'http://localhost:5000');
 
 export interface PlayerStat {
   _id: string;
