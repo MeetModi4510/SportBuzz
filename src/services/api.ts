@@ -105,6 +105,18 @@ export const cricketApi = {
         const qs = params.toString();
         return api.get(`cricket/cb/full-commentary/${matchId}${qs ? `?${qs}` : ''}`);
     },
+    getIplSeasons: () => api.get('cricket/scraped/series/ipl-seasons'),
+    getSeriesMatches: (id: string, slug: string) => api.get(`cricket/scraped/series/${id}/${slug}/matches`),
+    getSeriesStandings: (id: string, slug: string) => api.get(`cricket/scraped/series/${id}/${slug}/standings`),
+    getSeriesSquads: (id: string, slug: string) => api.get(`cricket/scraped/series/${id}/${slug}/squads`),
+    getSeriesStats: (id: string, slug: string) => api.get(`cricket/scraped/series/${id}/${slug}/stats`),
+
+    // LOCAL IPL DATA ENDPOINTS
+    getLocalIplSeasons: () => api.get('cricket/local/ipl-seasons'),
+    getLocalIplMatches: (season: string) => api.get(`cricket/local/ipl-matches/${season}`),
+    getLocalIplStandings: (season: string) => api.get(`cricket/local/ipl-standings/${season}`),
+    getLocalIplSquads: (season: string) => api.get(`cricket/local/ipl-squads/${season}`),
+    getLocalIplStats: (season: string) => api.get(`cricket/local/ipl-stats/${season}`),
     getFeaturedMatches: async () => {
         try {
             const res = await api.get('featured/matches');

@@ -90,6 +90,40 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
         'nmp': '/flags/t20_mumbai_2026/mp.png',
         'arcs andheri': '/flags/t20_mumbai_2026/aa.png',
         'aa': '/flags/t20_mumbai_2026/aa.png',
+        
+        // IPL Teams
+        'chennai super kings': '/flags/ipl_2026/csk.png',
+        'csk': '/flags/ipl_2026/csk.png',
+        'delhi capitals': '/flags/ipl_2026/dc.png',
+        'dc': '/flags/ipl_2026/dc.png',
+        'delhi daredevils': '/flags/ipl_2026/dd.png',
+        'dd': '/flags/ipl_2026/dd.png',
+        'gujarat lions': '/flags/ipl_2026/gl.png',
+        'gl': '/flags/ipl_2026/gl.png',
+        'gujarat titans': '/flags/ipl_2026/gt.png',
+        'gt': '/flags/ipl_2026/gt.png',
+        'kolkata knight riders': '/flags/ipl_2026/kkr.png',
+        'kkr': '/flags/ipl_2026/kkr.png',
+        'lucknow super giants': '/flags/ipl_2026/lsg.png',
+        'lsg': '/flags/ipl_2026/lsg.png',
+        'mumbai indians': '/flags/ipl_2026/mi.png',
+        'mi': '/flags/ipl_2026/mi.png',
+        'punjab kings': '/flags/ipl_2026/pbks.png',
+        'pbks': '/flags/ipl_2026/pbks.png',
+        'kings xi punjab': '/flags/ipl_2026/kxip.png',
+        'kxip': '/flags/ipl_2026/kxip.png',
+        'rising pune supergiant': '/flags/ipl_2026/rps.png',
+        'rising pune supergiants': '/flags/ipl_2026/rps.png',
+        'rps': '/flags/ipl_2026/rps.png',
+        'royal challengers bengaluru': '/flags/ipl_2026/rcb.png',
+        'royal challengers bangalore': '/flags/ipl_2026/rcb.png',
+        'rcb': '/flags/ipl_2026/rcb.png',
+        'rajasthan royals': '/flags/ipl_2026/rr.png',
+        'rr': '/flags/ipl_2026/rr.png',
+        'sunrisers hyderabad': '/flags/ipl_2026/srh.png',
+        'deccan chargers': '/flags/ipl_2026/srh.png',
+        'srh': '/flags/ipl_2026/srh.png',
+        
         ...mplFlags
     };
 
@@ -111,7 +145,7 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
                 className={cn(
                     sizeClasses[size].width,
                     sizeClasses[size].height,
-                    "object-contain rounded-md bg-white/10 p-1",
+                    "object-contain rounded-md",
                     className
                 )}
                 onError={() => setUseTextFallback(true)}

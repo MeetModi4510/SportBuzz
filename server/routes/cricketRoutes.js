@@ -13,6 +13,7 @@ const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 import { fetchTeamLogo, fetchLiveMatchesScraped, fetchRecentMatchesScraped, fetchUpcomingMatchesScraped, fetchMatchDetailScraped, fetchMatchSquadsScraped, fetchBallMap, fetchPartnershipGraph } from '../services/cricbuzzScraperService.js';
+import { getLocalMatchInfo, getLocalMatchScorecard, getLocalMatchSquads, getLocalMatchSummary, getLocalMatchCommentary } from '../services/localIplMapper.js';
 import axios from 'axios';
 
 // ─── STAGGERED TEAM LOGO PROXY ───────────────────────────────────────────────
@@ -128,6 +129,11 @@ router.get('/scraped/match/:id/scorecard', async (req, res) => {
         const { id } = req.params;
         const { slug } = req.query; // optional
         const force = req.query.force === '1' || req.query.force === 'true';
+
+        // Intercept local IPL match
+        const localData = await getLocalMatchScorecard(id);
+        if (localData) return res.json({ status: 'success', data: localData });
+
         const data = await scrapeScorecard(id, slug || null, force);
         if (!data) {
             return res.status(200).json({ status: 'success', data: null, message: 'No scorecard data available yet — match may not have started.' });
@@ -140,11 +146,82 @@ router.get('/scraped/match/:id/scorecard', async (req, res) => {
 });
 
 router.get('/scraped/match/:id/:endpointType', async (req, res) => {
+    const { id, endpointType } = req.params;
+    
+    // Intercept local IPL matches
+    if (endpointType === 'info') {
+        const localData = await getLocalMatchInfo(id);
+        if (localData) return res.json({ status: 'success', data: localData });
+    } else if (endpointType === 'squads') {
+        const localData = await getLocalMatchSquads(id);
+        if (localData) return res.json({ status: 'success', data: { success: true, data: localData } });
+    } else if (endpointType === 'summary') {
+        const localData = await getLocalMatchSummary(id);
+        if (localData) return res.json({ status: 'success', data: { success: true, data: localData } });
+    } else if (endpointType === 'scorecard') {
+        const localData = await getLocalMatchScorecard(id);
+        if (localData) return res.json({ status: 'success', data: { success: true, data: localData } });
+    } else if (endpointType === 'commentary') {
+        const localData = await getLocalMatchCommentary(id);
+        if (localData) return res.json({ status: 'success', data: { success: true, data: localData } });
+    } else if (endpointType === 'overs') {
+        return res.json({ status: 'success', data: { success: true, data: { overSummaryList: [] } } });
+    } else if (endpointType === 'graphs') {
+        return res.json({ status: 'success', data: { success: true, data: { matchId: id } } });
+    }
+
     const force = req.query.force === '1' || req.query.force === 'true';
-    const data = await fetchMatchDetailScraped(req.params.id, req.params.endpointType, force);
+    const data = await fetchMatchDetailScraped(id, endpointType, force);
     res.json({ status: 'success', data });
 });
 // =============================
+
+import { getIplSeasons, fetchSeriesMatches, fetchSeriesStandings, fetchSeriesSquads, fetchSeriesStats } from '../services/cricbuzzSeriesScraper.js';
+
+router.get('/scraped/series/ipl-seasons', async (req, res) => {
+    try {
+        const data = await getIplSeasons();
+        res.json({ status: 'success', data });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
+router.get('/scraped/series/:id/:slug/matches', async (req, res) => {
+    try {
+        const data = await fetchSeriesMatches(req.params.id, req.params.slug);
+        res.json({ status: 'success', data });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
+router.get('/scraped/series/:id/:slug/standings', async (req, res) => {
+    try {
+        const data = await fetchSeriesStandings(req.params.id, req.params.slug);
+        res.json({ status: 'success', data });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
+router.get('/scraped/series/:id/:slug/squads', async (req, res) => {
+    try {
+        const data = await fetchSeriesSquads(req.params.id, req.params.slug);
+        res.json({ status: 'success', data });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
+router.get('/scraped/series/:id/:slug/stats', async (req, res) => {
+    try {
+        const data = await fetchSeriesStats(req.params.id, req.params.slug);
+        res.json({ status: 'success', data });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
 
 // Get specific match details - now uses scraper
 router.get('/match/:id', async (req, res) => {
@@ -187,7 +264,13 @@ router.get('/match/:id/info', async (req, res) => {
             }
         }
 
-        // 2. Fallback to Scraper API instead of RapidAPI
+        // 2. Check if it's a local IPL file match
+        const localInfo = await getLocalMatchInfo(id);
+        if (localInfo) {
+            return res.json({ status: 'success', data: localInfo });
+        }
+
+        // 3. Fallback to Scraper API instead of RapidAPI
         const matchInfo = await fetchMatchDetailScraped(id, 'info');
         res.json({ status: 'success', data: matchInfo });
     } catch (error) {
@@ -307,6 +390,11 @@ router.get('/cb/full-commentary/:matchId', async (req, res) => {
         const { matchId } = req.params;
         const { slug } = req.query; // optional
         const force = req.query.force === '1' || req.query.force === 'true';
+
+        // Intercept local IPL match
+        const localData = await getLocalMatchCommentary(matchId);
+        if (localData) return res.json({ status: 'success', data: { success: true, data: localData } });
+
         const data = await scrapeFullCommentary(matchId, slug || null, force);
         if (!data) {
             return res.status(200).json({
@@ -549,6 +637,75 @@ router.get('/players/:playerId/stats', async (req, res) => {
     } catch (error) {
         console.error("Error fetching player stats:", error);
         res.status(500).json({ error: 'Failed to fetch player stats' });
+    }
+});
+
+// ====== LOCAL IPL DATA ROUTES ======
+let localIplCache = null;
+function getLocalIplData() {
+    if (localIplCache) return localIplCache;
+    try {
+        const dataPath = path.join(__dirname, '..', 'data', 'ipl_local_data.json');
+        if (fs.existsSync(dataPath)) {
+            const raw = fs.readFileSync(dataPath, 'utf8');
+            localIplCache = JSON.parse(raw);
+            return localIplCache;
+        }
+    } catch (e) {
+        console.error("Error reading local IPL data:", e);
+    }
+    return {};
+}
+
+router.get('/local/ipl-seasons', (req, res) => {
+    try {
+        const data = getLocalIplData();
+        const seasons = Object.keys(data)
+            .map(k => ({ id: k, year: k, name: `IPL ${k}`, slug: `ipl-${k}` }))
+            .sort((a, b) => parseInt(b.year) - parseInt(a.year));
+        res.json({ status: 'success', data: seasons });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
+router.get('/local/ipl-matches/:season', (req, res) => {
+    try {
+        const data = getLocalIplData();
+        const seasonData = data[req.params.season];
+        res.json({ status: 'success', data: seasonData ? seasonData.matches : [] });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
+router.get('/local/ipl-standings/:season', (req, res) => {
+    try {
+        const data = getLocalIplData();
+        const seasonData = data[req.params.season];
+        res.json({ status: 'success', data: seasonData ? seasonData.standings : [] });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
+router.get('/local/ipl-squads/:season', (req, res) => {
+    try {
+        const data = getLocalIplData();
+        const seasonData = data[req.params.season];
+        res.json({ status: 'success', data: seasonData ? seasonData.squads : {} });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
+router.get('/local/ipl-stats/:season', (req, res) => {
+    try {
+        const data = getLocalIplData();
+        const seasonData = data[req.params.season];
+        res.json({ status: 'success', data: seasonData ? seasonData.stats : { topRunScorers: [], topWicketTakers: [] } });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
     }
 });
 

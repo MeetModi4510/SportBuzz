@@ -47,6 +47,7 @@ import MatchCenter from "./pages/football/MatchCenter";
 import PlayerProfile from "./pages/football/PlayerProfile";
 import FootballLeagueOverview from "./pages/football/FootballLeagueOverview";
 import CricketHome from "./pages/cricket/CricketHome";
+import CricketSeriesOverview from "./pages/cricket/CricketSeriesOverview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -140,6 +141,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <GlobalNews />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cricket/series"
+                element={
+                  <ProtectedRoute>
+                    <CricketSeriesOverview />
                   </ProtectedRoute>
                 }
               />

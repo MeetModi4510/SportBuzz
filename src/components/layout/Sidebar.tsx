@@ -23,7 +23,7 @@ const discoverItems = [
 const topLeagues = [
   { name: "Premier League", icon: "⚽", path: "/football/league/47" },
   { name: "Champions League", icon: "⚽", path: "/football/league/42" },
-  { name: "IPL", icon: "🏏", path: "/" },
+  { name: "IPL", icon: "🏏", path: "/cricket/series" },
   { name: "NBA", icon: "🏀", path: "/" },
 ];
 
