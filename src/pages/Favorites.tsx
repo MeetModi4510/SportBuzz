@@ -279,6 +279,44 @@ function FavoriteTeamCard({ team, onRemove, navigate }: { team: Favorite, onRemo
   );
 }
 
+function FavoriteLeagueCard({ league, onRemove, navigate }: { league: any, onRemove: (id: string) => void, navigate: any }) {
+  return (
+    <div
+      onClick={() => navigate(`/football/league/${league.itemId}`)}
+      className="group flex flex-col bg-card hover:bg-accent/5 border border-border/50 hover:border-border rounded-2xl p-5 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-foreground/5 text-[10px] font-bold uppercase tracking-widest text-foreground/80">
+          <Medal size={12} className="text-[#d4af37]" />
+          {league.sport}
+        </span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(league._id);
+          }}
+          className="p-2 rounded-full hover:bg-rose-500/10 text-rose-500 transition-colors"
+        >
+          <Heart size={16} fill="currentColor" />
+        </button>
+      </div>
+      
+      <div className="flex flex-col items-center justify-center gap-4 py-4">
+        {league.image ? (
+          <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center p-3 shadow-md group-hover:scale-110 transition-transform duration-500">
+            <img src={league.image} alt={league.name} className="w-full h-full object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+          </div>
+        ) : (
+          <div className="w-20 h-20 rounded-full bg-foreground/5 flex items-center justify-center border border-border/50 shadow-sm transition-transform duration-500 group-hover:scale-105">
+            <Medal className="w-8 h-8 text-muted-foreground/50" />
+          </div>
+        )}
+        <h3 className="text-lg font-black text-foreground text-center line-clamp-1">{league.name}</h3>
+      </div>
+    </div>
+  );
+}
+
 function AthleteInfoData({ sport, itemId }: { sport: string, itemId?: string }) {
   const isCricket = sport === 'cricket';
   const isFootball = sport === 'football';
@@ -434,6 +472,12 @@ export default function Favorites() {
       (item.name?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  const filteredLeagues = favorites.filter(
+    (item) => item.type === 'league' && 
+      (activeSport === "all" || item.sport === activeSport) &&
+      (item.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
@@ -475,7 +519,7 @@ export default function Favorites() {
                 {activeTab === 'matches' && `${filteredMatches.length} ${filteredMatches.length === 1 ? "match" : "matches"} saved`}
                 {activeTab === 'teams' && `${filteredTeams.length} ${filteredTeams.length === 1 ? "team" : "teams"} saved`}
                 {activeTab === 'players' && `${filteredPlayers.length} ${filteredPlayers.length === 1 ? "player" : "players"} saved`}
-                {activeTab === 'leagues' && `0 leagues saved`}
+                {activeTab === 'leagues' && `${filteredLeagues.length} ${filteredLeagues.length === 1 ? "league" : "leagues"} saved`}
               </p>
             </div>
 
@@ -613,6 +657,30 @@ export default function Favorites() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-6">
                 {filteredPlayers.map((player) => (
                   <FavoritePlayerCard key={player._id} player={player} onRemove={removeFavorite} navigate={navigate} />
+                ))}
+              </div>
+            )
+          ) : activeTab === 'leagues' ? (
+            filteredLeagues.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+                <div className="w-16 h-16 mb-4 flex items-center justify-center rounded-2xl bg-foreground/5 border border-border/50">
+                  <Medal className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">No favorite leagues yet</h3>
+                <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-6">
+                  Keep track of your favorite leagues.
+                </p>
+                <button
+                  onClick={() => navigate("/")}
+                  className="px-6 py-2.5 bg-foreground text-background text-sm font-bold uppercase tracking-wider rounded-full hover:bg-foreground/90 transition-colors"
+                >
+                  Browse Leagues
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-6">
+                {filteredLeagues.map((league) => (
+                  <FavoriteLeagueCard key={league._id} league={league} onRemove={removeFavorite} navigate={navigate} />
                 ))}
               </div>
             )

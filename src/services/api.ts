@@ -48,6 +48,10 @@ api.interceptors.response.use(
                 localStorage.removeItem('user');
                 // Only redirect if auth/me explicitly fails
                 window.location.href = '/login?error=session_expired';
+            } else if (error.config?.method === 'post' || error.config?.method === 'delete' || error.config?.method === 'put') {
+                // Redirect to login if user tries to do a protected mutation (like add to favorites) without auth
+                window.location.href = '/login?error=login_required';
+                return new Promise(() => {}); // Prevent the catch block from firing a red toast
             }
         }
         return Promise.reject(error);

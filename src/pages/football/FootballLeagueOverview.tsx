@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useFotmobLeague } from '../../hooks/football/useFotmobLeague';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, ShieldAlert, Trophy, Calendar, Users, Activity, BarChart, ArrowRightLeft } from 'lucide-react';
+import { Loader2, ShieldAlert, Trophy, Calendar, Users, Activity, BarChart, ArrowRightLeft, Heart, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { favoritesApi } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
 import { Navbar } from '../../components/Navbar';
 
@@ -15,11 +17,70 @@ export default function FootballLeagueOverview() {
 
   const [activeTab, setActiveTab] = useState<string>('overview');
 
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState<string | null>(null);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+  const { toast } = useToast();
+
   React.useEffect(() => {
     if (data && data.tabs && data.tabs.length > 0 && activeTab === 'overview' && !data.tabs.includes('overview')) {
       setActiveTab(data.tabs[0]);
     }
   }, [data]);
+
+  React.useEffect(() => {
+    if (!leagueId) return;
+    const checkFav = async () => {
+      try {
+        const allFavs = await favoritesApi.get() as any;
+        if (allFavs.success) {
+          const fav = allFavs.data.find((f: any) => f.type === 'league' && f.itemId === leagueId.toString());
+          if (fav) {
+            setIsFavorite(true);
+            setFavoriteId(fav._id);
+          } else {
+            setIsFavorite(false);
+            setFavoriteId(null);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to check favorite status', e);
+      }
+    };
+    checkFav();
+  }, [leagueId]);
+
+  const toggleFavorite = async () => {
+    if (!leagueId) return;
+    setIsTogglingFavorite(true);
+    try {
+      if (isFavorite && favoriteId) {
+        await favoritesApi.remove(favoriteId);
+        setIsFavorite(false);
+        setFavoriteId(null);
+        toast({ title: 'Removed from Favorites' });
+      } else {
+        const leagueLogoUrl = `https://images.fotmob.com/image_resources/logo/leaguelogo/${leagueId}.png`;
+        const leagueName = data?.details?.name || 'League';
+        const res = await favoritesApi.add({
+          type: 'league',
+          itemId: leagueId.toString(),
+          name: leagueName,
+          sport: 'football',
+          image: leagueLogoUrl
+        }) as any;
+        if (res.success) {
+          setIsFavorite(true);
+          setFavoriteId(res.data._id);
+          toast({ title: 'Added to Favorites', description: `${leagueName} has been saved.` });
+        }
+      }
+    } catch (e) {
+      toast({ title: 'Error', description: 'Failed to update favorites', variant: 'destructive' });
+    } finally {
+      setIsTogglingFavorite(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -631,6 +692,18 @@ export default function FootballLeagueOverview() {
                   Season {data.details.selectedSeason}
                 </span>
               )}
+              <button 
+                onClick={toggleFavorite}
+                disabled={isTogglingFavorite}
+                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-lg border transition-all ${
+                  isFavorite 
+                    ? 'bg-rose-500/10 text-rose-500 border-rose-500/20 hover:bg-rose-500/20' 
+                    : 'bg-foreground/5 text-muted-foreground border-border hover:bg-foreground/10 hover:text-foreground'
+                }`}
+              >
+                <Heart size={14} fill={isFavorite ? "currentColor" : "none"} className={isTogglingFavorite ? "animate-pulse" : ""} />
+                {isFavorite ? 'Saved' : 'Favorite'}
+              </button>
             </div>
           </div>
         </div>
