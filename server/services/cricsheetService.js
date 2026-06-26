@@ -228,7 +228,9 @@ async function fetchHighestScores(espnTeamId, classId) {
         const name = $(cols[0]).text().trim();
         const runs = $(cols[1]).text().trim();
         const opp = $(cols[9]).text().trim().replace(/^v\s+/, '');
-        if (name) results.push({ name, runs, opp });
+        const ground = $(cols[10]).text().trim();
+        const date = $(cols[11]).text().trim();
+        if (name) results.push({ name, runs, opp, ground, date });
     });
     return results;
 }
@@ -247,7 +249,9 @@ async function fetchBestBowling(espnTeamId, classId) {
         const wkts = $(cols[5]).text().trim();
         const runs = $(cols[4]).text().trim();
         const opp = $(cols[9]).text().trim().replace(/^v\s+/, '');
-        if (name) results.push({ name, figures: `${wkts}/${runs}`, opp });
+        const ground = $(cols[10]).text().trim();
+        const date = $(cols[11]).text().trim();
+        if (name) results.push({ name, figures: `${wkts}/${runs}`, opp, ground, date });
     });
     return results;
 }

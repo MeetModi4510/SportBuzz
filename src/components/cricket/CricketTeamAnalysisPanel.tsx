@@ -93,6 +93,67 @@ export function CricketTeamAnalysisPanel() {
 
     React.useEffect(() => { setIsTriggered(false); }, [selectedTeam, selectedFormat]);
 
+    const [teamFlags, setTeamFlags] = useState<Record<string, string>>({});
+    const [playerImages, setPlayerImages] = useState<Record<string, string>>({});
+
+    React.useEffect(() => {
+        if (!analyticsData?.headToHead) return;
+        const fetchFlags = async () => {
+            const opps = Object.keys(analyticsData.headToHead);
+            for (const opp of opps) {
+                const cacheKey = `cricket_flag_${opp}`;
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                    if (cached !== 'null') setTeamFlags(prev => ({ ...prev, [opp]: cached }));
+                    continue;
+                }
+                try {
+                    const res = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(opp + ' Cricket')}`);
+                    const data = await res.json();
+                    const badge = data.teams?.[0]?.strBadge || 'null';
+                    localStorage.setItem(cacheKey, badge);
+                    if (badge !== 'null') setTeamFlags(prev => ({ ...prev, [opp]: badge }));
+                } catch (e) {
+                    console.error('Failed to fetch flag for', opp);
+                }
+                // tiny delay to prevent rate limit
+                await new Promise(r => setTimeout(r, 200));
+            }
+        };
+        fetchFlags();
+    }, [analyticsData?.headToHead]);
+
+    React.useEffect(() => {
+        if (!analyticsData?.players) return;
+        const fetchPlayerImages = async () => {
+            const players = [
+                ...(analyticsData.players.topRunScorers || []),
+                ...(analyticsData.players.topWicketTakers || [])
+            ];
+            const names = Array.from(new Set(players.map((p: any) => p.name)));
+            
+            for (const name of names) {
+                const cacheKey = `cricket_player_${name}`;
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                    if (cached !== 'null') setPlayerImages(prev => ({ ...prev, [name]: cached }));
+                    continue;
+                }
+                try {
+                    const res = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`);
+                    const data = await res.json();
+                    const thumb = data.player?.[0]?.strThumb || data.player?.[0]?.strCutout || data.player?.[0]?.strRender || 'null';
+                    localStorage.setItem(cacheKey, thumb);
+                    if (thumb !== 'null') setPlayerImages(prev => ({ ...prev, [name]: thumb }));
+                } catch (e) {
+                    console.error('Failed to fetch player image for', name);
+                }
+                await new Promise(r => setTimeout(r, 200));
+            }
+        };
+        fetchPlayerImages();
+    }, [analyticsData?.players]);
+
     const groups = [
         { label: 'Batsmen', players: [] as Player[] },
         { label: 'All-Rounders', players: [] as Player[] },
@@ -171,7 +232,7 @@ export function CricketTeamAnalysisPanel() {
                     </div>
                     <h3 className="text-3xl font-display font-bold text-white mb-3">Deep Dive Analytics Engine</h3>
                     <p className="text-slate-400 max-w-xl mb-8 text-base">
-                        Win/Loss, Home/Away, Form, Highest Scores, Best Bowling, Strike Rates and more — fetched live from ESPN.
+                        Win/Loss, Home/Away, Form, Highest Scores, Best Bowling, Strike Rates and more.
                     </p>
                     <button onClick={() => setIsTriggered(true)}
                         className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
@@ -253,7 +314,11 @@ export function CricketTeamAnalysisPanel() {
                                     <div key={i} className="flex justify-between items-center p-3 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/10 transition-colors">
                                         <div>
                                             <p className="font-bold text-slate-200 text-sm">{h.name}</p>
-                                            <p className="text-xs text-slate-500">vs {h.opp}</p>
+                                            <p className="text-[11px] text-slate-500 mt-0.5">
+                                                vs {h.opp}
+                                                {h.ground && <><span className="text-slate-600 px-1.5">•</span>{h.ground}</>}
+                                                {h.date && <><span className="text-slate-600 px-1.5">•</span>{h.date}</>}
+                                            </p>
                                         </div>
                                         <span className="font-black text-amber-400 text-xl">{h.runs}</span>
                                     </div>
@@ -272,7 +337,11 @@ export function CricketTeamAnalysisPanel() {
                                     <div key={i} className="flex justify-between items-center p-3 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/10 transition-colors">
                                         <div>
                                             <p className="font-bold text-slate-200 text-sm">{b.name}</p>
-                                            <p className="text-xs text-slate-500">vs {b.opp}</p>
+                                            <p className="text-[11px] text-slate-500 mt-0.5">
+                                                vs {b.opp}
+                                                {b.ground && <><span className="text-slate-600 px-1.5">•</span>{b.ground}</>}
+                                                {b.date && <><span className="text-slate-600 px-1.5">•</span>{b.date}</>}
+                                            </p>
                                         </div>
                                         <span className="font-black text-emerald-400 text-xl">{b.figures}</span>
                                     </div>
@@ -361,7 +430,16 @@ export function CricketTeamAnalysisPanel() {
                                 {(analyticsData.players?.topRunScorers || []).map((p: any, i: number) => (
                                     <div key={i} className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-colors">
                                         <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${i === 0 ? 'bg-amber-400/20 text-amber-400' : i === 1 ? 'bg-slate-400/20 text-slate-300' : i === 2 ? 'bg-orange-700/30 text-orange-400' : 'bg-slate-800 text-slate-500'}`}>{i + 1}</div>
-                                        <span className="font-bold text-slate-200 flex-1 text-sm">{p.name}</span>
+                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                            {playerImages[p.name] ? (
+                                                <img src={playerImages[p.name]} alt={p.name} className="w-8 h-8 rounded-full object-cover shrink-0 border border-white/10" />
+                                            ) : (
+                                                <div className="w-8 h-8 rounded-full bg-slate-800 shrink-0 border border-white/5 flex items-center justify-center text-xs font-bold text-slate-500">
+                                                    {p.name.charAt(0)}
+                                                </div>
+                                            )}
+                                            <span className="font-bold text-slate-200 text-sm truncate">{p.name}</span>
+                                        </div>
                                         <div className="flex items-center gap-3 text-xs text-slate-500 hidden sm:flex">
                                             {p.matches && <span>{p.matches}m</span>}
                                             {p.avg && <span>avg <strong className="text-slate-300">{p.avg}</strong></span>}
@@ -386,7 +464,16 @@ export function CricketTeamAnalysisPanel() {
                                 {(analyticsData.players?.topWicketTakers || []).map((p: any, i: number) => (
                                     <div key={i} className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-colors">
                                         <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${i === 0 ? 'bg-amber-400/20 text-amber-400' : i === 1 ? 'bg-slate-400/20 text-slate-300' : i === 2 ? 'bg-orange-700/30 text-orange-400' : 'bg-slate-800 text-slate-500'}`}>{i + 1}</div>
-                                        <span className="font-bold text-slate-200 flex-1 text-sm">{p.name}</span>
+                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                            {playerImages[p.name] ? (
+                                                <img src={playerImages[p.name]} alt={p.name} className="w-8 h-8 rounded-full object-cover shrink-0 border border-white/10" />
+                                            ) : (
+                                                <div className="w-8 h-8 rounded-full bg-slate-800 shrink-0 border border-white/5 flex items-center justify-center text-xs font-bold text-slate-500">
+                                                    {p.name.charAt(0)}
+                                                </div>
+                                            )}
+                                            <span className="font-bold text-slate-200 text-sm truncate">{p.name}</span>
+                                        </div>
                                         <div className="flex items-center gap-3 text-xs text-slate-500 hidden sm:flex">
                                             {p.matches && <span>{p.matches}m</span>}
                                             {p.avg && <span>avg <strong className="text-slate-300">{p.avg}</strong></span>}
@@ -418,7 +505,10 @@ export function CricketTeamAnalysisPanel() {
                                 return (
                                     <div key={opp} className="flex items-center gap-3 p-4 rounded-xl bg-slate-800/30 hover:bg-slate-800/60 border border-white/5 hover:border-white/10 transition-all">
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-white font-bold text-sm truncate">{opp}</p>
+                                            <div className="flex items-center gap-2">
+                                                {teamFlags[opp] && <img src={teamFlags[opp]} alt={opp} className="w-5 h-5 object-contain" />}
+                                                <p className="text-white font-bold text-sm truncate">{opp}</p>
+                                            </div>
                                             <p className="text-slate-500 text-xs mt-0.5">{rec.played} played</p>
                                         </div>
                                         <div className="flex items-center gap-2 text-xs font-bold shrink-0">
