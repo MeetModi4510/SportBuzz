@@ -272,7 +272,6 @@ export function CricketTeamAnalysisPanel() {
                 <div className="bg-slate-900/40 rounded-2xl border border-white/5 p-16 flex flex-col items-center justify-center text-center space-y-5">
                     <div className="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
                     <h3 className="text-2xl font-bold text-white">Fetching Live Data...</h3>
-                    <p className="text-slate-400 max-w-md text-sm">Pulling official statistics from ESPN Statsguru sequentially to prevent rate limits. This takes about 5-10 seconds.</p>
                 </div>
             ) : analyticsData ? (
                 <div className="space-y-6 animate-fade-in">
