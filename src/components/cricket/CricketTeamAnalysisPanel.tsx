@@ -292,17 +292,28 @@ export function CricketTeamAnalysisPanel() {
                             <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
                                 {(analyticsData.yearByYear || []).map((y: any) => {
                                     const yWinPct = y.mat > 0 ? Math.round((y.won / y.mat) * 100) : 0;
+                                    const yLossPct = y.mat > 0 ? Math.round((y.lost / y.mat) * 100) : 0;
+                                    const yTiePct = y.mat > 0 ? Math.round(((y.tied || 0) / y.mat) * 100) : 0;
+                                    const yDrawPct = y.mat > 0 ? Math.round(((y.drawNr || 0) / y.mat) * 100) : 0;
                                     return (
                                         <div key={y.year} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
                                             <span className="text-slate-400 font-bold text-sm w-10 shrink-0">{y.year}</span>
                                             <div className="flex-1">
                                                 <div className="flex rounded-full overflow-hidden h-2 gap-0.5">
-                                                    <div style={{ width: `${yWinPct}%` }} className="bg-emerald-500 rounded-full transition-all" />
-                                                    <div style={{ width: `${100 - yWinPct}%` }} className="bg-slate-700 rounded-full" />
+                                                    {yWinPct > 0 && <div style={{ width: `${yWinPct}%` }} className="bg-emerald-500 rounded-full transition-all" title="Won" />}
+                                                    {yLossPct > 0 && <div style={{ width: `${yLossPct}%` }} className="bg-rose-500 rounded-full transition-all" title="Lost" />}
+                                                    {yTiePct > 0 && <div style={{ width: `${yTiePct}%` }} className="bg-amber-400 rounded-full transition-all" title="Tied" />}
+                                                    {yDrawPct > 0 && <div style={{ width: `${yDrawPct}%` }} className="bg-slate-500 rounded-full transition-all" title="Draw/NR" />}
                                                 </div>
                                             </div>
                                             <span className="text-xs font-bold text-emerald-400 w-8 text-right">{y.won}W</span>
-                                            <span className="text-xs text-slate-500 w-8 text-right">{y.lost}L</span>
+                                            <span className="text-xs text-rose-400/80 w-8 text-right">{y.lost}L</span>
+                                            {(y.tied > 0 || y.drawNr > 0) && (
+                                                <div className="flex flex-col gap-0.5 w-8 text-right">
+                                                    {y.tied > 0 && <span className="text-[10px] leading-none text-amber-400">{y.tied}T</span>}
+                                                    {y.drawNr > 0 && <span className="text-[10px] leading-none text-slate-400">{y.drawNr}D/N</span>}
+                                                </div>
+                                            )}
                                             <span className={`text-xs font-black w-9 text-right ${yWinPct >= 60 ? 'text-emerald-400' : yWinPct >= 40 ? 'text-amber-400' : 'text-rose-400'}`}>{yWinPct}%</span>
                                         </div>
                                     );
@@ -322,7 +333,11 @@ export function CricketTeamAnalysisPanel() {
                                         <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-400 shrink-0">{i + 1}</div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-slate-200 text-sm font-semibold truncate">{v.ground.replace(/^[^-]+ - /, '')}</p>
-                                            <p className="text-slate-500 text-xs">{v.mat} matches • {v.won}W {v.lost}L</p>
+                                            <p className="text-slate-500 text-xs">
+                                                {v.mat} matches • {v.won}W {v.lost}L
+                                                {v.tied > 0 ? ` ${v.tied}T` : ''}
+                                                {v.drawNr > 0 ? ` ${v.drawNr}D` : ''}
+                                            </p>
                                         </div>
                                         <span className={`text-sm font-black shrink-0 ${v.winPct >= 70 ? 'text-emerald-400' : v.winPct >= 50 ? 'text-amber-400' : 'text-rose-400'}`}>{v.winPct}%</span>
                                     </div>
@@ -411,6 +426,7 @@ export function CricketTeamAnalysisPanel() {
                                             <span className="text-slate-600">·</span>
                                             <span className="text-rose-400">{rec.lost}L</span>
                                             {rec.tied > 0 && <><span className="text-slate-600">·</span><span className="text-amber-400">{rec.tied}T</span></>}
+                                            {rec.drawNr > 0 && <><span className="text-slate-600">·</span><span className="text-slate-400">{rec.drawNr}D</span></>}
                                         </div>
                                         <div className={`text-xs font-black px-2 py-1 rounded-lg shrink-0 ${oppWinPct >= 60 ? 'bg-emerald-500/15 text-emerald-400' : oppWinPct >= 40 ? 'bg-amber-500/15 text-amber-400' : 'bg-rose-500/15 text-rose-400'}`}>
                                             {oppWinPct}%

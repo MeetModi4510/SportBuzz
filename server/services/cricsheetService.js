@@ -60,7 +60,9 @@ async function fetchYearByYear(espnTeamId, classId) {
         const mat = parseInt($(cols[1]).text()) || 0;
         const won = parseInt($(cols[2]).text()) || 0;
         const lost = parseInt($(cols[3]).text()) || 0;
-        if (year && mat > 0) years.push({ year, mat, won, lost });
+        const tied = parseInt($(cols[4]).text()) || 0;
+        const drawNr = parseInt($(cols[5]).text()) || 0;
+        if (year && mat > 0) years.push({ year, mat, won, lost, tied, drawNr });
     });
     return years.sort((a, b) => b.year - a.year);
 }
@@ -79,7 +81,9 @@ async function fetchVenueBreakdown(espnTeamId, classId) {
             const mat = parseInt($(cols[2]).text()) || 0;
             const won = parseInt($(cols[3]).text()) || 0;
             const lost = parseInt($(cols[4]).text()) || 0;
-            pendingData = { mat, won, lost };
+            const tied = parseInt($(cols[5]).text()) || 0;
+            const drawNr = parseInt($(cols[6]).text()) || 0;
+            pendingData = { mat, won, lost, tied, drawNr };
         } else if (cols.length === 1 && pendingData) {
             const groundName = $(cols[0]).text().trim();
             venues.push({
@@ -87,6 +91,8 @@ async function fetchVenueBreakdown(espnTeamId, classId) {
                 mat: pendingData.mat,
                 won: pendingData.won,
                 lost: pendingData.lost,
+                tied: pendingData.tied,
+                drawNr: pendingData.drawNr,
                 winPct: pendingData.mat > 0 ? Math.round((pendingData.won / pendingData.mat) * 100) : 0
             });
             pendingData = null;
@@ -114,16 +120,17 @@ async function fetchMatchesList(espnTeamId, classId) {
             const result = $(cols[6]).text().trim().toLowerCase();
             
             // Collect recent form from the first 10 rows of the first page
-            if (page === 1 && i < 10 && ['won','lost','tied','n/r'].includes(result)) {
-                recentForm.push(result === 'n/r' ? 'NR' : result === 'won' ? 'W' : result === 'lost' ? 'L' : 'T');
+            if (page === 1 && i < 10 && ['won','lost','tied','n/r','draw','drawn'].includes(result)) {
+                recentForm.push(result === 'n/r' ? 'NR' : result === 'won' ? 'W' : result === 'lost' ? 'L' : ['draw','drawn'].includes(result) ? 'D' : 'T');
             }
 
             if (!opponent) return;
-            if (!headToHead[opponent]) headToHead[opponent] = { played: 0, won: 0, lost: 0, tied: 0 };
+            if (!headToHead[opponent]) headToHead[opponent] = { played: 0, won: 0, lost: 0, tied: 0, drawNr: 0 };
             headToHead[opponent].played++;
             if (result === 'won') headToHead[opponent].won++;
             else if (result === 'lost') headToHead[opponent].lost++;
             else if (result === 'tied') headToHead[opponent].tied++;
+            else if (['draw', 'n/r', 'drawn'].includes(result)) headToHead[opponent].drawNr++;
         });
 
         const pageText = $('table.engineTable').eq(3).text();
@@ -137,32 +144,21 @@ async function fetchMatchesList(espnTeamId, classId) {
 
 /** Fetch Batting First / Chasing */
 async function fetchBattingFirstVsChasing(espnTeamId, classId) {
-    let battingFirst = { matches: 0, won: 0 };
-    let chasing = { matches: 0, won: 0 };
-    let page = 1;
-    while (true) {
-        const url = `https://stats.espncricinfo.com/ci/engine/stats/index.html?class=${classId};team=${espnTeamId};template=results;type=team;view=innings;page=${page}`;
+    const fetchStats = async (battedOrFieldedFirst) => {
+        const url = `https://stats.espncricinfo.com/ci/engine/stats/index.html?batting_fielding_first=${battedOrFieldedFirst};class=${classId};team=${espnTeamId};template=results;type=team`;
         const $ = await espnGet(url);
-        const rows = $('table.engineTable').eq(2).find('tr.data1, tr.data2');
-        if (rows.length === 0) break;
-        rows.each((i, row) => {
-            const cols = $(row).find('td');
-            const innings = parseInt($(cols[4]).text().trim()) || 0;
-            const result = $(cols[5]).text().trim().toLowerCase();
-            if (innings === 1) {
-                battingFirst.matches++;
-                if (result === 'won') battingFirst.won++;
-            } else if (innings === 2) {
-                chasing.matches++;
-                if (result === 'won') chasing.won++;
-            }
-        });
-        const pageText = $('table.engineTable').eq(3).text();
-        const pageMatch = pageText.match(/Page (\d+) of (\d+)/);
-        if (!pageMatch || parseInt(pageMatch[1]) >= parseInt(pageMatch[2]) || page >= 15) break;
-        page++;
-    }
-    return { battingFirst, chasing };
+        const row = $('table.engineTable').eq(2).find('tr.data1').eq(0);
+        if (row.length === 0) return { matches: 0, won: 0 };
+        const cols = row.find('td');
+        return {
+            matches: parseInt($(cols[2]).text()) || 0,
+            won: parseInt($(cols[3]).text()) || 0
+        };
+    };
+    return {
+        battingFirst: await fetchStats(1),
+        chasing: await fetchStats(2)
+    };
 }
 
 /** Fetch Top Run Scorers */
@@ -315,19 +311,33 @@ export async function getTeamAnalytics(teamId, format) {
 
             yearByYear.forEach(y => {
                 const existing = aggregated.yearByYear.find(x => x.year === y.year);
-                if (existing) { existing.mat += y.mat; existing.won += y.won; existing.lost += y.lost; }
-                else aggregated.yearByYear.push({ ...y });
+                if (existing) { 
+                    existing.mat += y.mat; 
+                    existing.won += y.won; 
+                    existing.lost += y.lost; 
+                    existing.tied += (y.tied || 0);
+                    existing.drawNr += (y.drawNr || 0);
+                }
+                else aggregated.yearByYear.push({ ...y, tied: y.tied || 0, drawNr: y.drawNr || 0 });
             });
             venues.forEach(v => {
                 const existing = aggregated.venues.find(x => x.ground === v.ground);
-                if (existing) { existing.mat += v.mat; existing.won += v.won; existing.lost += v.lost; }
-                else aggregated.venues.push({ ...v });
+                if (existing) { 
+                    existing.mat += v.mat; 
+                    existing.won += v.won; 
+                    existing.lost += v.lost;
+                    existing.tied += (v.tied || 0);
+                    existing.drawNr += (v.drawNr || 0);
+                }
+                else aggregated.venues.push({ ...v, tied: v.tied || 0, drawNr: v.drawNr || 0 });
             });
             for (const [opp, rec] of Object.entries(matchesData.headToHead)) {
-                if (!aggregated.headToHead[opp]) aggregated.headToHead[opp] = { played: 0, won: 0, lost: 0, tied: 0 };
+                if (!aggregated.headToHead[opp]) aggregated.headToHead[opp] = { played: 0, won: 0, lost: 0, tied: 0, drawNr: 0 };
                 aggregated.headToHead[opp].played += rec.played;
                 aggregated.headToHead[opp].won += rec.won;
                 aggregated.headToHead[opp].lost += rec.lost;
+                aggregated.headToHead[opp].tied += rec.tied;
+                aggregated.headToHead[opp].drawNr += rec.drawNr;
             }
             
             // recent form is tricky across formats, we just take the first format's recent form if it's "all"
