@@ -217,6 +217,35 @@ async function fetchHomeAway(espnTeamId, classId) {
     };
 }
 
+const PLAYER_FULL_NAMES = {
+    "V Sehwag": "Virender Sehwag",
+    "KK Nair": "Karun Nair",
+    "VVS Laxman": "VVS Laxman", // Commonly known by acronym
+    "A Kumble": "Anil Kumble",
+    "JM Patel": "Jasu Patel",
+    "N Kapil Dev": "Kapil Dev",
+    "SP Gupte": "Subhash Gupte",
+    "MH Mankad": "Vinoo Mankad",
+    "SR Tendulkar": "Sachin Tendulkar",
+    "RG Sharma": "Rohit Sharma",
+    "V Kohli": "Virat Kohli",
+    "MS Dhoni": "MS Dhoni",
+    "SC Ganguly": "Sourav Ganguly",
+    "R Dravid": "Rahul Dravid",
+    "Yuvraj Singh": "Yuvraj Singh",
+    "Z Khan": "Zaheer Khan",
+    "Harbhajan Singh": "Harbhajan Singh",
+    "I Sharma": "Ishant Sharma",
+    "R Ashwin": "Ravichandran Ashwin",
+    "RA Jadeja": "Ravindra Jadeja",
+    "JJ Bumrah": "Jasprit Bumrah",
+    "Mohammed Shami": "Mohammed Shami"
+};
+
+function getFullName(acronymName) {
+    return PLAYER_FULL_NAMES[acronymName] || acronymName;
+}
+
 /** Fetch Highest Individual Scores in an Innings */
 async function fetchHighestScores(espnTeamId, classId) {
     const url = `https://stats.espncricinfo.com/ci/engine/stats/index.html?class=${classId};team=${espnTeamId};template=results;type=batting;view=innings`;
@@ -225,7 +254,7 @@ async function fetchHighestScores(espnTeamId, classId) {
     $('table.engineTable').eq(2).find('tr.data1').each((i, el) => {
         if (i >= 5) return false;
         const cols = $(el).find('td');
-        const name = $(cols[0]).text().trim();
+        const name = getFullName($(cols[0]).text().trim());
         const runs = $(cols[1]).text().trim();
         const opp = $(cols[9]).text().trim().replace(/^v\s+/, '');
         const ground = $(cols[10]).text().trim();
@@ -243,7 +272,7 @@ async function fetchBestBowling(espnTeamId, classId) {
     $('table.engineTable').eq(2).find('tr.data1').each((i, el) => {
         if (i >= 5) return false;
         const cols = $(el).find('td');
-        const name = $(cols[0]).text().trim();
+        const name = getFullName($(cols[0]).text().trim());
         const figures = $(cols[1]).text().trim() + '/' + $(cols[4]).text().trim(); // Overs/Runs is weird, let's just grab O M R W
         // Columns: [0]Player [1]Overs [2]... [3]Mdns [4]Runs [5]Wkts
         const wkts = $(cols[5]).text().trim();

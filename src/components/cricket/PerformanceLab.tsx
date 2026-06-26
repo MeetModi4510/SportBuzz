@@ -9,6 +9,28 @@ import { AttributeRadar } from './charts/AttributeRadar';
 import { CrossFormatAnalysis } from './charts/CrossFormatAnalysis';
 import { OppositionStats } from './charts/OppositionStats';
 
+const CricketBatIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        {/* Handle */}
+        <path d="M11 2h2v6h-2z" />
+        <line x1="11" y1="4" x2="13" y2="4" />
+        <line x1="11" y1="6" x2="13" y2="6" />
+        {/* Shoulders and Blade */}
+        <path d="M11 8L9 10v10a3 3 0 0 0 6 0V10l-2-2" />
+        {/* Splice */}
+        <path d="M11 8l1 2 1-2" />
+    </svg>
+);
+
+const CricketBallIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M8 5a9 9 0 0 0 0 14" />
+        <path d="M16 5a9 9 0 0 1 0 14" />
+        <line x1="12" y1="8" x2="12" y2="16" />
+    </svg>
+);
+
 interface PerformanceLabProps {
     activePlayer: any | null;
 }
@@ -200,7 +222,17 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
         <div className="flex-1 flex flex-col z-10 w-full px-4 lg:px-12 pb-16">
             
             {/* TOP HEADER: Player Identity */}
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-8 pb-10 mb-8 border-b dark:border-white/[0.05] border-slate-200">
+            <div className="relative flex flex-col md:flex-row items-center md:items-end gap-8 pb-10 pt-24 px-4 md:px-8 mb-8 border-b dark:border-white/[0.05] border-slate-200 overflow-hidden rounded-2xl -mx-4 md:-mx-8 min-h-[320px]">
+                {/* Background Photo */}
+                <div 
+                    className={`absolute inset-0 bg-cover bg-no-repeat transition-all duration-700 z-0 ${playerData.name === 'Virat Kohli' ? 'bg-[position:left_15%] opacity-100' : 'bg-[center_15%] opacity-80'}`}
+                    style={{ backgroundImage: `url('/player_background/${playerData.name} background.png?v=4')` }}
+                />
+                {/* Black tint */}
+                <div className={`absolute inset-0 z-0 ${playerData.name === 'Virat Kohli' ? 'bg-black/0' : 'bg-black/60'}`} />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 to-transparent z-0" />
+                
+                <div className="relative z-10 flex flex-col md:flex-row items-center md:items-end gap-8 w-full">
                 {/* Small Crisp Avatar */}
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl overflow-hidden dark:bg-[#0A0A0B] bg-slate-100 border dark:border-white/[0.08] border-slate-200 shadow-2xl flex-shrink-0 relative group">
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -264,6 +296,7 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                     >
                         Bowling
                     </button>
+                </div>
                 </div>
             </div>
 
@@ -376,7 +409,7 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                                     <div className="dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.03] border-slate-200 p-5 rounded-3xl relative overflow-hidden group shadow-lg flex items-center gap-4">
                                         <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         <div className="p-3 bg-white/[0.02] rounded-2xl border border-white/[0.05] text-amber-400 group-hover:text-amber-300 transition-colors">
-                                            <Activity className="w-5 h-5" />
+                                            <CricketBatIcon className="w-5 h-5" />
                                         </div>
                                         <div>
                                             <span className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold block mb-1">Batting Style</span>
@@ -386,7 +419,7 @@ export function PerformanceLab({ activePlayer }: PerformanceLabProps) {
                                     <div className="dark:bg-[#0B0D14]/80 bg-white/80 backdrop-blur-md border dark:border-white/[0.03] border-slate-200 p-5 rounded-3xl relative overflow-hidden group shadow-lg flex items-center gap-4">
                                         <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         <div className="p-3 bg-white/[0.02] rounded-2xl border border-white/[0.05] text-rose-400 group-hover:text-rose-300 transition-colors">
-                                            <Target className="w-5 h-5" />
+                                            <CricketBallIcon className="w-5 h-5" />
                                         </div>
                                         <div>
                                             <span className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold block mb-1">Bowling Style</span>

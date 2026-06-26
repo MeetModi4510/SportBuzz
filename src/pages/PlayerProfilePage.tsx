@@ -404,6 +404,14 @@ const PlayerProfilePage = () => {
                         <>
                             {/* SCOUT REPORT HEADER */}
                             <div className="relative group/scout overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 shadow-2xl transition-all duration-700 hover:shadow-blue-500/10">
+                                {/* Player Background Photo */}
+                                <div 
+                                    className="absolute inset-0 bg-[length:auto_100%] bg-right bg-no-repeat transition-transform duration-700 group-hover/scout:scale-105 opacity-50"
+                                    style={{ backgroundImage: `url('/player_background/${selectedPlayer.name} background.png?v=4')` }}
+                                />
+                                {/* Strong Black tint */}
+                                <div className="absolute inset-0 bg-black/60" />
+
                                 <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/5 blur-[100px] rounded-full -mr-32 -mt-32 group-hover/scout:bg-blue-600/15 transition-all duration-700" />
                                 <div className="absolute inset-0 bg-grid-white/[0.01] bg-[size:30px_30px]" />
 
