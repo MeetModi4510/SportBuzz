@@ -728,4 +728,62 @@ router.get('/local/ipl-stats/:season', (req, res) => {
     }
 });
 
+router.get('/player-image', async (req, res) => {
+    try {
+        const { name } = req.query;
+        if (!name) return res.status(400).json({ status: 'error', message: 'Name is required' });
+
+        // 1. Try TheSportsDB First (For High Quality Transparent PNG Cutouts)
+        try {
+            const sportsDbUrl = `https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`;
+            const sportsDbRes = await axios.get(sportsDbUrl);
+            
+            if (sportsDbRes.data && sportsDbRes.data.player) {
+                // Strictly filter for Cricket players to avoid cross-sport mismatch (e.g. Ishant Sharma vs Rohit Sharma, or wrong sports)
+                const cricketPlayers = sportsDbRes.data.player.filter(p => p.strSport === 'Cricket');
+                
+                // Find exact or closest match based on name to prevent mismatches
+                const exactMatch = cricketPlayers.find(p => p.strPlayer.toLowerCase() === name.toLowerCase()) || cricketPlayers[0];
+                
+                if (exactMatch) {
+                    // Only use SportsDB if they actually have a transparent cutout
+                    if (exactMatch.strCutout) {
+                        return res.json({ status: 'success', imageUrl: exactMatch.strCutout, source: 'sportsdb' });
+                    }
+                }
+            }
+        } catch(err) {
+            console.error('SportsDB fetch error:', err.message);
+        }
+
+        // 2. Fallback to Cricbuzz (Guarantees an image for almost all players)
+        try {
+            const url = `https://cricbuzz-cricket.p.rapidapi.com/stats/v1/player/search?plrN=${encodeURIComponent(name)}`;
+            const response = await axios.get(url, {
+                headers: {
+                    'X-RapidAPI-Key': process.env.CRICBUZZ_IMAGE_RAPIDAPI_KEY,
+                    'X-RapidAPI-Host': 'cricbuzz-cricket.p.rapidapi.com'
+                }
+            });
+
+            if (response.data && response.data.player && response.data.player.length > 0) {
+                const players = response.data.player;
+                const exactMatch = players.find(p => p.name.toLowerCase() === name.toLowerCase()) || players[0];
+                
+                const faceId = exactMatch.faceImageId;
+                if (faceId) {
+                    const imageUrl = `https://static.cricbuzz.com/a/img/v1/i1/c${faceId}/i.jpg`;
+                    return res.json({ status: 'success', imageUrl, source: 'cricbuzz' });
+                }
+            }
+        } catch (err) {
+            console.error('Cricbuzz fallback error:', err.message);
+        }
+
+        res.json({ status: 'success', imageUrl: 'null' });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
 export default router;

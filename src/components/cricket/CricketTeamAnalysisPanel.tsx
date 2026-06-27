@@ -155,22 +155,24 @@ export function CricketTeamAnalysisPanel() {
         if (!analyticsData?.players) return;
         const fetchPlayerImages = async () => {
             const players = [
-                ...(analyticsData.players.topRunScorers || []),
-                ...(analyticsData.players.topWicketTakers || [])
+                ...(analyticsData.players?.topRunScorers || []),
+                ...(analyticsData.players?.topWicketTakers || []),
+                ...(analyticsData.highestInnings || []),
+                ...(analyticsData.bestBowling || [])
             ];
-            const names = Array.from(new Set(players.map((p: any) => p.name)));
+            const names = Array.from(new Set(players.map((p: any) => p.name).filter(Boolean)));
             
             for (const name of names) {
-                const cacheKey = `cricket_player_${name}`;
+                const cacheKey = `cricket_player_hybrid_${name}`;
                 const cached = localStorage.getItem(cacheKey);
                 if (cached) {
                     if (cached !== 'null') setPlayerImages(prev => ({ ...prev, [name]: cached }));
                     continue;
                 }
                 try {
-                    const res = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`);
+                    const res = await fetch(`http://localhost:5000/api/cricket/player-image?name=${encodeURIComponent(name)}`);
                     const data = await res.json();
-                    const thumb = data.player?.[0]?.strThumb || data.player?.[0]?.strCutout || data.player?.[0]?.strRender || 'null';
+                    const thumb = data.status === 'success' && data.imageUrl !== 'null' ? data.imageUrl : 'null';
                     localStorage.setItem(cacheKey, thumb);
                     if (thumb !== 'null') setPlayerImages(prev => ({ ...prev, [name]: thumb }));
                 } catch (e) {
@@ -528,8 +530,11 @@ export function CricketTeamAnalysisPanel() {
                                         
                                         {/* Middle: The Node (Photo Space) */}
                                         <div className="w-14 h-14 rounded-full bg-[#0B0D14] border border-amber-500/40 group-hover:border-amber-400 z-10 flex items-center justify-center overflow-hidden group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all bg-cover bg-center">
-                                            {/* Photo Placeholder - You can render an img tag here later */}
-                                            <span className="text-[8px] text-slate-600 uppercase tracking-widest font-semibold group-hover:text-amber-500/50 transition-colors">Photo</span>
+                                            {playerImages[h.name] ? (
+                                                <img src={playerImages[h.name]} alt={h.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <span className="text-[8px] text-slate-600 uppercase tracking-widest font-semibold group-hover:text-amber-500/50 transition-colors">Photo</span>
+                                            )}
                                         </div>
                                         
                                         {/* Bottom: Details */}
@@ -572,8 +577,11 @@ export function CricketTeamAnalysisPanel() {
                                         
                                         {/* Middle: The Node (Photo Space) */}
                                         <div className="w-14 h-14 rounded-full bg-[#0B0D14] border border-emerald-500/40 group-hover:border-emerald-400 z-10 flex items-center justify-center overflow-hidden group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all bg-cover bg-center">
-                                            {/* Photo Placeholder - You can render an img tag here later */}
-                                            <span className="text-[8px] text-slate-600 uppercase tracking-widest font-semibold group-hover:text-emerald-500/50 transition-colors">Photo</span>
+                                            {playerImages[b.name] ? (
+                                                <img src={playerImages[b.name]} alt={b.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <span className="text-[8px] text-slate-600 uppercase tracking-widest font-semibold group-hover:text-emerald-500/50 transition-colors">Photo</span>
+                                            )}
                                         </div>
                                         
                                         {/* Bottom: Details */}

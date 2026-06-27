@@ -168,7 +168,8 @@ async function fetchTopRunScorers(espnTeamId, classId) {
     const results = [];
     $('table.engineTable').eq(2).find('tr.data1').each((i, el) => {
         if (i >= 15) return false;
-        const name = $(el).find('td').eq(0).find('a').first().text().trim() || $(el).find('td').eq(0).text().trim();
+        const rawName = $(el).find('td').eq(0).find('a').first().text().trim() || $(el).find('td').eq(0).text().trim();
+        const name = getFullName(rawName);
         const matches = parseInt($(el).find('td').eq(2).text());
         const runs = parseInt($(el).find('td').eq(5).text().replace(/,/g, ''));
         const hs = $(el).find('td').eq(6).text().trim();
@@ -186,12 +187,22 @@ async function fetchTopWicketTakers(espnTeamId, classId) {
     const results = [];
     $('table.engineTable').eq(2).find('tr.data1').each((i, el) => {
         if (i >= 15) return false;
-        const name = $(el).find('td').eq(0).find('a').first().text().trim() || $(el).find('td').eq(0).text().trim();
+        const rawName = $(el).find('td').eq(0).find('a').first().text().trim() || $(el).find('td').eq(0).text().trim();
+        const name = getFullName(rawName);
+        let wktCol, bbiCol, avgCol, econCol;
+        if (String(classId) === '1') { // Test
+            wktCol = 6; bbiCol = 7; avgCol = 9; econCol = 10;
+        } else if (String(classId) === '2') { // ODI
+            wktCol = 6; bbiCol = 7; avgCol = 8; econCol = 9;
+        } else { // T20I
+            wktCol = 7; bbiCol = 8; avgCol = 9; econCol = 10;
+        }
+        
         const matches = parseInt($(el).find('td').eq(2).text());
-        const wickets = parseInt($(el).find('td').eq(6).text().replace(/,/g, ''));
-        const bbi = $(el).find('td').eq(7).text().trim();
-        const avg = parseFloat($(el).find('td').eq(8).text());
-        const econ = parseFloat($(el).find('td').eq(9).text());
+        const wickets = parseInt($(el).find('td').eq(wktCol).text().replace(/,/g, ''));
+        const bbi = $(el).find('td').eq(bbiCol).text().trim();
+        const avg = parseFloat($(el).find('td').eq(avgCol).text());
+        const econ = parseFloat($(el).find('td').eq(econCol).text());
         if (name && !isNaN(wickets) && wickets > 0) results.push({ name, wickets, matches, bbi, avg, econ });
     });
     return results;
@@ -239,7 +250,22 @@ const PLAYER_FULL_NAMES = {
     "R Ashwin": "Ravichandran Ashwin",
     "RA Jadeja": "Ravindra Jadeja",
     "JJ Bumrah": "Jasprit Bumrah",
-    "Mohammed Shami": "Mohammed Shami"
+    "Mohammed Shami": "Mohammed Shami",
+    "HH Pandya": "Hardik Pandya",
+    "SA Yadav": "Suryakumar Yadav",
+    "DL Chahar": "Deepak Chahar",
+    "YS Chahal": "Yuzvendra Chahal",
+    "AR Patel": "Axar Patel",
+    "KL Rahul": "KL Rahul",
+    "CV Varun": "Varun Chakravarthy",
+    "B Kumar": "Bhuvneshwar Kumar",
+    "STR Binny": "Stuart Binny",
+    "S Dhawan": "Shikhar Dhawan",
+    "A Nehra": "Ashish Nehra",
+    "J Srinath": "Javagal Srinath",
+    "SV Samson": "Sanju Samson",
+    "NT Tilak Varma": "Tilak Varma",
+    "RR Pant": "Rishabh Pant"
 };
 
 function getFullName(acronymName) {
@@ -275,11 +301,18 @@ async function fetchBestBowling(espnTeamId, classId) {
         const name = getFullName($(cols[0]).text().trim());
         const figures = $(cols[1]).text().trim() + '/' + $(cols[4]).text().trim(); // Overs/Runs is weird, let's just grab O M R W
         // Columns: [0]Player [1]Overs [2]... [3]Mdns [4]Runs [5]Wkts
-        const wkts = $(cols[5]).text().trim();
-        const runs = $(cols[4]).text().trim();
-        const opp = $(cols[9]).text().trim().replace(/^v\s+/, '');
-        const ground = $(cols[10]).text().trim();
-        const date = $(cols[11]).text().trim();
+        const isT20 = String(classId) === '3';
+        const wktCol = isT20 ? 4 : 5;
+        const runsCol = isT20 ? 3 : 4;
+        const oppCol = isT20 ? 8 : 9;
+        const groundCol = isT20 ? 9 : 10;
+        const dateCol = isT20 ? 10 : 11;
+        
+        const wkts = $(cols[wktCol]).text().trim();
+        const runs = $(cols[runsCol]).text().trim();
+        const opp = $(cols[oppCol]).text().trim().replace(/^v\s+/, '');
+        const ground = $(cols[groundCol]).text().trim();
+        const date = $(cols[dateCol]).text().trim();
         if (name) results.push({ name, figures: `${wkts}/${runs}`, opp, ground, date });
     });
     return results;

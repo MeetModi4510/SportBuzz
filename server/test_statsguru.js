@@ -1,15 +1,20 @@
 import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config();
 
-async function testCricbuzzSearch() {
+async function testRapidAPI() {
     try {
-        const q = encodeURIComponent('VVS Laxman');
-        // A common Cricbuzz search endpoint format (let's try their mobile API or web API)
-        // Cricbuzz actually doesn't have an easily guessable public search API, but let's try their autocomplete
-        const url = `https://www.cricbuzz.com/api/search/results?q=${q}`;
-        const {data} = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-        console.log(data);
-    } catch (e) {
-        console.log("Cricbuzz search failed", e.message);
+        const query = 'Arshdeep Singh';
+        const url = `https://cricbuzz-cricket.p.rapidapi.com/stats/v1/player/search?plrN=${encodeURIComponent(query)}`;
+        const res = await axios.get(url, {
+            headers: {
+                'X-RapidAPI-Key': process.env.CRICBUZZ_IMAGE_RAPIDAPI_KEY,
+                'X-RapidAPI-Host': 'cricbuzz-cricket.p.rapidapi.com'
+            }
+        });
+        console.log(JSON.stringify(res.data, null, 2));
+    } catch(e) {
+        console.log("Failed:", e.message);
     }
 }
-testCricbuzzSearch();
+testRapidAPI();
