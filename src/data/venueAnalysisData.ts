@@ -12,6 +12,7 @@ export interface VenueAnalysis {
     established: number;
     nickname?: string;
     description: string;
+    image?: string;
     // Sport-specific stats are below — each sport adds its own shape
     stats: CricketVenueStats | FootballVenueStats | BasketballVenueStats | TennisVenueStats;
     recentMatches: VenueRecentMatch[];

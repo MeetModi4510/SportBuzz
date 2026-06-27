@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import {
     MapPin, ArrowLeft, TrendingUp, Trophy, Calendar, Users,
     BarChart3, Target, Star, Zap, Activity, Shield, Flame, Building2,
+    Globe
 } from "lucide-react";
 import {
     ResponsiveContainer, PieChart, Pie, Cell, Tooltip,
@@ -15,6 +16,7 @@ import {
     type BasketballVenueStats, type TennisVenueStats,
 } from "@/data/venueAnalysisData";
 import type { Sport } from "@/data/types";
+import { useCricketVenues, useCricketVenueDeepStats } from "@/hooks/cricket/useCricketVenues";
 
 // ─── Constants ───────────────────────────────────────────────────
 const PIE_COLORS = ["#8b5cf6", "#06b6d4", "#f97316", "#ec4899", "#10b981", "#f59e0b"];
@@ -62,7 +64,16 @@ const Section = ({ icon, title, subtitle, children }: {
 //  SPORT-SPECIFIC DETAIL PANELS
 // ═════════════════════════════════════════════════════════════════
 
-const CricketDetail = ({ stats, color }: { stats: CricketVenueStats; color: string }) => {
+const CricketDetail = ({ stats, color, isLoadingStats }: { stats: CricketVenueStats; color: string; isLoadingStats?: boolean }) => {
+    if (isLoadingStats) {
+        return (
+            <div className="flex items-center justify-center p-12">
+                <div className="animate-spin w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full" />
+                <span className="ml-4 text-muted-foreground">Scraping deep stats from Cricbuzz...</span>
+            </div>
+        );
+    }
+
     const winData = [
         { name: "Bat First Wins", value: stats.wonBattingFirst },
         { name: "Bat Second Wins", value: stats.wonBattingSecond },
@@ -78,7 +89,7 @@ const CricketDetail = ({ stats, color }: { stats: CricketVenueStats; color: stri
     ];
 
     return (
-        <div className="space-y-5">
+        <div className="space-y-5 animate-fade-in">
             {/* Key Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 <StatCard label="Avg 1st Innings" value={stats.avgFirstInningsScore} color={color}
@@ -182,29 +193,31 @@ const CricketDetail = ({ stats, color }: { stats: CricketVenueStats; color: stri
             </div>
 
             {/* Format Breakdown */}
-            <Section icon={<BarChart3 size={16} style={{ color }} />} title="Format Breakdown"
-                subtitle="Matches hosted by format">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {stats.formatBreakdown.map((f, i) => (
-                        <div key={i} className="p-3 bg-secondary/20 rounded-lg text-center border border-border/30">
-                            <span className="text-xs text-muted-foreground">{f.format}</span>
-                            <p className="text-lg font-bold font-mono mt-1" style={{ color }}>{f.matches}</p>
-                        </div>
-                    ))}
-                </div>
-            </Section>
+            {stats.formatBreakdown && stats.formatBreakdown.length > 0 && (
+                <Section icon={<BarChart3 size={16} style={{ color }} />} title="Format Breakdown"
+                    subtitle="Matches hosted by format">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {stats.formatBreakdown.map((f, i) => (
+                            <div key={i} className="p-3 bg-secondary/20 rounded-lg text-center border border-border/30">
+                                <span className="text-xs text-muted-foreground">{f.format}</span>
+                                <p className="text-lg font-bold font-mono mt-1" style={{ color }}>{f.matches}</p>
+                            </div>
+                        ))}
+                    </div>
+                </Section>
+            )}
 
             {/* Highest / Lowest */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 bg-secondary/15 rounded-xl border border-green-500/20">
                     <p className="text-[10px] uppercase text-muted-foreground tracking-wider mb-1">Highest Total</p>
-                    <p className="text-2xl font-bold font-mono text-green-400">{stats.highestTotal.score}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{stats.highestTotal.team} ({stats.highestTotal.year})</p>
+                    <p className="text-2xl font-bold font-mono text-green-400">{stats.highestTotal?.score}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{stats.highestTotal?.team} ({stats.highestTotal?.year})</p>
                 </div>
                 <div className="p-4 bg-secondary/15 rounded-xl border border-red-500/20">
                     <p className="text-[10px] uppercase text-muted-foreground tracking-wider mb-1">Lowest Total</p>
-                    <p className="text-2xl font-bold font-mono text-red-400">{stats.lowestTotal.score}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{stats.lowestTotal.team} ({stats.lowestTotal.year})</p>
+                    <p className="text-2xl font-bold font-mono text-red-400">{stats.lowestTotal?.score}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{stats.lowestTotal?.team} ({stats.lowestTotal?.year})</p>
                 </div>
             </div>
         </div>
@@ -441,16 +454,49 @@ const TennisDetail = ({ stats, color }: { stats: TennisVenueStats; color: string
 export const VenueAnalysisPanel = () => {
     const [activeSport, setActiveSport] = useState<Sport | "all">("all");
     const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
+    const [selectedCountry, setSelectedCountry] = useState<string>("India");
+
+    const { venues: dynamicCricketVenues, isLoading: isLoadingCricketVenues, error: errorCricketVenues } = useCricketVenues(selectedCountry);
+    
+    // We only fetch deep stats if the user has clicked on a cricket venue
+    const selectedCricketVenue = useMemo(() => {
+        if (!selectedVenueId) return null;
+        return dynamicCricketVenues.find(v => v.id === selectedVenueId) || null;
+    }, [selectedVenueId, dynamicCricketVenues]);
+
+    const { stats: dynamicDeepStats, isLoading: isLoadingDeepStats } = useCricketVenueDeepStats(
+        selectedCricketVenue ? selectedVenueId : null
+    );
+
+    const allVenues = useMemo(() => {
+        // We filter out any static cricket venues, and replace them with our dynamic ones!
+        const staticNonCricket = VENUE_ANALYSIS_DATA.filter(v => v.sport !== "cricket");
+        return [...staticNonCricket, ...dynamicCricketVenues];
+    }, [dynamicCricketVenues]);
 
     const filteredVenues = useMemo(() => {
-        if (activeSport === "all") return VENUE_ANALYSIS_DATA;
-        return VENUE_ANALYSIS_DATA.filter(v => v.sport === activeSport);
-    }, [activeSport]);
+        if (activeSport === "all") return allVenues;
+        return allVenues.filter(v => v.sport === activeSport);
+    }, [activeSport, allVenues]);
 
     const selectedVenue = useMemo(() => {
         if (!selectedVenueId) return null;
-        return VENUE_ANALYSIS_DATA.find(v => v.id === selectedVenueId) || null;
-    }, [selectedVenueId]);
+        
+        const baseVenue = allVenues.find(v => v.id === selectedVenueId) || null;
+        if (!baseVenue) return null;
+        
+        // If it's a cricket venue and we fetched deep stats, inject them!
+        if (baseVenue.sport === "cricket" && dynamicDeepStats) {
+            return {
+                ...baseVenue,
+                stats: {
+                    ...baseVenue.stats,
+                    ...dynamicDeepStats
+                }
+            };
+        }
+        return baseVenue;
+    }, [selectedVenueId, allVenues, dynamicDeepStats]);
 
     const sportColor = (sport: Sport) => SPORT_CONFIG[sport].color;
 
@@ -458,95 +504,141 @@ export const VenueAnalysisPanel = () => {
     if (!selectedVenue) {
         return (
             <div className="space-y-6">
-                {/* Sport Filter */}
-                <div className="flex items-center gap-2 flex-wrap">
-                    <button
-                        onClick={() => setActiveSport("all")}
-                        className={cn(
-                            "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border",
-                            activeSport === "all"
-                                ? "text-white shadow-lg scale-105 border-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600"
-                                : "bg-card text-muted-foreground hover:bg-secondary hover:text-foreground border-border/50"
-                        )}
-                    >
-                        🌐 All
-                    </button>
-                    {(Object.keys(SPORT_CONFIG) as Sport[]).map(sport => (
+                {/* Filters */}
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-2 flex-wrap">
                         <button
-                            key={sport}
-                            onClick={() => setActiveSport(sport)}
+                            onClick={() => setActiveSport("all")}
                             className={cn(
-                                "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2.5 border",
-                                activeSport === sport
-                                    ? "text-white shadow-lg scale-105 border-transparent"
+                                "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border",
+                                activeSport === "all"
+                                    ? "text-white shadow-lg scale-105 border-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600"
                                     : "bg-card text-muted-foreground hover:bg-secondary hover:text-foreground border-border/50"
                             )}
-                            style={activeSport === sport
-                                ? { background: `linear-gradient(135deg, ${SPORT_CONFIG[sport].color}, ${SPORT_CONFIG[sport].color}bb)` }
-                                : undefined}
                         >
-                            <span className="text-lg">{SPORT_CONFIG[sport].icon}</span>
-                            {SPORT_CONFIG[sport].label}
+                            🌐 All
                         </button>
-                    ))}
+                        {(Object.keys(SPORT_CONFIG) as Sport[]).map(sport => (
+                            <button
+                                key={sport}
+                                onClick={() => setActiveSport(sport)}
+                                className={cn(
+                                    "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2.5 border",
+                                    activeSport === sport
+                                        ? "text-white shadow-lg scale-105 border-transparent"
+                                        : "bg-card text-muted-foreground hover:bg-secondary hover:text-foreground border-border/50"
+                                )}
+                                style={activeSport === sport
+                                    ? { background: `linear-gradient(135deg, ${SPORT_CONFIG[sport].color}, ${SPORT_CONFIG[sport].color}bb)` }
+                                    : undefined}
+                            >
+                                <span className="text-lg">{SPORT_CONFIG[sport].icon}</span>
+                                {SPORT_CONFIG[sport].label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {(activeSport === "cricket" || activeSport === "all") && (
+                        <div className="flex items-center gap-2 px-4 py-2 bg-secondary/30 border border-border/50 rounded-xl animate-fade-in">
+                            <Globe size={16} className="text-emerald-500" />
+                            <select
+                                value={selectedCountry}
+                                onChange={(e) => setSelectedCountry(e.target.value)}
+                                className="bg-transparent text-sm font-semibold text-foreground border-none outline-none focus:ring-0 cursor-pointer"
+                            >
+                                <option value="India">India</option>
+                                <option value="Australia">Australia</option>
+                                <option value="England">England</option>
+                                <option value="South Africa">South Africa</option>
+                            </select>
+                            {isLoadingCricketVenues && (
+                                <div className="ml-2 w-4 h-4 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Venue Cards Grid */}
-                <div className="grid md:grid-cols-3 gap-5">
-                    {filteredVenues.map((venue, index) => {
-                        const color = sportColor(venue.sport);
-                        return (
-                            <div
-                                key={venue.id}
-                                onClick={() => setSelectedVenueId(venue.id)}
-                                className="bg-card border border-border rounded-xl p-6 space-y-4 cursor-pointer
-                                           hover:border-opacity-80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1
-                                           animate-slide-up group"
-                                style={{ animationDelay: `${index * 80}ms`, borderColor: `${color}20` }}
-                            >
-                                <div className="flex items-start justify-between">
-                                    <div>
-                                        <h3 className="font-semibold text-foreground group-hover:text-white transition-colors">
-                                            {venue.name}
-                                        </h3>
-                                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
-                                            <MapPin size={12} />
-                                            {venue.city}, {venue.country}
+                <div className="grid md:grid-cols-3 gap-5 min-h-[300px]">
+                    {errorCricketVenues ? (
+                        <div className="col-span-3 flex flex-col items-center justify-center text-red-500 p-12 space-y-4 bg-red-500/10 rounded-xl border border-red-500/20">
+                            <p className="font-bold">Error fetching venues: {errorCricketVenues}</p>
+                            <p className="text-sm">Please make sure the backend server is running and accessible.</p>
+                        </div>
+                    ) : isLoadingCricketVenues && filteredVenues.length === 0 ? (
+                        <div className="col-span-3 flex flex-col items-center justify-center text-muted-foreground p-12 space-y-4">
+                            <div className="w-8 h-8 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin" />
+                            <p>Scraping dynamic venues from TheSportsDB...</p>
+                        </div>
+                    ) : filteredVenues.length === 0 ? (
+                        <div className="col-span-3 flex items-center justify-center text-muted-foreground p-12">
+                            No venues found for the selected criteria.
+                        </div>
+                    ) : (
+                        filteredVenues.map((venue, index) => {
+                            const color = sportColor(venue.sport);
+                            return (
+                                <div
+                                    key={venue.id}
+                                    onClick={() => setSelectedVenueId(venue.id)}
+                                    className="bg-card border border-border rounded-xl p-6 space-y-4 cursor-pointer
+                                               hover:border-opacity-80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1
+                                               animate-slide-up group relative overflow-hidden"
+                                    style={{ animationDelay: `${index * 50}ms`, borderColor: `${color}20` }}
+                                >
+                                    {venue.image && (
+                                        <div 
+                                            className="absolute top-0 right-0 w-32 h-32 opacity-10 group-hover:opacity-20 transition-opacity blur-[2px] rounded-bl-full"
+                                            style={{ backgroundImage: `url(${venue.image})`, backgroundSize: 'cover' }}
+                                        />
+                                    )}
+                                    
+                                    <div className="flex items-start justify-between relative z-10">
+                                        <div>
+                                            <h3 className="font-semibold text-foreground group-hover:text-white transition-colors line-clamp-1">
+                                                {venue.name}
+                                            </h3>
+                                            <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
+                                                <MapPin size={12} />
+                                                {venue.city}, {venue.country}
+                                            </p>
+                                        </div>
+                                        <SportIcon sport={venue.sport} size={20} />
+                                    </div>
+
+                                    <div className="space-y-2 relative z-10">
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted-foreground">Capacity</span>
+                                            <span className="text-foreground font-medium font-mono">
+                                                {venue.capacity ? venue.capacity.toLocaleString() : 'N/A'}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted-foreground">Established</span>
+                                            <span className="text-foreground font-medium font-mono">{venue.established}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted-foreground">Matches</span>
+                                            <span className="font-medium font-mono" style={{ color }}>
+                                                {venue.sport === 'cricket' ? 'Scrape on click' : venue.stats.matchesHosted.toLocaleString()}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {venue.nickname && (
+                                        <p className="text-[11px] italic text-muted-foreground/70 border-t border-border/30 pt-3 relative z-10">
+                                            "{venue.nickname}"
                                         </p>
-                                    </div>
-                                    <SportIcon sport={venue.sport} size={20} />
-                                </div>
+                                    )}
 
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Capacity</span>
-                                        <span className="text-foreground font-medium font-mono">{venue.capacity.toLocaleString()}</span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Established</span>
-                                        <span className="text-foreground font-medium font-mono">{venue.established}</span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Matches</span>
-                                        <span className="font-medium font-mono" style={{ color }}>
-                                            {venue.stats.matchesHosted.toLocaleString()}
-                                        </span>
+                                    <div className="text-xs text-center py-1.5 rounded-lg bg-secondary/30 border border-border/30
+                                                  group-hover:text-white transition-colors relative z-10" style={{ color }}>
+                                        Click to view detailed analysis →
                                     </div>
                                 </div>
-
-                                {venue.nickname && (
-                                    <p className="text-[11px] italic text-muted-foreground/70 border-t border-border/30 pt-3">
-                                        "{venue.nickname}"
-                                    </p>
-                                )}
-
-                                <div className="text-xs text-center py-1.5 rounded-lg bg-secondary/30 border border-border/30
-                                              group-hover:text-white transition-colors" style={{ color }}>
-                                    Click to view detailed analysis →
-                                </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })
+                    )}
                 </div>
             </div>
         );
@@ -571,7 +663,18 @@ export const VenueAnalysisPanel = () => {
             {/* Venue Header Card */}
             <div className="relative overflow-hidden rounded-2xl border border-border/40 p-6 md:p-8"
                 style={{ background: `linear-gradient(135deg, ${color}18, ${color}08, transparent)` }}>
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                {selectedVenue.image && (
+                    <div 
+                        className="absolute right-0 top-0 bottom-0 w-1/3 opacity-20 pointer-events-none"
+                        style={{ 
+                            backgroundImage: `url(${selectedVenue.image})`, 
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            maskImage: 'linear-gradient(to left, black, transparent)'
+                        }}
+                    />
+                )}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
                     <div className="space-y-2">
                         <div className="flex items-center gap-3">
                             <Building2 size={28} style={{ color }} />
@@ -591,7 +694,7 @@ export const VenueAnalysisPanel = () => {
                     <div className="flex flex-wrap gap-3">
                         <div className="text-center px-5 py-3 rounded-xl bg-card/60 border border-border/40 backdrop-blur-sm">
                             <p className="text-[10px] uppercase text-muted-foreground tracking-wider">Capacity</p>
-                            <p className="text-xl font-bold font-mono text-foreground">{selectedVenue.capacity.toLocaleString()}</p>
+                            <p className="text-xl font-bold font-mono text-foreground">{selectedVenue.capacity ? selectedVenue.capacity.toLocaleString() : 'N/A'}</p>
                         </div>
                         <div className="text-center px-5 py-3 rounded-xl bg-card/60 border border-border/40 backdrop-blur-sm">
                             <p className="text-[10px] uppercase text-muted-foreground tracking-wider">Est.</p>
@@ -607,58 +710,61 @@ export const VenueAnalysisPanel = () => {
             </div>
 
             {/* Sport-Specific Detail Panel */}
-            {selectedVenue.stats.sport === "cricket" && <CricketDetail stats={selectedVenue.stats} color={color} />}
-            {selectedVenue.stats.sport === "football" && <FootballDetail stats={selectedVenue.stats} color={color} />}
-            {selectedVenue.stats.sport === "basketball" && <BasketballDetail stats={selectedVenue.stats} color={color} />}
-            {selectedVenue.stats.sport === "tennis" && <TennisDetail stats={selectedVenue.stats} color={color} />}
+            {selectedVenue.stats.sport === "cricket" && <CricketDetail stats={selectedVenue.stats as CricketVenueStats} color={color} isLoadingStats={isLoadingDeepStats} />}
+            {selectedVenue.stats.sport === "football" && <FootballDetail stats={selectedVenue.stats as FootballVenueStats} color={color} />}
+            {selectedVenue.stats.sport === "basketball" && <BasketballDetail stats={selectedVenue.stats as BasketballVenueStats} color={color} />}
+            {selectedVenue.stats.sport === "tennis" && <TennisDetail stats={selectedVenue.stats as TennisVenueStats} color={color} />}
 
-            {/* Recent Matches at Venue */}
-            <Section icon={<Calendar size={16} style={{ color }} />} title="Recent Matches"
-                subtitle={`Latest results at ${selectedVenue.name}`}>
-                <div className="space-y-2">
-                    {selectedVenue.recentMatches.map((m, i) => (
-                        <div key={i} className="flex items-center justify-between p-3.5 rounded-lg bg-secondary/15
-                                    hover:bg-secondary/30 transition-colors border border-border/20">
-                            <div className="flex items-center gap-4">
-                                <span className="text-xs text-muted-foreground font-mono w-20">{m.date}</span>
-                                <span className="text-sm text-foreground font-medium">{m.teams}</span>
+            {/* Recent Matches & Top Performers omitted for dynamic venues if empty */}
+            {selectedVenue.recentMatches && selectedVenue.recentMatches.length > 0 && (
+                <Section icon={<Calendar size={16} style={{ color }} />} title="Recent Matches"
+                    subtitle={`Latest results at ${selectedVenue.name}`}>
+                    <div className="space-y-2">
+                        {selectedVenue.recentMatches.map((m, i) => (
+                            <div key={i} className="flex items-center justify-between p-3.5 rounded-lg bg-secondary/15
+                                        hover:bg-secondary/30 transition-colors border border-border/20">
+                                <div className="flex items-center gap-4">
+                                    <span className="text-xs text-muted-foreground font-mono w-20">{m.date}</span>
+                                    <span className="text-sm text-foreground font-medium">{m.teams}</span>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <span className="text-xs text-muted-foreground font-mono">{m.score}</span>
+                                    <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                                        style={{ backgroundColor: `${color}15`, color }}>
+                                        {m.result}
+                                    </span>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-4">
-                                <span className="text-xs text-muted-foreground font-mono">{m.score}</span>
-                                <span className="text-xs px-2 py-0.5 rounded-full font-medium"
-                                    style={{ backgroundColor: `${color}15`, color }}>
-                                    {m.result}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </Section>
+                        ))}
+                    </div>
+                </Section>
+            )}
 
-            {/* Top Performers */}
-            <Section icon={<Trophy size={16} style={{ color }} />} title="Top Performers"
-                subtitle={`All-time greats at ${selectedVenue.name}`}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {selectedVenue.topPerformers.map((p, i) => (
-                        <div key={i} className="flex items-center gap-4 p-4 bg-secondary/15 rounded-xl
-                                    border border-border/20 hover:border-opacity-60 transition-all"
-                            style={{ borderColor: `${color}20` }}>
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
-                                style={{ backgroundColor: `${color}20`, color }}>
-                                {i + 1}
+            {selectedVenue.topPerformers && selectedVenue.topPerformers.length > 0 && (
+                <Section icon={<Trophy size={16} style={{ color }} />} title="Top Performers"
+                    subtitle={`All-time greats at ${selectedVenue.name}`}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {selectedVenue.topPerformers.map((p, i) => (
+                            <div key={i} className="flex items-center gap-4 p-4 bg-secondary/15 rounded-xl
+                                        border border-border/20 hover:border-opacity-60 transition-all"
+                                style={{ borderColor: `${color}20` }}>
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+                                    style={{ backgroundColor: `${color}20`, color }}>
+                                    {i + 1}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold text-foreground truncate">{p.name}</p>
+                                    <p className="text-[11px] text-muted-foreground">{p.country}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-sm font-bold font-mono" style={{ color }}>{p.stat}</p>
+                                    <p className="text-[10px] text-muted-foreground">{p.highlight}</p>
+                                </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-foreground truncate">{p.name}</p>
-                                <p className="text-[11px] text-muted-foreground">{p.country}</p>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-sm font-bold font-mono" style={{ color }}>{p.stat}</p>
-                                <p className="text-[10px] text-muted-foreground">{p.highlight}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </Section>
+                        ))}
+                    </div>
+                </Section>
+            )}
         </div>
     );
 };
