@@ -12,7 +12,7 @@ import { authApi } from "@/services/api";
 
 const API_BASE = import.meta.env.PROD 
   ? 'https://sportbuzz-backend.onrender.com' 
-  : (import.meta.env.PROD ? '' : 'http://localhost:5000');
+  : (import.meta.env.PROD ? '' : '');
 
 const Login = () => {
   const navigate = useNavigate();

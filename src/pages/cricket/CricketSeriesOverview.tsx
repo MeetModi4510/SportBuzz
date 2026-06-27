@@ -9,8 +9,9 @@ import SeriesMatches from '@/components/cricket/series/SeriesMatches';
 import SeriesStandings from '@/components/cricket/series/SeriesStandings';
 import SeriesSquads from '@/components/cricket/series/SeriesSquads';
 import SeriesStats from '@/components/cricket/series/SeriesStats';
+import SeriesAllTimeStats from '@/components/cricket/series/SeriesAllTimeStats';
 
-type TabType = 'matches' | 'standings' | 'squads' | 'stats';
+type TabType = 'matches' | 'standings' | 'squads' | 'stats' | 'all-time-stats';
 
 export default function CricketSeriesOverview() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -39,6 +40,7 @@ export default function CricketSeriesOverview() {
         { id: 'standings', label: 'Points Table', icon: Trophy },
         { id: 'squads', label: 'Squads', icon: Users },
         { id: 'stats', label: 'Stats', icon: BarChart },
+        { id: 'all-time-stats', label: 'All Time Stats', icon: Trophy },
     ];
 
     return (
@@ -175,6 +177,7 @@ export default function CricketSeriesOverview() {
                             {activeTab === 'standings' && <SeriesStandings season={selectedSeason.year} />}
                             {activeTab === 'squads' && <SeriesSquads season={selectedSeason.year} />}
                             {activeTab === 'stats' && <SeriesStats season={selectedSeason.year} />}
+                            {activeTab === 'all-time-stats' && <SeriesAllTimeStats teams={seasons[0]?.teams || []} />}
                         </>
                     ) : (
                         <div className="flex items-center justify-center h-64 text-muted-foreground">

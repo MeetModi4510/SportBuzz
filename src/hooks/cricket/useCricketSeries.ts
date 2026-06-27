@@ -142,3 +142,31 @@ export function useLocalIplStats(season: string) {
         staleTime: 12 * 60 * 60 * 1000
     });
 }
+
+export function useLocalIplNews(season: string) {
+    return useQuery({
+        queryKey: ['local-ipl-news', season],
+        queryFn: async () => {
+            if (!season) return null;
+            const res = await cricketApi.getLocalIplNews(season) as any;
+            if (res.status === 'success') return res.data;
+            throw new Error(res.message);
+        },
+        enabled: !!season,
+        staleTime: 60 * 60 * 1000 // 1 hour for news
+    });
+}
+
+export function useLocalIplAllTimeStats(teamId: string) {
+    return useQuery({
+        queryKey: ['local-ipl-all-time', teamId],
+        queryFn: async () => {
+            if (!teamId) return null;
+            const res = await cricketApi.getLocalIplAllTimeStats(teamId) as any;
+            if (res.status === 'success') return res.data;
+            throw new Error(res.message);
+        },
+        enabled: !!teamId,
+        staleTime: 12 * 60 * 60 * 1000 // 12 hours
+    });
+}

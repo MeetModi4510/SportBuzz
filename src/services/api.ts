@@ -10,7 +10,7 @@ if (import.meta.env.PROD) {
     }
 } else {
     if (!API_URL) {
-        API_URL = 'http://localhost:5000/api';
+        API_URL = '/api';
     }
 }
 
@@ -117,6 +117,7 @@ export const cricketApi = {
     getLocalIplStandings: (season: string) => api.get(`cricket/local/ipl-standings/${season}`),
     getLocalIplSquads: (season: string) => api.get(`cricket/local/ipl-squads/${season}`),
     getLocalIplStats: (season: string) => api.get(`cricket/local/ipl-stats/${season}`),
+    getLocalIplAllTimeStats: (teamId: string) => api.get(`cricket/team-all-time/${teamId}`),
     getFeaturedMatches: async () => {
         try {
             const res = await api.get('featured/matches');

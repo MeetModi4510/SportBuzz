@@ -136,7 +136,7 @@ export const PlayerProfileDialog = ({ player, isOpen, onClose }: PlayerProfileDi
         if (player.sport === 'football' && player.id && !imgError) {
             return (
                 <img 
-                    src={`${import.meta.env.PROD ? "" : (import.meta.env.PROD ? "" : "http://localhost:5000")}/api/football/trending-players/${player.id}/image`} 
+                    src={`${import.meta.env.PROD ? "" : (import.meta.env.PROD ? "" : "")}/api/football/trending-players/${player.id}/image`} 
                     alt={player.name}
                     className="w-full h-full object-cover" 
                     onError={() => setImgError(true)}

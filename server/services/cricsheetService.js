@@ -15,7 +15,27 @@ const ESPNCRICINFO_TEAM_IDS = {
     'india-2': 6, 'australia-4': 2, 'england-9': 1, 'new-zealand-13': 5,
     'south-africa-11': 3, 'pakistan-3': 7, 'sri-lanka-5': 8, 'west-indies-10': 4,
     'bangladesh-6': 25, 'afghanistan-96': 40, 'zimbabwe-12': 9, 'ireland-27': 29,
-    'scotland-23': 30, 'netherlands-24': 15, 'nepal-72': 32
+    'scotland-23': 30, 'netherlands-24': 15, 'nepal-72': 32,
+    // IPL Teams
+    'Chennai Super Kings': 4343,
+    'Deccan Chargers': 4347,
+    'Delhi Capitals': 4344,
+    'Delhi Daredevils': 4344,
+    'Gujarat Lions': 5845,
+    'Gujarat Titans': 6904,
+    'Kochi Tuskers Kerala': 4788,
+    'Kolkata Knight Riders': 4341,
+    'Lucknow Super Giants': 6903,
+    'Mumbai Indians': 4346,
+    'Pune Warriors': 4787,
+    'Punjab Kings': 4342,
+    'Kings XI Punjab': 4342,
+    'Rajasthan Royals': 4345,
+    'Rising Pune Supergiant': 5843,
+    'Rising Pune Supergiants': 5843,
+    'Royal Challengers Bangalore': 4340,
+    'Royal Challengers Bengaluru': 4340,
+    'Sunrisers Hyderabad': 5143
 };
 const FORMAT_CLASS = { 't20i': 3, 'odi': 2, 'test': 1 };
 const TEAM_NAMES = {
@@ -208,6 +228,57 @@ async function fetchTopWicketTakers(espnTeamId, classId) {
     return results;
 }
 
+/** Fetch All-Time IPL Top Run Scorers (Trophy=117) */
+async function fetchAllTimeIplScorers(espnTeamId) {
+    const url = `https://stats.espncricinfo.com/ci/engine/stats/index.html?class=6;team=${espnTeamId};template=results;trophy=117;type=batting`;
+    const $ = await espnGet(url);
+    const results = [];
+    $('table.engineTable').eq(2).find('tr.data1').each((i, el) => {
+        if (i >= 50) return false; // Fetch up to 50 players
+        const tds = $(el).find('td');
+        const rawName = tds.eq(0).find('a').first().text().trim() || tds.eq(0).text().trim();
+        const name = getFullName(rawName);
+        const matches = parseInt(tds.eq(2).text()) || 0;
+        const runs = parseInt(tds.eq(5).text().replace(/,/g, '')) || 0;
+        const hs = tds.eq(6).text().trim();
+        const avg = parseFloat(tds.eq(7).text()) || 0;
+        const sr = parseFloat(tds.eq(9).text()) || 0;
+        const hundreds = parseInt(tds.eq(10).text()) || 0;
+        const fifties = parseInt(tds.eq(11).text()) || 0;
+        const fours = parseInt(tds.eq(13).text()) || 0;
+        const sixes = parseInt(tds.eq(14).text()) || 0;
+        if (name && !isNaN(runs) && runs > 0) results.push({ name, runs, matches, hs, avg, sr, hundreds, fifties, fours, sixes });
+    });
+    return results;
+}
+
+/** Fetch All-Time IPL Top Wicket Takers (Trophy=117) */
+async function fetchAllTimeIplWickets(espnTeamId) {
+    const url = `https://stats.espncricinfo.com/ci/engine/stats/index.html?class=6;team=${espnTeamId};template=results;trophy=117;type=bowling`;
+    const $ = await espnGet(url);
+    const results = [];
+    $('table.engineTable').eq(2).find('tr.data1').each((i, el) => {
+        if (i >= 50) return false; // Fetch up to 50 players
+        const tds = $(el).find('td');
+        const rawName = tds.eq(0).find('a').first().text().trim() || tds.eq(0).text().trim();
+        const name = getFullName(rawName);
+        
+        const matches = parseInt(tds.eq(2).text()) || 0;
+        const overs = parseFloat(tds.eq(4).text()) || 0;
+        const maidens = parseInt(tds.eq(5).text()) || 0;
+        const runsConceded = parseInt(tds.eq(6).text().replace(/,/g, '')) || 0;
+        const wickets = parseInt(tds.eq(7).text().replace(/,/g, '')) || 0;
+        const bbi = tds.eq(8).text().trim();
+        const avg = parseFloat(tds.eq(9).text()) || 0;
+        const econ = parseFloat(tds.eq(10).text()) || 0;
+        const sr = parseFloat(tds.eq(11).text()) || 0;
+        const fourWickets = parseInt(tds.eq(12).text()) || 0;
+        const fiveWickets = parseInt(tds.eq(13).text()) || 0;
+        if (name && !isNaN(wickets) && wickets > 0) results.push({ name, wickets, matches, overs, maidens, runsConceded, bbi, avg, econ, sr, fourWickets, fiveWickets });
+    });
+    return results;
+}
+
 /** Fetch Home/Away Record */
 async function fetchHomeAway(espnTeamId, classId) {
     const fetchLoc = async (hostType) => {
@@ -240,7 +311,7 @@ const PLAYER_FULL_NAMES = {
     "SR Tendulkar": "Sachin Tendulkar",
     "RG Sharma": "Rohit Sharma",
     "V Kohli": "Virat Kohli",
-    "MS Dhoni": "MS Dhoni",
+    "MS Dhoni": "MS Dhoni", // Fine as is
     "SC Ganguly": "Sourav Ganguly",
     "R Dravid": "Rahul Dravid",
     "Yuvraj Singh": "Yuvraj Singh",
@@ -265,7 +336,185 @@ const PLAYER_FULL_NAMES = {
     "J Srinath": "Javagal Srinath",
     "SV Samson": "Sanju Samson",
     "NT Tilak Varma": "Tilak Varma",
-    "RR Pant": "Rishabh Pant"
+    "RR Pant": "Rishabh Pant",
+    // Expanded List
+    "SK Raina": "Suresh Raina",
+    "RD Gaikwad": "Ruturaj Gaikwad",
+    "F du Plessis": "Faf du Plessis",
+    "AT Rayudu": "Ambati Rayudu",
+    "MEK Hussey": "Michael Hussey",
+    "S Dube": "Shivam Dube",
+    "M Vijay": "Murali Vijay",
+    "S Badrinath": "Subramaniam Badrinath",
+    "SR Watson": "Shane Watson",
+    "ML Hayden": "Matthew Hayden",
+    "DP Conway": "Devon Conway",
+    "DJ Bravo": "Dwayne Bravo",
+    "DR Smith": "Dwayne Smith",
+    "MM Ali": "Moeen Ali",
+    "BB McCullum": "Brendon McCullum",
+    "JA Morkel": "Albie Morkel",
+    "AM Rahane": "Ajinkya Rahane",
+    "PA Patel": "Parthiv Patel",
+    "R Ravindra": "Rachin Ravindra",
+    "D Brevis": "Dewald Brevis",
+    "SM Curran": "Sam Curran",
+    "RV Uthappa": "Robin Uthappa",
+    "DJ Mitchell": "Daryl Mitchell",
+    "KM Jadhav": "Kedar Jadhav",
+    "SP Fleming": "Stephen Fleming",
+    "SN Khan": "Sarfaraz Khan",
+    "WP Saha": "Wriddhiman Saha",
+    "V Shankar": "Vijay Shankar",
+    "DJ Hussey": "David Hussey",
+    "P Negi": "Pawan Negi",
+    "SW Billings": "Sam Billings",
+    "JDP Oram": "Jacob Oram",
+    "MJ Santner": "Mitchell Santner",
+    "SN Thakur": "Shardul Thakur",
+    "GJ Bailey": "George Bailey",
+    "MM Sharma": "Mohit Sharma",
+    "M Pathirana": "Matheesha Pathirana",
+    "SB Jakati": "Shadab Jakati",
+    "M Muralidaran": "Muttiah Muralitharan",
+    "TU Deshpande": "Tushar Deshpande",
+    "DE Bollinger": "Doug Bollinger",
+    "L Balaji": "Lakshmipathy Balaji",
+    "L Ngidi": "Lungi Ngidi",
+    "M Theekshana": "Maheesh Theekshana",
+    "MS Gony": "Manpreet Gony",
+    "BW Hilfenhaus": "Ben Hilfenhaus",
+    "KK Ahmed": "Khaleel Ahmed",
+    "CH Morris": "Chris Morris",
+    "JR Hazlewood": "Josh Hazlewood",
+    "KV Sharma": "Karn Sharma",
+    "AJ Hosein": "Akeal Hosein",
+    "T Thushara": "Nuwan Thushara",
+    "M Ntini": "Makhaya Ntini",
+    "PP Chawla": "Piyush Chawla",
+    "D Pretorius": "Dwaine Pretorius",
+    "KA Pollard": "Kieron Pollard",
+    "Q de Kock": "Quinton de Kock",
+    "KH Pandya": "Krunal Pandya",
+    "LMP Simmons": "Lendl Simmons",
+    "ST Jayasuriya": "Sanath Jayasuriya",
+    "KD Karthik": "Dinesh Karthik",
+    "SS Tiwary": "Saurabh Tiwary",
+    "TH David": "Tim David",
+    "JP Duminy": "JP Duminy",
+    "JC Buttler": "Jos Buttler",
+    "AM Nayar": "Abhishek Nayar",
+    "C Green": "Cameron Green",
+    "N Rana": "Nitish Rana",
+    "E Lewis": "Evin Lewis",
+    "CJ Anderson": "Corey Anderson",
+    "WG Jacks": "Will Jacks",
+    "N Wadhera": "Nehal Wadhera",
+    "JEC Franklin": "James Franklin",
+    "AP Tare": "Aditya Tare",
+    "SM Pollock": "Shaun Pollock",
+    "A Symonds": "Andrew Symonds",
+    "SE Rutherford": "Sherfane Rutherford",
+    "BCJ Cutting": "Ben Cutting",
+    "SL Malinga": "Lasith Malinga",
+    "MJ McClenaghan": "Mitchell McClenaghan",
+    "TA Boult": "Trent Boult",
+    "RD Chahar": "Rahul Chahar",
+    "MM Patel": "Munaf Patel",
+    "DS Kulkarni": "Dhawal Kulkarni",
+    "MG Johnson": "Mitchell Johnson",
+    "PP Ojha": "Pragyan Ojha",
+    "JP Behrendorff": "Jason Behrendorff",
+    "A Madhwal": "Akash Madhwal",
+    "CRD Fernando": "Dilhara Fernando",
+    "M Markande": "Mayank Markande",
+    "G Coetzee": "Gerald Coetzee",
+    "NM Coulter-Nile": "Nathan Coulter-Nile",
+    "DR Sams": "Daniel Sams",
+    "TG Southee": "Tim Southee",
+    "R Vinay Kumar": "Vinay Kumar",
+    "JL Pattinson": "James Pattinson",
+    "S Gopal": "Shreyas Gopal",
+    "K Kartikeya": "Kumar Kartikeya",
+    "RP Singh": "RP Singh",
+    "M Ashwin": "Murugan Ashwin",
+    "AS Joseph": "Alzarri Joseph",
+    "AB de Villiers": "AB de Villiers",
+    "CH Gayle": "Chris Gayle",
+    "RM Patidar": "Rajat Patidar",
+    "D Padikkal": "Devdutt Padikkal",
+    "GJ Maxwell": "Glenn Maxwell",
+    "JH Kallis": "Jacques Kallis",
+    "PD Salt": "Phil Salt",
+    "TM Dilshan": "Tillakaratne Dilshan",
+    "MA Agarwal": "Mayank Agarwal",
+    "MK Pandey": "Manish Pandey",
+    "MV Boucher": "Mark Boucher",
+    "JM Sharma": "Jitesh Sharma",
+    "MK Lomror": "Mahipal Lomror",
+    "KP Pietersen": "Kevin Pietersen",
+    "AJ Finch": "Aaron Finch",
+    "MP Stoinis": "Marcus Stoinis",
+    "VR Iyer": "Venkatesh Iyer",
+    "TM Head": "Travis Head",
+    "KS Bharat": "KS Bharat",
+    "P Kumar": "Praveen Kumar",
+    "C de Grandhomme": "Colin de Grandhomme",
+    "MC Henriques": "Moises Henriques",
+    "HV Patel": "Harshal Patel",
+    "S Aravind": "Sreenath Aravind",
+    "PW Hasaranga": "Wanindu Hasaranga",
+    "MA Starc": "Mitchell Starc",
+    "DW Steyn": "Dale Steyn",
+    "UT Yadav": "Umesh Yadav",
+    "VR Aaron": "Varun Aaron",
+    "NA Saini": "Navdeep Saini",
+    "DL Vettori": "Daniel Vettori",
+    "D Wiese": "David Wiese",
+    "R Rampaul": "Ravi Rampaul",
+    "JD Unadkat": "Jaydev Unadkat",
+    "V Vyshak": "Vyshak Vijay Kumar",
+    "CJ Jordan": "Chris Jordan",
+    "RE van der Merwe": "Roelof van der Merwe",
+    "S Badree": "Samuel Badree",
+    "LH Ferguson": "Lockie Ferguson",
+    "KA Jamieson": "Kyle Jamieson",
+    "M Kartik": "Murali Kartik",
+    "KW Richardson": "Kane Richardson",
+    "DA Warner": "David Warner",
+    "S Dhawan": "Shikhar Dhawan",
+    "B Kumar": "Bhuvneshwar Kumar",
+    "T Natarajan": "T Natarajan",
+    "Rashid Khan": "Rashid Khan"
+};
+
+const TEAM_FULL_NAMES = {
+    'CSK': 'Chennai Super Kings',
+    'Super Kings': 'Chennai Super Kings',
+    'MI': 'Mumbai Indians',
+    'RCB': 'Royal Challengers Bengaluru',
+    'Royals': 'Rajasthan Royals',
+    'RR': 'Rajasthan Royals',
+    'KKR': 'Kolkata Knight Riders',
+    'Daredevils': 'Delhi Daredevils',
+    'Capitals': 'Delhi Capitals',
+    'DC': 'Delhi Capitals',
+    'Kings XI': 'Kings XI Punjab',
+    'Punjab Kings': 'Punjab Kings',
+    'PBKS': 'Punjab Kings',
+    'KXIP': 'Kings XI Punjab',
+    'SRH': 'Sunrisers Hyderabad',
+    'Sunrisers': 'Sunrisers Hyderabad',
+    'Chargers': 'Deccan Chargers',
+    'Titans': 'Gujarat Titans',
+    'GT': 'Gujarat Titans',
+    'Super Giant': 'Lucknow Super Giants',
+    'LSG': 'Lucknow Super Giants',
+    'Lions': 'Gujarat Lions',
+    'Pune': 'Rising Pune Supergiant',
+    'Supergiant': 'Rising Pune Supergiant',
+    'Kochi': 'Kochi Tuskers Kerala',
+    'Warriors': 'Pune Warriors'
 };
 
 function getFullName(acronymName) {
@@ -469,4 +718,127 @@ export async function getTeamAnalytics(teamId, format) {
     fs.writeFileSync(cacheFile, JSON.stringify(aggregated, null, 2));
     console.log(`[Analytics] Done for ${teamId}/${format}`);
     return aggregated;
+}
+
+/** Fetch All-Time IPL Top Fielders (Trophy=117) */
+async function fetchAllTimeIplFielding(espnTeamId) {
+    const url = `https://stats.espncricinfo.com/ci/engine/stats/index.html?class=6;team=${espnTeamId};template=results;trophy=117;type=fielding`;
+    const $ = await espnGet(url);
+    const results = [];
+    $('table.engineTable').eq(2).find('tr.data1').each((i, el) => {
+        if (i >= 50) return false;
+        const tds = $(el).find('td');
+        const rawName = tds.eq(0).find('a').first().text().trim() || tds.eq(0).text().trim();
+        const name = getFullName(rawName);
+        const matches = parseInt(tds.eq(2).text()) || 0;
+        const dismissals = parseInt(tds.eq(4).text()) || 0;
+        const catches = parseInt(tds.eq(5).text()) || 0;
+        const stumpings = parseInt(tds.eq(6).text()) || 0;
+        if (name && (dismissals > 0 || catches > 0 || stumpings > 0)) {
+            results.push({ name, matches, dismissals, catches, stumpings });
+        }
+    });
+    return results;
+}
+
+/** Fetch Fall of Wickets / Partnerships (Trophy=117) */
+async function fetchAllTimeIplFow(espnTeamId) {
+    const url = `https://stats.espncricinfo.com/ci/engine/stats/index.html?class=6;team=${espnTeamId};template=results;trophy=117;type=fow`;
+    const $ = await espnGet(url);
+    const results = [];
+    $('table.engineTable').eq(2).find('tr.data1').each((i, el) => {
+        if (i >= 20) return false; // Top 20 partnerships
+        const tds = $(el).find('td');
+        const partnersRaw = tds.eq(0).text().trim().split(',');
+        const partner1 = getFullName(partnersRaw[0]?.trim() || '');
+        const partner2 = getFullName(partnersRaw[1]?.trim() || '');
+        const partners = `${partner1}, ${partner2}`;
+        const inns = parseInt(tds.eq(2).text()) || 0;
+        const runs = parseInt(tds.eq(4).text()) || 0;
+        const highest = tds.eq(5).text().trim();
+        const avg = parseFloat(tds.eq(6).text()) || 0;
+        const hundreds = parseInt(tds.eq(9).text()) || 0;
+        const fifties = parseInt(tds.eq(10).text()) || 0;
+        if (partners && runs > 0) {
+            results.push({ partners, inns, runs, highest, avg, hundreds, fifties });
+        }
+    });
+    return results;
+}
+
+/** Fetch Head to Head (Trophy=117) */
+async function fetchAllTimeIplHeadToHead(espnTeamId) {
+    const url = `https://stats.espncricinfo.com/ci/engine/stats/index.html?class=6;team=${espnTeamId};template=results;trophy=117;type=team;view=opposition`;
+    const $ = await espnGet(url);
+    const results = [];
+    let currentH2h = null;
+    $('table.engineTable').eq(2).find('tr').each((i, el) => {
+        const cls = $(el).attr('class');
+        if (cls === 'data2' || cls === 'data1') {
+            const tds = $(el).find('td');
+            if (tds.length >= 7) {
+                currentH2h = {
+                    matches: parseInt(tds.eq(2).text()) || 0,
+                    won: parseInt(tds.eq(3).text()) || 0,
+                    lost: parseInt(tds.eq(4).text()) || 0,
+                    tied: parseInt(tds.eq(5).text()) || 0,
+                    nr: parseInt(tds.eq(6).text()) || 0
+                };
+            }
+        } else if (cls === 'note' && currentH2h) {
+            const oppText = $(el).find('td').text().trim().replace(/^v\s+/, '');
+            if (oppText) {
+                currentH2h.opposition = TEAM_FULL_NAMES[oppText] || oppText;
+                results.push(currentH2h);
+            }
+            currentH2h = null;
+        }
+    });
+    return results.sort((a, b) => b.matches - a.matches);
+}
+
+export async function getAllTimeIplStats(teamId) {
+    const espnTeamId = ESPNCRICINFO_TEAM_IDS[teamId];
+    if (!espnTeamId) {
+        throw new Error(`Team ID ${teamId} not found in ESPN mapping`);
+    }
+
+    const cacheFile = path.join(CACHE_DIR, `ipl_all_time_${teamId}.json`);
+    
+    // Check if cache exists and is fresh (e.g., 12 hours)
+    if (fs.existsSync(cacheFile)) {
+        const stats = fs.statSync(cacheFile);
+        const ageHrs = (Date.now() - stats.mtimeMs) / (1000 * 60 * 60);
+        if (ageHrs < 12) {
+            console.log(`[AllTimeStats] Serving cache for ${teamId}`);
+            return JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+        }
+    }
+
+    console.log(`[AllTimeStats] Fetching fresh all-time stats for ${teamId}`);
+    try {
+        const topRunScorers = await fetchAllTimeIplScorers(espnTeamId);
+        const topWicketTakers = await fetchAllTimeIplWickets(espnTeamId);
+        const topFielders = await fetchAllTimeIplFielding(espnTeamId);
+        const partnerships = await fetchAllTimeIplFow(espnTeamId);
+        const headToHead = await fetchAllTimeIplHeadToHead(espnTeamId);
+        
+        const aggregated = {
+            players: {
+                topRunScorers,
+                topWicketTakers,
+                topFielders,
+                partnerships,
+                headToHead
+            }
+        };
+
+        if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
+        fs.writeFileSync(cacheFile, JSON.stringify(aggregated, null, 2));
+        console.log(`[AllTimeStats] Done for ${teamId}`);
+        return aggregated;
+    } catch (e) {
+        console.error(`[AllTimeStats] Error fetching all-time stats for ${teamId}:`, e.message);
+        throw e;
+    }
 }

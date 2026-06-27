@@ -1,0 +1,1 @@
+﻿const axios = require('axios'); async function test() { const {data} = await axios.get('https://stats.espncricinfo.com/ci/engine/stats/index.html?class=6;type=batting', {headers: {'User-Agent': 'Mozilla/5.0'}}); const fs = require('fs'); fs.writeFileSync('temp.html', data); } test();

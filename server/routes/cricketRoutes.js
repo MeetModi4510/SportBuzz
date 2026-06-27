@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 const router = express.Router();
 import { fetchTeamLogo, fetchLiveMatchesScraped, fetchRecentMatchesScraped, fetchUpcomingMatchesScraped, fetchMatchDetailScraped, fetchMatchSquadsScraped, fetchBallMap, fetchPartnershipGraph } from '../services/cricbuzzScraperService.js';
 import { getLocalMatchInfo, getLocalMatchScorecard, getLocalMatchSquads, getLocalMatchSummary, getLocalMatchCommentary } from '../services/localIplMapper.js';
-import { getTeamAnalytics } from '../services/cricsheetService.js';
+import { getTeamAnalytics, getAllTimeIplStats } from '../services/cricsheetService.js';
 import axios from 'axios';
 
 // ─── STAGGERED TEAM LOGO PROXY ───────────────────────────────────────────────
@@ -560,6 +560,20 @@ router.get('/team-analysis/:teamId', async (req, res) => {
         res.json({ status: 'success', data });
     } catch (error) {
         console.error("Error fetching team analytics:", error);
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+});
+
+// All Time IPL Stats endpoint
+router.get('/team-all-time/:teamId', async (req, res) => {
+    try {
+        const { teamId } = req.params;
+        if (!teamId) return res.status(400).json({ error: 'teamId required' });
+        
+        const data = await getAllTimeIplStats(teamId);
+        res.json({ status: 'success', data });
+    } catch (error) {
+        console.error(`Error fetching all time stats for ${req.params.teamId}:`, error);
         res.status(500).json({ status: 'error', message: error.message });
     }
 });

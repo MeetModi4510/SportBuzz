@@ -170,7 +170,7 @@ export function CricketTeamAnalysisPanel() {
                     continue;
                 }
                 try {
-                    const res = await fetch(`http://localhost:5000/api/cricket/player-image?name=${encodeURIComponent(name)}`);
+                    const res = await fetch(`/api/cricket/player-image?name=${encodeURIComponent(name)}`);
                     const data = await res.json();
                     const thumb = data.status === 'success' && data.imageUrl !== 'null' ? data.imageUrl : 'null';
                     localStorage.setItem(cacheKey, thumb);

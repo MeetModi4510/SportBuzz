@@ -9,7 +9,7 @@ if (import.meta.env.PROD) {
     }
 } else {
     if (!BACKEND_URL) {
-        BACKEND_URL = (import.meta.env.PROD ? '' : 'http://localhost:5000') + '/api';
+        BACKEND_URL = (import.meta.env.PROD ? '' : '') + '/api';
     }
 }
 

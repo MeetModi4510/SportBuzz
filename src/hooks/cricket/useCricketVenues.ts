@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import type { VenueAnalysis } from '@/data/venueAnalysisData';
 
-const API_BASE_URL = import.meta.env.PROD ? 'https://sportbuzz-backend.onrender.com/api' : 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.PROD ? 'https://sportbuzz-backend.onrender.com/api' : '/api';
 
 export function useCricketVenues(country: string = 'India') {
     const [venues, setVenues] = useState<VenueAnalysis[]>([]);

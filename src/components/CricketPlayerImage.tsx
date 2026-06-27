@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
-  : (import.meta.env.PROD ? '' : 'http://localhost:5000');
+  : (import.meta.env.PROD ? '' : '');
 
 // ─── Sequential Image Resolution Queue ─────────────────────────────────────────
 // Processes ONE player at a time to avoid 429 rate limits.

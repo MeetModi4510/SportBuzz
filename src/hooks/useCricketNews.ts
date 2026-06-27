@@ -3,7 +3,7 @@ import { cacheManager } from '../utils/football/cacheManager'; // Reusing cacheM
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
-  : (import.meta.env.PROD ? '' : 'http://localhost:5000');
+  : (import.meta.env.PROD ? '' : '');
 
 export interface CricketNewsItem {
   id: string;

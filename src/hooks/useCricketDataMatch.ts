@@ -30,7 +30,7 @@ export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean
                     BACKEND = '/api';
                 }
             } else {
-                if (!BACKEND) BACKEND = (import.meta.env.PROD ? '' : 'http://localhost:5000') + '/api';
+                if (!BACKEND) BACKEND = (import.meta.env.PROD ? '' : '') + '/api';
             }
             const response = await fetch(`${BACKEND}/cricket/scraped/match/${matchId}/summary`);
             const json = await response.json();
@@ -120,7 +120,7 @@ export const useCricbuzzSquads = (matchId: string | number | undefined, enabled:
                     BACKEND = '/api';
                 }
             } else {
-                if (!BACKEND) BACKEND = (import.meta.env.PROD ? '' : 'http://localhost:5000') + '/api';
+                if (!BACKEND) BACKEND = (import.meta.env.PROD ? '' : '') + '/api';
             }
             const res = await fetch(`${BACKEND}/cricket/scraped/match/${matchId}/squads`);
             if (!res.ok) throw new Error('Network response was not ok');

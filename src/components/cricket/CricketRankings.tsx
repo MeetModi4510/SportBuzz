@@ -50,7 +50,7 @@ const COUNTRY_SHORT_NAMES: Record<string, string> = {
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
-  : (import.meta.env.PROD ? '' : 'http://localhost:5000');
+  : (import.meta.env.PROD ? '' : '');
 
 function TrendIcon({ trend }: { trend: string }) {
   if (trend === 'Up') return <TrendingUp size={11} className="text-green-400 inline" />;

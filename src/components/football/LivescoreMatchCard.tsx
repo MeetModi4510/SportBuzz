@@ -23,7 +23,7 @@ type MatchLike = {
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
-  : (import.meta.env.PROD ? '' : 'http://localhost:5000');
+  : (import.meta.env.PROD ? '' : '');
 
 /** Resolve any logo string to an actual URL */
 function resolveLogo(logo: string | null | undefined): string {

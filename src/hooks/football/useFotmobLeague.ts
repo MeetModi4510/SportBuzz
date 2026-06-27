@@ -37,7 +37,7 @@ export function useFotmobLeague(leagueId: number | string | null) {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`${import.meta.env.PROD ? "" : (import.meta.env.PROD ? "" : "http://localhost:5000")}/api/fotmob/league/${leagueId}`);
+        const response = await fetch(`${import.meta.env.PROD ? "" : (import.meta.env.PROD ? "" : "")}/api/fotmob/league/${leagueId}`);
         const result = await response.json();
         
         if (result.success && result.data) {
