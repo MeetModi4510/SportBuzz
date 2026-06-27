@@ -15,14 +15,14 @@ const TEAM_STYLES: Record<string, { logo: string, color: string, glow: string }>
     'Punjab Kings': { logo: '/flags/ipl_2026/pbks.png', color: 'text-red-500', glow: 'bg-red-600' },
     'Kolkata Knight Riders': { logo: '/flags/ipl_2026/kkr.png', color: 'text-purple-500', glow: 'bg-purple-600' },
     'Sunrisers Hyderabad': { logo: '/flags/ipl_2026/srh.png', color: 'text-orange-500', glow: 'bg-orange-600' },
-    'Deccan Chargers': { logo: 'https://upload.wikimedia.org/wikipedia/en/1/1b/Deccan_Chargers_Logo.svg', color: 'text-blue-300', glow: 'bg-blue-400' },
+    'Deccan Chargers': { logo: '/flags/ipl_2026/dec.png', color: 'text-blue-300', glow: 'bg-blue-400' },
     'Gujarat Titans': { logo: '/flags/ipl_2026/gt.png', color: 'text-slate-300', glow: 'bg-slate-400' },
     'Lucknow Super Giants': { logo: '/flags/ipl_2026/lsg.png', color: 'text-cyan-400', glow: 'bg-cyan-500' },
-    'Pune Warriors': { logo: 'https://upload.wikimedia.org/wikipedia/en/f/f2/Pune_Warriors_India_Logo.svg', color: 'text-slate-400', glow: 'bg-slate-500' },
+    'Pune Warriors': { logo: '/flags/ipl_2026/pwi.png', color: 'text-slate-400', glow: 'bg-slate-500' },
     'Rising Pune Supergiant': { logo: '/flags/ipl_2026/rps.png', color: 'text-fuchsia-400', glow: 'bg-fuchsia-500' },
     'Rising Pune Supergiants': { logo: '/flags/ipl_2026/rps.png', color: 'text-fuchsia-400', glow: 'bg-fuchsia-500' },
     'Gujarat Lions': { logo: '/flags/ipl_2026/gl.png', color: 'text-orange-400', glow: 'bg-orange-500' },
-    'Kochi Tuskers Kerala': { logo: 'https://upload.wikimedia.org/wikipedia/en/9/91/Kochi_Tuskers_Kerala_Logo.svg', color: 'text-purple-400', glow: 'bg-purple-500' }
+    'Kochi Tuskers Kerala': { logo: '/flags/ipl_2026/ktk.png', color: 'text-purple-400', glow: 'bg-purple-500' }
 };
 
 const DEFAULT_STYLE = { logo: '/flags/ipl_2026/rcb.png', color: 'text-primary', glow: 'bg-primary' };
@@ -394,8 +394,17 @@ export default function SeriesAllTimeStats({ teams }: { teams: any[] }) {
                                                         <td className="py-4 px-4 text-xs font-mono text-white/20 group-hover:text-white/40 transition-colors">
                                                             {(index + 1).toString().padStart(2, '0')}
                                                         </td>
-                                                        <td className="py-4 px-4 text-sm font-bold text-white/80 group-hover:text-white transition-colors">
-                                                            {h2h.opposition}
+                                                        <td className="py-4 px-4">
+                                                            <div className="flex items-center gap-3">
+                                                                {TEAM_STYLES[h2h.opposition]?.logo ? (
+                                                                    <img src={TEAM_STYLES[h2h.opposition].logo} alt={h2h.opposition} className="w-6 h-6 object-contain drop-shadow-md" />
+                                                                ) : (
+                                                                    <div className="w-6 h-6 rounded-full bg-white/10" />
+                                                                )}
+                                                                <span className="text-sm font-bold text-white/80 group-hover:text-white transition-colors">
+                                                                    {h2h.opposition}
+                                                                </span>
+                                                            </div>
                                                         </td>
                                                         <td className="py-4 px-4 text-right text-sm text-white/50 tabular-nums font-medium">{h2h.matches}</td>
                                                         <td className="py-4 px-4 text-right text-sm text-emerald-400/80 font-bold tabular-nums">{h2h.won}</td>

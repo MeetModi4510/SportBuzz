@@ -511,8 +511,10 @@ const TEAM_FULL_NAMES = {
     'Super Giant': 'Lucknow Super Giants',
     'LSG': 'Lucknow Super Giants',
     'Lions': 'Gujarat Lions',
+    'Guj Lions': 'Gujarat Lions',
     'Pune': 'Rising Pune Supergiant',
     'Supergiant': 'Rising Pune Supergiant',
+    'Supergiants': 'Rising Pune Supergiants',
     'Kochi': 'Kochi Tuskers Kerala',
     'Warriors': 'Pune Warriors'
 };
