@@ -357,13 +357,15 @@ export default function MatchCenter() {
           
           const time = g.clock?.displayValue || g.time || "";
           const isOwnGoal = g.type?.text?.toLowerCase().includes('own goal') || g.text?.toLowerCase().includes('own goal');
+          const isPenalty = g.type?.text?.toLowerCase().includes('penalty') || g.text?.toLowerCase().includes('penalty');
           
           return (
             <div key={i} className={cn("flex items-center gap-2 text-xs", isHome ? "flex-row" : "flex-row-reverse")}>
                <span className="font-semibold text-foreground/90">
                  {scorer} 
                  {isOwnGoal && <span className="text-red-500 font-bold ml-1">(OG)</span>} 
-                 {assist && !isOwnGoal && <span className="text-muted-foreground font-normal ml-1">({assist})</span>}
+                 {isPenalty && <span className="text-blue-500 font-bold ml-1">(P)</span>}
+                 {assist && !isOwnGoal && !isPenalty && <span className="text-muted-foreground font-normal ml-1">({assist})</span>}
                </span>
                <span className="text-[10px] text-emerald-500 font-bold">{time}</span>
             </div>
@@ -1123,7 +1125,9 @@ export default function MatchCenter() {
 
                           const isNeutral = !isHome && !isAway;
                           
-                          const isGoal = evt.type?.text?.toLowerCase().includes("goal");
+                          const typeText = evt.type?.text?.toLowerCase() || "";
+                          const isPenalty = typeText.includes("penalty");
+                          const isGoal = typeText.includes("goal") || (isPenalty && typeText.includes("scored"));
                           let scorer = "";
                           let assist = "";
                           let description = evt.text || "";
@@ -1221,7 +1225,10 @@ export default function MatchCenter() {
                                ) : isGoal ? (
                                  <div className={cn("flex flex-col mt-1", align === "left" ? "items-start md:items-end" : align === "right" ? "items-start" : "items-center")}>
                                    <div className={cn("flex items-center gap-2 mb-1", align === "left" ? "md:flex-row-reverse" : "")}>
-                                      <span className="font-bold text-xl tracking-tight text-foreground">{scorer || "Goal"}</span>
+                                      <span className="font-bold text-xl tracking-tight text-foreground">
+                                        {scorer || "Goal"}
+                                        {isPenalty && <span className="text-blue-500 font-bold ml-2 text-sm">(P)</span>}
+                                      </span>
                                    </div>
                                    {assist && (
                                       <div className={cn("flex items-center gap-1.5 mb-3", align === "left" ? "md:flex-row-reverse" : "")}>

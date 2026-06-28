@@ -47,6 +47,7 @@ import { SquadsList } from "@/components/SquadsList";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FootballPitchLineup } from "@/components/FootballPitchLineup";
 import { CricketPlayerImage } from "@/components/CricketPlayerImage";
+import { formatPlayerName } from "@/lib/playerNames";
 import { SquadsTab } from "@/components/cricket/SquadsTab";
 import { PlayerProfilePanel } from "@/components/cricket/PlayerProfilePanel";
 import type { Match } from "@/data/types";
@@ -113,6 +114,7 @@ const MatchDetails = () => {
   const [activeTab, setActiveTab] = useState('summary');
   const [activeInningsTab, setActiveInningsTab] = useState<number | 'preview'>(-1);
   const [activeInningsIndex, setActiveInningsIndex] = useState<number>(-1);
+  const [activeCommentaryInningsId, setActiveCommentaryInningsId] = useState<number | 'all'>('all');
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [selectedPlayerName, setSelectedPlayerName] = useState<string>('');
 
@@ -120,6 +122,7 @@ const MatchDetails = () => {
   useEffect(() => {
     setActiveTab('summary');
     setActiveInningsIndex(-1);
+    setActiveCommentaryInningsId('all');
   }, [id]);
 
   const summarizePlayerEvents = (playerName: string, events: any[], teamGoalsConceded: number = 0) => {
@@ -514,6 +517,18 @@ const MatchDetails = () => {
 
   // --- Dynamic Values extracted from Live API for Header ---
   const dynamicMatchInfo = cbInfo?.matchInfo || cbSummary?.matchHeader?.matchInfo || cbSummary?.matchInfo;
+  
+  const allMatchText = [
+      dynamicMatchInfo?.seriesName,
+      match?.tournament?.name,
+      match?.name,
+      (match as any)?.seriesName,
+      cbInfo?.extraInfo?.Match,
+      cbInfo?.matchInfo?.matchDesc,
+      cbSummary?.matchHeader?.matchInfo?.seriesName
+  ].filter(Boolean).join(" ").toLowerCase();
+  
+  const isIPL = allMatchText.includes('ipl') || allMatchText.includes('indian premier league');
   
   const dynamicVenueStr = dynamicMatchInfo?.venueInfo?.ground 
       ? `${dynamicMatchInfo.venueInfo.ground}${dynamicMatchInfo.venueInfo.city ? `, ${dynamicMatchInfo.venueInfo.city}` : ''}`
@@ -1151,7 +1166,7 @@ const MatchDetails = () => {
                 <MessageSquare size={16} />
                 Commentary
               </TabsTrigger>
-              {match?.sport === 'cricket' && (
+              {match?.sport === 'cricket' && !isIPL && (
                 <TabsTrigger 
                   value="graphs" 
                   className="flex items-center gap-2 px-1 py-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-all"
@@ -1225,7 +1240,7 @@ const MatchDetails = () => {
                                     <span className={cn(
                                       "font-semibold tracking-tight transition-colors", 
                                       isOnStrike ? "text-foreground text-lg" : "text-muted-foreground text-base"
-                                    )}>{bat.name}</span>
+                                    )}>{formatPlayerName(bat.name)}</span>
                                     {isOnStrike && <span className="text-[8px] font-black text-primary uppercase tracking-widest px-2 py-0.5 bg-primary/10 rounded-sm">Strike</span>}
                                   </div>
                                   
@@ -1267,7 +1282,7 @@ const MatchDetails = () => {
                                     <span className={cn(
                                       "font-semibold tracking-tight transition-colors", 
                                       isBowling ? "text-foreground text-lg" : "text-muted-foreground text-base"
-                                    )}>{bowl.name}</span>
+                                    )}>{formatPlayerName(bowl.name)}</span>
                                     {isBowling && <span className="text-[8px] font-black text-red-500 uppercase tracking-widest px-2 py-0.5 bg-red-500/10 rounded-sm">Bowling</span>}
                                   </div>
                                   
@@ -2134,7 +2149,7 @@ const MatchDetails = () => {
                                   <div key={bIdx} 
                                     onClick={() => {
                                       setSelectedPlayerId(b.cricbuzzPlayerId?.toString() || '0');
-                                      setSelectedPlayerName(b.name);
+                                      setSelectedPlayerName(formatPlayerName(b.name));
                                     }}
                                     className={cn(
                                     "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group cursor-pointer",
@@ -2150,14 +2165,14 @@ const MatchDetails = () => {
                                     <div className="flex items-start gap-3 relative z-10">
                                       <CricketPlayerImage
                                         playerId={getPlayerImageId(b.name)}
-                                        playerName={b.name}
+                                        playerName={formatPlayerName(b.name)}
                                         size={40}
                                         className="shrink-0 mt-0.5"
                                       />
                                       <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-start gap-2">
                                           <div className="flex flex-col min-w-0">
-                                            <h4 className={cn("font-bold text-sm leading-tight break-words", isActiveAtCrease ? "text-foreground" : "text-foreground/80")}>{b.name}</h4>
+                                            <h4 className={cn("font-bold text-sm leading-tight break-words", isActiveAtCrease ? "text-foreground" : "text-foreground/80")}>{formatPlayerName(b.name)}</h4>
                                             <div className="flex items-center gap-1.5 mt-1">
                                               {isActiveAtCrease && <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" title="Not Out"></span>}
                                               {b.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>}
@@ -2189,9 +2204,9 @@ const MatchDetails = () => {
                                         if (cAndB) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">c</span>
-                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{cAndB[1]}</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{formatPlayerName(cAndB[1])}</span>
                                                 <span className="text-muted-foreground/60 font-medium">b</span>
-                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{cAndB[2]}</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{formatPlayerName(cAndB[2])}</span>
                                             </div>
                                         );
 
@@ -2199,7 +2214,7 @@ const MatchDetails = () => {
                                         if (justB) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">b</span>
-                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{justB[1]}</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{formatPlayerName(justB[1])}</span>
                                             </div>
                                         );
 
@@ -2207,7 +2222,7 @@ const MatchDetails = () => {
                                         if (lbwB) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">lbw b</span>
-                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{lbwB[1]}</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{formatPlayerName(lbwB[1])}</span>
                                             </div>
                                         );
 
@@ -2215,7 +2230,7 @@ const MatchDetails = () => {
                                         if (runOut) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">run out</span>
-                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{runOut[1]}</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{runOut[1].split('/').map(n => formatPlayerName(n.trim())).join(' / ')}</span>
                                             </div>
                                         );
 
@@ -2223,9 +2238,9 @@ const MatchDetails = () => {
                                         if (stAndB) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">st</span>
-                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{stAndB[1]}</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{formatPlayerName(stAndB[1])}</span>
                                                 <span className="text-muted-foreground/60 font-medium">b</span>
-                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{stAndB[2]}</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{formatPlayerName(stAndB[2])}</span>
                                             </div>
                                         );
 
@@ -2233,7 +2248,7 @@ const MatchDetails = () => {
                                         if (candB) return (
                                             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                 <span className="text-muted-foreground/60 font-medium">c & b</span>
-                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{candB[1]}</span>
+                                                <span className="bg-white/5 border border-white/10 text-foreground/90 px-1.5 py-0.5 rounded-md font-semibold shadow-sm">{formatPlayerName(candB[1])}</span>
                                             </div>
                                         );
 
@@ -2288,7 +2303,7 @@ const MatchDetails = () => {
                                           if (match) {
                                               score = match[1];
                                               wicketNum = match[2];
-                                              batsmanName = match[3].trim();
+                                              batsmanName = formatPlayerName(match[3].trim());
                                           } else {
                                               // Fallback if the string format is completely unexpected
                                               return <div key={fIdx} className="flex items-center shrink-0 bg-background/30 px-2.5 py-1 rounded-full border border-border/10 text-xs text-muted-foreground">{f}</div>;
@@ -2296,7 +2311,7 @@ const MatchDetails = () => {
                                       } else {
                                           score = f.score;
                                           wicketNum = f.wicketNum;
-                                          batsmanName = f.batsmanName;
+                                          batsmanName = formatPlayerName(f.batsmanName);
                                       }
                                       
                                       return (
@@ -2319,7 +2334,7 @@ const MatchDetails = () => {
                                 <div key={bIdx} 
                                   onClick={() => {
                                     setSelectedPlayerId(b.cricbuzzPlayerId?.toString() || '0');
-                                    setSelectedPlayerName(b.name);
+                                    setSelectedPlayerName(formatPlayerName(b.name));
                                   }}
                                   className={cn(
                                   "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group cursor-pointer",
@@ -2332,14 +2347,14 @@ const MatchDetails = () => {
                                   <div className="flex items-start gap-3 relative z-10">
                                     <CricketPlayerImage
                                       playerId={getPlayerImageId(b.name)}
-                                      playerName={b.name}
+                                      playerName={formatPlayerName(b.name)}
                                       size={40}
                                       className="shrink-0 mt-0.5"
                                     />
                                     <div className="flex-1 min-w-0">
                                       <div className="flex justify-between items-start gap-1">
                                         <div className="flex flex-col min-w-0">
-                                          <h4 className="font-bold text-sm leading-tight break-words text-foreground/90">{b.name}</h4>
+                                          <h4 className="font-bold text-sm leading-tight break-words text-foreground/90">{formatPlayerName(b.name)}</h4>
                                           {b.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold mt-1.5 inline-block w-max">C</span>}
                                         </div>
                                         <div className="flex flex-col items-end leading-none shrink-0">
@@ -2521,7 +2536,45 @@ const MatchDetails = () => {
 
                       return (
                         <div className="space-y-8 mt-2">
-                          {displayInnIds.map((innId) => {
+                          {/* Innings Filter Buttons */}
+                          {displayInnIds.length > 1 && (
+                            <div className="flex flex-wrap items-center gap-2 mb-2 pb-4 border-b border-border/40">
+                              <button
+                                onClick={() => setActiveCommentaryInningsId('all')}
+                                className={cn(
+                                  "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-sm border",
+                                  activeCommentaryInningsId === 'all'
+                                    ? "bg-primary text-primary-foreground border-primary"
+                                    : "bg-background text-muted-foreground border-border/50 hover:bg-secondary hover:border-border"
+                                )}
+                              >
+                                All Innings
+                              </button>
+                              {displayInnIds.map(innId => {
+                                const innName = byInnings[innId][0]?.batTeamName 
+                                  ? `${byInnings[innId][0].batTeamName} Innings` 
+                                  : `Innings ${innId}`;
+                                return (
+                                  <button
+                                    key={innId}
+                                    onClick={() => setActiveCommentaryInningsId(innId)}
+                                    className={cn(
+                                      "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-sm border",
+                                      activeCommentaryInningsId === innId
+                                        ? "bg-primary text-primary-foreground border-primary"
+                                        : "bg-background text-muted-foreground border-border/50 hover:bg-secondary hover:border-border"
+                                    )}
+                                  >
+                                    {innName}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {displayInnIds
+                            .filter(innId => activeCommentaryInningsId === 'all' || activeCommentaryInningsId === innId)
+                            .map((innId) => {
                             const innItems = byInnings[innId]; // Do not reverse: keep latest first for over grouping
                             // Group by over
                             const byOver: Record<number, any[]> = {};
@@ -2531,9 +2584,18 @@ const MatchDetails = () => {
                               byOver[ov].push(item);
                             });
                             const overKeys = Object.keys(byOver).map(Number).sort((a, b) => b - a);
+                            const innName = innItems[0]?.batTeamName ? `${innItems[0].batTeamName} Innings` : `Innings ${innId}`;
 
                             return (
                               <div key={innId} className="space-y-5">
+                                {/* Innings Header */}
+                                <div className="sticky top-0 z-10 bg-card border-b border-border/50 py-3 mb-4 backdrop-blur-md bg-opacity-90">
+                                  <h4 className="font-bold text-foreground tracking-tight px-1 flex items-center gap-2">
+                                    <div className="w-1.5 h-4 bg-primary rounded-full"></div>
+                                    {innName}
+                                  </h4>
+                                </div>
+
                                 {overKeys.map((ov) => {
                                   const overItems = byOver[ov];
                                   const isSpecialOver = ov < 0;
@@ -2606,15 +2668,20 @@ const MatchDetails = () => {
                                             <div
                                               key={idx}
                                               className={cn(
-                                                "relative flex gap-4 p-4 border-b border-border/40 last:border-0 transition-colors",
+                                                "group relative flex gap-5 p-5 border-b border-border/30 last:border-0 hover:bg-card/40 transition-all duration-300",
                                                 cardBg
                                               )}
                                             >
                                             {/* Left: over.ball indicator */}
-                                            <div className="shrink-0 flex flex-col items-center gap-1 pt-0.5">
-                                              <div className={cn("w-2.5 h-2.5 rounded-full", dotColor)} />
+                                            <div className="shrink-0 flex flex-col items-center gap-1.5 pt-1 w-8">
+                                              <div className={cn(
+                                                "w-2.5 h-2.5 rounded-full ring-2 ring-background shadow-sm transition-transform duration-300 group-hover:scale-125", 
+                                                dotColor,
+                                                isWicket ? "shadow-[0_0_8px_rgba(239,68,68,0.6)]" : 
+                                                isSix || isFour ? "shadow-[0_0_8px_rgba(245,158,11,0.4)]" : ""
+                                              )} />
                                               {!isSpecialOver && item.ballNbr > 0 && (
-                                                <span className="text-[10px] font-bold font-mono text-foreground/80 leading-none mt-0.5">
+                                                <span className="text-[10px] font-bold font-mono text-muted-foreground/60 leading-none mt-1 group-hover:text-foreground/80 transition-colors">
                                                   {(() => {
                                                     const bInOver = item.ballInOver || (item.ballNbr % 6 === 0 ? 6 : item.ballNbr % 6);
                                                     return bInOver === 6 ? `${ov + 1}.0` : `${ov}.${bInOver}`;
@@ -2625,117 +2692,83 @@ const MatchDetails = () => {
 
                                             {/* Center: text */}
                                             <div className="flex-1 min-w-0">
-                                              {/* Event badge + batsman/bowler context */}
-                                              <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                                                {eventLabel && (
-                                                  <span className={cn(
-                                                    "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-sm text-white",
-                                                    isWicket ? "bg-red-500" :
-                                                    isMilestone ? "bg-purple-500" :
-                                                    isSix ? "bg-amber-500" :
-                                                    isFour ? "bg-blue-500" :
-                                                    isOverComplete ? "bg-emerald-500" :
-                                                    "bg-muted-foreground"
-                                                  )}>
-                                                    {eventIcon && <span>{eventIcon}</span>}
-                                                    {eventLabel}
-                                                  </span>
-                                                )}
-                                                {item.batsman && (
-                                                  <span className="text-[11px] font-semibold text-foreground/80">
-                                                    {item.batsman}
-                                                    {item.batsmanRuns != null && (
-                                                      <span className="ml-1 text-muted-foreground font-normal">
-                                                        ({item.batsmanRuns}{item.batsmanBalls != null ? `/${item.batsmanBalls}b` : ''})
-                                                      </span>
-                                                    )}
-                                                  </span>
-                                                )}
-                                                {item.batsman && item.bowler && (
-                                                  <span className="text-muted-foreground/40 text-[10px]">·</span>
-                                                )}
-                                                {item.bowler && (
-                                                  <span className="text-[11px] text-muted-foreground">
-                                                    {item.bowler}
-                                                  </span>
-                                                )}
-                                              </div>
-
-                                              {/* Commentary text */}
-                                              <div className="text-sm leading-relaxed mt-0.5">
-                                                {(() => {
-                                                  const text = item.commText || '';
-                                                  
-                                                  const highlightMilestones = (str: string) => {
-                                                    if (!isMilestone && !/(fifty|hundred|century|half century|half-century|\b50\b|\b100\b)/i.test(str)) return str;
-                                                    const parts = str.split(/(fifty|hundred|century|half century|half-century|\b50\b|\b100\b)/i);
-                                                    return parts.map((part, i) => 
-                                                      i % 2 === 1 ? <strong key={i} className="font-bold text-foreground">{part.toUpperCase()}</strong> : part
-                                                    );
-                                                  };
-
-                                                  const bangIndex = text.indexOf('!!');
-                                                  
-                                                  if (bangIndex !== -1) {
-                                                    const firstPart = text.substring(0, bangIndex + 2);
-                                                    const rest = text.substring(bangIndex + 2);
+                                              {/* Event text & badges */}
+                                              <div className="flex flex-col gap-2.5">
+                                                <div className="text-[14px] text-foreground/90 leading-[1.7] font-medium tracking-tight">
+                                                  {(() => {
+                                                    // Remove raw markdown asterisks
+                                                    let text = (item.commText || '').replace(/\*\*(.*?)\*\*/g, '$1');
                                                     
-                                                    const lastPeriod = rest.lastIndexOf('. ');
-                                                    if (lastPeriod !== -1) {
-                                                      const description = rest.substring(0, lastPeriod + 1);
-                                                      const summary = rest.substring(lastPeriod + 2);
-                                                      
-                                                      if (/(?: c | b | lbw |run out|stumped|hit wicket)/i.test(summary) || / \d+\(\d+\)/.test(summary)) {
-                                                        return (
-                                                          <>
-                                                            <span className="font-bold text-foreground">{firstPart}</span>
-                                                            <span className="font-normal text-foreground/80">{highlightMilestones(description)}</span>
-                                                            <span className="font-bold text-foreground block mt-1.5">{summary}</span>
-                                                          </>
-                                                        );
-                                                      }
+                                                    // Replace names inside text
+                                                    if (item.batsman) {
+                                                        const rawBatsman = item.batsman.trim();
+                                                        if (rawBatsman) text = text.replace(new RegExp(rawBatsman, 'g'), formatPlayerName(rawBatsman));
+                                                    }
+                                                    if (item.bowler) {
+                                                        const rawBowler = item.bowler.trim();
+                                                        if (rawBowler) text = text.replace(new RegExp(rawBowler, 'g'), formatPlayerName(rawBowler));
                                                     }
                                                     
-                                                    return (
-                                                      <>
-                                                        <span className="font-bold text-foreground">{firstPart}</span>
-                                                        <span className="font-normal text-foreground/80">{highlightMilestones(rest)}</span>
-                                                      </>
-                                                    );
-                                                  }
-                                                  
-                                                  const boundaryMatch = text.match(/^(.*?(?:,\s*FOUR\b|,\s*SIX\b)[^,.]*)(.*)$/);
-                                                  if (boundaryMatch) {
-                                                     return (
-                                                       <>
-                                                         <span className="font-bold text-foreground">{boundaryMatch[1]}</span>
-                                                         <span className="font-normal text-foreground/80">{highlightMilestones(boundaryMatch[2])}</span>
-                                                       </>
-                                                     );
-                                                  }
+                                                    const highlightMilestones = (str: string) => {
+                                                      if (!isMilestone && !/(fifty|hundred|century|half century|half-century|\b50\b|\b100\b)/i.test(str)) return str;
+                                                      const parts = str.split(/(fifty|hundred|century|half century|half-century|\b50\b|\b100\b)/i);
+                                                      return parts.map((part, i) => 
+                                                        i % 2 === 1 ? <strong key={i} className="font-bold text-primary">{part.toUpperCase()}</strong> : part
+                                                      );
+                                                    };
 
-                                                  return <span className="font-normal text-foreground/80">{highlightMilestones(text)}</span>;
-                                                })()}
+                                                    // Format the classic "Bowler to Batsman," prefix for premium readability
+                                                    const prefixMatch = text.match(/^(.*?\s+to\s+.*?,\s*)(.*)$/i);
+                                                    if (prefixMatch) {
+                                                        const [, prefix, rest] = prefixMatch;
+                                                        return (
+                                                          <>
+                                                            <span className="font-semibold text-foreground/60">{prefix}</span>
+                                                            <span className="text-foreground/90">{highlightMilestones(rest)}</span>
+                                                          </>
+                                                        );
+                                                    }
+                                                    return <span className="text-foreground/90">{highlightMilestones(text)}</span>;
+                                                  })()}
+                                                </div>
+
+                                                {/* Event Badges Below */}
+                                                {eventLabel && (
+                                                  <div className="flex items-center mt-1">
+                                                    <span className={cn(
+                                                      "inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-sm backdrop-blur-md",
+                                                      isWicket ? "bg-red-500/10 text-red-500 border border-red-500/20" :
+                                                      isMilestone ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" :
+                                                      isSix ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
+                                                      isFour ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" :
+                                                      isOverComplete ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+                                                      "bg-secondary/50 text-muted-foreground border border-border/40"
+                                                    )}>
+                                                      {eventIcon && <span className="opacity-80">{eventIcon}</span>}
+                                                      {eventLabel}
+                                                    </span>
+                                                  </div>
+                                                )}
                                               </div>
                                             </div>
 
                                             {/* Right: runs badge for scoring balls */}
                                             {item.legalRuns != null && item.legalRuns > 0 && !isWicket && (
-                                              <div className="shrink-0 self-center">
+                                              <div className="shrink-0 self-center hidden sm:block">
                                                 <div className={cn(
-                                                  "w-8 h-8 rounded-full flex items-center justify-center text-sm font-black border-2",
-                                                  isSix ? "bg-amber-500/20 border-amber-500/40 text-amber-400" :
-                                                  isFour ? "bg-blue-500/20 border-blue-500/40 text-blue-400" :
-                                                  "bg-muted/30 border-border/40 text-foreground/70"
+                                                  "w-9 h-9 rounded-full flex items-center justify-center text-sm font-black border transition-all duration-300",
+                                                  isSix ? "bg-amber-500/10 border-amber-500/30 text-amber-500 group-hover:bg-amber-500/20" :
+                                                  isFour ? "bg-blue-500/10 border-blue-500/30 text-blue-500 group-hover:bg-blue-500/20" :
+                                                  "bg-muted/20 border-border/30 text-foreground/60 group-hover:bg-muted/40"
                                                 )}>
                                                   {item.legalRuns}
                                                 </div>
                                               </div>
                                             )}
                                             {isWicket && (
-                                              <div className="shrink-0 self-center">
-                                                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-red-500/20 border-2 border-red-500/40">
-                                                  <span className="text-base">🏏</span>
+                                              <div className="shrink-0 self-center hidden sm:block">
+                                                <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-500/10 border border-red-500/30 group-hover:bg-red-500/20 transition-all duration-300">
+                                                  <span className="text-lg opacity-80">🏏</span>
                                                 </div>
                                               </div>
                                             )}
@@ -2832,7 +2865,7 @@ const MatchDetails = () => {
             </TabsContent>
 
 
-            {match?.sport === 'cricket' && (
+            {match?.sport === 'cricket' && !isIPL && (
               <TabsContent value="graphs" className="animate-fade-in">
                 <Suspense fallback={<div className="p-12 flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
                   <GraphsTab 

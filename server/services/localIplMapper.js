@@ -155,31 +155,38 @@ export async function getLocalMatchScorecard(id) {
         const oversFormatted = `${Math.floor(totalBalls / 6)}.${totalBalls % 6}`;
 
         const batting = Object.values(battingStats).map(b => ({
-            ...b,
+            name: b.batName,
+            runs: b.runs,
+            balls: b.balls,
+            fours: b.fours,
+            sixes: b.sixes,
+            dismissal: b.outDesc,
             strikeRate: b.balls > 0 ? ((b.runs / b.balls) * 100).toFixed(2) : '0.00'
         }));
 
         const bowling = Object.values(bowlingStats).map(b => ({
-            ...b,
+            name: b.bowlName,
             overs: `${Math.floor(b.balls / 6)}.${b.balls % 6}`,
+            maidens: b.maidens,
+            runs: b.runs,
+            wickets: b.wickets,
+            balls: b.balls,
             economy: b.balls > 0 ? ((b.runs / (b.balls / 6))).toFixed(2) : '0.00'
         }));
 
         innings.push({
             teamName: teamName,
-            scoreDetails: {
-                runs: totalRuns,
-                wickets: totalWickets,
-                overs: oversFormatted
-            },
-            batting: batting,
-            bowling: bowling,
-            extrasData: {
+            score: totalRuns,
+            wickets: totalWickets,
+            overs: oversFormatted,
+            batsmen: batting,
+            bowlers: bowling,
+            extras: {
                 total: extras.total,
                 byes: extras.byes,
-                legByes: extras.legByes,
+                legbyes: extras.legByes,
                 wides: extras.wides,
-                noBalls: extras.noBalls,
+                noballs: extras.noBalls,
                 penalty: extras.penalty
             }
         });
@@ -204,16 +211,16 @@ export async function getLocalMatchSummary(id) {
 
         if (inn1) {
             matchScore.team1Score.inngs1 = {
-                runs: inn1.scoreDetails.runs,
-                wickets: inn1.scoreDetails.wickets,
-                overs: inn1.scoreDetails.overs
+                runs: inn1.score,
+                wickets: inn1.wickets,
+                overs: inn1.overs
             };
         }
         if (inn2) {
             matchScore.team2Score.inngs1 = {
-                runs: inn2.scoreDetails.runs,
-                wickets: inn2.scoreDetails.wickets,
-                overs: inn2.scoreDetails.overs
+                runs: inn2.score,
+                wickets: inn2.wickets,
+                overs: inn2.overs
             };
         }
     }
@@ -241,12 +248,31 @@ export async function getLocalMatchCommentary(id) {
         // Calculate total score sequentially to assign to each ball
         const balls = [];
         inn.overs.forEach((over, overIdx) => {
+            let legalBallCount = 0;
             over.deliveries.forEach((ball, ballIdx) => {
                 totalRuns += ball.runs.total;
                 if (ball.wickets) {
                     totalWickets += ball.wickets.length;
                 }
-                balls.push({ overNum: over.over, overData: over, ball: ball, currentRuns: totalRuns, currentWkts: totalWickets, ballIdx: ballIdx + 1 });
+                
+                const isWide = ball.extras && ball.extras.wides > 0;
+                const isNoBall = ball.extras && ball.extras.noballs > 0;
+                
+                let ballInOver = legalBallCount + 1;
+                
+                if (!isWide && !isNoBall) {
+                    legalBallCount++;
+                }
+
+                balls.push({ 
+                    overNum: over.over, 
+                    overData: over, 
+                    ball: ball, 
+                    currentRuns: totalRuns, 
+                    currentWkts: totalWickets, 
+                    ballIdx: ballIdx + 1,
+                    ballInOver: ballInOver
+                });
             });
         });
 
@@ -279,12 +305,15 @@ export async function getLocalMatchCommentary(id) {
             }
 
             commentary.push({
+                inningsId: i + 1,
                 overNum: b.overNum,
                 ballNbr: b.ballIdx,
+                ballInOver: b.ballInOver,
                 commText: commText,
                 batTeamName: inn.team,
-                bowlerName: b.ball.bowler,
-                batsmanName: b.ball.batter,
+                bowler: b.ball.bowler,
+                batsman: b.ball.batter,
+                legalRuns: b.ball.runs.batter,
                 runs: b.ball.runs.total,
                 batTeamScore: b.currentRuns,
                 batTeamWkts: b.currentWkts,

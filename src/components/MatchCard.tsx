@@ -24,6 +24,9 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
     setMatch(initialMatch);
   }, [initialMatch]);
 
+  // Infer the season based on startTime or displayTime
+  const matchSeason = (typeof match.startTime === 'string' ? match.startTime.substring(0, 4) : match.startTime instanceof Date ? match.startTime.getFullYear().toString() : undefined) || match.displayTime?.match(/\b(20\d{2})\b/)?.[1] || undefined;
+
   // Socket listener for live updates
   useEffect(() => {
     if (match.sport === 'cricket' && match.status === 'live') {
@@ -115,7 +118,7 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
         {/* Home Team */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <TeamLogo logo={match.homeTeam?.logo || ''} name={match.homeTeam?.name || 'TBA'} shortName={match.homeTeam?.shortName} size="md" className="w-11 h-11 shadow-sm" />
+            <TeamLogo season={matchSeason} logo={match.homeTeam?.logo || ''} name={match.homeTeam?.name || 'TBA'} shortName={match.homeTeam?.shortName} size="md" className="w-11 h-11 shadow-sm" />
             <span className="font-semibold text-foreground text-[15px] tracking-tight">{match.homeTeam?.name || 'TBA'}</span>
           </div>
           <div className="flex flex-col items-end">
@@ -143,7 +146,7 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
         {/* Away Team */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <TeamLogo logo={match.awayTeam?.logo || ''} name={match.awayTeam?.name || 'TBA'} shortName={match.awayTeam?.shortName} size="md" className="w-11 h-11 shadow-sm" />
+            <TeamLogo season={matchSeason} logo={match.awayTeam?.logo || ''} name={match.awayTeam?.name || 'TBA'} shortName={match.awayTeam?.shortName} size="md" className="w-11 h-11 shadow-sm" />
             <span className="font-semibold text-foreground text-[15px] tracking-tight">{match.awayTeam?.name || 'TBA'}</span>
           </div>
           <div className="flex flex-col items-end">

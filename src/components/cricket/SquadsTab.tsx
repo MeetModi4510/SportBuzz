@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Users, Info } from 'lucide-react';
 import { CricketPlayerImage } from '@/components/CricketPlayerImage';
 import { PlayerProfilePanel } from '@/components/cricket/PlayerProfilePanel';
+import { formatPlayerName } from '@/lib/playerNames';
 
 interface Player {
     id: number | string;
@@ -62,7 +63,7 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
 
     const handlePlayerClick = (p: Player) => {
         setSelectedPlayerId(String(p.id));
-        setSelectedPlayerName(p.name);
+        setSelectedPlayerName(formatPlayerName(p.name));
         setSelectedPlayerFaceId(p.imageDetails?.imageId ? Number(p.imageDetails.imageId) : null);
     };
 
@@ -88,17 +89,17 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
                                 {imageId ? (
                                     <img 
                                         src={`https://static.cricbuzz.com/a/img/v1/152x152/i1/c${imageId}/player.jpg`} 
-                                        alt={p.name}
+                                        alt={formatPlayerName(p.name)}
                                         className="w-full h-full object-cover"
-                                        onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=random`; }}
+                                        onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(formatPlayerName(p.name))}&background=random`; }}
                                     />
                                 ) : (
-                                    <CricketPlayerImage playerId={p.id?.toString()} playerName={p.name} className="w-full h-full object-cover" />
+                                    <CricketPlayerImage playerId={p.id?.toString()} playerName={formatPlayerName(p.name)} className="w-full h-full object-cover" />
                                 )}
                             </div>
                             <div className="min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-1.5">
-                                    <h4 className="font-bold text-sm text-foreground break-words line-clamp-2">{p.name}</h4>
+                                    <h4 className="font-bold text-sm text-foreground break-words line-clamp-2">{formatPlayerName(p.name)}</h4>
                                     {!isSupportStaff && p.captain && <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary/20 text-primary whitespace-nowrap">C</span>}
                                     {!isSupportStaff && p.keeper && <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-500 whitespace-nowrap">WK</span>}
                                 </div>

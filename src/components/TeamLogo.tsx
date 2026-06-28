@@ -8,9 +8,10 @@ interface TeamLogoProps {
     shortName?: string;
     size?: "xs" | "sm" | "md" | "lg";
     className?: string;
+    season?: string | number;
 }
 
-export const TeamLogo = ({ logo, name, shortName, size = "md", className }: TeamLogoProps) => {
+export const TeamLogo = ({ logo, name, shortName, size = "md", className, season }: TeamLogoProps) => {
     const [useTextFallback, setUseTextFallback] = useState(false);
 
     const sizeClasses = {
@@ -133,6 +134,34 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className }: Team
             if (key.length >= 3 && (safeNameLower.includes(key) || safeShortLower.includes(key))) {
                 resolvedLocalFlag = path;
                 break;
+            }
+        }
+    }
+
+    // Dynamic Season Overrides
+    if (season) {
+        const seasonNum = parseInt(season.toString(), 10);
+        if (!isNaN(seasonNum)) {
+            // LSG logo update from 2026 onwards
+            if (
+                (safeNameLower === 'lucknow super giants' || safeShortLower === 'lsg') &&
+                seasonNum >= 2026
+            ) {
+                resolvedLocalFlag = '/flags/ipl_2026/lsg2026.png';
+            }
+            // RR legacy logo for 2009-2018
+            if (
+                (safeNameLower === 'rajasthan royals' || safeShortLower === 'rr') &&
+                seasonNum >= 2009 && seasonNum <= 2018
+            ) {
+                resolvedLocalFlag = '/flags/ipl_2026/rr2018.png';
+            }
+            // RCB legacy logo for 2016-2019
+            if (
+                (safeNameLower === 'royal challengers bengaluru' || safeNameLower === 'royal challengers bangalore' || safeShortLower === 'rcb') &&
+                seasonNum >= 2016 && seasonNum <= 2019
+            ) {
+                resolvedLocalFlag = '/flags/ipl_2026/rcb2016.png';
             }
         }
     }

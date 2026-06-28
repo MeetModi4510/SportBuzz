@@ -27,44 +27,65 @@ export default function SeriesStandings({ season }: { season: string }) {
     }
 
     return (
-        <div className="bg-card border border-border rounded-2xl overflow-hidden">
-            <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-muted/50 text-muted-foreground font-semibold text-xs uppercase tracking-wider">
-                        <tr>
-                            <th className="px-6 py-4">Team</th>
-                            <th className="px-4 py-4 text-center">M</th>
-                            <th className="px-4 py-4 text-center text-emerald-500">W</th>
-                            <th className="px-4 py-4 text-center text-red-500">L</th>
-                            <th className="px-4 py-4 text-center">T</th>
-                            <th className="px-4 py-4 text-center">NR</th>
-                            <th className="px-4 py-4 text-center font-bold text-primary">Pts</th>
-                            <th className="px-6 py-4 text-right">NRR</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                        {standings.map((team: any, index: number) => (
-                            <tr key={index} className={cn("hover:bg-muted/30 transition-colors border-b border-border/50 last:border-0", index < 4 ? "bg-primary/5" : "")}>
-                                <td className="px-6 py-4 font-bold text-foreground flex items-center gap-3">
-                                    <div className="flex items-center gap-4">
-                                        <span className={cn("w-6 text-center text-xs font-black", index < 4 ? "text-primary" : "text-muted-foreground")}>{index + 1}</span>
-                                        <TeamLogo logo="" name={team.teamName || team.team} size="sm" className="w-10 h-10 shadow-none drop-shadow-md" />
-                                        <span className="tracking-tight text-base">{team.teamName || team.team}</span>
+        <div className="bg-[#0A0A0A] border border-white/[0.05] rounded-[2rem] p-4 sm:p-6 shadow-2xl relative animate-in fade-in duration-700">
+            <div className="overflow-x-auto pb-2">
+                <div className="min-w-[750px]">
+                    {/* Minimalist Header */}
+                    <div className="grid grid-cols-[3rem_minmax(200px,1fr)_3rem_3rem_3rem_3rem_5rem_4rem] gap-4 px-6 py-4 border-b border-white/[0.05] mb-2 items-center">
+                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] text-center">Pos</div>
+                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Franchise</div>
+                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] text-center">P</div>
+                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] text-center">W</div>
+                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] text-center">L</div>
+                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] text-center">T/NR</div>
+                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] text-right">Net RR</div>
+                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] text-right">Pts</div>
+                    </div>
+
+                    {/* Standings Rows */}
+                    <div className="flex flex-col gap-1">
+                        {standings.map((team: any, index: number) => {
+                            const isTop4 = index < 4;
+                            const nr = team.noResult !== undefined ? team.noResult : team.nr;
+                            const tnr = team.tied + nr;
+                            
+                            return (
+                                <div key={index} className="relative grid grid-cols-[3rem_minmax(200px,1fr)_3rem_3rem_3rem_3rem_5rem_4rem] gap-4 px-6 py-4 items-center group hover:bg-white/[0.02] transition-colors rounded-[1rem] border border-transparent hover:border-white/[0.02]">
+                                    
+                                    {/* Qualification Indicator */}
+                                    {isTop4 && <div className="absolute left-0 top-[20%] bottom-[20%] w-[3px] bg-primary rounded-r-full shadow-[0_0_10px_rgba(var(--primary),0.5)] opacity-80 group-hover:opacity-100 transition-opacity"></div>}
+
+                                    {/* Rank */}
+                                    <div className={cn("text-xl font-black text-center tabular-nums tracking-tighter", isTop4 ? "text-primary" : "text-white/40")}>
+                                        {(index + 1).toString().padStart(2, '0')}
                                     </div>
-                                </td>
-                                <td className="px-4 py-4 text-center text-muted-foreground font-medium">{team.matches}</td>
-                                <td className="px-4 py-4 text-center font-bold text-emerald-500">{team.won}</td>
-                                <td className="px-4 py-4 text-center font-bold text-red-500">{team.lost}</td>
-                                <td className="px-4 py-4 text-center text-muted-foreground">{team.tied}</td>
-                                <td className="px-4 py-4 text-center text-muted-foreground">{team.noResult !== undefined ? team.noResult : team.nr}</td>
-                                <td className="px-4 py-4 text-center font-black text-primary text-base">{team.points}</td>
-                                <td className={cn("px-6 py-4 text-right font-mono font-medium", parseFloat(team.nrr) >= 0 ? "text-emerald-500" : "text-red-500")}>
-                                    {parseFloat(team.nrr) > 0 ? '+' : ''}{team.nrr}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+
+                                    {/* Team */}
+                                    <div className="flex items-center gap-5">
+                                        <TeamLogo season={season} logo="" name={team.teamName || team.team} size="sm" className="w-8 h-8 sm:w-10 sm:h-10 drop-shadow-xl" />
+                                        <span className="text-base sm:text-lg font-bold text-white/90 tracking-wide truncate">{team.teamName || team.team}</span>
+                                    </div>
+
+                                    {/* Stats */}
+                                    <div className="text-center font-mono font-medium text-white/50 text-sm">{team.matches}</div>
+                                    <div className="text-center font-mono font-bold text-emerald-400 text-sm">{team.won}</div>
+                                    <div className="text-center font-mono font-bold text-red-400 text-sm">{team.lost}</div>
+                                    <div className="text-center font-mono font-medium text-white/30 text-sm">{tnr > 0 ? tnr : '-'}</div>
+
+                                    {/* NRR */}
+                                    <div className={cn("text-right font-mono text-sm font-medium tracking-tight", parseFloat(team.nrr) >= 0 ? "text-emerald-400/80" : "text-red-400/80")}>
+                                        {parseFloat(team.nrr) > 0 ? '+' : ''}{team.nrr}
+                                    </div>
+
+                                    {/* Points */}
+                                    <div className={cn("text-right text-3xl font-black tabular-nums tracking-tighter", isTop4 ? "text-white" : "text-white/70")}>
+                                        {team.points}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
         </div>
     );

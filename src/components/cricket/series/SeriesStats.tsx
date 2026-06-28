@@ -2,51 +2,74 @@ import React, { useState, useMemo } from 'react';
 import { BarChart, Activity, Users, Trophy, Award, ChevronRight, Target } from 'lucide-react';
 import { useLocalIplStats, useLocalIplSquads } from '@/hooks/cricket/useCricketSeries';
 import { cn } from '@/lib/utils';
+import { formatPlayerName } from '@/lib/playerNames';
+
+const PremiumCapIcon = ({ size = 36, color = "#f97316", className = "" }: { size?: number, color?: string, className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 26 22" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ filter: `drop-shadow(0px 4px 6px ${color}40)` }}>
+    {/* Button */}
+    <circle cx="11" cy="3" r="1.5" fill={color} />
+    
+    {/* Cap Body (Dome) */}
+    <path d="M3 15V11C3 6.58 6.58 3 11 3C15.42 3 19 6.58 19 11V15H3Z" fill={color} />
+    
+    {/* Band */}
+    <path d="M3 13.5H19V15C19 15 11 15 3 15V13.5Z" fill="black" fillOpacity="0.1" />
+    
+    {/* Brim */}
+    <path d="M11 14.5C11 14.5 15 17.5 20 17.5C22 17.5 24 16.5 24 15.5C24 14.5 19 14 15 14H11V14.5Z" fill={color} />
+    <path d="M11 14.5C11 14.5 15 17.5 20 17.5C22 17.5 24 16.5 24 15.5C24 14.5 19 14 15 14H11V14.5Z" fill="black" fillOpacity="0.2" />
+    
+    {/* Seams */}
+    <path d="M11 3V15" stroke="black" strokeOpacity="0.15" strokeWidth="1.2" />
+    <path d="M7 4.5C8 8.5 8 11 8 15" stroke="black" strokeOpacity="0.15" strokeWidth="1.2" />
+    <path d="M15 4.5C14 8.5 14 11 14 15" stroke="black" strokeOpacity="0.15" strokeWidth="1.2" />
+  </svg>
+);
 
 const TEAM_STYLES: Record<string, { logo: string, color: string, glow: string }> = {
     'Chennai Super Kings': {
         logo: '/flags/ipl_2026/csk.png',
-        color: 'text-yellow-400', glow: 'bg-yellow-500'
+        color: 'text-[#F9CD05]', glow: 'bg-[#F9CD05]'
     },
     'Mumbai Indians': {
         logo: '/flags/ipl_2026/mi.png',
-        color: 'text-blue-500', glow: 'bg-blue-600'
+        color: 'text-[#005DAA]', glow: 'bg-[#005DAA]'
     },
     'Royal Challengers Bangalore': {
         logo: '/flags/ipl_2026/rcb.png',
-        color: 'text-red-500', glow: 'bg-red-600'
+        color: 'text-[#D71920]', glow: 'bg-[#D71920]'
     },
     'Royal Challengers Bengaluru': {
         logo: '/flags/ipl_2026/rcb.png',
-        color: 'text-red-500', glow: 'bg-red-600'
+        color: 'text-[#D71920]', glow: 'bg-[#D71920]'
     },
     'Rajasthan Royals': {
         logo: '/flags/ipl_2026/rr.png',
-        color: 'text-pink-500', glow: 'bg-pink-600'
+        color: 'text-[#EA1A85]', glow: 'bg-[#EA1A85]'
     },
     'Delhi Capitals': {
         logo: '/flags/ipl_2026/dc.png',
-        color: 'text-blue-400', glow: 'bg-blue-500'
+        color: 'text-[#2561AE]', glow: 'bg-[#2561AE]'
     },
     'Delhi Daredevils': {
         logo: '/flags/ipl_2026/dd.png',
-        color: 'text-red-600', glow: 'bg-red-600'
+        color: 'text-[#2561AE]', glow: 'bg-[#2561AE]'
     },
     'Kings XI Punjab': {
         logo: '/flags/ipl_2026/kxip.png',
-        color: 'text-red-500', glow: 'bg-red-600'
+        color: 'text-[#ED1B24]', glow: 'bg-[#ED1B24]'
     },
     'Punjab Kings': {
         logo: '/flags/ipl_2026/pbks.png',
-        color: 'text-red-500', glow: 'bg-red-600'
+        color: 'text-[#ED1B24]', glow: 'bg-[#ED1B24]'
     },
     'Kolkata Knight Riders': {
         logo: '/flags/ipl_2026/kkr.png',
-        color: 'text-purple-500', glow: 'bg-purple-600'
+        color: 'text-[#3A225D]', glow: 'bg-[#3A225D]'
     },
     'Sunrisers Hyderabad': {
         logo: '/flags/ipl_2026/srh.png',
-        color: 'text-orange-500', glow: 'bg-orange-600'
+        color: 'text-[#F47A20]', glow: 'bg-[#F47A20]'
     },
     'Deccan Chargers': {
         logo: 'https://upload.wikimedia.org/wikipedia/en/1/1b/Deccan_Chargers_Logo.svg',
@@ -54,11 +77,11 @@ const TEAM_STYLES: Record<string, { logo: string, color: string, glow: string }>
     },
     'Gujarat Titans': {
         logo: '/flags/ipl_2026/gt.png',
-        color: 'text-slate-300', glow: 'bg-slate-400'
+        color: 'text-[#1B2133]', glow: 'bg-[#1B2133]'
     },
     'Lucknow Super Giants': {
         logo: '/flags/ipl_2026/lsg.png',
-        color: 'text-cyan-400', glow: 'bg-cyan-500'
+        color: 'text-[#00AEEF]', glow: 'bg-[#00AEEF]'
     },
     'Pune Warriors': {
         logo: 'https://upload.wikimedia.org/wikipedia/en/f/f2/Pune_Warriors_India_Logo.svg',
@@ -179,10 +202,14 @@ export default function SeriesStats({ season }: { season: string }) {
                         </div>
                         <div>
                             <h4 className="font-medium text-white/90 text-sm tracking-wide group-hover:text-white transition-colors">
-                                {player.name || player.player}
+                                {formatPlayerName(player.name || player.player)}
                             </h4>
                             <div className="text-[10px] font-medium text-white/40 uppercase tracking-wider mt-0.5">
-                                {player.balls || player.matches} {player.balls || player.ballsBowled ? (isRuns ? 'Balls' : 'Overs') : 'Matches'}
+                                {isRuns ? (
+                                    <>{player.balls || player.matches} {player.balls ? 'Balls' : 'Matches'}</>
+                                ) : (
+                                    <>{player.overs != null ? player.overs : (player.ballsBowled ? `${Math.floor(player.ballsBowled / 6)}${player.ballsBowled % 6 > 0 ? `.${player.ballsBowled % 6}` : ''}` : player.matches)} {player.overs != null || player.ballsBowled ? 'Overs' : 'Matches'}</>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -244,13 +271,14 @@ export default function SeriesStats({ season }: { season: string }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Overall Batting */}
                     <div className="bg-[#0D0D0D] border border-white/[0.05] rounded-[2rem] p-8 shadow-2xl">
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="p-3 bg-primary/10 rounded-xl text-primary">
-                                <BarChart size={20} />
+                        <div className="flex items-center gap-5 mb-8 group cursor-default">
+                            <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-orange-600/5 rounded-2xl shadow-[0_0_20px_rgba(249,115,22,0.2)] flex items-center justify-center border border-orange-500/30 relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                                <div className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full"></div>
+                                <PremiumCapIcon size={38} color="#f97316" className="relative z-10 -ml-1 mt-1" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-xl text-white tracking-tight">Orange Cap</h3>
-                                <p className="text-white/40 text-xs font-medium uppercase tracking-widest mt-0.5">Top Run Scorers</p>
+                                <h3 className="font-black text-2xl text-white tracking-tight leading-none mb-1">Orange Cap</h3>
+                                <p className="text-orange-400/80 text-xs font-bold uppercase tracking-widest">Top Run Scorers</p>
                             </div>
                         </div>
                         <div className="space-y-1">
@@ -263,13 +291,14 @@ export default function SeriesStats({ season }: { season: string }) {
                     
                     {/* Overall Bowling */}
                     <div className="bg-[#0D0D0D] border border-white/[0.05] rounded-[2rem] p-8 shadow-2xl">
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-500">
-                                <Activity size={20} />
+                        <div className="flex items-center gap-5 mb-8 group cursor-default">
+                            <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-purple-600/5 rounded-2xl shadow-[0_0_20px_rgba(168,85,247,0.2)] flex items-center justify-center border border-purple-500/30 relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                                <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full"></div>
+                                <PremiumCapIcon size={38} color="#a855f7" className="relative z-10 -ml-1 mt-1" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-xl text-white tracking-tight">Purple Cap</h3>
-                                <p className="text-white/40 text-xs font-medium uppercase tracking-widest mt-0.5">Top Wicket Takers</p>
+                                <h3 className="font-black text-2xl text-white tracking-tight leading-none mb-1">Purple Cap</h3>
+                                <p className="text-purple-400/80 text-xs font-bold uppercase tracking-widest">Top Wicket Takers</p>
                             </div>
                         </div>
                         <div className="space-y-1">
@@ -287,10 +316,34 @@ export default function SeriesStats({ season }: { season: string }) {
                         .filter(([teamName]) => teamName !== 'Other' || (teamStats[teamName].runs.length > 0 || teamStats[teamName].wickets.length > 0))
                         .sort(([teamA], [teamB]) => teamA.localeCompare(teamB))
                         .map(([teamName, { runs, wickets }]) => {
-                            const style = TEAM_STYLES[teamName] || DEFAULT_STYLE;
-                            const maxTeamRuns = Math.max(...runs.slice(0, 5).map((r: any) => parseInt(r.runs) || 0), 1);
-                            const maxTeamWickets = Math.max(...wickets.slice(0, 5).map((w: any) => parseInt(w.wickets) || 0), 1);
+                            let style = { ...(TEAM_STYLES[teamName] || DEFAULT_STYLE) };
+                            const seasonNum = parseInt(season, 10);
                             
+                            // Show legacy RCB logo for 2016-2019 seasons
+                            if (
+                                (teamName === 'Royal Challengers Bengaluru' || teamName === 'Royal Challengers Bangalore') &&
+                                !isNaN(seasonNum) && seasonNum >= 2016 && seasonNum <= 2019
+                            ) {
+                                style.logo = '/flags/ipl_2026/rcb2016.png';
+                            }
+
+                            // Show legacy RR logo & color (blue) for 2009-2018 seasons
+                            if (
+                                teamName === 'Rajasthan Royals' &&
+                                !isNaN(seasonNum) && seasonNum >= 2009 && seasonNum <= 2018
+                            ) {
+                                style.logo = '/flags/ipl_2026/rr2018.png';
+                                style.color = 'text-[#004B8C]';
+                                style.glow = 'bg-[#004B8C]';
+                            }
+
+                            // Show updated LSG logo for 2026 onwards
+                            if (
+                                teamName === 'Lucknow Super Giants' &&
+                                !isNaN(seasonNum) && seasonNum >= 2026
+                            ) {
+                                style.logo = '/flags/ipl_2026/lsg2026.png';
+                            }
                             return (
                                 <div key={teamName} className="relative bg-[#0D0D0D] border border-white/[0.03] hover:border-white/[0.08] rounded-[2rem] p-8 shadow-2xl transition-colors duration-500 overflow-hidden group">
                                     <div className="relative h-36 sm:h-44 bg-gradient-to-r from-black/80 to-transparent rounded-[1.5rem] overflow-hidden flex items-center px-6 sm:px-10 border border-white/[0.05] mb-6">
@@ -321,144 +374,98 @@ export default function SeriesStats({ season }: { season: string }) {
                                     </div>
 
                                     {/* Data Visualization Dashboard */}
-                                    <div className="flex flex-col md:flex-row xl:flex-col 2xl:flex-row gap-6 relative z-10">
-                                        {/* Batting Bento */}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <Activity size={18} className="text-primary" />
-                                                <h4 className="text-primary text-xs sm:text-sm font-black uppercase tracking-[0.2em]">Top Batters</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                                        {/* Batting Section */}
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-5">
+                                                <div className="w-1 h-3 rounded-full bg-primary/60" />
+                                                <h4 className="text-white/60 text-xs font-semibold uppercase tracking-[0.15em]">Top Batters</h4>
                                             </div>
                                             
                                             {runs.length > 0 ? (
-                                                <div className="flex flex-col gap-4">
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                        {/* Hero Block (Rank 1) */}
-                                                        <div className="relative bg-gradient-to-br from-primary/20 to-primary/5 rounded-[2rem] p-6 sm:p-8 border border-primary/20 flex flex-col justify-end overflow-hidden min-h-[220px] group">
-                                                            <div className="absolute -right-6 -bottom-6 text-primary opacity-10 transform group-hover:scale-110 transition-transform duration-700">
-                                                                <Activity size={180} />
+                                                <div className="flex flex-col gap-3">
+                                                    {/* Rank 1 Hero */}
+                                                    <div className="relative bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 hover:bg-white/[0.04] transition-colors group/card">
+                                                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity rounded-2xl pointer-events-none"></div>
+                                                        <div className="flex items-start justify-between mb-4 relative z-10">
+                                                            <div>
+                                                                <div className="text-[10px] text-white/40 font-medium uppercase tracking-widest mb-1">Top Scorer</div>
+                                                                <div className="text-base font-medium text-white/90 truncate max-w-[150px]">{runs[0].name || runs[0].player}</div>
                                                             </div>
-                                                            <div className="absolute top-6 left-6 w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center border border-primary/30 shadow-[0_0_10px_rgba(var(--primary),0.3)]">
-                                                                <span className="text-primary font-black text-sm">1</span>
-                                                            </div>
-                                                            
-                                                            <div className="relative z-10 mt-12">
-                                                                <div className="text-[10px] text-primary font-bold uppercase tracking-[0.2em] mb-1">Star Batter</div>
-                                                                <div className="text-xl sm:text-2xl font-black text-white leading-tight mb-2 truncate pr-2">{runs[0].name || runs[0].player}</div>
-                                                                <div className="flex items-baseline gap-2">
-                                                                    <span className="text-4xl sm:text-5xl font-black text-primary tracking-tighter tabular-nums drop-shadow-[0_0_15px_rgba(var(--primary),0.5)]">
-                                                                        {runs[0].runs}
-                                                                    </span>
-                                                                    <span className="text-xs text-primary/60 font-bold uppercase tracking-widest">Runs</span>
-                                                                </div>
+                                                            <div className="w-7 h-7 rounded-full bg-white/[0.05] border border-white/10 flex items-center justify-center text-white/50 text-xs font-medium">
+                                                                1
                                                             </div>
                                                         </div>
-
-                                                        {/* Mid Blocks (Rank 2 & 3) */}
-                                                        {runs.length > 1 && (
-                                                            <div className="flex flex-col gap-4">
-                                                                {runs.slice(1, 3).map((p: any, i: number) => (
-                                                                    <div key={`bat-mid-${i}`} className="flex-1 bg-white/[0.02] hover:bg-white/[0.05] transition-colors rounded-[1.5rem] p-5 border border-white/[0.02] flex flex-col justify-center relative overflow-hidden group">
-                                                                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary/40 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                                                                        <div className="flex items-center justify-between gap-3">
-                                                                            <div className="flex flex-col min-w-0">
-                                                                                <span className="text-white/30 font-mono text-[10px] mb-1">#{i + 2}</span>
-                                                                                <span className="font-bold text-white/90 text-sm sm:text-base truncate leading-tight">{p.name || p.player}</span>
-                                                                            </div>
-                                                                            <span className="text-xl sm:text-2xl font-black text-white tabular-nums shrink-0">{p.runs}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
+                                                        <div className="flex items-baseline gap-2 relative z-10">
+                                                            <span className="text-3xl font-bold text-white tracking-tighter tabular-nums">{runs[0].runs}</span>
+                                                            <span className="text-[10px] text-white/40 font-medium uppercase tracking-widest">Runs</span>
+                                                        </div>
                                                     </div>
 
-                                                    {/* Low Blocks (Rank 4 & 5) */}
-                                                    {runs.length > 3 && (
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                            {runs.slice(3, 5).map((p: any, i: number) => (
-                                                                <div key={`bat-low-${i}`} className="bg-black/40 rounded-[1.2rem] p-4 border border-white/[0.02] flex items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
-                                                                    <div className="flex items-center gap-3 min-w-0">
-                                                                        <span className="text-white/20 font-mono text-xs shrink-0">#{i + 4}</span>
-                                                                        <span className="font-bold text-white/70 text-sm truncate leading-tight">{p.name || p.player}</span>
+                                                    {/* Ranks 2-5 List */}
+                                                    {runs.length > 1 && (
+                                                        <div className="flex flex-col gap-1 mt-2">
+                                                            {runs.slice(1, 5).map((p: any, i: number) => (
+                                                                <div key={`bat-${i}`} className="flex items-center justify-between px-4 py-2.5 rounded-xl hover:bg-white/[0.02] transition-colors border border-transparent hover:border-white/[0.02]">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-white/20 font-mono text-[10px] w-4 shrink-0">#{i + 2}</span>
+                                                                        <span className="font-medium text-white/70 text-sm truncate max-w-[120px]">{p.name || p.player}</span>
                                                                     </div>
-                                                                    <span className="text-lg font-black text-white/80 tabular-nums shrink-0">{p.runs}</span>
+                                                                    <span className="text-sm font-semibold text-white/90 tabular-nums">{p.runs}</span>
                                                                 </div>
                                                             ))}
                                                         </div>
                                                     )}
                                                 </div>
                                             ) : (
-                                                <div className="py-16 text-center text-white/20 text-sm font-medium uppercase tracking-widest bg-white/[0.01] rounded-[2rem] border border-white/[0.02]">No Batting Data</div>
+                                                <div className="py-12 text-center text-white/20 text-xs font-medium uppercase tracking-widest bg-white/[0.01] rounded-2xl border border-white/[0.02]">No Data</div>
                                             )}
                                         </div>
 
-                                        {/* Bowling Bento */}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <Target size={18} className="text-emerald-500" />
-                                                <h4 className="text-emerald-500 text-xs sm:text-sm font-black uppercase tracking-[0.2em]">Top Bowlers</h4>
+                                        {/* Bowling Section */}
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-5">
+                                                <div className="w-1 h-3 rounded-full bg-emerald-500/60" />
+                                                <h4 className="text-white/60 text-xs font-semibold uppercase tracking-[0.15em]">Top Bowlers</h4>
                                             </div>
                                             
                                             {wickets.length > 0 ? (
-                                                <div className="flex flex-col gap-4">
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                        {/* Hero Block (Rank 1) */}
-                                                        <div className="relative bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 rounded-[2rem] p-6 sm:p-8 border border-emerald-500/20 flex flex-col justify-end overflow-hidden min-h-[220px] group">
-                                                            <div className="absolute -right-6 -bottom-6 text-emerald-500 opacity-10 transform group-hover:scale-110 transition-transform duration-700">
-                                                                <Target size={180} />
+                                                <div className="flex flex-col gap-3">
+                                                    {/* Rank 1 Hero */}
+                                                    <div className="relative bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 hover:bg-white/[0.04] transition-colors group/card">
+                                                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity rounded-2xl pointer-events-none"></div>
+                                                        <div className="flex items-start justify-between mb-4 relative z-10">
+                                                            <div>
+                                                                <div className="text-[10px] text-white/40 font-medium uppercase tracking-widest mb-1">Leading Wicket Taker</div>
+                                                                <div className="text-base font-medium text-white/90 truncate max-w-[150px]">{wickets[0].name || wickets[0].player}</div>
                                                             </div>
-                                                            <div className="absolute top-6 left-6 w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
-                                                                <span className="text-emerald-400 font-black text-sm">1</span>
-                                                            </div>
-                                                            
-                                                            <div className="relative z-10 mt-12">
-                                                                <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-[0.2em] mb-1">Star Bowler</div>
-                                                                <div className="text-xl sm:text-2xl font-black text-white leading-tight mb-2 truncate pr-2">{wickets[0].name || wickets[0].player}</div>
-                                                                <div className="flex items-baseline gap-2">
-                                                                    <span className="text-4xl sm:text-5xl font-black text-emerald-400 tracking-tighter tabular-nums drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">
-                                                                        {wickets[0].wickets}
-                                                                    </span>
-                                                                    <span className="text-xs text-emerald-500/60 font-bold uppercase tracking-widest">Wkts</span>
-                                                                </div>
+                                                            <div className="w-7 h-7 rounded-full bg-white/[0.05] border border-white/10 flex items-center justify-center text-white/50 text-xs font-medium">
+                                                                1
                                                             </div>
                                                         </div>
-
-                                                        {/* Mid Blocks (Rank 2 & 3) */}
-                                                        {wickets.length > 1 && (
-                                                            <div className="flex flex-col gap-4">
-                                                                {wickets.slice(1, 3).map((p: any, i: number) => (
-                                                                    <div key={`bowl-mid-${i}`} className="flex-1 bg-white/[0.02] hover:bg-white/[0.05] transition-colors rounded-[1.5rem] p-5 border border-white/[0.02] flex flex-col justify-center relative overflow-hidden group">
-                                                                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500/40 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                                                                        <div className="flex items-center justify-between gap-3">
-                                                                            <div className="flex flex-col min-w-0">
-                                                                                <span className="text-white/30 font-mono text-[10px] mb-1">#{i + 2}</span>
-                                                                                <span className="font-bold text-white/90 text-sm sm:text-base truncate leading-tight">{p.name || p.player}</span>
-                                                                            </div>
-                                                                            <span className="text-xl sm:text-2xl font-black text-white tabular-nums shrink-0">{p.wickets}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
+                                                        <div className="flex items-baseline gap-2 relative z-10">
+                                                            <span className="text-3xl font-bold text-white tracking-tighter tabular-nums">{wickets[0].wickets}</span>
+                                                            <span className="text-[10px] text-white/40 font-medium uppercase tracking-widest">Wkts</span>
+                                                        </div>
                                                     </div>
 
-                                                    {/* Low Blocks (Rank 4 & 5) */}
-                                                    {wickets.length > 3 && (
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                            {wickets.slice(3, 5).map((p: any, i: number) => (
-                                                                <div key={`bowl-low-${i}`} className="bg-black/40 rounded-[1.2rem] p-4 border border-white/[0.02] flex items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
-                                                                    <div className="flex items-center gap-3 min-w-0">
-                                                                        <span className="text-white/20 font-mono text-xs shrink-0">#{i + 4}</span>
-                                                                        <span className="font-bold text-white/70 text-sm truncate leading-tight">{p.name || p.player}</span>
+                                                    {/* Ranks 2-5 List */}
+                                                    {wickets.length > 1 && (
+                                                        <div className="flex flex-col gap-1 mt-2">
+                                                            {wickets.slice(1, 5).map((p: any, i: number) => (
+                                                                <div key={`bowl-${i}`} className="flex items-center justify-between px-4 py-2.5 rounded-xl hover:bg-white/[0.02] transition-colors border border-transparent hover:border-white/[0.02]">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-white/20 font-mono text-[10px] w-4 shrink-0">#{i + 2}</span>
+                                                                        <span className="font-medium text-white/70 text-sm truncate max-w-[120px]">{p.name || p.player}</span>
                                                                     </div>
-                                                                    <span className="text-lg font-black text-white/80 tabular-nums shrink-0">{p.wickets}</span>
+                                                                    <span className="text-sm font-semibold text-white/90 tabular-nums">{p.wickets}</span>
                                                                 </div>
                                                             ))}
                                                         </div>
                                                     )}
                                                 </div>
                                             ) : (
-                                                <div className="py-16 text-center text-white/20 text-sm font-medium uppercase tracking-widest bg-white/[0.01] rounded-[2rem] border border-white/[0.02]">No Bowling Data</div>
+                                                <div className="py-12 text-center text-white/20 text-xs font-medium uppercase tracking-widest bg-white/[0.01] rounded-2xl border border-white/[0.02]">No Data</div>
                                             )}
                                         </div>
                                     </div>

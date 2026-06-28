@@ -90,6 +90,10 @@ router.get('/scraped/matches/upcoming', async (req, res) => {
 });
 
 router.get('/scraped/match/:id/squads', async (req, res) => {
+    // Intercept local IPL matches
+    const localData = await getLocalMatchSquads(req.params.id);
+    if (localData) return res.json({ status: 'success', data: { success: true, data: localData } });
+
     const data = await fetchMatchSquadsScraped(req.params.id);
     res.json({ status: 'success', data });
 });
@@ -158,17 +162,17 @@ router.get('/scraped/match/:id/:endpointType', async (req, res) => {
         if (localData) return res.json({ status: 'success', data: { success: true, data: localData } });
     } else if (endpointType === 'summary') {
         const localData = await getLocalMatchSummary(id);
-        if (localData) return res.json({ status: 'success', data: { success: true, data: localData } });
+        if (localData) return res.json({ status: 'success', data: localData });
     } else if (endpointType === 'scorecard') {
         const localData = await getLocalMatchScorecard(id);
-        if (localData) return res.json({ status: 'success', data: { success: true, data: localData } });
+        if (localData) return res.json({ status: 'success', data: localData });
     } else if (endpointType === 'commentary') {
         const localData = await getLocalMatchCommentary(id);
-        if (localData) return res.json({ status: 'success', data: { success: true, data: localData } });
+        if (localData) return res.json({ status: 'success', data: localData });
     } else if (endpointType === 'overs') {
-        return res.json({ status: 'success', data: { success: true, data: { overSummaryList: [] } } });
+        return res.json({ status: 'success', data: { overSummaryList: [] } });
     } else if (endpointType === 'graphs') {
-        return res.json({ status: 'success', data: { success: true, data: { matchId: id } } });
+        return res.json({ status: 'success', data: { matchId: id } });
     }
 
     const force = req.query.force === '1' || req.query.force === 'true';
@@ -394,7 +398,7 @@ router.get('/cb/full-commentary/:matchId', async (req, res) => {
 
         // Intercept local IPL match
         const localData = await getLocalMatchCommentary(matchId);
-        if (localData) return res.json({ status: 'success', data: { success: true, data: localData } });
+        if (localData) return res.json({ status: 'success', data: localData });
 
         const data = await scrapeFullCommentary(matchId, slug || null, force);
         if (!data) {

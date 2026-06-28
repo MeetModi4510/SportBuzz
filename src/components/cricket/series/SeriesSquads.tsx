@@ -73,7 +73,7 @@ export default function SeriesSquads({ season }: { season: string }) {
                         <ChevronLeft className="w-5 h-5 text-foreground" />
                     </button>
                     <div className="flex items-center gap-4">
-                        <TeamLogo logo="" name={selectedTeam} size="md" className="w-16 h-16 drop-shadow-md" />
+                        <TeamLogo season={season} logo="" name={selectedTeam} size="md" className="w-16 h-16 drop-shadow-md" />
                         <h2 className="text-2xl font-black tracking-tight">{selectedTeam}</h2>
                     </div>
                 </div>
@@ -114,7 +114,7 @@ export default function SeriesSquads({ season }: { season: string }) {
                     onClick={() => setSelectedTeam(teamName)}
                     className="bg-card hover:bg-card/80 transition-all border border-border rounded-2xl p-6 flex flex-col items-center justify-center gap-4 cursor-pointer group shadow-sm hover:shadow-md hover:border-primary/50 text-center"
                 >
-                    <TeamLogo logo="" name={teamName} size="lg" className="w-24 h-24 drop-shadow-md group-hover:scale-110 transition-transform duration-300" />
+                    <TeamLogo season={season} logo="" name={teamName} size="lg" className="w-24 h-24 drop-shadow-md group-hover:scale-110 transition-transform duration-300" />
                     <h4 className="font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mt-2">{teamName}</h4>
                     <div className="px-3 py-1 rounded-full bg-muted text-[10px] font-bold tracking-widest uppercase text-muted-foreground border border-border/50">
                         {(players as string[]).length} Players
