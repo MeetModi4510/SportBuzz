@@ -36,214 +36,206 @@ function _setCached(key, data, ttlMs = 6 * 60 * 60 * 1000) {
 // Format: lowercase key fragments → groundId
 export const ESPN_GROUND_MAP = {
     // ── India (all major international venues) ────────────────────────────────
-    'wankhede':             { id: 56,   name: 'Wankhede Stadium, Mumbai' },
-    'mumbai':               { id: 56,   name: 'Wankhede Stadium, Mumbai' },
-    'eden gardens':         { id: 292,  name: 'Eden Gardens, Kolkata' },
-    'kolkata':              { id: 292,  name: 'Eden Gardens, Kolkata' },
-    'ma chidambaram':       { id: 16,   name: 'MA Chidambaram Stadium, Chennai' },
-    'm. a. chidambaram':    { id: 16,   name: 'MA Chidambaram Stadium, Chennai' },
-    'chidambaram':          { id: 16,   name: 'MA Chidambaram Stadium, Chennai' },
-    'chepauk':              { id: 16,   name: 'MA Chidambaram Stadium, Chennai' },
-    'chennai':              { id: 16,   name: 'MA Chidambaram Stadium, Chennai' },
-    'arun jaitley':         { id: 17,   name: 'Arun Jaitley Stadium, Delhi' },
-    'feroz shah kotla':     { id: 17,   name: 'Arun Jaitley Stadium, Delhi' },
-    'delhi':                { id: 17,   name: 'Arun Jaitley Stadium, Delhi' },
-    'm. chinnaswamy':       { id: 6,    name: 'M. Chinnaswamy Stadium, Bengaluru' },
-    'chinnaswamy':          { id: 6,    name: 'M. Chinnaswamy Stadium, Bengaluru' },
-    'bangalore':            { id: 6,    name: 'M. Chinnaswamy Stadium, Bengaluru' },
-    'bengaluru':            { id: 6,    name: 'M. Chinnaswamy Stadium, Bengaluru' },
-    'narendra modi':        { id: 2,    name: 'Narendra Modi Stadium, Ahmedabad' },
-    'sardar patel':         { id: 2,    name: 'Narendra Modi Stadium, Ahmedabad' },
-    'motera':               { id: 2,    name: 'Narendra Modi Stadium, Ahmedabad' },
-    'ahmedabad':            { id: 2,    name: 'Narendra Modi Stadium, Ahmedabad' },
-    'rajiv gandhi':         { id: 47,   name: 'Rajiv Gandhi International Stadium, Hyderabad' },
-    'uppal':                { id: 47,   name: 'Rajiv Gandhi International Stadium, Hyderabad' },
-    'hyderabad':            { id: 47,   name: 'Rajiv Gandhi International Stadium, Hyderabad' },
-    'hpca':                 { id: 311,  name: 'HPCA Stadium, Dharamsala' },
-    'dharamsala':           { id: 311,  name: 'HPCA Stadium, Dharamsala' },
-    'himachal pradesh':     { id: 311,  name: 'HPCA Stadium, Dharamsala' },
-    'vidarbha':             { id: 494,  name: 'VCA Stadium, Nagpur' },
-    'vca stadium':          { id: 494,  name: 'VCA Stadium, Nagpur' },
-    'nagpur':               { id: 494,  name: 'VCA Stadium, Nagpur' },
-    'sawai mansingh':       { id: 507,  name: 'Sawai Mansingh Stadium, Jaipur' },
-    'jaipur':               { id: 507,  name: 'Sawai Mansingh Stadium, Jaipur' },
-    'barabati':             { id: 88,   name: 'Barabati Stadium, Cuttack' },
-    'cuttack':              { id: 88,   name: 'Barabati Stadium, Cuttack' },
-    'green park':           { id: 51,   name: 'Green Park, Kanpur' },
-    'kanpur':               { id: 51,   name: 'Green Park, Kanpur' },
-    'saurashtra':           { id: 456,  name: 'Saurashtra Cricket Association Stadium, Rajkot' },
-    'niranjan shah':        { id: 456,  name: 'Saurashtra Cricket Association Stadium, Rajkot' },
-    'rajkot':               { id: 456,  name: 'Saurashtra Cricket Association Stadium, Rajkot' },
-    'is bindra':            { id: 282,  name: 'IS Bindra Stadium, Mohali' },
-    'i. s. bindra':         { id: 282,  name: 'IS Bindra Stadium, Mohali' },
-    'bindra':               { id: 282,  name: 'IS Bindra Stadium, Mohali' },
-    'pca stadium':          { id: 282,  name: 'IS Bindra Stadium, Mohali' },
-    'mohali':               { id: 282,  name: 'IS Bindra Stadium, Mohali' },
-    'chandigarh':           { id: 282,  name: 'IS Bindra Stadium, Mohali' },
-    'ekana':                { id: 1170, name: 'Ekana Cricket Stadium, Lucknow' },
-    'lucknow':              { id: 1170, name: 'Ekana Cricket Stadium, Lucknow' },
-    'barsapara':            { id: 1133, name: 'Barsapara Cricket Stadium, Guwahati' },
-    'aca stadium':          { id: 1133, name: 'Barsapara Cricket Stadium, Guwahati' },
-    'guwahati':             { id: 1133, name: 'Barsapara Cricket Stadium, Guwahati' },
-    'aca vdca':             { id: 509,  name: 'ACA-VDCA Stadium, Visakhapatnam' },
-    'aca-vdca':             { id: 509,  name: 'ACA-VDCA Stadium, Visakhapatnam' },
-    'aca–vdca':             { id: 509,  name: 'ACA-VDCA Stadium, Visakhapatnam' },
-    'visakhapatnam':        { id: 509,  name: 'ACA-VDCA Stadium, Visakhapatnam' },
-    'maharaja yadavindra':  { id: 1385, name: 'Maharaja Yadavindra Singh International Stadium, Mullanpur' },
-    'mullanpur':            { id: 1385, name: 'Maharaja Yadavindra Singh International Stadium, Mullanpur' },
-    'holkar':               { id: 1096, name: 'Holkar Cricket Stadium, Indore' },
-    'indore':               { id: 1096, name: 'Holkar Cricket Stadium, Indore' },
-    'mca stadium':          { id: 353,  name: 'MCA International Stadium, Pune' },
-    'gahunje':              { id: 353,  name: 'MCA International Stadium, Pune' },
-    'pune':                 { id: 353,  name: 'MCA International Stadium, Pune' },
-    'jsca':                 { id: 1277, name: 'JSCA International Stadium Complex, Ranchi' },
-    'ranchi':               { id: 1277, name: 'JSCA International Stadium Complex, Ranchi' },
-    'greenfield':           { id: 1327, name: 'Greenfield International Stadium, Thiruvananthapuram' },
-    'the sports hub':       { id: 1327, name: 'Greenfield International Stadium, Thiruvananthapuram' },
-    'thiruvananthapuram':   { id: 1327, name: 'Greenfield International Stadium, Thiruvananthapuram' },
-    'trivandrum':           { id: 1327, name: 'Greenfield International Stadium, Thiruvananthapuram' },
+    'wankhede': { id: 713, name: 'Wankhede Stadium, Mumbai' },
+    'mumbai': { id: 713, name: 'Wankhede Stadium, Mumbai' },
+    'eden gardens': { id: 292, name: 'Eden Gardens, Kolkata' },
+    'kolkata': { id: 292, name: 'Eden Gardens, Kolkata' },
+    'ma chidambaram': { id: 291, name: 'MA Chidambaram Stadium, Chennai' },
+    'm. a. chidambaram': { id: 291, name: 'MA Chidambaram Stadium, Chennai' },
+    'chidambaram': { id: 291, name: 'MA Chidambaram Stadium, Chennai' },
+    'chepauk': { id: 291, name: 'MA Chidambaram Stadium, Chennai' },
+    'chennai': { id: 291, name: 'MA Chidambaram Stadium, Chennai' },
+    'arun jaitley': { id: 333, name: 'Arun Jaitley Stadium, Delhi' },
+    'feroz shah kotla': { id: 333, name: 'Arun Jaitley Stadium, Delhi' },
+    'delhi': { id: 333, name: 'Arun Jaitley Stadium, Delhi' },
+    'm. chinnaswamy': { id: 683, name: 'M. Chinnaswamy Stadium, Bengaluru' },
+    'chinnaswamy': { id: 683, name: 'M. Chinnaswamy Stadium, Bengaluru' },
+    'bangalore': { id: 683, name: 'M. Chinnaswamy Stadium, Bengaluru' },
+    'bengaluru': { id: 683, name: 'M. Chinnaswamy Stadium, Bengaluru' },
+    'narendra modi': { id: 840, name: 'Narendra Modi Stadium, Ahmedabad' },
+    'sardar patel': { id: 840, name: 'Narendra Modi Stadium, Ahmedabad' },
+    'motera': { id: 840, name: 'Narendra Modi Stadium, Ahmedabad' },
+    'ahmedabad': { id: 840, name: 'Narendra Modi Stadium, Ahmedabad' },
+    'rajiv gandhi': { id: 1981, name: 'Rajiv Gandhi International Stadium, Hyderabad' },
+    'uppal': { id: 1981, name: 'Rajiv Gandhi International Stadium, Hyderabad' },
+    'hyderabad': { id: 1981, name: 'Rajiv Gandhi International Stadium, Hyderabad' },
+    'hpca': { id: 1920, name: 'HPCA Stadium, Dharamsala' },
+    'dharamsala': { id: 1920, name: 'HPCA Stadium, Dharamsala' },
+    'himachal pradesh': { id: 1920, name: 'HPCA Stadium, Dharamsala' },
+    'vidarbha': { id: 2399, name: 'VCA Stadium, Nagpur' },
+    'vca stadium': { id: 2399, name: 'VCA Stadium, Nagpur' },
+    'nagpur': { id: 2399, name: 'VCA Stadium, Nagpur' },
+    'sawai mansingh': { id: 664, name: 'Sawai Mansingh Stadium, Jaipur' },
+    'jaipur': { id: 664, name: 'Sawai Mansingh Stadium, Jaipur' },
+    'barabati': { id: 442, name: 'Barabati Stadium, Cuttack' },
+    'cuttack': { id: 442, name: 'Barabati Stadium, Cuttack' },
+    'green park': { id: 419, name: 'Green Park, Kanpur' },
+    'kanpur': { id: 419, name: 'Green Park, Kanpur' },
+    'saurashtra': { id: 2401, name: 'Saurashtra Cricket Association Stadium, Rajkot' },
+    'niranjan shah': { id: 2401, name: 'Saurashtra Cricket Association Stadium, Rajkot' },
+    'rajkot': { id: 2401, name: 'Saurashtra Cricket Association Stadium, Rajkot' },
+    'is bindra': { id: 1015, name: 'IS Bindra Stadium, Mohali' },
+    'i. s. bindra': { id: 1015, name: 'IS Bindra Stadium, Mohali' },
+    'bindra': { id: 1015, name: 'IS Bindra Stadium, Mohali' },
+    'pca stadium': { id: 1015, name: 'IS Bindra Stadium, Mohali' },
+    'mohali': { id: 1015, name: 'IS Bindra Stadium, Mohali' },
+    'chandigarh': { id: 1015, name: 'IS Bindra Stadium, Mohali' },
+    'ekana': { id: 3355, name: 'Ekana Cricket Stadium, Lucknow' },
+    'lucknow': { id: 3355, name: 'Ekana Cricket Stadium, Lucknow' },
+    'barsapara': { id: 2865, name: 'Barsapara Cricket Stadium, Guwahati' },
+    'aca stadium': { id: 2865, name: 'Barsapara Cricket Stadium, Guwahati' },
+    'guwahati': { id: 2865, name: 'Barsapara Cricket Stadium, Guwahati' },
+    'aca vdca': { id: 1896, name: 'ACA-VDCA Stadium, Visakhapatnam' },
+    'aca-vdca': { id: 1896, name: 'ACA-VDCA Stadium, Visakhapatnam' },
+    'aca–vdca': { id: 1896, name: 'ACA-VDCA Stadium, Visakhapatnam' },
+    'visakhapatnam': { id: 1896, name: 'ACA-VDCA Stadium, Visakhapatnam' },
+    'maharaja yadavindra': { id: 3585, name: 'Maharaja Yadavindra Singh International Stadium, Mullanpur' },
+    'mullanpur': { id: 3585, name: 'Maharaja Yadavindra Singh International Stadium, Mullanpur' },
+    'holkar': { id: 1055, name: 'Holkar Cricket Stadium, Indore' },
+    'indore': { id: 1055, name: 'Holkar Cricket Stadium, Indore' },
+    'mca stadium': { id: 2677, name: 'MCA International Stadium, Pune' },
+    'gahunje': { id: 2677, name: 'MCA International Stadium, Pune' },
+    'pune': { id: 2677, name: 'MCA International Stadium, Pune' },
+    'jsca': { id: 2575, name: 'JSCA International Stadium Complex, Ranchi' },
+    'ranchi': { id: 2575, name: 'JSCA International Stadium Complex, Ranchi' },
+    'greenfield': { id: 3400, name: 'Greenfield International Stadium, Thiruvananthapuram' },
+    'the sports hub': { id: 3400, name: 'Greenfield International Stadium, Thiruvananthapuram' },
+    'thiruvananthapuram': { id: 3400, name: 'Greenfield International Stadium, Thiruvananthapuram' },
+    'trivandrum': { id: 3400, name: 'Greenfield International Stadium, Thiruvananthapuram' },
     // ── Australia ─────────────────────────────────────────────────────────────
-    'melbourne cricket ground': { id: 20,   name: 'Melbourne Cricket Ground' },
-    'mcg':                  { id: 20,   name: 'Melbourne Cricket Ground' },
-    'melbourne':            { id: 20,   name: 'Melbourne Cricket Ground' },
-    'sydney cricket ground':{ id: 37,   name: 'Sydney Cricket Ground' },
-    'scg':                  { id: 37,   name: 'Sydney Cricket Ground' },
-    'sydney':               { id: 37,   name: 'Sydney Cricket Ground' },
-    'gabba':                { id: 13,   name: 'The Gabba, Brisbane' },
-    'brisbane':             { id: 13,   name: 'The Gabba, Brisbane' },
-    'adelaide oval':        { id: 1,    name: 'Adelaide Oval' },
-    'adelaide':             { id: 1,    name: 'Adelaide Oval' },
-    'optus stadium':        { id: 1236, name: 'Optus Stadium, Perth' },
-    'perth stadium':        { id: 1236, name: 'Optus Stadium, Perth' },
-    'waca':                 { id: 41,   name: 'WACA Ground, Perth' },
-    'perth':                { id: 1236, name: 'Optus Stadium, Perth' },
-    'manuka oval':          { id: 601,  name: 'Manuka Oval, Canberra' },
-    'canberra':             { id: 601,  name: 'Manuka Oval, Canberra' },
-    'blundstone arena':     { id: 7,    name: 'Blundstone Arena, Hobart' },
-    'bellerive oval':       { id: 7,    name: 'Blundstone Arena, Hobart' },
-    'hobart':               { id: 7,    name: 'Blundstone Arena, Hobart' },
-    'stadium australia':    { id: 1321, name: 'Stadium Australia, Sydney' },
+    'melbourne cricket ground': { id: 61, name: 'Melbourne Cricket Ground' },
+    'mcg': { id: 61, name: 'Melbourne Cricket Ground' },
+    'melbourne': { id: 61, name: 'Melbourne Cricket Ground' },
+    'sydney cricket ground': { id: 132, name: 'Sydney Cricket Ground' },
+    'scg': { id: 132, name: 'Sydney Cricket Ground' },
+    'sydney': { id: 132, name: 'Sydney Cricket Ground' },
+    'gabba': { id: 209, name: 'The Gabba, Brisbane' },
+    'brisbane': { id: 209, name: 'The Gabba, Brisbane' },
+    'adelaide oval': { id: 131, name: 'Adelaide Oval' },
+    'adelaide': { id: 131, name: 'Adelaide Oval' },
+    'optus stadium': { id: 3404, name: 'Optus Stadium, Perth' },
+    'perth stadium': { id: 3404, name: 'Optus Stadium, Perth' },
+    'waca': { id: 213, name: 'WACA Ground, Perth' },
+    'manuka oval': { id: 757, name: 'Manuka Oval, Canberra' },
+    'canberra': { id: 757, name: 'Manuka Oval, Canberra' },
+    'blundstone arena': { id: 905, name: 'Blundstone Arena, Hobart' },
+    'bellerive oval': { id: 905, name: 'Blundstone Arena, Hobart' },
+    'hobart': { id: 905, name: 'Blundstone Arena, Hobart' },
+    'stadium australia': { id: 132, name: 'Stadium Australia, Sydney' },
     // ── England ───────────────────────────────────────────────────────────────
-    "lord's":               { id: 45,   name: "Lord's Cricket Ground, London" },
-    'lords':                { id: 45,   name: "Lord's Cricket Ground, London" },
-    'the oval':             { id: 40,   name: 'The Oval, London' },
-    'kia oval':             { id: 40,   name: 'The Oval, London' },
-    'london':               { id: 45,   name: "Lord's Cricket Ground, London" },
-    'old trafford':         { id: 29,   name: 'Old Trafford, Manchester' },
-    'manchester':           { id: 29,   name: 'Old Trafford, Manchester' },
-    'edgbaston':            { id: 11,   name: 'Edgbaston, Birmingham' },
-    'birmingham':           { id: 11,   name: 'Edgbaston, Birmingham' },
-    'headingley':           { id: 15,   name: 'Headingley, Leeds' },
-    'leeds':                { id: 15,   name: 'Headingley, Leeds' },
-    'trent bridge':         { id: 39,   name: 'Trent Bridge, Nottingham' },
-    'nottingham':           { id: 39,   name: 'Trent Bridge, Nottingham' },
-    "riverside ground":     { id: 25,   name: 'Riverside Ground, Chester-le-Street' },
-    "chester-le-street":    { id: 25,   name: 'Riverside Ground, Chester-le-Street' },
-    'rose bowl':            { id: 314,  name: 'The Rose Bowl, Southampton' },
-    'southampton':          { id: 314,  name: 'The Rose Bowl, Southampton' },
-    "sophia gardens":       { id: 309,  name: 'Sophia Gardens, Cardiff' },
-    'cardiff':              { id: 309,  name: 'Sophia Gardens, Cardiff' },
+    "lord's": { id: 10, name: "Lord's Cricket Ground, London" },
+    'lords': { id: 10, name: "Lord's Cricket Ground, London" },
+    'the oval': { id: 45, name: 'The Oval, London' },
+    'kia oval': { id: 45, name: 'The Oval, London' },
+    'old trafford': { id: 75, name: 'Old Trafford, Manchester' },
+    'manchester': { id: 75, name: 'Old Trafford, Manchester' },
+    'edgbaston': { id: 164, name: 'Edgbaston, Birmingham' },
+    'birmingham': { id: 164, name: 'Edgbaston, Birmingham' },
+    'headingley': { id: 179, name: 'Headingley, Leeds' },
+    'leeds': { id: 179, name: 'Headingley, Leeds' },
+    'trent bridge': { id: 34, name: 'Trent Bridge, Nottingham' },
+    'nottingham': { id: 34, name: 'Trent Bridge, Nottingham' },
+    "riverside ground": { id: 1039, name: 'Riverside Ground, Chester-le-Street' },
+    "chester-le-street": { id: 1039, name: 'Riverside Ground, Chester-le-Street' },
+    'rose bowl': { id: 1184, name: 'The Rose Bowl, Southampton' },
+    'southampton': { id: 1184, name: 'The Rose Bowl, Southampton' },
+    "sophia gardens": { id: 644, name: 'Sophia Gardens, Cardiff' },
+    'cardiff': { id: 644, name: 'Sophia Gardens, Cardiff' },
     // ── Pakistan ──────────────────────────────────────────────────────────────
-    'national stadium':     { id: 31,   name: 'National Stadium, Karachi' },
-    'karachi':              { id: 31,   name: 'National Stadium, Karachi' },
-    'gaddafi':              { id: 24,   name: 'Gaddafi Stadium, Lahore' },
-    'lahore':               { id: 24,   name: 'Gaddafi Stadium, Lahore' },
-    'rawalpindi':           { id: 33,   name: 'Rawalpindi Cricket Stadium' },
-    'multan cricket':       { id: 441,  name: 'Multan Cricket Stadium' },
-    'multan':               { id: 441,  name: 'Multan Cricket Stadium' },
-    'iqbal stadium':        { id: 26,   name: 'Iqbal Stadium, Faisalabad' },
-    'faisalabad':           { id: 26,   name: 'Iqbal Stadium, Faisalabad' },
-    'pindi club':           { id: 33,   name: 'Rawalpindi Cricket Stadium' },
+    'national stadium': { id: 487, name: 'National Stadium, Karachi' },
+    'karachi': { id: 487, name: 'National Stadium, Karachi' },
+    'gaddafi': { id: 545, name: 'Gaddafi Stadium, Lahore' },
+    'lahore': { id: 545, name: 'Gaddafi Stadium, Lahore' },
+    'rawalpindi': { id: 1001, name: 'Rawalpindi Cricket Stadium' },
+    'multan cricket': { id: 1597, name: 'Multan Cricket Stadium' },
+    'multan': { id: 1597, name: 'Multan Cricket Stadium' },
+    'iqbal stadium': { id: 639, name: 'Iqbal Stadium, Faisalabad' },
+    'faisalabad': { id: 639, name: 'Iqbal Stadium, Faisalabad' },
+    'pindi club': { id: 1001, name: 'Rawalpindi Cricket Stadium' },
     // ── South Africa ─────────────────────────────────────────────────────────
-    'newlands':             { id: 8,    name: 'Newlands Cricket Ground, Cape Town' },
-    'cape town':            { id: 8,    name: 'Newlands Cricket Ground, Cape Town' },
-    'wanderers':            { id: 4,    name: 'The Wanderers Stadium, Johannesburg' },
-    'johannesburg':         { id: 4,    name: 'The Wanderers Stadium, Johannesburg' },
-    'kingsmead':            { id: 18,   name: 'Kingsmead, Durban' },
-    'durban':               { id: 18,   name: 'Kingsmead, Durban' },
-    'supersport park':      { id: 3,    name: 'SuperSport Park, Centurion' },
-    'centurion':            { id: 3,    name: 'SuperSport Park, Centurion' },
-    "st george's park":     { id: 36,   name: "St George's Park, Gqeberha" },
-    'port elizabeth':       { id: 36,   name: "St George's Park, Gqeberha" },
-    'gqeberha':             { id: 36,   name: "St George's Park, Gqeberha" },
-    'diamond oval':         { id: 499,  name: 'Diamond Oval, Kimberley' },
-    'kimberley':            { id: 499,  name: 'Diamond Oval, Kimberley' },
-    'buffalo park':         { id: 196,  name: 'Buffalo Park, East London' },
+    'newlands': { id: 174, name: 'Newlands Cricket Ground, Cape Town' },
+    'cape town': { id: 174, name: 'Newlands Cricket Ground, Cape Town' },
+    'wanderers': { id: 508, name: 'The Wanderers Stadium, Johannesburg' },
+    'johannesburg': { id: 508, name: 'The Wanderers Stadium, Johannesburg' },
+    'kingsmead': { id: 302, name: 'Kingsmead, Durban' },
+    'durban': { id: 302, name: 'Kingsmead, Durban' },
+    'supersport park': { id: 902, name: 'SuperSport Park, Centurion' },
+    'centurion': { id: 902, name: 'SuperSport Park, Centurion' },
+    "st george's park": { id: 173, name: "St George's Park, Gqeberha" },
+    'port elizabeth': { id: 173, name: "St George's Park, Gqeberha" },
+    'gqeberha': { id: 173, name: "St George's Park, Gqeberha" },
+    'diamond oval': { id: 703, name: 'Diamond Oval, Kimberley' },
+    'kimberley': { id: 703, name: 'Diamond Oval, Kimberley' },
     // ── Sri Lanka ─────────────────────────────────────────────────────────────
-    'r premadasa':          { id: 119,  name: 'R Premadasa Stadium, Colombo' },
-    'premadasa':            { id: 119,  name: 'R Premadasa Stadium, Colombo' },
-    'sinhalese':            { id: 34,   name: 'Sinhalese Sports Club Ground, Colombo' },
-    'colombo ssc':          { id: 34,   name: 'Sinhalese Sports Club Ground, Colombo' },
-    'colombo':              { id: 119,  name: 'R Premadasa Stadium, Colombo' },
-    'galle':                { id: 159,  name: 'Galle International Stadium' },
-    'pallekele':            { id: 765,  name: 'Pallekele International Cricket Stadium' },
-    'kandy':                { id: 765,  name: 'Pallekele International Cricket Stadium' },
-    'asgiriya':             { id: 65,   name: 'Asgiriya Stadium, Kandy' },
-    'p sara oval':          { id: 35,   name: 'P Sara Oval, Colombo' },
-    'p. sara':              { id: 35,   name: 'P Sara Oval, Colombo' },
-    'dambulla':             { id: 257,  name: 'Rangiri Dambulla International Stadium' },
+    'r premadasa': { id: 1004, name: 'R Premadasa Stadium, Colombo' },
+    'premadasa': { id: 1004, name: 'R Premadasa Stadium, Colombo' },
+    'sinhalese': { id: 679, name: 'Sinhalese Sports Club Ground, Colombo' },
+    'colombo ssc': { id: 679, name: 'Sinhalese Sports Club Ground, Colombo' },
+    'galle': { id: 847, name: 'Galle International Stadium' },
+    'pallekele': { id: 2503, name: 'Pallekele International Cricket Stadium' },
+    'kandy': { id: 2503, name: 'Pallekele International Cricket Stadium' },
+    'asgiriya': { id: 726, name: 'Asgiriya Stadium, Kandy' },
+    'p sara oval': { id: 416, name: 'P Sara Oval, Colombo' },
+    'p. sara': { id: 416, name: 'P Sara Oval, Colombo' },
+    'dambulla': { id: 1434, name: 'Rangiri Dambulla International Stadium' },
     // ── Bangladesh ───────────────────────────────────────────────────────────
-    'shere bangla':         { id: 181,  name: 'Shere Bangla National Stadium, Dhaka' },
-    'mirpur':               { id: 181,  name: 'Shere Bangla National Stadium, Dhaka' },
-    'dhaka':                { id: 181,  name: 'Shere Bangla National Stadium, Dhaka' },
-    'zahur ahmed':          { id: 197,  name: 'Zahur Ahmed Chowdhury Stadium, Chittagong' },
-    'chittagong':           { id: 197,  name: 'Zahur Ahmed Chowdhury Stadium, Chittagong' },
-    'zac':                  { id: 197,  name: 'Zahur Ahmed Chowdhury Stadium, Chittagong' },
-    'sylhet':               { id: 489,  name: 'Sylhet International Cricket Stadium' },
+    'shere bangla': { id: 2025, name: 'Shere Bangla National Stadium, Dhaka' },
+    'mirpur': { id: 2025, name: 'Shere Bangla National Stadium, Dhaka' },
+    'dhaka': { id: 2025, name: 'Shere Bangla National Stadium, Dhaka' },
+    'zahur ahmed': { id: 1931, name: 'Zahur Ahmed Chowdhury Stadium, Chittagong' },
+    'chittagong': { id: 1931, name: 'Zahur Ahmed Chowdhury Stadium, Chittagong' },
+    'zac': { id: 1931, name: 'Zahur Ahmed Chowdhury Stadium, Chittagong' },
+    'sylhet': { id: 1564, name: 'Sylhet International Cricket Stadium' },
     // ── West Indies ──────────────────────────────────────────────────────────
-    'kensington oval':      { id: 52,   name: 'Kensington Oval, Bridgetown' },
-    'bridgetown':           { id: 52,   name: 'Kensington Oval, Bridgetown' },
-    'barbados':             { id: 52,   name: 'Kensington Oval, Bridgetown' },
-    "queen's park oval":    { id: 53,   name: "Queen's Park Oval, Port of Spain" },
-    'port of spain':        { id: 53,   name: "Queen's Park Oval, Port of Spain" },
-    'trinidad':             { id: 53,   name: "Queen's Park Oval, Port of Spain" },
-    'sabina park':          { id: 55,   name: 'Sabina Park, Kingston' },
-    'kingston':             { id: 55,   name: 'Sabina Park, Kingston' },
-    'jamaica':              { id: 55,   name: 'Sabina Park, Kingston' },
-    'sir vivian richards':  { id: 378,  name: 'Sir Vivian Richards Stadium, Antigua' },
-    'antigua':              { id: 378,  name: 'Sir Vivian Richards Stadium, Antigua' },
-    'providence':           { id: 430,  name: 'Providence Stadium, Guyana' },
-    'guyana':               { id: 430,  name: 'Providence Stadium, Guyana' },
-    'grenada':              { id: 393,  name: 'National Cricket Stadium, Grenada' },
-    'windward':             { id: 429,  name: 'Windsor Park, Dominica' },
-    'dominica':             { id: 429,  name: 'Windsor Park, Dominica' },
-    'daren sammy':          { id: 409,  name: 'Daren Sammy Cricket Ground, St Lucia' },
-    'st lucia':             { id: 409,  name: 'Daren Sammy Cricket Ground, St Lucia' },
-    'brian lara':           { id: 1296, name: 'Brian Lara Cricket Academy, Tarouba' },
+    'kensington oval': { id: 199, name: 'Kensington Oval, Bridgetown' },
+    'bridgetown': { id: 199, name: 'Kensington Oval, Bridgetown' },
+    'barbados': { id: 199, name: 'Kensington Oval, Bridgetown' },
+    "queen's park oval": { id: 208, name: "Queen's Park Oval, Port of Spain" },
+    'port of spain': { id: 208, name: "Queen's Park Oval, Port of Spain" },
+    'trinidad': { id: 208, name: "Queen's Park Oval, Port of Spain" },
+    'sabina park': { id: 200, name: 'Sabina Park, Kingston' },
+    'kingston': { id: 200, name: 'Sabina Park, Kingston' },
+    'jamaica': { id: 200, name: 'Sabina Park, Kingston' },
+    'sir vivian richards': { id: 1985, name: 'Sir Vivian Richards Stadium, Antigua' },
+    'antigua': { id: 1985, name: 'Sir Vivian Richards Stadium, Antigua' },
+    'providence': { id: 1986, name: 'Providence Stadium, Guyana' },
+    'guyana': { id: 1986, name: 'Providence Stadium, Guyana' },
+    'grenada': { id: 1131, name: 'National Cricket Stadium, Grenada' },
+    'windward': { id: 629, name: 'Windsor Park, Dominica' },
+    'dominica': { id: 629, name: 'Windsor Park, Dominica' },
+    'daren sammy': { id: 1697, name: 'Daren Sammy Cricket Ground, St Lucia' },
+    'st lucia': { id: 1697, name: 'Daren Sammy Cricket Ground, St Lucia' },
+    'brian lara': { id: 2041, name: 'Brian Lara Cricket Academy, Tarouba' },
     // ── UAE ───────────────────────────────────────────────────────────────────
-    'dubai international':  { id: 496,  name: 'Dubai International Cricket Stadium' },
-    'dubai':                { id: 496,  name: 'Dubai International Cricket Stadium' },
-    'sheikh zayed':         { id: 497,  name: 'Sheikh Zayed Stadium, Abu Dhabi' },
-    'abu dhabi':            { id: 497,  name: 'Sheikh Zayed Stadium, Abu Dhabi' },
-    'sharjah':              { id: 35,   name: 'Sharjah Cricket Stadium' },
-    // ── Afghanistan ──────────────────────────────────────────────────────────
-    'asghar afghan':        { id: 1214, name: 'Asghar Afghan Stadium, Kabul' },
-    'kabul':                { id: 1214, name: 'Asghar Afghan Stadium, Kabul' },
-    'kandahar':             { id: 1215, name: 'Ahmad Shah Abdali Cricket Ground, Kandahar' },
+    'dubai international': { id: 2439, name: 'Dubai International Cricket Stadium' },
+    'dubai': { id: 2439, name: 'Dubai International Cricket Stadium' },
+    'sheikh zayed': { id: 1965, name: 'Sheikh Zayed Stadium, Abu Dhabi' },
+    'abu dhabi': { id: 1965, name: 'Sheikh Zayed Stadium, Abu Dhabi' },
+    'sharjah': { id: 848, name: 'Sharjah Cricket Stadium' },
     // ── Zimbabwe ─────────────────────────────────────────────────────────────
-    'harare sports club':   { id: 73,   name: 'Harare Sports Club' },
-    'harare':               { id: 73,   name: 'Harare Sports Club' },
-    'queens sports club':   { id: 74,   name: "Queens Sports Club, Bulawayo" },
-    'bulawayo':             { id: 74,   name: "Queens Sports Club, Bulawayo" },
+    'harare sports club': { id: 260, name: 'Harare Sports Club' },
+    'harare': { id: 260, name: 'Harare Sports Club' },
+    'queens sports club': { id: 261, name: "Queens Sports Club, Bulawayo" },
+    'bulawayo': { id: 261, name: "Queens Sports Club, Bulawayo" },
     // ── New Zealand ──────────────────────────────────────────────────────────
-    'eden park':            { id: 10,   name: 'Eden Park, Auckland' },
-    'auckland':             { id: 10,   name: 'Eden Park, Auckland' },
-    'basin reserve':        { id: 5,    name: 'Basin Reserve, Wellington' },
-    'wellington':           { id: 5,    name: 'Basin Reserve, Wellington' },
-    'hagley oval':          { id: 935,  name: 'Hagley Oval, Christchurch' },
-    'christchurch':         { id: 935,  name: 'Hagley Oval, Christchurch' },
-    'seddon park':          { id: 21,   name: 'Seddon Park, Hamilton' },
-    'hamilton':             { id: 21,   name: 'Seddon Park, Hamilton' },
-    'mclean park':          { id: 22,   name: 'McLean Park, Napier' },
-    'napier':               { id: 22,   name: 'McLean Park, Napier' },
-    'university oval':      { id: 396,  name: 'University Oval, Dunedin' },
-    'dunedin':              { id: 396,  name: 'University Oval, Dunedin' },
+    'eden park': { id: 283, name: 'Eden Park, Auckland' },
+    'auckland': { id: 283, name: 'Eden Park, Auckland' },
+    'basin reserve': { id: 116, name: 'Basin Reserve, Wellington' },
+    'wellington': { id: 116, name: 'Basin Reserve, Wellington' },
+    'hagley oval': { id: 93, name: 'Hagley Oval, Christchurch' },
+    'christchurch': { id: 93, name: 'Hagley Oval, Christchurch' },
+    'seddon park': { id: 504, name: 'Seddon Park, Hamilton' },
+    'hamilton': { id: 504, name: 'Seddon Park, Hamilton' },
+    'mclean park': { id: 453, name: 'McLean Park, Napier' },
+    'napier': { id: 453, name: 'McLean Park, Napier' },
+    'university oval': { id: 769, name: 'University Oval, Dunedin' },
+    'dunedin': { id: 769, name: 'University Oval, Dunedin' },
     // ── Ireland ──────────────────────────────────────────────────────────────
-    'village':              { id: 618,  name: 'The Village, Dublin' },
-    'dublin':               { id: 618,  name: 'The Village, Dublin' },
+    'village': { id: 974, name: 'The Village, Dublin' },
+    'dublin': { id: 974, name: 'The Village, Dublin' },
     // ── Scotland ─────────────────────────────────────────────────────────────
-    'grange':               { id: 693,  name: 'The Grange Cricket Club, Edinburgh' },
-    'edinburgh':            { id: 693,  name: 'The Grange Cricket Club, Edinburgh' },
+    'grange': { id: 237, name: 'The Grange Cricket Club, Edinburgh' },
+    'edinburgh': { id: 237, name: 'The Grange Cricket Club, Edinburgh' },
 };
 
 /**
@@ -288,18 +280,18 @@ async function resolveESPNGroundDynamic(groundName) {
     // It won't filter perfectly, but the top results will have the correct ground ID in their links
     // We search using the team match view filtered by orderby=start to get all matches
     const encoded = encodeURIComponent(groundName.trim());
-    
+
     // Use the batting records page — Statsguru will show results for grounds
     // that fuzzy-match the ground name in the ordering. The key insight: 
     // The batting leaders URL with groundname= parameter works on the match-list view 
     const searchUrl = `https://stats.espncricinfo.com/ci/engine/stats/index.html?class=11;filter=advanced;groundname=${encoded};template=results;type=batting`;
-    
+
     try {
         const res = await fetchESPN(searchUrl);
         if (res.status !== 200) return null;
-        
+
         const $ = cheerio.load(res.html);
-        
+
         // Extract all ground IDs mentioned in links on this page
         const groundIds = new Set();
         $('a[href*="ground="]').each((_, a) => {
@@ -307,7 +299,7 @@ async function resolveESPNGroundDynamic(groundName) {
             const m = href.match(/ground=(\d+)/);
             if (m) groundIds.add(m[1]);
         });
-        
+
         // If exactly one unique ground ID was found in results, that's our match
         const ids = [...groundIds];
         if (ids.length === 1) {
@@ -316,7 +308,7 @@ async function resolveESPNGroundDynamic(groundName) {
             console.log(`[ESPN] Dynamic resolved: "${groundName}" → ID ${ids[0]}`);
             return result;
         }
-        
+
         // If multiple IDs found, try to find the one whose ground page name best matches
         if (ids.length > 1) {
             for (const id of ids.slice(0, 5)) {
@@ -337,7 +329,7 @@ async function resolveESPNGroundDynamic(groundName) {
             _dynamicGroundCache[key] = result;
             return result;
         }
-        
+
         return null;
     } catch (e) {
         console.warn(`[ESPN] Dynamic resolution failed for "${groundName}":`, e.message);
@@ -389,17 +381,17 @@ function parseBattingLeaders(html) {
             // Strip country code "(IND)" from player name
             const name = c[0].replace(/\s*\([A-Z]{2,3}\)\s*$/, '').trim();
             rows.push({
-                rank:    String(i + 1),
+                rank: String(i + 1),
                 name,
-                span:    c[1] || '',
+                span: c[1] || '',
                 matches: parseInt(c[2]) || 0,
                 innings: parseInt(c[3]) || 0,
-                notOut:  parseInt(c[4]) || 0,
-                runs:    parseInt(c[5]) || 0,
-                hs:      c[6] || '-',
-                avg:     parseFloat(c[7]) || 0,
+                notOut: parseInt(c[4]) || 0,
+                runs: parseInt(c[5]) || 0,
+                hs: c[6] || '-',
+                avg: parseFloat(c[7]) || 0,
                 hundreds: parseInt(c[8]) || 0,
-                fifties:  parseInt(c[9]) || 0,
+                fifties: parseInt(c[9]) || 0,
             });
         });
         return rows.slice(0, 15);
@@ -423,20 +415,20 @@ function parseBowlingLeaders(html) {
             if (!c[0] || c[0].includes('No records')) return;
             const name = c[0].replace(/\s*\([A-Z]{2,3}\)\s*$/, '').trim();
             rows.push({
-                rank:    String(i + 1),
+                rank: String(i + 1),
                 name,
-                span:    c[1] || '',
+                span: c[1] || '',
                 matches: parseInt(c[2]) || 0,
                 innings: parseInt(c[3]) || 0,
-                overs:   c[4] || '0',
+                overs: c[4] || '0',
                 wickets: parseInt(c[7]) || 0,
-                bbi:     c[8] || '-',
-                bbm:     c[9] || '-',
-                avg:     parseFloat(c[10]) || 0,
-                econ:    parseFloat(c[11]) || 0,
-                sr:      parseFloat(c[12]) || 0,
+                bbi: c[8] || '-',
+                bbm: c[9] || '-',
+                avg: parseFloat(c[10]) || 0,
+                econ: parseFloat(c[11]) || 0,
+                sr: parseFloat(c[12]) || 0,
                 fiveWkt: parseInt(c[13]) || 0,
-                tenWkt:  parseInt(c[14]) || 0,
+                tenWkt: parseInt(c[14]) || 0,
             });
         });
         return rows.slice(0, 15);
@@ -454,7 +446,7 @@ function parseMatchList(html) {
     try {
         const $ = cheerio.load(html);
         const table = $('table.engineTable').eq(2);
-        
+
         // Group rows into pairs (each match = 2 innings rows: team1 & team2)
         const allRows = [];
         table.find('tr.data1, tr.data2').each((_, row) => {
@@ -465,16 +457,16 @@ function parseMatchList(html) {
         // Deduplicate by date+ground — each match appears twice (one row per team)
         const matchMap = new Map();
         for (const c of allRows) {
-            const date  = c[10] || c[9] || '';
-            const opp   = c[8]  || '';
-            const team  = c[0]  || '';
+            const date = c[10] || c[9] || '';
+            const opp = c[8] || '';
+            const team = c[0] || '';
             const result = c[6] || '';
             const key = `${date}|${opp}`;
             if (!matchMap.has(key)) {
                 matchMap.set(key, { date, team1: team, opp, result, score1: c[1] ? `${c[1]}/${c[2]}` : '' });
             } else {
                 const m = matchMap.get(key);
-                m.team2  = team;
+                m.team2 = team;
                 m.score2 = c[1] ? `${c[1]}/${c[2]}` : '';
             }
         }
@@ -511,7 +503,7 @@ function parseInningsAverages(html) {
 
         let totalRpo = 0, rpoCount = 0;
         let highest = { scoreNum: -1, score: 'N/A', team: 'N/A', year: '' };
-        let lowest  = { scoreNum: 9999, score: 'N/A', team: 'N/A', year: '' };
+        let lowest = { scoreNum: 9999, score: 'N/A', team: 'N/A', year: '' };
 
         // view=innings rows: Team | Score | Overs | RPO | ActualScore | InningsNum | Result | '' | Opposition | Ground | Date
         table.find('tr.data1, tr.data2').each((_, row) => {
@@ -521,7 +513,7 @@ function parseInningsAverages(html) {
             const team = c[0];
             const scoreStrRaw = c[1] || '';
             const score = parseInt(scoreStrRaw) || 0;
-            
+
             let innings = 0;
             let result = '';
             let dateStr = '';
@@ -536,9 +528,9 @@ function parseInningsAverages(html) {
                 result = (c[5] || '').toLowerCase();
                 dateStr = c[9] || '';
             }
-            
+
             const year = dateStr.match(/\d{4}/)?.[0] || '';
-            
+
             // RPO
             const rpo = parseFloat(c[3]);
             if (!isNaN(rpo) && rpo > 0) {
@@ -571,7 +563,7 @@ function parseInningsAverages(html) {
             }
         });
 
-        const avgFirst  = count1st  > 0 ? Math.round(totalRuns1st  / count1st)  : 0;
+        const avgFirst = count1st > 0 ? Math.round(totalRuns1st / count1st) : 0;
         const avgSecond = count2nd > 0 ? Math.round(totalRuns2nd / count2nd) : 0;
         const avgRunRate = rpoCount > 0 ? parseFloat((totalRpo / rpoCount).toFixed(2)) : 0;
         const byYearArr = Object.entries(byYear)
@@ -585,11 +577,11 @@ function parseInningsAverages(html) {
             byYear: byYearArr,
             avgRunRate,
             highestTotal: highest.scoreNum !== -1 ? { score: highest.score, team: highest.team, year: highest.year } : { score: 'N/A', team: 'N/A', year: '' },
-            lowestTotal:  lowest.scoreNum !== 9999 ? { score: lowest.score, team: lowest.team, year: lowest.year } : { score: 'N/A', team: 'N/A', year: '' },
+            lowestTotal: lowest.scoreNum !== 9999 ? { score: lowest.score, team: lowest.team, year: lowest.year } : { score: 'N/A', team: 'N/A', year: '' },
         };
     } catch (e) {
         console.warn('[ESPN] parseInningsAverages error:', e.message);
-        return { 
+        return {
             avgFirst: 0, avgSecond: 0, totalMatches: 0, batFirstWins: 0, batSecondWins: 0, draws: 0, byYear: [],
             avgRunRate: 0, highestTotal: { score: 'N/A', team: 'N/A', year: '' }, lowestTotal: { score: 'N/A', team: 'N/A', year: '' }
         };
@@ -620,10 +612,10 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
     const gid = String(groundId);
     console.log(`[ESPN] Scraping groundId=${gid} (${groundName || 'unknown'}, ${format})`);
 
-    const battingUrl  = `${BASE}?class=${classId};ground=${gid};template=results;type=batting`;
-    const bowlingUrl  = `${BASE}?class=${classId};ground=${gid};template=results;type=bowling`;
-    const matchUrl    = `${BASE}?class=${classId};filter=advanced;ground=${gid};orderby=start;orderbyad=reverse;template=results;type=team;view=match`;
-    const inningsUrl  = `${BASE}?class=${classId};filter=advanced;ground=${gid};groupby=innings;orderby=innings_number;template=results;type=team;view=innings`;
+    const battingUrl = `${BASE}?class=${classId};ground=${gid};template=results;type=batting`;
+    const bowlingUrl = `${BASE}?class=${classId};ground=${gid};template=results;type=bowling`;
+    const matchUrl = `${BASE}?class=${classId};filter=advanced;ground=${gid};orderby=start;orderbyad=reverse;template=results;type=team;view=match`;
+    const inningsUrl = `${BASE}?class=${classId};filter=advanced;ground=${gid};groupby=innings;orderby=innings_number;template=results;type=team;view=innings`;
 
     try {
         const [batRes, bowlRes, matchRes, inningsRes] = await Promise.all([
@@ -633,18 +625,18 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
             fetchESPN(inningsUrl).catch(e => { console.warn('[ESPN] innings fetch error:', e.message); return null; }),
         ]);
 
-        const battingLeaders  = batRes?.status === 200  ? parseBattingLeaders(batRes.html)  : [];
-        const bowlingLeaders  = bowlRes?.status === 200 ? parseBowlingLeaders(bowlRes.html) : [];
-        const recentMatches   = matchRes?.status === 200 ? parseMatchList(matchRes.html)    : [];
-        const inningsAvg      = inningsRes?.status === 200 ? parseInningsAverages(inningsRes.html) : {
+        const battingLeaders = batRes?.status === 200 ? parseBattingLeaders(batRes.html) : [];
+        const bowlingLeaders = bowlRes?.status === 200 ? parseBowlingLeaders(bowlRes.html) : [];
+        const recentMatches = matchRes?.status === 200 ? parseMatchList(matchRes.html) : [];
+        const inningsAvg = inningsRes?.status === 200 ? parseInningsAverages(inningsRes.html) : {
             avgFirst: 0, avgSecond: 0, totalMatches: 0,
             batFirstWins: 0, batSecondWins: 0, draws: 0, byYear: [],
         };
 
         const total = inningsAvg.totalMatches;
-        const batFirstWinPct  = total > 0 ? Math.round((inningsAvg.batFirstWins  / total) * 100) : 0;
+        const batFirstWinPct = total > 0 ? Math.round((inningsAvg.batFirstWins / total) * 100) : 0;
         const batSecondWinPct = total > 0 ? Math.round((inningsAvg.batSecondWins / total) * 100) : 0;
-        const drawPct         = total > 0 ? Math.round((inningsAvg.draws         / total) * 100) : 0;
+        const drawPct = total > 0 ? Math.round((inningsAvg.draws / total) * 100) : 0;
 
         const result = {
             source: 'espn_statsguru',
@@ -652,27 +644,27 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
             venueName: groundName,
             format,
             // Core stats
-            matchesHosted:        total,
-            avgFirstInningsScore:  inningsAvg.avgFirst,
+            matchesHosted: total,
+            avgFirstInningsScore: inningsAvg.avgFirst,
             avgSecondInningsScore: inningsAvg.avgSecond,
             avgFirstInningsByYear: inningsAvg.byYear,
-            avgRunRate:            inningsAvg.avgRunRate,
-            highestTotal:          inningsAvg.highestTotal,
-            lowestTotal:           inningsAvg.lowestTotal,
+            avgRunRate: inningsAvg.avgRunRate,
+            highestTotal: inningsAvg.highestTotal,
+            lowestTotal: inningsAvg.lowestTotal,
             // Win/loss breakdown
-            wonBattingFirst:   inningsAvg.batFirstWins,
-            wonBattingSecond:  inningsAvg.batSecondWins,
-            draws:             inningsAvg.draws,
+            wonBattingFirst: inningsAvg.batFirstWins,
+            wonBattingSecond: inningsAvg.batSecondWins,
+            draws: inningsAvg.draws,
             batFirstWinPct,
             batSecondWinPct,
             drawPct,
 
             // Match outcomes object (for chart compatibility)
             matchOutcomes: total > 0 ? {
-                batFirstWins:     inningsAvg.batFirstWins,
-                batSecondWins:    inningsAvg.batSecondWins,
-                draws:            inningsAvg.draws,
-                totalMatches:     total,
+                batFirstWins: inningsAvg.batFirstWins,
+                batSecondWins: inningsAvg.batSecondWins,
+                draws: inningsAvg.draws,
+                totalMatches: total,
                 batFirstWinPct,
                 batSecondWinPct,
                 drawPct,
@@ -702,17 +694,17 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
 export async function scrapeESPNVenueByName(groundName, format = 'Test') {
     // 1. Try static map first (instant)
     let ground = resolveESPNGround(groundName);
-    
+
     // 2. Fall back to dynamic resolution via ESPN Statsguru (covers any stadium)
     if (!ground) {
         console.log(`[ESPN] Static map miss for "${groundName}", trying dynamic resolution...`);
         ground = await resolveESPNGroundDynamic(groundName);
     }
-    
+
     if (!ground) {
         console.log(`[ESPN] Could not resolve ground ID for: "${groundName}"`);
         return null;
     }
-    
+
     return scrapeESPNVenue(ground.id, format, ground.name);
 }
