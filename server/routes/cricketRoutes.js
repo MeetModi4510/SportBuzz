@@ -888,7 +888,7 @@ async function fetchStatGuruGrounds(hostId, classId) {
     }
 }
 
-// â”€â”€ Fuzzy name match: find best StatGuru ground for a Wikipedia venue name â”€â”€â”€â”€
+// ——— Fuzzy name match: find best StatGuru ground for a Wikipedia venue name ———
 function fuzzyMatchGround(wikiName, sgGrounds) {
     const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
     const stopWords = new Set(['the', 'cricket', 'ground', 'stadium', 'sports', 'complex', 'international']);
@@ -908,7 +908,7 @@ function fuzzyMatchGround(wikiName, sgGrounds) {
     return bestScore >= 1 ? best : null;
 }
 
-// â”€â”€ Batch-fetch Wikipedia images for a list of wikiTitles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ——— Batch-fetch Wikipedia images for a list of wikiTitles —————————————————
 async function batchWikipediaImages(wikiTitles) {
     const imageMap = {};
     const batchSize = 50;
@@ -929,12 +929,136 @@ async function batchWikipediaImages(wikiTitles) {
     return imageMap;
 }
 
-// â”€â”€ GET /api/cricket/venues/country/:country â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Fetches the complete venue list from Wikipedia with images
+// ── Country → ESPN ground IDs (canonical, deduplicated) ───────────────────────────────
+// Derived from ESPN_GROUND_MAP — authoritative list of which venues to show per country
+const COUNTRY_ESPN_VENUES = {
+    'India': [
+        { id: 713,  name: 'Wankhede Stadium, Mumbai',                          city: 'Mumbai' },
+        { id: 292,  name: 'Eden Gardens, Kolkata',                              city: 'Kolkata' },
+        { id: 291,  name: 'MA Chidambaram Stadium, Chennai',                    city: 'Chennai' },
+        { id: 333,  name: 'Arun Jaitley Stadium, Delhi',                        city: 'Delhi' },
+        { id: 683,  name: 'M. Chinnaswamy Stadium, Bengaluru',                  city: 'Bengaluru' },
+        { id: 840,  name: 'Narendra Modi Stadium, Ahmedabad',                   city: 'Ahmedabad' },
+        { id: 1981, name: 'Rajiv Gandhi International Stadium, Hyderabad',      city: 'Hyderabad' },
+        { id: 1920, name: 'HPCA Stadium, Dharamsala',                           city: 'Dharamsala' },
+        { id: 2399, name: 'VCA Stadium, Nagpur',                                city: 'Nagpur' },
+        { id: 664,  name: 'Sawai Mansingh Stadium, Jaipur',                     city: 'Jaipur' },
+        { id: 442,  name: 'Barabati Stadium, Cuttack',                          city: 'Cuttack' },
+        { id: 419,  name: 'Green Park, Kanpur',                                 city: 'Kanpur' },
+        { id: 2401, name: 'Saurashtra Cricket Association Stadium, Rajkot',     city: 'Rajkot' },
+        { id: 1015, name: 'IS Bindra Stadium, Mohali',                          city: 'Mohali' },
+        { id: 3355, name: 'Ekana Cricket Stadium, Lucknow',                     city: 'Lucknow' },
+        { id: 2865, name: 'Barsapara Cricket Stadium, Guwahati',                city: 'Guwahati' },
+        { id: 1896, name: 'ACA-VDCA Stadium, Visakhapatnam',                   city: 'Visakhapatnam' },
+        { id: 3585, name: 'Maharaja Yadavindra Singh International Stadium, Mullanpur', city: 'Mullanpur' },
+        { id: 1055, name: 'Holkar Cricket Stadium, Indore',                     city: 'Indore' },
+        { id: 2677, name: 'MCA International Stadium, Pune',                    city: 'Pune' },
+        { id: 2575, name: 'JSCA International Stadium Complex, Ranchi',         city: 'Ranchi' },
+        { id: 3400, name: 'Greenfield International Stadium, Thiruvananthapuram', city: 'Thiruvananthapuram' },
+    ],
+    'Australia': [
+        { id: 61,   name: 'Melbourne Cricket Ground',         city: 'Melbourne' },
+        { id: 132,  name: 'Sydney Cricket Ground',            city: 'Sydney' },
+        { id: 209,  name: 'The Gabba, Brisbane',              city: 'Brisbane' },
+        { id: 131,  name: 'Adelaide Oval',                    city: 'Adelaide' },
+        { id: 3404, name: 'Optus Stadium, Perth',             city: 'Perth' },
+        { id: 213,  name: 'WACA Ground, Perth',               city: 'Perth' },
+        { id: 757,  name: 'Manuka Oval, Canberra',            city: 'Canberra' },
+        { id: 905,  name: 'Blundstone Arena, Hobart',         city: 'Hobart' },
+    ],
+    'England': [
+        { id: 10,   name: "Lord's Cricket Ground, London",           city: 'London' },
+        { id: 45,   name: 'The Oval, London',                         city: 'London' },
+        { id: 75,   name: 'Old Trafford, Manchester',                 city: 'Manchester' },
+        { id: 164,  name: 'Edgbaston, Birmingham',                    city: 'Birmingham' },
+        { id: 179,  name: 'Headingley, Leeds',                        city: 'Leeds' },
+        { id: 34,   name: 'Trent Bridge, Nottingham',                 city: 'Nottingham' },
+        { id: 1039, name: 'Riverside Ground, Chester-le-Street',      city: 'Chester-le-Street' },
+        { id: 1184, name: 'The Rose Bowl, Southampton',               city: 'Southampton' },
+        { id: 644,  name: 'Sophia Gardens, Cardiff',                  city: 'Cardiff' },
+    ],
+    'Pakistan': [
+        { id: 487,  name: 'National Stadium, Karachi',        city: 'Karachi' },
+        { id: 545,  name: 'Gaddafi Stadium, Lahore',          city: 'Lahore' },
+        { id: 1001, name: 'Rawalpindi Cricket Stadium',       city: 'Rawalpindi' },
+        { id: 1597, name: 'Multan Cricket Stadium',           city: 'Multan' },
+        { id: 639,  name: 'Iqbal Stadium, Faisalabad',        city: 'Faisalabad' },
+    ],
+    'South Africa': [
+        { id: 174,  name: 'Newlands Cricket Ground, Cape Town',       city: 'Cape Town' },
+        { id: 508,  name: 'The Wanderers Stadium, Johannesburg',      city: 'Johannesburg' },
+        { id: 302,  name: 'Kingsmead, Durban',                        city: 'Durban' },
+        { id: 902,  name: 'SuperSport Park, Centurion',               city: 'Centurion' },
+        { id: 173,  name: "St George's Park, Gqeberha",               city: 'Gqeberha' },
+        { id: 703,  name: 'Diamond Oval, Kimberley',                  city: 'Kimberley' },
+    ],
+    'Sri Lanka': [
+        { id: 1004, name: 'R Premadasa Stadium, Colombo',                     city: 'Colombo' },
+        { id: 679,  name: 'Sinhalese Sports Club Ground, Colombo',            city: 'Colombo' },
+        { id: 847,  name: 'Galle International Stadium',                      city: 'Galle' },
+        { id: 2503, name: 'Pallekele International Cricket Stadium',           city: 'Kandy' },
+        { id: 726,  name: 'Asgiriya Stadium, Kandy',                          city: 'Kandy' },
+        { id: 416,  name: 'P Sara Oval, Colombo',                             city: 'Colombo' },
+        { id: 1434, name: 'Rangiri Dambulla International Stadium',           city: 'Dambulla' },
+    ],
+    'Bangladesh': [
+        { id: 2025, name: 'Shere Bangla National Stadium, Dhaka',             city: 'Dhaka' },
+        { id: 1931, name: 'Zahur Ahmed Chowdhury Stadium, Chittagong',        city: 'Chittagong' },
+        { id: 1564, name: 'Sylhet International Cricket Stadium',              city: 'Sylhet' },
+    ],
+    'West Indies': [
+        { id: 199,  name: 'Kensington Oval, Bridgetown',                      city: 'Bridgetown' },
+        { id: 208,  name: "Queen's Park Oval, Port of Spain",                 city: 'Port of Spain' },
+        { id: 200,  name: 'Sabina Park, Kingston',                            city: 'Kingston' },
+        { id: 1985, name: 'Sir Vivian Richards Stadium, Antigua',             city: 'Antigua' },
+        { id: 1986, name: 'Providence Stadium, Guyana',                       city: 'Guyana' },
+        { id: 1131, name: 'National Cricket Stadium, Grenada',                city: 'Grenada' },
+        { id: 629,  name: 'Windsor Park, Dominica',                           city: 'Dominica' },
+        { id: 1697, name: 'Daren Sammy Cricket Ground, St Lucia',             city: 'St Lucia' },
+        { id: 2041, name: 'Brian Lara Cricket Academy, Tarouba',              city: 'Tarouba' },
+    ],
+    'UAE': [
+        { id: 2439, name: 'Dubai International Cricket Stadium',              city: 'Dubai' },
+        { id: 1965, name: 'Sheikh Zayed Stadium, Abu Dhabi',                  city: 'Abu Dhabi' },
+        { id: 848,  name: 'Sharjah Cricket Stadium',                          city: 'Sharjah' },
+    ],
+    'Zimbabwe': [
+        { id: 260,  name: 'Harare Sports Club',                               city: 'Harare' },
+        { id: 261,  name: 'Queens Sports Club, Bulawayo',                     city: 'Bulawayo' },
+    ],
+    'New Zealand': [
+        { id: 283,  name: 'Eden Park, Auckland',                              city: 'Auckland' },
+        { id: 116,  name: 'Basin Reserve, Wellington',                        city: 'Wellington' },
+        { id: 93,   name: 'Hagley Oval, Christchurch',                        city: 'Christchurch' },
+        { id: 504,  name: 'Seddon Park, Hamilton',                            city: 'Hamilton' },
+        { id: 453,  name: 'McLean Park, Napier',                              city: 'Napier' },
+        { id: 769,  name: 'University Oval, Dunedin',                         city: 'Dunedin' },
+    ],
+    'Ireland': [
+        { id: 974,  name: 'The Village, Dublin',                              city: 'Dublin' },
+    ],
+    'Scotland': [
+        { id: 237,  name: 'The Grange Cricket Club, Edinburgh',               city: 'Edinburgh' },
+    ],
+    'Afghanistan': [
+        { id: 1965, name: 'Sheikh Zayed Stadium, Abu Dhabi',                  city: 'Abu Dhabi' },
+    ],
+};
+
+// ── GET /api/cricket/venues/country/:country ────────────────────────────────
+// Returns only venues from the ESPN_GROUND_MAP authoritative list for the given country.
+// Enriches each venue with Wikipedia capacity / match count data and images.
 router.get('/venues/country/:country', async (req, res) => {
     try {
         const { country } = req.params;
 
+        // 1. Get canonical venue list for this country (from ESPN_GROUND_MAP)
+        const canonicalVenues = COUNTRY_ESPN_VENUES[country];
+        if (!canonicalVenues || canonicalVenues.length === 0) {
+            return res.json({ status: 'success', source: 'espn_map', count: 0, data: [] });
+        }
+
+        // 2. Try to fetch Wikipedia table for enrichment (capacity, match counts, images)
         const wikiPageMap = {
             'India':        'List_of_international_cricket_grounds_in_India',
             'Australia':    'List_of_cricket_grounds_in_Australia',
@@ -945,70 +1069,69 @@ router.get('/venues/country/:country', async (req, res) => {
             'Sri Lanka':    'List_of_cricket_grounds_in_Sri_Lanka',
             'Bangladesh':   'List_of_cricket_grounds_in_Bangladesh',
             'UAE':          'List_of_cricket_grounds_in_the_United_Arab_Emirates',
-            'Afghanistan':  'List_of_cricket_grounds_in_Afghanistan',
+            'New Zealand':  'List_of_cricket_grounds_in_New_Zealand',
+            'Zimbabwe':     'List_of_cricket_grounds_in_Zimbabwe',
         };
 
-        const page = wikiPageMap[country] || `List_of_cricket_grounds_in_${country.replace(/ /g, '_')}`;
+        // Build a lookup map: espnGroundId → wiki enrichment data
+        const wikiEnrichment = {}; // espnGroundId → { capacity, tests, odis, t20is, established, wikiTitle }
 
-        // 1. Fetch Wikipedia active stadiums section (section=1)
-        const wikiRes = await axios.get(
-            `https://en.wikipedia.org/w/api.php?action=parse&page=${page}&section=1&prop=wikitext&format=json`,
-            { headers: WIKI_API_HEADERS, timeout: 12000 }
-        );
-        const text = wikiRes.data.parse?.wikitext?.['*'] || '';
+        try {
+            const page = wikiPageMap[country];
+            if (page) {
+                const wikiRes = await axios.get(
+                    `https://en.wikipedia.org/w/api.php?action=parse&page=${page}&section=1&prop=wikitext&format=json`,
+                    { headers: WIKI_API_HEADERS, timeout: 12000 }
+                );
+                const text = wikiRes.data.parse?.wikitext?.['*'] || '';
+                const rows = text.split('|-\n');
 
-        // 2. Parse the wikitable
-        const seen = new Set();
-        const venues = [];
-        const wikiTitles = [];
+                for (const row of rows) {
+                    const cells = row.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'));
+                    if (cells.length < 3) continue;
 
-        const rows = text.split('|-\n');
-        for (const row of rows) {
-            const cells = row.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'));
-            if (cells.length < 3) continue;
+                    const nameRaw = cells[0].replace(/^\|/, '').trim();
+                    const nameMatch = nameRaw.match(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/);
+                    if (!nameMatch) continue;
+                    const wikiTitle = nameMatch[1].trim();
+                    const rawDisplay = (nameMatch[2] || wikiTitle).trim();
+                    const wikiName = rawDisplay.replace(/\{\{[^}]+\}\}/g, '').replace(/\[\[[^\]]+\]\]/g, '').trim();
+                    if (!wikiName) continue;
 
-            // Cell 0 = Name
-            const nameRaw = cells[0].replace(/^\|/, '').trim();
-            const nameMatch = nameRaw.match(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/);
-            if (!nameMatch) continue;
-            const wikiTitle = nameMatch[1].trim();
-            const rawDisplay = (nameMatch[2] || wikiTitle).trim();
-            const name = rawDisplay.replace(/\{\{[^}]+\}\}/g, '').replace(/\[\[[^\]]+\]\]/g, '').trim();
-            if (!name || seen.has(name)) continue;
-            seen.add(name);
+                    const capacity = parseInt(cells[2].replace(/^\|/, '').replace(/,/g, '').replace(/[^0-9]/g, '')) || 0;
+                    const tests  = parseInt(cells[3]?.replace(/^\|/, '').replace(/[^0-9]/g, '')) || 0;
+                    const odis   = parseInt(cells[4]?.replace(/^\|/, '').replace(/[^0-9]/g, '')) || 0;
+                    const t20is  = parseInt(cells[5]?.replace(/^\|/, '').replace(/[^0-9]/g, '')) || 0;
 
-            // Cell 1 = City
-            const cityRaw = cells[1].replace(/^\|/, '').trim();
-            const cityMatch = cityRaw.match(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/);
-            const city = cityMatch ? (cityMatch[2] || cityMatch[1]).trim() : cityRaw.replace(/\[\[|\]\]/g, '').trim();
+                    let established = 'N/A';
+                    const dtsCell = cells[9] || cells[8] || '';
+                    const dtsMatch = dtsCell.match(/\{\{dts[^|]*\|[^|]*\|(\d{4})/);
+                    if (dtsMatch) established = parseInt(dtsMatch[1]);
 
-            // Cell 2 = Capacity
-            const capacity = parseInt(cells[2].replace(/^\|/, '').replace(/,/g, '').replace(/[^0-9]/g, '')) || 0;
-
-            // Cells 3, 4, 5 = Test, ODI, T20I match counts
-            const tests  = parseInt(cells[3]?.replace(/^\|/, '').replace(/[^0-9]/g, '')) || 0;
-            const odis   = parseInt(cells[4]?.replace(/^\|/, '').replace(/[^0-9]/g, '')) || 0;
-            const t20is  = parseInt(cells[5]?.replace(/^\|/, '').replace(/[^0-9]/g, '')) || 0;
-
-            // Cell 9 = First match (established year)
-            let established = 'N/A';
-            const dtsCell = cells[9] || cells[8] || '';
-            const dtsMatch = dtsCell.match(/\{\{dts[^|]*\|[^|]*\|(\d{4})/);
-            if (dtsMatch) established = parseInt(dtsMatch[1]);
-
-            // Resolve ESPN ground ID (static lookup — no extra HTTP call)
-            const espnGround = resolveESPNGround(name);
-            const espnGroundId = espnGround?.id || null;
-            
-            // USER REQUIREMENT: Only show hardcoded venues from ESPN_GROUND_MAP
-            if (!espnGroundId) continue;
-            
-            venues.push({ id: name, name, wikiTitle, city, country, capacity, established, tests, odis, t20is, image: null, espnGroundId });
-            wikiTitles.push(wikiTitle);
+                    // Match this wiki row to a canonical ESPN venue via resolveESPNGround
+                    const espnGround = resolveESPNGround(wikiName);
+                    if (espnGround && espnGround.id) {
+                        // Only enrich if this espnId is actually in our canonical list for this country
+                        const isInList = canonicalVenues.some(v => v.id === espnGround.id);
+                        if (isInList && !wikiEnrichment[espnGround.id]) {
+                            wikiEnrichment[espnGround.id] = { capacity, tests, odis, t20is, established, wikiTitle };
+                        }
+                    }
+                }
+            }
+        } catch (wikiErr) {
+            console.warn('[Venues] Wikipedia enrichment failed (non-fatal):', wikiErr.message);
         }
 
-        // 3. Batch-fetch Wikipedia images (check cache first)
-        const uncached = wikiTitles.filter(t => !getCached(imgCache, t));
+        // 3. Collect wikiTitles for image fetching
+        const wikiTitleToId = {};
+        for (const [id, enrichData] of Object.entries(wikiEnrichment)) {
+            if (enrichData.wikiTitle) wikiTitleToId[enrichData.wikiTitle] = parseInt(id);
+        }
+        const allWikiTitles = Object.keys(wikiTitleToId);
+
+        // 4. Batch-fetch Wikipedia images (check cache first)
+        const uncached = allWikiTitles.filter(t => !getCached(imgCache, t));
         if (uncached.length > 0) {
             const fetched = await batchWikipediaImages(uncached);
             for (const [title, url] of Object.entries(fetched)) {
@@ -1016,32 +1139,33 @@ router.get('/venues/country/:country', async (req, res) => {
             }
         }
 
-        // 4. Merge images into venues
-        for (const v of venues) {
-            v.image = getCached(imgCache, v.wikiTitle) || null;
-        }
+        // 5. Assemble final venue list from canonical ESPN venues, enriched with wiki data
+        const venues = canonicalVenues.map(v => {
+            const enrich = wikiEnrichment[v.id] || {};
+            const image = enrich.wikiTitle ? (getCached(imgCache, enrich.wikiTitle) || null) : null;
+            return {
+                id: v.name,
+                name: v.name,
+                wikiTitle: enrich.wikiTitle || v.name,
+                city: v.city,
+                country,
+                capacity: enrich.capacity || 0,
+                established: enrich.established || 'N/A',
+                tests: enrich.tests || 0,
+                odis: enrich.odis || 0,
+                t20is: enrich.t20is || 0,
+                image,
+                espnGroundId: v.id,
+            };
+        });
 
-        // 5. Fallback to TheSportsDB if Wikipedia parse failed entirely
-        if (venues.length === 0) {
-            const sportsRes = await axios.get(`https://www.thesportsdb.com/api/v1/json/3/search_all_teams.php?s=Cricket&c=${encodeURIComponent(country)}`);
-            const teams = sportsRes.data.teams || [];
-            const fb = [];
-            const seen2 = new Set();
-            for (const t of teams) {
-                if (t.strStadium && !seen2.has(t.strStadium)) {
-                    seen2.add(t.strStadium);
-                    fb.push({ id: t.strStadium, name: t.strStadium, wikiTitle: t.strStadium, city: t.strStadiumLocation || country, country, capacity: t.intStadiumCapacity || 0, established: 'N/A', tests: 0, odis: 0, t20is: 0, image: t.strStadiumThumb || null });
-                }
-            }
-            return res.json({ status: 'success', source: 'sportsdb_fallback', count: fb.length, data: fb });
-        }
-
-        res.json({ status: 'success', source: 'wikipedia', count: venues.length, data: venues });
+        res.json({ status: 'success', source: 'espn_map', count: venues.length, data: venues });
     } catch (e) {
         console.error('[Venues] Error:', e.message);
         res.status(500).json({ status: 'error', message: e.message });
     }
 });
+
 
 // â”€â”€ Cache for Deep Stats to prevent spinning up Chromium too often â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const deepStatsCache = new Map();

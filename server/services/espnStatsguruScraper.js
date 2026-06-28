@@ -439,15 +439,14 @@ function parseBowlingLeaders(html) {
 }
 
 /**
- * Parse match list table.
- * Columns: [0]Team [1]Runs [2]Wkts [3]Balls [4]Ave [5]RPO [6]Result [7]'' [8]Opposition [9]Ground [10]Date
+ * Parse match list table from view=results.
+ * Columns: [0]Team [1]Result [2]Margin [3]Toss [4]Bat [5]'' [6]Opposition [7]Ground [8]Start Date [9]''
  */
 function parseMatchList(html) {
     try {
         const $ = cheerio.load(html);
         const table = $('table.engineTable').eq(2);
 
-        // Group rows into pairs (each match = 2 innings rows: team1 & team2)
         const allRows = [];
         table.find('tr.data1, tr.data2').each((_, row) => {
             const c = $(row).find('td').map((_, td) => $(td).text().trim()).get();
@@ -457,28 +456,37 @@ function parseMatchList(html) {
         // Deduplicate by date+ground — each match appears twice (one row per team)
         const matchMap = new Map();
         for (const c of allRows) {
-            const date = c[10] || c[9] || '';
-            const opp = c[8] || '';
+            const date = c[8] || '';
+            const opp = c[6] || '';
             const team = c[0] || '';
-            const result = c[6] || '';
-            const key = `${date}|${opp}`;
-            if (!matchMap.has(key)) {
-                matchMap.set(key, { date, team1: team, opp, result, score1: c[1] ? `${c[1]}/${c[2]}` : '' });
+            const result = c[1] || '';
+            const margin = c[2] || '';
+            
+            // key using date helps deduplicate the two rows for the same match
+            const key = `${date}|${opp.replace('v ', '').trim()}`;
+            if (!matchMap.has(key) && !matchMap.has(`${date}|${team}`)) {
+                matchMap.set(key, { date, team1: team, opp, result, margin });
             } else {
-                const m = matchMap.get(key);
+                const existingKey = matchMap.has(key) ? key : `${date}|${team}`;
+                const m = matchMap.get(existingKey);
                 m.team2 = team;
-                m.score2 = c[1] ? `${c[1]}/${c[2]}` : '';
             }
         }
 
-        return [...matchMap.values()].map(m => ({
-            date: m.date,
-            teams: m.team2
-                ? `${m.team1} (${m.score1 || '?'}) vs ${m.team2} (${m.score2 || '?'})`
-                : `${m.team1} vs ${m.opp || '?'}`,
-            result: m.result,
-            matchUrl: null,
-        })).slice(0, 20);
+        return [...matchMap.values()].map(m => {
+            let resStr = m.result;
+            if (m.margin && m.margin !== '-') {
+                resStr += ` by ${m.margin}`;
+            }
+            return {
+                date: m.date,
+                teams: m.team2
+                    ? `${m.team1} vs ${m.team2}`
+                    : `${m.team1} ${m.opp}`,
+                result: resStr,
+                matchUrl: null,
+            };
+        }).slice(0, 20);
     } catch (e) {
         console.warn('[ESPN] parseMatchList error:', e.message);
         return [];
@@ -614,7 +622,7 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
 
     const battingUrl = `${BASE}?class=${classId};ground=${gid};template=results;type=batting`;
     const bowlingUrl = `${BASE}?class=${classId};ground=${gid};template=results;type=bowling`;
-    const matchUrl = `${BASE}?class=${classId};filter=advanced;ground=${gid};orderby=start;orderbyad=reverse;template=results;type=team;view=match`;
+    const matchUrl = `${BASE}?class=${classId};filter=advanced;ground=${gid};orderby=start;orderbyad=reverse;template=results;type=team;view=results`;
     const inningsUrl = `${BASE}?class=${classId};filter=advanced;ground=${gid};groupby=innings;orderby=innings_number;template=results;type=team;view=innings`;
 
     try {

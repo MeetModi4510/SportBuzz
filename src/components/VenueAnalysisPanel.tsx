@@ -45,15 +45,16 @@ const FORMAT_TABS: { key: VenueFormat; label: string; icon: string; color: strin
 
 // ─── Small Stat Card ─────────────────────────────────────────────
 const StatCard = ({ label, value, color, icon }: {
-    label: string; value: string | number; color: string; icon?: React.ReactNode;
+    label: string; value: string | number; color?: string; icon?: React.ReactNode;
 }) => (
-    <div className="p-4 bg-secondary/20 rounded-xl border border-border/50 transition-all hover:border-opacity-60"
-        style={{ borderColor: `${color}25` }}>
-        <div className="flex items-center gap-2 mb-1">
-            {icon}
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">{label}</p>
+    <div className="flex flex-col">
+        <div className="flex items-center gap-2 mb-2">
+            {icon && <div className="opacity-80">{icon}</div>}
+            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">{label}</p>
         </div>
-        <p className="text-xl font-bold font-mono" style={{ color }}>{value}</p>
+        <p className="text-3xl font-bold font-mono text-gray-100">
+            {value}
+        </p>
     </div>
 );
 
@@ -94,7 +95,6 @@ const FormatTabs = ({ active, onChange }: { active: VenueFormat; onChange: (f: V
                 )}
                 style={active === tab.key ? { background: `linear-gradient(135deg, ${tab.color}, ${tab.color}cc)` } : undefined}
             >
-                <span className="text-base">{tab.icon}</span>
                 {tab.label}
             </button>
         ))}
@@ -107,35 +107,38 @@ const BattingLeadersTable = ({ leaders, color }: { leaders: VenueDeepStats["batt
         <p className="text-sm text-muted-foreground text-center py-6">No batting data available for this format.</p>
     );
     return (
-        <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+        <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
-                    <tr className="border-b border-border/40">
-                        {["#", "Player", "Inn", "Runs", "Avg", "SR", "HS"].map(h => (
-                            <th key={h} className="py-2 px-3 text-[11px] text-muted-foreground font-medium text-left">{h}</th>
+                    <tr>
+                        {["#", "Player", "Inn", "Runs", "Avg", "SR", "HS"].map((h, i) => (
+                            <th key={h} className={cn(
+                                "pb-3 px-2 text-[10px] uppercase tracking-wider text-white/40 font-medium border-b border-white/5",
+                                i > 1 ? "text-right" : ""
+                            )}>{h}</th>
                         ))}
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-white/5">
                     {leaders.slice(0, 10).map((p, i) => (
-                        <tr key={i} className="border-b border-border/20 hover:bg-secondary/20 transition-colors">
-                            <td className="py-2.5 px-3">
-                                <div className={cn(
-                                    "w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold",
-                                    i === 0 ? "text-yellow-400 bg-yellow-400/15" :
-                                    i === 1 ? "text-slate-400 bg-slate-400/15" :
-                                    i === 2 ? "text-orange-400 bg-orange-400/15" :
-                                    "text-muted-foreground bg-secondary/30"
+                        <tr key={i} className="hover:bg-white/[0.01] transition-colors group">
+                            <td className="py-2.5 px-2 w-8">
+                                <span className={cn(
+                                    "font-mono text-[11px]",
+                                    i === 0 ? "text-yellow-500" :
+                                    i === 1 ? "text-slate-300" :
+                                    i === 2 ? "text-amber-600" :
+                                    "text-white/20"
                                 )}>
-                                    {i + 1}
-                                </div>
+                                    {i < 9 ? `0${i + 1}` : i + 1}
+                                </span>
                             </td>
-                            <td className="py-2.5 px-3 font-medium text-foreground">{p.name}</td>
-                            <td className="py-2.5 px-3 font-mono text-muted-foreground">{p.innings}</td>
-                            <td className="py-2.5 px-3 font-mono font-bold" style={{ color }}>{p.runs}</td>
-                            <td className="py-2.5 px-3 font-mono text-muted-foreground">{p.avg?.toFixed(1) || '-'}</td>
-                            <td className="py-2.5 px-3 font-mono text-muted-foreground">{p.sr?.toFixed(1) || '-'}</td>
-                            <td className="py-2.5 px-3 font-mono text-emerald-400 font-semibold">{p.hs}</td>
+                            <td className="py-2.5 px-2 font-medium text-[13px] text-white/90 group-hover:text-white">{p.name}</td>
+                            <td className="py-2.5 px-2 text-right font-mono text-[12px] text-white/40">{p.innings}</td>
+                            <td className="py-2.5 px-2 text-right font-mono text-[13px] font-semibold text-white">{p.runs}</td>
+                            <td className="py-2.5 px-2 text-right font-mono text-[12px] text-white/40">{p.avg?.toFixed(1) || '-'}</td>
+                            <td className="py-2.5 px-2 text-right font-mono text-[12px] text-white/40">{p.sr?.toFixed(1) || '-'}</td>
+                            <td className="py-2.5 px-2 text-right font-mono text-[12px] text-emerald-400/80">{p.hs}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -150,35 +153,38 @@ const BowlingLeadersTable = ({ leaders, color }: { leaders: VenueDeepStats["bowl
         <p className="text-sm text-muted-foreground text-center py-6">No bowling data available for this format.</p>
     );
     return (
-        <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+        <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
-                    <tr className="border-b border-border/40">
-                        {["#", "Player", "Inn", "Wkts", "Avg", "Econ", "BBI"].map(h => (
-                            <th key={h} className="py-2 px-3 text-[11px] text-muted-foreground font-medium text-left">{h}</th>
+                    <tr>
+                        {["#", "Player", "Inn", "Wkts", "Avg", "Econ", "BBI"].map((h, i) => (
+                            <th key={h} className={cn(
+                                "pb-3 px-2 text-[10px] uppercase tracking-wider text-white/40 font-medium border-b border-white/5",
+                                i > 1 ? "text-right" : ""
+                            )}>{h}</th>
                         ))}
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-white/5">
                     {leaders.slice(0, 10).map((p, i) => (
-                        <tr key={i} className="border-b border-border/20 hover:bg-secondary/20 transition-colors">
-                            <td className="py-2.5 px-3">
-                                <div className={cn(
-                                    "w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold",
-                                    i === 0 ? "text-yellow-400 bg-yellow-400/15" :
-                                    i === 1 ? "text-slate-400 bg-slate-400/15" :
-                                    i === 2 ? "text-orange-400 bg-orange-400/15" :
-                                    "text-muted-foreground bg-secondary/30"
+                        <tr key={i} className="hover:bg-white/[0.01] transition-colors group">
+                            <td className="py-2.5 px-2 w-8">
+                                <span className={cn(
+                                    "font-mono text-[11px]",
+                                    i === 0 ? "text-yellow-500" :
+                                    i === 1 ? "text-slate-300" :
+                                    i === 2 ? "text-amber-600" :
+                                    "text-white/20"
                                 )}>
-                                    {i + 1}
-                                </div>
+                                    {i < 9 ? `0${i + 1}` : i + 1}
+                                </span>
                             </td>
-                            <td className="py-2.5 px-3 font-medium text-foreground">{p.name}</td>
-                            <td className="py-2.5 px-3 font-mono text-muted-foreground">{p.innings}</td>
-                            <td className="py-2.5 px-3 font-mono font-bold" style={{ color }}>{p.wickets}</td>
-                            <td className="py-2.5 px-3 font-mono text-muted-foreground">{p.avg?.toFixed(1) || '-'}</td>
-                            <td className="py-2.5 px-3 font-mono text-muted-foreground">{p.econ?.toFixed(2) || '-'}</td>
-                            <td className="py-2.5 px-3 font-mono text-red-400 font-semibold">{p.bbi}</td>
+                            <td className="py-2.5 px-2 font-medium text-[13px] text-white/90 group-hover:text-white">{p.name}</td>
+                            <td className="py-2.5 px-2 text-right font-mono text-[12px] text-white/40">{p.innings}</td>
+                            <td className="py-2.5 px-2 text-right font-mono text-[13px] font-semibold text-white">{p.wickets}</td>
+                            <td className="py-2.5 px-2 text-right font-mono text-[12px] text-white/40">{p.avg?.toFixed(1) || '-'}</td>
+                            <td className="py-2.5 px-2 text-right font-mono text-[12px] text-white/40">{p.econ?.toFixed(2) || '-'}</td>
+                            <td className="py-2.5 px-2 text-right font-mono text-[12px] text-red-400/80">{p.bbi}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -204,48 +210,71 @@ const RecentMatchesSection = ({ matches, format, color, venueName }: {
     venueName: string;
 }) => {
     if (!matches || matches.length === 0) return (
-        <div className="text-center py-8 text-muted-foreground text-sm">
+        <div className="text-center py-8 text-white/40 text-[13px]">
             No match records found for {venueName} in {format === "All" ? "any format" : format + " cricket"}.
         </div>
     );
     return (
-        <div className="space-y-2.5">
-            {matches.map((m, i) => {
-                const badge = resultBadgeStyle(m.result);
-                return (
-                    <div
-                        key={i}
-                        className="group flex flex-col sm:flex-row sm:items-center justify-between
-                                   gap-2 p-4 rounded-xl border border-border/30 bg-secondary/10
-                                   hover:bg-secondary/20 hover:border-border/50 transition-all duration-200"
-                    >
-                        <div className="flex items-start gap-3 flex-1 min-w-0">
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"
-                                style={{ background: `${color}15`, color }}>
-                                🏏
+        <div className="mt-4">
+            <div className="flex flex-col border-t border-white/5">
+                {matches.map((m, i) => {
+                    const cleanTeams = m.teams.replace(/vs v/gi, 'v').trim();
+                    const teamsArray = cleanTeams.split(/\s+vs\s+|\s+v\s+/i);
+                    const team1 = teamsArray[0]?.trim();
+                    const team2 = teamsArray[1]?.trim();
+                    
+                    let resultText = m.result;
+                    let resultType = (m.result || "").toLowerCase();
+                    
+                    if (team1 && team2) {
+                        if (resultType.includes('won')) {
+                            const margin = m.result.substring(m.result.toLowerCase().indexOf('won') + 3).trim();
+                            resultText = `${team1} won ${margin}`.trim();
+                        } else if (resultType.includes('lost')) {
+                            const margin = m.result.substring(m.result.toLowerCase().indexOf('lost') + 4).trim();
+                            resultText = `${team2} won ${margin}`.trim();
+                            resultType = 'won'; // Color it green since it's a win for someone
+                        } else if (resultType.includes('draw')) {
+                            resultText = `Draw`;
+                        } else if (resultType.includes('tied')) {
+                            resultText = `Tied`;
+                        } else if (resultType.includes('no result') || resultType.includes('aban')) {
+                            resultText = `No Result`;
+                        }
+                    }
+                    
+                    const badge = resultBadgeStyle(resultType);
+
+                    return (
+                        <div
+                            key={i}
+                            className="group flex flex-col sm:flex-row sm:items-center justify-between
+                                       py-3 px-2 border-b border-white/5 hover:bg-white/[0.015] transition-colors"
+                        >
+                            <div className="flex items-center gap-4 flex-1 min-w-0">
+                                <span className="text-[11px] font-mono text-white/30 w-24 shrink-0 uppercase tracking-wider">{m.date}</span>
+                                <p className="text-[13px] font-medium text-white/80 truncate group-hover:text-white transition-colors">
+                                    {cleanTeams}
+                                </p>
                             </div>
-                            <div className="min-w-0">
-                                <p className="text-sm font-semibold text-foreground truncate">{m.teams}</p>
-                                <p className="text-[11px] text-muted-foreground mt-0.5">{m.date}</p>
+                            <div className="flex items-center gap-4 shrink-0 mt-2 sm:mt-0">
+                                <span className={cn(
+                                    "text-[10px] uppercase tracking-widest font-semibold",
+                                    badge.text
+                                )}>
+                                    {resultText}
+                                </span>
+                                {m.matchUrl && (
+                                    <a href={m.matchUrl} target="_blank" rel="noopener noreferrer"
+                                        className="text-white/20 hover:text-white transition-colors opacity-0 group-hover:opacity-100">
+                                        <ExternalLink size={14} />
+                                    </a>
+                                )}
                             </div>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                            <span className={cn(
-                                "text-[11px] font-medium px-2.5 py-1 rounded-full border",
-                                badge.bg, badge.text, badge.border
-                            )}>
-                                {m.result || "No Result"}
-                            </span>
-                            {m.matchUrl && (
-                                <a href={m.matchUrl} target="_blank" rel="noopener noreferrer"
-                                    className="text-muted-foreground hover:text-foreground transition-colors opacity-0 group-hover:opacity-100">
-                                    <ExternalLink size={14} />
-                                </a>
-                            )}
-                        </div>
-                    </div>
-                );
-            })}
+                    );
+                })}
+            </div>
         </div>
     );
 };
@@ -301,23 +330,25 @@ const CricketDeepStatsPanel = ({
     return (
         <div className="space-y-6 animate-fade-in">
             {/* ── Key stats grid ── */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                <StatCard label="Matches Hosted" value={deepStats.matchesHosted || 0} color={color}
-                    icon={<Calendar size={14} style={{ color }} />} />
-                <StatCard label="Avg 1st Innings"  value={deepStats.avgFirstInningsScore  || "—"} color={color}
-                    icon={<BarChart3 size={14} style={{ color }} />} />
-                <StatCard label="Avg 2nd Innings"  value={deepStats.avgSecondInningsScore || "—"} color={color}
-                    icon={<BarChart3 size={14} style={{ color }} />} />
-                <StatCard label="Avg Run Rate"      value={deepStats.avgRunRate || "—"}            color={color}
-                    icon={<TrendingUp size={14} style={{ color }} />} />
-                <StatCard label="Bat First Win %"   value={`${batFirstPct}%`}   color="#8b5cf6"
-                    icon={<Trophy size={14} style={{ color: "#8b5cf6" }} />} />
-                <StatCard label="Bat 2nd Win %"     value={`${batSecondPct}%`}  color="#06b6d4"
-                    icon={<Shield size={14} style={{ color: "#06b6d4" }} />} />
-                <StatCard label="Centuries"         value={deepStats.centuries || 0}               color="#eab308"
-                    icon={<Star size={14} style={{ color: "#eab308" }} />} />
-                <StatCard label="5-Wicket Hauls"    value={deepStats.fiveWicketHauls || 0}         color="#ef4444"
-                    icon={<Flame size={14} style={{ color: "#ef4444" }} />} />
+            <div className="bg-[#141414] rounded-3xl p-6 md:p-8 border border-white/[0.03] shadow-2xl">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-10 gap-x-6">
+                    <StatCard label="Matches Hosted" value={deepStats.matchesHosted || 0} color={color}
+                        icon={<Calendar size={14} style={{ color }} />} />
+                    <StatCard label="Avg 1st Innings"  value={deepStats.avgFirstInningsScore  || "—"} color={color}
+                        icon={<BarChart3 size={14} style={{ color }} />} />
+                    <StatCard label="Avg 2nd Innings"  value={deepStats.avgSecondInningsScore || "—"} color={color}
+                        icon={<BarChart3 size={14} style={{ color }} />} />
+                    <StatCard label="Avg Run Rate"      value={deepStats.avgRunRate || "—"}            color={color}
+                        icon={<TrendingUp size={14} style={{ color }} />} />
+                    <StatCard label="Bat First Win %"   value={`${batFirstPct}%`}   color="#8b5cf6"
+                        icon={<Trophy size={14} style={{ color: "#8b5cf6" }} />} />
+                    <StatCard label="Bat 2nd Win %"     value={`${batSecondPct}%`}  color="#06b6d4"
+                        icon={<Shield size={14} style={{ color: "#06b6d4" }} />} />
+                    <StatCard label="Centuries"         value={deepStats.centuries || 0}               color="#eab308"
+                        icon={<Star size={14} style={{ color: "#eab308" }} />} />
+                    <StatCard label="5-Wicket Hauls"    value={deepStats.fiveWicketHauls || 0}         color="#ef4444"
+                        icon={<Flame size={14} style={{ color: "#ef4444" }} />} />
+                </div>
             </div>
 
             {/* ── Format breakdown pills ── */}
@@ -337,7 +368,9 @@ const CricketDeepStatsPanel = ({
             )}
 
             {/* ── Charts row: Innings avg, Win dist, Toss ── */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className={cn("grid grid-cols-1 gap-5", 
+                (deepStats.tossWinBatFirst > 0 || deepStats.tossWinFieldFirst > 0) ? "md:grid-cols-3" : "md:grid-cols-2"
+            )}>
                 <Section icon={<BarChart3 size={16} style={{ color }} />} title="Innings Comparison"
                     subtitle="Avg score: 1st vs 2nd innings">
                     <div className="h-[200px]">
@@ -411,7 +444,7 @@ const CricketDeepStatsPanel = ({
             {/* ── Avg 1st innings by year (line chart) ── */}
             {avgFirstInningsByYear && avgFirstInningsByYear.length > 1 && (
                 <Section icon={<TrendingUp size={16} style={{ color }} />} title="Average 1st Innings Score Trend"
-                    subtitle="How batting conditions have evolved year by year (Cricmetric)">
+                    subtitle="How batting conditions have evolved year by year">
                     <div className="h-[220px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart
@@ -481,52 +514,63 @@ const CricketDeepStatsPanel = ({
             {/* ── Batting & Bowling Leaders ── */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
                 <Section icon={<Award size={16} style={{ color }} />} title="Batting Leaders"
-                    subtitle={`Top run-scorers at this venue in ${format === "All" ? "all formats" : format} (ESPN)`}>
+                    subtitle={`Top run-scorers at this venue in ${format === "All" ? "all formats" : format}`}>
                     <BattingLeadersTable leaders={battingLeaders || deepStats.battingLeaders || []} color={color} />
                 </Section>
                 <Section icon={<Swords size={16} style={{ color: "#ef4444" }} />} title="Bowling Leaders"
-                    subtitle={`Top wicket-takers at this venue in ${format === "All" ? "all formats" : format} (ESPN)`}>
+                    subtitle={`Top wicket-takers at this venue in ${format === "All" ? "all formats" : format}`}>
                     <BowlingLeadersTable leaders={bowlingLeaders || deepStats.bowlingLeaders || []} color="#ef4444" />
                 </Section>
             </div>
 
-            {/* ── Pitch info ── */}
-            <div className="p-4 bg-secondary/15 rounded-xl border border-border/30">
-                <div className="flex items-center gap-2 mb-1">
-                    <Activity size={14} style={{ color }} />
-                    <span className="text-xs font-semibold text-foreground">Pitch Characteristics</span>
-                </div>
-                <p className="text-sm text-muted-foreground">{deepStats.pitchType}</p>
-            </div>
+
 
             {/* ── Highest/Lowest ── */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 bg-secondary/15 rounded-xl border border-green-500/20">
-                    <p className="text-[10px] uppercase text-muted-foreground tracking-wider mb-1">Highest Total</p>
-                    <p className="text-2xl font-bold font-mono text-green-400">{deepStats.highestTotal?.score}</p>
+            <div className="grid grid-cols-2 mt-8 border-t border-white/5">
+                <div className="py-5 pr-6 border-r border-white/5">
+                    <p className="text-[10px] uppercase tracking-wider text-white/40 mb-2 font-medium">Highest Total</p>
+                    <p className="text-3xl font-mono text-white">{deepStats.highestTotal?.score}</p>
                     {deepStats.highestTotal?.team && deepStats.highestTotal.team !== "—" && (
-                        <p className="text-xs text-muted-foreground mt-1">{deepStats.highestTotal.team} ({deepStats.highestTotal.year})</p>
+                        <p className="text-[12px] text-white/60 mt-1">
+                            {deepStats.highestTotal.team} <span className="text-white/30 ml-1">({deepStats.highestTotal.year})</span>
+                        </p>
                     )}
                 </div>
-                <div className="p-4 bg-secondary/15 rounded-xl border border-red-500/20">
-                    <p className="text-[10px] uppercase text-muted-foreground tracking-wider mb-1">Lowest Total</p>
-                    <p className="text-2xl font-bold font-mono text-red-400">{deepStats.lowestTotal?.score}</p>
+                
+                <div className="py-5 pl-6">
+                    <p className="text-[10px] uppercase tracking-wider text-white/40 mb-2 font-medium">Lowest Total</p>
+                    <p className="text-3xl font-mono text-white">{deepStats.lowestTotal?.score}</p>
                     {deepStats.lowestTotal?.team && deepStats.lowestTotal.team !== "—" && (
-                        <p className="text-xs text-muted-foreground mt-1">{deepStats.lowestTotal.team} ({deepStats.lowestTotal.year})</p>
+                        <p className="text-[12px] text-white/60 mt-1">
+                            {deepStats.lowestTotal.team} <span className="text-white/30 ml-1">({deepStats.lowestTotal.year})</span>
+                        </p>
                     )}
                 </div>
             </div>
 
             {/* ── Recent Matches ── */}
-            <Section icon={<Calendar size={16} style={{ color }} />} title="Recent Matches"
-                subtitle={`Last ${(recentMatches || deepStats.recentMatches || []).length} matches at this venue in ${format === "All" ? "all formats" : format} (ESPN)`}>
-                <RecentMatchesSection
-                    matches={recentMatches || deepStats.recentMatches || []}
-                    format={format}
-                    color={color}
-                    venueName={venueName}
-                />
-            </Section>
+            {(() => {
+                const rawMatches = recentMatches || deepStats.recentMatches || [];
+                const uniqueMatches = [];
+                const seenDates = new Set();
+                for (const m of rawMatches) {
+                    if (!seenDates.has(m.date)) {
+                        uniqueMatches.push(m);
+                        seenDates.add(m.date);
+                    }
+                }
+                return (
+                    <Section icon={<Calendar size={16} style={{ color }} />} title="Recent Matches"
+                        subtitle={`Last ${uniqueMatches.length} matches at this venue in ${format === "All" ? "all formats" : format}`}>
+                        <RecentMatchesSection
+                            matches={uniqueMatches}
+                            format={format}
+                            color={color}
+                            venueName={venueName}
+                        />
+                    </Section>
+                );
+            })()}
         </div>
     );
 };
@@ -540,15 +584,17 @@ const FootballDetail = ({ stats, color }: { stats: FootballVenueStats; color: st
     ];
     return (
         <div className="space-y-5">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                <StatCard label="Matches Hosted" value={stats.matchesHosted.toLocaleString()} color={color} icon={<Calendar size={14} style={{ color }} />} />
-                <StatCard label="Avg Goals/Match" value={stats.avgGoalsPerMatch} color={color} icon={<Target size={14} style={{ color }} />} />
-                <StatCard label="Home Win %" value={`${stats.homeWinPct}%`} color="#10b981" icon={<Trophy size={14} style={{ color: "#10b981" }} />} />
-                <StatCard label="Away Win %" value={`${stats.awayWinPct}%`} color="#ef4444" icon={<Shield size={14} style={{ color: "#ef4444" }} />} />
-                <StatCard label="Draw %" value={`${stats.drawPct}%`} color="#94a3b8" icon={<Activity size={14} style={{ color: "#94a3b8" }} />} />
-                <StatCard label="Clean Sheet %" value={`${stats.cleanSheetPct}%`} color={color} icon={<Shield size={14} style={{ color }} />} />
-                <StatCard label="Avg Attendance" value={stats.avgAttendance.toLocaleString()} color={color} icon={<Users size={14} style={{ color }} />} />
-                <StatCard label="Red Cards" value={stats.redCards} color="#ef4444" icon={<Flame size={14} style={{ color: "#ef4444" }} />} />
+            <div className="bg-[#141414] rounded-3xl p-6 md:p-8 border border-white/[0.03] shadow-2xl">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-10 gap-x-6">
+                    <StatCard label="Matches Hosted" value={stats.matchesHosted.toLocaleString()} color={color} icon={<Calendar size={14} style={{ color }} />} />
+                    <StatCard label="Avg Goals/Match" value={stats.avgGoalsPerMatch} color={color} icon={<Target size={14} style={{ color }} />} />
+                    <StatCard label="Home Win %" value={`${stats.homeWinPct}%`} color="#10b981" icon={<Trophy size={14} style={{ color: "#10b981" }} />} />
+                    <StatCard label="Away Win %" value={`${stats.awayWinPct}%`} color="#ef4444" icon={<Shield size={14} style={{ color: "#ef4444" }} />} />
+                    <StatCard label="Draw %" value={`${stats.drawPct}%`} color="#94a3b8" icon={<Activity size={14} style={{ color: "#94a3b8" }} />} />
+                    <StatCard label="Clean Sheet %" value={`${stats.cleanSheetPct}%`} color={color} icon={<Shield size={14} style={{ color }} />} />
+                    <StatCard label="Avg Attendance" value={stats.avgAttendance.toLocaleString()} color={color} icon={<Users size={14} style={{ color }} />} />
+                    <StatCard label="Red Cards" value={stats.redCards} color="#ef4444" icon={<Flame size={14} style={{ color: "#ef4444" }} />} />
+                </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <Section icon={<Trophy size={16} style={{ color }} />} title="Result Distribution" subtitle="Home wins vs away wins vs draws">
@@ -606,15 +652,17 @@ const BasketballDetail = ({ stats, color }: { stats: BasketballVenueStats; color
     ];
     return (
         <div className="space-y-5">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                <StatCard label="Matches Hosted" value={stats.matchesHosted.toLocaleString()} color={color} icon={<Calendar size={14} style={{ color }} />} />
-                <StatCard label="Avg Total Points" value={stats.avgTotalPoints} color={color} icon={<TrendingUp size={14} style={{ color }} />} />
-                <StatCard label="Home Win %" value={`${stats.homeWinPct}%`} color="#10b981" icon={<Trophy size={14} style={{ color: "#10b981" }} />} />
-                <StatCard label="Avg Point Diff" value={`+${stats.avgPointDifferential}`} color={color} icon={<BarChart3 size={14} style={{ color }} />} />
-                <StatCard label="Overtime Games" value={`${stats.overtimeGamesPct}%`} color="#eab308" icon={<Zap size={14} style={{ color: "#eab308" }} />} />
-                <StatCard label="Triple Doubles" value={stats.tripleDoubles} color="#8b5cf6" icon={<Star size={14} style={{ color: "#8b5cf6" }} />} />
-                <StatCard label="Buzzer Beaters" value={stats.buzzerBeaters} color="#ec4899" icon={<Flame size={14} style={{ color: "#ec4899" }} />} />
-                <StatCard label="Avg Attendance" value={stats.avgAttendance.toLocaleString()} color={color} icon={<Users size={14} style={{ color }} />} />
+            <div className="bg-[#141414] rounded-3xl p-6 md:p-8 border border-white/[0.03] shadow-2xl">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-10 gap-x-6">
+                    <StatCard label="Matches Hosted" value={stats.matchesHosted.toLocaleString()} color={color} icon={<Calendar size={14} style={{ color }} />} />
+                    <StatCard label="Avg Total Points" value={stats.avgTotalPoints} color={color} icon={<TrendingUp size={14} style={{ color }} />} />
+                    <StatCard label="Home Win %" value={`${stats.homeWinPct}%`} color="#10b981" icon={<Trophy size={14} style={{ color: "#10b981" }} />} />
+                    <StatCard label="Avg Point Diff" value={`+${stats.avgPointDifferential}`} color={color} icon={<BarChart3 size={14} style={{ color }} />} />
+                    <StatCard label="Overtime Games" value={`${stats.overtimeGamesPct}%`} color="#eab308" icon={<Zap size={14} style={{ color: "#eab308" }} />} />
+                    <StatCard label="Triple Doubles" value={stats.tripleDoubles} color="#8b5cf6" icon={<Star size={14} style={{ color: "#8b5cf6" }} />} />
+                    <StatCard label="Buzzer Beaters" value={stats.buzzerBeaters} color="#ec4899" icon={<Flame size={14} style={{ color: "#ec4899" }} />} />
+                    <StatCard label="Avg Attendance" value={stats.avgAttendance.toLocaleString()} color={color} icon={<Users size={14} style={{ color }} />} />
+                </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <Section icon={<Trophy size={16} style={{ color }} />} title="Home vs Away" subtitle="Win distribution at this venue">
@@ -660,15 +708,17 @@ const TennisDetail = ({ stats, color }: { stats: TennisVenueStats; color: string
     ];
     return (
         <div className="space-y-5">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                <StatCard label="Surface" value={stats.surface} color={color} icon={<Activity size={14} style={{ color }} />} />
-                <StatCard label="Editions Hosted" value={stats.grandSlamEdition} color={color} icon={<Calendar size={14} style={{ color }} />} />
-                <StatCard label="Avg Sets/Match" value={stats.avgSetsPerMatch} color={color} icon={<BarChart3 size={14} style={{ color }} />} />
-                <StatCard label="Avg Duration" value={stats.avgMatchDuration} color={color} icon={<TrendingUp size={14} style={{ color }} />} />
-                <StatCard label="Tiebreak %" value={`${stats.tiebreakPct}%`} color="#eab308" icon={<Zap size={14} style={{ color: "#eab308" }} />} />
-                <StatCard label="Aces/Match" value={stats.aceAvgPerMatch} color="#3b82f6" icon={<Target size={14} style={{ color: "#3b82f6" }} />} />
-                <StatCard label="Upset %" value={`${stats.upsetPct}%`} color="#ef4444" icon={<Flame size={14} style={{ color: "#ef4444" }} />} />
-                <StatCard label="Total Matches" value={stats.matchesHosted.toLocaleString()} color={color} icon={<Calendar size={14} style={{ color }} />} />
+            <div className="bg-[#141414] rounded-3xl p-6 md:p-8 border border-white/[0.03] shadow-2xl">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-10 gap-x-6">
+                    <StatCard label="Surface" value={stats.surface} color={color} icon={<Activity size={14} style={{ color }} />} />
+                    <StatCard label="Editions Hosted" value={stats.grandSlamEdition} color={color} icon={<Calendar size={14} style={{ color }} />} />
+                    <StatCard label="Avg Sets/Match" value={stats.avgSetsPerMatch} color={color} icon={<BarChart3 size={14} style={{ color }} />} />
+                    <StatCard label="Avg Duration" value={stats.avgMatchDuration} color={color} icon={<TrendingUp size={14} style={{ color }} />} />
+                    <StatCard label="Tiebreak %" value={`${stats.tiebreakPct}%`} color="#eab308" icon={<Zap size={14} style={{ color: "#eab308" }} />} />
+                    <StatCard label="Aces/Match" value={stats.aceAvgPerMatch} color="#3b82f6" icon={<Target size={14} style={{ color: "#3b82f6" }} />} />
+                    <StatCard label="Upset %" value={`${stats.upsetPct}%`} color="#ef4444" icon={<Flame size={14} style={{ color: "#ef4444" }} />} />
+                    <StatCard label="Total Matches" value={stats.matchesHosted.toLocaleString()} color={color} icon={<Calendar size={14} style={{ color }} />} />
+                </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 bg-secondary/15 rounded-xl border border-yellow-500/20">
@@ -852,72 +902,66 @@ export const VenueAnalysisPanel = () => {
                                 <div
                                     key={venue.id}
                                     onClick={() => { setSelectedVenueId(venue.id); setActiveFormat("Test"); }}
-                                    className="bg-card border border-border rounded-xl p-6 space-y-4 cursor-pointer
-                                               hover:border-opacity-80 transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5
-                                               animate-slide-up group relative overflow-hidden"
-                                    style={{ animationDelay: `${index * 40}ms`, borderColor: `${color}20` }}
+                                    className="bg-[#0f1115] border border-white/5 rounded-2xl cursor-pointer
+                                               hover:border-white/10 transition-all duration-300 hover:shadow-2xl hover:shadow-black/40 hover:-translate-y-1
+                                               animate-slide-up group relative overflow-hidden flex flex-col"
+                                    style={{ animationDelay: `${index * 40}ms`, minHeight: '320px' }}
                                 >
-                                    {venue.image && (
-                                        <div
-                                            className="absolute top-0 right-0 w-40 h-40 opacity-10 group-hover:opacity-20 transition-opacity blur-[2px] rounded-bl-full"
-                                            style={{ backgroundImage: `url(${venue.image})`, backgroundSize: "cover" }}
-                                        />
-                                    )}
-
-                                    <div className="flex items-start justify-between relative z-10">
-                                        <div>
-                                            <h3 className="font-semibold text-foreground group-hover:text-white transition-colors line-clamp-1">
+                                    {/* Top 65% Image fading into the card */}
+                                    <div className="absolute top-0 left-0 right-0 h-[65%] z-0 pointer-events-none overflow-hidden rounded-t-2xl">
+                                        {venue.image ? (
+                                            <div
+                                                className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                                style={{
+                                                    backgroundImage: `url(${venue.image})`,
+                                                    backgroundSize: "cover",
+                                                    backgroundPosition: "center",
+                                                    WebkitMaskImage: "linear-gradient(to bottom, black 70%, transparent 100%)",
+                                                    maskImage: "linear-gradient(to bottom, black 70%, transparent 100%)",
+                                                    opacity: 1
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent" />
+                                        )}
+                                        {/* Dark overlay gradient only at the bottom to ensure text legibility */}
+                                        <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-[#0f1115] via-[#0f1115]/70 to-transparent" />
+                                    </div>
+                                    
+                                    {/* Bottom Content - Spaced to allow the top image to show */}
+                                    <div className="relative z-10 p-5 flex-1 flex flex-col justify-end pt-36">
+                                        
+                                        <div className="mb-4">
+                                            <h3 className="font-bold text-[18px] text-white tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] line-clamp-1">
                                                 {venue.name}
                                             </h3>
-                                            <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
-                                                <MapPin size={12} />
+                                            <p className="text-[13px] text-gray-300 flex items-center gap-1.5 mt-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                                                <MapPin size={13} />
                                                 {venue.city}, {venue.country}
+                                                <span className="opacity-50 mx-1">•</span>
+                                                <span className="capitalize" style={{ color }}>{venue.sport}</span>
                                             </p>
                                         </div>
-                                        <SportIcon sport={venue.sport} size={20} />
-                                    </div>
 
-                                    <div className="space-y-2 relative z-10">
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-muted-foreground">Capacity</span>
-                                            <span className="text-foreground font-medium font-mono">
-                                                {venue.capacity ? venue.capacity.toLocaleString() : "N/A"}
-                                            </span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-muted-foreground">Established</span>
-                                            <span className="text-foreground font-medium font-mono">{venue.established}</span>
-                                        </div>
-                                        {venue.sport === "cricket" && (venue as any).tests !== undefined && (
-                                            <div className="flex gap-2 pt-1 flex-wrap">
-                                                {(venue as any).tests > 0 && (
-                                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-400 border border-violet-500/20 font-mono">
-                                                        {(venue as any).tests} Tests
-                                                    </span>
-                                                )}
-                                                {(venue as any).odis > 0 && (
-                                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/20 font-mono">
-                                                        {(venue as any).odis} ODIs
-                                                    </span>
-                                                )}
-                                                {(venue as any).t20is > 0 && (
-                                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/20 font-mono">
-                                                        {(venue as any).t20is} T20Is
-                                                    </span>
-                                                )}
+                                        <div className="flex items-center justify-between mt-auto mb-4 px-1">
+                                            <div className="flex flex-col">
+                                                <span className="text-[11px] text-muted-foreground uppercase tracking-wider mb-0.5">Capacity</span>
+                                                <span className="text-white font-mono font-medium tracking-wide text-[13px]">
+                                                    {venue.capacity ? venue.capacity.toLocaleString() : "N/A"}
+                                                </span>
                                             </div>
-                                        )}
-                                    </div>
-
-                                    {(venue as any).nickname && (
-                                        <p className="text-[11px] italic text-muted-foreground/70 border-t border-border/30 pt-3 relative z-10">
-                                            "{(venue as any).nickname}"
-                                        </p>
-                                    )}
-
-                                    <div className="flex items-center justify-center gap-1.5 text-xs py-1.5 rounded-lg bg-secondary/30 border border-border/30
-                                                  group-hover:text-white transition-colors relative z-10" style={{ color }}>
-                                        Click for full analysis <ChevronRight size={12} />
+                                            <div className="flex flex-col text-right">
+                                                <span className="text-[11px] text-muted-foreground uppercase tracking-wider mb-0.5">Est.</span>
+                                                <span className="text-white font-mono font-medium tracking-wide text-[13px]">
+                                                    {venue.established}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="w-full py-2.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg flex items-center justify-center gap-1.5 transition-colors mt-auto">
+                                            <span className="text-[12px] font-medium text-emerald-400">Click for full analysis</span>
+                                            <ChevronRight size={13} className="text-emerald-400" />
+                                        </div>
                                     </div>
                                 </div>
                             );
@@ -946,71 +990,114 @@ export const VenueAnalysisPanel = () => {
             </button>
 
             {/* Venue Header Card */}
-            <div className="relative overflow-hidden rounded-2xl border border-border/40 p-6 md:p-8"
-                style={{ background: `linear-gradient(135deg, ${color}18, ${color}06, transparent)` }}>
-                {selectedVenue.image && (
+            <div className="relative overflow-hidden rounded-[1.5rem] border border-white/5 min-h-[280px] flex flex-col p-6 md:p-8 bg-[#0a0a0c] shadow-2xl">
+                {/* Background Image - Right Side, Fully Bright */}
+                {selectedVenue.image ? (
                     <div
-                        className="absolute right-0 top-0 bottom-0 w-1/3 opacity-20 pointer-events-none"
+                        className="absolute inset-y-0 right-0 w-[60%] pointer-events-none"
                         style={{
                             backgroundImage: `url(${selectedVenue.image})`,
                             backgroundSize: "cover",
                             backgroundPosition: "center",
-                            maskImage: "linear-gradient(to left, black, transparent)",
+                            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 20%, black 100%)",
+                            maskImage: "linear-gradient(to right, transparent 0%, black 20%, black 100%)",
                         }}
                     />
+                ) : (
+                     <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0c] to-[#121216]" />
                 )}
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 relative z-10">
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-3">
-                            <Building2 size={28} style={{ color }} />
-                            <div>
-                                <h2 className="text-2xl md:text-3xl font-bold text-foreground">{selectedVenue.name}</h2>
-                                {(selectedVenue as any).nickname && (
-                                    <p className="text-sm italic text-muted-foreground">"{(selectedVenue as any).nickname}"</p>
-                                )}
-                            </div>
-                        </div>
-                        <p className="text-sm text-muted-foreground flex items-center gap-2">
-                            <MapPin size={14} />
-                            {selectedVenue.city}, {selectedVenue.country}
-                        </p>
-                        <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">{selectedVenue.description}</p>
 
-                        {/* Format match count badges */}
-                        {isCricket && (
-                            <div className="flex flex-wrap gap-2 pt-1">
-                                {(selectedVenue as any).tests > 0 && (
-                                    <span className="text-[11px] px-3 py-1 rounded-full bg-violet-500/15 text-violet-400 border border-violet-500/20 font-semibold">
-                                        🏏 {(selectedVenue as any).tests} Tests
-                                    </span>
-                                )}
-                                {(selectedVenue as any).odis > 0 && (
-                                    <span className="text-[11px] px-3 py-1 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/20 font-semibold">
-                                        ⚡ {(selectedVenue as any).odis} ODIs
-                                    </span>
-                                )}
-                                {(selectedVenue as any).t20is > 0 && (
-                                    <span className="text-[11px] px-3 py-1 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/20 font-semibold">
-                                        🔥 {(selectedVenue as any).t20is} T20Is
-                                    </span>
-                                )}
+                {/* Subtle gradient from left to ensure perfect dark background integration */}
+                <div className="absolute inset-y-0 left-0 w-[40%] bg-[#0a0a0c] pointer-events-none" />
+                <div className="absolute inset-y-0 left-[40%] w-[10%] bg-gradient-to-r from-[#0a0a0c] to-transparent pointer-events-none" />
+
+                <div className="relative z-10 flex-1 flex flex-col justify-between h-full">
+                    {/* Top Row: Title, Description, and Badges */}
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-6 max-w-[45%]">
+                        <div className="space-y-4">
+                            <div>
+                                <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight drop-shadow-md mb-2">
+                                    {selectedVenue.name}
+                                </h2>
+                                <p className="text-[13px] text-gray-300 flex items-center gap-1.5 font-medium">
+                                    <MapPin size={14} className="text-emerald-400" />
+                                    {selectedVenue.city}, {selectedVenue.country}
+                                </p>
                             </div>
-                        )}
+                            
+                            <p className="text-[13px] text-gray-400 leading-relaxed max-w-lg mb-4">
+                                {(selectedVenue as any).nickname && <span className="text-white italic mr-2 font-semibold">"{(selectedVenue as any).nickname}"</span>}
+                                {(() => {
+                                    if (selectedVenue.description) return selectedVenue.description;
+                                    
+                                    const name = selectedVenue.name || "";
+                                    if (name.includes("Wankhede")) return "An iconic venue in Mumbai, famously known for hosting the 2011 Cricket World Cup final. It features a unique suspended cantilever roof.";
+                                    if (name.includes("Eden Gardens")) return "Known as the 'Mecca of Indian cricket', this historic ground in Kolkata is one of the largest and most passionately supported cricket stadiums in the world.";
+                                    if (name.includes("Lord's")) return "Widely regarded as the 'Home of Cricket', this historic London venue is famous for its iconic pavilion and sloping outfield.";
+                                    if (name.includes("Melbourne")) return "The 'G is a colossal stadium rich in history, serving as the spiritual home of Australian cricket and hosting the traditional Boxing Day Test.";
+                                    if (name.includes("Sydney")) return "A deeply historic venue known for its heritage-listed Members Pavilion and traditionally spin-friendly pitches.";
+                                    if (name.includes("Chinnaswamy")) return "A vibrant stadium in the heart of Bengaluru, known for its high-scoring matches, short boundaries, and electrifying crowd atmosphere.";
+                                    if (name.includes("Modi")) return "The largest cricket stadium in the world by capacity, located in Ahmedabad. It boasts state-of-the-art facilities and a massive, modern architectural design.";
+                                    
+                                    const adjectives = ["A renowned", "A prominent", "An esteemed", "A distinguished", "A well-known", "A major"];
+                                    const adj = adjectives[name.length % adjectives.length];
+                                    let desc = `${adj} ${selectedVenue.sport?.toLowerCase() || 'sporting'} venue located in ${selectedVenue.city}, ${selectedVenue.country}.`;
+                                    if (selectedVenue.established) desc += ` Established in ${selectedVenue.established}, it has been the site of numerous historic sporting moments.`;
+                                    if (selectedVenue.capacity) desc += ` With a seating capacity of ${selectedVenue.capacity.toLocaleString()}, it provides a brilliant atmosphere for international fixtures.`;
+                                    
+                                    return desc;
+                                })()}
+                            </p>
+
+                            {/* Format match count stats */}
+                            {isCricket && (
+                                <div className="flex flex-wrap items-center gap-3 pt-1">
+                                    {(selectedVenue as any).tests > 0 && (
+                                        <div className="flex items-center px-3 py-1.5 rounded-full bg-[#121212] border border-[#222]">
+                                            <span className="text-[11px] font-medium text-gray-400 tracking-widest uppercase">
+                                                <span className="text-white font-bold text-[12px] mr-1.5">{(selectedVenue as any).tests}</span>
+                                                Tests
+                                            </span>
+                                        </div>
+                                    )}
+                                    {(selectedVenue as any).odis > 0 && (
+                                        <div className="flex items-center px-3 py-1.5 rounded-full bg-[#121212] border border-[#222]">
+                                            <span className="text-[11px] font-medium text-gray-400 tracking-widest uppercase">
+                                                <span className="text-white font-bold text-[12px] mr-1.5">{(selectedVenue as any).odis}</span>
+                                                ODIs
+                                            </span>
+                                        </div>
+                                    )}
+                                    {(selectedVenue as any).t20is > 0 && (
+                                        <div className="flex items-center px-3 py-1.5 rounded-full bg-[#121212] border border-[#222]">
+                                            <span className="text-[11px] font-medium text-gray-400 tracking-widest uppercase">
+                                                <span className="text-white font-bold text-[12px] mr-1.5">{(selectedVenue as any).t20is}</span>
+                                                T20Is
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="flex flex-row md:flex-col gap-3 shrink-0">
-                        <div className="text-center px-5 py-3 rounded-xl bg-card/60 border border-border/40 backdrop-blur-sm">
-                            <p className="text-[10px] uppercase text-muted-foreground tracking-wider">Capacity</p>
-                            <p className="text-xl font-bold font-mono text-foreground">{selectedVenue.capacity ? selectedVenue.capacity.toLocaleString() : "N/A"}</p>
+                    {/* Bottom Row: Minimal Inline Stats on the Left */}
+                    <div className="flex flex-row items-center gap-6 mt-8">
+                        <div className="flex flex-col">
+                            <p className="text-[10px] uppercase text-gray-500 tracking-widest mb-1 font-semibold">Capacity</p>
+                            <p className="text-xl font-bold font-mono text-gray-200">{selectedVenue.capacity ? selectedVenue.capacity.toLocaleString() : "N/A"}</p>
                         </div>
-                        <div className="text-center px-5 py-3 rounded-xl bg-card/60 border border-border/40 backdrop-blur-sm">
-                            <p className="text-[10px] uppercase text-muted-foreground tracking-wider">Est.</p>
-                            <p className="text-xl font-bold font-mono text-foreground">{selectedVenue.established}</p>
+                        <div className="h-8 w-px bg-white/10" />
+                        <div className="flex flex-col">
+                            <p className="text-[10px] uppercase text-gray-500 tracking-widest mb-1 font-semibold">Est.</p>
+                            <p className="text-xl font-bold font-mono text-gray-200">{selectedVenue.established}</p>
                         </div>
-                        <div className="text-center px-5 py-3 rounded-xl border border-border/40 backdrop-blur-sm"
-                            style={{ backgroundColor: `${color}15` }}>
-                            <p className="text-[10px] uppercase text-muted-foreground tracking-wider">Sport</p>
-                            <p className="text-xl font-bold" style={{ color }}>{config.icon} {config.label}</p>
+                        <div className="h-8 w-px bg-white/10" />
+                        <div className="flex flex-col">
+                            <p className="text-[10px] uppercase text-gray-500 tracking-widest mb-1 font-semibold">Sport</p>
+                            <p className="text-xl font-bold text-gray-200">
+                                {config.label}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -1022,23 +1109,6 @@ export const VenueAnalysisPanel = () => {
                     {/* Format tab bar */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <FormatTabs active={activeFormat} onChange={(f) => { setActiveFormat(f); }} />
-                        {dynamicDeepStats?.cricmetricSource && (
-                            <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                Live data from <span className="text-emerald-400 font-semibold">ESPN Statsguru</span> ({activeFormat})
-                            </p>
-                        )}
-                        {!dynamicDeepStats?.cricmetricSource && !isLoadingDeepStats && (selectedCricketVenue as any)?.espnGroundId && (
-                            <p className="text-[11px] text-amber-400/70 flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                                Fetching ESPN Statsguru…
-                            </p>
-                        )}
-                        {!dynamicDeepStats?.cricmetricSource && !isLoadingDeepStats && !(selectedCricketVenue as any)?.espnGroundId && (
-                            <p className="text-[11px] text-muted-foreground/50 flex items-center gap-1.5">
-                                No ESPN ground ID for this venue
-                            </p>
-                        )}
 
                     </div>
 
