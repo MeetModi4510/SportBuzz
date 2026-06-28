@@ -1,0 +1,93 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": "M. A. Chidambaram Stadium",
+      "name": "M. A. Chidambaram Stadium",
+      "city": "India",
+      "country": "India",
+      "capacity": "38000",
+      "established": 1900,
+      "description": "M. A. Chidambaram Stadium is a major cricket venue located in India.",
+      "image": null,
+      "cricbuzzId": "14"
+    },
+    {
+      "id": "Rajiv Gandhi International Cricket Stadium",
+      "name": "Rajiv Gandhi International Cricket Stadium",
+      "city": "India",
+      "country": "India",
+      "capacity": "55000",
+      "established": 1900,
+      "description": "Rajiv Gandhi International Cricket Stadium is a major cricket venue located in India.",
+      "image": null,
+      "cricbuzzId": "15"
+    },
+    {
+      "id": "Arun Jaitley Stadium",
+      "name": "Arun Jaitley Stadium",
+      "city": "India",
+      "country": "India",
+      "capacity": "45000",
+      "established": 1900,
+      "description": "Arun Jaitley Stadium is a major cricket venue located in India.",
+      "image": null,
+      "cricbuzzId": "16"
+    },
+    {
+      "id": "Saurashtra Cricket Association Stadium",
+      "name": "Saurashtra Cricket Association Stadium",
+      "city": "India",
+      "country": "India",
+      "capacity": "28000",
+      "established": 1900,
+      "description": "Saurashtra Cricket Association Stadium is a major cricket venue located in India.",
+      "image": null,
+      "cricbuzzId": "37"
+    },
+    {
+      "id": "Narendra Modi Stadium",
+      "name": "Narendra Modi Stadium",
+      "city": "India",
+      "country": "India",
+      "capacity": "0",
+      "established": 1900,
+      "description": "Narendra Modi Stadium is a major cricket venue located in India.",
+      "image": null,
+      "cricbuzzId": "53"
+    },
+    {
+      "id": "Jawaharlal Nehru Stadium Kochi",
+      "name": "Jawaharlal Nehru Stadium Kochi",
+      "city": "India",
+      "country": "India",
+      "capacity": "60500",
+      "established": 1900,
+      "description": "Jawaharlal Nehru Stadium Kochi is a major cricket venue located in India.",
+      "image": null,
+      "cricbuzzId": "37"
+    },
+    {
+      "id": "Eden Gardens",
+      "name": "Eden Gardens",
+      "city": "India",
+      "country": "India",
+      "capacity": "68000",
+      "established": 1900,
+      "description": "Eden Gardens is a major cricket venue located in India.",
+      "image": null,
+      "cricbuzzId": "58"
+    },
+    {
+      "id": "BRSABV Ekana Cricket Stadium",
+      "name": "BRSABV Ekana Cricket Stadium",
+      "city": "India",
+      "country": "India",
+      "capacity": "50000",
+      "established": 1900,
+      "description": "BRSABV Ekana Cricket Stadium is a major cricket venue located in India.",
+      "image": null,
+      "cricbuzzId": "37"
+    }
+  ]
+}

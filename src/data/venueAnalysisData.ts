@@ -13,6 +13,7 @@ export interface VenueAnalysis {
     nickname?: string;
     description: string;
     image?: string;
+    cricbuzzId?: string;
     // Sport-specific stats are below — each sport adds its own shape
     stats: CricketVenueStats | FootballVenueStats | BasketballVenueStats | TennisVenueStats;
     recentMatches: VenueRecentMatch[];
