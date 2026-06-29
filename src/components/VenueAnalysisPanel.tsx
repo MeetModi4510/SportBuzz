@@ -783,7 +783,7 @@ const TennisDetail = ({ stats, color }: { stats: TennisVenueStats; color: string
 //  MAIN PANEL
 // ═════════════════════════════════════════════════════════════════
 export const VenueAnalysisPanel = () => {
-    const [activeSport,     setActiveSport]     = useState<Sport | "all">("all");
+    const [activeSport,     setActiveSport]     = useState<Sport | "all">("cricket");
     const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
     const [selectedCountry, setSelectedCountry] = useState<string>("All");
     const [venueSearch,     setVenueSearch]     = useState<string>("");
@@ -854,17 +854,7 @@ export const VenueAnalysisPanel = () => {
                 {/* Sport + Country Filter row */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div className="flex items-center gap-2 flex-wrap">
-                        <button
-                            onClick={() => setActiveSport("all")}
-                            className={cn(
-                                "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border",
-                                activeSport === "all"
-                                    ? "text-white shadow-lg scale-105 border-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600"
-                                    : "bg-card text-muted-foreground hover:bg-secondary hover:text-foreground border-border/50"
-                            )}
-                        >
-                            🌐 All
-                        </button>
+                        {/* "All" button removed to avoid redundancy */}
                         {(Object.keys(SPORT_CONFIG) as Sport[]).map(sport => (
                             <button
                                 key={sport}
@@ -887,7 +877,6 @@ export const VenueAnalysisPanel = () => {
 
                     {(activeSport === "cricket" || activeSport === "all") && (
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-secondary/30 border border-border/50 rounded-xl animate-fade-in">
-                            <Globe size={16} className="text-emerald-500 shrink-0" />
                             <Select 
                                 value={selectedCountry} 
                                 onValueChange={(val) => { setSelectedCountry(val); setVenueSearch(""); }}
