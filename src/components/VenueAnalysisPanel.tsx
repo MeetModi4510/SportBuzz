@@ -293,7 +293,7 @@ const CricketDeepStatsPanel = ({
     color: string;
     venueName: string;
 }) => {
-    if (isLoading) return <LoadingOverlay text={`Fetching ${format} stats from Cricmetric…`} />;
+    if (isLoading) return <LoadingOverlay text={`Fetching ${format} stats…`} />;
     if (!deepStats) return (
         <div className="text-center py-12 text-muted-foreground text-sm">
             Select a format above to load live venue stats.
