@@ -1644,14 +1644,17 @@ router.get('/venues/country/:country', async (req, res) => {
             let finalCapacity = v.capacity || 0;
             let finalEstablished = v.established || 'N/A';
             
-            // Format name to match file (e.g. "MA Chidambaram Stadium" -> "ma_chidambaram_stadium.jpg")
+            // Format name to match file (e.g. "MA Chidambaram Stadium" -> "ma_chidambaram_stadium.png")
             const baseName = (v.wikiTitle || v.name.split(',')[0]).trim();
-            const fileName = baseName.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '.jpg';
-            const localImagePath = path.join(__dirname, '../../public/images/stadiums', fileName);
+            const fileNameBase = baseName.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+            const jpgPath = path.join(__dirname, '../../public/images/stadiums', fileNameBase + '.jpg');
+            const pngPath = path.join(__dirname, '../../public/images/stadiums', fileNameBase + '.png');
             
             let finalImage = null;
-            if (fs.existsSync(localImagePath)) {
-                finalImage = `/images/stadiums/${fileName}`;
+            if (fs.existsSync(jpgPath)) {
+                finalImage = `/images/stadiums/${fileNameBase}.jpg`;
+            } else if (fs.existsSync(pngPath)) {
+                finalImage = `/images/stadiums/${fileNameBase}.png`;
             } else {
                 // Fallback local image if the specific one is missing
                 finalImage = '/images/stadiums/default_stadium.jpg';
