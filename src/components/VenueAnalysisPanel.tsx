@@ -13,7 +13,7 @@ import {
 import { SportIcon } from "@/components/SportIcon";
 import {
     VENUE_ANALYSIS_DATA, type VenueAnalysis,
-    type CricketVenueStats, type FootballVenueStats,
+    type CricketVenueStats, type FootballVenueStats, type BDFutbolVenueStats,
     type BasketballVenueStats, type TennisVenueStats,
 } from "@/data/venueAnalysisData";
 import type { Sport } from "@/data/types";
@@ -602,6 +602,156 @@ const CricketDeepStatsPanel = ({
         </div>
     );
 };
+// ─── BDFutbol Premium Detail ───────────────────────────────────────
+const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: string }) => {
+    return (
+        <div className="space-y-6">
+            {/* Real Scraped Key Stats Grid */}
+            <div className="bg-[#141414] rounded-3xl p-6 md:p-8 border border-white/[0.03] shadow-2xl">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-10 gap-x-6">
+                    <StatCard label="Matches Hosted" value={stats.matchesHosted} color={color} icon={<Calendar size={14} style={{ color }} />} />
+                    <StatCard label="Total Clubs" value={stats.clubs} color={color} icon={<Shield size={14} style={{ color }} />} />
+                    <StatCard label="Seasons Played" value={stats.seasons} color={color} icon={<TrendingUp size={14} style={{ color }} />} />
+                    <StatCard label="Competitions" value={stats.competitions.length} color={color} icon={<Trophy size={14} style={{ color }} />} />
+                    
+                    <StatCard label="Architect" value={stats.architect} color="#10b981" icon={<Users size={14} style={{ color: "#10b981" }} />} />
+                    <StatCard label="Dimensions" value={stats.dimensions} color="#3b82f6" icon={<Target size={14} style={{ color: "#3b82f6" }} />} />
+                    <StatCard label="Location" value={stats.locationText} color="#8b5cf6" icon={<MapPin size={14} style={{ color: "#8b5cf6" }} />} />
+                    <StatCard label="Finals Hosted" value={1} color="#f59e0b" icon={<Star size={14} style={{ color: "#f59e0b" }} />} />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Top Visitors Chart */}
+                <Section icon={<BarChart3 size={16} style={{ color }} />} title="Top Visitors" subtitle="Matches played by visiting teams">
+                    <div className="h-[250px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={stats.topVisitors} margin={{ top: 20, right: 30, left: 0, bottom: 40 }}>
+                                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.1} vertical={false} />
+                                <XAxis dataKey="equip" tick={{ fill: "#666", fontSize: 11 }} angle={-45} textAnchor="end" interval={0} />
+                                <YAxis tick={{ fill: "#666", fontSize: 11 }} />
+                                <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={TOOLTIP_TEXT_STYLE} labelStyle={TOOLTIP_TEXT_STYLE} />
+                                <Bar dataKey="partits" fill={color} radius={[4, 4, 0, 0]}>
+                                    {stats.topVisitors.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={index % 2 === 0 ? color : `${color}88`} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </Section>
+
+                {/* Map Integration */}
+                <Section icon={<MapPin size={16} style={{ color }} />} title="Location Map" subtitle={`${stats.locationCoords[0]}, ${stats.locationCoords[1]}`}>
+                    <div className="h-[250px] w-full rounded-xl overflow-hidden border border-white/10 relative bg-muted/20">
+                        <iframe 
+                            width="100%" 
+                            height="100%" 
+                            frameBorder="0" 
+                            scrolling="no" 
+                            marginHeight={0} 
+                            marginWidth={0} 
+                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${stats.locationCoords[1]-0.01}%2C${stats.locationCoords[0]-0.01}%2C${stats.locationCoords[1]+0.01}%2C${stats.locationCoords[0]+0.01}&layer=mapnik&marker=${stats.locationCoords[0]}%2C${stats.locationCoords[1]}`}
+                            style={{ filter: "invert(90%) hue-rotate(180deg) brightness(85%) contrast(85%)" }}
+                        ></iframe>
+                    </div>
+                </Section>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Visiting Teams List */}
+                <Section icon={<Users size={16} style={{ color }} />} title="Visiting Teams" subtitle="Top 10 visiting clubs by matches">
+                    <div className="mt-2 space-y-2">
+                        {stats.visitingTeams.map((team, idx) => (
+                            <div key={idx} className="flex justify-between items-center p-2.5 rounded-lg bg-secondary/15 border border-white/5 hover:bg-secondary/30 transition-colors">
+                                <span className="text-sm text-foreground flex items-center gap-3">
+                                    <span className="text-xs font-mono text-muted-foreground w-4">{idx + 1}.</span> 
+                                    {team.name}
+                                </span>
+                                <span className="font-mono text-sm font-semibold text-primary">{team.matches}</span>
+                            </div>
+                        ))}
+                    </div>
+                </Section>
+
+                {/* Competitions and Finals */}
+                <div className="space-y-5">
+                    <Section icon={<Trophy size={16} style={{ color }} />} title="Competitions Hosted" subtitle="Matches by competition">
+                        <div className="flex flex-col gap-3 mt-2">
+                            {stats.competitions.map((comp, idx) => (
+                                <div key={idx} className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border/30 bg-secondary/20">
+                                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                                        <Trophy size={14} className="text-primary" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-sm font-semibold text-foreground">{comp.name}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-lg font-mono font-bold text-white">{comp.matches}</p>
+                                        <p className="text-[10px] text-muted-foreground uppercase">Matches</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </Section>
+                    
+                    <Section icon={<Star size={16} style={{ color: "#eab308" }} />} title="Finals Played" subtitle="Notable finals hosted">
+                        <div className="p-4 bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-xl border border-amber-500/20">
+                            <p className="text-sm text-amber-200 font-medium leading-relaxed">
+                                {stats.finalsPlayed}
+                            </p>
+                        </div>
+                    </Section>
+                </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Home Team and Historical Names */}
+                <div className="space-y-5">
+                    <Section icon={<Users size={16} style={{ color }} />} title="Home Team" subtitle="Primary tenant of the stadium">
+                        <div className="flex items-center gap-4 px-5 py-4 rounded-xl border border-primary/30 bg-primary/10">
+                            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                                <Shield size={18} className="text-primary" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-lg font-bold text-white">{stats.homeTeam.name}</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-xl font-mono font-bold text-primary">{stats.homeTeam.matches}</p>
+                                <p className="text-[10px] text-muted-foreground uppercase">Matches</p>
+                            </div>
+                        </div>
+                    </Section>
+
+                    <Section icon={<Building2 size={16} style={{ color }} />} title="Historical Names" subtitle="Past names of the stadium">
+                        <div className="flex flex-col gap-2 mt-2">
+                            {stats.historicalNames.map((name, idx) => (
+                                <div key={idx} className="flex justify-between items-center p-3 rounded-lg bg-secondary/15 border border-white/5">
+                                    <span className="text-sm font-medium text-foreground">{name.name}</span>
+                                    <span className="text-xs font-mono text-muted-foreground">{name.period}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </Section>
+                </div>
+
+                {/* Seasons List */}
+                <Section icon={<Calendar size={16} style={{ color }} />} title="Seasons Played" subtitle="Recent seasons and matches">
+                    <div className="mt-2 space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                        {stats.seasonsList.map((season, idx) => (
+                            <div key={idx} className="flex justify-between items-center p-2.5 rounded-lg bg-secondary/15 border border-white/5 hover:bg-secondary/30 transition-colors">
+                                <span className="text-sm text-foreground flex items-center gap-3">
+                                    <span className="text-xs font-mono text-muted-foreground w-4">{idx + 1}.</span> 
+                                    Season {season.year}
+                                </span>
+                                <span className="font-mono text-sm font-semibold text-primary">{season.matches} matches</span>
+                            </div>
+                        ))}
+                    </div>
+                </Section>
+            </div>
+        </div>
+    );
+};
 
 // ─── Football ──────────────────────────────────────────────────────
 const FootballDetail = ({ stats, color }: { stats: FootballVenueStats; color: string }) => {
@@ -1143,7 +1293,11 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
             ) : (
                 /* Non-cricket panels */
                 <>
-                    {selectedVenue.stats.sport === "football" && <FootballDetail stats={selectedVenue.stats as FootballVenueStats} color={color} />}
+                    {selectedVenue.stats.sport === "football" && (
+                        (selectedVenue.stats as any).isBDFutbol 
+                            ? <BDFutbolDetail stats={selectedVenue.stats as BDFutbolVenueStats} color={color} />
+                            : <FootballDetail stats={selectedVenue.stats as FootballVenueStats} color={color} />
+                    )}
                     {selectedVenue.stats.sport === "basketball" && <BasketballDetail stats={selectedVenue.stats as BasketballVenueStats} color={color} />}
                     {selectedVenue.stats.sport === "tennis" && <TennisDetail stats={selectedVenue.stats as TennisVenueStats} color={color} />}
                 </>
