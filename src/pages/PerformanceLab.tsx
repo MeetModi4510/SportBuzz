@@ -193,7 +193,7 @@ const PerformanceLab = () => {
 
             {/* Venue Analysis Tab */}
             <TabsContent value="venues" className="space-y-6 animate-fade-in">
-              <VenueAnalysisPanel />
+              <VenueAnalysisPanel activeSport={activeSport} />
             </TabsContent>
           </Tabs>
         </main>

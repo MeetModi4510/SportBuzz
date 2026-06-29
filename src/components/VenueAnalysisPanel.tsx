@@ -41,9 +41,9 @@ const SPORT_CONFIG: Record<Sport, { label: string; icon: string; color: string }
 };
 
 const FORMAT_TABS: { key: VenueFormat; label: string; icon: string; color: string }[] = [
-    { key: "Test", label: "Test",  icon: "🏏", color: "#8b5cf6" },
-    { key: "ODI",  label: "ODI",   icon: "⚡", color: "#3b82f6" },
-    { key: "T20",  label: "T20",   icon: "🔥", color: "#f97316" },
+    { key: "Test", label: "Test", icon: "🏏", color: "#8b5cf6" },
+    { key: "ODI", label: "ODI", icon: "⚡", color: "#3b82f6" },
+    { key: "T20", label: "T20", icon: "🔥", color: "#f97316" },
 ];
 
 // ─── Small Stat Card ─────────────────────────────────────────────
@@ -129,9 +129,9 @@ const BattingLeadersTable = ({ leaders, color }: { leaders: VenueDeepStats["batt
                                 <span className={cn(
                                     "font-mono text-[11px]",
                                     i === 0 ? "text-yellow-500" :
-                                    i === 1 ? "text-slate-300" :
-                                    i === 2 ? "text-amber-600" :
-                                    "text-white/20"
+                                        i === 1 ? "text-slate-300" :
+                                            i === 2 ? "text-amber-600" :
+                                                "text-white/20"
                                 )}>
                                     {i < 9 ? `0${i + 1}` : i + 1}
                                 </span>
@@ -174,9 +174,9 @@ const BowlingLeadersTable = ({ leaders, color }: { leaders: VenueDeepStats["bowl
                                 <span className={cn(
                                     "font-mono text-[11px]",
                                     i === 0 ? "text-yellow-500" :
-                                    i === 1 ? "text-slate-300" :
-                                    i === 2 ? "text-amber-600" :
-                                    "text-white/20"
+                                        i === 1 ? "text-slate-300" :
+                                            i === 2 ? "text-amber-600" :
+                                                "text-white/20"
                                 )}>
                                     {i < 9 ? `0${i + 1}` : i + 1}
                                 </span>
@@ -199,8 +199,8 @@ const BowlingLeadersTable = ({ leaders, color }: { leaders: VenueDeepStats["bowl
 const resultBadgeStyle = (result: string) => {
     const r = result.toLowerCase();
     if (r.includes("won") || r.includes("win")) return { bg: "bg-emerald-500/15", text: "text-emerald-400", border: "border-emerald-500/20" };
-    if (r.includes("draw") || r.includes("tied")) return { bg: "bg-blue-500/15",   text: "text-blue-400",   border: "border-blue-500/20"   };
-    if (r.includes("no result"))                  return { bg: "bg-slate-500/15",  text: "text-slate-400",  border: "border-slate-500/20"  };
+    if (r.includes("draw") || r.includes("tied")) return { bg: "bg-blue-500/15", text: "text-blue-400", border: "border-blue-500/20" };
+    if (r.includes("no result")) return { bg: "bg-slate-500/15", text: "text-slate-400", border: "border-slate-500/20" };
     return { bg: "bg-amber-500/15", text: "text-amber-400", border: "border-amber-500/20" };
 };
 
@@ -224,10 +224,10 @@ const RecentMatchesSection = ({ matches, format, color, venueName }: {
                     const teamsArray = cleanTeams.split(/\s+vs\s+|\s+v\s+/i);
                     const team1 = teamsArray[0]?.trim();
                     const team2 = teamsArray[1]?.trim();
-                    
+
                     let resultText = m.result;
                     let resultType = (m.result || "").toLowerCase();
-                    
+
                     if (team1 && team2) {
                         if (resultType.includes('won')) {
                             const margin = m.result.substring(m.result.toLowerCase().indexOf('won') + 3).trim();
@@ -244,7 +244,7 @@ const RecentMatchesSection = ({ matches, format, color, venueName }: {
                             resultText = `No Result`;
                         }
                     }
-                    
+
                     const badge = resultBadgeStyle(resultType);
 
                     return (
@@ -301,7 +301,7 @@ const CricketDeepStatsPanel = ({
     );
 
     const { avgFirstInningsByYear, avgSecondInningsByYear, bowlerTypes, matchOutcomes: _mo,
-            battingLeaders, bowlingLeaders, recentMatches } = deepStats as any;
+        battingLeaders, bowlingLeaders, recentMatches } = deepStats as any;
 
     const totalWins = (deepStats.wonBattingFirst || 0) + (deepStats.wonBattingSecond || 0) + (deepStats.draws || 0);
     const batFirstPct = totalWins > 0 ? Math.round(((deepStats.wonBattingFirst || 0) / totalWins) * 100) : 0;
@@ -309,13 +309,13 @@ const CricketDeepStatsPanel = ({
     const drawsPct = totalWins > 0 ? Math.round(((deepStats.draws || 0) / totalWins) * 100) : 0;
 
     const winData = [
-        { name: "Bat 1st Wins",   value: batFirstPct },
-        { name: "Bat 2nd Wins",   value: batSecondPct },
+        { name: "Bat 1st Wins", value: batFirstPct },
+        { name: "Bat 2nd Wins", value: batSecondPct },
         { name: "Draws / No Res", value: drawsPct },
     ].filter(d => d.value > 0);
 
     const tossData = [
-        { name: "Chose Bat",   value: deepStats.tossWinBatFirst },
+        { name: "Chose Bat", value: deepStats.tossWinBatFirst },
         { name: "Chose Field", value: deepStats.tossWinFieldFirst },
     ];
 
@@ -336,19 +336,19 @@ const CricketDeepStatsPanel = ({
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-10 gap-x-6">
                     <StatCard label="Matches Hosted" value={deepStats.matchesHosted || 0} color={color}
                         icon={<Calendar size={14} style={{ color }} />} />
-                    <StatCard label="Avg 1st Innings"  value={deepStats.avgFirstInningsScore  || "—"} color={color}
+                    <StatCard label="Avg 1st Innings" value={deepStats.avgFirstInningsScore || "—"} color={color}
                         icon={<BarChart3 size={14} style={{ color }} />} />
-                    <StatCard label="Avg 2nd Innings"  value={deepStats.avgSecondInningsScore || "—"} color={color}
+                    <StatCard label="Avg 2nd Innings" value={deepStats.avgSecondInningsScore || "—"} color={color}
                         icon={<BarChart3 size={14} style={{ color }} />} />
-                    <StatCard label="Avg Run Rate"      value={deepStats.avgRunRate || "—"}            color={color}
+                    <StatCard label="Avg Run Rate" value={deepStats.avgRunRate || "—"} color={color}
                         icon={<TrendingUp size={14} style={{ color }} />} />
-                    <StatCard label="Bat First Win %"   value={`${batFirstPct}%`}   color="#8b5cf6"
+                    <StatCard label="Bat First Win %" value={`${batFirstPct}%`} color="#8b5cf6"
                         icon={<Trophy size={14} style={{ color: "#8b5cf6" }} />} />
-                    <StatCard label="Bat 2nd Win %"     value={`${batSecondPct}%`}  color="#06b6d4"
+                    <StatCard label="Bat 2nd Win %" value={`${batSecondPct}%`} color="#06b6d4"
                         icon={<Shield size={14} style={{ color: "#06b6d4" }} />} />
-                    <StatCard label="Centuries"         value={deepStats.centuries || 0}               color="#eab308"
+                    <StatCard label="Centuries" value={deepStats.centuries || 0} color="#eab308"
                         icon={<Star size={14} style={{ color: "#eab308" }} />} />
-                    <StatCard label="5-Wicket Hauls"    value={deepStats.fiveWicketHauls || 0}         color="#ef4444"
+                    <StatCard label="5-Wicket Hauls" value={deepStats.fiveWicketHauls || 0} color="#ef4444"
                         icon={<Flame size={14} style={{ color: "#ef4444" }} />} />
                 </div>
             </div>
@@ -370,7 +370,7 @@ const CricketDeepStatsPanel = ({
             )}
 
             {/* ── Charts row: Innings avg, Win dist, Toss ── */}
-            <div className={cn("grid grid-cols-1 gap-5", 
+            <div className={cn("grid grid-cols-1 gap-5",
                 (deepStats.tossWinBatFirst > 0 || deepStats.tossWinFieldFirst > 0) ? "md:grid-cols-3" : "md:grid-cols-2"
             )}>
                 <Section icon={<BarChart3 size={16} style={{ color }} />} title="Innings Comparison"
@@ -564,7 +564,7 @@ const CricketDeepStatsPanel = ({
                         </p>
                     )}
                 </div>
-                
+
                 <div className="py-5 pl-6">
                     <p className="text-[10px] uppercase tracking-wider text-white/40 mb-2 font-medium">Lowest Total</p>
                     <p className="text-3xl font-mono text-white">{deepStats.lowestTotal?.score}</p>
@@ -608,7 +608,7 @@ const FootballDetail = ({ stats, color }: { stats: FootballVenueStats; color: st
     const resultData = [
         { name: "Home Win", value: stats.homeWinPct },
         { name: "Away Win", value: stats.awayWinPct },
-        { name: "Draw",     value: stats.drawPct     },
+        { name: "Draw", value: stats.drawPct },
     ];
     return (
         <div className="space-y-5">
@@ -782,12 +782,11 @@ const TennisDetail = ({ stats, color }: { stats: TennisVenueStats; color: string
 // ═════════════════════════════════════════════════════════════════
 //  MAIN PANEL
 // ═════════════════════════════════════════════════════════════════
-export const VenueAnalysisPanel = () => {
-    const [activeSport,     setActiveSport]     = useState<Sport | "all">("cricket");
+export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: Sport | "all" }) => {
     const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
     const [selectedCountry, setSelectedCountry] = useState<string>("All");
-    const [venueSearch,     setVenueSearch]     = useState<string>("");
-    const [activeFormat,    setActiveFormat]    = useState<VenueFormat>("Test");
+    const [venueSearch, setVenueSearch] = useState<string>("");
+    const [activeFormat, setActiveFormat] = useState<VenueFormat>("Test");
 
     const { venues: dynamicCricketVenues, isLoading: isLoadingCricketVenues, error: errorCricketVenues } = useCricketVenues(selectedCountry);
 
@@ -806,15 +805,15 @@ export const VenueAnalysisPanel = () => {
     const allVenues = useMemo(() => {
         const staticNonCricket = VENUE_ANALYSIS_DATA.filter(v => v.sport !== "cricket");
         const staticCricket = VENUE_ANALYSIS_DATA.filter(v => v.sport === "cricket");
-        
+
         const enrichedDynamicCricket = dynamicCricketVenues.map(dynamicV => {
-            const matchingStatic = staticCricket.find(staticV => 
-                staticV.name.toLowerCase() === dynamicV.name.toLowerCase() || 
+            const matchingStatic = staticCricket.find(staticV =>
+                staticV.name.toLowerCase() === dynamicV.name.toLowerCase() ||
                 (staticV.city === dynamicV.city && staticV.name.toLowerCase().includes(dynamicV.name.split(',')[0].toLowerCase())) ||
                 dynamicV.name.toLowerCase().includes(staticV.name.toLowerCase()) ||
                 staticV.name.toLowerCase().includes(dynamicV.name.toLowerCase())
             );
-            
+
             if (matchingStatic) {
                 return {
                     ...dynamicV,
@@ -851,37 +850,15 @@ export const VenueAnalysisPanel = () => {
     if (!selectedVenue) {
         return (
             <div className="space-y-6">
-                {/* Sport + Country Filter row */}
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-2 flex-wrap">
-                        {/* "All" button removed to avoid redundancy */}
-                        {(Object.keys(SPORT_CONFIG) as Sport[]).map(sport => (
-                            <button
-                                key={sport}
-                                onClick={() => setActiveSport(sport)}
-                                className={cn(
-                                    "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2.5 border",
-                                    activeSport === sport
-                                        ? "text-white shadow-lg scale-105 border-transparent"
-                                        : "bg-card text-muted-foreground hover:bg-secondary hover:text-foreground border-border/50"
-                                )}
-                                style={activeSport === sport
-                                    ? { background: `linear-gradient(135deg, ${SPORT_CONFIG[sport].color}, ${SPORT_CONFIG[sport].color}bb)` }
-                                    : undefined}
-                            >
-                                <span className="text-lg">{SPORT_CONFIG[sport].icon}</span>
-                                {SPORT_CONFIG[sport].label}
-                            </button>
-                        ))}
-                    </div>
-
+                {/* Filter and Search row */}
+                <div className="flex flex-col md:flex-row items-center gap-4 w-full">
                     {(activeSport === "cricket" || activeSport === "all") && (
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-secondary/30 border border-border/50 rounded-xl animate-fade-in">
-                            <Select 
-                                value={selectedCountry} 
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-secondary/30 border border-border/50 rounded-xl animate-fade-in shrink-0 w-full md:w-auto">
+                            <Select
+                                value={selectedCountry}
                                 onValueChange={(val) => { setSelectedCountry(val); setVenueSearch(""); }}
                             >
-                                <SelectTrigger className="w-[180px] bg-transparent border-none text-sm font-semibold shadow-none focus:ring-0 px-0 h-auto gap-2">
+                                <SelectTrigger className="w-full md:w-[180px] bg-transparent border-none text-sm font-semibold shadow-none focus:ring-0 px-0 h-auto gap-2">
                                     <SelectValue placeholder="Select country" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-slate-900 border-white/10 text-white rounded-xl shadow-2xl backdrop-blur-xl">
@@ -906,24 +883,23 @@ export const VenueAnalysisPanel = () => {
                             )}
                         </div>
                     )}
+                    
+                    {(activeSport === "cricket" || activeSport === "all") && dynamicCricketVenues.length > 0 && (
+                        <div className="flex items-center gap-3 px-4 py-2 bg-secondary/20 border border-border/40 rounded-xl flex-1 w-full">
+                            <svg className="w-4 h-4 text-muted-foreground shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            <input
+                                type="text"
+                                placeholder={`Search ${filteredVenues.length} venues by name or city…`}
+                                value={venueSearch}
+                                onChange={(e) => setVenueSearch(e.target.value)}
+                                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground border-none outline-none min-w-0"
+                            />
+                            {venueSearch && (
+                                <button onClick={() => setVenueSearch("")} className="text-muted-foreground hover:text-foreground text-xs px-2 shrink-0">✕ Clear</button>
+                            )}
+                        </div>
+                    )}
                 </div>
-
-                {/* Search */}
-                {(activeSport === "cricket" || activeSport === "all") && dynamicCricketVenues.length > 0 && (
-                    <div className="flex items-center gap-3 px-4 py-2.5 bg-secondary/20 border border-border/40 rounded-xl">
-                        <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                        <input
-                            type="text"
-                            placeholder={`Search ${filteredVenues.length} venues by name or city…`}
-                            value={venueSearch}
-                            onChange={(e) => setVenueSearch(e.target.value)}
-                            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground border-none outline-none"
-                        />
-                        {venueSearch && (
-                            <button onClick={() => setVenueSearch("")} className="text-muted-foreground hover:text-foreground text-xs px-2">✕ Clear</button>
-                        )}
-                    </div>
-                )}
 
                 {/* Venue Cards Grid */}
                 <div className="grid md:grid-cols-3 gap-5 min-h-[300px]">
@@ -973,10 +949,10 @@ export const VenueAnalysisPanel = () => {
                                         {/* Dark overlay gradient only at the bottom to ensure text legibility */}
                                         <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-[#0f1115] via-[#0f1115]/70 to-transparent" />
                                     </div>
-                                    
+
                                     {/* Bottom Content - Spaced to allow the top image to show */}
                                     <div className="relative z-10 p-5 flex-1 flex flex-col justify-end pt-36">
-                                        
+
                                         <div className="mb-4">
                                             <h3 className="font-bold text-[18px] text-white tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] line-clamp-1">
                                                 {venue.name}
@@ -984,8 +960,6 @@ export const VenueAnalysisPanel = () => {
                                             <p className="text-[13px] text-gray-300 flex items-center gap-1.5 mt-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                                                 <MapPin size={13} />
                                                 {venue.city}, {venue.country}
-                                                <span className="opacity-50 mx-1">•</span>
-                                                <span className="capitalize" style={{ color }}>{venue.sport}</span>
                                             </p>
                                         </div>
 
@@ -1003,7 +977,7 @@ export const VenueAnalysisPanel = () => {
                                                 </span>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="w-full py-2.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg flex items-center justify-center gap-1.5 transition-colors mt-auto">
                                             <span className="text-[12px] font-medium text-emerald-400">Click for full analysis</span>
                                             <ChevronRight size={13} className="text-emerald-400" />
@@ -1050,7 +1024,7 @@ export const VenueAnalysisPanel = () => {
                         }}
                     />
                 ) : (
-                     <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0c] to-[#121216]" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0c] to-[#121216]" />
                 )}
 
                 {/* Subtle gradient from left to ensure perfect dark background integration */}
@@ -1070,12 +1044,12 @@ export const VenueAnalysisPanel = () => {
                                     {selectedVenue.city}, {selectedVenue.country}
                                 </p>
                             </div>
-                            
+
                             <p className="text-[13px] text-gray-400 leading-relaxed max-w-lg mb-4">
                                 {(selectedVenue as any).nickname && <span className="text-white italic mr-2 font-semibold">"{(selectedVenue as any).nickname}"</span>}
                                 {(() => {
                                     if (selectedVenue.description) return selectedVenue.description;
-                                    
+
                                     const name = selectedVenue.name || "";
                                     if (name.includes("Wankhede")) return "An iconic venue in Mumbai, famously known for hosting the 2011 Cricket World Cup final. It features a unique suspended cantilever roof.";
                                     if (name.includes("Eden Gardens")) return "Known as the 'Mecca of Indian cricket', this historic ground in Kolkata is one of the largest and most passionately supported cricket stadiums in the world.";
@@ -1084,13 +1058,13 @@ export const VenueAnalysisPanel = () => {
                                     if (name.includes("Sydney")) return "A deeply historic venue known for its heritage-listed Members Pavilion and traditionally spin-friendly pitches.";
                                     if (name.includes("Chinnaswamy")) return "A vibrant stadium in the heart of Bengaluru, known for its high-scoring matches, short boundaries, and electrifying crowd atmosphere.";
                                     if (name.includes("Modi")) return "The largest cricket stadium in the world by capacity, located in Ahmedabad. It boasts state-of-the-art facilities and a massive, modern architectural design.";
-                                    
+
                                     const adjectives = ["A renowned", "A prominent", "An esteemed", "A distinguished", "A well-known", "A major"];
                                     const adj = adjectives[name.length % adjectives.length];
                                     let desc = `${adj} ${selectedVenue.sport?.toLowerCase() || 'sporting'} venue located in ${selectedVenue.city}, ${selectedVenue.country}.`;
                                     if (selectedVenue.established) desc += ` Established in ${selectedVenue.established}, it has been the site of numerous historic sporting moments.`;
                                     if (selectedVenue.capacity) desc += ` With a seating capacity of ${selectedVenue.capacity.toLocaleString()}, it provides a brilliant atmosphere for international fixtures.`;
-                                    
+
                                     return desc;
                                 })()}
                             </p>
@@ -1169,9 +1143,9 @@ export const VenueAnalysisPanel = () => {
             ) : (
                 /* Non-cricket panels */
                 <>
-                    {selectedVenue.stats.sport === "football"   && <FootballDetail   stats={selectedVenue.stats as FootballVenueStats}   color={color} />}
+                    {selectedVenue.stats.sport === "football" && <FootballDetail stats={selectedVenue.stats as FootballVenueStats} color={color} />}
                     {selectedVenue.stats.sport === "basketball" && <BasketballDetail stats={selectedVenue.stats as BasketballVenueStats} color={color} />}
-                    {selectedVenue.stats.sport === "tennis"     && <TennisDetail     stats={selectedVenue.stats as TennisVenueStats}     color={color} />}
+                    {selectedVenue.stats.sport === "tennis" && <TennisDetail stats={selectedVenue.stats as TennisVenueStats} color={color} />}
                 </>
             )}
         </div>
