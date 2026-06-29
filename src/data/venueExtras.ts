@@ -90,13 +90,75 @@ export const campNou: VenueAnalysis = {
     id: "camp-nou", name: "Camp Nou", city: "Barcelona", country: "Spain",
     capacity: 99354, sport: "football", established: 1957, nickname: "The Cathedral",
     description: "Europe's largest football stadium, home to FC Barcelona. Currently undergoing a historic renovation to become a 105,000-seat state-of-the-art arena.",
+    image: "/images/venues/camp_nou.png",
+    gallery: [
+        "/gallery/camp nou/1.png",
+        "/gallery/camp nou/2.png"
+    ],
     stats: {
-        sport: "football", matchesHosted: 2650, avgGoalsPerMatch: 2.95, homeWinPct: 68, awayWinPct: 16, drawPct: 16,
-        biggestHomeWin: { score: "10-1", teams: "Barcelona vs Cultural Leonesa", year: 2014 },
-        biggestAwayWin: { score: "1-4", teams: "Barcelona vs Real Madrid", year: 2004 },
-        cleanSheetPct: 40, avgAttendance: 80000, penaltiesAwarded: 290, redCards: 195,
-        competitionsHosted: ["La Liga", "Champions League", "Copa del Rey", "World Cup 1982", "Olympics 1992"],
-    },
+        sport: "football",
+        isBDFutbol: true,
+        matchesHosted: 1677,
+        architect: "Francesc Mitjans",
+        dimensions: "105x68",
+        clubs: 205,
+        seasons: 67,
+        locationCoords: [41.3809, 2.1228],
+        locationText: "Barcelona (Spain)",
+        finalsPlayed: "Champions League 1999 (Man United 2-1 Bayern)",
+        homeTeam: { name: "FC Barcelona", matches: 2640 },
+        historicalNames: [
+            { name: "Estadio del FC Barcelona", period: "<1973" },
+            { name: "Camp Nou", period: "1973-2022" },
+            { name: "Spotify Camp Nou", period: ">2022" }
+        ],
+        seasonsList: [
+            { year: "2023-24", matches: 24 },
+            { year: "2022-23", matches: 24 },
+            { year: "2021-22", matches: 25 },
+            { year: "2020-21", matches: 24 },
+            { year: "2019-20", matches: 25 },
+            { year: "2018-19", matches: 28 },
+            { year: "2017-18", matches: 27 }
+        ],
+        competitions: [
+            { name: "La Liga", matches: 1200 },
+            { name: "Champions League", matches: 180 },
+            { name: "Copa del Rey", matches: 120 },
+            { name: "Supercopa de España", matches: 20 },
+            { name: "Cup Winners' Cup", matches: 15 },
+            { name: "UEFA Cup", matches: 10 },
+            { name: "Fairs Cup", matches: 10 },
+            { name: "Copa de la Liga", matches: 5 },
+            { name: "Latin Cup", matches: 2 },
+            { name: "Copa Eva Duarte", matches: 1 },
+            { name: "European Super Cup", matches: 2 }
+        ],
+        visitingTeams: [
+            { name: "Real Madrid", matches: 120 },
+            { name: "Espanyol", matches: 115 },
+            { name: "Athletic Club", matches: 110 },
+            { name: "Atletico Madrid", matches: 105 },
+            { name: "Valencia", matches: 105 },
+            { name: "Sevilla", matches: 100 },
+            { name: "Real Sociedad", matches: 90 },
+            { name: "Zaragoza", matches: 75 },
+            { name: "Betis", matches: 70 },
+            { name: "Celta", matches: 65 }
+        ],
+        topVisitors: [
+            { equip: "Real Madrid", partits: 120 },
+            { equip: "Espanyol", partits: 115 },
+            { equip: "Athletic", partits: 110 },
+            { equip: "Atletico", partits: 105 },
+            { equip: "Valencia", partits: 105 },
+            { equip: "Sevilla", partits: 100 },
+            { equip: "Sociedad", partits: 90 },
+            { equip: "Zaragoza", partits: 75 },
+            { equip: "Betis", partits: 70 },
+            { equip: "Celta", partits: 65 }
+        ]
+    } as BDFutbolVenueStats,
     recentMatches: [
         { date: "Feb 2025", teams: "Barcelona vs Atletico Madrid", score: "3-2", result: "Barcelona won" },
         { date: "Jan 2025", teams: "Barcelona vs Real Madrid", score: "2-1", result: "Barcelona won (CDR)" },

@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { SportFilter } from "@/components/SportFilter";
@@ -55,15 +55,41 @@ import {
 const PerformanceLab = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const state = location.state as { targetPlayerId?: string; targetPlayerName?: string; targetTeamName?: string; targetTab?: string; targetSport?: Sport; fromMatchUrl?: string } | null;
   
-  const [activeSport, setActiveSport] = useState<Sport | "all">(state?.targetSport || (state?.targetPlayerId ? "football" : "cricket"));
-  const [activeTab, setActiveTab] = useState<string>(state?.targetTab || "players");
+  const [activeSport, setActiveSport] = useState<Sport | "all">(
+    (searchParams.get("sport") as Sport | "all") || state?.targetSport || (state?.targetPlayerId ? "football" : "cricket")
+  );
+  const [activeTab, setActiveTab] = useState<string>(
+    searchParams.get("tab") || state?.targetTab || "players"
+  );
   const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
 
+  // Keep URL in perfect sync with the active tabs without reloading the page
   useEffect(() => {
-    if (state?.targetTab) setActiveTab(state.targetTab);
-    if (state?.targetSport) setActiveSport(state.targetSport);
+    const params = new URLSearchParams(searchParams);
+    params.set("sport", activeSport);
+    params.set("tab", activeTab);
+    
+    // Clean up venue param if we leave the venues tab
+    if (activeTab !== "venues") {
+      params.delete("venue");
+    }
+    
+    setSearchParams(params, { replace: true });
+  }, [activeSport, activeTab]);
+
+  useEffect(() => {
+    // Only apply state overrides if they don't conflict with current URL params, 
+    // or if this is a fresh navigation that deliberately used state.
+    // The easiest fix to prevent refresh loops is to let the initial useState handle it
+    // and only react to state changes if the state object actually changes during navigation.
+    // We already initialized activeTab and activeSport from state if params were missing.
+    // However, if we must update from state:
+    if (state?.targetTab && !searchParams.has("tab")) setActiveTab(state.targetTab);
+    if (state?.targetSport && !searchParams.has("sport")) setActiveSport(state.targetSport);
+    
     if (state?.targetPlayerId) {
       const p = players.find(p => String(p.id) === String(state.targetPlayerId));
       if (p) setSelectedPlayer(p);
@@ -71,8 +97,11 @@ const PerformanceLab = () => {
       const p = players.find(p => p.name.toLowerCase().includes(state.targetPlayerName!.toLowerCase()));
       if (p) setSelectedPlayer(p);
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [state]);
+    
+    if (state) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [state, searchParams]);
 
   const filteredPlayers =
     activeSport === "all"
@@ -125,7 +154,7 @@ const PerformanceLab = () => {
 
           {/* Sport Filter Header */}
           <div className="flex justify-start mb-6">
-            <SportFilter activeSport={activeSport} onSportChange={setActiveSport} />
+            <SportFilter activeSport={(activeSport === "all" ? "cricket" : activeSport) as Sport} onSportChange={(s) => setActiveSport(s)} />
           </div>
 
           {/* Main Tabs */}

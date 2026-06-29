@@ -1,7 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
-    MapPin, ArrowLeft, TrendingUp, Trophy, Calendar, Users,
+    MapPin, ArrowLeft, TrendingUp, Trophy, Calendar, Users, Camera,
     BarChart3, Target, Star, Zap, Activity, Shield, Flame, Building2,
     Globe, ChevronRight, Award, Swords, ExternalLink,
 } from "lucide-react";
@@ -666,21 +667,152 @@ const CricketDeepStatsPanel = ({
     );
 };
 // ─── BDFutbol Premium Detail ───────────────────────────────────────
+const TEAM_COLORS: Record<string, { primary: string; secondary: string; domain?: string }> = {
+    "Liverpool": { primary: "#C8102E", secondary: "#F6EB61", domain: "liverpoolfc.com" },
+    "Arsenal": { primary: "#EF0107", secondary: "#9C824A", domain: "arsenal.com" },
+    "Man Utd": { primary: "#DA291C", secondary: "#FBE122", domain: "manutd.com" },
+    "Chelsea": { primary: "#034694", secondary: "#EE242C", domain: "chelseafc.com" },
+    "Tottenham": { primary: "#132257", secondary: "#ffffff", domain: "tottenhamhotspur.com" },
+    "Everton": { primary: "#003399", secondary: "#ffffff", domain: "evertonfc.com" },
+    "Newcastle": { primary: "#241F20", secondary: "#ffffff", domain: "nufc.co.uk" },
+    "Aston Villa": { primary: "#670E36", secondary: "#95BFE5", domain: "avfc.co.uk" },
+    "West Ham": { primary: "#7A263A", secondary: "#1BB1E7", domain: "whufc.com" },
+    "Fulham": { primary: "#000000", secondary: "#ffffff", domain: "fulhamfc.com" },
+    "Real Madrid": { primary: "#ffffff", secondary: "#FEBE10", domain: "realmadrid.com" },
+    "Barcelona": { primary: "#004D98", secondary: "#A50044", domain: "fcbarcelona.com" },
+    "FC Barcelona": { primary: "#004D98", secondary: "#A50044", domain: "fcbarcelona.com" },
+    "Bayern Munich": { primary: "#DC052D", secondary: "#0066B2", domain: "fcbayern.com" },
+    "Atletico Madrid": { primary: "#CB3524", secondary: "#272E61", domain: "atleticodemadrid.com" },
+    "Atletico": { primary: "#CB3524", secondary: "#272E61", domain: "atleticodemadrid.com" },
+    "PSG": { primary: "#004170", secondary: "#DA291C", domain: "psg.fr" },
+    "Sevilla": { primary: "#D42A20", secondary: "#ffffff", domain: "sevillafc.es" },
+    "Juventus": { primary: "#000000", secondary: "#ffffff", domain: "juventus.com" },
+    "Manchester City": { primary: "#6CABDD", secondary: "#1C2C5B", domain: "mancity.com" },
+    "Espanyol": { primary: "#007FC8", secondary: "#ffffff", domain: "rcdespanyol.com" },
+    "Athletic Club": { primary: "#EE2523", secondary: "#ffffff", domain: "athletic-club.eus" },
+    "Athletic": { primary: "#EE2523", secondary: "#ffffff", domain: "athletic-club.eus" },
+    "Valencia": { primary: "#ffffff", secondary: "#000000", domain: "valenciacf.com" },
+    "Real Sociedad": { primary: "#0067B1", secondary: "#ffffff", domain: "realsociedad.eus" },
+    "Sociedad": { primary: "#0067B1", secondary: "#ffffff", domain: "realsociedad.eus" },
+    "Zaragoza": { primary: "#005CA5", secondary: "#ffffff", domain: "realzaragoza.com" },
+    "Betis": { primary: "#0BB363", secondary: "#ffffff", domain: "realbetisbalompie.es" },
+    "Celta": { primary: "#8B99BA", secondary: "#E30613", domain: "rccelta.es" }
+};
+
+const COMP_DOMAINS: Record<string, string> = {
+    "Premier League": "/images/logos/pl.png",
+    "Champions League": "/images/logos/ucl.png",
+    "Europa League": "/images/logos/uel.png",
+    "FA Cup": "thefa.com",
+    "League Cup": "efl.com",
+    "La Liga": "laliga.com",
+    "Copa del Rey": "rfef.es",
+    "World Cup": "fifa.com",
+    "Euro": "uefa.com",
+    "Serie A": "legaseriea.it",
+    "Bundesliga": "bundesliga.com",
+    "Ligue 1": "ligue1.com",
+};
+
 const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: string }) => {
     return (
         <div className="space-y-6">
-            {/* Real Scraped Key Stats Grid */}
-            <div className="bg-[#141414] rounded-3xl p-6 md:p-8 border border-white/[0.03] shadow-2xl">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-10 gap-x-6">
-                    <StatCard label="Matches Hosted" value={stats.matchesHosted} color={color} icon={<Calendar size={14} style={{ color }} />} />
-                    <StatCard label="Total Clubs" value={stats.clubs} color={color} icon={<Shield size={14} style={{ color }} />} />
-                    <StatCard label="Seasons Played" value={stats.seasons} color={color} icon={<TrendingUp size={14} style={{ color }} />} />
-                    <StatCard label="Competitions" value={stats.competitions.length} color={color} icon={<Trophy size={14} style={{ color }} />} />
-                    
-                    <StatCard label="Architect" value={stats.architect} color="#10b981" icon={<Users size={14} style={{ color: "#10b981" }} />} />
-                    <StatCard label="Dimensions" value={stats.dimensions} color="#3b82f6" icon={<Target size={14} style={{ color: "#3b82f6" }} />} />
-                    <StatCard label="Location" value={stats.locationText} color="#8b5cf6" icon={<MapPin size={14} style={{ color: "#8b5cf6" }} />} />
-                    <StatCard label="Finals Hosted" value={1} color="#f59e0b" icon={<Star size={14} style={{ color: "#f59e0b" }} />} />
+            {/* Premium Glassmorphism Dashboard */}
+            <div className="relative mb-8 p-1">
+                {/* Background Glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 blur-[120px] opacity-[0.15] pointer-events-none" style={{ backgroundColor: color }} />
+                
+                <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Hero Card - Matches */}
+                    <div className="md:col-span-1 relative overflow-hidden bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-3xl p-8 flex flex-col justify-between group hover:bg-white/[0.04] transition-colors duration-500 shadow-2xl">
+                        <div className="absolute top-0 right-0 w-48 h-48 blur-[80px] opacity-10 -translate-y-1/2 translate-x-1/4 transition-opacity duration-500 group-hover:opacity-20" style={{ backgroundColor: color }} />
+                        <div className="flex items-center gap-2 text-white/50 mb-8 relative z-10">
+                            <Calendar size={16} />
+                            <span className="text-xs font-bold uppercase tracking-[0.15em]">Historical Matches Hosted</span>
+                        </div>
+                        <div className="relative z-10">
+                            <div className="text-6xl xl:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/40 tracking-tighter mb-2">
+                                {stats.matchesHosted}
+                            </div>
+                            <div className="text-[11px] font-medium text-white/40 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }} /> Total recorded fixtures
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Secondary Card - Clubs */}
+                    <div className="md:col-span-1 relative overflow-hidden bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-3xl p-8 flex flex-col justify-between group hover:bg-white/[0.04] transition-colors duration-500 shadow-2xl">
+                        <div className="flex items-center gap-2 text-white/50 mb-8 relative z-10">
+                            <Shield size={16} />
+                            <span className="text-xs font-bold uppercase tracking-[0.15em]">Distinct Clubs</span>
+                        </div>
+                        <div className="relative z-10">
+                            <div className="text-6xl xl:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/40 tracking-tighter mb-2">
+                                {stats.clubs}
+                            </div>
+                            <div className="text-[11px] font-medium text-white/40">
+                                Teams played here
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Secondary Card - Seasons */}
+                    <div className="md:col-span-1 relative overflow-hidden bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-3xl p-8 flex flex-col justify-between group hover:bg-white/[0.04] transition-colors duration-500 shadow-2xl">
+                        <div className="flex items-center gap-2 text-white/50 mb-8 relative z-10">
+                            <TrendingUp size={16} />
+                            <span className="text-xs font-bold uppercase tracking-[0.15em]">Seasons Played</span>
+                        </div>
+                        <div className="relative z-10">
+                            <div className="text-6xl xl:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/40 tracking-tighter mb-2">
+                                {stats.seasons}
+                            </div>
+                            <div className="text-[11px] font-medium text-white/40">
+                                Years of history
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Details Row */}
+                    <div className="md:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+                        <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-2xl p-5 flex flex-col justify-center hover:bg-white/[0.04] transition-colors shadow-md">
+                            <div className="flex items-center gap-1.5 text-white/30 mb-2">
+                                <MapPin size={12} />
+                                <span className="text-[9px] font-bold uppercase tracking-widest">Location</span>
+                            </div>
+                            <span className="text-sm font-semibold text-white truncate" title={stats.locationText}>{stats.locationText || "Unknown"}</span>
+                        </div>
+                        <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-2xl p-5 flex flex-col justify-center hover:bg-white/[0.04] transition-colors shadow-md">
+                            <div className="flex items-center gap-1.5 text-white/30 mb-2">
+                                <Users size={12} />
+                                <span className="text-[9px] font-bold uppercase tracking-widest">Architect</span>
+                            </div>
+                            <span className="text-sm font-semibold text-white truncate" title={stats.architect}>{stats.architect || "Unknown"}</span>
+                        </div>
+                        <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-2xl p-5 flex flex-col justify-center hover:bg-white/[0.04] transition-colors shadow-md">
+                            <div className="flex items-center gap-1.5 text-white/30 mb-2">
+                                <Target size={12} />
+                                <span className="text-[9px] font-bold uppercase tracking-widest">Dimensions</span>
+                            </div>
+                            <span className="text-sm font-semibold text-white font-mono">{stats.dimensions || "N/A"}</span>
+                        </div>
+                        <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-2xl p-5 flex items-center justify-between hover:bg-white/[0.04] transition-colors shadow-md">
+                            <div>
+                                <div className="flex items-center gap-1.5 text-white/30 mb-2">
+                                    <Trophy size={12} />
+                                    <span className="text-[9px] font-bold uppercase tracking-widest">Comps</span>
+                                </div>
+                                <span className="text-sm font-semibold text-white font-mono">{stats.competitions.length}</span>
+                            </div>
+                            <div className="w-px h-8 bg-white/10" />
+                            <div className="text-right">
+                                <div className="flex items-center justify-end gap-1.5 text-white/30 mb-2">
+                                    <Star size={12} />
+                                    <span className="text-[9px] font-bold uppercase tracking-widest">Finals</span>
+                                </div>
+                                <span className="text-sm font-semibold text-white font-mono">1</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -694,10 +826,11 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                                 <XAxis dataKey="equip" tick={{ fill: "#666", fontSize: 11 }} angle={-45} textAnchor="end" interval={0} />
                                 <YAxis tick={{ fill: "#666", fontSize: 11 }} />
                                 <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={TOOLTIP_TEXT_STYLE} labelStyle={TOOLTIP_TEXT_STYLE} />
-                                <Bar dataKey="partits" fill={color} radius={[4, 4, 0, 0]}>
-                                    {stats.topVisitors.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={index % 2 === 0 ? color : `${color}88`} />
-                                    ))}
+                                <Bar dataKey="partits" radius={[4, 4, 0, 0]}>
+                                    {stats.topVisitors.map((entry, index) => {
+                                        const homeColors = TEAM_COLORS[stats.homeTeam.name] || { primary: color, secondary: `${color}44` };
+                                        return <Cell key={`cell-${index}`} fill={index % 2 === 0 ? homeColors.primary : homeColors.secondary} />;
+                                    })}
                                 </Bar>
                             </BarChart>
                         </ResponsiveContainer>
@@ -707,108 +840,185 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                 {/* Map Integration */}
                 <Section icon={<MapPin size={16} style={{ color }} />} title="Location Map" subtitle={`${stats.locationCoords[0]}, ${stats.locationCoords[1]}`}>
                     <div className="h-[250px] w-full rounded-xl overflow-hidden border border-white/10 relative bg-muted/20">
-                        <iframe 
-                            width="100%" 
-                            height="100%" 
-                            frameBorder="0" 
-                            scrolling="no" 
-                            marginHeight={0} 
-                            marginWidth={0} 
-                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${stats.locationCoords[1]-0.01}%2C${stats.locationCoords[0]-0.01}%2C${stats.locationCoords[1]+0.01}%2C${stats.locationCoords[0]+0.01}&layer=mapnik&marker=${stats.locationCoords[0]}%2C${stats.locationCoords[1]}`}
-                            style={{ filter: "invert(90%) hue-rotate(180deg) brightness(85%) contrast(85%)" }}
-                        ></iframe>
+                        {/* We use an absolute container slightly larger than the wrapper to hide the OSM attribution bar at the bottom */}
+                        <div className="absolute -inset-1 -bottom-10 pointer-events-auto">
+                            <iframe 
+                                width="100%" 
+                                height="100%" 
+                                frameBorder="0" 
+                                marginHeight={0} 
+                                marginWidth={0} 
+                                src={`https://www.openstreetmap.org/export/embed.html?bbox=${stats.locationCoords[1]-0.02}%2C${stats.locationCoords[0]-0.005}%2C${stats.locationCoords[1]+0.02}%2C${stats.locationCoords[0]+0.005}&layer=mapnik&marker=${stats.locationCoords[0]}%2C${stats.locationCoords[1]}`}
+                                style={{ filter: "invert(90%) hue-rotate(180deg) brightness(85%) contrast(85%)" }}
+                            ></iframe>
+                        </div>
                     </div>
                 </Section>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 {/* Visiting Teams List */}
                 <Section icon={<Users size={16} style={{ color }} />} title="Visiting Teams" subtitle="Top 10 visiting clubs by matches">
-                    <div className="mt-2 space-y-2">
-                        {stats.visitingTeams.map((team, idx) => (
-                            <div key={idx} className="flex justify-between items-center p-2.5 rounded-lg bg-secondary/15 border border-white/5 hover:bg-secondary/30 transition-colors">
-                                <span className="text-sm text-foreground flex items-center gap-3">
-                                    <span className="text-xs font-mono text-muted-foreground w-4">{idx + 1}.</span> 
-                                    {team.name}
-                                </span>
-                                <span className="font-mono text-sm font-semibold text-primary">{team.matches}</span>
-                            </div>
-                        ))}
+                    <div className="mt-2 grid grid-cols-1 gap-4">
+                        {stats.visitingTeams.map((team, idx) => {
+                            const teamData = TEAM_COLORS[team.name === "Manchester United" ? "Man Utd" : team.name];
+                            return (
+                                <div key={idx} className="flex justify-between items-center py-3.5 px-4 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all duration-300 group">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group-hover:scale-105 transition-transform ${team.name === "Tottenham" ? "bg-[#132257]" : "bg-white"}`}>
+                                            {teamData?.domain ? (
+                                                <img src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${teamData.domain}&size=128`} alt={team.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <Shield size={14} className="text-muted-foreground" />
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors">{team.name}</span>
+                                            <span className="text-[10px] uppercase tracking-wider text-white/40 font-mono">Rank {idx + 1}</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="text-right">
+                                            <div className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 font-mono">{team.matches}</div>
+                                            <div className="text-[9px] uppercase tracking-widest text-white/30 font-bold">Matches</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </Section>
 
-                {/* Competitions and Finals */}
-                <div className="space-y-5">
-                    <Section icon={<Trophy size={16} style={{ color }} />} title="Competitions Hosted" subtitle="Matches by competition">
-                        <div className="flex flex-col gap-3 mt-2">
-                            {stats.competitions.map((comp, idx) => (
-                                <div key={idx} className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border/30 bg-secondary/20">
-                                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                                        <Trophy size={14} className="text-primary" />
+                {/* Competitions Hosted */}
+                <Section icon={<Trophy size={16} style={{ color }} />} title="Competitions Hosted" subtitle="Matches by competition">
+                    <div className="mt-2 grid grid-cols-1 gap-3">
+                            {stats.competitions.map((comp, idx) => {
+                                // Match domains, stripping out years if present (e.g. "World Cup 1982")
+                                const domain = COMP_DOMAINS[comp.name] || COMP_DOMAINS[comp.name.replace(/[0-9]/g, "").trim()];
+                                const isDirectUrl = domain?.startsWith("http") || domain?.startsWith("/");
+                                return (
+                                    <div key={idx} className="flex justify-between items-center p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all duration-300 group">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-full bg-white border border-white/20 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group-hover:scale-110 transition-transform p-1">
+                                                {domain ? (
+                                                    <img 
+                                                        src={isDirectUrl ? domain : `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=128`} 
+                                                        alt={comp.name} 
+                                                        className="w-full h-full object-contain drop-shadow-sm scale-110" 
+                                                    />
+                                                ) : (
+                                                    <Trophy size={16} className="text-white/40" />
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors">{comp.name}</span>
+                                                <span className="text-[10px] uppercase tracking-wider text-white/40 font-mono">Tournament</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="text-right">
+                                                <div className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 font-mono">{comp.matches}</div>
+                                                <div className="text-[9px] uppercase tracking-widest text-white/30 font-bold">Matches</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm font-semibold text-foreground">{comp.name}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-lg font-mono font-bold text-white">{comp.matches}</p>
-                                        <p className="text-[10px] text-muted-foreground uppercase">Matches</p>
-                                    </div>
+                                );
+                            })}
+                        </div>
+                    </Section>
+                
+                    {/* Seasons List */}
+                    <Section className="h-full flex flex-col" icon={<Calendar size={16} style={{ color }} />} title="Seasons Played" subtitle="Recent seasons and matches">
+                        <div className="mt-2 flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
+                            {stats.seasonsList.map((season, idx) => (
+                                <div key={idx} className="min-h-[44px] flex justify-between items-center p-3 rounded-xl bg-secondary/15 border border-white/5 hover:bg-secondary/30 transition-colors">
+                                    <span className="text-sm text-foreground flex items-center gap-3">
+                                        <span className="text-xs font-mono text-muted-foreground w-4">{idx + 1}.</span> 
+                                        Season {season.year}
+                                    </span>
+                                    <span className="font-mono text-sm font-semibold text-primary">{season.matches} matches</span>
                                 </div>
                             ))}
                         </div>
                     </Section>
-                    
-                    <Section icon={<Star size={16} style={{ color: "#eab308" }} />} title="Finals Played" subtitle="Notable finals hosted">
-                        <div className="p-4 bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-xl border border-amber-500/20">
-                            <p className="text-sm text-amber-200 font-medium leading-relaxed">
-                                {stats.finalsPlayed}
-                            </p>
-                        </div>
-                    </Section>
-                </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Home Team and Historical Names */}
-                <div className="space-y-5">
+
+            <div className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {/* Home Team */}
                     <Section icon={<Users size={16} style={{ color }} />} title="Home Team" subtitle="Primary tenant of the stadium">
-                        <div className="flex items-center gap-4 px-5 py-4 rounded-xl border border-primary/30 bg-primary/10">
-                            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                                <Shield size={18} className="text-primary" />
-                            </div>
-                            <div className="flex-1">
-                                <p className="text-lg font-bold text-white">{stats.homeTeam.name}</p>
+                        <div className="mt-2 p-5 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between hover:bg-white/[0.04] transition-all group shadow-md">
+                            <div className="flex items-center gap-5">
+                                <div className="w-14 h-14 rounded-full bg-white/10 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group-hover:scale-105 transition-transform">
+                                    {(() => {
+                                        const homeTeamData = TEAM_COLORS[stats.homeTeam.name];
+                                        if (homeTeamData?.domain) {
+                                            return <img src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${homeTeamData.domain}&size=128`} alt={stats.homeTeam.name} className="w-full h-full object-cover" />;
+                                        }
+                                        return <Shield size={24} className="text-white/40" />;
+                                    })()}
+                                </div>
+                                <div>
+                                    <h4 className="text-xl font-bold text-white/90 group-hover:text-white transition-colors">{stats.homeTeam.name}</h4>
+                                    <span className="text-xs uppercase tracking-[0.2em] text-white/40 font-semibold">Primary Tenant</span>
+                                </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-xl font-mono font-bold text-primary">{stats.homeTeam.matches}</p>
-                                <p className="text-[10px] text-muted-foreground uppercase">Matches</p>
+                                <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/50 tracking-tighter">{stats.homeTeam.matches}</div>
+                                <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mt-1">Matches</div>
                             </div>
                         </div>
                     </Section>
 
                     <Section icon={<Building2 size={16} style={{ color }} />} title="Historical Names" subtitle="Past names of the stadium">
-                        <div className="flex flex-col gap-2 mt-2">
+                        <div className="flex flex-col gap-3 mt-2 relative">
+                            {/* Timeline line */}
+                            <div className="absolute left-[15px] top-5 bottom-5 w-px bg-white/10" />
+                            
                             {stats.historicalNames.map((name, idx) => (
-                                <div key={idx} className="flex justify-between items-center p-3 rounded-lg bg-secondary/15 border border-white/5">
-                                    <span className="text-sm font-medium text-foreground">{name.name}</span>
-                                    <span className="text-xs font-mono text-muted-foreground">{name.period}</span>
+                                <div key={idx} className="relative pl-10 pr-4 py-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors group">
+                                    {/* Timeline node */}
+                                    <div className="absolute left-[12px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 border-white/20 bg-background group-hover:border-white/60 group-hover:bg-white/20 transition-all z-10 shadow-[0_0_10px_rgba(255,255,255,0)] group-hover:shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+                                    
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm font-semibold text-white/80 group-hover:text-white transition-colors">{name.name}</span>
+                                        <span className="text-xs font-mono text-white/40 tracking-wider bg-white/5 px-2.5 py-1 rounded-md border border-white/5">{name.period}</span>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </Section>
                 </div>
 
-                {/* Seasons List */}
-                <Section icon={<Calendar size={16} style={{ color }} />} title="Seasons Played" subtitle="Recent seasons and matches">
-                    <div className="mt-2 space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                        {stats.seasonsList.map((season, idx) => (
-                            <div key={idx} className="flex justify-between items-center p-2.5 rounded-lg bg-secondary/15 border border-white/5 hover:bg-secondary/30 transition-colors">
-                                <span className="text-sm text-foreground flex items-center gap-3">
-                                    <span className="text-xs font-mono text-muted-foreground w-4">{idx + 1}.</span> 
-                                    Season {season.year}
-                                </span>
-                                <span className="font-mono text-sm font-semibold text-primary">{season.matches} matches</span>
+                <Section icon={<Star size={16} style={{ color: "#eab308" }} />} title="Finals Played" subtitle="Notable finals hosted">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {!stats.finalsPlayed || stats.finalsPlayed === "None" ? (
+                            <div className="p-4 bg-white/[0.02] rounded-xl border border-white/5">
+                                <p className="text-sm text-white/40 font-medium">No notable finals hosted</p>
                             </div>
-                        ))}
+                        ) : (
+                            stats.finalsPlayed.split(',').map((final, idx) => {
+                                const trimmed = final.trim();
+                                const dateMatch = trimmed.match(/\b\d{2}\/\d{2}\/\d{4}\b/);
+                                const date = dateMatch ? dateMatch[0] : "";
+                                const parts = trimmed.split(/\b\d{2}\/\d{2}\/\d{4}\b/);
+                                const comp = parts[0]?.trim();
+                                const match = parts[1]?.trim();
+                                
+                                return (
+                                    <div key={idx} className="p-4 bg-white/[0.02] rounded-xl border border-white/5 hover:bg-white/[0.05] transition-all duration-300 flex flex-col gap-2 relative overflow-hidden group">
+                                        <div className="absolute -right-4 -top-4 w-16 h-16 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-colors" />
+                                        <div className="flex justify-between items-start gap-4 relative z-10">
+                                            <span className="text-[11px] font-bold text-amber-500/90 uppercase tracking-[0.15em]">{comp || 'Final'}</span>
+                                            {date && <span className="text-[10px] font-mono text-white/40 tracking-wider bg-white/5 px-2 py-1 rounded-md border border-white/5">{date}</span>}
+                                        </div>
+                                        <p className="text-sm text-white/90 font-medium mt-1 relative z-10">
+                                            {match || trimmed}
+                                        </p>
+                                    </div>
+                                );
+                            })
+                        )}
                     </div>
                 </Section>
             </div>
@@ -996,10 +1206,49 @@ const TennisDetail = ({ stats, color }: { stats: TennisVenueStats; color: string
 //  MAIN PANEL
 // ═════════════════════════════════════════════════════════════════
 export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: Sport | "all" }) => {
-    const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [selectedVenueId, setSelectedVenueId] = useState<string | null>(searchParams.get("venue"));
+
+    // Sync selected venue to URL so refreshing doesn't lose the active stadium
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams);
+        if (selectedVenueId) {
+            params.set("venue", selectedVenueId);
+        } else {
+            params.delete("venue");
+        }
+        setSearchParams(params, { replace: true });
+    }, [selectedVenueId]);
     const [selectedCountry, setSelectedCountry] = useState<string>("All");
     const [venueSearch, setVenueSearch] = useState<string>("");
     const [activeFormat, setActiveFormat] = useState<VenueFormat>("Test");
+    const [dynamicGallery, setDynamicGallery] = useState<string[]>([]);
+
+    // Auto-fetch the dynamic gallery for the selected venue
+    useEffect(() => {
+        if (!selectedVenueId) {
+            setDynamicGallery([]);
+            return;
+        }
+        
+        const fetchGallery = async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/api/venues/${selectedVenueId}/gallery`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        setDynamicGallery(data);
+                    } else {
+                        setDynamicGallery([]);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load dynamic gallery:", err);
+                setDynamicGallery([]);
+            }
+        };
+        fetchGallery();
+    }, [selectedVenueId]);
 
     const { venues: dynamicCricketVenues, isLoading: isLoadingCricketVenues, error: errorCricketVenues } = useCricketVenues(selectedCountry);
 
@@ -1364,6 +1613,22 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
                     {selectedVenue.stats.sport === "basketball" && <BasketballDetail stats={selectedVenue.stats as BasketballVenueStats} color={color} />}
                     {selectedVenue.stats.sport === "tennis" && <TennisDetail stats={selectedVenue.stats as TennisVenueStats} color={color} />}
                 </>
+            )}
+
+            {/* ── Stadium Gallery ── */}
+            {(dynamicGallery.length > 0 ? dynamicGallery : selectedVenue.gallery) && (dynamicGallery.length > 0 ? dynamicGallery : selectedVenue.gallery)?.length > 0 && (
+                <div className="mt-8 space-y-5">
+                    <Section icon={<Camera size={16} style={{ color }} />} title="Stadium Gallery" subtitle="Local photos from the public folder">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+                            {(dynamicGallery.length > 0 ? dynamicGallery : selectedVenue.gallery)?.map((src, idx) => (
+                                <div key={idx} className="aspect-video rounded-xl overflow-hidden bg-white/5 border border-white/10 group cursor-pointer relative shadow-lg">
+                                    <img src={src} alt={`${selectedVenue.name} photo ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                </div>
+                            ))}
+                        </div>
+                    </Section>
+                </div>
             )}
         </div>
     );

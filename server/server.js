@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import session from 'express-session';
 import passport from 'passport';
@@ -155,6 +156,37 @@ app.use('/api/teams', teamRoutes);
 app.use('/api/players', playerRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/auctions', auctionRoutes);
+
+// Dynamic Gallery Endpoint
+app.get('/api/venues/:venueId/gallery', (req, res) => {
+    const venueId = req.params.venueId;
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const publicPath = path.join(__dirname, '../public');
+    const galleryPath = path.join(publicPath, 'gallery');
+    
+    try {
+        if (!fs.existsSync(galleryPath)) {
+            return res.json([]);
+        }
+        
+        // Find the folder that loosely matches the venueId (ignoring spaces, dashes)
+        const folders = fs.readdirSync(galleryPath);
+        const targetFolder = folders.find(f => f.toLowerCase().replace(/[^a-z0-9]/g, '') === venueId.toLowerCase().replace(/[^a-z0-9]/g, ''));
+        
+        if (!targetFolder) {
+            return res.json([]);
+        }
+        
+        const folderPath = path.join(galleryPath, targetFolder);
+        const files = fs.readdirSync(folderPath).filter(f => f.match(/\.(jpg|jpeg|png|webp|gif)$/i));
+        
+        const fileUrls = files.map(f => `/gallery/${targetFolder}/${f}`);
+        res.json(fileUrls);
+    } catch (error) {
+        console.error("Gallery read error:", error);
+        res.status(500).json({ error: "Failed to read gallery" });
+    }
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

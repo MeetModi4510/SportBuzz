@@ -13,6 +13,7 @@ export interface VenueAnalysis {
     nickname?: string;
     description: string;
     image?: string;
+    gallery?: string[];
     cricbuzzId?: string;
     // Sport-specific stats are below — each sport adds its own shape
     stats: CricketVenueStats | FootballVenueStats | BDFutbolVenueStats | BasketballVenueStats | TennisVenueStats;
@@ -329,6 +330,12 @@ const etihad: VenueAnalysis = {
     nickname: "City of Manchester",
     description: "Home of Manchester City, a modern fortress known for breathtaking football and numerous Premier League titles under Pep Guardiola.",
     image: "/images/venues/etihad.jpg",
+    gallery: [
+        "/gallery/etihad/1.png",
+        "/gallery/etihad/2.png",
+        "/gallery/etihad/3.png",
+        "/gallery/etihad/4.png"
+    ],
     stats: {
         sport: "football",
         isBDFutbol: true,
