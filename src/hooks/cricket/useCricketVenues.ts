@@ -37,8 +37,8 @@ export function useCricketVenues(country: string = 'India') {
                             matchesHosted: 0,
                             avgFirstInningsScore: 0,
                             avgSecondInningsScore: 0,
-                            highestTotal: { score: "N/A", team: "N/A", year: 0 },
-                            lowestTotal: { score: "N/A", team: "N/A", year: 0 },
+                            highestTotal: { score: "N/A", team: "N/A", year: 0, opposition: "" },
+                            lowestTotal: { score: "N/A", team: "N/A", year: 0, opposition: "" },
                             wonBattingFirst: 0,
                             wonBattingSecond: 0,
                             draws: 0,
@@ -87,8 +87,8 @@ export interface VenueDeepStats {
     centuries: number;
     fiveWicketHauls: number;
     pitchType: string;
-    highestTotal: { score: string; team: string; year: string | number };
-    lowestTotal: { score: string; team: string; year: string | number };
+    highestTotal: { score: string; team: string; year: string | number; opposition?: string };
+    lowestTotal: { score: string; team: string; year: string | number; opposition?: string };
     formatBreakdown: Array<{ format: string; matches: number; won: number; lost: number; winPct: number }>;
     bowlerTypes: Array<{ type: string; economy: number; average: number }>;
     avgFirstInningsByYear: Array<{ year: string; score: number }>;

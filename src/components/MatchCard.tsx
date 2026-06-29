@@ -25,7 +25,7 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
   }, [initialMatch]);
 
   // Infer the season based on startTime or displayTime
-  const matchSeason = (typeof match.startTime === 'string' ? match.startTime.substring(0, 4) : match.startTime instanceof Date ? match.startTime.getFullYear().toString() : undefined) || match.displayTime?.match(/\b(20\d{2})\b/)?.[1] || undefined;
+  const matchSeason = (typeof (match.startTime as unknown) === 'string' ? (match.startTime as unknown as string).substring(0, 4) : match.startTime instanceof Date ? match.startTime.getFullYear().toString() : undefined) || match.displayTime?.match(/\b(20\d{2})\b/)?.[1] || undefined;
 
   // Socket listener for live updates
   useEffect(() => {

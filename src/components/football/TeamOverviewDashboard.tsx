@@ -285,24 +285,22 @@ export function TeamOverviewDashboard({ data }: TeamOverviewDashboardProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
         
         {/* Stadium Info */}
-        {overview.venue?.widget && (
+        {overview.venue?.statValue && (
           <div className="bg-card/40 hover:bg-card border border-border/40 p-6 rounded-[2rem] flex items-center gap-6 transition-colors group">
             <div className="w-16 h-16 rounded-2xl bg-foreground/5 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
               <StadiumIcon className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
             </div>
             <div className="flex-1">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Home Stadium</p>
-              <h4 className="text-lg font-bold text-foreground line-clamp-1">{overview.venue.widget.name}</h4>
-              <p className="text-xs font-semibold text-muted-foreground mb-2">{overview.venue.widget.city}</p>
+              <h4 className="text-lg font-bold text-foreground line-clamp-1">{overview.venue.statValue.name}</h4>
+              <p className="text-xs font-semibold text-muted-foreground mb-2">{overview.venue.statValue.city}</p>
               
-              {overview.venue.statPairs && (
+              {overview.venue.statValue.capacity && (
                 <div className="flex items-center gap-4 mt-2 border-t border-border/50 pt-2">
-                   {overview.venue.statPairs.map(([key, value]: [string, any]) => (
-                     <div key={key} className="flex flex-col">
-                        <span className="text-[9px] uppercase tracking-widest text-muted-foreground">{key}</span>
-                        <span className="text-xs font-bold">{typeof value === 'number' && key === 'Capacity' ? value.toLocaleString() : value}</span>
+                     <div className="flex flex-col">
+                        <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Capacity</span>
+                        <span className="text-xs font-bold">{overview.venue.statValue.capacity.toLocaleString()}</span>
                      </div>
-                   ))}
                 </div>
               )}
             </div>

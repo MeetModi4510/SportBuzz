@@ -205,6 +205,42 @@ const resultBadgeStyle = (result: string) => {
 };
 
 // ─── Recent Matches Section ───────────────────────────────────────
+const getTeamFlagUrl = (teamName: string) => {
+    if (!teamName) return null;
+    const t = teamName.toLowerCase().trim();
+    const map: Record<string, string> = {
+        'india': 'in',
+        'afghanistan': 'af',
+        'south africa': 'za',
+        'sri lanka': 'lk',
+        'australia': 'au',
+        'england': 'gb-eng',
+        'pakistan': 'pk',
+        'west indies': 'wi',
+        'bangladesh': 'bd',
+        'new zealand': 'nz',
+        'ireland': 'ie',
+        'zimbabwe': 'zw',
+        'netherlands': 'nl',
+        'scotland': 'gb-sct',
+        'nepal': 'np',
+        'uae': 'ae',
+        'oman': 'om',
+        'usa': 'us',
+        'namibia': 'na',
+        'uganda': 'ug',
+        'papua new guinea': 'pg',
+        'canada': 'ca'
+    };
+    if (t === 'west indies') return '/flags/westindies.png';
+    if (t === 'sri lanka') return '/flags/srilanka.png';
+    if (t === 'england') return '/flags/england.png';
+    
+    const code = map[t];
+    if (code) return `https://flagcdn.com/w40/${code}.png`;
+    return null;
+};
+
 const RecentMatchesSection = ({ matches, format, color, venueName }: {
     matches: VenueDeepStats["recentMatches"];
     format: VenueFormat;
@@ -246,6 +282,9 @@ const RecentMatchesSection = ({ matches, format, color, venueName }: {
                     }
 
                     const badge = resultBadgeStyle(resultType);
+                    
+                    const flag1 = team1 ? getTeamFlagUrl(team1) : null;
+                    const flag2 = team2 ? getTeamFlagUrl(team2) : null;
 
                     return (
                         <div
@@ -255,20 +294,34 @@ const RecentMatchesSection = ({ matches, format, color, venueName }: {
                         >
                             <div className="flex items-center gap-4 flex-1 min-w-0">
                                 <span className="text-[11px] font-mono text-white/30 w-24 shrink-0 uppercase tracking-wider">{m.date}</span>
-                                <p className="text-[13px] font-medium text-white/80 truncate group-hover:text-white transition-colors">
-                                    {cleanTeams}
-                                </p>
+                                {team1 && team2 ? (
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        {flag1 && <img src={flag1} alt={team1} className={cn(team1.toLowerCase() === 'west indies' ? "w-5 h-5 object-contain" : "w-5 h-3.5 object-cover")} />}
+                                        <p className="text-[13px] font-medium text-white/80 truncate group-hover:text-white transition-colors">
+                                            {team1}
+                                        </p>
+                                        <span className="text-white/30 text-[11px]">vs</span>
+                                        {flag2 && <img src={flag2} alt={team2} className={cn(team2.toLowerCase() === 'west indies' ? "w-5 h-5 object-contain" : "w-5 h-3.5 object-cover")} />}
+                                        <p className="text-[13px] font-medium text-white/80 truncate group-hover:text-white transition-colors">
+                                            {team2}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <p className="text-[13px] font-medium text-white/80 truncate group-hover:text-white transition-colors">
+                                        {cleanTeams}
+                                    </p>
+                                )}
                             </div>
-                            <div className="flex items-center gap-4 shrink-0 mt-2 sm:mt-0">
+                            <div className="flex items-center gap-4 shrink-0 mt-2 sm:mt-0 w-full sm:w-64">
                                 <span className={cn(
-                                    "text-[10px] uppercase tracking-widest font-semibold",
+                                    "text-[10px] uppercase tracking-widest font-semibold truncate flex-1",
                                     badge.text
                                 )}>
                                     {resultText}
                                 </span>
                                 {m.matchUrl && (
                                     <a href={m.matchUrl} target="_blank" rel="noopener noreferrer"
-                                        className="text-white/20 hover:text-white transition-colors opacity-0 group-hover:opacity-100">
+                                        className="text-white/20 hover:text-white transition-colors opacity-0 group-hover:opacity-100 shrink-0">
                                         <ExternalLink size={14} />
                                     </a>
                                 )}
@@ -559,9 +612,14 @@ const CricketDeepStatsPanel = ({
                     <p className="text-[10px] uppercase tracking-wider text-white/40 mb-2 font-medium">Highest Total</p>
                     <p className="text-3xl font-mono text-white">{deepStats.highestTotal?.score}</p>
                     {deepStats.highestTotal?.team && deepStats.highestTotal.team !== "—" && (
-                        <p className="text-[12px] text-white/60 mt-1">
-                            {deepStats.highestTotal.team} <span className="text-white/30 ml-1">({deepStats.highestTotal.year})</span>
-                        </p>
+                        <div className="mt-1 flex items-center gap-2">
+                            {getTeamFlagUrl(deepStats.highestTotal.team) && <img src={getTeamFlagUrl(deepStats.highestTotal.team)!} alt={deepStats.highestTotal.team} className={cn(deepStats.highestTotal.team.toLowerCase() === 'west indies' ? "w-4 h-4 object-contain" : "w-4 h-3 object-cover")} />}
+                            <p className="text-[12px] text-white/60">
+                                {deepStats.highestTotal.team}
+                                {deepStats.highestTotal.opposition && <span className="text-white/40 ml-1">v {deepStats.highestTotal.opposition}</span>}
+                                <span className="text-white/30 ml-1">({deepStats.highestTotal.year})</span>
+                            </p>
+                        </div>
                     )}
                 </div>
 
@@ -569,9 +627,14 @@ const CricketDeepStatsPanel = ({
                     <p className="text-[10px] uppercase tracking-wider text-white/40 mb-2 font-medium">Lowest Total</p>
                     <p className="text-3xl font-mono text-white">{deepStats.lowestTotal?.score}</p>
                     {deepStats.lowestTotal?.team && deepStats.lowestTotal.team !== "—" && (
-                        <p className="text-[12px] text-white/60 mt-1">
-                            {deepStats.lowestTotal.team} <span className="text-white/30 ml-1">({deepStats.lowestTotal.year})</span>
-                        </p>
+                        <div className="mt-1 flex items-center gap-2">
+                            {getTeamFlagUrl(deepStats.lowestTotal.team) && <img src={getTeamFlagUrl(deepStats.lowestTotal.team)!} alt={deepStats.lowestTotal.team} className={cn(deepStats.lowestTotal.team.toLowerCase() === 'west indies' ? "w-4 h-4 object-contain" : "w-4 h-3 object-cover")} />}
+                            <p className="text-[12px] text-white/60">
+                                {deepStats.lowestTotal.team}
+                                {deepStats.lowestTotal.opposition && <span className="text-white/40 ml-1">v {deepStats.lowestTotal.opposition}</span>}
+                                <span className="text-white/30 ml-1">({deepStats.lowestTotal.year})</span>
+                            </p>
+                        </div>
                     )}
                 </div>
             </div>

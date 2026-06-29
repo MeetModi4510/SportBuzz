@@ -650,7 +650,10 @@ function parseHighLow(highestHtml, lowestHtml) {
                 if (c.length > 5 && c[1] && !c[1].includes('DNB')) {
                     const dateStr = c.length >= 11 && !isNaN(parseInt(c[5])) ? c[10] : c[9];
                     const year = dateStr.match(/\d{4}/)?.[0] || '';
-                    highest = { score: c[1], team: c[0], year };
+                    let opposition = '';
+                    const oppCol = c.find(val => val.startsWith('v '));
+                    if (oppCol) opposition = oppCol.substring(2).trim();
+                    highest = { score: c[1], team: c[0], year, opposition };
                     return false; // break
                 }
             });
@@ -666,7 +669,10 @@ function parseHighLow(highestHtml, lowestHtml) {
                     if (score > 10 && !c[1].includes('/') && !c[1].includes('d')) {
                         const dateStr = c.length >= 11 && !isNaN(parseInt(c[5])) ? c[10] : c[9];
                         const year = dateStr.match(/\d{4}/)?.[0] || '';
-                        lowest = { score: c[1], team: c[0], year };
+                        let opposition = '';
+                        const oppCol = c.find(val => val.startsWith('v '));
+                        if (oppCol) opposition = oppCol.substring(2).trim();
+                        lowest = { score: c[1], team: c[0], year, opposition };
                         return false; // break
                     }
                 }
