@@ -1058,7 +1058,7 @@ router.get('/venues/country/:country', async (req, res) => {
             return res.json({ status: 'success', source: 'espn_map', count: 0, data: [] });
         }
 
-        // 2. Try to fetch Wikipedia table for enrichment (capacity, match counts, images)
+        // 2. Fetch and parse Wikipedia country list to get exact wikiTitles
         const wikiPageMap = {
             'India':        'List_of_international_cricket_grounds_in_India',
             'Australia':    'List_of_cricket_grounds_in_Australia',
@@ -1077,46 +1077,68 @@ router.get('/venues/country/:country', async (req, res) => {
         const wikiEnrichment = {}; // espnGroundId → { capacity, tests, odis, t20is, established, wikiTitle }
 
         try {
-            const page = wikiPageMap[country];
-            if (page) {
-                const wikiRes = await axios.get(
-                    `https://en.wikipedia.org/w/api.php?action=parse&page=${page}&section=1&prop=wikitext&format=json`,
-                    { headers: WIKI_API_HEADERS, timeout: 12000 }
-                );
-                const text = wikiRes.data.parse?.wikitext?.['*'] || '';
-                const rows = text.split('|-\n');
+            const pagesToScrape = [wikiPageMap[country], 'List_of_Test_cricket_grounds'];
+            for (const page of pagesToScrape) {
+                if (!page) continue;
+                try {
+                    const wikiRes = await axios.get(
+                        `https://en.wikipedia.org/w/api.php?action=parse&page=${page}&prop=wikitext&format=json`,
+                        { headers: WIKI_API_HEADERS, timeout: 12000 }
+                    );
+                    const text = wikiRes.data.parse?.wikitext?.['*'] || '';
+                    const rows = text.split('|-\n');
 
-                for (const row of rows) {
-                    const cells = row.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'));
-                    if (cells.length < 3) continue;
+                    for (const row of rows) {
+                        const rawRow = row.replace(/^\|/, '');
+                        const cells = rawRow.split(/\|\||\n\|/).map(c => c.trim()).filter(c => c !== '');
+                        if (cells.length < 3) continue;
 
-                    const nameRaw = cells[0].replace(/^\|/, '').trim();
-                    const nameMatch = nameRaw.match(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/);
-                    if (!nameMatch) continue;
-                    const wikiTitle = nameMatch[1].trim();
-                    const rawDisplay = (nameMatch[2] || wikiTitle).trim();
-                    const wikiName = rawDisplay.replace(/\{\{[^}]+\}\}/g, '').replace(/\[\[[^\]]+\]\]/g, '').trim();
-                    if (!wikiName) continue;
+                        let nameMatch = null;
+                        for (const cell of cells) {
+                            nameMatch = cell.match(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/);
+                            if (nameMatch) break;
+                        }
+                        if (!nameMatch) continue;
 
-                    const capacity = parseInt(cells[2].replace(/^\|/, '').replace(/,/g, '').replace(/[^0-9]/g, '')) || 0;
-                    const tests  = parseInt(cells[3]?.replace(/^\|/, '').replace(/[^0-9]/g, '')) || 0;
-                    const odis   = parseInt(cells[4]?.replace(/^\|/, '').replace(/[^0-9]/g, '')) || 0;
-                    const t20is  = parseInt(cells[5]?.replace(/^\|/, '').replace(/[^0-9]/g, '')) || 0;
+                        const wikiTitle = nameMatch[1].trim();
+                        const rawDisplay = (nameMatch[2] || wikiTitle).trim();
+                        const wikiName = rawDisplay.replace(/\{\{[^}]+\}\}/g, '').replace(/\[\[[^\]]+\]\]/g, '').trim();
+                        if (!wikiName) continue;
 
-                    let established = 'N/A';
-                    const dtsCell = cells[9] || cells[8] || '';
-                    const dtsMatch = dtsCell.match(/\{\{dts[^|]*\|[^|]*\|(\d{4})/);
-                    if (dtsMatch) established = parseInt(dtsMatch[1]);
+                        const espnGround = resolveESPNGround(wikiName);
+                        if (espnGround && espnGround.id) {
+                            const isInList = canonicalVenues.some(v => v.id === espnGround.id);
+                            if (isInList) {
+                                let capacity = 0;
+                                for (let i = 1; i < cells.length; i++) {
+                                    const textContent = cells[i].replace(/<[^>]*>/g, '').replace(/\[\d+\]/g, '').replace(/,/g, '').trim();
+                                    const match = textContent.match(/^\d{4,6}$/);
+                                    if (match) {
+                                        capacity = parseInt(match[0]);
+                                        break;
+                                    }
+                                }
 
-                    // Match this wiki row to a canonical ESPN venue via resolveESPNGround
-                    const espnGround = resolveESPNGround(wikiName);
-                    if (espnGround && espnGround.id) {
-                        // Only enrich if this espnId is actually in our canonical list for this country
-                        const isInList = canonicalVenues.some(v => v.id === espnGround.id);
-                        if (isInList && !wikiEnrichment[espnGround.id]) {
-                            wikiEnrichment[espnGround.id] = { capacity, tests, odis, t20is, established, wikiTitle };
+                                let established = 'N/A';
+                                for (let i = 0; i < cells.length; i++) {
+                                    const match = cells[i].match(/\b(18|19|20)\d{2}\b/);
+                                    if (match) {
+                                        established = match[0];
+                                        break;
+                                    }
+                                }
+
+                                if (!wikiEnrichment[espnGround.id]) {
+                                    wikiEnrichment[espnGround.id] = { capacity, tests: 0, odis: 0, t20is: 0, established, wikiTitle };
+                                } else {
+                                    if (capacity > 0) wikiEnrichment[espnGround.id].capacity = capacity;
+                                    if (established !== 'N/A') wikiEnrichment[espnGround.id].established = established;
+                                }
+                            }
                         }
                     }
+                } catch (e) {
+                    // Ignore individual page errors
                 }
             }
         } catch (wikiErr) {
@@ -1143,18 +1165,28 @@ router.get('/venues/country/:country', async (req, res) => {
         const venues = canonicalVenues.map(v => {
             const enrich = wikiEnrichment[v.id] || {};
             const image = enrich.wikiTitle ? (getCached(imgCache, enrich.wikiTitle) || null) : null;
+            let finalImage = image;
+            let finalCapacity = enrich.capacity || 0;
+            let finalEstablished = enrich.established || 'N/A';
+
+            if (v.name.includes('Saurashtra')) {
+                if (!finalImage) finalImage = 'https://upload.wikimedia.org/wikipedia/commons/a/ae/SCA_Stadium.jpg';
+                if (!finalCapacity) finalCapacity = 28000;
+                if (finalEstablished === 'N/A') finalEstablished = '2008';
+            }
+
             return {
                 id: v.name,
                 name: v.name,
                 wikiTitle: enrich.wikiTitle || v.name,
                 city: v.city,
                 country,
-                capacity: enrich.capacity || 0,
-                established: enrich.established || 'N/A',
+                capacity: finalCapacity,
+                established: finalEstablished,
                 tests: enrich.tests || 0,
                 odis: enrich.odis || 0,
                 t20is: enrich.t20is || 0,
-                image,
+                image: finalImage,
                 espnGroundId: v.id,
             };
         });
