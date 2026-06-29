@@ -785,7 +785,7 @@ const TennisDetail = ({ stats, color }: { stats: TennisVenueStats; color: string
 export const VenueAnalysisPanel = () => {
     const [activeSport,     setActiveSport]     = useState<Sport | "all">("all");
     const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
-    const [selectedCountry, setSelectedCountry] = useState<string>("India");
+    const [selectedCountry, setSelectedCountry] = useState<string>("All");
     const [venueSearch,     setVenueSearch]     = useState<string>("");
     const [activeFormat,    setActiveFormat]    = useState<VenueFormat>("Test");
 
@@ -896,6 +896,7 @@ export const VenueAnalysisPanel = () => {
                                     <SelectValue placeholder="Select country" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-slate-900 border-white/10 text-white rounded-xl shadow-2xl backdrop-blur-xl">
+                                    <SelectItem value="All" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2">🌐 All</div></SelectItem>
                                     <SelectItem value="India" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/in.png" alt="India" className="w-5 h-auto rounded-[2px] object-cover" /> India</div></SelectItem>
                                     <SelectItem value="Australia" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/au.png" alt="Australia" className="w-5 h-auto rounded-[2px] object-cover" /> Australia</div></SelectItem>
                                     <SelectItem value="England" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/gb-eng.png" alt="England" className="w-5 h-auto rounded-[2px] object-cover" /> England</div></SelectItem>
@@ -903,13 +904,12 @@ export const VenueAnalysisPanel = () => {
                                     <SelectItem value="South Africa" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/za.png" alt="South Africa" className="w-5 h-auto rounded-[2px] object-cover" /> South Africa</div></SelectItem>
                                     <SelectItem value="Sri Lanka" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/lk.png" alt="Sri Lanka" className="w-5 h-auto rounded-[2px] object-cover" /> Sri Lanka</div></SelectItem>
                                     <SelectItem value="Bangladesh" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/bd.png" alt="Bangladesh" className="w-5 h-auto rounded-[2px] object-cover" /> Bangladesh</div></SelectItem>
-                                    <SelectItem value="West Indies" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><span className="text-base leading-none">🌴</span> West Indies</div></SelectItem>
+                                    <SelectItem value="West Indies" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="/flags/westindies.png" alt="West Indies" className="w-5 h-auto rounded-[2px] object-cover" /> West Indies</div></SelectItem>
                                     <SelectItem value="New Zealand" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/nz.png" alt="New Zealand" className="w-5 h-auto rounded-[2px] object-cover" /> New Zealand</div></SelectItem>
                                     <SelectItem value="Zimbabwe" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/zw.png" alt="Zimbabwe" className="w-5 h-auto rounded-[2px] object-cover" /> Zimbabwe</div></SelectItem>
                                     <SelectItem value="Ireland" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/ie.png" alt="Ireland" className="w-5 h-auto rounded-[2px] object-cover" /> Ireland</div></SelectItem>
                                     <SelectItem value="Scotland" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/gb-sct.png" alt="Scotland" className="w-5 h-auto rounded-[2px] object-cover" /> Scotland</div></SelectItem>
                                     <SelectItem value="UAE" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/ae.png" alt="UAE" className="w-5 h-auto rounded-[2px] object-cover" /> UAE</div></SelectItem>
-                                    <SelectItem value="Afghanistan" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><img src="https://flagcdn.com/w20/af.png" alt="Afghanistan" className="w-5 h-auto rounded-[2px] object-cover" /> Afghanistan</div></SelectItem>
                                 </SelectContent>
                             </Select>
                             {isLoadingCricketVenues && (

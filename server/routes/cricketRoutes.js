@@ -1634,8 +1634,22 @@ router.get('/venues/country/:country', async (req, res) => {
         const { country } = req.params;
 
         // 1. Get canonical venue list for this country (from ESPN_GROUND_MAP)
-        const canonicalVenues = COUNTRY_ESPN_VENUES[country];
-        if (!canonicalVenues || canonicalVenues.length === 0) {
+        let canonicalVenues = [];
+        if (country === 'All') {
+            const seenIds = new Set();
+            Object.keys(COUNTRY_ESPN_VENUES).forEach(c => {
+                COUNTRY_ESPN_VENUES[c].forEach(v => {
+                    if (!seenIds.has(v.id)) {
+                        seenIds.add(v.id);
+                        canonicalVenues.push({ ...v, country: c });
+                    }
+                });
+            });
+        } else {
+            canonicalVenues = COUNTRY_ESPN_VENUES[country] || [];
+        }
+
+        if (canonicalVenues.length === 0) {
             return res.json({ status: 'success', source: 'espn_map', count: 0, data: [] });
         }
 
@@ -1671,7 +1685,7 @@ router.get('/venues/country/:country', async (req, res) => {
                 name: v.name,
                 wikiTitle: v.wikiTitle || v.name,
                 city: v.city,
-                country,
+                country: v.country || country,
                 capacity: finalCapacity,
                 established: finalEstablished,
                 tests: 0,
