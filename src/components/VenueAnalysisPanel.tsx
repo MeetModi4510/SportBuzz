@@ -114,7 +114,7 @@ const BattingLeadersTable = ({ leaders, color }: { leaders: VenueDeepStats["batt
             <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                     <tr>
-                        {["#", "Player", "Inn", "Runs", "Avg", "SR", "HS"].map((h, i) => (
+                        {["#", "Player", "Inn", "Runs", "Avg", "HS"].map((h, i) => (
                             <th key={h} className={cn(
                                 "pb-3 px-2 text-[10px] uppercase tracking-wider text-white/40 font-medium border-b border-white/5",
                                 i > 1 ? "text-right" : ""
@@ -140,7 +140,6 @@ const BattingLeadersTable = ({ leaders, color }: { leaders: VenueDeepStats["batt
                             <td className="py-2.5 px-2 text-right font-mono text-[12px] text-white/40">{p.innings}</td>
                             <td className="py-2.5 px-2 text-right font-mono text-[13px] font-semibold text-white">{p.runs}</td>
                             <td className="py-2.5 px-2 text-right font-mono text-[12px] text-white/40">{p.avg?.toFixed(1) || '-'}</td>
-                            <td className="py-2.5 px-2 text-right font-mono text-[12px] text-white/40">{p.sr?.toFixed(1) || '-'}</td>
                             <td className="py-2.5 px-2 text-right font-mono text-[12px] text-emerald-400/80">{p.hs}</td>
                         </tr>
                     ))}
@@ -301,7 +300,7 @@ const CricketDeepStatsPanel = ({
         </div>
     );
 
-    const { avgFirstInningsByYear, bowlerTypes, matchOutcomes: _mo,
+    const { avgFirstInningsByYear, avgSecondInningsByYear, bowlerTypes, matchOutcomes: _mo,
             battingLeaders, bowlingLeaders, recentMatches } = deepStats as any;
 
     const totalWins = (deepStats.wonBattingFirst || 0) + (deepStats.wonBattingSecond || 0) + (deepStats.draws || 0);
@@ -444,27 +443,53 @@ const CricketDeepStatsPanel = ({
                 )}
             </div>
 
-            {/* ── Avg 1st innings by year (line chart) ── */}
-            {avgFirstInningsByYear && avgFirstInningsByYear.length > 1 && (
-                <Section icon={<TrendingUp size={16} style={{ color }} />} title="Average 1st Innings Score Trend"
-                    subtitle="How batting conditions have evolved year by year">
-                    <div className="h-[220px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart
-                                data={[...avgFirstInningsByYear].sort((a: any, b: any) => parseInt(a.year) - parseInt(b.year))}
-                                margin={{ left: 10, right: 20, top: 10, bottom: 10 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.07} />
-                                <XAxis dataKey="year" tick={{ fontSize: 11, fill: "currentColor" }} />
-                                <YAxis tick={{ fontSize: 11, fill: "currentColor" }} />
-                                <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={TOOLTIP_TEXT_STYLE} labelStyle={TOOLTIP_TEXT_STYLE}
-                                    formatter={(val: number) => [`${val} runs`, "Avg 1st Innings"]} />
-                                <Line type="monotone" dataKey="score" stroke={color} strokeWidth={2.5}
-                                    dot={{ r: 4, fill: color }} activeDot={{ r: 6 }} />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-                </Section>
-            )}
+            {/* ── Avg 1st & 2nd innings by year (line chart) ── */}
+            {((avgFirstInningsByYear && avgFirstInningsByYear.length > 1) || (avgSecondInningsByYear && avgSecondInningsByYear.length > 1)) && (() => {
+                // Merge data by year for the chart
+                const mergedMap = new Map();
+                if (avgFirstInningsByYear) {
+                    avgFirstInningsByYear.forEach((d: any) => mergedMap.set(d.year, { year: d.year, first: d.score }));
+                }
+                if (avgSecondInningsByYear) {
+                    avgSecondInningsByYear.forEach((d: any) => {
+                        if (mergedMap.has(d.year)) mergedMap.get(d.year).second = d.score;
+                        else mergedMap.set(d.year, { year: d.year, second: d.score });
+                    });
+                }
+                const mergedData = Array.from(mergedMap.values()).sort((a, b) => parseInt(a.year) - parseInt(b.year));
+
+                return (
+                    <Section icon={<TrendingUp size={16} style={{ color }} />} title="Average Innings Score Trend"
+                        subtitle="How batting conditions have evolved over recent years">
+                        <div className="h-[220px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart
+                                    data={mergedData}
+                                    margin={{ left: 10, right: 20, top: 10, bottom: 10 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.07} />
+                                    <XAxis dataKey="year" tick={{ fontSize: 11, fill: "currentColor" }} />
+                                    <YAxis tick={{ fontSize: 11, fill: "currentColor" }} />
+                                    <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={TOOLTIP_TEXT_STYLE} labelStyle={TOOLTIP_TEXT_STYLE} />
+                                    <Line type="monotone" name="1st Innings" dataKey="first" stroke={color} strokeWidth={2.5}
+                                        dot={{ r: 4, fill: color }} activeDot={{ r: 6 }} connectNulls={true} />
+                                    <Line type="monotone" name="2nd Innings" dataKey="second" stroke="#3b82f6" strokeWidth={2.5}
+                                        dot={{ r: 4, fill: "#3b82f6" }} activeDot={{ r: 6 }} connectNulls={true} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="flex gap-4 justify-center mt-2">
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+                                <span className="text-[10px] text-muted-foreground">1st Innings</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                                <span className="text-[10px] text-muted-foreground">2nd Innings</span>
+                            </div>
+                        </div>
+                    </Section>
+                );
+            })()}
 
             {/* ── Bowler type scatter chart ── */}
             {bowlerTypes && bowlerTypes.length > 0 && (
@@ -794,7 +819,7 @@ export const VenueAnalysisPanel = () => {
                 return {
                     ...dynamicV,
                     capacity: (dynamicV.capacity && dynamicV.capacity !== 0) ? dynamicV.capacity : matchingStatic.capacity,
-                    established: (dynamicV.established && dynamicV.established !== 'N/A') ? dynamicV.established : matchingStatic.established,
+                    established: dynamicV.established ? dynamicV.established : matchingStatic.established,
                     image: dynamicV.image || matchingStatic.image
                 };
             }

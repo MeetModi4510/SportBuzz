@@ -1,10 +1,10 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const battingUrl = 'https://stats.espncricinfo.com/ci/engine/stats/index.html?class=1;ground=61;template=results;type=batting';
+const bowlingUrl = 'https://stats.espncricinfo.com/ci/engine/stats/index.html?class=1;ground=61;template=results;type=bowling';
 
 async function test() {
     try {
-        const r1 = await axios.get(battingUrl, {headers: {'User-Agent': 'Mozilla/5.0'}});
+        const r1 = await axios.get(bowlingUrl, {headers: {'User-Agent': 'Mozilla/5.0'}});
         const $1 = cheerio.load(r1.data);
         const table1 = $1('table.engineTable').eq(2);
         

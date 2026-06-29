@@ -352,7 +352,11 @@ function fetchESPN(rawUrl) {
         const req = https.get(opts, (res) => {
             // Follow redirects
             if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-                return fetchESPN(res.headers.location).then(resolve).catch(reject);
+                let redirectUrl = res.headers.location;
+                if (!redirectUrl.startsWith('http')) {
+                    redirectUrl = new URL(redirectUrl, `https://${urlObj.hostname}`).href;
+                }
+                return fetchESPN(redirectUrl).then(resolve).catch(reject);
             }
             res.on('data', chunk => { data += chunk; });
             res.on('end', () => resolve({ status: res.statusCode, html: data }));
@@ -375,6 +379,11 @@ function parseBattingLeaders(html) {
         const $ = cheerio.load(html);
         const table = $('table.engineTable').eq(2);
         const rows = [];
+        
+        const headers = table.find('tr.headlinks').first().find('th').map((_, th) => $(th).text().trim()).get();
+        const idx100 = headers.indexOf('100') !== -1 ? headers.indexOf('100') : 8;
+        const idx50 = headers.indexOf('50') !== -1 ? headers.indexOf('50') : 9;
+
         table.find('tr.data1, tr.data2').each((i, row) => {
             const c = $(row).find('td').map((_, td) => $(td).text().trim()).get();
             if (!c[0] || c[0].includes('No records')) return;
@@ -390,8 +399,8 @@ function parseBattingLeaders(html) {
                 runs: parseInt(c[5]) || 0,
                 hs: c[6] || '-',
                 avg: parseFloat(c[7]) || 0,
-                hundreds: parseInt(c[8]) || 0,
-                fifties: parseInt(c[9]) || 0,
+                hundreds: parseInt(c[idx100]) || 0,
+                fifties: parseInt(c[idx50]) || 0,
             });
         });
         return rows.slice(0, 15);
@@ -410,6 +419,17 @@ function parseBowlingLeaders(html) {
         const $ = cheerio.load(html);
         const table = $('table.engineTable').eq(2);
         const rows = [];
+        
+        const headers = table.find('tr.headlinks').first().find('th').map((_, th) => $(th).text().trim()).get();
+        const idxWkts = headers.indexOf('Wkts') !== -1 ? headers.indexOf('Wkts') : 6;
+        const idxBBI = headers.indexOf('BBI') !== -1 ? headers.indexOf('BBI') : 7;
+        const idxBBM = headers.indexOf('BBM') !== -1 ? headers.indexOf('BBM') : 8;
+        const idxAve = headers.indexOf('Ave') !== -1 ? headers.indexOf('Ave') : 9;
+        const idxEcon = headers.indexOf('Econ') !== -1 ? headers.indexOf('Econ') : 10;
+        const idxSR = headers.indexOf('SR') !== -1 ? headers.indexOf('SR') : 11;
+        const idx5 = headers.indexOf('5') !== -1 ? headers.indexOf('5') : (headers.indexOf('5W') !== -1 ? headers.indexOf('5W') : 12);
+        const idx10 = headers.indexOf('10') !== -1 ? headers.indexOf('10') : (headers.indexOf('10W') !== -1 ? headers.indexOf('10W') : 13);
+
         table.find('tr.data1, tr.data2').each((i, row) => {
             const c = $(row).find('td').map((_, td) => $(td).text().trim()).get();
             if (!c[0] || c[0].includes('No records')) return;
@@ -420,15 +440,16 @@ function parseBowlingLeaders(html) {
                 span: c[1] || '',
                 matches: parseInt(c[2]) || 0,
                 innings: parseInt(c[3]) || 0,
-                overs: c[4] || '0',
-                wickets: parseInt(c[7]) || 0,
-                bbi: c[8] || '-',
-                bbm: c[9] || '-',
-                avg: parseFloat(c[10]) || 0,
-                econ: parseFloat(c[11]) || 0,
-                sr: parseFloat(c[12]) || 0,
-                fiveWkt: parseInt(c[13]) || 0,
-                tenWkt: parseInt(c[14]) || 0,
+                balls: parseInt(c[4]) || 0,
+                runs: parseInt(c[5]) || 0,
+                wickets: parseInt(c[idxWkts]) || 0,
+                bbi: c[idxBBI] || '-',
+                bbm: c[idxBBM] || '-',
+                avg: parseFloat(c[idxAve]) || 0,
+                econ: parseFloat(c[idxEcon]) || 0,
+                sr: parseFloat(c[idxSR]) || 0,
+                fiveWkt: parseInt(c[idx5]) || 0,
+                tenWkt: parseInt(c[idx10]) || 0,
             });
         });
         return rows.slice(0, 15);
@@ -447,6 +468,13 @@ function parseMatchList(html) {
         const $ = cheerio.load(html);
         const table = $('table.engineTable').eq(2);
 
+        const headers = table.find('tr.headlinks').first().find('th').map((_, th) => $(th).text().trim()).get();
+        const idxTeam = headers.indexOf('Team') !== -1 ? headers.indexOf('Team') : 0;
+        const idxResult = headers.indexOf('Result') !== -1 ? headers.indexOf('Result') : 1;
+        const idxMargin = headers.indexOf('Margin') !== -1 ? headers.indexOf('Margin') : 2;
+        const idxOpp = headers.indexOf('Opposition') !== -1 ? headers.indexOf('Opposition') : 6;
+        const idxDate = headers.indexOf('Start Date') !== -1 ? headers.indexOf('Start Date') : 8;
+
         const allRows = [];
         table.find('tr.data1, tr.data2').each((_, row) => {
             const c = $(row).find('td').map((_, td) => $(td).text().trim()).get();
@@ -456,11 +484,11 @@ function parseMatchList(html) {
         // Deduplicate by date+ground — each match appears twice (one row per team)
         const matchMap = new Map();
         for (const c of allRows) {
-            const date = c[8] || '';
-            const opp = c[6] || '';
-            const team = c[0] || '';
-            const result = c[1] || '';
-            const margin = c[2] || '';
+            const date = c[idxDate] || '';
+            const opp = c[idxOpp] || '';
+            const team = c[idxTeam] || '';
+            const result = c[idxResult] || '';
+            const margin = c[idxMargin] || '';
             
             // key using date helps deduplicate the two rows for the same match
             const key = `${date}|${opp.replace('v ', '').trim()}`;
@@ -499,22 +527,27 @@ function parseMatchList(html) {
  *           batFirstWins, batSecondWins, draws,
  *           avgRunRate, highestTotal, lowestTotal }
  */
-function parseInningsAverages(html) {
+function parseInningsAverages(htmls) {
     try {
-        const $ = cheerio.load(html);
-        const table = $('table.engineTable').eq(2);
-
+        if (!Array.isArray(htmls)) htmls = [htmls];
+        
         let totalRuns1st = 0, count1st = 0;
         let totalRuns2nd = 0, count2nd = 0;
         let batFirstWins = 0, batSecondWins = 0, draws = 0;
         const byYear = {};
+        const byYear2nd = {};
 
         let totalRpo = 0, rpoCount = 0;
         let highest = { scoreNum: -1, score: 'N/A', team: 'N/A', year: '' };
         let lowest = { scoreNum: 9999, score: 'N/A', team: 'N/A', year: '' };
 
-        // view=innings rows: Team | Score | Overs | RPO | ActualScore | InningsNum | Result | '' | Opposition | Ground | Date
-        table.find('tr.data1, tr.data2').each((_, row) => {
+        for (const html of htmls) {
+            if (!html) continue;
+            const $ = cheerio.load(html);
+            const table = $('table.engineTable').eq(2);
+
+            // view=innings rows: Team | Score | Overs | RPO | ActualScore | InningsNum | Result | '' | Opposition | Ground | Date
+            table.find('tr.data1, tr.data2').each((_, row) => {
             const c = $(row).find('td').map((_, td) => $(td).text().trim()).get();
             if (!c[0] || c[0].includes('No records')) return;
 
@@ -568,8 +601,11 @@ function parseInningsAverages(html) {
                 if (year) { byYear[year].sum += score; byYear[year].cnt++; }
             } else if (innings === 2) {
                 totalRuns2nd += score; count2nd++;
+                if (year) byYear2nd[year] = (byYear2nd[year] || { sum: 0, cnt: 0 });
+                if (year) { byYear2nd[year].sum += score; byYear2nd[year].cnt++; }
             }
         });
+        }
 
         const avgFirst = count1st > 0 ? Math.round(totalRuns1st / count1st) : 0;
         const avgSecond = count2nd > 0 ? Math.round(totalRuns2nd / count2nd) : 0;
@@ -578,11 +614,16 @@ function parseInningsAverages(html) {
             .map(([year, { sum, cnt }]) => ({ year, score: Math.round(sum / cnt) }))
             .sort((a, b) => a.year.localeCompare(b.year));
 
+        const byYear2ndArr = Object.entries(byYear2nd)
+            .map(([year, { sum, cnt }]) => ({ year, score: Math.round(sum / cnt) }))
+            .sort((a, b) => a.year.localeCompare(b.year));
+
         return {
             avgFirst, avgSecond,
             totalMatches: count1st,
             batFirstWins, batSecondWins, draws,
             byYear: byYearArr,
+            byYear2nd: byYear2ndArr,
             avgRunRate,
             highestTotal: highest.scoreNum !== -1 ? { score: highest.score, team: highest.team, year: highest.year } : { score: 'N/A', team: 'N/A', year: '' },
             lowestTotal: lowest.scoreNum !== 9999 ? { score: lowest.score, team: lowest.team, year: lowest.year } : { score: 'N/A', team: 'N/A', year: '' },
@@ -590,10 +631,51 @@ function parseInningsAverages(html) {
     } catch (e) {
         console.warn('[ESPN] parseInningsAverages error:', e.message);
         return {
-            avgFirst: 0, avgSecond: 0, totalMatches: 0, batFirstWins: 0, batSecondWins: 0, draws: 0, byYear: [],
+            avgFirst: 0, avgSecond: 0, totalMatches: 0, batFirstWins: 0, batSecondWins: 0, draws: 0, byYear: [], byYear2nd: [],
             avgRunRate: 0, highestTotal: { score: 'N/A', team: 'N/A', year: '' }, lowestTotal: { score: 'N/A', team: 'N/A', year: '' }
         };
     }
+}
+
+function parseHighLow(highestHtml, lowestHtml) {
+    let highest = { score: 'N/A', team: 'N/A', year: '' };
+    let lowest = { score: 'N/A', team: 'N/A', year: '' };
+
+    try {
+        if (highestHtml) {
+            const $ = cheerio.load(highestHtml);
+            const table = $('table.engineTable').eq(2);
+            table.find('tr.data1').slice(0, 5).each((_, row) => {
+                const c = $(row).find('td').map((_, td) => $(td).text().trim()).get();
+                if (c.length > 5 && c[1] && !c[1].includes('DNB')) {
+                    const dateStr = c.length >= 11 && !isNaN(parseInt(c[5])) ? c[10] : c[9];
+                    const year = dateStr.match(/\d{4}/)?.[0] || '';
+                    highest = { score: c[1], team: c[0], year };
+                    return false; // break
+                }
+            });
+        }
+        if (lowestHtml) {
+            const $ = cheerio.load(lowestHtml);
+            const table = $('table.engineTable').eq(2);
+            table.find('tr.data1, tr.data2').each((_, row) => {
+                const c = $(row).find('td').map((_, td) => $(td).text().trim()).get();
+                if (c.length > 5 && c[1]) {
+                    const score = parseInt(c[1]);
+                    // must be completed innings (no / and no d)
+                    if (score > 10 && !c[1].includes('/') && !c[1].includes('d')) {
+                        const dateStr = c.length >= 11 && !isNaN(parseInt(c[5])) ? c[10] : c[9];
+                        const year = dateStr.match(/\d{4}/)?.[0] || '';
+                        lowest = { score: c[1], team: c[0], year };
+                        return false; // break
+                    }
+                }
+            });
+        }
+    } catch (e) {
+        console.warn('[ESPN] parseHighLow error:', e.message);
+    }
+    return { highestTotal: highest, lowestTotal: lowest };
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────
@@ -623,7 +705,10 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
     const battingUrl = `${BASE}?class=${classId};ground=${gid};template=results;type=batting`;
     const bowlingUrl = `${BASE}?class=${classId};ground=${gid};template=results;type=bowling`;
     const matchUrl = `${BASE}?class=${classId};filter=advanced;ground=${gid};orderby=start;orderbyad=reverse;template=results;type=team;view=results`;
-    const inningsUrl = `${BASE}?class=${classId};filter=advanced;ground=${gid};groupby=innings;orderby=innings_number;template=results;type=team;view=innings`;
+    const innings1Url = `${BASE}?class=${classId};filter=advanced;ground=${gid};groupby=innings;orderby=start;orderbyad=reverse;template=results;type=team;view=innings;innings_number=1`;
+    const innings2Url = `${BASE}?class=${classId};filter=advanced;ground=${gid};groupby=innings;orderby=start;orderbyad=reverse;template=results;type=team;view=innings;innings_number=2`;
+    const highestUrl = `${BASE}?class=${classId};ground=${gid};template=results;type=team;view=innings;orderby=team_score`;
+    const lowestUrl = `${BASE}?class=${classId};ground=${gid};template=results;type=team;view=innings;orderby=team_score;orderbyad=reverse`;
 
     // Aggregate URLs for true stats
     const aggUrl = `${BASE}?class=${classId};ground=${gid};template=results;type=aggregate`;
@@ -633,14 +718,17 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
     const aggWin2Url = `${agg2Url};result=1`;
 
     try {
-        const [batRes, bowlRes, matchRes, inningsRes, aggRes, agg1Res, agg2Res, agg1WinRes, agg2WinRes] = await Promise.all([
+        const [batRes, bowlRes, matchRes, innings1Res, innings2Res, highRes, lowRes, aggRes, agg1Res, agg2Res, agg1WinRes, agg2WinRes] = await Promise.all([
             fetchESPN(battingUrl).catch(e => { console.warn('[ESPN] batting fetch error:', e.message); return null; }),
             fetchESPN(bowlingUrl).catch(e => { console.warn('[ESPN] bowling fetch error:', e.message); return null; }),
             fetchESPN(matchUrl).catch(e => { console.warn('[ESPN] match fetch error:', e.message); return null; }),
-            fetchESPN(inningsUrl).catch(e => { console.warn('[ESPN] innings fetch error:', e.message); return null; }),
+            fetchESPN(innings1Url).catch(e => { console.warn('[ESPN] innings1 fetch error:', e.message); return null; }),
+            fetchESPN(innings2Url).catch(e => { console.warn('[ESPN] innings2 fetch error:', e.message); return null; }),
+            fetchESPN(highestUrl).catch(() => null),
+            fetchESPN(lowestUrl).catch(() => null),
             fetchESPN(aggUrl).catch(() => null),
             fetchESPN(agg1Url).catch(() => null),
-            fetchESPN(agg2Url).catch(e => { console.log('AGG2 ERROR:', e.message); return null; }),
+            fetchESPN(agg2Url).catch(() => null),
             fetchESPN(aggWin1Url).catch(() => null),
             fetchESPN(aggWin2Url).catch(() => null),
         ]);
@@ -648,10 +736,14 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
         const battingLeaders = batRes?.status === 200 ? parseBattingLeaders(batRes.html) : [];
         const bowlingLeaders = bowlRes?.status === 200 ? parseBowlingLeaders(bowlRes.html) : [];
         const recentMatches = matchRes?.status === 200 ? parseMatchList(matchRes.html) : [];
-        const inningsAvg = inningsRes?.status === 200 ? parseInningsAverages(inningsRes.html) : {
-            avgFirst: 0, avgSecond: 0, totalMatches: 0,
-            batFirstWins: 0, batSecondWins: 0, draws: 0, byYear: [],
-        };
+        const inningsAvg = parseInningsAverages([
+            innings1Res?.status === 200 ? innings1Res.html : null,
+            innings2Res?.status === 200 ? innings2Res.html : null
+        ]);
+        const highLow = parseHighLow(
+            highRes?.status === 200 ? highRes.html : null,
+            lowRes?.status === 200 ? lowRes.html : null
+        );
 
         const extractAgg = (html) => {
             if (!html) return [];
@@ -697,9 +789,10 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
             avgFirstInningsScore: avgFirst,
             avgSecondInningsScore: avgSecond,
             avgFirstInningsByYear: inningsAvg.byYear,
+            avgSecondInningsByYear: inningsAvg.byYear2nd,
             avgRunRate: overallRpo,
-            highestTotal: inningsAvg.highestTotal,
-            lowestTotal: inningsAvg.lowestTotal,
+            highestTotal: highLow.highestTotal.score !== 'N/A' ? highLow.highestTotal : inningsAvg.highestTotal,
+            lowestTotal: highLow.lowestTotal.score !== 'N/A' ? highLow.lowestTotal : inningsAvg.lowestTotal,
             // Win/loss breakdown
             wonBattingFirst: batFirstWins,
             wonBattingSecond: batSecondWins,

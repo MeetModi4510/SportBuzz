@@ -937,7 +937,7 @@ const COUNTRY_ESPN_VENUES = {
             id: 713,
             name: 'Wankhede Stadium, Mumbai',
             city: 'Mumbai',
-            capacity: 33108,
+            capacity: 33000,
             established: '1974',
             wikiTitle: 'Wankhede Stadium'
         },
@@ -953,7 +953,7 @@ const COUNTRY_ESPN_VENUES = {
             id: 291,
             name: 'MA Chidambaram Stadium, Chennai',
             city: 'Chennai',
-            capacity: 38200,
+            capacity: 38000,
             established: '1916',
             wikiTitle: 'MA Chidambaram Stadium'
         },
@@ -961,7 +961,7 @@ const COUNTRY_ESPN_VENUES = {
             id: 333,
             name: 'Arun Jaitley Stadium, Delhi',
             city: 'Delhi',
-            capacity: 41842,
+            capacity: 41820,
             established: '1883',
             wikiTitle: 'Arun Jaitley Stadium'
         },
@@ -978,15 +978,15 @@ const COUNTRY_ESPN_VENUES = {
             name: 'Narendra Modi Stadium, Ahmedabad',
             city: 'Ahmedabad',
             capacity: 132000,
-            established: '1983',
+            established: '1982 (renovated 2020)',
             wikiTitle: 'Narendra Modi Stadium'
         },
         {
             id: 1981,
             name: 'Rajiv Gandhi International Stadium, Hyderabad',
             city: 'Hyderabad',
-            capacity: 39200,
-            established: '2003',
+            capacity: 55000,
+            established: '2004',
             wikiTitle: 'Rajiv Gandhi International Stadium'
         },
         {
@@ -1041,7 +1041,7 @@ const COUNTRY_ESPN_VENUES = {
             id: 1015,
             name: 'IS Bindra Stadium, Mohali',
             city: 'Mohali',
-            capacity: 27000,
+            capacity: 26000,
             established: '1993',
             wikiTitle: 'IS Bindra Stadium'
         },
@@ -1058,7 +1058,7 @@ const COUNTRY_ESPN_VENUES = {
             name: 'Barsapara Cricket Stadium, Guwahati',
             city: 'Guwahati',
             capacity: 40000,
-            established: '2012',
+            established: '2017',
             wikiTitle: 'Barsapara Cricket Stadium'
         },
         {
@@ -1074,7 +1074,7 @@ const COUNTRY_ESPN_VENUES = {
             name: 'Maharaja Yadavindra Singh International Stadium, Mullanpur',
             city: 'Mullanpur',
             capacity: 38000,
-            established: '2021',
+            established: '2023',
             wikiTitle: 'Maharaja Yadavindra Singh International Stadium'
         },
         {
@@ -1089,7 +1089,7 @@ const COUNTRY_ESPN_VENUES = {
             id: 2677,
             name: 'MCA International Stadium, Pune',
             city: 'Pune',
-            capacity: 37000,
+            capacity: 42700,
             established: '2012',
             wikiTitle: 'MCA International Stadium'
         },
@@ -1098,14 +1098,14 @@ const COUNTRY_ESPN_VENUES = {
             name: 'JSCA International Stadium Complex, Ranchi',
             city: 'Ranchi',
             capacity: 50000,
-            established: '2011',
+            established: '2013',
             wikiTitle: 'JSCA International Stadium Complex'
         },
         {
             id: 3400,
             name: 'Greenfield International Stadium, Thiruvananthapuram',
             city: 'Thiruvananthapuram',
-            capacity: 50000,
+            capacity: 55000,
             established: '2015',
             wikiTitle: 'Greenfield International Stadium'
         }
@@ -1131,7 +1131,7 @@ const COUNTRY_ESPN_VENUES = {
             id: 209,
             name: 'The Gabba, Brisbane',
             city: 'Brisbane',
-            capacity: 36000,
+            capacity: 42000,
             established: '1895',
             wikiTitle: 'Brisbane Cricket Ground'
         },
@@ -1147,8 +1147,8 @@ const COUNTRY_ESPN_VENUES = {
             id: 3404,
             name: 'Optus Stadium, Perth',
             city: 'Perth',
-            capacity: 60000,
-            established: '2017',
+            capacity: 61266,
+            established: '2018',
             wikiTitle: 'Perth Stadium'
         },
         {
@@ -1156,14 +1156,14 @@ const COUNTRY_ESPN_VENUES = {
             name: 'WACA Ground, Perth',
             city: 'Perth',
             capacity: 20000,
-            established: '1890',
+            established: '1893',
             wikiTitle: 'WACA Ground'
         },
         {
             id: 757,
             name: 'Manuka Oval, Canberra',
             city: 'Canberra',
-            capacity: 13550,
+            capacity: 12000,
             established: '1929',
             wikiTitle: 'Manuka Oval'
         },
@@ -1171,7 +1171,7 @@ const COUNTRY_ESPN_VENUES = {
             id: 905,
             name: 'Blundstone Arena, Hobart',
             city: 'Hobart',
-            capacity: 19500,
+            capacity: 20000,
             established: '1914',
             wikiTitle: 'Bellerive Oval'
         }
@@ -1245,8 +1245,8 @@ const COUNTRY_ESPN_VENUES = {
             id: 644,
             name: 'Sophia Gardens, Cardiff',
             city: 'Cardiff',
-            capacity: 15643,
-            established: '1858',
+            capacity: 15600,
+            established: '1967',
             wikiTitle: 'Sophia Gardens'
         }
     ],
@@ -1255,7 +1255,7 @@ const COUNTRY_ESPN_VENUES = {
             id: 487,
             name: 'National Stadium, Karachi',
             city: 'Karachi',
-            capacity: 34228,
+            capacity: 34000,
             established: '1955',
             wikiTitle: 'National Stadium, Karachi'
         },
@@ -1279,7 +1279,7 @@ const COUNTRY_ESPN_VENUES = {
             id: 1597,
             name: 'Multan Cricket Stadium',
             city: 'Multan',
-            capacity: 30000,
+            capacity: 35000,
             established: '2001',
             wikiTitle: 'Multan Cricket Stadium'
         },
@@ -1288,7 +1288,7 @@ const COUNTRY_ESPN_VENUES = {
             name: 'Iqbal Stadium, Faisalabad',
             city: 'Faisalabad',
             capacity: 18000,
-            established: '1978',
+            established: '1979',
             wikiTitle: 'Iqbal Stadium'
         }
     ],
@@ -1330,7 +1330,7 @@ const COUNTRY_ESPN_VENUES = {
             name: "St George's Park, Gqeberha",
             city: 'Gqeberha',
             capacity: 19000,
-            established: '1882',
+            established: '1889',
             wikiTitle: "St George's Park Cricket Ground"
         },
         {
@@ -1347,7 +1347,7 @@ const COUNTRY_ESPN_VENUES = {
             id: 1004,
             name: 'R Premadasa Stadium, Colombo',
             city: 'Colombo',
-            capacity: 35000,
+            capacity: 40000,
             established: '1986',
             wikiTitle: 'R Premadasa Stadium'
         },
@@ -1380,7 +1380,7 @@ const COUNTRY_ESPN_VENUES = {
             name: 'Asgiriya Stadium, Kandy',
             city: 'Kandy',
             capacity: 10300,
-            established: '1915',
+            established: '1910',
             wikiTitle: 'Asgiriya Stadium'
         },
         {
@@ -1388,7 +1388,7 @@ const COUNTRY_ESPN_VENUES = {
             name: 'P Sara Oval, Colombo',
             city: 'Colombo',
             capacity: 15000,
-            established: '1982',
+            established: '1945',
             wikiTitle: 'P Sara Oval'
         },
         {
@@ -1396,7 +1396,7 @@ const COUNTRY_ESPN_VENUES = {
             name: 'Rangiri Dambulla International Stadium',
             city: 'Dambulla',
             capacity: 16800,
-            established: '2000',
+            established: '2001',
             wikiTitle: 'Rangiri Dambulla International Stadium'
         }
     ],
@@ -1405,8 +1405,8 @@ const COUNTRY_ESPN_VENUES = {
             id: 2025,
             name: 'Shere Bangla National Stadium, Dhaka',
             city: 'Dhaka',
-            capacity: 25416,
-            established: '2006',
+            capacity: 25000,
+            established: '2004',
             wikiTitle: 'Shere Bangla National Stadium'
         },
         {
@@ -1422,7 +1422,7 @@ const COUNTRY_ESPN_VENUES = {
             name: 'Sylhet International Cricket Stadium',
             city: 'Sylhet',
             capacity: 18500,
-            established: '2007',
+            established: '2014',
             wikiTitle: 'Sylhet International Cricket Stadium'
         }
     ],
@@ -1432,7 +1432,7 @@ const COUNTRY_ESPN_VENUES = {
             name: 'Kensington Oval, Bridgetown',
             city: 'Bridgetown',
             capacity: 28000,
-            established: '1882',
+            established: '1871',
             wikiTitle: 'Kensington Oval'
         },
         {
@@ -1448,7 +1448,7 @@ const COUNTRY_ESPN_VENUES = {
             name: 'Sabina Park, Kingston',
             city: 'Kingston',
             capacity: 20000,
-            established: '1895',
+            established: '1930',
             wikiTitle: 'Sabina Park'
         },
         {
@@ -1456,14 +1456,14 @@ const COUNTRY_ESPN_VENUES = {
             name: 'Sir Vivian Richards Stadium, Antigua',
             city: 'Antigua',
             capacity: 10000,
-            established: '2006',
+            established: '2007',
             wikiTitle: 'Sir Vivian Richards Stadium'
         },
         {
             id: 1986,
             name: 'Providence Stadium, Guyana',
             city: 'Guyana',
-            capacity: 20000,
+            capacity: 15000,
             established: '2006',
             wikiTitle: 'Providence Stadium'
         },
@@ -1557,7 +1557,7 @@ const COUNTRY_ESPN_VENUES = {
             id: 116,
             name: 'Basin Reserve, Wellington',
             city: 'Wellington',
-            capacity: 11600,
+            capacity: 13000,
             established: '1868',
             wikiTitle: 'Basin Reserve'
         },
@@ -1565,8 +1565,8 @@ const COUNTRY_ESPN_VENUES = {
             id: 93,
             name: 'Hagley Oval, Christchurch',
             city: 'Christchurch',
-            capacity: 18000,
-            established: '1851',
+            capacity: 20000,
+            established: '1867',
             wikiTitle: 'Hagley Oval'
         },
         {
@@ -1600,7 +1600,7 @@ const COUNTRY_ESPN_VENUES = {
             name: 'The Village, Dublin',
             city: 'Dublin',
             capacity: 11500,
-            established: '1998',
+            established: '1993',
             wikiTitle: 'The Village, Malahide'
         }
     ],
@@ -1855,9 +1855,10 @@ router.get('/venue/espn-stats', async (req, res) => {
             lowestTotal: espnData.lowestTotal || { score: 'See ESPN', team: '', year: '' },
             formatBreakdown: [], bowlerTypes: [],
             avgFirstInningsByYear: espnData.avgFirstInningsByYear || [],
+            avgSecondInningsByYear: espnData.avgSecondInningsByYear || [],
             battingLeaders: (espnData.battingLeaders || []).map(p => ({
                 rank: p.rank, name: p.name, innings: p.innings, runs: p.runs,
-                avg: p.avg, hs: p.hs, sr: 0, hundreds: p.hundreds || 0, fifties: p.fifties || 0,
+                avg: p.avg, hs: p.hs, sr: null, hundreds: p.hundreds || 0, fifties: p.fifties || 0,
             })),
             bowlingLeaders: (espnData.bowlingLeaders || []).map(p => ({
                 rank: p.rank, name: p.name, innings: p.innings, wickets: p.wickets,
@@ -1880,7 +1881,7 @@ function _emptyESPNStats(format, country) {
         tossWinBatFirst: 0, tossWinFieldFirst: 0, avgWicketsFallen: 0, centuries: 0, fiveWicketHauls: 0,
         pitchType: 'International cricket venue',
         highestTotal: { score: 'N/A', team: '', year: '' }, lowestTotal: { score: 'N/A', team: '', year: '' },
-        formatBreakdown: [], bowlerTypes: [], avgFirstInningsByYear: [],
+        formatBreakdown: [], bowlerTypes: [], avgFirstInningsByYear: [], avgSecondInningsByYear: [],
         battingLeaders: [], bowlingLeaders: [], recentMatches: [], matchOutcomes: null, cricmetricSource: null,
     };
 }
