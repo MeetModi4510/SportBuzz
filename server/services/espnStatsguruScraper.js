@@ -625,12 +625,24 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
     const matchUrl = `${BASE}?class=${classId};filter=advanced;ground=${gid};orderby=start;orderbyad=reverse;template=results;type=team;view=results`;
     const inningsUrl = `${BASE}?class=${classId};filter=advanced;ground=${gid};groupby=innings;orderby=innings_number;template=results;type=team;view=innings`;
 
+    // Aggregate URLs for true stats
+    const aggUrl = `${BASE}?class=${classId};ground=${gid};template=results;type=aggregate`;
+    const agg1Url = `${aggUrl};innings_number=1`;
+    const agg2Url = `${aggUrl};innings_number=2`;
+    const aggWin1Url = `${agg1Url};result=1`;
+    const aggWin2Url = `${agg2Url};result=1`;
+
     try {
-        const [batRes, bowlRes, matchRes, inningsRes] = await Promise.all([
+        const [batRes, bowlRes, matchRes, inningsRes, aggRes, agg1Res, agg2Res, agg1WinRes, agg2WinRes] = await Promise.all([
             fetchESPN(battingUrl).catch(e => { console.warn('[ESPN] batting fetch error:', e.message); return null; }),
             fetchESPN(bowlingUrl).catch(e => { console.warn('[ESPN] bowling fetch error:', e.message); return null; }),
             fetchESPN(matchUrl).catch(e => { console.warn('[ESPN] match fetch error:', e.message); return null; }),
             fetchESPN(inningsUrl).catch(e => { console.warn('[ESPN] innings fetch error:', e.message); return null; }),
+            fetchESPN(aggUrl).catch(() => null),
+            fetchESPN(agg1Url).catch(() => null),
+            fetchESPN(agg2Url).catch(e => { console.log('AGG2 ERROR:', e.message); return null; }),
+            fetchESPN(aggWin1Url).catch(() => null),
+            fetchESPN(aggWin2Url).catch(() => null),
         ]);
 
         const battingLeaders = batRes?.status === 200 ? parseBattingLeaders(batRes.html) : [];
@@ -641,10 +653,39 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
             batFirstWins: 0, batSecondWins: 0, draws: 0, byYear: [],
         };
 
-        const total = inningsAvg.totalMatches;
-        const batFirstWinPct = total > 0 ? Math.round((inningsAvg.batFirstWins / total) * 100) : 0;
-        const batSecondWinPct = total > 0 ? Math.round((inningsAvg.batSecondWins / total) * 100) : 0;
-        const drawPct = total > 0 ? Math.round((inningsAvg.draws / total) * 100) : 0;
+        const extractAgg = (html) => {
+            if (!html) return [];
+            const $ = cheerio.load(html);
+            return $('table.engineTable').eq(2).find('tr.data1').first().find('td').map((_, el) => $(el).text().trim()).get();
+        };
+
+        const agg = extractAgg(aggRes?.html);
+        const agg1 = extractAgg(agg1Res?.html);
+        const agg2 = extractAgg(agg2Res?.html);
+        const agg1Win = extractAgg(agg1WinRes?.html);
+        const agg2Win = extractAgg(agg2WinRes?.html);
+
+        // Overall stats (agg): Span(0), Mat(1), Won(2), Tied(3), Draw(4), Runs(5), Wkts(6), Balls(7), Ave(8), RPO(9)
+        const total = parseInt(agg[1]) || inningsAvg.totalMatches;
+        const draws = (parseInt(agg[4]) || 0) + (parseInt(agg[3]) || 0); // Draws + Ties
+        const overallRpo = parseFloat(agg[9]) || inningsAvg.avgRunRate || 0;
+
+        // Innings stats
+        const inn1Matches = parseInt(agg1[1]) || 1;
+        const inn1Runs = parseInt(agg1[5]) || 0;
+        const avgFirst = inn1Runs > 0 ? Math.round(inn1Runs / inn1Matches) : inningsAvg.avgFirst;
+
+        const inn2Matches = parseInt(agg2[1]) || 1;
+        const inn2Runs = parseInt(agg2[5]) || 0;
+        const avgSecond = inn2Runs > 0 ? Math.round(inn2Runs / inn2Matches) : inningsAvg.avgSecond;
+
+        // Wins
+        const batFirstWins = parseInt(agg1Win[1]) || inningsAvg.batFirstWins;
+        const batSecondWins = parseInt(agg2Win[1]) || inningsAvg.batSecondWins;
+
+        const batFirstWinPct = total > 0 ? Math.round((batFirstWins / total) * 100) : 0;
+        const batSecondWinPct = total > 0 ? Math.round((batSecondWins / total) * 100) : 0;
+        const drawPct = total > 0 ? Math.round((draws / total) * 100) : 0;
 
         const result = {
             source: 'espn_statsguru',
@@ -653,25 +694,25 @@ export async function scrapeESPNVenue(groundId, format = 'Test', groundName = ''
             format,
             // Core stats
             matchesHosted: total,
-            avgFirstInningsScore: inningsAvg.avgFirst,
-            avgSecondInningsScore: inningsAvg.avgSecond,
+            avgFirstInningsScore: avgFirst,
+            avgSecondInningsScore: avgSecond,
             avgFirstInningsByYear: inningsAvg.byYear,
-            avgRunRate: inningsAvg.avgRunRate,
+            avgRunRate: overallRpo,
             highestTotal: inningsAvg.highestTotal,
             lowestTotal: inningsAvg.lowestTotal,
             // Win/loss breakdown
-            wonBattingFirst: inningsAvg.batFirstWins,
-            wonBattingSecond: inningsAvg.batSecondWins,
-            draws: inningsAvg.draws,
+            wonBattingFirst: batFirstWins,
+            wonBattingSecond: batSecondWins,
+            draws: draws,
             batFirstWinPct,
             batSecondWinPct,
             drawPct,
 
             // Match outcomes object (for chart compatibility)
             matchOutcomes: total > 0 ? {
-                batFirstWins: inningsAvg.batFirstWins,
-                batSecondWins: inningsAvg.batSecondWins,
-                draws: inningsAvg.draws,
+                batFirstWins: batFirstWins,
+                batSecondWins: batSecondWins,
+                draws: draws,
                 totalMatches: total,
                 batFirstWinPct,
                 batSecondWinPct,

@@ -932,117 +932,698 @@ async function batchWikipediaImages(wikiTitles) {
 // ── Country → ESPN ground IDs (canonical, deduplicated) ───────────────────────────────
 // Derived from ESPN_GROUND_MAP — authoritative list of which venues to show per country
 const COUNTRY_ESPN_VENUES = {
-    'India': [
-        { id: 713,  name: 'Wankhede Stadium, Mumbai',                          city: 'Mumbai' },
-        { id: 292,  name: 'Eden Gardens, Kolkata',                              city: 'Kolkata' },
-        { id: 291,  name: 'MA Chidambaram Stadium, Chennai',                    city: 'Chennai' },
-        { id: 333,  name: 'Arun Jaitley Stadium, Delhi',                        city: 'Delhi' },
-        { id: 683,  name: 'M. Chinnaswamy Stadium, Bengaluru',                  city: 'Bengaluru' },
-        { id: 840,  name: 'Narendra Modi Stadium, Ahmedabad',                   city: 'Ahmedabad' },
-        { id: 1981, name: 'Rajiv Gandhi International Stadium, Hyderabad',      city: 'Hyderabad' },
-        { id: 1920, name: 'HPCA Stadium, Dharamsala',                           city: 'Dharamsala' },
-        { id: 2399, name: 'VCA Stadium, Nagpur',                                city: 'Nagpur' },
-        { id: 664,  name: 'Sawai Mansingh Stadium, Jaipur',                     city: 'Jaipur' },
-        { id: 442,  name: 'Barabati Stadium, Cuttack',                          city: 'Cuttack' },
-        { id: 419,  name: 'Green Park, Kanpur',                                 city: 'Kanpur' },
-        { id: 2401, name: 'Saurashtra Cricket Association Stadium, Rajkot',     city: 'Rajkot' },
-        { id: 1015, name: 'IS Bindra Stadium, Mohali',                          city: 'Mohali' },
-        { id: 3355, name: 'Ekana Cricket Stadium, Lucknow',                     city: 'Lucknow' },
-        { id: 2865, name: 'Barsapara Cricket Stadium, Guwahati',                city: 'Guwahati' },
-        { id: 1896, name: 'ACA-VDCA Stadium, Visakhapatnam',                   city: 'Visakhapatnam' },
-        { id: 3585, name: 'Maharaja Yadavindra Singh International Stadium, Mullanpur', city: 'Mullanpur' },
-        { id: 1055, name: 'Holkar Cricket Stadium, Indore',                     city: 'Indore' },
-        { id: 2677, name: 'MCA International Stadium, Pune',                    city: 'Pune' },
-        { id: 2575, name: 'JSCA International Stadium Complex, Ranchi',         city: 'Ranchi' },
-        { id: 3400, name: 'Greenfield International Stadium, Thiruvananthapuram', city: 'Thiruvananthapuram' },
+    India: [
+        {
+            id: 713,
+            name: 'Wankhede Stadium, Mumbai',
+            city: 'Mumbai',
+            capacity: 33108,
+            established: '1974',
+            wikiTitle: 'Wankhede Stadium'
+        },
+        {
+            id: 292,
+            name: 'Eden Gardens, Kolkata',
+            city: 'Kolkata',
+            capacity: 68000,
+            established: '1864',
+            wikiTitle: 'Eden Gardens'
+        },
+        {
+            id: 291,
+            name: 'MA Chidambaram Stadium, Chennai',
+            city: 'Chennai',
+            capacity: 38200,
+            established: '1916',
+            wikiTitle: 'MA Chidambaram Stadium'
+        },
+        {
+            id: 333,
+            name: 'Arun Jaitley Stadium, Delhi',
+            city: 'Delhi',
+            capacity: 41842,
+            established: '1883',
+            wikiTitle: 'Arun Jaitley Stadium'
+        },
+        {
+            id: 683,
+            name: 'M. Chinnaswamy Stadium, Bengaluru',
+            city: 'Bengaluru',
+            capacity: 40000,
+            established: '1969',
+            wikiTitle: 'M. Chinnaswamy Stadium'
+        },
+        {
+            id: 840,
+            name: 'Narendra Modi Stadium, Ahmedabad',
+            city: 'Ahmedabad',
+            capacity: 132000,
+            established: '1983',
+            wikiTitle: 'Narendra Modi Stadium'
+        },
+        {
+            id: 1981,
+            name: 'Rajiv Gandhi International Stadium, Hyderabad',
+            city: 'Hyderabad',
+            capacity: 39200,
+            established: '2003',
+            wikiTitle: 'Rajiv Gandhi International Stadium'
+        },
+        {
+            id: 1920,
+            name: 'HPCA Stadium, Dharamsala',
+            city: 'Dharamsala',
+            capacity: 23000,
+            established: '2003',
+            wikiTitle: 'HPCA Stadium'
+        },
+        {
+            id: 2399,
+            name: 'VCA Stadium, Nagpur',
+            city: 'Nagpur',
+            capacity: 45000,
+            established: '2008',
+            wikiTitle: 'VCA Stadium'
+        },
+        {
+            id: 664,
+            name: 'Sawai Mansingh Stadium, Jaipur',
+            city: 'Jaipur',
+            capacity: 30000,
+            established: '1969',
+            wikiTitle: 'Sawai Mansingh Stadium'
+        },
+        {
+            id: 442,
+            name: 'Barabati Stadium, Cuttack',
+            city: 'Cuttack',
+            capacity: 45000,
+            established: '1958',
+            wikiTitle: 'Barabati Stadium'
+        },
+        {
+            id: 419,
+            name: 'Green Park, Kanpur',
+            city: 'Kanpur',
+            capacity: 32000,
+            established: '1945',
+            wikiTitle: 'Green Park'
+        },
+        {
+            id: 2401,
+            name: 'Saurashtra Cricket Association Stadium, Rajkot',
+            city: 'Rajkot',
+            capacity: 28000,
+            established: '2008',
+            wikiTitle: 'Saurashtra Cricket Association Stadium'
+        },
+        {
+            id: 1015,
+            name: 'IS Bindra Stadium, Mohali',
+            city: 'Mohali',
+            capacity: 27000,
+            established: '1993',
+            wikiTitle: 'IS Bindra Stadium'
+        },
+        {
+            id: 3355,
+            name: 'Ekana Cricket Stadium, Lucknow',
+            city: 'Lucknow',
+            capacity: 50000,
+            established: '2017',
+            wikiTitle: 'Ekana Cricket Stadium'
+        },
+        {
+            id: 2865,
+            name: 'Barsapara Cricket Stadium, Guwahati',
+            city: 'Guwahati',
+            capacity: 40000,
+            established: '2012',
+            wikiTitle: 'Barsapara Cricket Stadium'
+        },
+        {
+            id: 1896,
+            name: 'ACA-VDCA Stadium, Visakhapatnam',
+            city: 'Visakhapatnam',
+            capacity: 27500,
+            established: '2003',
+            wikiTitle: 'ACA-VDCA Stadium'
+        },
+        {
+            id: 3585,
+            name: 'Maharaja Yadavindra Singh International Stadium, Mullanpur',
+            city: 'Mullanpur',
+            capacity: 38000,
+            established: '2021',
+            wikiTitle: 'Maharaja Yadavindra Singh International Stadium'
+        },
+        {
+            id: 1055,
+            name: 'Holkar Cricket Stadium, Indore',
+            city: 'Indore',
+            capacity: 30000,
+            established: '1990',
+            wikiTitle: 'Holkar Cricket Stadium'
+        },
+        {
+            id: 2677,
+            name: 'MCA International Stadium, Pune',
+            city: 'Pune',
+            capacity: 37000,
+            established: '2012',
+            wikiTitle: 'MCA International Stadium'
+        },
+        {
+            id: 2575,
+            name: 'JSCA International Stadium Complex, Ranchi',
+            city: 'Ranchi',
+            capacity: 50000,
+            established: '2011',
+            wikiTitle: 'JSCA International Stadium Complex'
+        },
+        {
+            id: 3400,
+            name: 'Greenfield International Stadium, Thiruvananthapuram',
+            city: 'Thiruvananthapuram',
+            capacity: 50000,
+            established: '2015',
+            wikiTitle: 'Greenfield International Stadium'
+        }
     ],
-    'Australia': [
-        { id: 61,   name: 'Melbourne Cricket Ground',         city: 'Melbourne' },
-        { id: 132,  name: 'Sydney Cricket Ground',            city: 'Sydney' },
-        { id: 209,  name: 'The Gabba, Brisbane',              city: 'Brisbane' },
-        { id: 131,  name: 'Adelaide Oval',                    city: 'Adelaide' },
-        { id: 3404, name: 'Optus Stadium, Perth',             city: 'Perth' },
-        { id: 213,  name: 'WACA Ground, Perth',               city: 'Perth' },
-        { id: 757,  name: 'Manuka Oval, Canberra',            city: 'Canberra' },
-        { id: 905,  name: 'Blundstone Arena, Hobart',         city: 'Hobart' },
+    Australia: [
+        {
+            id: 61,
+            name: 'Melbourne Cricket Ground',
+            city: 'Melbourne',
+            capacity: 100024,
+            established: '1853',
+            wikiTitle: 'Melbourne Cricket Ground'
+        },
+        {
+            id: 132,
+            name: 'Sydney Cricket Ground',
+            city: 'Sydney',
+            capacity: 48000,
+            established: '1848',
+            wikiTitle: 'Sydney Cricket Ground'
+        },
+        {
+            id: 209,
+            name: 'The Gabba, Brisbane',
+            city: 'Brisbane',
+            capacity: 36000,
+            established: '1895',
+            wikiTitle: 'Brisbane Cricket Ground'
+        },
+        {
+            id: 131,
+            name: 'Adelaide Oval',
+            city: 'Adelaide',
+            capacity: 53500,
+            established: '1871',
+            wikiTitle: 'Adelaide Oval'
+        },
+        {
+            id: 3404,
+            name: 'Optus Stadium, Perth',
+            city: 'Perth',
+            capacity: 60000,
+            established: '2017',
+            wikiTitle: 'Perth Stadium'
+        },
+        {
+            id: 213,
+            name: 'WACA Ground, Perth',
+            city: 'Perth',
+            capacity: 20000,
+            established: '1890',
+            wikiTitle: 'WACA Ground'
+        },
+        {
+            id: 757,
+            name: 'Manuka Oval, Canberra',
+            city: 'Canberra',
+            capacity: 13550,
+            established: '1929',
+            wikiTitle: 'Manuka Oval'
+        },
+        {
+            id: 905,
+            name: 'Blundstone Arena, Hobart',
+            city: 'Hobart',
+            capacity: 19500,
+            established: '1914',
+            wikiTitle: 'Bellerive Oval'
+        }
     ],
-    'England': [
-        { id: 10,   name: "Lord's Cricket Ground, London",           city: 'London' },
-        { id: 45,   name: 'The Oval, London',                         city: 'London' },
-        { id: 75,   name: 'Old Trafford, Manchester',                 city: 'Manchester' },
-        { id: 164,  name: 'Edgbaston, Birmingham',                    city: 'Birmingham' },
-        { id: 179,  name: 'Headingley, Leeds',                        city: 'Leeds' },
-        { id: 34,   name: 'Trent Bridge, Nottingham',                 city: 'Nottingham' },
-        { id: 1039, name: 'Riverside Ground, Chester-le-Street',      city: 'Chester-le-Street' },
-        { id: 1184, name: 'The Rose Bowl, Southampton',               city: 'Southampton' },
-        { id: 644,  name: 'Sophia Gardens, Cardiff',                  city: 'Cardiff' },
+    England: [
+        {
+            id: 10,
+            name: "Lord's Cricket Ground, London",
+            city: 'London',
+            capacity: 31100,
+            established: '1814',
+            wikiTitle: "Lord's"
+        },
+        {
+            id: 45,
+            name: 'The Oval, London',
+            city: 'London',
+            capacity: 27500,
+            established: '1845',
+            wikiTitle: 'The Oval'
+        },
+        {
+            id: 75,
+            name: 'Old Trafford, Manchester',
+            city: 'Manchester',
+            capacity: 26000,
+            established: '1857',
+            wikiTitle: 'Old Trafford Cricket Ground'
+        },
+        {
+            id: 164,
+            name: 'Edgbaston, Birmingham',
+            city: 'Birmingham',
+            capacity: 25000,
+            established: '1882',
+            wikiTitle: 'Edgbaston Cricket Ground'
+        },
+        {
+            id: 179,
+            name: 'Headingley, Leeds',
+            city: 'Leeds',
+            capacity: 18350,
+            established: '1890',
+            wikiTitle: 'Headingley Cricket Ground'
+        },
+        {
+            id: 34,
+            name: 'Trent Bridge, Nottingham',
+            city: 'Nottingham',
+            capacity: 17500,
+            established: '1841',
+            wikiTitle: 'Trent Bridge'
+        },
+        {
+            id: 1039,
+            name: 'Riverside Ground, Chester-le-Street',
+            city: 'Chester-le-Street',
+            capacity: 17000,
+            established: '1995',
+            wikiTitle: 'Riverside Ground'
+        },
+        {
+            id: 1184,
+            name: 'The Rose Bowl, Southampton',
+            city: 'Southampton',
+            capacity: 25000,
+            established: '2001',
+            wikiTitle: 'The Rose Bowl'
+        },
+        {
+            id: 644,
+            name: 'Sophia Gardens, Cardiff',
+            city: 'Cardiff',
+            capacity: 15643,
+            established: '1858',
+            wikiTitle: 'Sophia Gardens'
+        }
     ],
-    'Pakistan': [
-        { id: 487,  name: 'National Stadium, Karachi',        city: 'Karachi' },
-        { id: 545,  name: 'Gaddafi Stadium, Lahore',          city: 'Lahore' },
-        { id: 1001, name: 'Rawalpindi Cricket Stadium',       city: 'Rawalpindi' },
-        { id: 1597, name: 'Multan Cricket Stadium',           city: 'Multan' },
-        { id: 639,  name: 'Iqbal Stadium, Faisalabad',        city: 'Faisalabad' },
+    Pakistan: [
+        {
+            id: 487,
+            name: 'National Stadium, Karachi',
+            city: 'Karachi',
+            capacity: 34228,
+            established: '1955',
+            wikiTitle: 'National Stadium, Karachi'
+        },
+        {
+            id: 545,
+            name: 'Gaddafi Stadium, Lahore',
+            city: 'Lahore',
+            capacity: 27000,
+            established: '1959',
+            wikiTitle: 'Gaddafi Stadium'
+        },
+        {
+            id: 1001,
+            name: 'Rawalpindi Cricket Stadium',
+            city: 'Rawalpindi',
+            capacity: 15000,
+            established: '1992',
+            wikiTitle: 'Rawalpindi Cricket Stadium'
+        },
+        {
+            id: 1597,
+            name: 'Multan Cricket Stadium',
+            city: 'Multan',
+            capacity: 30000,
+            established: '2001',
+            wikiTitle: 'Multan Cricket Stadium'
+        },
+        {
+            id: 639,
+            name: 'Iqbal Stadium, Faisalabad',
+            city: 'Faisalabad',
+            capacity: 18000,
+            established: '1978',
+            wikiTitle: 'Iqbal Stadium'
+        }
     ],
     'South Africa': [
-        { id: 174,  name: 'Newlands Cricket Ground, Cape Town',       city: 'Cape Town' },
-        { id: 508,  name: 'The Wanderers Stadium, Johannesburg',      city: 'Johannesburg' },
-        { id: 302,  name: 'Kingsmead, Durban',                        city: 'Durban' },
-        { id: 902,  name: 'SuperSport Park, Centurion',               city: 'Centurion' },
-        { id: 173,  name: "St George's Park, Gqeberha",               city: 'Gqeberha' },
-        { id: 703,  name: 'Diamond Oval, Kimberley',                  city: 'Kimberley' },
+        {
+            id: 174,
+            name: 'Newlands Cricket Ground, Cape Town',
+            city: 'Cape Town',
+            capacity: 25000,
+            established: '1888',
+            wikiTitle: 'Newlands Cricket Ground'
+        },
+        {
+            id: 508,
+            name: 'The Wanderers Stadium, Johannesburg',
+            city: 'Johannesburg',
+            capacity: 34000,
+            established: '1956',
+            wikiTitle: 'The Wanderers Stadium'
+        },
+        {
+            id: 302,
+            name: 'Kingsmead, Durban',
+            city: 'Durban',
+            capacity: 25000,
+            established: '1923',
+            wikiTitle: 'Kingsmead Cricket Ground'
+        },
+        {
+            id: 902,
+            name: 'SuperSport Park, Centurion',
+            city: 'Centurion',
+            capacity: 22000,
+            established: '1986',
+            wikiTitle: 'SuperSport Park'
+        },
+        {
+            id: 173,
+            name: "St George's Park, Gqeberha",
+            city: 'Gqeberha',
+            capacity: 19000,
+            established: '1882',
+            wikiTitle: "St George's Park Cricket Ground"
+        },
+        {
+            id: 703,
+            name: 'Diamond Oval, Kimberley',
+            city: 'Kimberley',
+            capacity: 11000,
+            established: '1973',
+            wikiTitle: 'Diamond Oval'
+        }
     ],
     'Sri Lanka': [
-        { id: 1004, name: 'R Premadasa Stadium, Colombo',                     city: 'Colombo' },
-        { id: 679,  name: 'Sinhalese Sports Club Ground, Colombo',            city: 'Colombo' },
-        { id: 847,  name: 'Galle International Stadium',                      city: 'Galle' },
-        { id: 2503, name: 'Pallekele International Cricket Stadium',           city: 'Kandy' },
-        { id: 726,  name: 'Asgiriya Stadium, Kandy',                          city: 'Kandy' },
-        { id: 416,  name: 'P Sara Oval, Colombo',                             city: 'Colombo' },
-        { id: 1434, name: 'Rangiri Dambulla International Stadium',           city: 'Dambulla' },
+        {
+            id: 1004,
+            name: 'R Premadasa Stadium, Colombo',
+            city: 'Colombo',
+            capacity: 35000,
+            established: '1986',
+            wikiTitle: 'R Premadasa Stadium'
+        },
+        {
+            id: 679,
+            name: 'Sinhalese Sports Club Ground, Colombo',
+            city: 'Colombo',
+            capacity: 10000,
+            established: '1952',
+            wikiTitle: 'Sinhalese Sports Club Ground'
+        },
+        {
+            id: 847,
+            name: 'Galle International Stadium',
+            city: 'Galle',
+            capacity: 35000,
+            established: '1876',
+            wikiTitle: 'Galle International Stadium'
+        },
+        {
+            id: 2503,
+            name: 'Pallekele International Cricket Stadium',
+            city: 'Kandy',
+            capacity: 35000,
+            established: '2009',
+            wikiTitle: 'Pallekele International Cricket Stadium'
+        },
+        {
+            id: 726,
+            name: 'Asgiriya Stadium, Kandy',
+            city: 'Kandy',
+            capacity: 10300,
+            established: '1915',
+            wikiTitle: 'Asgiriya Stadium'
+        },
+        {
+            id: 416,
+            name: 'P Sara Oval, Colombo',
+            city: 'Colombo',
+            capacity: 15000,
+            established: '1982',
+            wikiTitle: 'P Sara Oval'
+        },
+        {
+            id: 1434,
+            name: 'Rangiri Dambulla International Stadium',
+            city: 'Dambulla',
+            capacity: 16800,
+            established: '2000',
+            wikiTitle: 'Rangiri Dambulla International Stadium'
+        }
     ],
-    'Bangladesh': [
-        { id: 2025, name: 'Shere Bangla National Stadium, Dhaka',             city: 'Dhaka' },
-        { id: 1931, name: 'Zahur Ahmed Chowdhury Stadium, Chittagong',        city: 'Chittagong' },
-        { id: 1564, name: 'Sylhet International Cricket Stadium',              city: 'Sylhet' },
+    Bangladesh: [
+        {
+            id: 2025,
+            name: 'Shere Bangla National Stadium, Dhaka',
+            city: 'Dhaka',
+            capacity: 25416,
+            established: '2006',
+            wikiTitle: 'Shere Bangla National Stadium'
+        },
+        {
+            id: 1931,
+            name: 'Zahur Ahmed Chowdhury Stadium, Chittagong',
+            city: 'Chittagong',
+            capacity: 22000,
+            established: '2004',
+            wikiTitle: 'Zahur Ahmed Chowdhury Stadium'
+        },
+        {
+            id: 1564,
+            name: 'Sylhet International Cricket Stadium',
+            city: 'Sylhet',
+            capacity: 18500,
+            established: '2007',
+            wikiTitle: 'Sylhet International Cricket Stadium'
+        }
     ],
     'West Indies': [
-        { id: 199,  name: 'Kensington Oval, Bridgetown',                      city: 'Bridgetown' },
-        { id: 208,  name: "Queen's Park Oval, Port of Spain",                 city: 'Port of Spain' },
-        { id: 200,  name: 'Sabina Park, Kingston',                            city: 'Kingston' },
-        { id: 1985, name: 'Sir Vivian Richards Stadium, Antigua',             city: 'Antigua' },
-        { id: 1986, name: 'Providence Stadium, Guyana',                       city: 'Guyana' },
-        { id: 1131, name: 'National Cricket Stadium, Grenada',                city: 'Grenada' },
-        { id: 629,  name: 'Windsor Park, Dominica',                           city: 'Dominica' },
-        { id: 1697, name: 'Daren Sammy Cricket Ground, St Lucia',             city: 'St Lucia' },
-        { id: 2041, name: 'Brian Lara Cricket Academy, Tarouba',              city: 'Tarouba' },
+        {
+            id: 199,
+            name: 'Kensington Oval, Bridgetown',
+            city: 'Bridgetown',
+            capacity: 28000,
+            established: '1882',
+            wikiTitle: 'Kensington Oval'
+        },
+        {
+            id: 208,
+            name: "Queen's Park Oval, Port of Spain",
+            city: 'Port of Spain',
+            capacity: 20000,
+            established: '1896',
+            wikiTitle: "Queen's Park Oval"
+        },
+        {
+            id: 200,
+            name: 'Sabina Park, Kingston',
+            city: 'Kingston',
+            capacity: 20000,
+            established: '1895',
+            wikiTitle: 'Sabina Park'
+        },
+        {
+            id: 1985,
+            name: 'Sir Vivian Richards Stadium, Antigua',
+            city: 'Antigua',
+            capacity: 10000,
+            established: '2006',
+            wikiTitle: 'Sir Vivian Richards Stadium'
+        },
+        {
+            id: 1986,
+            name: 'Providence Stadium, Guyana',
+            city: 'Guyana',
+            capacity: 20000,
+            established: '2006',
+            wikiTitle: 'Providence Stadium'
+        },
+        {
+            id: 1131,
+            name: 'National Cricket Stadium, Grenada',
+            city: 'Grenada',
+            capacity: 20000,
+            established: '1999',
+            wikiTitle: 'National Cricket Stadium (Grenada)'
+        },
+        {
+            id: 629,
+            name: 'Windsor Park, Dominica',
+            city: 'Dominica',
+            capacity: 12000,
+            established: '2007',
+            wikiTitle: 'Windsor Park (Dominica)'
+        },
+        {
+            id: 1697,
+            name: 'Daren Sammy Cricket Ground, St Lucia',
+            city: 'St Lucia',
+            capacity: 15000,
+            established: '2002',
+            wikiTitle: 'Daren Sammy Cricket Ground'
+        },
+        {
+            id: 2041,
+            name: 'Brian Lara Cricket Academy, Tarouba',
+            city: 'Tarouba',
+            capacity: 15000,
+            established: '2017',
+            wikiTitle: 'Brian Lara Cricket Academy'
+        }
     ],
-    'UAE': [
-        { id: 2439, name: 'Dubai International Cricket Stadium',              city: 'Dubai' },
-        { id: 1965, name: 'Sheikh Zayed Stadium, Abu Dhabi',                  city: 'Abu Dhabi' },
-        { id: 848,  name: 'Sharjah Cricket Stadium',                          city: 'Sharjah' },
+    UAE: [
+        {
+            id: 2439,
+            name: 'Dubai International Cricket Stadium',
+            city: 'Dubai',
+            capacity: 25000,
+            established: '2009',
+            wikiTitle: 'Dubai International Cricket Stadium'
+        },
+        {
+            id: 1965,
+            name: 'Sheikh Zayed Stadium, Abu Dhabi',
+            city: 'Abu Dhabi',
+            capacity: 20000,
+            established: '2004',
+            wikiTitle: 'Sheikh Zayed Stadium'
+        },
+        {
+            id: 848,
+            name: 'Sharjah Cricket Stadium',
+            city: 'Sharjah',
+            capacity: 16000,
+            established: '1982',
+            wikiTitle: 'Sharjah Cricket Stadium'
+        }
     ],
-    'Zimbabwe': [
-        { id: 260,  name: 'Harare Sports Club',                               city: 'Harare' },
-        { id: 261,  name: 'Queens Sports Club, Bulawayo',                     city: 'Bulawayo' },
+    Zimbabwe: [
+        {
+            id: 260,
+            name: 'Harare Sports Club',
+            city: 'Harare',
+            capacity: 10000,
+            established: '1900',
+            wikiTitle: 'Harare Sports Club'
+        },
+        {
+            id: 261,
+            name: 'Queens Sports Club, Bulawayo',
+            city: 'Bulawayo',
+            capacity: 13000,
+            established: '1890',
+            wikiTitle: 'Queens Sports Club'
+        }
     ],
     'New Zealand': [
-        { id: 283,  name: 'Eden Park, Auckland',                              city: 'Auckland' },
-        { id: 116,  name: 'Basin Reserve, Wellington',                        city: 'Wellington' },
-        { id: 93,   name: 'Hagley Oval, Christchurch',                        city: 'Christchurch' },
-        { id: 504,  name: 'Seddon Park, Hamilton',                            city: 'Hamilton' },
-        { id: 453,  name: 'McLean Park, Napier',                              city: 'Napier' },
-        { id: 769,  name: 'University Oval, Dunedin',                         city: 'Dunedin' },
+        {
+            id: 283,
+            name: 'Eden Park, Auckland',
+            city: 'Auckland',
+            capacity: 50000,
+            established: '1900',
+            wikiTitle: 'Eden Park'
+        },
+        {
+            id: 116,
+            name: 'Basin Reserve, Wellington',
+            city: 'Wellington',
+            capacity: 11600,
+            established: '1868',
+            wikiTitle: 'Basin Reserve'
+        },
+        {
+            id: 93,
+            name: 'Hagley Oval, Christchurch',
+            city: 'Christchurch',
+            capacity: 18000,
+            established: '1851',
+            wikiTitle: 'Hagley Oval'
+        },
+        {
+            id: 504,
+            name: 'Seddon Park, Hamilton',
+            city: 'Hamilton',
+            capacity: 10000,
+            established: '1950',
+            wikiTitle: 'Seddon Park'
+        },
+        {
+            id: 453,
+            name: 'McLean Park, Napier',
+            city: 'Napier',
+            capacity: 19700,
+            established: '1911',
+            wikiTitle: 'McLean Park'
+        },
+        {
+            id: 769,
+            name: 'University Oval, Dunedin',
+            city: 'Dunedin',
+            capacity: 3500,
+            established: '1920',
+            wikiTitle: 'University Oval'
+        }
     ],
-    'Ireland': [
-        { id: 974,  name: 'The Village, Dublin',                              city: 'Dublin' },
+    Ireland: [
+        {
+            id: 974,
+            name: 'The Village, Dublin',
+            city: 'Dublin',
+            capacity: 11500,
+            established: '1998',
+            wikiTitle: 'The Village, Malahide'
+        }
     ],
-    'Scotland': [
-        { id: 237,  name: 'The Grange Cricket Club, Edinburgh',               city: 'Edinburgh' },
+    Scotland: [
+        {
+            id: 237,
+            name: 'The Grange Cricket Club, Edinburgh',
+            city: 'Edinburgh',
+            capacity: 5000,
+            established: '1832',
+            wikiTitle: 'The Grange Club'
+        }
     ],
-    'Afghanistan': [
-        { id: 1965, name: 'Sheikh Zayed Stadium, Abu Dhabi',                  city: 'Abu Dhabi' },
-    ],
+    Afghanistan: [
+        {
+            id: 1965,
+            name: 'Sheikh Zayed Stadium, Abu Dhabi',
+            city: 'Abu Dhabi',
+            capacity: 20000,
+            established: '2004',
+            wikiTitle: 'Sheikh Zayed Stadium'
+        }
+    ]
 };
 
 // ── GET /api/cricket/venues/country/:country ────────────────────────────────
@@ -1058,119 +1639,26 @@ router.get('/venues/country/:country', async (req, res) => {
             return res.json({ status: 'success', source: 'espn_map', count: 0, data: [] });
         }
 
-        // 2. Fetch and parse Wikipedia country list to get exact wikiTitles
-        const wikiPageMap = {
-            'India':        'List_of_international_cricket_grounds_in_India',
-            'Australia':    'List_of_cricket_grounds_in_Australia',
-            'England':      'List_of_cricket_grounds_in_England_and_Wales',
-            'South Africa': 'List_of_cricket_grounds_in_South_Africa',
-            'Pakistan':     'List_of_cricket_grounds_in_Pakistan',
-            'West Indies':  'List_of_cricket_grounds_in_the_West_Indies',
-            'Sri Lanka':    'List_of_cricket_grounds_in_Sri_Lanka',
-            'Bangladesh':   'List_of_cricket_grounds_in_Bangladesh',
-            'UAE':          'List_of_cricket_grounds_in_the_United_Arab_Emirates',
-            'New Zealand':  'List_of_cricket_grounds_in_New_Zealand',
-            'Zimbabwe':     'List_of_cricket_grounds_in_Zimbabwe',
-        };
-
-        // Build a lookup map: espnGroundId → wiki enrichment data
-        const wikiEnrichment = {}; // espnGroundId → { capacity, tests, odis, t20is, established, wikiTitle }
-
-        try {
-            const pagesToScrape = [wikiPageMap[country], 'List_of_Test_cricket_grounds'];
-            for (const page of pagesToScrape) {
-                if (!page) continue;
-                try {
-                    const wikiRes = await axios.get(
-                        `https://en.wikipedia.org/w/api.php?action=parse&page=${page}&prop=wikitext&format=json`,
-                        { headers: WIKI_API_HEADERS, timeout: 12000 }
-                    );
-                    const text = wikiRes.data.parse?.wikitext?.['*'] || '';
-                    const rows = text.split('|-\n');
-
-                    for (const row of rows) {
-                        const rawRow = row.replace(/^\|/, '');
-                        const cells = rawRow.split(/\|\||\n\|/).map(c => c.trim()).filter(c => c !== '');
-                        if (cells.length < 3) continue;
-
-                        let nameMatch = null;
-                        for (const cell of cells) {
-                            nameMatch = cell.match(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/);
-                            if (nameMatch) break;
-                        }
-                        if (!nameMatch) continue;
-
-                        const wikiTitle = nameMatch[1].trim();
-                        const rawDisplay = (nameMatch[2] || wikiTitle).trim();
-                        const wikiName = rawDisplay.replace(/\{\{[^}]+\}\}/g, '').replace(/\[\[[^\]]+\]\]/g, '').trim();
-                        if (!wikiName) continue;
-
-                        const espnGround = resolveESPNGround(wikiName);
-                        if (espnGround && espnGround.id) {
-                            const isInList = canonicalVenues.some(v => v.id === espnGround.id);
-                            if (isInList) {
-                                let capacity = 0;
-                                for (let i = 1; i < cells.length; i++) {
-                                    const textContent = cells[i].replace(/<[^>]*>/g, '').replace(/\[\d+\]/g, '').replace(/,/g, '').trim();
-                                    const match = textContent.match(/^\d{4,6}$/);
-                                    if (match) {
-                                        capacity = parseInt(match[0]);
-                                        break;
-                                    }
-                                }
-
-                                let established = 'N/A';
-                                for (let i = 0; i < cells.length; i++) {
-                                    const match = cells[i].match(/\b(18|19|20)\d{2}\b/);
-                                    if (match) {
-                                        established = match[0];
-                                        break;
-                                    }
-                                }
-
-                                if (!wikiEnrichment[espnGround.id]) {
-                                    wikiEnrichment[espnGround.id] = { capacity, tests: 0, odis: 0, t20is: 0, established, wikiTitle };
-                                } else {
-                                    if (capacity > 0) wikiEnrichment[espnGround.id].capacity = capacity;
-                                    if (established !== 'N/A') wikiEnrichment[espnGround.id].established = established;
-                                }
-                            }
-                        }
-                    }
-                } catch (e) {
-                    // Ignore individual page errors
-                }
-            }
-        } catch (wikiErr) {
-            console.warn('[Venues] Wikipedia enrichment failed (non-fatal):', wikiErr.message);
-        }
-
-        // 3. Collect wikiTitles for image fetching
-        const wikiTitleToId = {};
-        for (const [id, enrichData] of Object.entries(wikiEnrichment)) {
-            if (enrichData.wikiTitle) wikiTitleToId[enrichData.wikiTitle] = parseInt(id);
-        }
-        const allWikiTitles = Object.keys(wikiTitleToId);
-
-        // 4. Batch-fetch Wikipedia images (check cache first)
-        const uncached = allWikiTitles.filter(t => !getCached(imgCache, t));
-        if (uncached.length > 0) {
-            const fetched = await batchWikipediaImages(uncached);
-            for (const [title, url] of Object.entries(fetched)) {
-                setCached(imgCache, title, url, 24 * 60 * 60 * 1000);
-            }
-        }
-
-        // 5. Assemble final venue list from canonical ESPN venues, enriched with wiki data
+        // 2. Assemble final venue list from canonical ESPN venues, using local images
         const venues = canonicalVenues.map(v => {
-            const enrich = wikiEnrichment[v.id] || {};
-            const image = enrich.wikiTitle ? (getCached(imgCache, enrich.wikiTitle) || null) : null;
-            let finalImage = image;
-            let finalCapacity = enrich.capacity || 0;
-            let finalEstablished = enrich.established || 'N/A';
+            let finalCapacity = v.capacity || 0;
+            let finalEstablished = v.established || 'N/A';
+            
+            // Format name to match file (e.g. "MA Chidambaram Stadium" -> "ma_chidambaram_stadium.jpg")
+            const baseName = (v.wikiTitle || v.name.split(',')[0]).trim();
+            const fileName = baseName.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '.jpg';
+            const localImagePath = path.join(__dirname, '../../public/images/stadiums', fileName);
+            
+            let finalImage = null;
+            if (fs.existsSync(localImagePath)) {
+                finalImage = `/images/stadiums/${fileName}`;
+            } else {
+                // Fallback local image if the specific one is missing
+                finalImage = '/images/stadiums/default_stadium.jpg';
+            }
 
             if (v.name.includes('Saurashtra')) {
-                if (!finalImage) finalImage = 'https://upload.wikimedia.org/wikipedia/commons/a/ae/SCA_Stadium.jpg';
+                if (finalImage === '/images/stadiums/default_stadium.jpg') finalImage = 'https://upload.wikimedia.org/wikipedia/commons/a/ae/SCA_Stadium.jpg';
                 if (!finalCapacity) finalCapacity = 28000;
                 if (finalEstablished === 'N/A') finalEstablished = '2008';
             }
@@ -1178,14 +1666,14 @@ router.get('/venues/country/:country', async (req, res) => {
             return {
                 id: v.name,
                 name: v.name,
-                wikiTitle: enrich.wikiTitle || v.name,
+                wikiTitle: v.wikiTitle || v.name,
                 city: v.city,
                 country,
                 capacity: finalCapacity,
                 established: finalEstablished,
-                tests: enrich.tests || 0,
-                odis: enrich.odis || 0,
-                t20is: enrich.t20is || 0,
+                tests: 0,
+                odis: 0,
+                t20is: 0,
                 image: finalImage,
                 espnGroundId: v.id,
             };
@@ -1197,6 +1685,7 @@ router.get('/venues/country/:country', async (req, res) => {
         res.status(500).json({ status: 'error', message: e.message });
     }
 });
+
 
 
 // â”€â”€ Cache for Deep Stats to prevent spinning up Chromium too often â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
