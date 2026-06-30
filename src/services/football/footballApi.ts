@@ -314,5 +314,15 @@ export const footballApi = {
       console.error("Failed to fetch FIFA rankings", error);
       return [];
     }
+  },
+
+  async getBDFutbolVenueStats(id: string, signal?: AbortSignal): Promise<any> {
+    try {
+      const response: any = await api.get(`/football/venue/bdfutbol/${id}`, { signal });
+      return response?.data || null;
+    } catch (error) {
+      console.error(`Failed to fetch BDFutbol stats for venue ${id}`, error);
+      return null;
+    }
   }
 };

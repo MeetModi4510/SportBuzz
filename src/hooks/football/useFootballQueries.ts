@@ -75,3 +75,13 @@ export const useFifaRankings = () => {
     staleTime: 24 * 60 * 60 * 1000, // 24 hours
   });
 };
+
+export const useBDFutbolVenueStats = (venueId: string | null) => {
+  return useQuery({
+    queryKey: ['football', 'venue', 'bdfutbol', venueId],
+    queryFn: ({ signal }) => venueId ? footballApi.getBDFutbolVenueStats(venueId, signal) : Promise.resolve(null),
+    enabled: !!venueId,
+    ...NO_AUTO_REFETCH,
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+  });
+};

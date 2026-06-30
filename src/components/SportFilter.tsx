@@ -3,12 +3,13 @@ import { Sport } from "@/data/types";
 import { SportIcon } from "./SportIcon";
 
 interface SportFilterProps {
-  activeSport: Sport;
-  onSportChange: (sport: Sport) => void;
+  activeSport: Sport | "all";
+  onSportChange: (sport: Sport | "all") => void;
   className?: string;
 }
 
-const sports: { id: Sport; label: string }[] = [
+const sports: { id: Sport | "all"; label: string }[] = [
+  { id: "all", label: "All Sports" },
   { id: "cricket", label: "Cricket" },
   { id: "football", label: "Football" },
   { id: "basketball", label: "Basketball" },

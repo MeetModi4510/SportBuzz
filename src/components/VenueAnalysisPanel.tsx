@@ -22,6 +22,7 @@ import {
     useCricketVenues, useCricketVenueDeepStats, useESPNVenueStats,
     type VenueFormat, type VenueDeepStats,
 } from "@/hooks/cricket/useCricketVenues";
+import { useBDFutbolVenueStats } from "@/hooks/football/useFootballQueries";
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
@@ -705,13 +706,14 @@ const COMP_DOMAINS: Record<string, string> = {
     "Europa League": "/images/logos/uel.png",
     "FA Cup": "thefa.com",
     "League Cup": "efl.com",
-    "La Liga": "laliga.com",
-    "Copa del Rey": "rfef.es",
-    "World Cup": "fifa.com",
-    "Euro": "uefa.com",
-    "Serie A": "legaseriea.it",
-    "Bundesliga": "bundesliga.com",
-    "Ligue 1": "ligue1.com",
+    "First Division": "laliga.com",
+    "King's Cup": "rfef.es",
+    "Cup Winners' Cup": "uefa.com",
+    "Fairs Cup": "uefa.com",
+    "Spanish Super Cup": "rfef.es",
+    "European Super Cup": "uefa.com",
+    "Latin Cup": "uefa.com",
+    "Eva Duarte Cup": "rfef.es",
 };
 
 const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: string }) => {
@@ -827,8 +829,9 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                                 <YAxis tick={{ fill: "#666", fontSize: 11 }} />
                                 <Tooltip contentStyle={CHART_TOOLTIP} itemStyle={TOOLTIP_TEXT_STYLE} labelStyle={TOOLTIP_TEXT_STYLE} />
                                 <Bar dataKey="partits" radius={[4, 4, 0, 0]}>
-                                    {stats.topVisitors.map((entry, index) => {
-                                        const homeColors = TEAM_COLORS[stats.homeTeam.name] || { primary: color, secondary: `${color}44` };
+                                    {stats.topVisitors?.map((entry, index) => {
+                                        const homeTeamName = stats.homeTeams?.[0]?.name;
+                                        const homeColors = homeTeamName && TEAM_COLORS[homeTeamName] ? TEAM_COLORS[homeTeamName] : { primary: color, secondary: `${color}44` };
                                         return <Cell key={`cell-${index}`} fill={index % 2 === 0 ? homeColors.primary : homeColors.secondary} />;
                                     })}
                                 </Bar>
@@ -858,8 +861,8 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 {/* Visiting Teams List */}
-                <Section icon={<Users size={16} style={{ color }} />} title="Visiting Teams" subtitle="Top 10 visiting clubs by matches">
-                    <div className="mt-2 grid grid-cols-1 gap-4">
+                <Section className="h-[800px] flex flex-col" icon={<Users size={16} style={{ color }} />} title="Visiting Teams" subtitle="Top 10 visiting clubs by matches">
+                    <div className="mt-2 flex flex-col gap-4 flex-1 overflow-y-auto min-h-0 pr-2 custom-scrollbar">
                         {stats.visitingTeams.map((team, idx) => {
                             const teamData = TEAM_COLORS[team.name === "Manchester United" ? "Man Utd" : team.name];
                             return (
@@ -890,16 +893,16 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                 </Section>
 
                 {/* Competitions Hosted */}
-                <Section icon={<Trophy size={16} style={{ color }} />} title="Competitions Hosted" subtitle="Matches by competition">
-                    <div className="mt-2 grid grid-cols-1 gap-3">
-                            {stats.competitions.map((comp, idx) => {
+                <Section className="h-[450px] flex flex-col" icon={<Trophy size={16} style={{ color }} />} title="Competitions Hosted" subtitle="Matches by competition">
+                    <div className="mt-2 flex flex-col gap-3 flex-1 overflow-y-auto min-h-0 pr-2 custom-scrollbar">
+                            {(stats.competitions || []).map((comp, idx) => {
                                 // Match domains, stripping out years if present (e.g. "World Cup 1982")
                                 const domain = COMP_DOMAINS[comp.name] || COMP_DOMAINS[comp.name.replace(/[0-9]/g, "").trim()];
                                 const isDirectUrl = domain?.startsWith("http") || domain?.startsWith("/");
                                 return (
                                     <div key={idx} className="flex justify-between items-center p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all duration-300 group">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-full bg-white border border-white/20 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group-hover:scale-110 transition-transform p-1">
+                                        <div className="w-10 h-10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                                                 {domain ? (
                                                     <img 
                                                         src={isDirectUrl ? domain : `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=128`} 
@@ -927,10 +930,10 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                         </div>
                     </Section>
                 
-                    {/* Seasons List */}
-                    <Section className="h-full flex flex-col" icon={<Calendar size={16} style={{ color }} />} title="Seasons Played" subtitle="Recent seasons and matches">
-                        <div className="mt-2 flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
-                            {stats.seasonsList.map((season, idx) => (
+                {/* Seasons List */}
+                <Section className="h-[450px] flex flex-col" icon={<Calendar size={16} style={{ color }} />} title="Seasons Played" subtitle="Recent seasons and matches">
+                    <div className="mt-2 flex flex-col gap-2 flex-1 overflow-y-auto min-h-0 pr-2 custom-scrollbar">
+                            {(stats.seasonsList || []).map((season, idx) => (
                                 <div key={idx} className="min-h-[44px] flex justify-between items-center p-3 rounded-xl bg-secondary/15 border border-white/5 hover:bg-secondary/30 transition-colors">
                                     <span className="text-sm text-foreground flex items-center gap-3">
                                         <span className="text-xs font-mono text-muted-foreground w-4">{idx + 1}.</span> 
@@ -945,28 +948,38 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
 
             <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {/* Home Team */}
-                    <Section icon={<Users size={16} style={{ color }} />} title="Home Team" subtitle="Primary tenant of the stadium">
-                        <div className="mt-2 p-5 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between hover:bg-white/[0.04] transition-all group shadow-md">
-                            <div className="flex items-center gap-5">
-                                <div className="w-14 h-14 rounded-full bg-white/10 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group-hover:scale-105 transition-transform">
-                                    {(() => {
-                                        const homeTeamData = TEAM_COLORS[stats.homeTeam.name];
-                                        if (homeTeamData?.domain) {
-                                            return <img src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${homeTeamData.domain}&size=128`} alt={stats.homeTeam.name} className="w-full h-full object-cover" />;
-                                        }
-                                        return <Shield size={24} className="text-white/40" />;
-                                    })()}
+                    {/* Home Teams */}
+                    <Section icon={<Users size={16} style={{ color }} />} title="Home Teams" subtitle="Teams that used the stadium">
+                        <div className="mt-2 flex flex-col gap-2 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
+                            {(stats.homeTeams || []).map((team, idx) => (
+                                <div key={idx} className="flex justify-between items-center p-3 rounded-xl bg-secondary/15 border border-white/5 hover:bg-secondary/30 transition-colors group">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-7 h-7 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                            {(() => {
+                                                const fallbackDomains: Record<string, string> = {
+                                                    "Barcelona": "fcbarcelona.com",
+                                                    "Barcelona Atlético": "fcbarcelona.com",
+                                                    "Anderlecht": "rsca.be",
+                                                    "Åtvidabergs": "atvidabergsff.se",
+                                                    "Leeds": "leedsunited.com",
+                                                    "Lyn": "lynfotball.no",
+                                                    "Español": "rcdespanyol.com",
+                                                    "Condal": "https://upload.wikimedia.org/wikipedia/en/7/7f/CD_Condal.gif",
+                                                };
+                                                const domain = TEAM_COLORS[team.name]?.domain || fallbackDomains[team.name];
+                                                if (domain) {
+                                                    const isDirectUrl = domain.startsWith("http");
+                                                    const imgUrl = isDirectUrl ? domain : `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=64`;
+                                                    return <img src={imgUrl} alt={team.name} className="w-full h-full object-contain" />;
+                                                }
+                                                return <Shield size={16} className="text-white/40" />;
+                                            })()}
+                                        </div>
+                                        <span className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors">{team.name}</span>
+                                    </div>
+                                    <span className="font-mono text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-md">{team.matches} {team.matches === 1 ? 'Match' : 'Matches'}</span>
                                 </div>
-                                <div>
-                                    <h4 className="text-xl font-bold text-white/90 group-hover:text-white transition-colors">{stats.homeTeam.name}</h4>
-                                    <span className="text-xs uppercase tracking-[0.2em] text-white/40 font-semibold">Primary Tenant</span>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/50 tracking-tighter">{stats.homeTeam.matches}</div>
-                                <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mt-1">Matches</div>
-                            </div>
+                            ))}
                         </div>
                     </Section>
 
@@ -975,7 +988,7 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                             {/* Timeline line */}
                             <div className="absolute left-[15px] top-5 bottom-5 w-px bg-white/10" />
                             
-                            {stats.historicalNames.map((name, idx) => (
+                            {(stats.historicalNames || []).map((name, idx) => (
                                 <div key={idx} className="relative pl-10 pr-4 py-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors group">
                                     {/* Timeline node */}
                                     <div className="absolute left-[12px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 border-white/20 bg-background group-hover:border-white/60 group-hover:bg-white/20 transition-all z-10 shadow-[0_0_10px_rgba(255,255,255,0)] group-hover:shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
@@ -1226,6 +1239,7 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
         }, { replace: true });
     }, [selectedVenueId, searchParams, setSearchParams]);
     const [selectedCountry, setSelectedCountry] = useState<string>("All");
+    const [selectedLeague, setSelectedLeague] = useState<string>("All");
     const [venueSearch, setVenueSearch] = useState<string>("");
     const [activeFormat, setActiveFormat] = useState<VenueFormat>("Test");
     const [dynamicGallery, setDynamicGallery] = useState<string[]>([]);
@@ -1270,6 +1284,30 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
         activeFormat
     );
 
+    const bdfutbolId = useMemo(() => {
+        if (!selectedVenueId) return null;
+        const v = VENUE_ANALYSIS_DATA.find(x => x.id === selectedVenueId);
+        if (v && v.sport === 'football' && 'isBDFutbol' in v.stats && v.stats.isBDFutbol) {
+            return (v.stats as BDFutbolVenueStats).bdfutbolId || null;
+        }
+        return null;
+    }, [selectedVenueId]);
+
+    const [debouncedBdfutbolId, setDebouncedBdfutbolId] = useState<string | null>(bdfutbolId);
+
+    useEffect(() => {
+        // Wait 1000ms before setting the ID to prevent firing requests when rapidly clicking stadiums
+        const handler = setTimeout(() => {
+            setDebouncedBdfutbolId(bdfutbolId);
+        }, 1000);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [bdfutbolId]);
+
+    const { data: bdfutbolDynamicStats, isLoading: isLoadingBDFutbolStats } = useBDFutbolVenueStats(debouncedBdfutbolId);
+
     const allVenues = useMemo(() => {
         const staticNonCricket = VENUE_ANALYSIS_DATA.filter(v => v.sport !== "cricket");
         const staticCricket = VENUE_ANALYSIS_DATA.filter(v => v.sport === "cricket");
@@ -1298,6 +1336,11 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
 
     const filteredVenues = useMemo(() => {
         let result = activeSport === "all" ? allVenues : allVenues.filter(v => v.sport === activeSport);
+        
+        if (activeSport === "football" && selectedLeague !== "All") {
+            result = result.filter(v => v.league === selectedLeague);
+        }
+
         if (venueSearch.trim()) {
             const q = venueSearch.toLowerCase();
             result = result.filter(v =>
@@ -1305,7 +1348,7 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
             );
         }
         return result;
-    }, [activeSport, allVenues, venueSearch]);
+    }, [activeSport, allVenues, venueSearch, selectedLeague]);
 
     const selectedVenue = useMemo(() => {
         if (!selectedVenueId) return null;
@@ -1352,7 +1395,28 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
                         </div>
                     )}
 
-                    {(activeSport === "cricket" || activeSport === "all") && dynamicCricketVenues.length > 0 && (
+                    {activeSport === "football" && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-secondary/30 border border-border/50 rounded-xl animate-fade-in shrink-0 w-full md:w-auto">
+                            <Select
+                                value={selectedLeague}
+                                onValueChange={(val) => { setSelectedLeague(val); setVenueSearch(""); }}
+                            >
+                                <SelectTrigger className="w-full md:w-[200px] bg-transparent border-none text-sm font-semibold shadow-none focus:ring-0 px-0 h-auto gap-2">
+                                    <SelectValue placeholder="Select League" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-slate-900 border-white/10 text-white rounded-xl shadow-2xl backdrop-blur-xl">
+                                    <SelectItem value="All" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2">🌐 All Leagues</div></SelectItem>
+                                    <SelectItem value="Premier League" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><div className="w-5 h-5 rounded-full bg-white flex items-center justify-center p-0.5 shrink-0"><img src="https://images.fotmob.com/image_resources/logo/leaguelogo/47.png" alt="Premier League" className="w-4 h-4 object-contain" /></div> Premier League</div></SelectItem>
+                                    <SelectItem value="La Liga" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><div className="w-5 h-5 rounded-full bg-white flex items-center justify-center p-0.5 shrink-0"><img src="https://images.fotmob.com/image_resources/logo/leaguelogo/87.png" alt="La Liga" className="w-4 h-4 object-contain" /></div> La Liga</div></SelectItem>
+                                    <SelectItem value="Serie A" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><div className="w-5 h-5 rounded-full bg-white flex items-center justify-center p-0.5 shrink-0"><img src="https://images.fotmob.com/image_resources/logo/leaguelogo/55.png" alt="Serie A" className="w-4 h-4 object-contain" /></div> Serie A</div></SelectItem>
+                                    <SelectItem value="Bundesliga" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><div className="w-5 h-5 rounded-full bg-white flex items-center justify-center p-0.5 shrink-0"><img src="https://images.fotmob.com/image_resources/logo/leaguelogo/54.png" alt="Bundesliga" className="w-4 h-4 object-contain" /></div> Bundesliga</div></SelectItem>
+                                    <SelectItem value="Ligue 1" className="focus:bg-white/10 focus:text-white cursor-pointer rounded-lg mx-1 my-0.5"><div className="flex items-center gap-2"><div className="w-5 h-5 rounded-full bg-white flex items-center justify-center p-0.5 shrink-0"><img src="https://images.fotmob.com/image_resources/logo/leaguelogo/53.png" alt="Ligue 1" className="w-4 h-4 object-contain" /></div> Ligue 1</div></SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+
+                    {((activeSport === "cricket" || activeSport === "all") ? dynamicCricketVenues.length > 0 : true) && (
                         <div className="flex items-center gap-3 px-4 py-2 bg-secondary/20 border border-border/40 rounded-xl flex-1 w-full">
                             <svg className="w-4 h-4 text-muted-foreground shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
                             <input
@@ -1613,7 +1677,21 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
                 <>
                     {selectedVenue.stats.sport === "football" && (
                         (selectedVenue.stats as any).isBDFutbol 
-                            ? <BDFutbolDetail stats={selectedVenue.stats as BDFutbolVenueStats} color={color} />
+                            ? (isLoadingBDFutbolStats 
+                                ? <div className="flex flex-col items-center justify-center p-12 text-muted-foreground"><div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />Loading stadium data (this may take up to 10-15 seconds on first load)...</div>
+                                : <BDFutbolDetail stats={(() => {
+                                    if (!bdfutbolDynamicStats) return selectedVenue.stats as BDFutbolVenueStats;
+                                    const staticStats = selectedVenue.stats as BDFutbolVenueStats;
+                                    return {
+                                        ...staticStats,
+                                        ...bdfutbolDynamicStats,
+                                        homeTeams: bdfutbolDynamicStats.homeTeams?.length ? bdfutbolDynamicStats.homeTeams : staticStats.homeTeams,
+                                        competitions: bdfutbolDynamicStats.competitions?.length ? bdfutbolDynamicStats.competitions : staticStats.competitions,
+                                        seasonsList: bdfutbolDynamicStats.seasonsList?.length ? bdfutbolDynamicStats.seasonsList : staticStats.seasonsList,
+                                        visitingTeams: bdfutbolDynamicStats.visitingTeams?.length ? bdfutbolDynamicStats.visitingTeams : staticStats.visitingTeams,
+                                        topVisitors: bdfutbolDynamicStats.topVisitors?.length ? bdfutbolDynamicStats.topVisitors : staticStats.topVisitors,
+                                    };
+                                })()} color={color} />)
                             : <FootballDetail stats={selectedVenue.stats as FootballVenueStats} color={color} />
                     )}
                     {selectedVenue.stats.sport === "basketball" && <BasketballDetail stats={selectedVenue.stats as BasketballVenueStats} color={color} />}
