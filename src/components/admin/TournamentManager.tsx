@@ -20,7 +20,7 @@ import {
     Loader2, TrendingUp, TrendingDown, Target, Zap, BarChart3, Activity, Trash2, History as HistoryIcon,
     Bell, BellOff, Camera, Crosshair, User, Pencil, ChevronRight, Calculator, ChevronDown, ChevronUp, Check,
     Newspaper, MessageCircle, Sparkles, Globe, Pencil as Edit, PencilLine, ArrowRight, RefreshCw, Award, Share2, Brain, Hand, Focus,
-    Fingerprint, Boxes, Database, Compass, Search
+    Fingerprint, Boxes, Database, Compass, Search, Lock
 } from "lucide-react";
 
 import { useTournamentFollow } from "@/hooks/useTournamentFollow";
@@ -713,23 +713,19 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
         }
         setIsVerifyingPasscode(true);
         try {
-            // Make request to backend to verify passcode
-            const res = await fetch(`${BASE_URL}/api/tournaments/${passcodePromptTournament._id}/verify-passcode`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ passcode: passcodeAttempt })
-            });
-            const data = await res.json();
-            if (res.ok && data.success) {
+            // Use axios api instance for consistent auth headers & base URL
+            const res = await tournamentApi.verifyPasscode(passcodePromptTournament._id, passcodeAttempt) as any;
+            if (res.success) {
                 toast.success("Access granted!");
+                const t = passcodePromptTournament;
                 setPasscodePromptTournament(null);
                 setPasscodeAttempt("");
-                openTournamentDetail(passcodePromptTournament);
+                openTournamentDetail(t);
             } else {
-                toast.error(data.message || "Invalid passcode");
+                toast.error(res.message || "Invalid passcode");
             }
-        } catch (err) {
-            toast.error("Failed to verify passcode");
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message || "Invalid passcode");
         } finally {
             setIsVerifyingPasscode(false);
         }
@@ -1594,7 +1590,7 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                                     openTournamentDetail(tournament);
                                                 }
                                             }}
-                                            className="group relative flex flex-col bg-zinc-900/90 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-600 hover:shadow-xl transition-all duration-300 cursor-pointer">
+                                            className={`group relative flex flex-col bg-zinc-900/90 border rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer ${tournament.visibility === 'Private' && !isTournamentOwner ? 'border-zinc-700 hover:border-amber-600/50' : 'border-zinc-800 hover:border-zinc-600'}`}>
                                             
                                             {/* Status Accent Line (Left border) */}
                                             <div className={`absolute left-0 top-0 bottom-0 w-1 ${isLive ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)]' : isUpcoming ? 'bg-blue-500' : 'bg-zinc-600'} transition-all duration-300`} />
@@ -1621,9 +1617,16 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                                 </div>
 
                                                 <h3 className="text-xl font-bold text-zinc-100 mb-3 leading-tight group-hover:text-white transition-colors line-clamp-2 pr-4">
-                                                    {tournament.visibility === 'Private' && <Shield size={16} className="inline mr-2 text-zinc-500 -mt-1" />}
+                                                    {tournament.visibility === 'Private' && <Shield size={16} className={`inline mr-2 -mt-1 ${isTournamentOwner ? 'text-zinc-500' : 'text-amber-500'}`} />}
                                                     {tournament.name}
                                                 </h3>
+                                                {tournament.visibility === 'Private' && !isTournamentOwner && (
+                                                    <div className="flex items-center gap-2 mb-3">
+                                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-xs font-medium text-amber-400">
+                                                            <Lock size={11} /> Click to enter passcode
+                                                        </span>
+                                                    </div>
+                                                )}
                                                 
                                                 {/* Detailed Tags */}
                                                 <div className="flex flex-wrap gap-2 mb-2">
