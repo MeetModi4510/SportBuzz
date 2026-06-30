@@ -362,7 +362,7 @@ export const etihad: VenueAnalysis = {
         clubs: 95,
         seasons: 23,
         locationCoords: [53.483, -2.2],
-        locationText: "Manchester (England)",
+        locationText: "Manchester, England",
         finalsPlayed: "Europa League 14/05/2008 Zenit 2 - 0 Rangers",
         homeTeams: [
             { name: "Manchester City", matches: 526 }
