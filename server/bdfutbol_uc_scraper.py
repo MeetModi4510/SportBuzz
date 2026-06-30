@@ -64,8 +64,16 @@ def start_hiding_thread(browser_pid):
     return t
 
 def parse_html(html):
+    with open("campnou_dump.html", "w", encoding="utf-8") as f: f.write(html)
     soup = bs4.BeautifulSoup(html, 'lxml')
     data = {"isBDFutbol": True}
+
+    # Fetch Location Coordinates natively from Leaflet script on the page
+    map_match = re.search(r"L\.map\('mapid'\)\.setView\(\[\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\]", html)
+    if map_match:
+        data['locationCoords'] = [float(map_match.group(1)), float(map_match.group(2))]
+    else:
+        data['locationCoords'] = [0, 0]
 
     h1 = soup.find('h1')
     if h1: data['stadium_name'] = h1.text.strip()
@@ -127,6 +135,9 @@ def parse_html(html):
     for sec in soup.find_all(['h2', 'h3']):
         title = sec.text.strip()
         content_div = sec.find_next_sibling('div')
+        if not content_div and sec.parent:
+            content_div = sec.parent.find_next_sibling('div')
+        
         if not content_div: continue
         
         if title == 'Competitions':
@@ -172,28 +183,51 @@ def parse_html(html):
                             if title == 'Seasons': data['seasonsList'].append({'year': name, 'matches': val})
                             else: data['visitingTeams'].append({'name': name, 'matches': val})
                             
-        elif title == 'Names':
+        elif 'Name' in title:
             table = content_div.find('table')
             if table:
                 for tr in table.find_all('tr'):
                     cols = [td.text.strip() for td in tr.find_all(['td', 'th'])]
                     if len(cols) >= 1:
-                        name_str = cols[0]
+                        name_str = " ".join(cols)
                         m = re.search(r'\((.*?)\)', name_str)
                         period = m.group(1) if m else ""
                         name = re.sub(r'\(.*?\)', '', name_str).strip()
-                        if name:
+                        if name and not any(x['name'] == name for x in data['historicalNames']):
                             data['historicalNames'].append({'name': name, 'period': period})
             else:
-                # Sometimes it's just a list of divs
-                for item in content_div.find_all('div', recursive=False):
-                    text = item.text.strip()
-                    if not text: continue
+                # Robust extraction: look at all divs/lis, extract text, find parenthesis
+                for row in content_div.find_all(['div', 'li', 'p']):
+                    text = row.get_text(separator=" ", strip=True)
+                    if not text or len(text) > 100: continue
                     m = re.search(r'\((.*?)\)', text)
-                    period = m.group(1) if m else ""
-                    name = re.sub(r'\(.*?\)', '', text).strip()
-                    if name:
-                        data['historicalNames'].append({'name': name, 'period': period})
+                    if m:
+                        period = m.group(1)
+                        name = re.sub(r'\(.*?\)', '', text).strip()
+                        if name and not any(x['name'] == name for x in data['historicalNames']):
+                            data['historicalNames'].append({'name': name, 'period': period})
+                            
+        elif title == 'Finals Played':
+            finals_arr = []
+            if content_div:
+                for mb4 in content_div.find_all('div', class_='mb-4'):
+                    comp = ''
+                    h4 = mb4.find('h4')
+                    if h4: comp = h4.text.strip()
+                    
+                    for match in mb4.find_all('div', class_='final-match'):
+                        date = ''
+                        muted = match.find('small', class_='text-muted')
+                        if muted: date = muted.text.strip()
+                        
+                        teams = [t.text.strip() for t in match.find_all('span', class_='team-name')]
+                        scores = [s.text.strip() for s in match.find_all('div', class_=re.compile('resultat-gols'))]
+                        
+                        if len(teams) >= 2:
+                            score_str = f"{scores[0]} - {scores[1]}" if len(scores) >= 2 else ""
+                            finals_arr.append(f"{comp} {date} {teams[0]} {score_str} {teams[1]}")
+            if finals_arr:
+                data['finalsPlayed'] = ", ".join(finals_arr)
                         
         elif title == 'Top Visitors':
             script_match = re.search(r'dataVisit\s*=\s*(\[.*?\]);', html, re.DOTALL)
@@ -233,7 +267,15 @@ def main():
         hide_thread = start_hiding_thread(driver.browser_pid)
         
         driver.get(f'https://www.bdfutbol.com/en/s/{stadium_id}.html')
-        time.sleep(10)  # Wait for CF challenge to solve
+        
+        # Smart wait for Cloudflare challenge to solve (up to 30 seconds)
+        for _ in range(30):
+            title = driver.title.lower()
+            if "just a moment" not in title and "www.bdfutbol.com" not in title and "cloudflare" not in title:
+                break
+            time.sleep(1)
+            
+        time.sleep(2) # Give it 2 extra seconds to render the DOM fully after bypass
         
         html = driver.page_source
         data = parse_html(html)

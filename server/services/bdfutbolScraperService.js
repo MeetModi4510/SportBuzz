@@ -62,6 +62,17 @@ export async function scrapeBDFutbolVenue(id) {
         if (statsObj.error) {
             throw new Error('Python scraper error: ' + statsObj.error);
         }
+        
+        // Prevent empty arrays from the scraper from overwriting hardcoded static data
+        if (Array.isArray(statsObj.historicalNames) && statsObj.historicalNames.length === 0) {
+            delete statsObj.historicalNames;
+        }
+        if (Array.isArray(statsObj.seasonsList) && statsObj.seasonsList.length === 0) {
+            delete statsObj.seasonsList;
+        }
+        if (Array.isArray(statsObj.visitingTeams) && statsObj.visitingTeams.length === 0) {
+            delete statsObj.visitingTeams;
+        }
     } catch (e) {
         console.error('[BDFutbol] Scraper error:', e.message);
         throw e;

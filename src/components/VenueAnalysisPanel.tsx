@@ -843,15 +843,14 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                 {/* Map Integration */}
                 <Section icon={<MapPin size={16} style={{ color }} />} title="Location Map" subtitle={`${stats.locationCoords[0]}, ${stats.locationCoords[1]}`}>
                     <div className="h-[250px] w-full rounded-xl overflow-hidden border border-white/10 relative bg-muted/20">
-                        {/* We use an absolute container slightly larger than the wrapper to hide the OSM attribution bar at the bottom */}
-                        <div className="absolute -inset-1 -bottom-10 pointer-events-auto">
+                        <div className="absolute inset-0 pointer-events-auto">
                             <iframe 
                                 width="100%" 
                                 height="100%" 
                                 frameBorder="0" 
                                 marginHeight={0} 
                                 marginWidth={0} 
-                                src={`https://www.openstreetmap.org/export/embed.html?bbox=${stats.locationCoords[1]-0.02}%2C${stats.locationCoords[0]-0.005}%2C${stats.locationCoords[1]+0.02}%2C${stats.locationCoords[0]+0.005}&layer=mapnik&marker=${stats.locationCoords[0]}%2C${stats.locationCoords[1]}`}
+                                src={`https://maps.google.com/maps?q=${stats.locationCoords[0]},${stats.locationCoords[1]}&z=15&output=embed`}
                                 style={{ filter: "invert(90%) hue-rotate(180deg) brightness(85%) contrast(85%)" }}
                             ></iframe>
                         </div>
@@ -983,23 +982,30 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                         </div>
                     </Section>
 
+                    {/* Historical Names */}
                     <Section icon={<Building2 size={16} style={{ color }} />} title="Historical Names" subtitle="Past names of the stadium">
-                        <div className="flex flex-col gap-3 mt-2 relative">
-                            {/* Timeline line */}
-                            <div className="absolute left-[15px] top-5 bottom-5 w-px bg-white/10" />
-                            
-                            {(stats.historicalNames || []).map((name, idx) => (
-                                <div key={idx} className="relative pl-10 pr-4 py-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors group">
-                                    {/* Timeline node */}
-                                    <div className="absolute left-[12px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 border-white/20 bg-background group-hover:border-white/60 group-hover:bg-white/20 transition-all z-10 shadow-[0_0_10px_rgba(255,255,255,0)] group-hover:shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
-                                    
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm font-semibold text-white/80 group-hover:text-white transition-colors">{name.name}</span>
-                                        <span className="text-xs font-mono text-white/40 tracking-wider bg-white/5 px-2.5 py-1 rounded-md border border-white/5">{name.period}</span>
+                        {stats.historicalNames && stats.historicalNames.length > 0 ? (
+                            <div className="flex flex-col gap-3 mt-2 relative">
+                                {/* Timeline line */}
+                                <div className="absolute left-[15px] top-5 bottom-5 w-px bg-white/10" />
+                                
+                                {stats.historicalNames.map((name, idx) => (
+                                    <div key={idx} className="relative pl-10 pr-4 py-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors group">
+                                        {/* Timeline node */}
+                                        <div className="absolute left-[12px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 border-white/20 bg-background group-hover:border-white/60 group-hover:bg-white/20 transition-all z-10 shadow-[0_0_10px_rgba(255,255,255,0)] group-hover:shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+                                        
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm font-semibold text-white/80 group-hover:text-white transition-colors">{name.name}</span>
+                                            <span className="text-xs font-mono text-white/40 tracking-wider bg-white/5 px-2.5 py-1 rounded-md border border-white/5">{name.period}</span>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="p-4 bg-white/[0.02] rounded-xl border border-white/5 mt-2">
+                                <p className="text-sm text-white/40 font-medium text-center">No historical names found</p>
+                            </div>
+                        )}
                     </Section>
                 </div>
 
@@ -1016,18 +1022,34 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                                 const date = dateMatch ? dateMatch[0] : "";
                                 const parts = trimmed.split(/\b\d{2}\/\d{2}\/\d{4}\b/);
                                 const comp = parts[0]?.trim();
-                                const match = parts[1]?.trim();
+                                let matchStr = parts[1]?.trim() || "";
+                                
+                                // Parse "Team A X - Y Team B" or "Team A X-Y Team B"
+                                const scoreRegex = /^(.*?)\s+(\d+)\s*-\s*(\d+)\s+(.*?)$/;
+                                const scoreMatch = matchStr.match(scoreRegex);
                                 
                                 return (
-                                    <div key={idx} className="p-4 bg-white/[0.02] rounded-xl border border-white/5 hover:bg-white/[0.05] transition-all duration-300 flex flex-col gap-2 relative overflow-hidden group">
+                                    <div key={idx} className="p-4 bg-white/[0.02] rounded-xl border border-white/5 hover:bg-white/[0.05] transition-all duration-300 flex flex-col gap-3 relative overflow-hidden group">
                                         <div className="absolute -right-4 -top-4 w-16 h-16 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-colors" />
-                                        <div className="flex justify-between items-start gap-4 relative z-10">
-                                            <span className="text-[11px] font-bold text-amber-500/90 uppercase tracking-[0.15em]">{comp || 'Final'}</span>
-                                            {date && <span className="text-[10px] font-mono text-white/40 tracking-wider bg-white/5 px-2 py-1 rounded-md border border-white/5">{date}</span>}
+                                        <div className="flex justify-between items-center relative z-10 border-b border-white/5 pb-2">
+                                            <span className="text-[12px] font-bold text-amber-500/90 uppercase tracking-[0.15em]">{comp || 'Final'}</span>
+                                            {date && <span className="text-[11px] font-mono text-white/40 tracking-wider bg-white/5 px-2 py-1 rounded-md border border-white/5">{date}</span>}
                                         </div>
-                                        <p className="text-sm text-white/90 font-medium mt-1 relative z-10">
-                                            {match || trimmed}
-                                        </p>
+                                        
+                                        {scoreMatch ? (
+                                            <div className="flex items-center justify-between mt-1 relative z-10 w-full gap-2">
+                                                <span className="flex-1 text-sm text-white/90 font-medium text-right truncate">{scoreMatch[1].trim()}</span>
+                                                <div className="flex items-center gap-1.5 shrink-0 px-2">
+                                                    <span className="w-7 h-7 flex items-center justify-center bg-blue-900/60 border border-blue-500/30 text-white font-mono font-bold rounded shadow-inner text-sm">{scoreMatch[2]}</span>
+                                                    <span className="w-7 h-7 flex items-center justify-center bg-blue-900/60 border border-blue-500/30 text-white font-mono font-bold rounded shadow-inner text-sm">{scoreMatch[3]}</span>
+                                                </div>
+                                                <span className="flex-1 text-sm text-white/90 font-medium text-left truncate">{scoreMatch[4].trim()}</span>
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm text-white/90 font-medium mt-1 relative z-10 text-center">
+                                                {matchStr || trimmed}
+                                            </p>
+                                        )}
                                     </div>
                                 );
                             })
