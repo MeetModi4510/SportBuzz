@@ -254,7 +254,9 @@ export const teamApi = {
     getById: (id: string) => api.get(`teams/${id}`),
     create: (data: any) => api.post('teams', data),
     update: (id: string, data: any) => api.put(`teams/${id}`, data),
-    delete: (id: string) => api.delete(`teams/${id}`)
+    delete: (id: string) => api.delete(`teams/${id}`),
+    generateCodes: (id: string) => api.post(`teams/${id}/generate-codes`),
+    join: (code: string) => api.post('teams/join', { code })
 };
 
 export const playerApi = {

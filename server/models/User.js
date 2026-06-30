@@ -107,8 +107,17 @@ const userSchema = new mongoose.Schema({
     },
     bowlingStyle: {
         type: String,
-        default: 'None'
+        default: 'Right-arm Fast'
     },
+    playingRole: {
+        type: String,
+        enum: ['Batsman', 'Bowler', 'All-rounder', 'Wicket Keeper'],
+        default: 'Batsman'
+    },
+    teams: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Team'
+    }],
     preferences: {
         darkMode: { type: Boolean, default: true },
         emailNotifications: { type: Boolean, default: true },

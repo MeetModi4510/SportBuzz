@@ -17,6 +17,20 @@ const teamSchema = new mongoose.Schema({
         uppercase: true,
         maxLength: 5
     },
+    captainId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    captainJoinCode: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    playerJoinCode: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
     players: {
         type: mongoose.Schema.Types.Mixed,
         default: []

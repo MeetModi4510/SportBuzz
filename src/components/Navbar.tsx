@@ -70,7 +70,7 @@ export const Navbar = () => {
   const [allTournaments, setAllTournaments] = useState<any[]>([]);
   const [allPlayers, setAllPlayers] = useState<any[]>([]);
   const [dataLoaded, setDataLoaded] = useState(false);
-  const [user, setUser] = useState<{ email: string; fullName?: string } | null>(null);
+  const [user, setUser] = useState<{ email: string; fullName?: string; photoUrl?: string } | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const searchRef = useRef<HTMLDivElement>(null);
@@ -285,8 +285,12 @@ export const Navbar = () => {
                 <div className="hidden sm:flex items-center gap-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors">
-                        <User size={18} />
+                      <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary border border-border/50 text-foreground hover:bg-secondary/80 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        {user.photoUrl ? (
+                          <img src={user.photoUrl.startsWith('http') || user.photoUrl.startsWith('data:') ? user.photoUrl : `http://localhost:5001/${user.photoUrl}`} alt={user.fullName || 'User'} className="w-5 h-5 rounded-full object-cover" />
+                        ) : (
+                          <User size={18} />
+                        )}
                         <span className="text-sm font-medium">{user.fullName || user.email}</span>
                       </button>
                     </DropdownMenuTrigger>

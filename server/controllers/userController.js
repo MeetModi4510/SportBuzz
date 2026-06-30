@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import Activity from '../models/Activity.js';
 import Achievement from '../models/Achievement.js';
+import Team from '../models/Team.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 
 /**
@@ -9,8 +10,7 @@ import { asyncHandler } from '../middleware/errorHandler.js';
  * @access  Private
  */
 export const getProfile = asyncHandler(async (req, res) => {
-    // Optimization: Use the user already fetched by the protect middleware
-    const user = req.user;
+    const user = await User.findById(req.user._id).populate('teams');
 
     if (!user) {
         res.status(401);
@@ -28,7 +28,9 @@ export const getProfile = asyncHandler(async (req, res) => {
             favoriteTeam: user.favoriteTeam,
             bio: user.bio,
             battingStyle: user.battingStyle || 'Right-hand Bat',
-            bowlingStyle: user.bowlingStyle || 'None',
+            bowlingStyle: user.bowlingStyle || 'Right-arm Fast',
+            playingRole: user.playingRole || 'Batsman',
+            teams: user.teams || [],
             photoUrl: user.photoUrl,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt
@@ -54,9 +56,51 @@ export const updateProfile = asyncHandler(async (req, res) => {
     if (bio !== undefined) user.bio = bio;
     if (req.body.battingStyle !== undefined) user.battingStyle = req.body.battingStyle;
     if (req.body.bowlingStyle !== undefined) user.bowlingStyle = req.body.bowlingStyle;
+    if (req.body.playingRole !== undefined) user.playingRole = req.body.playingRole;
     if (photoUrl !== undefined) user.photoUrl = photoUrl;
 
     await user.save();
+
+    // Sync player details across all teams they belong to
+    if (fullName !== undefined || photoUrl !== undefined || req.body.playingRole !== undefined || req.body.battingStyle !== undefined || req.body.bowlingStyle !== undefined) {
+        try {
+            const teams = await Team.find({ "players.userId": user._id });
+            
+            for (const team of teams) {
+                let teamChanged = false;
+                
+                if (team.players && Array.isArray(team.players)) {
+                    team.players = team.players.map(p => {
+                        if (p.userId && p.userId.toString() === user._id.toString()) {
+                            teamChanged = true;
+                            return {
+                                ...p,
+                                name: user.fullName || p.name,
+                                photo: user.photoUrl !== undefined ? user.photoUrl : p.photo,
+                                role: user.playingRole || p.role,
+                                battingStyle: user.battingStyle || p.battingStyle,
+                                bowlingStyle: user.bowlingStyle || p.bowlingStyle
+                            };
+                        }
+                        return p;
+                    });
+                }
+                
+                if (teamChanged) {
+                    team.markModified('players');
+                    
+                    // Sync captain name if they are the captain
+                    if (team.captainId && team.captainId.toString() === user._id.toString() && fullName) {
+                        team.captain = user.fullName;
+                    }
+                    
+                    await team.save();
+                }
+            }
+        } catch (error) {
+            console.error('Error syncing player profile to teams:', error);
+        }
+    }
 
     // Log activity
     await Activity.create({

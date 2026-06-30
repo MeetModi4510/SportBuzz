@@ -21,7 +21,7 @@ import {
     Loader2, TrendingUp, TrendingDown, Target, Zap, BarChart3, Activity, Trash2, History as HistoryIcon,
     Bell, BellOff, Camera, Crosshair, User, Pencil, ChevronRight, Calculator, ChevronDown, ChevronUp, Check,
     Newspaper, MessageCircle, Sparkles, Globe, Pencil as Edit, PencilLine, ArrowRight, RefreshCw, Award, Share2, Brain, Hand, Focus,
-    Fingerprint, Boxes, Database, Compass, Search, Lock
+    Fingerprint, Boxes, Database, Compass, Search, Lock, Copy
 } from "lucide-react";
 
 import { useTournamentFollow } from "@/hooks/useTournamentFollow";
@@ -525,13 +525,7 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
     const [isAddTeamOpen, setIsAddTeamOpen] = useState(false);
     const [newTeamName, setNewTeamName] = useState("");
     const [newTeamAcronym, setNewTeamAcronym] = useState("");
-    const [newTeamCaptain, setNewTeamCaptain] = useState("");
     const [newTeamLogo, setNewTeamLogo] = useState("");
-    const [newTeamPlayerInput, setNewTeamPlayerInput] = useState("");
-    const [newTeamPlayerRole, setNewTeamPlayerRole] = useState<PlayerRole>("Batsman");
-    const [newTeamPlayerBattingStyle, setNewTeamPlayerBattingStyle] = useState<string>("Right-hand Bat");
-    const [newTeamPlayerBowlingStyle, setNewTeamPlayerBowlingStyle] = useState<string>("None");
-    const [newTeamPlayers, setNewTeamPlayers] = useState<PlayerEntry[]>([]);
     const [newTeamColor, setNewTeamColor] = useState("#3b82f6");
 
     // Add existing team dialog
@@ -653,7 +647,7 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
 
     // Debounced player search for autocomplete
     useEffect(() => {
-        const name = showSuggestions === 'add' ? addPlayerName : showSuggestions === 'new' ? newTeamPlayerInput : '';
+        const name = showSuggestions === 'add' ? addPlayerName : '';
         if (!name || name.trim().length < 2) {
             setPlayerSuggestions([]);
             return;
@@ -666,7 +660,7 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
             } catch { setPlayerSuggestions([]); }
         }, 300);
         return () => clearTimeout(timer);
-    }, [addPlayerName, newTeamPlayerInput, showSuggestions]);
+    }, [addPlayerName, showSuggestions]);
 
     // Handle initialTournamentId from URL or search params
     useEffect(() => {
@@ -1131,17 +1125,9 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
     const handleCreateAndAddTeam = async () => {
         if (!newTeamName || !selectedTournament) { toast.error("Team name is required"); return; }
         try {
-            // Auto-include captain in players list so they can bat/bowl
-            const hasCaptain = newTeamCaptain && newTeamPlayers.some(p => p.name === newTeamCaptain);
-            const finalPlayers = !hasCaptain && newTeamCaptain
-                ? [{ name: newTeamCaptain, role: "All-Rounder" as PlayerRole }, ...newTeamPlayers]
-                : newTeamPlayers;
-
             const teamRes = await teamApi.create({
                 name: newTeamName,
                 acronym: newTeamAcronym.toUpperCase(),
-                captain: newTeamCaptain,
-                players: finalPlayers,
                 logo: newTeamLogo,
                 color: newTeamColor
             }) as any;
@@ -1149,13 +1135,13 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                 await tournamentApi.addTeam(selectedTournament._id, teamRes.data._id, {
                     groupIndex: assignGroupIndex !== "" ? parseInt(assignGroupIndex) : undefined
                 });
-                toast.success(`${newTeamName} added to tournament!`);
+                toast.success(`${newTeamName} created! Captain Code: ${teamRes.data.captainJoinCode || 'check team details'}`, {
+                    duration: 5000
+                });
                 setIsAddTeamOpen(false);
                 setNewTeamName("");
                 setNewTeamAcronym("");
-                setNewTeamCaptain("");
-                setNewTeamPlayers([]);
-                setNewTeamLogo(""); setNewTeamPlayerInput("");
+                setNewTeamLogo("");
                 setAssignGroupIndex("");
                 await fetchTournamentDetails(selectedTournament._id);
             }
@@ -1222,27 +1208,6 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                 if (selectedTournament) await fetchTournamentDetails(selectedTournament._id);
             }
         } catch { toast.error("Failed to delete match"); }
-    };
-
-    const addPlayer = () => {
-        const pName = newTeamPlayerInput.trim();
-        if (!pName) return;
-
-        const existingTeam = getPlayerTeam(pName);
-        if (existingTeam) {
-            toast.error(`${pName} is already playing for ${existingTeam} in this tournament!`);
-            return;
-        }
-
-        if (!newTeamPlayers.some(p => p.name === pName)) {
-            setNewTeamPlayers([...newTeamPlayers, { 
-                name: pName, 
-                role: newTeamPlayerRole,
-                battingStyle: newTeamPlayerBattingStyle,
-                bowlingStyle: newTeamPlayerBowlingStyle
-            }]);
-            setNewTeamPlayerInput("");
-        }
     };
 
     const getPlayerTeam = (playerName: string) => {
@@ -2005,10 +1970,15 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                     </div>
                                 )}
                             </h2>
-                            {selectedTeam.captain && (
+                            {selectedTeam.captain ? (
                                 <p className="text-yellow-400 text-sm flex items-center gap-1.5 mt-0.5">
                                     <Crown size={14} /> Captain: <span className="font-bold">{selectedTeam.captain}</span>
                                 </p>
+                            ) : (
+                                <div className="mt-3 flex items-center gap-3 bg-white/5 backdrop-blur-md w-fit px-3 py-1.5 rounded-lg border border-white/10 cursor-pointer hover:bg-white/10 transition-colors" onClick={(e) => { e.stopPropagation(); if((selectedTeam as any).captainJoinCode) { navigator.clipboard.writeText((selectedTeam as any).captainJoinCode); toast.success('Code copied!'); } }}>
+                                    <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Captain Code:</span>
+                                    <span className="font-mono font-bold text-amber-400 tracking-widest text-sm flex items-center gap-2">{(selectedTeam as any).captainJoinCode || 'N/A'} <Copy size={12} className="opacity-50 hover:opacity-100" /></span>
+                                </div>
                             )}
                         </div>
                         {isTournamentOwner && (
@@ -3880,15 +3850,9 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                                         </Select>
                                                     </div>
                                                 )}
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="space-y-2">
-                                                        <Label className="text-zinc-300 font-medium">Captain</Label>
-                                                        <Input placeholder="e.g. Rohit" className="bg-zinc-900/50 border-zinc-800 rounded-xl" value={newTeamCaptain} onChange={(e) => setNewTeamCaptain(e.target.value)} />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="text-zinc-300 font-medium">Acronym</Label>
-                                                        <Input placeholder="MI" maxLength={5} className="bg-zinc-900/50 border-zinc-800 uppercase rounded-xl" value={newTeamAcronym} onChange={(e) => setNewTeamAcronym(e.target.value.toUpperCase())} />
-                                                    </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-zinc-300 font-medium">Acronym</Label>
+                                                    <Input placeholder="MI" maxLength={5} className="bg-zinc-900/50 border-zinc-800 uppercase rounded-xl" value={newTeamAcronym} onChange={(e) => setNewTeamAcronym(e.target.value.toUpperCase())} />
                                                 </div>
                                             </div>
 
@@ -3907,85 +3871,6 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                                         </button>
                                                     ))}
                                                 </div>
-                                            </div>
-
-                                            <div className="space-y-3 pt-5 border-t border-zinc-800/50">
-                                                <Label className="text-zinc-300 font-medium">Add Players</Label>
-                                                <div className="flex gap-2">
-                                                    <div className="relative flex-1">
-                                                        <Input placeholder="Player name" className="bg-zinc-900/50 border-zinc-800 w-full rounded-xl" value={newTeamPlayerInput} onChange={(e) => { setNewTeamPlayerInput(e.target.value); setShowSuggestions('new'); }} onFocus={() => newTeamPlayerInput.trim().length >= 2 && setShowSuggestions('new')} onKeyDown={(e) => { if (e.key === 'Enter') { setShowSuggestions(null); addPlayer(); } }} autoComplete="off" />
-                                                        {showSuggestions === 'new' && playerSuggestions.length > 0 && (
-                                                            <div className="absolute left-0 right-0 mt-2 bg-zinc-900 border border-zinc-700/50 rounded-2xl shadow-2xl z-50 max-h-48 overflow-y-auto">
-                                                                {playerSuggestions.map((s: any, i: number) => (
-                                                                    <button key={i} type="button" className="w-full flex items-center gap-3 px-4 py-3 hover:bg-zinc-800/80 transition-colors text-left text-sm first:rounded-t-2xl last:rounded-b-2xl" onClick={() => {
-                                                                        setNewTeamPlayerInput(s.name);
-                                                                        setNewTeamPlayerRole(s.role || 'Batsman');
-                                                                        setNewTeamPlayerBattingStyle(s.battingStyle || 'Right-hand Bat');
-                                                                        setNewTeamPlayerBowlingStyle(s.bowlingStyle || 'None');
-                                                                        setShowSuggestions(null);
-                                                                    }}>
-                                                                        {s.photo ? <img src={s.photo} className="w-9 h-9 rounded-full object-cover border border-zinc-700" /> : <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20"><User size={16} className="text-blue-400" /></div>}
-                                                                        <div className="flex-1 min-w-0">
-                                                                            <p className="text-white font-medium truncate">{s.name}</p>
-                                                                            <p className="text-xs text-zinc-500">{s.role} · {s.team?.name || 'Existing Player'}</p>
-                                                                        </div>
-                                                                    </button>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <Select value={newTeamPlayerRole} onValueChange={(v: PlayerRole) => setNewTeamPlayerRole(v)}>
-                                                        <SelectTrigger className="bg-zinc-900/50 border-zinc-800 w-[140px] rounded-xl"><SelectValue /></SelectTrigger>
-                                                        <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-xl">
-                                                            {ROLES.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-3">
-                                                    <div className="space-y-1.5">
-                                                        <Label className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Batting Style</Label>
-                                                        <Select value={newTeamPlayerBattingStyle} onValueChange={setNewTeamPlayerBattingStyle}>
-                                                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 h-9 text-xs rounded-lg"><SelectValue /></SelectTrigger>
-                                                            <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-lg">
-                                                                <SelectItem value="Right-hand Bat">Right-hand Bat</SelectItem>
-                                                                <SelectItem value="Left-hand Bat">Left-hand Bat</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-                                                    <div className="space-y-1.5">
-                                                        <Label className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Bowling Style</Label>
-                                                        <Select value={newTeamPlayerBowlingStyle} onValueChange={setNewTeamPlayerBowlingStyle}>
-                                                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 h-9 text-xs rounded-lg"><SelectValue /></SelectTrigger>
-                                                            <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-lg">
-                                                                <SelectItem value="None">None</SelectItem>
-                                                                <SelectItem value="Right-arm Fast">Right-arm Fast</SelectItem>
-                                                                <SelectItem value="Right-arm Medium">Right-arm Medium</SelectItem>
-                                                                <SelectItem value="Right-arm Off-break">Right-arm Off-spin</SelectItem>
-                                                                <SelectItem value="Right-arm Leg-break">Right-arm Leg-spin</SelectItem>
-                                                                <SelectItem value="Left-arm Fast">Left-arm Fast</SelectItem>
-                                                                <SelectItem value="Left-arm Medium">Left-arm Medium</SelectItem>
-                                                                <SelectItem value="Left-arm Orthodox">Left-arm Orthodox</SelectItem>
-                                                                <SelectItem value="Left-arm Unorthodox">Left-arm Chinaman</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-                                                </div>
-                                                <Button onClick={addPlayer} className="w-full bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl py-5 font-semibold mt-2 transition-colors">Add to Draft Squad</Button>
-                                                
-                                                {newTeamPlayers.length > 0 && (
-                                                    <div className="flex flex-wrap gap-2 mt-4 p-4 bg-zinc-900/30 border border-zinc-800/50 rounded-2xl max-h-40 overflow-y-auto custom-scrollbar">
-                                                        {newTeamPlayers.map((p) => {
-                                                            const rc = ROLE_COLORS[p.role];
-                                                            return (
-                                                                <span key={p.name} className={`px-3 py-1.5 ${rc.bg} ${rc.text} text-xs font-medium rounded-lg flex items-center gap-2 border ${rc.border} shadow-sm`}>
-                                                                    {rc.icon} {p.name}
-                                                                    <span className="text-[10px] opacity-60 ml-0.5">({p.role === "Wicket Keeper" ? "WK" : p.role === "All-Rounder" ? "AR" : p.role === "Batsman" ? "BAT" : "BOWL"})</span>
-                                                                    <button onClick={() => setNewTeamPlayers(newTeamPlayers.filter(x => x.name !== p.name))} className="hover:text-white ml-1 p-0.5 rounded-full hover:bg-black/20 transition-colors">&times;</button>
-                                                                </span>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                )}
                                             </div>
                                         </div>
                                         <DialogFooter className="border-t border-zinc-800 pt-5 mt-2">
@@ -4089,10 +3974,15 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                                 <div className="min-w-0">
                                                     {groupName && <span className="inline-block px-2.5 py-1 rounded text-[9px] font-black tracking-[0.2em] uppercase mb-3 border backdrop-blur-sm" style={{ color: themeColor, borderColor: `${themeColor}30`, backgroundColor: `${themeColor}10` }}>{groupName}</span>}
                                                     <h3 className="text-2xl font-black text-white group-hover:text-zinc-100 transition-colors tracking-tight truncate drop-shadow-md">{team.name}</h3>
-                                                    {team.captain && (
+                                                    {team.captain ? (
                                                         <p className="flex items-center gap-2 text-zinc-400 text-sm mt-2 font-medium group-hover:text-zinc-300 transition-colors">
                                                             <Crown size={14} className="text-amber-500 drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]" /> {team.captain}
                                                         </p>
+                                                    ) : (
+                                                        <div className="mt-3 flex items-center gap-3 bg-white/5 backdrop-blur-md w-fit px-3 py-1.5 rounded-lg border border-white/10" onClick={(e) => { e.stopPropagation(); if((team as any).captainJoinCode) { navigator.clipboard.writeText((team as any).captainJoinCode); toast.success('Code copied!'); } }}>
+                                                            <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Captain Code:</span>
+                                                            <span className="font-mono font-bold text-amber-400 tracking-widest text-sm flex items-center gap-2">{(team as any).captainJoinCode || 'N/A'} <Copy size={12} className="opacity-50 hover:opacity-100 cursor-pointer" /></span>
+                                                        </div>
                                                     )}
                                                 </div>
                                                 {/* W/L Form */}

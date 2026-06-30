@@ -65,6 +65,18 @@ export const TeamManager = () => {
         }
     };
 
+    const handleGenerateCodes = async (teamId: string) => {
+        try {
+            const response = await teamApi.generateCodes(teamId) as any;
+            if (response.success) {
+                toast.success("Join codes regenerated successfully");
+                fetchTeams();
+            }
+        } catch (error) {
+            toast.error("Failed to generate codes");
+        }
+    };
+
     const handleAddPlayer = () => {
         if (playerInput.trim() && !players.some(p => p.name === playerInput.trim())) {
             setPlayers([...players, { name: playerInput.trim(), role: playerRole }]);
@@ -254,6 +266,24 @@ export const TeamManager = () => {
                             <CardContent className="pt-0">
                                 <div className="text-slate-500 text-sm mb-4">
                                     {team.players?.length || 0} Registered Players
+                                </div>
+                                <div className="space-y-2 mb-4 bg-slate-950/50 p-3 rounded-xl border border-slate-800">
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="text-slate-500 font-bold uppercase tracking-widest">Captain Code:</span>
+                                        <span className="text-blue-400 font-mono tracking-widest bg-blue-500/10 px-2 py-0.5 rounded">{team.captainJoinCode || "N/A"}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="text-slate-500 font-bold uppercase tracking-widest">Player Code:</span>
+                                        <span className="text-amber-400 font-mono tracking-widest bg-amber-500/10 px-2 py-0.5 rounded">{team.playerJoinCode || "N/A"}</span>
+                                    </div>
+                                    <Button 
+                                        variant="ghost" 
+                                        size="sm" 
+                                        className="w-full h-7 text-[10px] uppercase font-black tracking-widest text-slate-500 hover:text-white hover:bg-slate-800 mt-2"
+                                        onClick={() => handleGenerateCodes(team._id!)}
+                                    >
+                                        Regenerate Codes
+                                    </Button>
                                 </div>
                                 <Button
                                     variant="outline"
