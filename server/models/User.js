@@ -111,7 +111,7 @@ const userSchema = new mongoose.Schema({
     },
     playingRole: {
         type: String,
-        enum: ['Batsman', 'Bowler', 'All-rounder', 'Wicket Keeper'],
+        enum: ['Batsman', 'Bowler', 'All-rounder', 'All-Rounder', 'Wicket Keeper'],
         default: 'Batsman'
     },
     teams: [{
