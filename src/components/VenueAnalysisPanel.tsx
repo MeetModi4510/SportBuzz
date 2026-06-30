@@ -1463,21 +1463,24 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
                                 >
                                     {/* Top 65% Image fading into the card */}
                                     <div className="absolute top-0 left-0 right-0 h-[65%] z-0 pointer-events-none overflow-hidden rounded-t-2xl">
-                                        {venue.image ? (
-                                            <div
-                                                className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105"
-                                                style={{
-                                                    backgroundImage: `url(${venue.image})`,
-                                                    backgroundSize: "cover",
-                                                    backgroundPosition: "center",
-                                                    WebkitMaskImage: "linear-gradient(to bottom, black 70%, transparent 100%)",
-                                                    maskImage: "linear-gradient(to bottom, black 70%, transparent 100%)",
-                                                    opacity: 1
-                                                }}
-                                            />
-                                        ) : (
-                                            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent" />
-                                        )}
+                                        <img
+                                            src={venue.image || `/images/venues/${venue.id}.jpg`}
+                                            alt={venue.name}
+                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                            style={{
+                                                WebkitMaskImage: "linear-gradient(to bottom, black 70%, transparent 100%)",
+                                                maskImage: "linear-gradient(to bottom, black 70%, transparent 100%)",
+                                            }}
+                                            onError={(e) => {
+                                                const target = e.currentTarget as HTMLImageElement;
+                                                if (target.src.endsWith('.jpg')) {
+                                                    target.src = target.src.replace('.jpg', '.png');
+                                                } else {
+                                                    target.style.display = 'none';
+                                                    target.parentElement!.classList.add('bg-gradient-to-b', 'from-white/10', 'to-transparent');
+                                                }
+                                            }}
+                                        />
                                         {/* Dark overlay gradient only at the bottom to ensure text legibility */}
                                         <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-[#0f1115] via-[#0f1115]/70 to-transparent" />
                                     </div>
@@ -1544,20 +1547,28 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
             {/* Venue Header Card */}
             <div className="relative overflow-hidden rounded-[1.5rem] border border-white/5 min-h-[280px] flex flex-col p-6 md:p-8 bg-[#0a0a0c] shadow-2xl">
                 {/* Background Image - Right Side, Fully Bright */}
-                {selectedVenue.image ? (
-                    <div
-                        className="absolute inset-y-0 right-0 w-[60%] pointer-events-none"
+                <div className="absolute inset-y-0 right-0 w-[60%] pointer-events-none">
+                    <img
+                        src={selectedVenue.image || `/images/venues/${selectedVenue.id}.jpg`}
+                        alt={selectedVenue.name}
+                        className="w-full h-full object-cover"
                         style={{
-                            backgroundImage: `url(${selectedVenue.image})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
                             WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 20%, black 100%)",
                             maskImage: "linear-gradient(to right, transparent 0%, black 20%, black 100%)",
                         }}
+                        onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            if (target.src.endsWith('.jpg')) {
+                                target.src = target.src.replace('.jpg', '.png');
+                            } else {
+                                target.style.display = 'none';
+                                target.parentElement!.classList.add('bg-gradient-to-br', 'from-[#0a0a0c]', 'to-[#121216]');
+                                target.parentElement!.classList.remove('right-0', 'w-[60%]');
+                                target.parentElement!.classList.add('inset-0');
+                            }
+                        }}
                     />
-                ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0c] to-[#121216]" />
-                )}
+                </div>
 
                 {/* Subtle gradient from left to ensure perfect dark background integration */}
                 <div className="absolute inset-y-0 left-0 w-[40%] bg-[#0a0a0c] pointer-events-none" />
