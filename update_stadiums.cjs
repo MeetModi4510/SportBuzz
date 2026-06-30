@@ -23,8 +23,8 @@ updates.forEach(u => {
     return match
       .replace(/city: "[^"]*"/g, `city: "${u.city}"`)
       .replace(/country: "[^"]*"/g, `country: "${u.country}"`)
-      .replace(/capacity: \\d+/g, `capacity: ${u.capacity}`)
-      .replace(/established: \\d+/g, `established: ${u.est}`)
+      .replace(/capacity: \d+/g, `capacity: ${u.capacity}`)
+      .replace(/established: \d+/g, `established: ${u.est}`)
       .replace(/locationText: "[^"]*"/g, `locationText: "${u.loc}"`);
   });
 });
@@ -40,8 +40,8 @@ code2 = code2.replace(regex2, (match) => {
     return match
       .replace(/city: "[^"]*"/g, `city: "${et.city}"`)
       .replace(/country: "[^"]*"/g, `country: "${et.country}"`)
-      .replace(/capacity: \\d+/g, `capacity: ${et.capacity}`)
-      .replace(/established: \\d+/g, `established: ${et.est}`)
+      .replace(/capacity: \d+/g, `capacity: ${et.capacity}`)
+      .replace(/established: \d+/g, `established: ${et.est}`)
       .replace(/locationText: "[^"]*"/g, `locationText: "${et.loc}"`);
 });
 fs.writeFileSync(path2, code2);
