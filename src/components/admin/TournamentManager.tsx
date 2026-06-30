@@ -3036,233 +3036,271 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {/* Top Stats - Minimalist Glass Cards */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                             {[
-                            { label: "Played", value: currentTeamStats.played, color: "text-blue-400", bg: "bg-blue-500/10" },
-                            { label: "Won", value: currentTeamStats.won, color: "text-green-400", bg: "bg-green-500/10" },
-                            { label: "Lost", value: currentTeamStats.lost, color: "text-red-400", bg: "bg-red-500/10" },
-                            { label: "Total Runs", value: currentTeamStats.totalRuns, color: "text-purple-400", bg: "bg-purple-500/10" },
-                            { label: "Upcoming", value: currentTeamStats.upcoming, color: "text-amber-400", bg: "bg-amber-500/10" },
-                        ].map(stat => (
-                            <Card key={stat.label} className={`${stat.bg} border-slate-700/50`}>
-                                <CardContent className="p-4 text-center">
-                                    <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                                    <p className="text-slate-400 text-xs mt-1">{stat.label}</p>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
+                                { label: "Played", value: currentTeamStats.played, color: "text-blue-400", bg: "from-blue-500/10 to-transparent", border: "border-blue-500/20" },
+                                { label: "Won", value: currentTeamStats.won, color: "text-emerald-400", bg: "from-emerald-500/10 to-transparent", border: "border-emerald-500/20" },
+                                { label: "Lost", value: currentTeamStats.lost, color: "text-rose-400", bg: "from-rose-500/10 to-transparent", border: "border-rose-500/20" },
+                                { label: "Total Runs", value: currentTeamStats.totalRuns, color: "text-purple-400", bg: "from-purple-500/10 to-transparent", border: "border-purple-500/20" },
+                                { label: "Upcoming", value: currentTeamStats.upcoming, color: "text-amber-400", bg: "from-amber-500/10 to-transparent", border: "border-amber-500/20" },
+                            ].map(stat => (
+                                <div key={stat.label} className={`relative overflow-hidden bg-[#0a0a0c] rounded-[1.5rem] p-6 border ${stat.border} shadow-xl`}>
+                                    <div className={`absolute inset-0 bg-gradient-to-b ${stat.bg} opacity-20 pointer-events-none`} />
+                                    <div className="relative z-10 flex flex-col items-center justify-center text-center">
+                                        <span className={`text-4xl font-black ${stat.color} drop-shadow-md tracking-tighter`}>{stat.value}</span>
+                                        <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-500 mt-2">{stat.label}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
 
-                        {/* Squad by Role */}
-                        <Card className="bg-slate-900 border-slate-700">
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-white text-lg flex items-center gap-2">
-                                    <Users size={18} className="text-blue-400" /> Squad
-                                    <span className="text-xs text-slate-500 font-normal ml-2">{players.length} players</span>
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-5">
-
-                                {ROLES.map(role => {
-                                    const rolePlayers = grouped[role];
-                                    if (rolePlayers.length === 0) return null;
-                                    const rc = ROLE_COLORS[role];
-                                    return (
-                                        <div key={role}>
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className={`text-sm font-semibold ${rc.text} flex items-center gap-1.5`}>
-                                                    <span>{rc.icon}</span> {role}s
-                                                </span>
-                                                <span className="text-xs text-slate-600">({rolePlayers.length})</span>
-                                            </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                                                {rolePlayers.map((pName, idx) => (
-                                                    <div key={pName}
-                                                        className={`flex items-center gap-3 p-3 rounded-lg border ${rc.bg} ${rc.border} hover:brightness-110 transition-all cursor-pointer group`}
-                                                        onClick={() => {
-                                                            const pModel = players.find(x => (typeof x === 'string' ? x : x.name) === pName);
-                                                            const bStyle = typeof pModel === 'object' ? pModel?.battingStyle : undefined;
-                                                            const bowlStyle = typeof pModel === 'object' ? pModel?.bowlingStyle : undefined;
-                                                            const photo = typeof pModel === 'object' ? pModel?.photo : undefined;
-                                                            fetchPlayerStats(pName, role, bStyle, bowlStyle, photo);
-                                                        }}>
-                                                        <div className={`w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-xs font-bold shrink-0 ${rc.bg} ${rc.text}`}>
-                                                            {(() => {
-                                                                const playerModel = players.find(x => (typeof x === 'string' ? x : x.name) === pName);
-                                                                const photoUrl = typeof playerModel === 'object' && playerModel !== null ? (playerModel as any).photo : null;
-                                                                if (photoUrl) {
-                                                                    return <img src={photoUrl} alt={pName} className="w-full h-full object-cover" />;
-                                                                }
-                                                                return pName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                                                            })()}
+                        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mt-4">
+                            {/* Left Col: Squad */}
+                            <div className="xl:col-span-2 space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xl font-black text-white flex items-center gap-3">
+                                        <Users size={20} className="text-blue-500" />
+                                        Team Roster
+                                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest ml-2 px-2 py-0.5 border border-white/10 rounded-md bg-white/5">{players.length} Players</span>
+                                    </h3>
+                                    {isTournamentOwner && (
+                                        <Dialog open={isAddingPlayer} onOpenChange={setIsAddingPlayer}>
+                                            <DialogTrigger asChild>
+                                                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-900/30 active:scale-95">
+                                                    <Plus size={14} /> Add Player
+                                                </button>
+                                            </DialogTrigger>
+                                            <DialogContent className="bg-[#0a0a0c] border-white/10 text-white rounded-[2rem] p-8 max-w-md backdrop-blur-3xl">
+                                                <DialogHeader className="mb-6">
+                                                    <DialogTitle className="text-2xl font-black">Draft Player</DialogTitle>
+                                                    <DialogDescription className="text-zinc-400">Add a player to <span className="text-white font-bold">{selectedTeam?.name}</span>.</DialogDescription>
+                                                </DialogHeader>
+                                                <div className="space-y-5">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs uppercase font-bold tracking-widest text-zinc-400">Player Name</Label>
+                                                        <div className="relative">
+                                                            <Input placeholder="e.g. Virat Kohli" className="bg-white/5 border-white/10 h-12 rounded-xl focus:ring-blue-500" value={addPlayerName} onChange={(e) => { setAddPlayerName(e.target.value); setShowSuggestions('add'); setTournamentConflict(null); }} onFocus={() => addPlayerName.trim().length >= 2 && setShowSuggestions('add')} autoComplete="off" />
+                                                            {showSuggestions === 'add' && playerSuggestions.length > 0 && (
+                                                                <div className="absolute left-0 right-0 mt-2 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto">
+                                                                    {playerSuggestions.map((s: any, i: number) => (
+                                                                        <button key={i} type="button" className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left" onClick={() => {
+                                                                            setAddPlayerName(s.name);
+                                                                            setAddPlayerRole(s.role || 'Batsman');
+                                                                            setAddPlayerBattingStyle(s.battingStyle || 'Right-hand Bat');
+                                                                            setAddPlayerBowlingStyle(s.bowlingStyle || 'None');
+                                                                            setShowSuggestions(null);
+                                                                            // Check tournament conflict
+                                                                            if (selectedTournament?._id) {
+                                                                                playerApi.checkTournament(s.name, selectedTournament._id).then(r => {
+                                                                                    const d = r?.data || r;
+                                                                                    if (d?.conflict && d.teamId !== selectedTeam?._id) setTournamentConflict(d.teamName);
+                                                                                    else setTournamentConflict(null);
+                                                                                }).catch(() => {});
+                                                                            }
+                                                                        }}>
+                                                                            {s.photo ? <img src={s.photo} className="w-8 h-8 rounded-full object-cover border border-white/10" /> : <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center"><User size={14} className="text-emerald-400" /></div>}
+                                                                            <div className="flex-1 min-w-0">
+                                                                                <p className="text-white font-bold text-sm truncate">{s.name}</p>
+                                                                                <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">{s.role} · {s.team?.name || 'Unknown Team'}</p>
+                                                                            </div>
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                            {tournamentConflict && (
+                                                                <p className="text-rose-400 text-[10px] uppercase font-bold tracking-widest mt-2 flex items-center gap-1">⚠️ Already in <span className="text-white">{tournamentConflict}</span></p>
+                                                            )}
                                                         </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="text-white text-sm font-medium truncate">{pName}</p>
-                                                            {pName === selectedTeam?.captain && (
-                                                                <p className="text-[10px] text-yellow-500 flex items-center gap-1 font-bold">
-                                                                    <Crown size={10} /> Captain
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs uppercase font-bold tracking-widest text-zinc-400">Role</Label>
+                                                        <Select value={addPlayerRole} onValueChange={(v: any) => setAddPlayerRole(v)}>
+                                                            <SelectTrigger className="bg-white/5 border-white/10 text-white h-12 rounded-xl"><SelectValue /></SelectTrigger>
+                                                            <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-xl">
+                                                                {ROLES.map(r => <SelectItem key={r} value={r} className="rounded-lg">{r}</SelectItem>)}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <Label className="text-xs uppercase font-bold tracking-widest text-zinc-400">Batting Style</Label>
+                                                            <Select value={addPlayerBattingStyle} onValueChange={setAddPlayerBattingStyle}>
+                                                                <SelectTrigger className="bg-white/5 border-white/10 text-white h-12 rounded-xl"><SelectValue /></SelectTrigger>
+                                                                <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-xl">
+                                                                    <SelectItem value="Right-hand Bat" className="rounded-lg">Right-hand Bat</SelectItem>
+                                                                    <SelectItem value="Left-hand Bat" className="rounded-lg">Left-hand Bat</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-xs uppercase font-bold tracking-widest text-zinc-400">Bowling Style</Label>
+                                                            <Select value={addPlayerBowlingStyle} onValueChange={setAddPlayerBowlingStyle}>
+                                                                <SelectTrigger className="bg-white/5 border-white/10 text-white h-12 rounded-xl"><SelectValue /></SelectTrigger>
+                                                                <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-xl max-h-48">
+                                                                    <SelectItem value="None" className="rounded-lg">None</SelectItem>
+                                                                    <SelectItem value="Right-arm Fast" className="rounded-lg">Right-arm Fast</SelectItem>
+                                                                    <SelectItem value="Right-arm Medium" className="rounded-lg">Right-arm Medium</SelectItem>
+                                                                    <SelectItem value="Right-arm Off-break" className="rounded-lg">Right-arm Off-spin</SelectItem>
+                                                                    <SelectItem value="Right-arm Leg-break" className="rounded-lg">Right-arm Leg-spin</SelectItem>
+                                                                    <SelectItem value="Left-arm Fast" className="rounded-lg">Left-arm Fast</SelectItem>
+                                                                    <SelectItem value="Left-arm Medium" className="rounded-lg">Left-arm Medium</SelectItem>
+                                                                    <SelectItem value="Left-arm Orthodox" className="rounded-lg">Left-arm Orthodox</SelectItem>
+                                                                    <SelectItem value="Left-arm Unorthodox" className="rounded-lg">Left-arm Chinaman</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <DialogFooter className="mt-8 border-t border-white/5 pt-6">
+                                                    <Button variant="ghost" onClick={() => setIsAddingPlayer(false)} className="hover:bg-white/5 hover:text-white rounded-xl">Cancel</Button>
+                                                    <Button onClick={handleAddPlayerToTeam} className="bg-blue-600 hover:bg-blue-500 rounded-xl px-8 font-bold text-white">Draft Player</Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
+                                    )}
+                                </div>
+
+                                <div className="space-y-8 bg-[#0a0a0c] border border-white/5 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
+                                    {/* Subtle background glow */}
+                                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+
+                                    <div className="relative z-10 space-y-8">
+                                        {ROLES.map(role => {
+                                            const rolePlayers = grouped[role];
+                                            if (rolePlayers.length === 0) return null;
+                                            
+                                            const iconMap: Record<string, any> = {
+                                                'Batsman': { icon: '🏏', color: 'text-blue-400', shadow: 'rgba(96,165,250,0.5)' },
+                                                'Bowler': { icon: '🎯', color: 'text-rose-400', shadow: 'rgba(251,113,133,0.5)' },
+                                                'All-Rounder': { icon: '⚡', color: 'text-amber-400', shadow: 'rgba(251,191,36,0.5)' },
+                                                'Wicket Keeper': { icon: '🧤', color: 'text-emerald-400', shadow: 'rgba(52,211,153,0.5)' }
+                                            };
+                                            const rInfo = iconMap[role];
+
+                                            return (
+                                                <div key={role} className="animate-in fade-in duration-500">
+                                                    <div className="flex items-center gap-3 mb-4 border-b border-white/5 pb-2">
+                                                        <span className={`text-lg drop-shadow-[0_0_8px_${rInfo.shadow}]`}>{rInfo.icon}</span>
+                                                        <h4 className={`text-sm font-black uppercase tracking-widest ${rInfo.color}`}>{role}s</h4>
+                                                        <span className="text-[10px] text-zinc-500 font-bold bg-white/5 px-2 py-0.5 rounded-full">{rolePlayers.length}</span>
+                                                    </div>
+                                                    
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                        {rolePlayers.map((pName, idx) => {
+                                                            const pModel = players.find(x => (typeof x === 'string' ? x : x.name) === pName);
+                                                            const isCaptain = pName === selectedTeam?.captain;
+                                                            return (
+                                                                <div key={pName}
+                                                                    className="group flex items-center gap-3 p-2 pr-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.06] hover:border-white/10 transition-all cursor-pointer overflow-hidden shadow-sm hover:shadow-md"
+                                                                    onClick={() => {
+                                                                        const bStyle = typeof pModel === 'object' ? pModel?.battingStyle : undefined;
+                                                                        const bowlStyle = typeof pModel === 'object' ? pModel?.bowlingStyle : undefined;
+                                                                        const photo = typeof pModel === 'object' ? pModel?.photo : undefined;
+                                                                        fetchPlayerStats(pName, role, bStyle, bowlStyle, photo);
+                                                                    }}
+                                                                >
+                                                                    <div className="w-10 h-10 rounded-[12px] overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                                                        {(() => {
+                                                                            const photoUrl = typeof pModel === 'object' && pModel !== null ? (pModel as any).photo : null;
+                                                                            if (photoUrl) return <img src={photoUrl} alt={pName} className="w-full h-full object-cover" />;
+                                                                            return <span className={`text-xs font-black ${rInfo.color}`}>{pName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}</span>;
+                                                                        })()}
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <p className="text-white text-sm font-bold truncate group-hover:text-blue-400 transition-colors tracking-tight">{pName}</p>
+                                                                        {isCaptain && (
+                                                                            <p className="text-[9px] text-amber-500 flex items-center gap-1 font-black uppercase tracking-widest mt-0.5">
+                                                                                <Crown size={10} className="drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]" /> Captain
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                        
+                                        {players.length === 0 && (
+                                            <div className="py-12 flex flex-col items-center justify-center border border-dashed border-white/10 rounded-3xl">
+                                                <Users size={32} className="text-zinc-600 mb-4 opacity-50" />
+                                                <p className="text-zinc-400 text-sm font-medium">No players drafted yet</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right Col: Matches */}
+                            <div className="xl:col-span-1 space-y-6">
+                                <h3 className="text-xl font-black text-white flex items-center gap-3">
+                                    <Swords size={20} className="text-purple-500" />
+                                    Match History
+                                </h3>
+
+                                <div className="bg-[#0a0a0c] border border-white/5 rounded-[2rem] p-6 shadow-2xl relative overflow-hidden h-full max-h-[800px] overflow-y-auto custom-scrollbar">
+                                    {/* Subtle background glow */}
+                                    <div className="absolute top-0 left-0 w-64 h-64 bg-purple-500/5 blur-[100px] rounded-full pointer-events-none" />
+
+                                    <div className="relative z-10 space-y-3">
+                                        {teamMatches.length > 0 ? teamMatches.map(match => {
+                                            const isHome = match.homeTeam?._id === selectedTeam?._id;
+                                            const opponent = isHome ? match.awayTeam : match.homeTeam;
+                                            const teamScore = isHome ? match.score?.team1 : match.score?.team2;
+                                            const opponentScore = isHome ? match.score?.team2 : match.score?.team1;
+                                            const isWin = match.status === 'Completed' && (match.result as any)?.winner === selectedTeam?._id;
+                                            const isLoss = match.status === 'Completed' && (match.result as any)?.winner && (match.result as any)?.winner !== selectedTeam?._id;
+
+                                            return (
+                                                <div key={match._id} className="group flex flex-col p-4 bg-white/[0.02] border border-white/5 rounded-[1.25rem] hover:bg-white/[0.04] hover:border-white/10 transition-all">
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <div className="flex items-center gap-2">
+                                                            {match.status === 'Completed' ? (
+                                                                <span className={`w-2 h-2 rounded-full ${isWin ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : isLoss ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]' : 'bg-zinc-500'}`} />
+                                                            ) : match.status === 'Live' ? (
+                                                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                                                            ) : (
+                                                                <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                                                            )}
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                                                {match.status === 'Completed' ? (isWin ? 'Victory' : isLoss ? 'Defeat' : 'Draw') : match.status}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-[9px] font-bold text-zinc-600 bg-white/5 px-2 py-0.5 rounded-full uppercase tracking-wider border border-white/5">
+                                                            {isHome ? "Home" : "Away"}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex-1 min-w-0 pr-4">
+                                                            <p className="text-white text-sm font-bold truncate group-hover:text-blue-400 transition-colors">vs {opponent?.name}</p>
+                                                            {match.status !== 'Upcoming' ? (
+                                                                <p className="text-zinc-400 text-xs mt-1 font-medium">
+                                                                    <span className="text-white font-bold">{teamScore?.runs}/{teamScore?.wickets}</span> <span className="text-[10px]">({teamScore?.overs?.toFixed(1)})</span>
+                                                                    <span className="text-zinc-600 mx-2">|</span>
+                                                                    {opponentScore?.runs}/{opponentScore?.wickets} <span className="text-[10px]">({opponentScore?.overs?.toFixed(1)})</span>
+                                                                </p>
+                                                            ) : (
+                                                                <p className="text-zinc-500 text-xs mt-1 font-medium flex items-center gap-1.5">
+                                                                    <Calendar size={12} className="text-blue-400/70" /> {new Date(match.date).toLocaleDateString()}
                                                                 </p>
                                                             )}
                                                         </div>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-
-                                {players.length === 0 && (
-                                    <p className="text-slate-500 text-sm py-4 text-center">No players registered yet.</p>
-                                )}
-
-                                {/* Add Player Dialog */}
-                                {isTournamentOwner && (
-                                <Dialog open={isAddingPlayer} onOpenChange={setIsAddingPlayer}>
-                                    <DialogTrigger asChild>
-                                        <Button className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 py-6 text-slate-400 group">
-                                            <Plus size={18} className="mr-2 group-hover:text-blue-400 transition-colors" /> Add Player to Squad
-                                        </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="bg-slate-900 border-slate-700 text-white">
-                                        <DialogHeader>
-                                            <DialogTitle>Add New Player</DialogTitle>
-                                            <DialogDescription className="text-slate-400">Enter player details for {selectedTeam?.name || "the team"}</DialogDescription>
-                                        </DialogHeader>
-                                        <div className="space-y-4 py-4">
-                                            <div className="space-y-2">
-                                                <Label>Player Name</Label>
-                                                <div className="relative">
-                                                    <Input placeholder="e.g. Virat Kohli" className="bg-slate-800 border-slate-700" value={addPlayerName} onChange={(e) => { setAddPlayerName(e.target.value); setShowSuggestions('add'); setTournamentConflict(null); }} onFocus={() => addPlayerName.trim().length >= 2 && setShowSuggestions('add')} autoComplete="off" />
-                                                    {showSuggestions === 'add' && playerSuggestions.length > 0 && (
-                                                        <div className="absolute left-0 right-0 mt-1 bg-slate-800 border border-slate-600 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto">
-                                                            {playerSuggestions.map((s: any, i: number) => (
-                                                                <button key={i} type="button" className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-700 transition-colors text-left text-sm" onClick={() => {
-                                                                    setAddPlayerName(s.name);
-                                                                    setAddPlayerRole(s.role || 'Batsman');
-                                                                    setAddPlayerBattingStyle(s.battingStyle || 'Right-hand Bat');
-                                                                    setAddPlayerBowlingStyle(s.bowlingStyle || 'None');
-                                                                    setShowSuggestions(null);
-                                                                    // Check tournament conflict
-                                                                    if (selectedTournament?._id) {
-                                                                        playerApi.checkTournament(s.name, selectedTournament._id).then(r => {
-                                                                            const d = r?.data || r;
-                                                                            if (d?.conflict && d.teamId !== selectedTeam?._id) setTournamentConflict(d.teamName);
-                                                                            else setTournamentConflict(null);
-                                                                        }).catch(() => {});
-                                                                    }
-                                                                }}>
-                                                                    {s.photo ? <img src={s.photo} className="w-7 h-7 rounded-full object-cover border border-slate-600" /> : <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center"><User size={14} className="text-emerald-400" /></div>}
-                                                                    <div className="flex-1 min-w-0">
-                                                                        <p className="text-white font-medium truncate">{s.name}</p>
-                                                                        <p className="text-[10px] text-slate-500">{s.role} · {s.team?.name || 'Unknown Team'}</p>
-                                                                    </div>
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                    {tournamentConflict && (
-                                                        <p className="text-red-400 text-xs mt-1 flex items-center gap-1">⚠️ Already in <span className="font-bold">{tournamentConflict}</span> in this tournament</p>
-                                                    )}
                                                 </div>
+                                            );
+                                        }) : (
+                                            <div className="py-12 flex flex-col items-center justify-center text-center">
+                                                <HistoryIcon size={32} className="text-zinc-600 mb-3 opacity-50" />
+                                                <p className="text-zinc-500 text-sm font-medium">No matches scheduled</p>
                                             </div>
-                                            <div className="space-y-2">
-                                                <Label>Role</Label>
-                                                <Select value={addPlayerRole} onValueChange={(v: any) => setAddPlayerRole(v)}>
-                                                    <SelectTrigger className="bg-slate-800 border-slate-700 text-white"><SelectValue /></SelectTrigger>
-                                                    <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                                                        {ROLES.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="space-y-2">
-                                                    <Label>Batting Style</Label>
-                                                    <Select value={addPlayerBattingStyle} onValueChange={setAddPlayerBattingStyle}>
-                                                        <SelectTrigger className="bg-slate-800 border-slate-700 text-white"><SelectValue /></SelectTrigger>
-                                                        <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                                                            <SelectItem value="Right-hand Bat">Right-hand Bat</SelectItem>
-                                                            <SelectItem value="Left-hand Bat">Left-hand Bat</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Bowling Style</Label>
-                                                    <Select value={addPlayerBowlingStyle} onValueChange={setAddPlayerBowlingStyle}>
-                                                        <SelectTrigger className="bg-slate-800 border-slate-700 text-white"><SelectValue /></SelectTrigger>
-                                                        <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                                                            <SelectItem value="None">None</SelectItem>
-                                                            <SelectItem value="Right-arm Fast">Right-arm Fast</SelectItem>
-                                                            <SelectItem value="Right-arm Medium">Right-arm Medium</SelectItem>
-                                                            <SelectItem value="Right-arm Off-break">Right-arm Off-spin</SelectItem>
-                                                            <SelectItem value="Right-arm Leg-break">Right-arm Leg-spin</SelectItem>
-                                                            <SelectItem value="Left-arm Fast">Left-arm Fast</SelectItem>
-                                                            <SelectItem value="Left-arm Medium">Left-arm Medium</SelectItem>
-                                                            <SelectItem value="Left-arm Orthodox">Left-arm Orthodox</SelectItem>
-                                                            <SelectItem value="Left-arm Unorthodox">Left-arm Chinaman</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <DialogFooter>
-                                            <Button variant="ghost" onClick={() => setIsAddingPlayer(false)}>Cancel</Button>
-                                            <Button onClick={handleAddPlayerToTeam} className="bg-blue-600 hover:bg-blue-700">Add Player</Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
-                                )}
-                            </CardContent>
-                        </Card>
-
-                        {/* Team Matches */}
-                        <Card className="bg-slate-900 border-slate-700">
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-white text-lg flex items-center gap-2">
-                                    <Swords size={18} className="text-purple-400" /> Matches
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                {teamMatches.length > 0 ? teamMatches.map(match => {
-                                    const isHome = match.homeTeam?._id === selectedTeam?._id;
-                                    const opponent = isHome ? match.awayTeam : match.homeTeam;
-                                    const teamScore = isHome ? match.score?.team1 : match.score?.team2;
-                                    const opponentScore = isHome ? match.score?.team2 : match.score?.team1;
-                                    const isWin = match.status === 'Completed' && (match.result as any)?.winner === selectedTeam?._id;
-                                    const isLoss = match.status === 'Completed' && (match.result as any)?.winner && (match.result as any)?.winner !== selectedTeam?._id;
-
-                                    return (
-                                        <div key={match._id} className="flex items-center gap-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
-                                            <div className={`w-2 h-10 rounded-full shrink-0 ${isWin ? 'bg-green-500' : isLoss ? 'bg-red-500' : 'bg-slate-600'}`} />
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <p className="text-white text-sm font-medium">{isHome ? "vs" : "@"} {opponent?.name}</p>
-                                                    <span className={`text-xs px-2 py-0.5 rounded-full ${match.status === 'Completed' ? (isWin ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400') :
-                                                        match.status === 'Live' ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 text-slate-400'
-                                                        }`}>
-                                                        {match.status === 'Completed' ? (isWin ? 'WON' : isLoss ? 'LOST' : 'TIE') : match.status}
-                                                    </span>
-                                                </div>
-                                                {match.status !== 'Upcoming' && (
-                                                    <p className="text-slate-400 text-xs">
-                                                        {teamScore?.runs}/{teamScore?.wickets} ({teamScore?.overs?.toFixed(1)} ov)
-                                                        {" vs "}
-                                                        {opponentScore?.runs}/{opponentScore?.wickets} ({opponentScore?.overs?.toFixed(1)} ov)
-                                                    </p>
-                                                )}
-                                                {match.status === 'Upcoming' && (
-                                                    <p className="text-slate-500 text-xs flex items-center gap-1">
-                                                        <Calendar size={11} /> {new Date(match.date).toLocaleDateString()}
-                                                        <MapPin size={11} className="ml-2" /> {match.venue}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                }) : (
-                                    <p className="text-slate-500 text-sm text-center py-4">No matches yet for this team.</p>
-                                )}
-                            </CardContent>
-                        </Card>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </>
                 )}
             </div>
@@ -3787,50 +3825,208 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
 
             {/* Tab Content: Teams */}
             {detailTab === "teams" && (
-                <div className="space-y-4">
+                <div className="space-y-8 animate-in fade-in duration-500">
+                    {/* Header Actions */}
                     {isTournamentOwner && selectedTournament?.status !== 'Completed' && (
-                    <div className="flex gap-2">
-                        {/* Create New Team */}
-                        <div className="flex-1 flex gap-2">
-                            <Dialog open={isAddTeamOpen} onOpenChange={setIsAddTeamOpen}>
-                                <DialogTrigger asChild>
-                                    <Button className="bg-blue-600 hover:bg-blue-700"><Plus size={16} className="mr-2" /> New Team</Button>
-                                </DialogTrigger>
-                                <DialogContent className="bg-slate-900 border-slate-700 text-white max-w-md">
-                                    <DialogHeader>
-                                        <DialogTitle>Register New Team</DialogTitle>
-                                        <DialogDescription className="text-slate-400">Create a team and add it to {selectedTournament?.name || "the tournament"}</DialogDescription>
-                                    </DialogHeader>
-                                    <div className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
-                                        <div className="space-y-2">
-                                            <Label>Team Name</Label>
-                                            <Input placeholder="e.g. Mumbai Warriors" className="bg-slate-800 border-slate-700" value={newTeamName} onChange={(e) => setNewTeamName(e.target.value)} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="flex items-center gap-2"><Image size={14} /> Team Logo (File)</Label>
-                                            <div className="flex gap-2">
-                                                <Input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    className="bg-slate-800 border-slate-700 flex-1 file:bg-slate-700 file:text-white file:border-0 file:rounded-md file:px-2 file:py-1 file:mr-2 hover:file:bg-slate-600"
-                                                    onChange={handleLogoUpload}
-                                                />
+                        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-zinc-900/40 p-3 sm:p-4 rounded-3xl border border-zinc-800/50 backdrop-blur-sm">
+                            <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+                                {/* Create New Team */}
+                                <Dialog open={isAddTeamOpen} onOpenChange={setIsAddTeamOpen}>
+                                    <DialogTrigger asChild>
+                                        <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-black hover:bg-zinc-200 hover:scale-[1.02] active:scale-95 transition-all rounded-full font-semibold text-sm shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                                            <Plus size={16} /> New Team
+                                        </button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-zinc-950 border-zinc-800 text-white max-w-md rounded-[24px]">
+                                        <DialogHeader>
+                                            <DialogTitle className="text-xl font-bold">Register New Team</DialogTitle>
+                                            <DialogDescription className="text-zinc-400">Create a team and add it to {selectedTournament?.name || "the tournament"}</DialogDescription>
+                                        </DialogHeader>
+                                        <div className="space-y-5 py-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                                            <div className="space-y-2">
+                                                <Label className="text-zinc-300 font-medium">Team Name</Label>
+                                                <Input placeholder="e.g. Mumbai Warriors" className="bg-zinc-900/50 border-zinc-800 focus:border-zinc-700 rounded-xl" value={newTeamName} onChange={(e) => setNewTeamName(e.target.value)} />
                                             </div>
-                                            {newTeamLogo && (
-                                                <div className="flex items-center gap-3 mt-2 p-2 bg-slate-800 rounded-lg border border-slate-700">
-                                                    <img src={newTeamLogo} alt="Logo preview" className="w-12 h-12 rounded-lg object-cover border border-slate-600" />
-                                                    <p className="text-xs text-slate-400 flex-1">Logo preview</p>
-                                                    <button onClick={() => setNewTeamLogo("")} className="text-slate-500 hover:text-white"><X size={14} /></button>
+                                            <div className="space-y-2">
+                                                <Label className="flex items-center gap-2 text-zinc-300 font-medium"><Image size={14} /> Team Logo</Label>
+                                                <div className="flex gap-2">
+                                                    <Input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="bg-zinc-900/50 border-zinc-800 flex-1 file:bg-zinc-800 file:text-white file:border-0 file:rounded-lg file:px-3 file:py-1.5 file:mr-3 hover:file:bg-zinc-700 rounded-xl"
+                                                        onChange={handleLogoUpload}
+                                                    />
                                                 </div>
-                                            )}
+                                                {newTeamLogo && (
+                                                    <div className="flex items-center gap-3 mt-3 p-3 bg-zinc-900/50 rounded-xl border border-zinc-800">
+                                                        <img src={newTeamLogo} alt="Logo preview" className="w-12 h-12 rounded-lg object-cover border border-zinc-700 shadow-lg" />
+                                                        <p className="text-xs text-zinc-400 flex-1 font-medium">Logo preview ready</p>
+                                                        <button onClick={() => setNewTeamLogo("")} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-800 text-zinc-500 hover:text-white transition-colors"><X size={14} /></button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            <div className="space-y-4">
+                                                {selectedTournament?.groupStructure !== "None" && (selectedTournament?.groupsCount || 0) > 1 && (
+                                                    <div className="space-y-2">
+                                                        <Label className="text-zinc-300 font-medium">Assign to Group</Label>
+                                                        <Select value={assignGroupIndex} onValueChange={setAssignGroupIndex}>
+                                                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 rounded-xl"><SelectValue placeholder="Select Group" /></SelectTrigger>
+                                                            <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-xl">
+                                                                {selectedTournament?.groups?.map((g, i) => (
+                                                                    <SelectItem key={i} value={i.toString()}>{g.name}</SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                )}
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-zinc-300 font-medium">Captain</Label>
+                                                        <Input placeholder="e.g. Rohit" className="bg-zinc-900/50 border-zinc-800 rounded-xl" value={newTeamCaptain} onChange={(e) => setNewTeamCaptain(e.target.value)} />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-zinc-300 font-medium">Acronym</Label>
+                                                        <Input placeholder="MI" maxLength={5} className="bg-zinc-900/50 border-zinc-800 uppercase rounded-xl" value={newTeamAcronym} onChange={(e) => setNewTeamAcronym(e.target.value.toUpperCase())} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-3 pt-5 border-t border-zinc-800/50">
+                                                <Label className="text-zinc-300 font-medium">Team Theme Color</Label>
+                                                <div className="flex flex-wrap gap-2.5 p-4 bg-zinc-900/30 rounded-2xl border border-zinc-800/50">
+                                                    {PRESET_COLORS.map(c => (
+                                                        <button
+                                                            key={c.value}
+                                                            onClick={() => setNewTeamColor(c.value)}
+                                                            className={`w-10 h-10 rounded-full transition-all flex items-center justify-center relative overflow-hidden group hover:scale-110 ${newTeamColor === c.value ? 'scale-110 shadow-[0_0_15px_rgba(255,255,255,0.15)] ring-2 ring-white ring-offset-2 ring-offset-zinc-950' : 'opacity-60 hover:opacity-100'}`}
+                                                            style={{ backgroundColor: c.value }}
+                                                        >
+                                                            {newTeamColor === c.value && <CircleDot size={16} className="text-white relative z-10" />}
+                                                            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-3 pt-5 border-t border-zinc-800/50">
+                                                <Label className="text-zinc-300 font-medium">Add Players</Label>
+                                                <div className="flex gap-2">
+                                                    <div className="relative flex-1">
+                                                        <Input placeholder="Player name" className="bg-zinc-900/50 border-zinc-800 w-full rounded-xl" value={newTeamPlayerInput} onChange={(e) => { setNewTeamPlayerInput(e.target.value); setShowSuggestions('new'); }} onFocus={() => newTeamPlayerInput.trim().length >= 2 && setShowSuggestions('new')} onKeyDown={(e) => { if (e.key === 'Enter') { setShowSuggestions(null); addPlayer(); } }} autoComplete="off" />
+                                                        {showSuggestions === 'new' && playerSuggestions.length > 0 && (
+                                                            <div className="absolute left-0 right-0 mt-2 bg-zinc-900 border border-zinc-700/50 rounded-2xl shadow-2xl z-50 max-h-48 overflow-y-auto">
+                                                                {playerSuggestions.map((s: any, i: number) => (
+                                                                    <button key={i} type="button" className="w-full flex items-center gap-3 px-4 py-3 hover:bg-zinc-800/80 transition-colors text-left text-sm first:rounded-t-2xl last:rounded-b-2xl" onClick={() => {
+                                                                        setNewTeamPlayerInput(s.name);
+                                                                        setNewTeamPlayerRole(s.role || 'Batsman');
+                                                                        setNewTeamPlayerBattingStyle(s.battingStyle || 'Right-hand Bat');
+                                                                        setNewTeamPlayerBowlingStyle(s.bowlingStyle || 'None');
+                                                                        setShowSuggestions(null);
+                                                                    }}>
+                                                                        {s.photo ? <img src={s.photo} className="w-9 h-9 rounded-full object-cover border border-zinc-700" /> : <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20"><User size={16} className="text-blue-400" /></div>}
+                                                                        <div className="flex-1 min-w-0">
+                                                                            <p className="text-white font-medium truncate">{s.name}</p>
+                                                                            <p className="text-xs text-zinc-500">{s.role} · {s.team?.name || 'Existing Player'}</p>
+                                                                        </div>
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <Select value={newTeamPlayerRole} onValueChange={(v: PlayerRole) => setNewTeamPlayerRole(v)}>
+                                                        <SelectTrigger className="bg-zinc-900/50 border-zinc-800 w-[140px] rounded-xl"><SelectValue /></SelectTrigger>
+                                                        <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-xl">
+                                                            {ROLES.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div className="space-y-1.5">
+                                                        <Label className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Batting Style</Label>
+                                                        <Select value={newTeamPlayerBattingStyle} onValueChange={setNewTeamPlayerBattingStyle}>
+                                                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 h-9 text-xs rounded-lg"><SelectValue /></SelectTrigger>
+                                                            <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-lg">
+                                                                <SelectItem value="Right-hand Bat">Right-hand Bat</SelectItem>
+                                                                <SelectItem value="Left-hand Bat">Left-hand Bat</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-1.5">
+                                                        <Label className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Bowling Style</Label>
+                                                        <Select value={newTeamPlayerBowlingStyle} onValueChange={setNewTeamPlayerBowlingStyle}>
+                                                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 h-9 text-xs rounded-lg"><SelectValue /></SelectTrigger>
+                                                            <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-lg">
+                                                                <SelectItem value="None">None</SelectItem>
+                                                                <SelectItem value="Right-arm Fast">Right-arm Fast</SelectItem>
+                                                                <SelectItem value="Right-arm Medium">Right-arm Medium</SelectItem>
+                                                                <SelectItem value="Right-arm Off-break">Right-arm Off-spin</SelectItem>
+                                                                <SelectItem value="Right-arm Leg-break">Right-arm Leg-spin</SelectItem>
+                                                                <SelectItem value="Left-arm Fast">Left-arm Fast</SelectItem>
+                                                                <SelectItem value="Left-arm Medium">Left-arm Medium</SelectItem>
+                                                                <SelectItem value="Left-arm Orthodox">Left-arm Orthodox</SelectItem>
+                                                                <SelectItem value="Left-arm Unorthodox">Left-arm Chinaman</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                                <Button onClick={addPlayer} className="w-full bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl py-5 font-semibold mt-2 transition-colors">Add to Draft Squad</Button>
+                                                
+                                                {newTeamPlayers.length > 0 && (
+                                                    <div className="flex flex-wrap gap-2 mt-4 p-4 bg-zinc-900/30 border border-zinc-800/50 rounded-2xl max-h-40 overflow-y-auto custom-scrollbar">
+                                                        {newTeamPlayers.map((p) => {
+                                                            const rc = ROLE_COLORS[p.role];
+                                                            return (
+                                                                <span key={p.name} className={`px-3 py-1.5 ${rc.bg} ${rc.text} text-xs font-medium rounded-lg flex items-center gap-2 border ${rc.border} shadow-sm`}>
+                                                                    {rc.icon} {p.name}
+                                                                    <span className="text-[10px] opacity-60 ml-0.5">({p.role === "Wicket Keeper" ? "WK" : p.role === "All-Rounder" ? "AR" : p.role === "Batsman" ? "BAT" : "BOWL"})</span>
+                                                                    <button onClick={() => setNewTeamPlayers(newTeamPlayers.filter(x => x.name !== p.name))} className="hover:text-white ml-1 p-0.5 rounded-full hover:bg-black/20 transition-colors">&times;</button>
+                                                                </span>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="space-y-4">
+                                        <DialogFooter className="border-t border-zinc-800 pt-5 mt-2">
+                                            <Button variant="ghost" onClick={() => setIsAddTeamOpen(false)} className="rounded-xl hover:bg-zinc-900 hover:text-white text-zinc-400">Cancel</Button>
+                                            <Button onClick={handleCreateAndAddTeam} className="bg-white text-black hover:bg-zinc-200 rounded-xl font-bold px-6">Create & Add</Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+
+                                {selectedTournament?.groupStructure !== "None" && Number(selectedTournament?.groupsCount) > 1 && (
+                                    <button onClick={handleShuffleGroups} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 hover:border-amber-500/40 transition-all rounded-full font-semibold text-sm">
+                                        <Zap size={16} className="animate-pulse" /> Make Groups
+                                    </button>
+                                )}
+                            </div>
+
+                            {unlinkedTeams.length > 0 && (
+                                <Dialog open={isLinkTeamOpen} onOpenChange={setIsLinkTeamOpen}>
+                                    <DialogTrigger asChild>
+                                        <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition-all rounded-full text-zinc-300 hover:text-white font-medium text-sm shadow-sm">
+                                            <Users size={16} /> Add Existing Team
+                                        </button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-zinc-950 border-zinc-800 text-white rounded-[24px]">
+                                        <DialogHeader><DialogTitle className="text-xl font-bold">Add Existing Team</DialogTitle></DialogHeader>
+                                        <div className="space-y-6 py-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-zinc-300 font-medium">Select Team</Label>
+                                                <Select value={selectedTeamToLink} onValueChange={setSelectedTeamToLink}>
+                                                    <SelectTrigger className="bg-zinc-900/50 border-zinc-800 rounded-xl h-12"><SelectValue placeholder="Select a team" /></SelectTrigger>
+                                                    <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-xl">
+                                                        {unlinkedTeams.map(t => <SelectItem key={t._id} value={t._id}>{t.name}</SelectItem>)}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
                                             {selectedTournament?.groupStructure !== "None" && (selectedTournament?.groupsCount || 0) > 1 && (
                                                 <div className="space-y-2">
-                                                    <Label>Assign to Group</Label>
+                                                    <Label className="text-zinc-300 font-medium">Assign to Group</Label>
                                                     <Select value={assignGroupIndex} onValueChange={setAssignGroupIndex}>
-                                                        <SelectTrigger className="bg-slate-800 border-slate-700"><SelectValue placeholder="Select Group" /></SelectTrigger>
-                                                        <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                                                        <SelectTrigger className="bg-zinc-900/50 border-zinc-800 rounded-xl h-12"><SelectValue placeholder="Select Group" /></SelectTrigger>
+                                                        <SelectContent className="bg-zinc-900 border-zinc-800 text-white rounded-xl">
                                                             {selectedTournament?.groups?.map((g, i) => (
                                                                 <SelectItem key={i} value={i.toString()}>{g.name}</SelectItem>
                                                             ))}
@@ -3838,223 +4034,120 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                                     </Select>
                                                 </div>
                                             )}
-                                            <div className="space-y-2">
-                                                <Label>Captain</Label>
-                                                <Input placeholder="e.g. Rohit Sharma" className="bg-slate-800 border-slate-700" value={newTeamCaptain} onChange={(e) => setNewTeamCaptain(e.target.value)} />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label>Acronym (Max 5 chars)</Label>
-                                                <Input placeholder="e.g. MI" maxLength={5} className="bg-slate-800 border-slate-700 uppercase" value={newTeamAcronym} onChange={(e) => setNewTeamAcronym(e.target.value.toUpperCase())} />
-                                            </div>
                                         </div>
-                                        <div className="space-y-2 pt-4 border-t border-slate-800">
-                                            <Label>Team Theme Color</Label>
-                                            <div className="flex flex-wrap gap-2 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                                                {PRESET_COLORS.map(c => (
-                                                    <button
-                                                        key={c.value}
-                                                        onClick={() => setNewTeamColor(c.value)}
-                                                        className={`w-10 h-10 rounded-xl border-2 transition-all flex items-center justify-center ${newTeamColor === c.value ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-50 hover:opacity-100'}`}
-                                                        style={{ backgroundColor: c.value }}
-                                                    >
-                                                        {newTeamColor === c.value && <CircleDot size={16} className="text-white" />}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2 pt-4 border-t border-slate-800">
-                                            <Label>Add Players</Label>
-                                            <div className="flex gap-2">
-                                                <div className="relative flex-1">
-                                                    <Input placeholder="Player name" className="bg-slate-800 border-slate-700 w-full" value={newTeamPlayerInput} onChange={(e) => { setNewTeamPlayerInput(e.target.value); setShowSuggestions('new'); }} onFocus={() => newTeamPlayerInput.trim().length >= 2 && setShowSuggestions('new')} onKeyDown={(e) => { if (e.key === 'Enter') { setShowSuggestions(null); addPlayer(); } }} autoComplete="off" />
-                                                    {showSuggestions === 'new' && playerSuggestions.length > 0 && (
-                                                        <div className="absolute left-0 right-0 mt-1 bg-slate-800 border border-slate-600 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto">
-                                                            {playerSuggestions.map((s: any, i: number) => (
-                                                                <button key={i} type="button" className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-700 transition-colors text-left text-sm" onClick={() => {
-                                                                    setNewTeamPlayerInput(s.name);
-                                                                    setNewTeamPlayerRole(s.role || 'Batsman');
-                                                                    setNewTeamPlayerBattingStyle(s.battingStyle || 'Right-hand Bat');
-                                                                    setNewTeamPlayerBowlingStyle(s.bowlingStyle || 'None');
-                                                                    setShowSuggestions(null);
-                                                                }}>
-                                                                    {s.photo ? <img src={s.photo} className="w-7 h-7 rounded-full object-cover border border-slate-600" /> : <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center"><User size={14} className="text-emerald-400" /></div>}
-                                                                    <div className="flex-1 min-w-0">
-                                                                        <p className="text-white font-medium truncate">{s.name}</p>
-                                                                        <p className="text-[10px] text-slate-500">{s.role} · {s.team?.name || 'Existing Player'}</p>
-                                                                    </div>
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <Select value={newTeamPlayerRole} onValueChange={(v: PlayerRole) => setNewTeamPlayerRole(v)}>
-                                                    <SelectTrigger className="bg-slate-800 border-slate-700 w-[130px]"><SelectValue /></SelectTrigger>
-                                                    <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                                                        {ROLES.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <div className="space-y-1">
-                                                    <Label className="text-[10px] uppercase font-bold text-slate-500">Batting Style</Label>
-                                                    <Select value={newTeamPlayerBattingStyle} onValueChange={setNewTeamPlayerBattingStyle}>
-                                                        <SelectTrigger className="bg-slate-800 border-slate-700 h-8 text-xs"><SelectValue /></SelectTrigger>
-                                                        <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                                                            <SelectItem value="Right-hand Bat">Right-hand Bat</SelectItem>
-                                                            <SelectItem value="Left-hand Bat">Left-hand Bat</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <Label className="text-[10px] uppercase font-bold text-slate-500">Bowling Style</Label>
-                                                    <Select value={newTeamPlayerBowlingStyle} onValueChange={setNewTeamPlayerBowlingStyle}>
-                                                        <SelectTrigger className="bg-slate-800 border-slate-700 h-8 text-xs"><SelectValue /></SelectTrigger>
-                                                        <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                                                            <SelectItem value="None">None</SelectItem>
-                                                            <SelectItem value="Right-arm Fast">Right-arm Fast</SelectItem>
-                                                            <SelectItem value="Right-arm Medium">Right-arm Medium</SelectItem>
-                                                            <SelectItem value="Right-arm Off-break">Right-arm Off-spin</SelectItem>
-                                                            <SelectItem value="Right-arm Leg-break">Right-arm Leg-spin</SelectItem>
-                                                            <SelectItem value="Left-arm Fast">Left-arm Fast</SelectItem>
-                                                            <SelectItem value="Left-arm Medium">Left-arm Medium</SelectItem>
-                                                            <SelectItem value="Left-arm Orthodox">Left-arm Orthodox</SelectItem>
-                                                            <SelectItem value="Left-arm Unorthodox">Left-arm Chinaman</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                            </div>
-                                            <Button onClick={addPlayer} size="sm" className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs py-1 h-8">Add to Draft Squad</Button>
-                                            <div className="flex flex-wrap gap-2 mt-2 max-h-32 overflow-y-auto">
-                                                {newTeamPlayers.map((p) => {
-                                                    const rc = ROLE_COLORS[p.role];
-                                                    return (
-                                                        <span key={p.name} className={`px-2.5 py-1 ${rc.bg} ${rc.text} text-xs rounded-full flex items-center gap-1.5 border ${rc.border}`}>
-                                                            {rc.icon} {p.name}
-                                                            <span className="text-[10px] opacity-70">({p.role === "Wicket Keeper" ? "WK" : p.role === "All-Rounder" ? "AR" : p.role === "Batsman" ? "BAT" : "BOWL"})</span>
-                                                            <button onClick={() => setNewTeamPlayers(newTeamPlayers.filter(x => x.name !== p.name))} className="hover:text-white ml-0.5">&times;</button>
-                                                        </span>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <DialogFooter>
-                                        <Button variant="ghost" onClick={() => setIsAddTeamOpen(false)}>Cancel</Button>
-                                        <Button onClick={handleCreateAndAddTeam} className="bg-blue-600 hover:bg-blue-700">Create & Add</Button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
-
-                            {selectedTournament?.groupStructure !== "None" && Number(selectedTournament?.groupsCount) > 1 && (
-                                <Button variant="outline" onClick={handleShuffleGroups} className="border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10">
-                                    <Zap size={16} className="mr-2" /> Make Groups
-                                </Button>
+                                        <DialogFooter className="border-t border-zinc-800 pt-5 mt-2">
+                                            <Button variant="ghost" onClick={() => setIsLinkTeamOpen(false)} className="rounded-xl hover:bg-zinc-900 hover:text-white text-zinc-400">Cancel</Button>
+                                            <Button onClick={handleLinkExistingTeam} className="bg-white text-black hover:bg-zinc-200 rounded-xl font-bold px-6">Add to Tournament</Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             )}
                         </div>
-
-                        {isTournamentOwner && (selectedTournament?.status as string) !== 'Completed' && unlinkedTeams.length > 0 && (
-                            <Dialog open={isLinkTeamOpen} onOpenChange={setIsLinkTeamOpen}>
-                                <DialogTrigger asChild>
-                                    <Button variant="outline" className="border-slate-700 text-slate-300 hover:text-white"><Users size={16} className="mr-2" /> Add Existing Team</Button>
-                                </DialogTrigger>
-                                <DialogContent className="bg-slate-900 border-slate-700 text-white">
-                                    <DialogHeader><DialogTitle>Add Existing Team</DialogTitle></DialogHeader>
-                                    <div className="space-y-4 py-4">
-                                        <Select value={selectedTeamToLink} onValueChange={setSelectedTeamToLink}>
-                                            <SelectTrigger className="bg-slate-800 border-slate-700"><SelectValue placeholder="Select a team" /></SelectTrigger>
-                                            <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                                                {unlinkedTeams.map(t => <SelectItem key={t._id} value={t._id}>{t.name}</SelectItem>)}
-                                            </SelectContent>
-                                        </Select>
-                                        {selectedTournament?.groupStructure !== "None" && (selectedTournament?.groupsCount || 0) > 1 && (
-                                            <div className="space-y-2">
-                                                <Label>Assign to Group</Label>
-                                                <Select value={assignGroupIndex} onValueChange={setAssignGroupIndex}>
-                                                    <SelectTrigger className="bg-slate-800 border-slate-700"><SelectValue placeholder="Select Group" /></SelectTrigger>
-                                                    <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                                                        {selectedTournament?.groups?.map((g, i) => (
-                                                            <SelectItem key={i} value={i.toString()}>{g.name}</SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <DialogFooter>
-                                        <Button variant="ghost" onClick={() => setIsLinkTeamOpen(false)}>Cancel</Button>
-                                        <Button onClick={handleLinkExistingTeam} className="bg-blue-600 hover:bg-blue-700">Add to Tournament</Button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
-                        )}
-                    </div>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         {tournamentTeams.map((team) => {
                             const stats = getTeamStats(team);
                             const players = team.players || [];
                             const grouped = groupPlayersByRole(players);
                             // Find which group this team belongs to
                             const groupName = selectedTournament?.groups?.find(g => g.teams.some(t => t._id === team._id))?.name;
+                            const themeColor = team.color || '#3b82f6';
 
                             return (
-                                <Card key={team._id} onClick={() => openTeamDetail(team)}
-                                    className="bg-slate-900 border-slate-700 transition-all cursor-pointer group hover:shadow-lg hover:shadow-blue-500/5"
-                                    style={{ borderColor: team.color ? `${team.color}50` : undefined }}>
-                                    <CardHeader className="pb-3">
-                                        <div className="flex items-center gap-3">
-                                            {team.logo ? (
-                                                <img src={team.logo} alt={team.name} className="w-11 h-11 rounded-lg object-cover border border-slate-700" />
-                                            ) : (
-                                                <div className="w-11 h-11 rounded-lg flex items-center justify-center border border-slate-700 font-black text-lg tracking-wider" style={{ backgroundColor: `${team.color || '#3b82f6'}20`, color: team.color || '#3b82f6' }}>
-                                                    {team.acronym || getTeamAcronym(team.name)}
+                                <div key={team._id} onClick={() => openTeamDetail(team)}
+                                    className="relative group cursor-pointer bg-[#0a0a0c] rounded-[24px] border border-white/5 hover:border-white/10 transition-all duration-500 overflow-hidden shadow-xl hover:shadow-2xl flex flex-col min-h-[220px]"
+                                >
+                                    {/* Spotlight Gradient */}
+                                    <div className="absolute top-0 left-0 w-full h-full opacity-[0.15] group-hover:opacity-[0.25] transition-opacity duration-700 pointer-events-none" style={{ background: `radial-gradient(120% 120% at 0% 0%, ${themeColor} 0%, transparent 60%)` }} />
+                                    
+                                    {/* Huge Watermark */}
+                                    <div className="absolute -bottom-10 -right-6 w-56 h-56 opacity-[0.02] group-hover:opacity-[0.05] transition-all duration-700 pointer-events-none transform group-hover:scale-110 group-hover:-rotate-6 flex items-center justify-center">
+                                        {team.logo ? <img src={team.logo} className="w-full h-full object-contain filter grayscale blur-[1px]" alt="" /> : <span className="text-9xl font-black uppercase tracking-tighter" style={{ color: themeColor }}>{team.acronym || getTeamAcronym(team.name)}</span>}
+                                    </div>
+
+                                    <div className="relative z-10 flex flex-col sm:flex-row flex-1 p-6 gap-6 items-start sm:items-center">
+                                        {/* Left: Logo */}
+                                        <div className="flex-shrink-0 relative">
+                                            <div className="w-24 h-24 rounded-[1.25rem] p-1 bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl relative z-10 overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                                                {team.logo ? (
+                                                    <img src={team.logo} className="w-full h-full rounded-xl object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full rounded-xl flex items-center justify-center font-black text-3xl shadow-inner" style={{ backgroundColor: `${themeColor}20`, color: themeColor }}>
+                                                        {team.acronym || getTeamAcronym(team.name)}
+                                                    </div>
+                                                )}
+                                                <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[1.25rem] pointer-events-none" />
+                                            </div>
+                                            {/* Backdrop shadow for logo */}
+                                            <div className="absolute top-2 left-2 right-2 bottom-0 blur-[20px] opacity-40 rounded-full z-0 pointer-events-none transition-opacity duration-500 group-hover:opacity-60" style={{ backgroundColor: themeColor }} />
+                                        </div>
+
+                                        {/* Right: Info */}
+                                        <div className="flex-1 min-w-0 w-full flex flex-col justify-center">
+                                            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                                                <div className="min-w-0">
+                                                    {groupName && <span className="inline-block px-2.5 py-1 rounded text-[9px] font-black tracking-[0.2em] uppercase mb-3 border backdrop-blur-sm" style={{ color: themeColor, borderColor: `${themeColor}30`, backgroundColor: `${themeColor}10` }}>{groupName}</span>}
+                                                    <h3 className="text-2xl font-black text-white group-hover:text-zinc-100 transition-colors tracking-tight truncate drop-shadow-md">{team.name}</h3>
+                                                    {team.captain && (
+                                                        <p className="flex items-center gap-2 text-zinc-400 text-sm mt-2 font-medium group-hover:text-zinc-300 transition-colors">
+                                                            <Crown size={14} className="text-amber-500 drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]" /> {team.captain}
+                                                        </p>
+                                                    )}
                                                 </div>
-                                            )}
-                                            <div className="flex-1 min-w-0">
-                                                <CardTitle className="text-white text-base group-hover:text-blue-400 transition-colors truncate">{team.name}</CardTitle>
-                                                <CardDescription className="text-slate-400 text-xs flex flex-col gap-0.5">
-                                                    {groupName && <span className="text-blue-400 font-bold">{groupName}</span>}
-                                                    {team.captain ? (
-                                                        <span className="flex items-center gap-1"><Crown size={10} className="text-yellow-400" /> {team.captain}</span>
-                                                    ) : "No captain set"}
-                                                </CardDescription>
+                                                {/* W/L Form */}
+                                                {stats.played > 0 && (
+                                                    <div className="flex flex-col items-start sm:items-end gap-1.5 flex-shrink-0 mt-2 sm:mt-0">
+                                                        <span className="text-[9px] uppercase tracking-widest text-zinc-600 font-bold hidden sm:block">Form</span>
+                                                        <div className="flex items-center rounded-lg overflow-hidden border border-white/10 font-black text-xs shadow-lg backdrop-blur-md">
+                                                            <div className="px-2.5 py-1.5 bg-emerald-500/10 text-emerald-400">{stats.won}W</div>
+                                                            <div className="px-2.5 py-1.5 bg-rose-500/10 text-rose-400 border-l border-white/5">{stats.lost}L</div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
-                                    </CardHeader>
-                                    <CardContent className="pt-0">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <p className="text-slate-500 text-sm">{players.length} players</p>
-                                            {stats.played > 0 && (
-                                                <div className="flex gap-2 text-xs">
-                                                    <span className="text-green-400">{stats.won}W</span>
-                                                    <span className="text-red-400">{stats.lost}L</span>
-                                                </div>
-                                            )}
+                                    </div>
+
+                                    {/* Bottom Bar: Roster Breakdown */}
+                                    <div className="relative z-10 bg-white/[0.02] border-t border-white/5 p-4 px-6 flex flex-wrap gap-4 items-center justify-between backdrop-blur-xl mt-auto transition-colors duration-500 group-hover:bg-white/[0.04]">
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="text-sm font-black text-white drop-shadow-md">{players.length}</span>
+                                            <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Squad Size</span>
                                         </div>
-                                        <div className="flex flex-wrap gap-1">
+                                        <div className="flex items-center gap-5">
                                             {ROLES.map(r => {
                                                 const count = grouped[r].length;
                                                 if (count === 0) return null;
-                                                const rc = ROLE_COLORS[r];
+                                                const isBat = r === 'Batsman';
+                                                const isBowl = r === 'Bowler';
+                                                const isAr = r === 'All-Rounder';
+                                                const isWk = r === 'Wicket Keeper';
                                                 return (
-                                                    <span key={r} className={`text-[10px] px-1.5 py-0.5 rounded-full ${rc.bg} ${rc.text} border ${rc.border}`}>
-                                                        {rc.icon} {count}
-                                                    </span>
+                                                    <div key={r} className="flex items-center gap-2 group/role" title={r}>
+                                                        {isBat && <span className="text-blue-400 text-sm drop-shadow-[0_0_8px_rgba(96,165,250,0.5)] group-hover/role:scale-110 transition-transform">🏏</span>}
+                                                        {isBowl && <span className="text-rose-400 text-sm drop-shadow-[0_0_8px_rgba(251,113,133,0.5)] group-hover/role:scale-110 transition-transform">🎯</span>}
+                                                        {isAr && <span className="text-amber-400 text-sm drop-shadow-[0_0_8px_rgba(251,191,36,0.5)] group-hover/role:scale-110 transition-transform">⚡</span>}
+                                                        {isWk && <span className="text-emerald-400 text-sm drop-shadow-[0_0_8px_rgba(52,211,153,0.5)] group-hover/role:scale-110 transition-transform">🧤</span>}
+                                                        <span className="text-xs font-bold text-zinc-400 group-hover/role:text-white transition-colors">{count}</span>
+                                                    </div>
                                                 );
                                             })}
                                         </div>
-                                    </CardContent>
-                                </Card>
+                                    </div>
+                                </div>
                             );
                         })}
                     </div>
 
                     {tournamentTeams.length === 0 && (
-                        <div className="py-12 text-center bg-slate-900/50 rounded-2xl border-2 border-dashed border-slate-800">
-                            <Users className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium text-slate-400">No teams yet</h3>
-                            <p className="text-slate-500 mt-1">Add teams to this tournament to get started.</p>
+                        <div className="py-20 flex flex-col items-center justify-center bg-zinc-900/20 rounded-[32px] border border-dashed border-zinc-800 backdrop-blur-sm relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
+                            <div className="w-20 h-20 rounded-full bg-zinc-900/80 border border-zinc-800 flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(59,130,246,0.1)] relative z-10">
+                                <Users size={32} className="text-zinc-500" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-white mb-2 relative z-10 tracking-tight">No teams yet</h3>
+                            <p className="text-zinc-500 text-sm max-w-sm text-center relative z-10">Add teams to this tournament to get started with the draft or manual group assignments.</p>
                         </div>
                     )}
                 </div>
