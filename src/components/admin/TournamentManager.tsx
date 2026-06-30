@@ -4190,7 +4190,10 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
 
             {/* Passcode Verification Modal */}
             <Dialog open={!!passcodePromptTournament} onOpenChange={(open) => !open && setPasscodePromptTournament(null)}>
-                <DialogContent className="bg-zinc-950 border-zinc-800 text-white rounded-2xl shadow-2xl sm:max-w-[400px] p-6">
+                <DialogContent 
+                    className="bg-zinc-950 border-zinc-800 text-white rounded-2xl shadow-2xl sm:max-w-[400px] p-6"
+                    onOpenAutoFocus={(e) => { e.preventDefault(); }}
+                >
                     <DialogHeader className="mb-4">
                         <DialogTitle className="text-xl font-semibold tracking-tight text-white flex items-center gap-2">
                             <Shield className="text-emerald-500" size={24} />
@@ -4206,9 +4209,11 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                             <Input 
                                 type="password" 
                                 placeholder="Enter passcode" 
-                                className="h-11 bg-zinc-900/50 border-zinc-800 focus:border-zinc-700 rounded-lg text-sm" 
+                                className="h-11 bg-zinc-900/50 border-zinc-800 focus:border-emerald-600 rounded-lg text-sm text-white" 
                                 value={passcodeAttempt} 
                                 onChange={(e) => setPasscodeAttempt(e.target.value)} 
+                                autoFocus
+                                ref={(el) => { if (el) setTimeout(() => el.focus(), 50); }}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') handleVerifyPasscode();
                                 }}
