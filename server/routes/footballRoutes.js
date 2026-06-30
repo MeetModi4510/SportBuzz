@@ -7,6 +7,7 @@ import * as cheerio from 'cheerio';
 import FootballStanding from '../models/FootballStanding.js';
 import WorldCupStanding from '../models/WorldCupStanding.js';
 import FotmobCache from '../models/FotmobCache.js';
+import BDFutbolCache from '../models/BDFutbolCache.js';
 import FootballTransfer from '../models/FootballTransfer.js';
 import TrendingPlayer from '../models/TrendingPlayer.js';
 import { PlayerTopStat, TeamTopStat } from '../models/FootballTopStat.js';
@@ -41,6 +42,7 @@ import livescore6Service from '../services/livescore6Service.js';
 import * as espnService from '../services/espnService.js';
 import { fotmobService } from '../services/fotmobService.js';
 import { imageQueueService } from '../services/imageQueueService.js';
+import { scrapeBDFutbolVenue } from '../services/bdfutbolScraperService.js';
 
 const router = express.Router();
 
@@ -192,6 +194,20 @@ router.get('/proxy/*', async (req, res) => {
     } catch (err) {
         console.error(`[Proxy] /${req.params[0]} Error:`, err.message);
         res.status(err.response?.status || 500).json(err.response?.data || { success: false, message: err.message });
+    }
+});
+
+// ─── BDFUTBOL SCRAPER ────────────────────────────────────────────────────────
+router.get('/venue/bdfutbol/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) return res.status(400).json({ success: false, message: 'Venue ID is required' });
+        
+        const data = await scrapeBDFutbolVenue(id);
+        res.json({ success: true, data });
+    } catch (error) {
+        console.error(`Error in /venue/bdfutbol/${req.params.id}:`, error);
+        res.status(500).json({ success: false, message: 'Server Error fetching BDFutbol data' });
     }
 });
 

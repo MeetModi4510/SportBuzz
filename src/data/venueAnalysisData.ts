@@ -1,3 +1,4 @@
+import { FOOTBALL_VENUES } from "./footballVenues";
 // Sport-specific detailed venue analysis data
 import { Sport } from "./types";
 import { edenGardens, gabba, galle, campNou, anfield, maracana, unitedCenter, chasecenter, usOpen, australianOpen } from './venueExtras';
@@ -9,6 +10,7 @@ export interface VenueAnalysis {
     country: string;
     capacity: number;
     sport: Sport;
+    league?: string;
     established: number;
     nickname?: string;
     description: string;
@@ -62,6 +64,7 @@ export interface FootballVenueStats {
 export interface BDFutbolVenueStats {
     sport: "football";
     isBDFutbol: true;
+    bdfutbolId?: string;
     matchesHosted: number;
     architect: string;
     dimensions: string;
@@ -73,7 +76,7 @@ export interface BDFutbolVenueStats {
     finalsPlayed: string;
     locationCoords: [number, number];
     locationText: string;
-    homeTeam: { name: string; matches: number };
+    homeTeams: { name: string; matches: number }[];
     historicalNames: { name: string; period: string }[];
     seasonsList: { year: string; matches: number }[];
 }
@@ -286,6 +289,7 @@ const oldTrafford: VenueAnalysis = {
     country: "England",
     capacity: 74310,
     sport: "football",
+    league: "Premier League",
     established: 1910,
     nickname: "Theatre of Dreams",
     description: "Home of Manchester United, one of the most storied grounds in world football with a rich history of legendary players and dramatic moments.",
@@ -319,92 +323,7 @@ const oldTrafford: VenueAnalysis = {
     ],
 };
 
-const etihad: VenueAnalysis = {
-    id: "etihad",
-    name: "Etihad Stadium",
-    city: "Manchester",
-    country: "England",
-    capacity: 52900,
-    sport: "football",
-    established: 1999,
-    nickname: "City of Manchester",
-    description: "Home of Manchester City, a modern fortress known for breathtaking football and numerous Premier League titles under Pep Guardiola.",
-    image: "/images/venues/etihad.jpg",
-    gallery: [
-        "/gallery/etihad/1.png",
-        "/gallery/etihad/2.png",
-        "/gallery/etihad/3.png",
-        "/gallery/etihad/4.png"
-    ],
-    stats: {
-        sport: "football",
-        isBDFutbol: true,
-        matchesHosted: 527,
-        architect: "Arup",
-        dimensions: "105x68",
-        clubs: 95,
-        seasons: 23,
-        locationCoords: [53.483, -2.2],
-        locationText: "Manchester (England)",
-        finalsPlayed: "Europa League 14/05/2008 Zenit 2 - 0 Rangers",
-        homeTeam: { name: "Manchester City", matches: 526 },
-        historicalNames: [
-            { name: "City of Manchester", period: "<2010" },
-            { name: "Etihad Stadium", period: ">2011" }
-        ],
-        seasonsList: [
-            { year: "2025-26", matches: 24 },
-            { year: "2024-25", matches: 24 },
-            { year: "2023-24", matches: 24 },
-            { year: "2022-23", matches: 25 },
-            { year: "2021-22", matches: 25 },
-            { year: "2020-21", matches: 24 },
-            { year: "2019-20", matches: 23 }
-        ],
-        competitions: [
-            { name: "Premier League", matches: 437 },
-            { name: "Champions League", matches: 71 },
-            { name: "Europa League", matches: 19 }
-        ],
-        visitingTeams: [
-            { name: "Liverpool", matches: 24 },
-            { name: "Tottenham", matches: 24 },
-            { name: "Arsenal", matches: 23 },
-            { name: "Chelsea", matches: 23 },
-            { name: "Manchester United", matches: 23 },
-            { name: "Everton", matches: 23 },
-            { name: "Newcastle", matches: 21 },
-            { name: "Aston Villa", matches: 20 },
-            { name: "West Ham", matches: 20 },
-            { name: "Fulham", matches: 17 }
-        ],
-        topVisitors: [
-            { equip: "Liverpool", partits: 24 },
-            { equip: "Tottenham", partits: 24 },
-            { equip: "Arsenal", partits: 23 },
-            { equip: "Chelsea", partits: 23 },
-            { equip: "Man Utd", partits: 23 },
-            { equip: "Everton", partits: 23 },
-            { equip: "Newcastle", partits: 21 },
-            { equip: "Aston Villa", partits: 20 },
-            { equip: "West Ham", partits: 20 },
-            { equip: "Fulham", partits: 17 }
-        ]
-    } as BDFutbolVenueStats,
-    recentMatches: [
-        { date: "Feb 2025", teams: "Man City vs Arsenal", score: "2-0", result: "Man City won" },
-        { date: "Jan 2025", teams: "Man City vs Chelsea", score: "3-1", result: "Man City won" },
-        { date: "Jan 2025", teams: "Man City vs Real Madrid", score: "4-0", result: "Man City won" },
-        { date: "Dec 2024", teams: "Man City vs Liverpool", score: "1-1", result: "Draw" },
-        { date: "Dec 2024", teams: "Man City vs Aston Villa", score: "3-0", result: "Man City won" }
-    ],
-    topPerformers: [
-        { name: "Sergio Agüero", country: "Argentina", stat: "106 goals", highlight: "All-time top scorer" },
-        { name: "Kevin De Bruyne", country: "Belgium", stat: "150+ assists", highlight: "Assist King" },
-        { name: "David Silva", country: "Spain", stat: "436 apps", highlight: "Midfield Maestro" },
-        { name: "Erling Haaland", country: "Norway", stat: "60+ goals", highlight: "Goal Machine" }
-    ]
-};
+
 
 const bernabeu: VenueAnalysis = {
     id: "bernabeu",
@@ -616,7 +535,7 @@ const rolandGarros: VenueAnalysis = {
 
 export const VENUE_ANALYSIS_DATA: VenueAnalysis[] = [
     wankhede, lords, mcg, edenGardens, gabba, galle,
-    oldTrafford, bernabeu, campNou, anfield, maracana, etihad,
+    ...FOOTBALL_VENUES,
     cryptoArena, msg, unitedCenter, chasecenter,
     wimbledon, rolandGarros, usOpen, australianOpen,
 ];
