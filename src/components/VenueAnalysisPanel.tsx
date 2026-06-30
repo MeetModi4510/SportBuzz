@@ -1211,14 +1211,20 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
 
     // Sync selected venue to URL so refreshing doesn't lose the active stadium
     useEffect(() => {
-        const params = new URLSearchParams(searchParams);
-        if (selectedVenueId) {
-            params.set("venue", selectedVenueId);
-        } else {
-            params.delete("venue");
+        const currentVenue = searchParams.get("venue");
+        if (selectedVenueId === currentVenue || (!selectedVenueId && !currentVenue)) {
+            return; // No need to update URL if it already matches our state
         }
-        setSearchParams(params, { replace: true });
-    }, [selectedVenueId]);
+        
+        setSearchParams(prev => {
+            if (selectedVenueId) {
+                prev.set("venue", selectedVenueId);
+            } else {
+                prev.delete("venue");
+            }
+            return prev;
+        }, { replace: true });
+    }, [selectedVenueId, searchParams, setSearchParams]);
     const [selectedCountry, setSelectedCountry] = useState<string>("All");
     const [venueSearch, setVenueSearch] = useState<string>("");
     const [activeFormat, setActiveFormat] = useState<VenueFormat>("Test");

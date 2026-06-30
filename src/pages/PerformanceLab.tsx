@@ -68,17 +68,31 @@ const PerformanceLab = () => {
 
   // Keep URL in perfect sync with the active tabs without reloading the page
   useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    params.set("sport", activeSport);
-    params.set("tab", activeTab);
+    const currentSport = searchParams.get("sport");
+    const currentTab = searchParams.get("tab");
     
-    // Clean up venue param if we leave the venues tab
-    if (activeTab !== "venues") {
-      params.delete("venue");
+    if (currentSport === activeSport && currentTab === activeTab) {
+      // If we're leaving venues, but venue isn't in URL anyway, we can also skip
+      if (activeTab !== "venues" && !searchParams.has("venue")) {
+        return;
+      }
+      // If we are on venues tab, sport and tab match, we can skip
+      if (activeTab === "venues") {
+        return;
+      }
     }
-    
-    setSearchParams(params, { replace: true });
-  }, [activeSport, activeTab]);
+
+    setSearchParams(prev => {
+      prev.set("sport", activeSport);
+      prev.set("tab", activeTab);
+      
+      // Clean up venue param if we leave the venues tab
+      if (activeTab !== "venues") {
+        prev.delete("venue");
+      }
+      return prev;
+    }, { replace: true });
+  }, [activeSport, activeTab, searchParams, setSearchParams]);
 
   useEffect(() => {
     // Only apply state overrides if they don't conflict with current URL params, 
