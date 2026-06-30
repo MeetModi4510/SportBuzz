@@ -50,7 +50,7 @@ export const oldTrafford: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "2013",
+        bdfutbolId: "2019",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -84,7 +84,7 @@ export const emiratesStadium: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "882",
+        bdfutbolId: "2016",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -118,7 +118,7 @@ export const stamfordBridge: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "143",
+        bdfutbolId: "2003",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -152,7 +152,7 @@ export const tottenhamHotspurStadium: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "1076",
+        bdfutbolId: "2017",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -186,7 +186,7 @@ export const villaPark: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "674",
+        bdfutbolId: "2012",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -220,7 +220,7 @@ export const stJamesPark: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "823",
+        bdfutbolId: "2020",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -254,7 +254,7 @@ export const goodisonPark: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "652",
+        bdfutbolId: "e2010",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -288,7 +288,7 @@ export const molineuxStadium: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "847",
+        bdfutbolId: "2037",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -322,7 +322,7 @@ export const ellandRoad: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "405",
+        bdfutbolId: "2009",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -356,7 +356,7 @@ export const cityGround: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "415",
+        bdfutbolId: "2042",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -390,7 +390,7 @@ export const santiagoBernabU: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "711",
+        bdfutbolId: "2",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -424,7 +424,7 @@ export const riyadhAirMetropolitano: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "1052",
+        bdfutbolId: "7",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -458,7 +458,7 @@ export const mestalla: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "313",
+        bdfutbolId: "e36",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -492,7 +492,7 @@ export const sanMamS: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "715",
+        bdfutbolId: "6c",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -526,7 +526,7 @@ export const benitoVillamarN: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "999",
+        bdfutbolId: "8c",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -560,7 +560,7 @@ export const ramNSNchezPizjuN: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "541",
+        bdfutbolId: "33",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -594,7 +594,7 @@ export const realeArena: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "395",
+        bdfutbolId: "30",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -628,7 +628,7 @@ export const estadioDeLaCerMica: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "905",
+        bdfutbolId: "38",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -662,7 +662,7 @@ export const rcdeStadium: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "879",
+        bdfutbolId: "14",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -696,7 +696,7 @@ export const sanSiroGiuseppeMeazza: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "112",
+        bdfutbolId: "3008",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -730,7 +730,7 @@ export const allianzStadium: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "826",
+        bdfutbolId: "3004",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -764,7 +764,7 @@ export const stadioOlimpico: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "930",
+        bdfutbolId: "3018",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -798,7 +798,7 @@ export const diegoArmandoMaradonaStadium: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "928",
+        bdfutbolId: "3003",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -832,7 +832,7 @@ export const gewissStadium: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "527",
+        bdfutbolId: "3017",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -866,7 +866,7 @@ export const renatoDallAra: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "547",
+        bdfutbolId: "3010",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -900,7 +900,7 @@ export const artemioFranchi: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "947",
+        bdfutbolId: "3014",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -934,7 +934,7 @@ export const ennioTardini: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "413",
+        bdfutbolId: "3013",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -968,7 +968,7 @@ export const luigiFerraris: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "908",
+        bdfutbolId: "3036",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1002,7 +1002,7 @@ export const stadioViaDelMare: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "666",
+        bdfutbolId: "3012",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1036,7 +1036,7 @@ export const signalIdunaPark: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "368",
+        bdfutbolId: "1003",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1070,7 +1070,7 @@ export const allianzArena: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "793",
+        bdfutbolId: "1016",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1104,7 +1104,7 @@ export const redBullArena: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "954",
+        bdfutbolId: "1049",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1138,7 +1138,7 @@ export const bayarena: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "999",
+        bdfutbolId: "1014",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1172,7 +1172,7 @@ export const borussiaPark: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "203",
+        bdfutbolId: "1018",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1206,7 +1206,7 @@ export const deutscheBankPark: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "1060",
+        bdfutbolId: "1010",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1240,7 +1240,7 @@ export const mhparena: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "188",
+        bdfutbolId: "1002",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1274,7 +1274,7 @@ export const volkswagenArena: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "303",
+        bdfutbolId: "1001",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1308,7 +1308,7 @@ export const weserstadion: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "587",
+        bdfutbolId: "1009",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1342,7 +1342,7 @@ export const millerntorStadion: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "810",
+        bdfutbolId: "1020",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1376,7 +1376,7 @@ export const parcDesPrinces: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "764",
+        bdfutbolId: "4002",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1410,7 +1410,7 @@ export const orangeVLodrome: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "909",
+        bdfutbolId: "4004",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1444,7 +1444,7 @@ export const groupamaStadium: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "106",
+        bdfutbolId: "4017",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1478,7 +1478,7 @@ export const stadePierreMauroy: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "1030",
+        bdfutbolId: "4009",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1512,7 +1512,7 @@ export const stadeLouisIi: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "723",
+        bdfutbolId: "4018",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1546,7 +1546,7 @@ export const allianzRiviera: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "576",
+        bdfutbolId: "4015",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1580,7 +1580,7 @@ export const stadeBollaertDelelis: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "1034",
+        bdfutbolId: "4014",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",
@@ -1614,7 +1614,7 @@ export const stadeDeLaMeinau: VenueAnalysis = {
     stats: {
         sport: "football",
         isBDFutbol: true,
-        bdfutbolId: "1095",
+        bdfutbolId: "4034",
         matchesHosted: 0,
         architect: "Unknown",
         dimensions: "105x68",

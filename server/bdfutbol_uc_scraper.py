@@ -266,7 +266,9 @@ def main():
         # Start hiding thread on Windows only
         hide_thread = start_hiding_thread(driver.browser_pid)
         
-        driver.get(f'https://www.bdfutbol.com/en/s/{stadium_id}.html')
+        # Determine endpoint: teams start with 'e', stadiums usually don't but we use 's' as default.
+        endpoint = "e" if stadium_id.startswith("e") else "s"
+        driver.get(f'https://www.bdfutbol.com/en/{endpoint}/{stadium_id}.html')
         
         # Smart wait for Cloudflare challenge to solve (up to 30 seconds)
         for _ in range(30):
