@@ -105,8 +105,13 @@ export const createMatch = asyncHandler(async (req, res) => {
 // @route   GET /api/matches
 // @access  Public
 export const getMatches = asyncHandler(async (req, res) => {
-    const { tournamentId } = req.query;
-    const query = tournamentId ? { tournament: tournamentId } : {};
+    const { tournamentId, teamId } = req.query;
+    
+    const query = {};
+    if (tournamentId) query.tournament = tournamentId;
+    if (teamId) {
+        query.$or = [{ homeTeam: teamId }, { awayTeam: teamId }];
+    }
 
     const matches = await Match.find(query)
         .populate('homeTeam awayTeam tournament')

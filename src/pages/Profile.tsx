@@ -13,6 +13,7 @@ import { StatCard } from "@/components/admin/DashboardCards";
 import { useToast } from "@/hooks/use-toast";
 import { userApi, activityApi } from "@/services/api";
 import { CaptainTeamManagementModal } from "@/components/CaptainTeamManagementModal";
+import { TeamProfileModal } from "@/components/TeamProfileModal";
 
 interface UserStats {
   totalPoints: number;
@@ -84,7 +85,8 @@ const Profile = () => {
   const [isJoinTeamModalOpen, setIsJoinTeamModalOpen] = useState(false);
   const [joinCode, setJoinCode] = useState("");
   const [isJoiningTeam, setIsJoiningTeam] = useState(false);
-  const [selectedTeamForManagement, setSelectedTeamForManagement] = useState<any>(null);
+  const [selectedTeamForManagement, setSelectedTeamForManagement] = useState<any | null>(null);
+  const [selectedTeamForProfile, setSelectedTeamForProfile] = useState<any | null>(null);
 
   const handleJoinTeam = async () => {
     if (!joinCode.trim()) {
@@ -542,7 +544,11 @@ const Profile = () => {
                         user.teams.map((team: any) => {
                           const isCaptain = team.captainId === user.id || team.captainId === user._id;
                           return (
-                            <div key={team._id} className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-5 hover:bg-white/[0.04] transition-all">
+                            <div 
+                              key={team._id} 
+                              className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-5 hover:bg-white/[0.04] transition-all cursor-pointer"
+                              onClick={() => setSelectedTeamForProfile(team)}
+                            >
                               {team.logo ? (
                                 <img src={team.logo} alt={team.name} className="w-14 h-14 rounded-full object-cover" />
                               ) : (
@@ -562,7 +568,10 @@ const Profile = () => {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => setSelectedTeamForManagement(team)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedTeamForManagement(team);
+                                  }}
                                   className="border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/10 rounded-full"
                                 >
                                   Manage
@@ -688,6 +697,14 @@ const Profile = () => {
               setUser({ ...user, teams: updatedTeams });
             }
           }}
+        />
+      )}
+
+      {selectedTeamForProfile && (
+        <TeamProfileModal
+          team={selectedTeamForProfile}
+          isOpen={!!selectedTeamForProfile}
+          onClose={() => setSelectedTeamForProfile(null)}
         />
       )}
     </>
