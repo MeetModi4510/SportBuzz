@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getTeamAcronym } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -4188,47 +4189,52 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                 </div>
             )}
 
-            {/* Passcode Verification Modal */}
-            <Dialog open={!!passcodePromptTournament} onOpenChange={(open) => !open && setPasscodePromptTournament(null)}>
-                <DialogContent 
-                    className="bg-zinc-950 border-zinc-800 text-white rounded-2xl shadow-2xl sm:max-w-[400px] p-6"
-                    onOpenAutoFocus={(e) => { e.preventDefault(); }}
-                >
-                    <DialogHeader className="mb-4">
-                        <DialogTitle className="text-xl font-semibold tracking-tight text-white flex items-center gap-2">
-                            <Shield className="text-emerald-500" size={24} />
-                            Private Tournament
-                        </DialogTitle>
-                        <DialogDescription className="text-zinc-400 mt-2 text-sm">
-                            Please enter the passcode to view details for <strong className="text-white">{passcodePromptTournament?.name}</strong>.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                        <div className="space-y-2.5">
-                            <Label className="text-sm font-medium text-zinc-300">Passcode</Label>
-                            <Input 
-                                type="password" 
-                                placeholder="Enter passcode" 
-                                className="h-11 bg-zinc-900/50 border-zinc-800 focus:border-emerald-600 rounded-lg text-sm text-white" 
-                                value={passcodeAttempt} 
-                                onChange={(e) => setPasscodeAttempt(e.target.value)} 
+            {/* Passcode Verification Modal - Custom portal to avoid Radix focus trap issues */}
+            {passcodePromptTournament && typeof document !== 'undefined' && createPortal(
+                    <div 
+                        className="fixed inset-0 z-[9999] flex items-center justify-center"
+                        onClick={(e) => { if (e.target === e.currentTarget) setPasscodePromptTournament(null); }}
+                    >
+                        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+                        <div className="relative bg-zinc-950 border border-zinc-800 text-white rounded-2xl shadow-2xl w-full max-w-[400px] mx-4 p-6">
+                            <div className="flex items-center gap-3 mb-2">
+                                <Shield className="text-emerald-500" size={24} />
+                                <h2 className="text-xl font-semibold tracking-tight text-white">Private Tournament</h2>
+                            </div>
+                            <p className="text-zinc-400 text-sm mb-6">
+                                Enter the passcode to access <strong className="text-white">{passcodePromptTournament.name}</strong>.
+                            </p>
+                            <label className="text-sm font-medium text-zinc-300 block mb-2">Passcode</label>
+                            <input
+                                type="password"
+                                placeholder="Enter passcode"
+                                className="w-full h-11 px-3 bg-zinc-900 border border-zinc-700 focus:border-emerald-500 focus:outline-none rounded-lg text-sm text-white placeholder:text-zinc-500 transition-colors"
+                                value={passcodeAttempt}
+                                onChange={(e) => setPasscodeAttempt(e.target.value)}
+                                onKeyDown={(e) => { if (e.key === 'Enter') handleVerifyPasscode(); }}
                                 autoFocus
-                                ref={(el) => { if (el) setTimeout(() => el.focus(), 50); }}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleVerifyPasscode();
-                                }}
                             />
+                            <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-zinc-800">
+                                <button 
+                                    onClick={() => { setPasscodePromptTournament(null); setPasscodeAttempt(""); }}
+                                    className="px-4 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={handleVerifyPasscode}
+                                    disabled={isVerifyingPasscode}
+                                    className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                                >
+                                    {isVerifyingPasscode ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                                    Verify Access
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <DialogFooter className="mt-8 border-t border-zinc-800 pt-6">
-                        <Button variant="ghost" onClick={() => setPasscodePromptTournament(null)} className="text-zinc-400 hover:text-white hover:bg-zinc-900">Cancel</Button>
-                        <Button onClick={handleVerifyPasscode} disabled={isVerifyingPasscode} className="bg-emerald-600 text-white hover:bg-emerald-700 px-6 font-medium">
-                            {isVerifyingPasscode ? <Loader2 size={16} className="animate-spin mr-2" /> : <Check size={16} className="mr-2" />}
-                            Verify Access
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                    </div>,
+                    document.body
+                )
+            }
         </div>
     );
 };
