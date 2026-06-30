@@ -693,7 +693,7 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
         try {
             // Fetch "My Tournaments" (userId filter ensures we only get our own tournaments)
             const params: any = {};
-            if (currentUserId && isOwner) {
+            if (currentUserId) {
                 params.userId = currentUserId;
             }
             const res = await tournamentApi.getAll(params);
@@ -1467,15 +1467,18 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                         <div className="grid grid-cols-2 gap-5">
                                             <div className="space-y-2.5">
                                                 <Label className="text-sm font-medium text-zinc-300">Visibility</Label>
-                                                <div 
-                                                    className="relative flex items-center h-11 bg-zinc-900/80 border border-zinc-800 rounded-lg p-1 cursor-pointer hover:border-zinc-700 transition-colors"
-                                                    onClick={() => setVisibility(visibility === "Public" ? "Private" : "Public")}
-                                                >
-                                                    <div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-md transition-all duration-300 ${visibility === 'Public' ? 'left-1 bg-white shadow-sm' : 'left-[calc(50%+4px)] bg-zinc-700 shadow-sm'}`} />
-                                                    <div className={`flex-1 flex items-center justify-center gap-2 text-sm font-medium relative z-10 transition-colors duration-300 ${visibility === 'Public' ? 'text-black' : 'text-zinc-500'}`}>
+                                                <div className="relative flex items-center h-11 bg-zinc-900/80 border border-zinc-800 rounded-lg p-1 cursor-pointer hover:border-zinc-700 transition-colors">
+                                                    <div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-md bg-white shadow-sm transition-all duration-300 ${visibility === 'Public' ? 'left-1' : 'left-[calc(50%+4px)]'}`} />
+                                                    <div 
+                                                        onClick={() => setVisibility("Public")}
+                                                        className={`flex-1 flex items-center justify-center gap-2 text-sm font-medium relative z-10 transition-colors duration-300 h-full ${visibility === 'Public' ? 'text-black' : 'text-zinc-400 hover:text-zinc-200'}`}
+                                                    >
                                                         <Globe size={14} /> Public
                                                     </div>
-                                                    <div className={`flex-1 flex items-center justify-center gap-2 text-sm font-medium relative z-10 transition-colors duration-300 ${visibility === 'Private' ? 'text-white' : 'text-zinc-500'}`}>
+                                                    <div 
+                                                        onClick={() => setVisibility("Private")}
+                                                        className={`flex-1 flex items-center justify-center gap-2 text-sm font-medium relative z-10 transition-colors duration-300 h-full ${visibility === 'Private' ? 'text-black' : 'text-zinc-400 hover:text-zinc-200'}`}
+                                                    >
                                                         <Shield size={14} /> Private
                                                     </div>
                                                 </div>
@@ -1630,11 +1633,9 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                                     <span className="inline-flex items-center px-2 py-1 bg-zinc-800/40 border border-zinc-700/50 rounded text-xs font-medium text-zinc-300">
                                                         {tournament.matchType === 'Test' ? 'Test Match' : tournament.matchType}
                                                     </span>
-                                                    {tournament.visibility && (
-                                                        <span className="inline-flex items-center px-2 py-1 bg-zinc-800/40 border border-zinc-700/50 rounded text-xs font-medium text-zinc-400">
-                                                            {tournament.visibility}
-                                                        </span>
-                                                    )}
+                                                    <span className="inline-flex items-center px-2 py-1 bg-zinc-800/40 border border-zinc-700/50 rounded text-xs font-medium text-zinc-400">
+                                                        {tournament.visibility || 'Public'}
+                                                    </span>
                                                 </div>
                                             </div>
 
