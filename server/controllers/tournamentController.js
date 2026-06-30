@@ -8,7 +8,7 @@ import User from '../models/User.js';
 // @route   POST /api/tournaments
 // @access  Private/Admin
 export const createTournament = asyncHandler(async (req, res) => {
-    const { name, format, matchType, overs, testDays, oversPerSession, groupStructure, groupsCount, pointsRule, startDate, endDate, teams } = req.body;
+    const { name, format, matchType, overs, testDays, oversPerSession, groupStructure, groupsCount, pointsRule, startDate, endDate, teams, visibility, passcode, locationName, locationCoordinates } = req.body;
 
     const groups = [];
     if (groupStructure !== 'None' && groupsCount > 1) {
@@ -31,6 +31,10 @@ export const createTournament = asyncHandler(async (req, res) => {
         startDate,
         endDate,
         teams,
+        visibility: visibility || 'Public',
+        passcode: passcode || undefined,
+        locationName: locationName || undefined,
+        locationCoordinates: locationCoordinates || { type: 'Point', coordinates: [0, 0] },
         status: 'Upcoming',
         createdBy: req.user ? req.user._id : null
     });
@@ -59,20 +63,44 @@ export const createTournament = asyncHandler(async (req, res) => {
 // @route   GET /api/tournaments
 // @access  Public
 export const getTournaments = asyncHandler(async (req, res) => {
-    const { search, userId } = req.query;
+    const { search, userId, lat, lng } = req.query;
     const filter = {};
 
-    if (search) {
-        filter.name = { $regex: search, $options: 'i' };
-    }
     if (userId) {
+        // "My Tournaments" view: user sees their own, no location/visibility filter
         filter.createdBy = userId;
+    } else if (search) {
+        // Search view: can find any tournament by name (Public or Private), global
+        filter.name = { $regex: search, $options: 'i' };
+    } else {
+        // Discover view: Only Public tournaments
+        filter.visibility = { $ne: 'Private' }; // Default is Public, so $ne Private handles legacy too
+
+        // Apply 30km radius filtering if location is provided
+        if (lat && lng) {
+            filter.locationCoordinates = {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [parseFloat(lng), parseFloat(lat)]
+                    },
+                    $maxDistance: 30000 // 30km in meters
+                }
+            };
+        }
     }
 
-    const tournaments = await Tournament.find(filter)
+    let query = Tournament.find(filter)
+        .select('-passcode') // NEVER send passcodes to the frontend
         .populate('teams')
-        .populate('createdBy', 'fullName email photoUrl')
-        .sort({ createdAt: -1 });
+        .populate('createdBy', 'fullName email photoUrl');
+
+    // Only sort by createdAt if $near is NOT used ($near implicitly sorts by distance)
+    if (!filter.locationCoordinates) {
+        query = query.sort({ createdAt: -1 });
+    }
+
+    const tournaments = await query;
 
     res.json({
         success: true,
@@ -763,4 +791,28 @@ export const unfollowTournament = asyncHandler(async (req, res) => {
         success: true,
         message: 'Successfully unfollowed tournament'
     });
+});
+
+// @desc    Verify tournament passcode
+// @route   POST /api/tournaments/:id/verify-passcode
+// @access  Public
+export const verifyPasscode = asyncHandler(async (req, res) => {
+    const { passcode } = req.body;
+    const tournament = await Tournament.findById(req.params.id).select('+passcode'); // Explicitly select passcode
+
+    if (!tournament) {
+        res.status(404);
+        throw new Error('Tournament not found');
+    }
+
+    if (tournament.visibility !== 'Private') {
+        return res.json({ success: true, message: 'Tournament is not private' });
+    }
+
+    if (tournament.passcode === passcode) {
+        res.json({ success: true });
+    } else {
+        res.status(401);
+        throw new Error('Invalid passcode');
+    }
 });

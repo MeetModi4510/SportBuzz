@@ -82,6 +82,17 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    locationCoordinates: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            default: [0, 0]
+        }
+    },
     favoriteTeam: {
         type: String,
         trim: true

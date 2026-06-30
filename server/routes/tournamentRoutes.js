@@ -10,7 +10,8 @@ import {
     shuffleTournamentGroups,
     recalculatePointsTable,
     followTournament,
-    unfollowTournament
+    unfollowTournament,
+    verifyPasscode
 } from '../controllers/tournamentController.js';
 import { protect, optionalAuth, adminOnly, adminOrScorer } from '../middleware/authMiddleware.js';
 
@@ -26,6 +27,7 @@ router.put('/:id/shuffle', protect, adminOrScorer, shuffleTournamentGroups);
 router.post('/:id/recalculate', protect, adminOrScorer, recalculatePointsTable);
 router.post('/:id/follow', protect, followTournament);
 router.post('/:id/unfollow', protect, unfollowTournament);
+router.post('/:id/verify-passcode', verifyPasscode);
 
 router.route('/:id')
     .get(getTournamentById)
