@@ -80,10 +80,13 @@ export const addFavorite = asyncHandler(async (req, res) => {
                 points: 50
             });
 
-            // Add points
-            await User.findByIdAndUpdate(req.user.id, {
-                $inc: { 'stats.totalPoints': 50 }
-            });
+            // Add points and calculate level
+            const favUser = await User.findById(req.user.id);
+            if (favUser) {
+                favUser.stats.totalPoints += 50;
+                favUser.stats.level = favUser.calculateLevel();
+                await favUser.save();
+            }
         } catch (e) {
             // Achievement already exists
         }
