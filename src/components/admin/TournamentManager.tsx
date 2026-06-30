@@ -544,6 +544,8 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
 
     // Add player to existing team (inline in team detail)
     const [addPlayerName, setAddPlayerName] = useState("");
+    const [addPlayerUserId, setAddPlayerUserId] = useState<string | null>(null);
+    const [addPlayerPhoto, setAddPlayerPhoto] = useState<string | null>(null);
     const [addPlayerRole, setAddPlayerRole] = useState<PlayerRole>("Batsman");
     const [addPlayerBattingStyle, setAddPlayerBattingStyle] = useState<string>("Right-hand Bat");
     const [addPlayerBowlingStyle, setAddPlayerBowlingStyle] = useState<string>("None");
@@ -1255,7 +1257,9 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
             const newPlayers = [
                 ...(selectedTeam.players || []),
                 { 
+                    userId: addPlayerUserId || undefined,
                     name: addPlayerName.trim(), 
+                    photo: addPlayerPhoto || undefined,
                     role: addPlayerRole,
                     battingStyle: addPlayerBattingStyle,
                     bowlingStyle: addPlayerBowlingStyle
@@ -1265,6 +1269,8 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
             if ((res as any).success) {
                 toast.success(`${addPlayerName.trim()} added to ${selectedTeam.name}`);
                 setAddPlayerName("");
+                setAddPlayerUserId(null);
+                setAddPlayerPhoto(null);
                 setAddPlayerRole("Batsman");
                 // Refresh team data
                 const teamRes = await teamApi.getById(selectedTeam._id) as any;
@@ -1336,6 +1342,7 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                 const pName = typeof p === 'string' ? p : p.name;
                 if (pName === selectedPlayer.name) {
                     return {
+                        ...(typeof p === 'object' ? p : {}),
                         name: editPlayerName.trim(),
                         role: editPlayerRole,
                         battingStyle: editPlayerBattingStyle,
@@ -3050,12 +3057,14 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                                     <div className="space-y-2">
                                                         <Label className="text-xs uppercase font-bold tracking-widest text-zinc-400">Player Name</Label>
                                                         <div className="relative">
-                                                            <Input placeholder="e.g. Virat Kohli" className="bg-white/5 border-white/10 h-12 rounded-xl focus:ring-blue-500" value={addPlayerName} onChange={(e) => { setAddPlayerName(e.target.value); setShowSuggestions('add'); setTournamentConflict(null); }} onFocus={() => addPlayerName.trim().length >= 2 && setShowSuggestions('add')} autoComplete="off" />
+                                                            <Input placeholder="e.g. Virat Kohli" className="bg-white/5 border-white/10 h-12 rounded-xl focus:ring-blue-500" value={addPlayerName} onChange={(e) => { setAddPlayerName(e.target.value); setAddPlayerUserId(null); setAddPlayerPhoto(null); setShowSuggestions('add'); setTournamentConflict(null); }} onFocus={() => addPlayerName.trim().length >= 2 && setShowSuggestions('add')} autoComplete="off" />
                                                             {showSuggestions === 'add' && playerSuggestions.length > 0 && (
                                                                 <div className="absolute left-0 right-0 mt-2 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto">
                                                                     {playerSuggestions.map((s: any, i: number) => (
                                                                         <button key={i} type="button" className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left" onClick={() => {
                                                                             setAddPlayerName(s.name);
+                                                                            setAddPlayerUserId(s._id || s.userId || null);
+                                                                            setAddPlayerPhoto(s.photo || s.photoUrl || null);
                                                                             setAddPlayerRole(s.role || 'Batsman');
                                                                             setAddPlayerBattingStyle(s.battingStyle || 'Right-hand Bat');
                                                                             setAddPlayerBowlingStyle(s.bowlingStyle || 'None');

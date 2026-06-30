@@ -64,17 +64,28 @@ export const updateProfile = asyncHandler(async (req, res) => {
     // Sync player details across all teams they belong to
     if (fullName !== undefined || photoUrl !== undefined || req.body.playingRole !== undefined || req.body.battingStyle !== undefined || req.body.bowlingStyle !== undefined) {
         try {
-            const teams = await Team.find({ "players.userId": user._id });
+            const teams = await Team.find({
+                $or: [
+                    { "players.userId": user._id },
+                    { "players.userId": user._id.toString() },
+                    { "captainId": user._id },
+                    { "captainId": user._id.toString() }
+                ]
+            });
             
             for (const team of teams) {
                 let teamChanged = false;
                 
                 if (team.players && Array.isArray(team.players)) {
                     team.players = team.players.map(p => {
-                        if (p.userId && p.userId.toString() === user._id.toString()) {
+                        const isCaptainMatch = team.captainId && team.captainId.toString() === user._id.toString() && (!p.userId ? p.name === user.fullName || p.name === team.captain : p.userId.toString() === user._id.toString());
+                        const isPlayerMatch = (p.userId && p.userId.toString() === user._id.toString()) || (!p.userId && p.name === user.fullName);
+                        
+                        if (isPlayerMatch || isCaptainMatch) {
                             teamChanged = true;
                             return {
                                 ...p,
+                                userId: p.userId || user._id, // Add userId if it was missing (like for captain)
                                 name: user.fullName || p.name,
                                 photo: user.photoUrl !== undefined ? user.photoUrl : p.photo,
                                 role: user.playingRole || p.role,

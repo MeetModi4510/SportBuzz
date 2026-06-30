@@ -29,8 +29,11 @@ export const getPlayerName = (p: PlayerEntry | string | any): string => {
 };
 
 /** Utility: extract player role (defaults to Batsman for legacy string entries) */
-export const getPlayerRole = (p: PlayerEntry | string | any): PlayerRole =>
-    (typeof p === 'object' && p !== null && p.role) ? p.role : 'Batsman';
+export const getPlayerRole = (p: PlayerEntry | string | any): PlayerRole => {
+    let role = (typeof p === 'object' && p !== null && p.role) ? p.role : 'Batsman';
+    if (role === 'All-rounder') role = 'All-Rounder';
+    return role as PlayerRole;
+};
 
 export interface PointsTableEntry {
     _id: string;

@@ -208,3 +208,38 @@ export const joinTeam = asyncHandler(async (req, res) => {
         data: team
     });
 });
+
+// @desc    Delete a team
+// @route   DELETE /api/teams/:id
+// @access  Private/Captain/Admin
+export const deleteTeam = asyncHandler(async (req, res) => {
+    const team = await Team.findById(req.params.id);
+
+    if (team) {
+        // Authorization check
+        const isCaptain = team.captainId && team.captainId.toString() === req.user._id.toString();
+        const isAdmin = req.user.role === 'admin';
+        
+        if (!isCaptain && !isAdmin) {
+            res.status(403);
+            throw new Error('Not authorized to delete this team.');
+        }
+
+        // Remove team from all users who have it in their profile
+        await User.updateMany(
+            { teams: team._id },
+            { $pull: { teams: team._id } }
+        );
+
+        // Delete the team document
+        await Team.findByIdAndDelete(team._id);
+
+        res.json({
+            success: true,
+            message: 'Team removed'
+        });
+    } else {
+        res.status(404);
+        throw new Error('Team not found');
+    }
+});

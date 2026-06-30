@@ -182,12 +182,14 @@ const Profile = () => {
         location: formData.location,
         favoriteTeam: formData.favoriteTeam,
         bio: formData.bio,
+        playingRole: formData.playingRole,
         battingStyle: formData.battingStyle,
         bowlingStyle: formData.bowlingStyle,
       }) as any;
 
       if (response.success) {
-        setUser(prev => ({ ...prev, ...response.data }));
+        const profileRes = await userApi.getProfile() as any;
+        if (profileRes.success) setUser(profileRes.data);
         setIsEditing(false);
         toast({ title: "Profile Updated", description: "Your changes have been saved." });
       }
@@ -403,7 +405,7 @@ const Profile = () => {
                   <Select value={formData.playingRole} onValueChange={(v) => handleSelectChange('playingRole', v)}>
                     <SelectTrigger className="h-14 bg-[#09090b] border-white/10 rounded-xl focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 px-4 text-white"><SelectValue /></SelectTrigger>
                     <SelectContent className="bg-[#18181b] border-white/10 text-white rounded-xl">
-                      {["Batsman", "Bowler", "All-rounder", "Wicket Keeper"].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                      {["Batsman", "Bowler", "All-Rounder", "Wicket Keeper"].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
