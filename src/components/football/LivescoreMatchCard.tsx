@@ -248,8 +248,11 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
               {match.homeTeam.name}
             </span>
             {!isUpcoming && (
-              <span className="font-black text-2xl drop-shadow-md mt-1">
+              <span className="font-black text-2xl drop-shadow-md mt-1 flex items-center gap-1">
                 {match.homeScore || 0}
+                {match.homePenaltyScore != null && (
+                  <span className="text-amber-300 ml-0.5">({match.homePenaltyScore})</span>
+                )}
               </span>
             )}
           </div>
@@ -274,8 +277,11 @@ export const LivescoreMatchCard = ({ match, onClick, className }: LivescoreMatch
               {match.awayTeam.name}
             </span>
             {!isUpcoming && (
-              <span className="font-black text-2xl drop-shadow-md mt-1">
+              <span className="font-black text-2xl drop-shadow-md mt-1 flex items-center gap-1">
                 {match.awayScore || 0}
+                {match.awayPenaltyScore != null && (
+                  <span className="text-amber-300 ml-0.5">({match.awayPenaltyScore})</span>
+                )}
               </span>
             )}
           </div>

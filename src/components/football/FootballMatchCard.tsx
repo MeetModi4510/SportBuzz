@@ -148,12 +148,16 @@ export const FootballMatchCard = ({ match, onClick, className }: FootballMatchCa
              
              <div className="flex flex-col items-center justify-center shrink-0 px-2 relative z-20">
                 <div className="absolute inset-0 bg-amber-500/30 blur-md rounded-full scale-125" />
-                <div className="w-14 h-14 rounded-full bg-slate-950/80 backdrop-blur-md border-2 border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.4)] flex flex-col items-center justify-center group-hover:scale-110 transition-transform duration-500 relative z-10">
+                <div className="min-w-[3.5rem] px-3 h-14 rounded-full bg-slate-950/80 backdrop-blur-md border-2 border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.4)] flex flex-col items-center justify-center group-hover:scale-110 transition-transform duration-500 relative z-10">
                   {isUpcoming ? (
                     <span className="font-black text-[18px] italic tracking-tighter text-amber-500 drop-shadow-md">VS</span>
                   ) : (
-                    <span className="font-black text-[20px] tracking-tighter text-white drop-shadow-md">
-                      {match.goals.home ?? 0}<span className="text-amber-500 mx-0.5">-</span>{match.goals.away ?? 0}
+                    <span className="font-black text-[20px] tracking-tighter text-white drop-shadow-md flex items-center justify-center whitespace-nowrap">
+                      {match.goals.home ?? 0}
+                      {match.score?.penalty?.home != null && <span className="text-sm font-bold text-amber-400 ml-0.5">({match.score.penalty.home})</span>}
+                      <span className="text-amber-500 mx-0.5">-</span>
+                      {match.goals.away ?? 0}
+                      {match.score?.penalty?.away != null && <span className="text-sm font-bold text-amber-400 ml-0.5">({match.score.penalty.away})</span>}
                     </span>
                   )}
                 </div>
@@ -178,8 +182,11 @@ export const FootballMatchCard = ({ match, onClick, className }: FootballMatchCa
                 </span>
               </div>
               <div className="flex flex-col items-end">
-                 <span className="font-black text-[22px] tracking-tight text-foreground">
+                 <span className="font-black text-[22px] tracking-tight text-foreground flex items-center">
                    {isUpcoming ? '-' : match.goals.home ?? 0}
+                   {!isUpcoming && match.score?.penalty?.home != null && (
+                     <span className="text-[16px] text-muted-foreground ml-1.5 font-bold">({match.score.penalty.home})</span>
+                   )}
                  </span>
               </div>
             </div>
@@ -193,8 +200,11 @@ export const FootballMatchCard = ({ match, onClick, className }: FootballMatchCa
                 </span>
               </div>
               <div className="flex flex-col items-end">
-                 <span className="font-black text-[22px] tracking-tight text-foreground">
+                 <span className="font-black text-[22px] tracking-tight text-foreground flex items-center">
                    {isUpcoming ? '-' : match.goals.away ?? 0}
+                   {!isUpcoming && match.score?.penalty?.away != null && (
+                     <span className="text-[16px] text-muted-foreground ml-1.5 font-bold">({match.score.penalty.away})</span>
+                   )}
                  </span>
               </div>
             </div>

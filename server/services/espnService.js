@@ -69,6 +69,8 @@ function normalizeEspnMatch(event, leagueName) {
         },
         homeScore: home.score,
         awayScore: away.score,
+        homePenaltyScore: home.shootoutScore !== undefined ? home.shootoutScore : null,
+        awayPenaltyScore: away.shootoutScore !== undefined ? away.shootoutScore : null,
         status: mappedStatus,
         statusCode: statusType,
         statusDetail: event.status.type.detail, // e.g. "FT", "85'", "Sat, 3:00 PM"

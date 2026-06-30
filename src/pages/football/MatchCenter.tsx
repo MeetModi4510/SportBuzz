@@ -306,15 +306,20 @@ export default function MatchCenter() {
       return !isStartEnd && !isDelay;
   });
   
-  // Sort events by period and clock (ascending, same as ESPN default for summary)
+  // Sort events by period and clock (ascending first to maintain relative order of same-time events, then reverse)
   keyEvents.sort((a: any, b: any) => {
       const pA = a.period?.number || Math.floor((a.clock?.value || 0) / 2700) + 1;
       const pB = b.period?.number || Math.floor((b.clock?.value || 0) / 2700) + 1;
       if (pA !== pB) return pA - pB;
       const timeA = a.clock?.value || 0;
       const timeB = b.clock?.value || 0;
+      if (timeA === timeB) {
+          const idA = parseInt(a.id || "0");
+          const idB = parseInt(b.id || "0");
+          return idA - idB;
+      }
       return timeA - timeB;
-  });
+  }).reverse();
   const homeStats = matchData.boxscore?.teams?.find((t: any) => t.team.id === homeTeam.id)?.statistics || [];
   const awayStats = matchData.boxscore?.teams?.find((t: any) => t.team.id === awayTeam.id)?.statistics || [];
   
@@ -329,8 +334,10 @@ export default function MatchCenter() {
   const broadcasts = matchData.broadcasts || [];
 
   const details = matchData.details || matchData.keyEvents || [];
-  const homeGoals = details.filter((d: any) => d.scoringPlay && d.team?.id === homeTeam.id);
-  const awayGoals = details.filter((d: any) => d.scoringPlay && d.team?.id === awayTeam.id);
+  const homeGoals = details.filter((d: any) => d.scoringPlay && d.team?.id === homeTeam.id && !d.shootout && !d.type?.text?.toLowerCase().includes('shootout'));
+  const awayGoals = details.filter((d: any) => d.scoringPlay && d.team?.id === awayTeam.id && !d.shootout && !d.type?.text?.toLowerCase().includes('shootout'));
+  const homeShootout = matchData.shootout?.find((s: any) => s.id == homeTeam.id)?.shots || [];
+  const awayShootout = matchData.shootout?.find((s: any) => s.id == awayTeam.id)?.shots || [];
 
   const getFlagUrl = (team: any) => {
     if (!team.abbreviation) return team.logo;
@@ -374,6 +381,8 @@ export default function MatchCenter() {
       </div>
     );
   };
+
+
 
   const renderPitchPlayer = (p: any, teamColor: string, teamId: string, isFotmob = false, teamName?: string) => {
     // For Fotmob players: p has { id, name, shirtNumber, rating, ... }
@@ -680,12 +689,18 @@ export default function MatchCenter() {
 
             {/* Score */}
             <div className="flex items-center gap-4 md:gap-8 font-black tracking-tighter shrink-0 pt-2 md:pt-4">
-               <span className={cn("text-5xl md:text-[5rem] leading-none", statusState === 'post' && homeTeamObj.winner ? "text-emerald-500" : "text-foreground")}>
+               <span className={cn("text-5xl md:text-[5rem] leading-none flex items-center gap-2", statusState === 'post' && homeTeamObj?.winner ? "text-emerald-500" : "text-foreground")}>
                  {homeTeamObj?.score || "0"}
+                 {homeTeamObj?.shootoutScore != null && (
+                   <span className="text-3xl md:text-5xl text-amber-500 drop-shadow-sm font-bold">({homeTeamObj.shootoutScore})</span>
+                 )}
                </span>
                <span className="text-3xl md:text-5xl text-muted-foreground/20 font-light pb-2">-</span>
-               <span className={cn("text-5xl md:text-[5rem] leading-none", statusState === 'post' && awayTeamObj.winner ? "text-emerald-500" : "text-foreground")}>
+               <span className={cn("text-5xl md:text-[5rem] leading-none flex items-center gap-2", statusState === 'post' && awayTeamObj?.winner ? "text-emerald-500" : "text-foreground")}>
                  {awayTeamObj?.score || "0"}
+                 {awayTeamObj?.shootoutScore != null && (
+                   <span className="text-3xl md:text-5xl text-amber-500 drop-shadow-sm font-bold">({awayTeamObj.shootoutScore})</span>
+                 )}
                </span>
             </div>
 
@@ -716,6 +731,58 @@ export default function MatchCenter() {
             </div>
 
           </div>
+
+          {/* Centralized Penalty Shootout (TV Broadcast Style) */}
+          {(homeShootout.length > 0 || awayShootout.length > 0) && (
+            <div className="flex flex-col items-center w-full mt-2 pt-8 pb-4 border-t border-border/10 relative">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#131313] md:bg-secondary/20 px-4">
+                <span className="text-[10px] font-black uppercase tracking-widest text-amber-500 drop-shadow-sm flex items-center gap-2">
+                  <span className="w-1 h-1 bg-amber-500 rounded-full animate-pulse"></span>
+                  Penalty Shootout
+                  <span className="w-1 h-1 bg-amber-500 rounded-full animate-pulse"></span>
+                </span>
+              </div>
+              
+              <div className="flex w-full items-start justify-center gap-4 md:gap-12 mt-4 max-w-2xl">
+                 {/* Home Penalties */}
+                 <div className="flex flex-col items-end gap-3 flex-1">
+                    {homeShootout.map((g: any, i: number) => (
+                       <div key={i} className="flex items-center gap-3">
+                          <span className={cn("text-xs md:text-sm font-semibold tracking-wide", g.didScore ? "text-foreground" : "text-muted-foreground line-through decoration-red-500/50 opacity-80")}>
+                            {g.player}
+                          </span>
+                          <div className={cn("w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center text-[10px] md:text-xs text-white shadow-sm border", g.didScore ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-500" : "bg-red-500/10 border-red-500/30 text-red-500")}>
+                            {g.didScore ? "✓" : "✕"}
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+                 
+                 {/* Turn Numbers / Middle Divider */}
+                 <div className="flex flex-col items-center gap-3">
+                    {Array.from({ length: Math.max(homeShootout.length, awayShootout.length) }).map((_, i) => (
+                       <div key={i} className="flex items-center justify-center h-5 md:h-6">
+                          <span className="text-[10px] text-muted-foreground/50 font-bold">Round {i + 1}</span>
+                       </div>
+                    ))}
+                 </div>
+
+                 {/* Away Penalties */}
+                 <div className="flex flex-col items-start gap-3 flex-1">
+                    {awayShootout.map((g: any, i: number) => (
+                       <div key={i} className="flex items-center gap-3">
+                          <div className={cn("w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center text-[10px] md:text-xs text-white shadow-sm border", g.didScore ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-500" : "bg-red-500/10 border-red-500/30 text-red-500")}>
+                            {g.didScore ? "✓" : "✕"}
+                          </div>
+                          <span className={cn("text-xs md:text-sm font-semibold tracking-wide", g.didScore ? "text-foreground" : "text-muted-foreground line-through decoration-red-500/50 opacity-80")}>
+                            {g.player}
+                          </span>
+                       </div>
+                    ))}
+                 </div>
+              </div>
+            </div>
+          )}
 
           {/* Bottom Bar */}
           <div className="flex flex-col md:flex-row items-center justify-between border-t border-border/10 pt-4 md:pt-6 gap-4">
@@ -882,8 +949,8 @@ export default function MatchCenter() {
                            </div>
                            <div>
                               <p className="text-[10px] font-black text-orange-500/80 uppercase tracking-widest mb-0.5">Tournament Phase</p>
-                              <p className="font-bold text-sm leading-tight">
-                                {comp.type?.abbreviation || comp.type?.name || "Regular Stage"}
+                              <p className="font-bold text-sm leading-tight capitalize">
+                                {header?.season?.name?.includes(',') ? header.season.name.split(',').pop()?.trim() : (comp?.type?.abbreviation || comp?.type?.name || "Regular Stage")}
                               </p>
                            </div>
                         </div>
@@ -1051,7 +1118,11 @@ export default function MatchCenter() {
                                         <div className="text-xs font-bold text-muted-foreground w-10 text-center">{dateStr}</div>
                                         <div className="flex items-center gap-2 flex-1 justify-center">
                                            <TeamLogo logo={h2hHomeObj.logo || `https://a.espncdn.com/i/teamlogos/soccer/500/${h2hHomeObj.id}.png`} name={h2hHomeObj.name} size="xs" className="w-5 h-5 object-contain" />
-                                           <span className="font-black text-sm w-12 text-center">{h2hHomeScore} - {h2hAwayScore}</span>
+                                           <span className="font-black text-sm text-center px-2 whitespace-nowrap">
+                                              {h2h.homeShootoutScore && h2h.awayShootoutScore && (parseInt(h2h.homeShootoutScore) > 0 || parseInt(h2h.awayShootoutScore) > 0) 
+                                                ? `${h2hHomeScore} (${h2h.homeShootoutScore}) - ${h2hAwayScore} (${h2h.awayShootoutScore})` 
+                                                : `${h2hHomeScore} - ${h2hAwayScore}`}
+                                           </span>
                                            <TeamLogo logo={h2hAwayObj.logo || `https://a.espncdn.com/i/teamlogos/soccer/500/${h2hAwayObj.id}.png`} name={h2hAwayObj.name} size="xs" className="w-5 h-5 object-contain" />
                                         </div>
                                      </div>
@@ -1202,7 +1273,7 @@ export default function MatchCenter() {
                                       align === "left" ? "text-emerald-500" : 
                                       align === "right" ? "text-blue-500" : 
                                       "text-muted-foreground"
-                                   )}>{evt.clock.displayValue}</span>
+                                   )}>{evt.period?.number === 5 && isPenalty ? "SHOOTOUT" : evt.clock.displayValue}</span>
                                  )}
                                  <span className="font-medium text-[11px] text-muted-foreground uppercase tracking-widest">{evt.type?.text}</span>
                                </div>

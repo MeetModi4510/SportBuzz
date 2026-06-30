@@ -1,7 +1,6 @@
 import { NewTransferData } from "../../types/football/transfers";
-import { ArrowRight, User, Shield } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
+import { ArrowRight, User } from "lucide-react";
+import React, { useState, useEffect } from "react";
 
 interface TransferCardProps {
   transferData: NewTransferData;
@@ -65,8 +64,16 @@ function ClubLogo({ name, id, url, size = 32, glow, isDark }: { name: string; id
 
 export function TransferCard({ transferData }: TransferCardProps) {
   const [imgError, setImgError] = useState(false);
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme !== 'light';
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     setImgError(false);
