@@ -49,13 +49,15 @@ const BOWLING_STYLES = [
 ];
 
 const StatCard = ({ icon: Icon, label, value }: any) => (
-  <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-5 hover:bg-white/[0.04] transition-colors">
-    <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
-      <Icon size={24} />
+  <div className="relative overflow-hidden p-6 rounded-3xl bg-white/[0.01] border border-white/[0.03] flex items-start gap-5 hover:bg-white/[0.03] hover:border-white/[0.06] transition-all duration-300 group shadow-lg shadow-black/10">
+    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-all duration-500 group-hover:bg-blue-500/15" />
+    
+    <div className="w-12 h-12 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-blue-400/80 group-hover:text-blue-400 group-hover:bg-blue-500/10 group-hover:border-blue-500/20 transition-all duration-300 shrink-0">
+      <Icon size={22} strokeWidth={1.5} />
     </div>
-    <div>
-      <p className="text-sm text-slate-400 font-medium mb-1">{label}</p>
-      <p className="text-2xl font-bold text-white leading-none">{value}</p>
+    <div className="flex-1 mt-0.5 relative">
+      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-1.5">{label}</p>
+      <p className="text-3xl font-light text-white tracking-tight">{value}</p>
     </div>
   </div>
 );
@@ -529,11 +531,11 @@ const Profile = () => {
                 {/* TAB: TEAMS */}
                 {activeTab === 'teams' && (
                   <div className="space-y-8 animate-in fade-in duration-500">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-xl font-semibold text-white">My Squads</h3>
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-xl font-light tracking-tight text-white">My Squads</h3>
                       <Button 
                         onClick={() => setIsJoinTeamModalOpen(true)}
-                        className="bg-blue-600 hover:bg-blue-500 text-white rounded-full h-10 px-6 font-medium"
+                        className="bg-blue-600/10 border border-blue-500/20 hover:bg-blue-500/20 text-blue-400 rounded-full h-10 px-6 font-bold uppercase tracking-wider text-xs transition-all duration-300 shadow-lg shadow-black/20"
                       >
                         Join Team
                       </Button>
@@ -546,22 +548,23 @@ const Profile = () => {
                           return (
                             <div 
                               key={team._id} 
-                              className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-5 hover:bg-white/[0.04] transition-all cursor-pointer"
+                              className="relative overflow-hidden p-6 rounded-3xl bg-white/[0.01] border border-white/[0.03] flex items-center gap-5 hover:bg-white/[0.03] hover:border-white/[0.06] transition-all duration-300 cursor-pointer group shadow-lg shadow-black/10"
                               onClick={() => setSelectedTeamForProfile(team)}
                             >
+                              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-all duration-500 group-hover:bg-blue-500/15" />
                               {team.logo ? (
-                                <img src={team.logo} alt={team.name} className="w-14 h-14 rounded-full object-cover" />
+                                <img src={team.logo} alt={team.name} className="w-14 h-14 rounded-2xl object-cover border border-white/5 group-hover:border-white/20 transition-all duration-300 relative z-10 shadow-lg" />
                               ) : (
-                                <div className="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center text-lg font-bold text-slate-400">
+                                <div className="w-14 h-14 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-lg font-black text-slate-400 group-hover:text-blue-400 group-hover:bg-blue-500/10 group-hover:border-blue-500/20 transition-all duration-300 relative z-10 shadow-lg tracking-wider">
                                   {team.acronym || team.name.substring(0, 2).toUpperCase()}
                                 </div>
                               )}
-                              <div className="flex-1">
-                                <h4 className="text-base font-semibold text-white mb-1">{team.name}</h4>
+                              <div className="flex-1 relative z-10">
+                                <h4 className="text-lg font-medium text-white mb-1.5 tracking-tight group-hover:text-blue-400 transition-colors">{team.name}</h4>
                                 {isCaptain ? (
-                                  <span className="px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-500 text-[10px] font-bold uppercase tracking-wider">Captain</span>
+                                  <span className="px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_0_10px_rgba(234,179,8,0.1)]">Captain</span>
                                 ) : (
-                                  <span className="px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 text-[10px] font-bold uppercase tracking-wider">Player</span>
+                                  <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">Player</span>
                                 )}
                               </div>
                               {isCaptain && (
@@ -572,7 +575,7 @@ const Profile = () => {
                                     e.stopPropagation();
                                     setSelectedTeamForManagement(team);
                                   }}
-                                  className="border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/10 rounded-full"
+                                  className="relative z-10 border-yellow-500/20 text-yellow-500 bg-yellow-500/5 hover:bg-yellow-500/20 hover:border-yellow-500/40 rounded-full text-xs font-bold uppercase tracking-wider px-5 h-9 transition-all duration-300 shadow-lg shadow-black/20"
                                 >
                                   Manage
                                 </Button>
@@ -581,9 +584,9 @@ const Profile = () => {
                           );
                         })
                       ) : (
-                        <div className="col-span-full py-16 text-center bg-white/[0.01] border border-white/5 rounded-3xl">
-                          <Shield className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                          <h4 className="text-white font-medium mb-1">No Teams Yet</h4>
+                        <div className="col-span-full py-20 text-center bg-white/[0.01] border border-white/[0.03] rounded-3xl shadow-lg shadow-black/10">
+                          <Shield className="w-12 h-12 text-slate-700 mx-auto mb-4" strokeWidth={1} />
+                          <h4 className="text-white font-medium mb-1 tracking-tight text-lg">No Teams Yet</h4>
                           <p className="text-slate-500 text-sm">Ask your captain for a join code to get started.</p>
                         </div>
                       )}
@@ -599,12 +602,24 @@ const Profile = () => {
                       { title: "First Action", description: "Participated in a match", icon: "🔥", unlocked: user.stats?.totalPredictions! > 0, points: 50 },
                       { title: "Early Adopter", description: "Joined during beta", icon: "🚀", unlocked: true, points: 200 },
                     ]).map((ach, idx) => (
-                      <div key={idx} className={`p-6 rounded-2xl border transition-all ${ach.unlocked ? 'bg-white/[0.02] border-white/10' : 'bg-transparent border-white/5 opacity-50'}`}>
-                        <div className="flex items-start gap-4">
-                          <div className="text-3xl">{ach.icon || "🏆"}</div>
-                          <div>
-                            <h4 className="text-base font-semibold text-white mb-1">{ach.title}</h4>
-                            <p className="text-sm text-slate-400">{ach.description}</p>
+                      <div key={idx} className={`p-6 rounded-3xl border transition-all duration-300 relative overflow-hidden group ${ach.unlocked ? 'bg-white/[0.02] border-white/[0.05] shadow-lg shadow-black/10 hover:bg-white/[0.04] hover:border-white/[0.08]' : 'bg-white/[0.01] border-white/[0.02] opacity-50 grayscale hover:grayscale-0 hover:opacity-75'}`}>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-all duration-500 group-hover:bg-blue-500/15" />
+                        <div className="flex items-start justify-between gap-4 relative z-10">
+                          <div className="flex items-start gap-4">
+                            <div className="text-3xl bg-white/[0.02] w-14 h-14 rounded-2xl flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform duration-300 shadow-lg shrink-0">
+                              {ach.icon || "🏆"}
+                            </div>
+                            <div className="mt-1">
+                              <h4 className="text-base font-semibold text-white mb-1 tracking-tight group-hover:text-blue-400 transition-colors">{ach.title}</h4>
+                              <p className="text-xs text-slate-400 font-medium leading-relaxed max-w-[200px]">{ach.description}</p>
+                            </div>
+                          </div>
+                          <div className="shrink-0 flex flex-col items-end gap-2 mt-1">
+                             {ach.points > 0 && (
+                                <span className={`px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-[0.2em] shadow-lg ${ach.unlocked ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-white/5 border-white/10 text-slate-500'}`}>
+                                  +{ach.points} XP
+                                </span>
+                             )}
                           </div>
                         </div>
                       </div>
@@ -615,25 +630,29 @@ const Profile = () => {
 
               {/* Sidebar */}
               <div className="space-y-6">
-                <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/5">
-                  <h3 className="text-lg font-semibold text-white mb-6">Level & Progress</h3>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-slate-400 text-sm font-medium">Level {user.stats?.level || '1'}</span>
-                    <span className="text-blue-400 text-sm font-medium">{user.stats?.totalPoints || 0} XP</span>
+                <div className="relative overflow-hidden p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] shadow-lg shadow-black/10">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+                  <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-6">Level & Progress</h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-white text-lg font-light tracking-tight">Level {user.stats?.level || '1'}</span>
+                    <span className="text-blue-400 text-sm font-bold tracking-wider">{user.stats?.totalPoints || 0} XP</span>
                   </div>
-                  <div className="h-2 bg-slate-900 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: `${Math.min(100, ((user.stats?.totalPoints || 0) % 1000) / 10)}%` }} />
+                  <div className="h-1.5 bg-white/[0.05] rounded-full overflow-hidden mb-4">
+                    <div className="h-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] rounded-full transition-all duration-1000" style={{ width: `${Math.min(100, ((user.stats?.totalPoints || 0) % 1000) / 10)}%` }} />
                   </div>
-                  <p className="text-xs text-slate-500 mt-3">Earn more XP by participating in matches.</p>
+                  <p className="text-xs text-slate-500">Earn more XP by participating in matches.</p>
                 </div>
 
-                <Link to="/showcase" className="block p-6 rounded-3xl bg-blue-600/10 border border-blue-500/20 hover:bg-blue-600/20 transition-colors group">
-                  <div className="flex justify-between items-center">
+                <Link to="/showcase" className="relative block overflow-hidden p-6 rounded-3xl bg-blue-600/5 border border-blue-500/10 hover:bg-blue-600/10 hover:border-blue-500/20 transition-all duration-300 group shadow-lg shadow-black/10">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600/0 to-blue-600/5 pointer-events-none transition-opacity opacity-0 group-hover:opacity-100" />
+                  <div className="flex justify-between items-center relative z-10">
                     <div>
-                      <h4 className="text-white font-medium mb-1 group-hover:text-blue-400 transition-colors">Showcase Room</h4>
-                      <p className="text-slate-400 text-xs">View all your unlocked badges</p>
+                      <h4 className="text-white font-medium mb-1 tracking-tight group-hover:text-blue-400 transition-colors">Showcase Room</h4>
+                      <p className="text-slate-500 text-[11px] uppercase tracking-wider">View unlocked badges</p>
                     </div>
-                    <ChevronRight className="text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" size={20} />
+                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300">
+                      <ChevronRight size={18} strokeWidth={2} className="group-hover:translate-x-0.5 transition-transform" />
+                    </div>
                   </div>
                 </Link>
               </div>

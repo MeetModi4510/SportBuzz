@@ -58,6 +58,11 @@ export const signup = asyncHandler(async (req, res) => {
             category: 'milestone',
             points: 50
         });
+
+        // Add points and update level
+        user.stats.totalPoints += 50;
+        user.stats.level = user.calculateLevel();
+        await user.save();
     } catch (e) {
         // Achievement may already exist
     }
