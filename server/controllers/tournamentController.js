@@ -795,10 +795,10 @@ export const unfollowTournament = asyncHandler(async (req, res) => {
 
 // @desc    Verify tournament passcode
 // @route   POST /api/tournaments/:id/verify-passcode
-// @access  Public
+// @access  Public (saves to DB if user is logged in)
 export const verifyPasscode = asyncHandler(async (req, res) => {
     const { passcode } = req.body;
-    const tournament = await Tournament.findById(req.params.id).select('+passcode'); // Explicitly select passcode
+    const tournament = await Tournament.findById(req.params.id).select('+passcode');
 
     if (!tournament) {
         res.status(404);
@@ -810,9 +810,25 @@ export const verifyPasscode = asyncHandler(async (req, res) => {
     }
 
     if (tournament.passcode === passcode) {
+        // If user is logged in, save the granted access permanently to their profile
+        if (req.user) {
+            await User.findByIdAndUpdate(
+                req.user._id,
+                { $addToSet: { grantedTournaments: tournament._id } },
+                { new: true }
+            );
+        }
         res.json({ success: true });
     } else {
         res.status(401);
         throw new Error('Invalid passcode');
     }
+});
+
+// @desc    Get IDs of all tournaments user has been granted access to
+// @route   GET /api/tournaments/granted
+// @access  Private
+export const getGrantedTournaments = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id).select('grantedTournaments');
+    res.json({ success: true, data: user?.grantedTournaments || [] });
 });

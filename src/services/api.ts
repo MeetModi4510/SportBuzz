@@ -245,7 +245,8 @@ export const tournamentApi = {
     unfollow: (id: string) => api.post(`tournaments/${id}/unfollow`),
     search: (query: string) => api.get('tournaments', { params: { search: query } }),
     getMyTournaments: (userId: string) => api.get('tournaments', { params: { userId } }),
-    verifyPasscode: (id: string, passcode: string) => api.post(`tournaments/${id}/verify-passcode`, { passcode })
+    verifyPasscode: (id: string, passcode: string) => api.post(`tournaments/${id}/verify-passcode`, { passcode }),
+    getGrantedTournaments: () => api.get('tournaments/granted')
 };
 
 export const teamApi = {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { createPortal } from "react-dom";
+import { createPortal, flushSync } from "react-dom";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getTeamAcronym } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -451,7 +451,30 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
     const [tournamentStats, setTournamentStats] = useState<any>(null);
     const [matchFilter, setMatchFilter] = useState<MatchFilter>("All");
     const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
-    const { toggle: toggleFollow, isFollowed } = useTournamentFollow();
+    const { followed, toggle: toggleFollow, isFollowed } = useTournamentFollow();
+    const [followedTournamentsData, setFollowedTournamentsData] = useState<Tournament[]>([]);
+
+    useEffect(() => {
+        if (followed.length === 0) {
+            setFollowedTournamentsData([]);
+            return;
+        }
+        const fetchFollowed = async () => {
+            try {
+                const promises = followed.map(id => tournamentApi.getById(id));
+                const results = await Promise.allSettled(promises);
+                const validData = results
+                    .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled')
+                    .map(r => r.value.data?.data || r.value.data)
+                    .filter(t => t && t._id);
+                setFollowedTournamentsData(validData);
+            } catch (err) {
+                console.error("Failed to fetch followed tournaments data", err);
+            }
+        };
+        fetchFollowed();
+    }, [followed]);
+
     // Team detail panel
     const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
     const [teamMatches, setTeamMatches] = useState<Match[]>([]);
@@ -557,6 +580,16 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
     const [passcodePromptTournament, setPasscodePromptTournament] = useState<Tournament | null>(null);
     const [passcodeAttempt, setPasscodeAttempt] = useState("");
     const [isVerifyingPasscode, setIsVerifyingPasscode] = useState(false);
+    const [grantedTournamentIds, setGrantedTournamentIds] = useState<string[]>([]);
+    const passcodeInputRef = React.useRef<HTMLInputElement>(null);
+
+    // Focus passcode input whenever the modal becomes visible
+    React.useEffect(() => {
+        if (passcodePromptTournament) {
+            const t = setTimeout(() => passcodeInputRef.current?.focus(), 10);
+            return () => clearTimeout(t);
+        }
+    }, [passcodePromptTournament]);
 
     // Get current user ID from localStorage
     const getCurrentUserId = () => {
@@ -606,6 +639,17 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
     const isTournamentOwner = isOwner;
 
     useEffect(() => { fetchTournaments(); }, []);
+
+    // Fetch DB-stored granted tournament IDs for this user on mount
+    useEffect(() => {
+        if (!currentUserId) return;
+        tournamentApi.getGrantedTournaments()
+            .then((res: any) => {
+                const ids = (res.data || []).map((id: any) => id.toString());
+                setGrantedTournamentIds(ids);
+            })
+            .catch(() => { /* not logged in or error, ignore */ });
+    }, [currentUserId]);
 
     // Debounced player search for autocomplete
     useEffect(() => {
@@ -718,6 +762,15 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
             const res = await tournamentApi.verifyPasscode(passcodePromptTournament._id, passcodeAttempt) as any;
             if (res.success) {
                 toast.success("Access granted!");
+                // Update local state so user doesn't need to re-enter passcode this session
+                setGrantedTournamentIds(prev => [...prev, passcodePromptTournament._id]);
+                // Also save to localStorage as fallback for guests
+                const key = `sportbuzz_access_${currentUserId || 'guest'}`;
+                const granted: string[] = JSON.parse(localStorage.getItem(key) || '[]');
+                if (!granted.includes(passcodePromptTournament._id)) {
+                    granted.push(passcodePromptTournament._id);
+                    localStorage.setItem(key, JSON.stringify(granted));
+                }
                 const t = passcodePromptTournament;
                 setPasscodePromptTournament(null);
                 setPasscodeAttempt("");
@@ -1368,6 +1421,193 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
     };
 
     // ============================
+    // CARD RENDERER
+    // ============================
+    const renderTournamentCard = (tournament: any) => {
+        const ownerId = typeof tournament.createdBy === 'object' ? tournament.createdBy?._id : tournament.createdBy;
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const currentUserEmail = user.email?.toLowerCase();
+        const currentUserRole = user.role?.toLowerCase();
+        const isTournamentOwner = 
+            (ownerId && currentUserId && ownerId.toString() === currentUserId.toString()) || 
+            currentUserEmail === 'admin@sportbuzz.com' ||
+            currentUserRole === 'admin';
+
+        const isLive = tournament.status === 'Live';
+        const isUpcoming = tournament.status === 'Upcoming';
+        
+        // Format dates
+        const startDate = new Date(tournament.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        const endDate = tournament.endDate ? new Date(tournament.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : null;
+        const dateRange = endDate && endDate !== startDate ? `${startDate} - ${endDate}` : startDate;
+
+        return (
+            <div key={tournament._id} onClick={() => {
+                    const localKey = `sportbuzz_access_${currentUserId || 'guest'}`;
+                    const localGranted: string[] = JSON.parse(localStorage.getItem(localKey) || '[]');
+                    const hasAccess = 
+                        grantedTournamentIds.includes(tournament._id) ||
+                        localGranted.includes(tournament._id);
+                    if (tournament.visibility === 'Private' && !isTournamentOwner && !hasAccess) {
+                        setPasscodePromptTournament(tournament);
+                    } else {
+                        openTournamentDetail(tournament);
+                    }
+                }}
+                className={`group relative flex flex-col bg-zinc-900/90 border rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer ${tournament.visibility === 'Private' && !isTournamentOwner ? 'border-zinc-700 hover:border-amber-600/50' : 'border-zinc-800 hover:border-zinc-600'}`}>
+                
+                {/* Status Accent Line (Left border) */}
+                <div className={`absolute left-0 top-0 bottom-0 w-1 ${isLive ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)]' : isUpcoming ? 'bg-blue-500' : 'bg-zinc-600'} transition-all duration-300`} />
+                
+                <div className="p-5 pl-7 flex-1 relative z-10">
+                    <div className="flex justify-between items-start mb-5">
+                        {/* Status Badge */}
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-950/80 border border-zinc-800/80 text-[10px] font-bold text-zinc-300 uppercase tracking-widest shadow-sm">
+                            <span className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-emerald-500 animate-pulse' : isUpcoming ? 'bg-blue-500' : 'bg-zinc-500'}`}></span>
+                            {tournament.status}
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="flex items-center gap-1 text-zinc-500 opacity-80 group-hover:opacity-100 transition-opacity">
+                            <button onClick={(e) => { e.stopPropagation(); toggleFollow(tournament._id); }} className={`p-1.5 rounded-md transition-colors ${isFollowed(tournament._id) ? 'text-zinc-200 bg-zinc-800' : 'hover:text-zinc-200 hover:bg-zinc-800'}`}>
+                                {isFollowed(tournament._id) ? <BellOff size={14} /> : <Bell size={14} />}
+                            </button>
+                            {isTournamentOwner && (
+                                <button onClick={(e) => handleDeleteTournament(e, tournament._id, tournament.name)} className="p-1.5 rounded-md hover:text-red-400 hover:bg-red-950/30 transition-colors">
+                                    <Trash2 size={14} />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-zinc-100 mb-3 leading-tight group-hover:text-white transition-colors line-clamp-2 pr-4">
+                        {tournament.visibility === 'Private' && <Shield size={16} className={`inline mr-2 -mt-1 ${isTournamentOwner ? 'text-zinc-500' : 'text-amber-500'}`} />}
+                        {tournament.name}
+                    </h3>
+                    {tournament.visibility === 'Private' && !isTournamentOwner && (
+                        <div className="flex items-center gap-2 mb-3">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-xs font-medium text-amber-400">
+                                <Lock size={11} /> Click to enter passcode
+                            </span>
+                        </div>
+                    )}
+                    
+                    {/* Detailed Tags */}
+                    <div className="flex flex-wrap gap-2 mb-2">
+                        <span className="inline-flex items-center px-2 py-1 bg-zinc-800/40 border border-zinc-700/50 rounded text-xs font-medium text-zinc-300">
+                            {tournament.format}
+                        </span>
+                        <span className="inline-flex items-center px-2 py-1 bg-zinc-800/40 border border-zinc-700/50 rounded text-xs font-medium text-zinc-300">
+                            {tournament.matchType === 'Test' ? 'Test Match' : tournament.matchType}
+                        </span>
+                        <span className="inline-flex items-center px-2 py-1 bg-zinc-800/40 border border-zinc-700/50 rounded text-xs font-medium text-zinc-400">
+                            {tournament.visibility || 'Public'}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Footer Area with detailed metadata */}
+                <div className="bg-zinc-950/60 pl-7 pr-5 py-4 border-t border-zinc-800/80 flex items-center justify-between relative z-10">
+                    <div className="flex flex-col gap-2 w-full">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-zinc-400">
+                                <Users size={14} className="text-zinc-500" />
+                                <span className="text-xs font-medium text-zinc-300">
+                                    <span className="text-white font-semibold">{tournament.teams?.length || 0}</span> Teams Registered
+                                </span>
+                            </div>
+                            {/* Interactive Hover Arrow */}
+                            <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                                <ArrowRight size={12} className="text-white" />
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-zinc-400">
+                            <Calendar size={14} className="text-zinc-500" />
+                            <span className="text-xs font-medium text-zinc-300">{dateRange}</span>
+                            {tournament.locationName && (
+                                <>
+                                    <span className="text-zinc-600 mx-1">•</span>
+                                    <MapPin size={12} className="text-zinc-500" />
+                                    <span className="text-xs font-medium text-zinc-300 truncate max-w-[100px]" title={tournament.locationName}>{tournament.locationName}</span>
+                                </>
+                            )}
+                            {tournament.dist && (
+                                <>
+                                    <span className="text-zinc-600 mx-1">•</span>
+                                    <Compass size={12} className="text-zinc-500" />
+                                    <span className="text-xs font-medium text-zinc-300">{(tournament.dist.calculated / 1000).toFixed(1)} km</span>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // ============================
+    // PASSCODE MODAL PORTAL
+    // ============================
+    const passcodeModal = createPortal(
+        <div
+            style={{
+                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                zIndex: 99999,
+                display: passcodePromptTournament ? 'flex' : 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+        >
+            {/* Backdrop */}
+            <div
+                style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
+                onClick={() => { setPasscodePromptTournament(null); setPasscodeAttempt(''); }}
+            />
+            {/* Modal */}
+            <div style={{ position: 'relative', background: '#09090b', border: '1px solid #27272a', borderRadius: 16, padding: 24, width: '100%', maxWidth: 400, margin: '0 16px', boxShadow: '0 25px 50px rgba(0,0,0,0.6)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                    <Shield style={{ color: '#10b981' }} size={22} />
+                    <h2 style={{ color: 'white', fontSize: 18, fontWeight: 600, margin: 0 }}>Private Tournament</h2>
+                </div>
+                <p style={{ color: '#a1a1aa', fontSize: 14, marginBottom: 20, marginTop: 4 }}>
+                    Enter the passcode to access <strong style={{ color: 'white' }}>{passcodePromptTournament?.name}</strong>.
+                </p>
+                <label style={{ color: '#d4d4d8', fontSize: 13, fontWeight: 500, display: 'block', marginBottom: 8 }}>Passcode</label>
+                <input
+                    ref={passcodeInputRef}
+                    type="password"
+                    placeholder="Enter passcode"
+                    style={{ width: '100%', height: 44, padding: '0 12px', background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8, color: 'white', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
+                    value={passcodeAttempt}
+                    onChange={(e) => setPasscodeAttempt(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleVerifyPasscode(); }}
+                    onFocus={(e) => { (e.target.style as any).borderColor = '#10b981'; }}
+                    onBlur={(e) => { (e.target.style as any).borderColor = '#3f3f46'; }}
+                />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 24, borderTop: '1px solid #27272a' }}>
+                    <button
+                        onClick={() => { setPasscodePromptTournament(null); setPasscodeAttempt(''); }}
+                        style={{ padding: '8px 16px', color: '#a1a1aa', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: 8, fontSize: 14 }}
+                        onMouseEnter={(e) => { (e.target as any).style.color = 'white'; }}
+                        onMouseLeave={(e) => { (e.target as any).style.color = '#a1a1aa'; }}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={handleVerifyPasscode}
+                        disabled={isVerifyingPasscode}
+                        style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 20px', background: '#059669', color: 'white', border: 'none', borderRadius: 8, cursor: isVerifyingPasscode ? 'not-allowed' : 'pointer', fontSize: 14, fontWeight: 500, opacity: isVerifyingPasscode ? 0.6 : 1 }}
+                    >
+                        {isVerifyingPasscode ? <Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> : <Check size={15} />}
+                        Verify Access
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+
+    // ============================
     // RENDER: Tournament List
     // ============================
     if (view === "list") {
@@ -1563,136 +1803,49 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                                 )}
                             </div>
 
-                            {/* Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {(listMode === 'mine' ? tournaments : (searchQuery.trim() ? searchResults : discoverResults)).map((tournament: any) => {
-                                    const ownerId = typeof tournament.createdBy === 'object' ? tournament.createdBy?._id : tournament.createdBy;
-                                    const user = JSON.parse(localStorage.getItem("user") || "{}");
-                                    const currentUserEmail = user.email?.toLowerCase();
-                                    const currentUserRole = user.role?.toLowerCase();
-                                    const isTournamentOwner = 
-                                        (ownerId && currentUserId && ownerId.toString() === currentUserId.toString()) || 
-                                        currentUserEmail === 'admin@sportbuzz.com' ||
-                                        currentUserRole === 'admin';
-
-                                    const isLive = tournament.status === 'Live';
-                                    const isUpcoming = tournament.status === 'Upcoming';
-                                    
-                                    // Format dates
-                                    const startDate = new Date(tournament.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                                    const endDate = tournament.endDate ? new Date(tournament.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : null;
-                                    const dateRange = endDate && endDate !== startDate ? `${startDate} - ${endDate}` : startDate;
-
-                                    return (
-                                        <div key={tournament._id} onClick={() => {
-                                                if (tournament.visibility === 'Private' && !isTournamentOwner) {
-                                                    setPasscodePromptTournament(tournament);
-                                                } else {
-                                                    openTournamentDetail(tournament);
-                                                }
-                                            }}
-                                            className={`group relative flex flex-col bg-zinc-900/90 border rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer ${tournament.visibility === 'Private' && !isTournamentOwner ? 'border-zinc-700 hover:border-amber-600/50' : 'border-zinc-800 hover:border-zinc-600'}`}>
-                                            
-                                            {/* Status Accent Line (Left border) */}
-                                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${isLive ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)]' : isUpcoming ? 'bg-blue-500' : 'bg-zinc-600'} transition-all duration-300`} />
-                                            
-                                            <div className="p-5 pl-7 flex-1 relative z-10">
-                                                <div className="flex justify-between items-start mb-5">
-                                                    {/* Status Badge */}
-                                                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-950/80 border border-zinc-800/80 text-[10px] font-bold text-zinc-300 uppercase tracking-widest shadow-sm">
-                                                        <span className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-emerald-500 animate-pulse' : isUpcoming ? 'bg-blue-500' : 'bg-zinc-500'}`}></span>
-                                                        {tournament.status}
-                                                    </div>
-                                                    
-                                                    {/* Actions */}
-                                                    <div className="flex items-center gap-1 text-zinc-500 opacity-80 group-hover:opacity-100 transition-opacity">
-                                                        <button onClick={(e) => { e.stopPropagation(); toggleFollow(tournament._id); }} className={`p-1.5 rounded-md transition-colors ${isFollowed(tournament._id) ? 'text-zinc-200 bg-zinc-800' : 'hover:text-zinc-200 hover:bg-zinc-800'}`}>
-                                                            {isFollowed(tournament._id) ? <BellOff size={14} /> : <Bell size={14} />}
-                                                        </button>
-                                                        {isTournamentOwner && (
-                                                            <button onClick={(e) => handleDeleteTournament(e, tournament._id, tournament.name)} className="p-1.5 rounded-md hover:text-red-400 hover:bg-red-950/30 transition-colors">
-                                                                <Trash2 size={14} />
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                <h3 className="text-xl font-bold text-zinc-100 mb-3 leading-tight group-hover:text-white transition-colors line-clamp-2 pr-4">
-                                                    {tournament.visibility === 'Private' && <Shield size={16} className={`inline mr-2 -mt-1 ${isTournamentOwner ? 'text-zinc-500' : 'text-amber-500'}`} />}
-                                                    {tournament.name}
-                                                </h3>
-                                                {tournament.visibility === 'Private' && !isTournamentOwner && (
-                                                    <div className="flex items-center gap-2 mb-3">
-                                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-xs font-medium text-amber-400">
-                                                            <Lock size={11} /> Click to enter passcode
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                
-                                                {/* Detailed Tags */}
-                                                <div className="flex flex-wrap gap-2 mb-2">
-                                                    <span className="inline-flex items-center px-2 py-1 bg-zinc-800/40 border border-zinc-700/50 rounded text-xs font-medium text-zinc-300">
-                                                        {tournament.format}
-                                                    </span>
-                                                    <span className="inline-flex items-center px-2 py-1 bg-zinc-800/40 border border-zinc-700/50 rounded text-xs font-medium text-zinc-300">
-                                                        {tournament.matchType === 'Test' ? 'Test Match' : tournament.matchType}
-                                                    </span>
-                                                    <span className="inline-flex items-center px-2 py-1 bg-zinc-800/40 border border-zinc-700/50 rounded text-xs font-medium text-zinc-400">
-                                                        {tournament.visibility || 'Public'}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            {/* Footer Area with detailed metadata */}
-                                            <div className="bg-zinc-950/60 pl-7 pr-5 py-4 border-t border-zinc-800/80 flex items-center justify-between relative z-10">
-                                                <div className="flex flex-col gap-2 w-full">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-2 text-zinc-400">
-                                                            <Users size={14} className="text-zinc-500" />
-                                                            <span className="text-xs font-medium text-zinc-300">
-                                                                <span className="text-white font-semibold">{tournament.teams?.length || 0}</span> Teams Registered
-                                                            </span>
-                                                        </div>
-                                                        {/* Interactive Hover Arrow */}
-                                                        <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                                                            <ArrowRight size={12} className="text-white" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-zinc-400">
-                                                        <Calendar size={14} className="text-zinc-500" />
-                                                        <span className="text-xs font-medium text-zinc-300">{dateRange}</span>
-                                                        {tournament.locationName && (
-                                                            <>
-                                                                <span className="text-zinc-600 mx-1">•</span>
-                                                                <MapPin size={12} className="text-zinc-500" />
-                                                                <span className="text-xs font-medium text-zinc-300 truncate max-w-[100px]" title={tournament.locationName}>{tournament.locationName}</span>
-                                                            </>
-                                                        )}
-                                                        {tournament.dist && (
-                                                            <>
-                                                                <span className="text-zinc-600 mx-1">•</span>
-                                                                <Compass size={12} className="text-zinc-500" />
-                                                                <span className="text-xs font-medium text-zinc-300">{(tournament.dist.calculated / 1000).toFixed(1)} km</span>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </div>
+                            {/* Grid / Sections */}
+                            {listMode === 'mine' ? (
+                                <div className="space-y-12">
+                                    {/* Followed Tournaments Section */}
+                                    {followedTournamentsData.length > 0 && (
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-zinc-200 mb-6 flex items-center gap-2">
+                                                <Bell className="text-emerald-500" size={20} />
+                                                Followed Tournaments
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                                {followedTournamentsData.map(t => renderTournamentCard(t))}
                                             </div>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                    )}
 
-                            {listMode === 'mine' && tournaments.length === 0 && (
-                                <div className="py-32 flex flex-col items-center justify-center border border-zinc-800/50 rounded-2xl bg-zinc-900/20 border-dashed">
-                                    <div className="w-16 h-16 rounded-full bg-zinc-900 flex items-center justify-center mb-6">
-                                        <Trophy size={24} className="text-zinc-500" />
+                                    {/* My Tournaments Section */}
+                                    <div>
+                                        <h3 className="text-xl font-semibold text-zinc-200 mb-6 flex items-center gap-2">
+                                            <Trophy className="text-blue-500" size={20} />
+                                            My Tournaments
+                                        </h3>
+                                        {tournaments.length > 0 ? (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                                {tournaments.map(t => renderTournamentCard(t))}
+                                            </div>
+                                        ) : (
+                                            <div className="py-20 flex flex-col items-center justify-center border border-zinc-800/50 rounded-2xl bg-zinc-900/20 border-dashed">
+                                                <div className="w-16 h-16 rounded-full bg-zinc-900 flex items-center justify-center mb-6">
+                                                    <Trophy size={24} className="text-zinc-500" />
+                                                </div>
+                                                <h3 className="text-lg font-medium text-white mb-2">No tournaments yet</h3>
+                                                <p className="text-zinc-500 text-sm mb-8 text-center max-w-sm">Get started by creating your first tournament or league.</p>
+                                                <Button onClick={() => setIsCreateOpen(true)} className="h-10 px-6 rounded-full bg-white text-black hover:bg-zinc-200 font-medium text-sm">
+                                                    Create Tournament
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
-                                    <h3 className="text-lg font-medium text-white mb-2">No tournaments yet</h3>
-                                    <p className="text-zinc-500 text-sm mb-8 text-center max-w-sm">Get started by creating your first tournament or league.</p>
-                                    <Button onClick={() => setIsCreateOpen(true)} className="h-10 px-6 rounded-full bg-white text-black hover:bg-zinc-200 font-medium text-sm">
-                                        Create Tournament
-                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {(searchQuery.trim() ? searchResults : discoverResults).map(t => renderTournamentCard(t))}
                                 </div>
                             )}
 
@@ -1712,6 +1865,7 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                         </div>
                     )}
                 </div>
+                {passcodeModal}
             </div>
         );
     }
@@ -4189,53 +4343,7 @@ export const TournamentManager = ({ initialTournamentId, initialPlayerName }: { 
                 </div>
             )}
 
-            {/* Passcode Verification Modal - Custom portal to avoid Radix focus trap issues */}
-            {passcodePromptTournament && typeof document !== 'undefined' && createPortal(
-                    <div 
-                        className="fixed inset-0 z-[9999] flex items-center justify-center"
-                        onClick={(e) => { if (e.target === e.currentTarget) setPasscodePromptTournament(null); }}
-                    >
-                        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-                        <div className="relative bg-zinc-950 border border-zinc-800 text-white rounded-2xl shadow-2xl w-full max-w-[400px] mx-4 p-6">
-                            <div className="flex items-center gap-3 mb-2">
-                                <Shield className="text-emerald-500" size={24} />
-                                <h2 className="text-xl font-semibold tracking-tight text-white">Private Tournament</h2>
-                            </div>
-                            <p className="text-zinc-400 text-sm mb-6">
-                                Enter the passcode to access <strong className="text-white">{passcodePromptTournament.name}</strong>.
-                            </p>
-                            <label className="text-sm font-medium text-zinc-300 block mb-2">Passcode</label>
-                            <input
-                                type="password"
-                                placeholder="Enter passcode"
-                                className="w-full h-11 px-3 bg-zinc-900 border border-zinc-700 focus:border-emerald-500 focus:outline-none rounded-lg text-sm text-white placeholder:text-zinc-500 transition-colors"
-                                value={passcodeAttempt}
-                                onChange={(e) => setPasscodeAttempt(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === 'Enter') handleVerifyPasscode(); }}
-                                autoFocus
-                            />
-                            <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-zinc-800">
-                                <button 
-                                    onClick={() => { setPasscodePromptTournament(null); setPasscodeAttempt(""); }}
-                                    className="px-4 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button 
-                                    onClick={handleVerifyPasscode}
-                                    disabled={isVerifyingPasscode}
-                                    className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
-                                >
-                                    {isVerifyingPasscode ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
-                                    Verify Access
-                                </button>
-                            </div>
-                        </div>
-                    </div>,
-                    document.body
-                )
-            }
+            {passcodeModal}
         </div>
     );
 };
-
