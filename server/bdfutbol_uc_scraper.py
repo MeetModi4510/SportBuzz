@@ -171,6 +171,29 @@ def parse_html(html):
                             val = int(m.group()) if m else 0
                             if title == 'Seasons': data['seasonsList'].append({'year': name, 'matches': val})
                             else: data['visitingTeams'].append({'name': name, 'matches': val})
+                            
+        elif title == 'Names':
+            table = content_div.find('table')
+            if table:
+                for tr in table.find_all('tr'):
+                    cols = [td.text.strip() for td in tr.find_all(['td', 'th'])]
+                    if len(cols) >= 1:
+                        name_str = cols[0]
+                        m = re.search(r'\((.*?)\)', name_str)
+                        period = m.group(1) if m else ""
+                        name = re.sub(r'\(.*?\)', '', name_str).strip()
+                        if name:
+                            data['historicalNames'].append({'name': name, 'period': period})
+            else:
+                # Sometimes it's just a list of divs
+                for item in content_div.find_all('div', recursive=False):
+                    text = item.text.strip()
+                    if not text: continue
+                    m = re.search(r'\((.*?)\)', text)
+                    period = m.group(1) if m else ""
+                    name = re.sub(r'\(.*?\)', '', text).strip()
+                    if name:
+                        data['historicalNames'].append({'name': name, 'period': period})
                         
         elif title == 'Top Visitors':
             script_match = re.search(r'dataVisit\s*=\s*(\[.*?\]);', html, re.DOTALL)
