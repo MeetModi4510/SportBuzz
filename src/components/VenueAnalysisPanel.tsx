@@ -1259,7 +1259,7 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
         
         const fetchGallery = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/venues/${selectedVenueId}/gallery`);
+                const response = await fetch(`/api/venues/${selectedVenueId}/gallery`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data && data.length > 0) {
@@ -1481,6 +1481,8 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
                                                 const target = e.currentTarget as HTMLImageElement;
                                                 if (target.src.endsWith('.jpg')) {
                                                     target.src = target.src.replace('.jpg', '.png');
+                                                } else if (target.src.endsWith('.png')) {
+                                                    target.src = target.src.replace('.png', '.jpeg');
                                                 } else {
                                                     target.style.display = 'none';
                                                     target.parentElement!.classList.add('bg-gradient-to-b', 'from-white/10', 'to-transparent');
