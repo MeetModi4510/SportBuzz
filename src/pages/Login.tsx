@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,11 +16,22 @@ const API_BASE = import.meta.env.PROD
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const errorParam = params.get("error");
+    if (errorParam === "session_expired") {
+      setError("Please login again: Authentication error or session expired.");
+    } else if (errorParam === "login_required") {
+      setError("Please login to continue.");
+    }
+  }, [location.search]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

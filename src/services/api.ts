@@ -40,19 +40,23 @@ api.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             console.error("API 401 Error on:", error.config?.url);
-            // We used to redirect to login here, but it caused aggressive redirect loops
-            // if a single component like notifications threw a 401.
-            // Now we just let the error propagate. The ProtectedRoute handles missing tokens.
-            if (error.config?.url === '/auth/me') {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                // Only redirect if auth/me explicitly fails
-                window.location.href = '/login?error=session_expired';
-            } else if (error.config?.method === 'post' || error.config?.method === 'delete' || error.config?.method === 'put') {
-                // Redirect to login if user tries to do a protected mutation (like add to favorites) without auth
-                window.location.href = '/login?error=login_required';
-                return new Promise(() => {}); // Prevent the catch block from firing a red toast
+            
+            // Do not globally redirect if it's a normal login attempt failing (e.g. wrong password)
+            if (error.config?.url?.includes('auth/login')) {
+                return Promise.reject(error);
             }
+
+            // Clear credentials so the app knows we are fully logged out
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            
+            // Prevent redirect loops by checking if we're already on the login page
+            if (!window.location.pathname.includes('/login')) {
+                window.location.href = '/login?error=session_expired';
+            }
+            
+            // Return an empty promise to halt execution and prevent random red toasts in the UI
+            return new Promise(() => {});
         }
         return Promise.reject(error);
     }
