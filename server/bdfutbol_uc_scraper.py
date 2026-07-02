@@ -259,6 +259,19 @@ def main():
         # Windows (local dev): position off-screen + hide via win32
         options.add_argument('--window-position=-2000,0')
 
+    if not IS_LINUX:
+        # On Windows, undetected_chromedriver often crashes with WinError 183 if a zombie 
+        # chromedriver.exe is left over in the APPDATA folder from a previous aborted run.
+        import os, shutil
+        appdata = os.environ.get('APPDATA')
+        if appdata:
+            uc_path = os.path.join(appdata, 'undetected_chromedriver')
+            if os.path.exists(uc_path):
+                try:
+                    shutil.rmtree(uc_path, ignore_errors=True)
+                except Exception:
+                    pass
+
     driver = None
     try:
         driver = uc.Chrome(options=options, version_main=149)

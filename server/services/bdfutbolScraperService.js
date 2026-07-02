@@ -85,7 +85,7 @@ export async function scrapeBDFutbolVenue(id) {
             { stadiumId: id, data: statsObj, createdAt: new Date() },
             { upsert: true, new: true }
         );
-        console.log(`[BDFutbol] 💾 Saved data for venue ${id} to MongoDB (expires in 24h)`);
+        console.log(`[BDFutbol] 💾 Saved data for venue ${id} to MongoDB (Saved Permanently)`);
     } catch (dbErr) {
         // Saving to cache failed - still return data to user, just won't cache
         console.warn('[BDFutbol] Failed to save to MongoDB cache:', dbErr.message);

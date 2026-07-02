@@ -198,6 +198,16 @@ router.get('/proxy/*', async (req, res) => {
 });
 
 // ─── BDFUTBOL SCRAPER ────────────────────────────────────────────────────────
+router.delete('/venue/bdfutbol/cache', async (req, res) => {
+    try {
+        const result = await BDFutbolCache.deleteMany({});
+        res.json({ success: true, deletedCount: result.deletedCount });
+    } catch (error) {
+        console.error("Error clearing BDFutbol cache:", error);
+        res.status(500).json({ success: false, message: 'Server Error clearing cache' });
+    }
+});
+
 router.get('/venue/bdfutbol/:id', async (req, res) => {
     try {
         const { id } = req.params;
