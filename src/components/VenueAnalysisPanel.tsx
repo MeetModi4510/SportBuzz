@@ -26,6 +26,7 @@ import { useBDFutbolVenueStats } from "@/hooks/football/useFootballQueries";
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
+import { DynamicLogo } from "@/components/DynamicLogo";
 
 // ─── Constants ───────────────────────────────────────────────────
 const PIE_COLORS = ["#8b5cf6", "#06b6d4", "#f97316", "#ec4899", "#10b981", "#f59e0b"];
@@ -860,7 +861,7 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 {/* Visiting Teams List */}
-                <Section className="h-[800px] flex flex-col" icon={<Users size={16} style={{ color }} />} title="Visiting Teams" subtitle="Top 10 visiting clubs by matches">
+                <Section className="h-[450px] flex flex-col" icon={<Users size={16} style={{ color }} />} title="Visiting Teams" subtitle="Top 10 visiting clubs by matches">
                     <div className="mt-2 flex flex-col gap-4 flex-1 overflow-y-auto min-h-0 pr-2 custom-scrollbar">
                         {stats.visitingTeams.map((team, idx) => {
                             const teamData = TEAM_COLORS[team.name === "Manchester United" ? "Man Utd" : team.name];
@@ -868,11 +869,7 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                                 <div key={idx} className="flex justify-between items-center py-3.5 px-4 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all duration-300 group">
                                     <div className="flex items-center gap-4">
                                         <div className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group-hover:scale-105 transition-transform ${team.name === "Tottenham" ? "bg-[#132257]" : "bg-white"}`}>
-                                            {teamData?.domain ? (
-                                                <img src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${teamData.domain}&size=128`} alt={team.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <Shield size={14} className="text-muted-foreground" />
-                                            )}
+                                            <DynamicLogo name={team.name} fallbackIcon={Shield} localDomain={teamData?.domain} />
                                         </div>
                                         <div className="flex flex-col">
                                             <span className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors">{team.name}</span>
@@ -901,17 +898,9 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                                 return (
                                     <div key={idx} className="flex justify-between items-center p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all duration-300 group">
                                         <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                                {domain ? (
-                                                    <img 
-                                                        src={isDirectUrl ? domain : `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=128`} 
-                                                        alt={comp.name} 
-                                                        className="w-full h-full object-contain drop-shadow-sm scale-110" 
-                                                    />
-                                                ) : (
-                                                    <Trophy size={16} className="text-white/40" />
-                                                )}
-                                            </div>
+                                        <div className={cn("w-10 h-10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform", domain ? "bg-white rounded-full p-1.5" : "")}>
+                                            <DynamicLogo name={comp.name} isCompetition fallbackIcon={Trophy} localDomain={domain} />
+                                        </div>
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors">{comp.name}</span>
                                                 <span className="text-[10px] uppercase tracking-wider text-white/40 font-mono">Tournament</span>
@@ -966,12 +955,7 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                                                     "Condal": "https://upload.wikimedia.org/wikipedia/en/7/7f/CD_Condal.gif",
                                                 };
                                                 const domain = TEAM_COLORS[team.name]?.domain || fallbackDomains[team.name];
-                                                if (domain) {
-                                                    const isDirectUrl = domain.startsWith("http");
-                                                    const imgUrl = isDirectUrl ? domain : `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=64`;
-                                                    return <img src={imgUrl} alt={team.name} className="w-full h-full object-contain" />;
-                                                }
-                                                return <Shield size={16} className="text-white/40" />;
+                                                return <DynamicLogo name={team.name} fallbackIcon={Shield} localDomain={domain} />;
                                             })()}
                                         </div>
                                         <span className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors">{team.name}</span>
