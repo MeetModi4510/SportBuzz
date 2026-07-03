@@ -101,7 +101,11 @@ def parse_html(html):
             if parent:
                 val_div = parent.find_next_sibling('div')
                 if val_div:
-                    data[box.lower()] = int(val_div.text.strip())
+                    val_text = val_div.text.strip()
+                    try:
+                        data[box.lower()] = int(val_text)
+                    except ValueError:
+                        data[box.lower()] = 0
                 else:
                     data[box.lower()] = 0
         else:
