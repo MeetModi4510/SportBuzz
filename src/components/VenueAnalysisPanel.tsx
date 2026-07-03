@@ -27,6 +27,7 @@ import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import { DynamicLogo } from "@/components/DynamicLogo";
+import { FootballTeamLogo } from "@/components/football/FootballTeamLogo";
 
 // ─── Constants ───────────────────────────────────────────────────
 const PIE_COLORS = ["#8b5cf6", "#06b6d4", "#f97316", "#ec4899", "#10b981", "#f59e0b"];
@@ -238,7 +239,7 @@ const getTeamFlagUrl = (teamName: string) => {
     if (t === 'west indies') return '/flags/westindies.png';
     if (t === 'sri lanka') return '/flags/srilanka.png';
     if (t === 'england') return '/flags/england.png';
-    
+
     const code = map[t];
     if (code) return `https://flagcdn.com/w40/${code}.png`;
     return null;
@@ -285,7 +286,7 @@ const RecentMatchesSection = ({ matches, format, color, venueName }: {
                     }
 
                     const badge = resultBadgeStyle(resultType);
-                    
+
                     const flag1 = team1 ? getTeamFlagUrl(team1) : null;
                     const flag2 = team2 ? getTeamFlagUrl(team2) : null;
 
@@ -724,7 +725,7 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
             <div className="relative mb-8 p-1">
                 {/* Background Glow */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 blur-[120px] opacity-[0.15] pointer-events-none" style={{ backgroundColor: color }} />
-                
+
                 <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Hero Card - Matches */}
                     <div className="md:col-span-1 relative overflow-hidden bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-3xl p-8 flex flex-col justify-between group hover:bg-white/[0.04] transition-colors duration-500 shadow-2xl">
@@ -822,9 +823,9 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* Top Visitors Chart */}
                 <Section icon={<BarChart3 size={16} style={{ color }} />} title="Top Visitors" subtitle="Matches played by visiting teams">
-                    <div className="h-[250px] w-full">
+                    <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={stats.topVisitors} margin={{ top: 20, right: 30, left: 0, bottom: 40 }}>
+                            <BarChart data={stats.topVisitors} margin={{ top: 20, right: 30, left: 0, bottom: 85 }}>
                                 <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.1} vertical={false} />
                                 <XAxis dataKey="equip" tick={{ fill: "#666", fontSize: 11 }} angle={-45} textAnchor="end" interval={0} />
                                 <YAxis tick={{ fill: "#666", fontSize: 11 }} />
@@ -842,20 +843,30 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                 </Section>
 
                 {/* Map Integration */}
-                <Section icon={<MapPin size={16} style={{ color }} />} title="Location Map" subtitle={`${stats.locationCoords[0]}, ${stats.locationCoords[1]}`}>
-                    <div className="h-[250px] w-full rounded-xl overflow-hidden border border-white/10 relative bg-muted/20">
-                        <div className="absolute inset-0 pointer-events-auto">
-                            <iframe 
-                                width="100%" 
-                                height="100%" 
-                                frameBorder="0" 
-                                marginHeight={0} 
-                                marginWidth={0} 
-                                src={`https://maps.google.com/maps?q=${stats.locationCoords[0]},${stats.locationCoords[1]}&z=15&output=embed`}
-                                style={{ filter: "invert(90%) hue-rotate(180deg) brightness(85%) contrast(85%)" }}
-                            ></iframe>
+                <Section icon={<MapPin size={16} style={{ color }} />} title="Location Map" subtitle={stats.locationCoords && stats.locationCoords[0] ? `${stats.locationCoords[0]}, ${stats.locationCoords[1]}` : "Location Unknown"}>
+                    {stats.locationCoords && stats.locationCoords[0] && stats.locationCoords[1] ? (
+                        <div className="h-[300px] w-full rounded-xl overflow-hidden border border-white/10 relative bg-muted/20">
+                            <div className="absolute inset-0 pointer-events-auto">
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    frameBorder="0"
+                                    marginHeight={0}
+                                    marginWidth={0}
+                                    src={`https://maps.google.com/maps?q=${stats.locationCoords[0]},${stats.locationCoords[1]}&z=15&output=embed`}
+                                    style={{ filter: "invert(90%) hue-rotate(180deg) brightness(85%) contrast(85%)" }}
+                                ></iframe>
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="h-[300px] w-full rounded-xl border border-white/10 border-dashed bg-white/[0.02] flex flex-col items-center justify-center text-center p-6 gap-3">
+                            <MapPin className="text-white/20" size={48} />
+                            <div>
+                                <p className="text-white/60 font-medium text-lg">Location Unavailable</p>
+                                <p className="text-white/40 text-sm mt-1 max-w-[250px] mx-auto">We don't have the exact map coordinates for this stadium yet.</p>
+                            </div>
+                        </div>
+                    )}
                 </Section>
             </div>
 
@@ -891,47 +902,47 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                 {/* Competitions Hosted */}
                 <Section className="h-[450px] flex flex-col" icon={<Trophy size={16} style={{ color }} />} title="Competitions Hosted" subtitle="Matches by competition">
                     <div className="mt-2 flex flex-col gap-3 flex-1 overflow-y-auto min-h-0 pr-2 custom-scrollbar">
-                            {(stats.competitions || []).map((comp, idx) => {
-                                // Match domains, stripping out years if present (e.g. "World Cup 1982")
-                                const domain = COMP_DOMAINS[comp.name] || COMP_DOMAINS[comp.name.replace(/[0-9]/g, "").trim()];
-                                const isDirectUrl = domain?.startsWith("http") || domain?.startsWith("/");
-                                return (
-                                    <div key={idx} className="flex justify-between items-center p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all duration-300 group">
-                                        <div className="flex items-center gap-4">
+                        {(stats.competitions || []).map((comp, idx) => {
+                            // Match domains, stripping out years if present (e.g. "World Cup 1982")
+                            const domain = COMP_DOMAINS[comp.name] || COMP_DOMAINS[comp.name.replace(/[0-9]/g, "").trim()];
+                            const isDirectUrl = domain?.startsWith("http") || domain?.startsWith("/");
+                            return (
+                                <div key={idx} className="flex justify-between items-center p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all duration-300 group">
+                                    <div className="flex items-center gap-4">
                                         <div className={cn("w-10 h-10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform", domain ? "bg-white rounded-full p-1.5" : "")}>
                                             <DynamicLogo name={comp.name} isCompetition fallbackIcon={Trophy} localDomain={domain} />
                                         </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors">{comp.name}</span>
-                                                <span className="text-[10px] uppercase tracking-wider text-white/40 font-mono">Tournament</span>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <div className="text-right">
-                                                <div className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 font-mono">{comp.matches}</div>
-                                                <div className="text-[9px] uppercase tracking-widest text-white/30 font-bold">Matches</div>
-                                            </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors">{comp.name}</span>
+                                            <span className="text-[10px] uppercase tracking-wider text-white/40 font-mono">Tournament</span>
                                         </div>
                                     </div>
-                                );
-                            })}
-                        </div>
-                    </Section>
-                
+                                    <div className="flex items-center gap-2">
+                                        <div className="text-right">
+                                            <div className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 font-mono">{comp.matches}</div>
+                                            <div className="text-[9px] uppercase tracking-widest text-white/30 font-bold">Matches</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </Section>
+
                 {/* Seasons List */}
                 <Section className="h-[450px] flex flex-col" icon={<Calendar size={16} style={{ color }} />} title="Seasons Played" subtitle="Recent seasons and matches">
                     <div className="mt-2 flex flex-col gap-2 flex-1 overflow-y-auto min-h-0 pr-2 custom-scrollbar">
-                            {(stats.seasonsList || []).map((season, idx) => (
-                                <div key={idx} className="min-h-[44px] flex justify-between items-center p-3 rounded-xl bg-secondary/15 border border-white/5 hover:bg-secondary/30 transition-colors">
-                                    <span className="text-sm text-foreground flex items-center gap-3">
-                                        <span className="text-xs font-mono text-muted-foreground w-4">{idx + 1}.</span> 
-                                        Season {season.year}
-                                    </span>
-                                    <span className="font-mono text-sm font-semibold text-primary">{season.matches} matches</span>
-                                </div>
-                            ))}
-                        </div>
-                    </Section>
+                        {(stats.seasonsList || []).map((season, idx) => (
+                            <div key={idx} className="min-h-[44px] flex justify-between items-center p-3 rounded-xl bg-secondary/15 border border-white/5 hover:bg-secondary/30 transition-colors">
+                                <span className="text-sm text-foreground flex items-center gap-3">
+                                    <span className="text-xs font-mono text-muted-foreground w-4">{idx + 1}.</span>
+                                    Season {season.year}
+                                </span>
+                                <span className="font-mono text-sm font-semibold text-primary">{season.matches} matches</span>
+                            </div>
+                        ))}
+                    </div>
+                </Section>
             </div>
 
             <div className="space-y-5">
@@ -972,12 +983,12 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                             <div className="flex flex-col gap-3 mt-2 relative">
                                 {/* Timeline line */}
                                 <div className="absolute left-[15px] top-5 bottom-5 w-px bg-white/10" />
-                                
+
                                 {stats.historicalNames.map((name, idx) => (
                                     <div key={idx} className="relative pl-10 pr-4 py-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors group">
                                         {/* Timeline node */}
                                         <div className="absolute left-[12px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 border-white/20 bg-background group-hover:border-white/60 group-hover:bg-white/20 transition-all z-10 shadow-[0_0_10px_rgba(255,255,255,0)] group-hover:shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
-                                        
+
                                         <div className="flex justify-between items-center">
                                             <span className="text-sm font-semibold text-white/80 group-hover:text-white transition-colors">{name.name}</span>
                                             <span className="text-xs font-mono text-white/40 tracking-wider bg-white/5 px-2.5 py-1 rounded-md border border-white/5">{name.period}</span>
@@ -1007,11 +1018,11 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                                 const parts = trimmed.split(/\b\d{2}\/\d{2}\/\d{4}\b/);
                                 const comp = parts[0]?.trim();
                                 let matchStr = parts[1]?.trim() || "";
-                                
+
                                 // Parse "Team A X - Y Team B" or "Team A X-Y Team B"
                                 const scoreRegex = /^(.*?)\s+(\d+)\s*-\s*(\d+)\s+(.*?)$/;
                                 const scoreMatch = matchStr.match(scoreRegex);
-                                
+
                                 return (
                                     <div key={idx} className="p-4 bg-white/[0.02] rounded-xl border border-white/5 hover:bg-white/[0.05] transition-all duration-300 flex flex-col gap-3 relative overflow-hidden group">
                                         <div className="absolute -right-4 -top-4 w-16 h-16 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-colors" />
@@ -1019,15 +1030,21 @@ const BDFutbolDetail = ({ stats, color }: { stats: BDFutbolVenueStats; color: st
                                             <span className="text-[12px] font-bold text-amber-500/90 uppercase tracking-[0.15em]">{comp || 'Final'}</span>
                                             {date && <span className="text-[11px] font-mono text-white/40 tracking-wider bg-white/5 px-2 py-1 rounded-md border border-white/5">{date}</span>}
                                         </div>
-                                        
+
                                         {scoreMatch ? (
                                             <div className="flex items-center justify-between mt-1 relative z-10 w-full gap-2">
-                                                <span className="flex-1 text-sm text-white/90 font-medium text-right truncate">{scoreMatch[1].trim()}</span>
+                                                <div className="flex-1 flex items-center justify-start gap-2">
+                                                    <FootballTeamLogo name={scoreMatch[1].trim()} logo={null} size="xs" className="shrink-0" />
+                                                    <span className="text-[13px] leading-tight text-white/90 font-medium text-left line-clamp-2">{scoreMatch[1].trim()}</span>
+                                                </div>
                                                 <div className="flex items-center gap-1.5 shrink-0 px-2">
                                                     <span className="w-7 h-7 flex items-center justify-center bg-blue-900/60 border border-blue-500/30 text-white font-mono font-bold rounded shadow-inner text-sm">{scoreMatch[2]}</span>
                                                     <span className="w-7 h-7 flex items-center justify-center bg-blue-900/60 border border-blue-500/30 text-white font-mono font-bold rounded shadow-inner text-sm">{scoreMatch[3]}</span>
                                                 </div>
-                                                <span className="flex-1 text-sm text-white/90 font-medium text-left truncate">{scoreMatch[4].trim()}</span>
+                                                <div className="flex-1 flex items-center justify-end gap-2">
+                                                    <span className="text-[13px] leading-tight text-white/90 font-medium text-right line-clamp-2">{scoreMatch[4].trim()}</span>
+                                                    <FootballTeamLogo name={scoreMatch[4].trim()} logo={null} size="xs" className="shrink-0" />
+                                                </div>
                                             </div>
                                         ) : (
                                             <p className="text-sm text-white/90 font-medium mt-1 relative z-10 text-center">
@@ -1234,7 +1251,7 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
         if (selectedVenueId === currentVenue || (!selectedVenueId && !currentVenue)) {
             return; // No need to update URL if it already matches our state
         }
-        
+
         setSearchParams(prev => {
             if (selectedVenueId) {
                 prev.set("venue", selectedVenueId);
@@ -1256,7 +1273,7 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
             setDynamicGallery([]);
             return;
         }
-        
+
         const fetchGallery = async () => {
             try {
                 const response = await fetch(`/api/venues/${selectedVenueId}/gallery`);
@@ -1342,7 +1359,7 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
 
     const filteredVenues = useMemo(() => {
         let result = activeSport === "all" ? allVenues : allVenues.filter(v => v.sport === activeSport);
-        
+
         if (activeSport === "football" && selectedLeague !== "All") {
             result = result.filter(v => v.league === selectedLeague);
         }
@@ -1695,8 +1712,8 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
                 /* Non-cricket panels */
                 <>
                     {selectedVenue.stats.sport === "football" && (
-                        (selectedVenue.stats as any).isBDFutbol 
-                            ? (isLoadingBDFutbolStats 
+                        (selectedVenue.stats as any).isBDFutbol
+                            ? (isLoadingBDFutbolStats
                                 ? <div className="flex flex-col items-center justify-center p-12 text-muted-foreground"><div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />Loading stadium data (this may take up to 10-15 seconds on first load)...</div>
                                 : <BDFutbolDetail stats={(() => {
                                     if (!bdfutbolDynamicStats) return selectedVenue.stats as BDFutbolVenueStats;

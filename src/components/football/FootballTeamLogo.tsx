@@ -24,8 +24,28 @@ async function fetchTeamBadge(teamName: string): Promise<string | null> {
 
     const promise = (async () => {
         try {
+            // Map BDFutbol Spanish names to TheSportsDB Anglicized names
+            const nameAliases: Record<string, string> = {
+                'athletic club': 'athletic bilbao',
+                'atlético de madrid': 'atlético madrid',
+                'celta de vigo': 'celta vigo',
+                'zaragoza': 'real zaragoza',
+                'betis': 'real betis',
+                'espanyol': 'rcd espanyol',
+                'mallorca': 'rcd mallorca',
+                'osasuna': 'ca osasuna',
+                'sociedad': 'real sociedad',
+                'deportivo': 'deportivo la coruña',
+                'alavés': 'deportivo alaves',
+                'sporting de gijón': 'sporting gijon',
+                'racing de santander': 'racing santander',
+                'valladolid': 'real valladolid',
+            };
+
+            const searchName = nameAliases[key] || teamName;
+
             const res = await axios.get(
-                `${TSDB_BASE}/searchteams.php?t=${encodeURIComponent(teamName)}`,
+                `${TSDB_BASE}/searchteams.php?t=${encodeURIComponent(searchName)}`,
                 { timeout: 8000 }
             );
 
@@ -33,9 +53,10 @@ async function fetchTeamBadge(teamName: string): Promise<string | null> {
                 // Find the soccer team, preferring exact name/country match
                 const team = res.data.teams.find((t: any) =>
                     t.strSport === 'Soccer' &&
-                    (t.strCountry?.toLowerCase() === teamName.toLowerCase() ||
-                     t.strTeam?.toLowerCase() === teamName.toLowerCase())
-                );
+                    (t.strCountry?.toLowerCase() === searchName.toLowerCase() ||
+                     t.strTeam?.toLowerCase() === searchName.toLowerCase() ||
+                     t.strTeamShort?.toLowerCase() === searchName.toLowerCase())
+                ) || res.data.teams.find((t: any) => t.strSport === 'Soccer'); // Fallback to first soccer team found
 
                 if (team?.strBadge) {
                     badgeCache.set(key, team.strBadge);
