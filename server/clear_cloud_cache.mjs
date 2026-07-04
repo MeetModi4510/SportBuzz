@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import 'dotenv/config';
 
 async function clearCloudCache() {
-    const uri = "mongodb+srv://meetmodi45:MeetModi-45@sportbuzz.bfrawfb.mongodb.net/SportBuzz?appName=SportBuzz";
+    const uri = process.env.MONGODB_URI;
     await mongoose.connect(uri);
     const db = mongoose.connection.db;
     const result = await db.collection('fotmobcaches').deleteMany({ endpoint: { $regex: '^/fotmob-player-stats' } });

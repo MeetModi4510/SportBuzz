@@ -7,10 +7,11 @@
  */
 
 import mongoose from 'mongoose';
+import 'dotenv/config';
 import { scrapeLatestTransfers, scrapeTopTransfers } from './services/transfermarktScraper.js';
 import FootballTransfer from './models/FootballTransfer.js';
 
-const ATLAS_URI = 'mongodb+srv://meetmodi45:MeetModi-45@sportbuzz.bfrawfb.mongodb.net/SportBuzz?appName=SportBuzz';
+const ATLAS_URI = process.env.MONGODB_URI;
 
 // 30-day cache so Atlas TTL index (which fires 1hr after expiry) doesn't wipe data
 const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
