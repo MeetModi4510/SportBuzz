@@ -10,6 +10,7 @@ import {
   type TrendingPlayerEntry,
   type CricbuzzPlayerInfo,
 } from '@/hooks/useCricketTrending';
+import { SportIcon } from '@/components/SportIcon';
 
 const API_BASE = import.meta.env.PROD
   ? 'https://sportbuzz-backend.onrender.com'
@@ -316,10 +317,12 @@ export function TrendingCard({
   player,
   index,
   onClick,
+  showSportIcon,
 }: {
   player: TrendingPlayerEntry;
   index: number;
   onClick: () => void;
+  showSportIcon?: boolean;
 }) {
   const flagSrc = player.flagLocal || (player.flagCode ? `https://flagcdn.com/w320/${player.flagCode}.png` : undefined);
 
@@ -332,6 +335,11 @@ export function TrendingCard({
       )}
       style={{ animationDelay: `${index * 50}ms` }}
     >
+      {showSportIcon && (
+        <div className="absolute top-2 right-2 z-20 bg-background/80 backdrop-blur-md rounded-full p-1.5 border border-border/50 shadow-sm">
+          <SportIcon sport="cricket" size={16} />
+        </div>
+      )}
       {/* Header */}
       <div className="relative h-28 bg-slate-900 overflow-hidden">
         {/* Flag Background */}

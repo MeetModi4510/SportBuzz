@@ -37,7 +37,7 @@ async function fetchLeagueTransfers(leagueId) {
 
 async function fetchPopularTransfers() {
     try {
-        const url = `https://www.fotmob.com/api/data/transfers?orderBy=lastModified&page=1&minFeeCurrency=EUR&transferType=top`;
+        const url = `https://www.fotmob.com/api/data/transfers?orderBy=lastModified&page=1&minFeeCurrency=EUR&popular=true`;
         const response = await axios.get(url, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -61,9 +61,8 @@ export async function scrapeFotmobTransfers() {
         processTransfers(transfers, league.id, false);
     });
 
-    // Also fetch popular transfers using Puppeteer
-    const { fetchFotmobRumors } = await import('./fotmobPuppeteerScraper.js');
-    const popularPromise = fetchFotmobRumors().then(transfers => {
+    // Fetch popular transfers using internal API
+    const popularPromise = fetchPopularTransfers().then(transfers => {
         processTransfers(transfers, 'popular', true);
     });
 

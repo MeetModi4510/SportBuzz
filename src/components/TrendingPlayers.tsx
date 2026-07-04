@@ -118,6 +118,7 @@ export const TrendingPlayers = ({
                     player={item as TrendingPlayerEntry} 
                     index={index} 
                     onClick={() => handleCricketClick(item as TrendingPlayerEntry)} 
+                    showSportIcon={true}
                   />
                 </div>
               ) : isFootballApi ? (
@@ -125,6 +126,7 @@ export const TrendingPlayers = ({
                   <TrendingPlayerCard
                     player={item as TrendingPlayerData}
                     onClick={setSelectedFootballPlayer}
+                    showSportIcon={true}
                   />
                 </div>
               ) : (
@@ -133,6 +135,7 @@ export const TrendingPlayers = ({
                     player={item as Player}
                     onClick={() => onPlayerClick?.(item as Player)}
                     hideStats={true}
+                    showSportIcon={true}
                   />
                 </div>
               )}

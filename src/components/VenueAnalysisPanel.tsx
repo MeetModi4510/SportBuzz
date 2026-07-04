@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import {
     MapPin, ArrowLeft, TrendingUp, Trophy, Calendar, Users, Camera,
     BarChart3, Target, Star, Zap, Activity, Shield, Flame, Building2,
-    Globe, ChevronRight, Award, Swords, ExternalLink,
+    Globe, ChevronRight, ChevronLeft, X, Award, Swords, ExternalLink, Maximize2,
 } from "lucide-react";
 import {
     ResponsiveContainer, PieChart, Pie, Cell, Tooltip,
@@ -1266,6 +1266,28 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
     const [venueSearch, setVenueSearch] = useState<string>("");
     const [activeFormat, setActiveFormat] = useState<VenueFormat>("Test");
     const [dynamicGallery, setDynamicGallery] = useState<string[]>([]);
+    const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+    // Handle lightbox keyboard navigation
+    useEffect(() => {
+        if (lightboxIndex === null) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const currentGallery = selectedVenueId ? (dynamicGallery.length > 0 ? dynamicGallery : allVenues.find(v => v.id === selectedVenueId)?.gallery || []) : [];
+            if (!currentGallery.length) return;
+
+            if (e.key === "ArrowLeft") {
+                setLightboxIndex(prev => prev === null || prev === 0 ? currentGallery.length - 1 : prev - 1);
+            } else if (e.key === "ArrowRight") {
+                setLightboxIndex(prev => prev === null || prev === currentGallery.length - 1 ? 0 : prev + 1);
+            } else if (e.key === "Escape") {
+                setLightboxIndex(null);
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [lightboxIndex, selectedVenueId, dynamicGallery]);
 
     // Auto-fetch the dynamic gallery for the selected venue
     useEffect(() => {
@@ -1735,19 +1757,70 @@ export const VenueAnalysisPanel = ({ activeSport = "cricket" }: { activeSport?: 
                 </>
             )}
 
-            {/* ── Stadium Gallery ── */}
+            {/* 📸 Stadium Gallery 📸 */}
             {(dynamicGallery.length > 0 ? dynamicGallery : selectedVenue.gallery) && (dynamicGallery.length > 0 ? dynamicGallery : selectedVenue.gallery)?.length > 0 && (
                 <div className="mt-8 space-y-5">
                     <Section icon={<Camera size={16} style={{ color }} />} title="Stadium Gallery" subtitle="Local photos from the public folder">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
                             {(dynamicGallery.length > 0 ? dynamicGallery : selectedVenue.gallery)?.map((src, idx) => (
-                                <div key={idx} className="aspect-video rounded-xl overflow-hidden bg-white/5 border border-white/10 group cursor-pointer relative shadow-lg">
+                                <div key={idx} onClick={() => setLightboxIndex(idx)} className="aspect-video rounded-xl overflow-hidden bg-white/5 border border-white/10 group cursor-pointer relative shadow-lg">
                                     <img src={src} alt={`${selectedVenue.name} photo ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-3">
+                                        <div className="bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full text-white/80 text-xs flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                            <Camera size={12} /> View Full
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </Section>
+                </div>
+            )}
+
+            {/* Lightbox Modal */}
+            {lightboxIndex !== null && selectedVenue && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm" onClick={() => setLightboxIndex(null)}>
+                    {/* Close Button */}
+                    <button className="absolute top-6 right-6 text-white/50 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all" onClick={() => setLightboxIndex(null)}>
+                        <X size={24} />
+                    </button>
+                    
+                    {/* Previous Button */}
+                    <button 
+                        className="absolute left-6 text-white/50 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-all"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const currentGallery = dynamicGallery.length > 0 ? dynamicGallery : selectedVenue.gallery || [];
+                            setLightboxIndex(prev => prev === null || prev === 0 ? currentGallery.length - 1 : prev - 1);
+                        }}
+                    >
+                        <ChevronLeft size={32} />
+                    </button>
+
+                    {/* Main Image */}
+                    <img 
+                        src={(dynamicGallery.length > 0 ? dynamicGallery : selectedVenue.gallery || [])[lightboxIndex]} 
+                        alt="Stadium Full View" 
+                        className="w-full h-full max-w-[80vw] max-h-[80vh] object-contain rounded-lg shadow-2xl" 
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                    
+                    {/* Next Button */}
+                    <button 
+                        className="absolute right-6 text-white/50 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-all"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const currentGallery = dynamicGallery.length > 0 ? dynamicGallery : selectedVenue.gallery || [];
+                            setLightboxIndex(prev => prev === null || prev === currentGallery.length - 1 ? 0 : prev + 1);
+                        }}
+                    >
+                        <ChevronRight size={32} />
+                    </button>
+                    
+                    {/* Image Counter */}
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full text-white/80 font-mono text-sm tracking-widest">
+                        {lightboxIndex + 1} / {(dynamicGallery.length > 0 ? dynamicGallery : selectedVenue.gallery || []).length}
+                    </div>
                 </div>
             )}
         </div>
