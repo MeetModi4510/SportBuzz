@@ -10,6 +10,7 @@ import { useFootballNewsDetail } from '@/hooks/football/useFootballQueries';
 import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { type Sport } from '@/data/types';
 
 // Merge type: can be mock NewsItem OR live CricketNewsItem OR live FootballNewsItem
 type DisplayNewsItem = (NewsItem | CricketNewsItem | FootballNewsItem) & { isLive?: boolean; snippet?: string; title?: string };
@@ -101,7 +102,7 @@ const GlobalNews = () => {
                       : "bg-secondary/50 border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-border"
                   )}
                 >
-                  {sport !== 'all' && <SportIcon sport={sport} size={14} />}
+                  {sport !== 'all' && <SportIcon sport={sport as Sport} size={14} />}
                   {sport === 'all' ? 'All News' : sport.charAt(0).toUpperCase() + sport.slice(1)}
                 </button>
               ))}
@@ -183,7 +184,7 @@ const GlobalNews = () => {
               ))
              : (
               <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground border border-dashed border-border/50 rounded-2xl bg-secondary/10">
-                <SportIcon sport={selectedSport} size={48} className="mb-4 opacity-20" />
+                {selectedSport !== 'all' && <SportIcon sport={selectedSport as Sport} size={48} className="mb-4 opacity-20" />}
                 <p className="text-lg font-medium">No {selectedSport} news found</p>
                 <p className="text-sm opacity-70">Please check back later for updates.</p>
               </div>
