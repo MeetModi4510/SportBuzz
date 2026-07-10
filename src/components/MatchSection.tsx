@@ -113,6 +113,21 @@ export const MatchSection = ({
     );
   };
   
+  const renderHorizontalMatches = (horizontalMatches: Match[]) => {
+    return (
+      <div className="flex overflow-x-auto snap-x gap-6 pb-6 pt-2 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+        {horizontalMatches.map(match => (
+          <div key={match.id} className="snap-start shrink-0 w-[300px] md:w-[380px] h-full flex flex-col transition-all hover:-translate-y-1">
+            <MatchCard match={match} onClick={onMatchClick} showSeriesName={true} />
+          </div>
+        ))}
+      </div>
+    );
+  };
+  
+  const upcomingMatches = matches.filter((m) => m.status === "upcoming");
+  const completedMatches = matches.filter((m) => m.status === "completed");
+
   if (onlyLive) {
     return (
       <section className={cn("space-y-4", className)}>
@@ -123,7 +138,7 @@ export const MatchSection = ({
             <div className="flex items-baseline gap-3">
               <h2 className="text-2xl font-bold font-display text-foreground">{title}</h2>
               <span className="text-xs font-semibold text-muted-foreground/80 tracking-widest uppercase">
-                All Live Matches
+                {liveMatches.length > 0 ? "Live Matches" : "Recent & Upcoming"}
               </span>
             </div>
           </div>
@@ -136,8 +151,16 @@ export const MatchSection = ({
         </div>
 
         {liveMatches.length === 0 ? (
-          <div className="text-sm text-muted-foreground italic py-6 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">
-            No Live Matches
+          <div className="space-y-2 mt-6">
+            {(completedMatches.length > 0 || upcomingMatches.length > 0) ? (
+              <div>
+                {renderHorizontalMatches([...completedMatches.slice(0, 2), ...upcomingMatches.slice(0, 2)])}
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground italic py-6 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">
+                No matches in this category
+              </div>
+            )}
           </div>
         ) : (
           renderMatchGroup(liveMatches)
@@ -147,8 +170,7 @@ export const MatchSection = ({
   }
 
   // Not onlyLive: Show Live, Upcoming, Recent
-  const upcomingMatches = matches.filter((m) => m.status === "upcoming");
-  const completedMatches = matches.filter((m) => m.status === "completed");
+
 
 
 
@@ -195,14 +217,30 @@ export const MatchSection = ({
         {/* LIVE */}
         {activeTab === 'live' && (
           <div className="space-y-4 animate-in fade-in duration-300">
-            <div className="flex items-center gap-2">
-               <span className="relative flex h-3 w-3">
-                 <span className="absolute inline-flex h-full w-full rounded-full bg-live opacity-75 animate-ping" />
-                 <span className="relative inline-flex h-3 w-3 rounded-full bg-live" />
-               </span>
-               <h3 className="text-lg font-bold text-foreground">Live Now</h3>
-            </div>
-            {renderMatchGroup(liveMatches)}
+            {liveMatches.length > 0 ? (
+              <>
+                <div className="flex items-center gap-2">
+                   <span className="relative flex h-3 w-3">
+                     <span className="absolute inline-flex h-full w-full rounded-full bg-live opacity-75 animate-ping" />
+                     <span className="relative inline-flex h-3 w-3 rounded-full bg-live" />
+                   </span>
+                   <h3 className="text-lg font-bold text-foreground">Live Now</h3>
+                </div>
+                {renderMatchGroup(liveMatches)}
+              </>
+            ) : (
+              <div className="space-y-2 mt-2">
+                {(completedMatches.length > 0 || upcomingMatches.length > 0) ? (
+                  <div>
+                    {renderHorizontalMatches([...completedMatches.slice(0, 2), ...upcomingMatches.slice(0, 2)])}
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground italic py-6 bg-secondary/10 rounded-lg text-center border border-dashed border-border/50">
+                    No matches in this category
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
