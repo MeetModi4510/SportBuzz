@@ -13,12 +13,15 @@ if (import.meta.env.PROD) {
     }
 }
 
+import { SportIcon } from '@/components/SportIcon';
+
 interface TrendingPlayerCardProps {
   player: TrendingPlayerData;
   onClick: (player: TrendingPlayerData) => void;
+  showSportIcon?: boolean;
 }
 
-export function TrendingPlayerCard({ player, onClick }: TrendingPlayerCardProps) {
+export function TrendingPlayerCard({ player, onClick, showSportIcon }: TrendingPlayerCardProps) {
   const [imgError, setImgError] = useState(false);
 
   // Derive the position short name if possible
@@ -39,6 +42,12 @@ export function TrendingPlayerCard({ player, onClick }: TrendingPlayerCardProps)
         "cursor-pointer transition-all duration-300 card-hover"
       )}
     >
+      {showSportIcon && (
+        <div className="absolute top-2 right-2 z-20 bg-background/80 backdrop-blur-md rounded-full p-1.5 border border-border/50 shadow-sm">
+          <SportIcon sport="football" size={16} />
+        </div>
+      )}
+      
       {/* Header */}
       <div className="relative h-28 bg-slate-900 overflow-hidden">
         {/* Flag Background */}

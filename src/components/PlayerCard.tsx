@@ -20,9 +20,10 @@ interface PlayerCardProps {
   className?: string;
   compact?: boolean;
   hideStats?: boolean;
+  showSportIcon?: boolean;
 }
 
-export const PlayerCard = ({ player, onClick, className, compact = false, hideStats = false }: PlayerCardProps) => {
+export const PlayerCard = ({ player, onClick, className, compact = false, hideStats = false, showSportIcon = false }: PlayerCardProps) => {
   const [imgError, setImgError] = useState(false);
 
   if (!player) return null;
@@ -166,6 +167,11 @@ export const PlayerCard = ({ player, onClick, className, compact = false, hideSt
         className
       )}
     >
+      {showSportIcon && (
+        <div className="absolute top-2 right-2 z-20 bg-background/80 backdrop-blur-md rounded-full p-1.5 border border-border/50 shadow-sm">
+          <SportIcon sport={player.sport} size={16} />
+        </div>
+      )}
       {/* Header */}
       <div className="relative h-24 bg-gradient-to-br from-secondary to-muted flex items-center justify-center">
         <div className="relative">

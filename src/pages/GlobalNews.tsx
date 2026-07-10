@@ -10,6 +10,7 @@ import { useFootballNewsDetail } from '@/hooks/football/useFootballQueries';
 import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { type Sport } from '@/data/types';
 
 // Merge type: can be mock NewsItem OR live CricketNewsItem OR live FootballNewsItem
 type DisplayNewsItem = (NewsItem | CricketNewsItem | FootballNewsItem) & { isLive?: boolean; snippet?: string; title?: string };
@@ -23,6 +24,8 @@ const GlobalNews = () => {
   const navigate = useNavigate();
   const [selectedArticle, setSelectedArticle] = useState<DisplayNewsItem | null>(null);
   
+  const [selectedSport, setSelectedSport] = useState<string>('all');
+
   const { news: liveNews, loading: cricketLoading } = useCricketNews();
   const { news: liveFootball, loading: footballLoading } = useFootballNews();
   const { content: cricketContent, loading: cricketContentLoading } = useCricketNewsDetail(
@@ -58,6 +61,8 @@ const GlobalNews = () => {
     if (oi < otherMock.length) combined.push(otherMock[oi++]);
   }
 
+  const filteredCombined = combined.filter(news => selectedSport === 'all' || news.sport === selectedSport);
+
   return (
     <>
       <Helmet>
@@ -68,20 +73,44 @@ const GlobalNews = () => {
         <Navbar />
 
         <main className="container mx-auto px-4 py-8">
-          <div className="mb-8 flex items-center gap-4">
-            <button 
-              onClick={() => navigate(-1)}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-secondary/50 hover:bg-secondary border border-border/50 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
-              Global News
-            </h1>
+          <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => navigate(-1)}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-secondary/50 hover:bg-secondary border border-border/50 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+                Global News
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 hide-scrollbar scroll-smooth">
+              {['all', 'football', 'cricket', 'basketball', 'tennis'].map((sport) => (
+                <button
+                  key={sport}
+                  onClick={() => setSelectedSport(sport)}
+                  className={cn(
+                    "px-4 py-2 rounded-full border text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2 shrink-0",
+                    selectedSport === sport
+                      ? sport === 'football' ? "bg-green-500/10 border-green-500/50 text-green-400" :
+                        sport === 'cricket' ? "bg-blue-500/10 border-blue-500/50 text-blue-400" :
+                        sport === 'basketball' ? "bg-orange-500/10 border-orange-500/50 text-orange-400" :
+                        sport === 'tennis' ? "bg-yellow-500/10 border-yellow-500/50 text-yellow-400" :
+                        "bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--primary),0.2)]"
+                      : "bg-secondary/50 border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-border"
+                  )}
+                >
+                  {sport !== 'all' && <SportIcon sport={sport as Sport} size={14} />}
+                  {sport === 'all' ? 'All News' : sport.charAt(0).toUpperCase() + sport.slice(1)}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {combined.map((news, index) => (
+            {filteredCombined.length > 0 ? filteredCombined.map((news, index) => (
               <div
                 key={`${news.id}-${index}`}
                 onClick={() => setSelectedArticle(news)}
@@ -150,9 +179,16 @@ const GlobalNews = () => {
                       </span>
                     )}
                   </div>
+                  </div>
                 </div>
+              ))
+             : (
+              <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground border border-dashed border-border/50 rounded-2xl bg-secondary/10">
+                {selectedSport !== 'all' && <SportIcon sport={selectedSport as Sport} size={48} className="mb-4 opacity-20" />}
+                <p className="text-lg font-medium">No {selectedSport} news found</p>
+                <p className="text-sm opacity-70">Please check back later for updates.</p>
               </div>
-            ))}
+            )}
           </div>
         </main>
 

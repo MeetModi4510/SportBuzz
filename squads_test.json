@@ -1,0 +1,7 @@
+{
+  "status": "success",
+  "data": {
+    "success": false,
+    "message": "Could not extract squads data from Cricbuzz"
+  }
+}

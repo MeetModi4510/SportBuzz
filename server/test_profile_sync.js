@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import 'dotenv/config';
 
 async function test() {
-    await mongoose.connect('mongodb+srv://meetmodi45:MeetModi-45@sportbuzz.bfrawfb.mongodb.net/SportBuzz?appName=SportBuzz');
+    await mongoose.connect(process.env.MONGODB_URI);
     const User = mongoose.connection.db.collection('users');
     const Team = mongoose.connection.db.collection('teams');
     

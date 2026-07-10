@@ -67,14 +67,42 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
         setSelectedPlayerFaceId(p.imageDetails?.imageId ? Number(p.imageDetails.imageId) : null);
     };
 
-    const renderPlayerGroup = (title: string, players?: Player[], isSupportStaff: boolean = false) => {
+    const getTeamInfo = (teamData?: TeamSquad | any) => {
+        if (!teamData) return { name: '', imageId: null };
+        let name = teamData.teamName || teamData.name;
+        let imageId = teamData.imageDetails?.imageId || teamData.imageId;
+
+        if (teamData.team) {
+            name = name || teamData.team.name || teamData.team.teamName;
+            imageId = imageId || teamData.team.imageId || teamData.team.imageDetails?.imageId;
+        }
+        
+        return { name, imageId };
+    };
+
+    const renderPlayerGroup = (title: string, players?: Player[], isSupportStaff: boolean = false, team?: TeamSquad) => {
         if (!players || players.length === 0) return null;
+
+        const { name: tName, imageId: tImageId } = getTeamInfo(team);
 
         return (
             <div className="mt-8 mb-4">
                 <div className="flex items-center gap-2 mb-4 px-2">
-                    <Info className="w-4 h-4 text-primary" />
-                    <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">{title} <span className="text-muted-foreground ml-1">({players.length})</span></h3>
+                    {team && tImageId ? (
+                        <div className="w-5 h-5 rounded-full overflow-hidden bg-secondary border border-border/50 shrink-0">
+                            <img 
+                                src={`/api/cricket/scraped/team-logo/${tImageId}`} 
+                                alt={tName} 
+                                className="w-full h-full object-cover" 
+                                onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + tName + '&background=random'; }}
+                            />
+                        </div>
+                    ) : (
+                        <Info className="w-4 h-4 text-primary" />
+                    )}
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">
+                        {team ? `${tName} ` : ''}{title} <span className="text-muted-foreground ml-1">({players.length})</span>
+                    </h3>
                 </div>
                 <div className="flex flex-col gap-3">
                     {players.map((p, i) => {
@@ -120,19 +148,21 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
 
     const renderTeamHeader = (team?: TeamSquad) => {
         if (!team) return <div />;
+        const { name: tName, imageId: tImageId } = getTeamInfo(team);
+        
         return (
             <div className="flex items-center gap-4 border-b border-border/40 pb-4">
-                {team.imageDetails && (
+                {tImageId && (
                     <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary p-1 shrink-0">
                         <img 
-                            src={`/api/cricket/scraped/team-logo/${team.imageDetails.imageId}`} 
-                            alt={team.teamName} 
+                            src={`/api/cricket/scraped/team-logo/${tImageId}`} 
+                            alt={tName} 
                             className="w-full h-full object-contain" 
-                            onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + team.teamName + '&background=random'; }}
+                            onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + tName + '&background=random'; }}
                         />
                     </div>
                 )}
-                <h2 className="text-xl font-black uppercase tracking-wider">{team.teamName}</h2>
+                <h2 className="text-xl font-black uppercase tracking-wider">{tName}</h2>
             </div>
         );
     };
@@ -144,29 +174,29 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
                 <div className="col-span-1">{renderTeamHeader(team1)}</div>
                 <div className="col-span-1">{renderTeamHeader(team2)}</div>
 
-                <div className="col-span-1">{renderPlayerGroup('Playing XI', team1?.['playing XI'], false)}</div>
-                <div className="col-span-1">{renderPlayerGroup('Playing XI', team2?.['playing XI'], false)}</div>
+                <div className="col-span-1">{renderPlayerGroup('Playing XI', team1?.['playing XI'], false, team1)}</div>
+                <div className="col-span-1">{renderPlayerGroup('Playing XI', team2?.['playing XI'], false, team2)}</div>
 
-                <div className="col-span-1">{renderPlayerGroup('Bench', team1?.bench, false)}</div>
-                <div className="col-span-1">{renderPlayerGroup('Bench', team2?.bench, false)}</div>
+                <div className="col-span-1">{renderPlayerGroup('Bench', team1?.bench, false, team1)}</div>
+                <div className="col-span-1">{renderPlayerGroup('Bench', team2?.bench, false, team2)}</div>
 
-                <div className="col-span-1">{renderPlayerGroup('Support Staff', team1?.['support staff'], true)}</div>
-                <div className="col-span-1">{renderPlayerGroup('Support Staff', team2?.['support staff'], true)}</div>
+                <div className="col-span-1">{renderPlayerGroup('Support Staff', team1?.['support staff'], true, team1)}</div>
+                <div className="col-span-1">{renderPlayerGroup('Support Staff', team2?.['support staff'], true, team2)}</div>
             </div>
 
             {/* Mobile Split Layout */}
             <div className="grid grid-cols-1 gap-8 lg:hidden">
                 <div className="bg-muted/5 rounded-3xl p-6 border border-border/20">
                     {renderTeamHeader(team1)}
-                    {renderPlayerGroup('Playing XI', team1?.['playing XI'], false)}
-                    {renderPlayerGroup('Bench', team1?.bench, false)}
-                    {renderPlayerGroup('Support Staff', team1?.['support staff'], true)}
+                    {renderPlayerGroup('Playing XI', team1?.['playing XI'], false, team1)}
+                    {renderPlayerGroup('Bench', team1?.bench, false, team1)}
+                    {renderPlayerGroup('Support Staff', team1?.['support staff'], true, team1)}
                 </div>
                 <div className="bg-muted/5 rounded-3xl p-6 border border-border/20">
                     {renderTeamHeader(team2)}
-                    {renderPlayerGroup('Playing XI', team2?.['playing XI'], false)}
-                    {renderPlayerGroup('Bench', team2?.bench, false)}
-                    {renderPlayerGroup('Support Staff', team2?.['support staff'], true)}
+                    {renderPlayerGroup('Playing XI', team2?.['playing XI'], false, team2)}
+                    {renderPlayerGroup('Bench', team2?.bench, false, team2)}
+                    {renderPlayerGroup('Support Staff', team2?.['support staff'], true, team2)}
                 </div>
             </div>
 
