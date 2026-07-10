@@ -243,7 +243,7 @@ export const Navbar = () => {
             {sports.map((sport) => (
               <Link
                 key={sport}
-                to={`/?sport=${sport}`}
+                to={['cricket', 'football'].includes(sport) ? `/${sport}` : `/?sport=${sport}`}
                 className={cn(
                   "p-2 rounded-lg transition-all duration-200",
                   "hover:bg-secondary",
@@ -440,7 +440,7 @@ export const Navbar = () => {
               <NavItem to="/create" icon={<PlusCircle size={18} />} label="Create" isActive={location.pathname === "/create"} />
               <div className="flex items-center gap-2 pt-4 border-t border-border mt-2">
                 {sports.map((sport) => (
-                  <Link key={sport} to={`/?sport=${sport}`} className="flex-1 flex items-center justify-center p-3 rounded-lg bg-secondary">
+                  <Link key={sport} to={['cricket', 'football'].includes(sport) ? `/${sport}` : `/?sport=${sport}`} className="flex-1 flex items-center justify-center p-3 rounded-lg bg-secondary">
                     <SportIcon sport={sport} size={24} />
                   </Link>
                 ))}

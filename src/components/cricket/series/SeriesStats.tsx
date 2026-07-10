@@ -72,7 +72,7 @@ const TEAM_STYLES: Record<string, { logo: string, color: string, glow: string }>
         color: 'text-[#F47A20]', glow: 'bg-[#F47A20]'
     },
     'Deccan Chargers': {
-        logo: 'https://upload.wikimedia.org/wikipedia/en/1/1b/Deccan_Chargers_Logo.svg',
+        logo: '/flags/ipl_2026/dec.png',
         color: 'text-blue-300', glow: 'bg-blue-400'
     },
     'Gujarat Titans': {
@@ -84,7 +84,11 @@ const TEAM_STYLES: Record<string, { logo: string, color: string, glow: string }>
         color: 'text-[#00AEEF]', glow: 'bg-[#00AEEF]'
     },
     'Pune Warriors': {
-        logo: 'https://upload.wikimedia.org/wikipedia/en/f/f2/Pune_Warriors_India_Logo.svg',
+        logo: '/flags/ipl_2026/pwi.png',
+        color: 'text-slate-400', glow: 'bg-slate-500'
+    },
+    'Pune Warriors India': {
+        logo: '/flags/ipl_2026/pwi.png',
         color: 'text-slate-400', glow: 'bg-slate-500'
     },
     'Rising Pune Supergiant': {
@@ -100,7 +104,7 @@ const TEAM_STYLES: Record<string, { logo: string, color: string, glow: string }>
         color: 'text-orange-400', glow: 'bg-orange-500'
     },
     'Kochi Tuskers Kerala': {
-        logo: 'https://upload.wikimedia.org/wikipedia/en/9/91/Kochi_Tuskers_Kerala_Logo.svg',
+        logo: '/flags/ipl_2026/ktk.png',
         color: 'text-purple-400', glow: 'bg-purple-500'
     }
 };

@@ -320,7 +320,7 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
         if (!batStats.has(b.batsman)) {
             batStats.set(b.batsman, {
                 name: b.batsman, runs: 0, balls: 0, fours: 0, sixes: 0,
-                outs: 0, highestScore: 0, fifties: 0, hundreds: 0,
+                outs: 0, highestScore: 0, highestScoreMatchId: null, fifties: 0, hundreds: 0,
                 matchRuns: new Map(), matchFours: new Map(), matchSixes: new Map(), matchOuts: new Set()
             });
         }
@@ -352,7 +352,7 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
         if (!bowlStats.has(b.bowler)) {
             bowlStats.set(b.bowler, {
                 name: b.bowler, wickets: 0, runsConceded: 0, ballsBowled: 0,
-                fiveWickets: 0, bestFigW: 0, bestFigR: Infinity,
+                fiveWickets: 0, bestFigW: 0, bestFigR: Infinity, bestFigMatchId: null,
                 matchFigures: new Map() // matchId -> {w, r, b}
             });
         }
@@ -380,7 +380,7 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
                 if (!batStats.has(playerOut)) {
                     batStats.set(playerOut, {
                         name: playerOut, runs: 0, balls: 0, fours: 0, sixes: 0,
-                        outs: 0, highestScore: 0, fifties: 0, hundreds: 0,
+                        outs: 0, highestScore: 0, highestScoreMatchId: null, fifties: 0, hundreds: 0,
                         matchRuns: new Map(), matchFours: new Map(), matchSixes: new Map(), matchOuts: new Set()
                     });
                 }
@@ -457,7 +457,10 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
             const sixes = bat.matchSixes.get(mId) || 0;
 
             let pts = score + fours + (sixes * 2);
-            if (score > bat.highestScore) bat.highestScore = score;
+            if (score > bat.highestScore) {
+                bat.highestScore = score;
+                bat.highestScoreMatchId = mId;
+            }
             if (score >= 100) { bat.hundreds += 1; pts += 20; mvp.bat += 20; }
             else if (score >= 50) { bat.fifties += 1; pts += 10; mvp.bat += 10; }
             else if (score >= 30) { pts += 5; mvp.bat += 5; }
@@ -488,6 +491,7 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
             if (fig.w > bowl.bestFigW || (fig.w === bowl.bestFigW && fig.r < bowl.bestFigR)) {
                 bowl.bestFigW = fig.w;
                 bowl.bestFigR = fig.r === Infinity ? 0 : fig.r;
+                bowl.bestFigMatchId = mId;
             }
 
             // Economy bonus (Min 2 overs = 12 balls)
@@ -563,7 +567,10 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
             topRuns, highestSR, bestBatAvg, highestScores, topFours, topSixes, mostFifties, mostHundreds,
             topWickets, bestEcon, bestBowlAvg, most5W, bestBowlingFigures,
             mostDismissals, topCatches, mostRunouts, mostStumpings,
-            mvpRankings
+            mvpRankings,
+            allBatStats: bArr,
+            allBowlStats: bwArr,
+            allFieldStats: fArr
         }
     });
 });

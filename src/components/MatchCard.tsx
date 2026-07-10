@@ -88,6 +88,7 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
   };
 
   const themeBorder = getSportBorderColor(match.sport) || "border-border/60";
+  const isFinalMatch = match.matchType?.toLowerCase().includes('final');
 
   return (
     <div
@@ -95,6 +96,7 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
       className={cn(
         "group relative overflow-hidden rounded-xl border bg-secondary/30 p-4 transition-all duration-200",
         themeBorder,
+        isFinalMatch ? "border-yellow-500/40 shadow-[0_0_15px_rgba(234,179,8,0.1)] bg-yellow-500/[0.03]" : "",
         "hover:bg-secondary/50 hover:shadow-md cursor-pointer",
         "w-full flex flex-col gap-4",
         className

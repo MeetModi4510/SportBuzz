@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { Trophy, Calendar, Users, BarChart, Activity } from 'lucide-react';
@@ -13,6 +13,23 @@ import SeriesAllTimeStats from '@/components/cricket/series/SeriesAllTimeStats';
 
 type TabType = 'matches' | 'standings' | 'squads' | 'stats' | 'all-time-stats';
 
+const formatSeasonYear = (year: string) => {
+    if (!year) return '';
+    
+    // Explicit overrides for inconsistent season naming
+    if (year === '2020/21') return '2020';
+    if (year === '2007/08') return '2008';
+    if (year === '2009/10') return '2010';
+
+    if (year.includes('/')) {
+        const parts = year.split('/');
+        const lastPart = parts[1];
+        if (lastPart.length === 2) return `20${lastPart}`;
+        return lastPart;
+    }
+    return year;
+};
+
 export default function CricketSeriesOverview() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState<TabType>('matches');
@@ -20,17 +37,38 @@ export default function CricketSeriesOverview() {
     
     const { data: seasons, isLoading: isLoadingSeasons } = useLocalIplSeasons();
 
+    const sortedSeasons = useMemo(() => {
+        if (!seasons) return [];
+        
+        const seenYears = new Set();
+        const uniqueSeasons = [];
+        
+        for (const s of seasons) {
+            const formattedYear = formatSeasonYear(s.year);
+            if (!seenYears.has(formattedYear)) {
+                seenYears.add(formattedYear);
+                uniqueSeasons.push(s);
+            }
+        }
+        
+        return uniqueSeasons.sort((a, b) => {
+            const yearA = parseInt(formatSeasonYear(a.year));
+            const yearB = parseInt(formatSeasonYear(b.year));
+            return yearB - yearA;
+        });
+    }, [seasons]);
+
     // Default to the most recent season (which is first in the list usually)
     const [selectedSeason, setSelectedSeason] = useState<any>(null);
 
     useEffect(() => {
-        if (seasons && seasons.length > 0 && !selectedSeason) {
-            setSelectedSeason(seasons[0]);
+        if (sortedSeasons && sortedSeasons.length > 0 && !selectedSeason) {
+            setSelectedSeason(sortedSeasons[0]);
         }
-    }, [seasons]);
+    }, [sortedSeasons]);
 
     const handleSeasonChange = (id: string) => {
-        const season = seasons?.find((s: any) => s.id === id);
+        const season = sortedSeasons?.find((s: any) => s.id === id);
         if (season) setSelectedSeason(season);
         setIsSeasonDropdownOpen(false);
     };
@@ -81,7 +119,7 @@ export default function CricketSeriesOverview() {
                                         <span className="uppercase tracking-widest">Indian Premier League</span>
                                     </div>
                                     <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/60 drop-shadow-sm mb-2">
-                                        {selectedSeason ? selectedSeason.name : "IPL Series"}
+                                        {selectedSeason ? (selectedSeason.name === "IPL Series" || selectedSeason.name.includes("IPL") ? selectedSeason.name : `IPL ${formatSeasonYear(selectedSeason.year)}`) : "IPL Series"}
                                     </h1>
                                     <p className="text-muted-foreground font-medium text-lg max-w-xl">
                                         Complete coverage, stats, and standings for the ultimate T20 league.
@@ -90,7 +128,7 @@ export default function CricketSeriesOverview() {
                             </div>
                             
                             {/* Season Selector */}
-                            {seasons && seasons.length > 0 && (
+                            {sortedSeasons && sortedSeasons.length > 0 && (
                                 <div className="relative shrink-0 mt-4 md:mt-0 z-50">
                                     <div 
                                         className="relative bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 hover:border-primary/50 transition-all duration-300 shadow-2xl cursor-pointer group"
@@ -100,7 +138,7 @@ export default function CricketSeriesOverview() {
                                         <div className="flex flex-col pr-8">
                                             <span className="text-[10px] uppercase font-black tracking-widest text-white/50 mb-0.5">Select Season</span>
                                             <span className="text-white font-bold text-xl">
-                                                {selectedSeason ? `${selectedSeason.year} Season` : 'Select...'}
+                                                {selectedSeason ? `${formatSeasonYear(selectedSeason.year)} Season` : 'Select...'}
                                             </span>
                                         </div>
                                         {/* Custom chevron */}
@@ -116,7 +154,7 @@ export default function CricketSeriesOverview() {
                                             <div className="fixed inset-0 z-40" onClick={() => setIsSeasonDropdownOpen(false)}></div>
                                             
                                             <div className="absolute top-full right-0 mt-3 w-full md:min-w-[260px] max-h-80 overflow-y-auto bg-[#0A0D14]/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] z-50 p-2 scrollbar-hide animate-in fade-in slide-in-from-top-4 duration-200">
-                                                {seasons.map((s: any) => (
+                                                {sortedSeasons.map((s: any) => (
                                                     <div 
                                                         key={s.id} 
                                                         onClick={() => handleSeasonChange(s.id)}
@@ -127,7 +165,7 @@ export default function CricketSeriesOverview() {
                                                                 : "text-white/70 hover:bg-white/5 hover:text-white"
                                                         )}
                                                     >
-                                                        <span className="transform group-hover/item:translate-x-1 transition-transform duration-200">{s.year} Season</span>
+                                                        <span className="transform group-hover/item:translate-x-1 transition-transform duration-200">{formatSeasonYear(s.year)} Season</span>
                                                         {selectedSeason?.id === s.id && (
                                                             <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.8)]"></div>
                                                         )}
@@ -177,7 +215,7 @@ export default function CricketSeriesOverview() {
                             {activeTab === 'standings' && <SeriesStandings season={selectedSeason.year} />}
                             {activeTab === 'squads' && <SeriesSquads season={selectedSeason.year} />}
                             {activeTab === 'stats' && <SeriesStats season={selectedSeason.year} />}
-                            {activeTab === 'all-time-stats' && <SeriesAllTimeStats teams={seasons[0]?.teams || []} />}
+                            {activeTab === 'all-time-stats' && <SeriesAllTimeStats teams={sortedSeasons[0]?.teams || []} />}
                         </>
                     ) : (
                         <div className="flex items-center justify-center h-64 text-muted-foreground">

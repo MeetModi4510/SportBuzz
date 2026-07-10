@@ -426,3 +426,66 @@
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--foreground) / 0.3) transparent;
 }
+
+/* Ultra Premium Minimalist Scrollbar */
+.premium-scrollbar::-webkit-scrollbar {
+  height: 6px;
+}
+
+.premium-scrollbar::-webkit-scrollbar-button {
+  display: none;
+}
+
+.premium-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 0 4px; 
+}
+
+.premium-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(50, 50, 50, 0.7); /* Premium blackish/graphite shade */
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background-clip: padding-box;
+  transition: all 0.3s ease;
+}
+
+.premium-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: rgba(80, 80, 80, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.premium-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(50, 50, 50, 0.7) transparent;
+}
+
+/* Premium Square Minimalist Scrollbar */
+.square-scrollbar::-webkit-scrollbar {
+  height: 8px !important;
+  width: 8px !important;
+}
+
+.square-scrollbar::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.square-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5) !important; /* Slate track */
+  border-radius: 0 !important;
+}
+
+.square-scrollbar::-webkit-scrollbar-thumb {
+  background: #3b82f6 !important; /* Blue 500 */
+  border-radius: 0 !important; /* Pure Square Theme */
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4) !important;
+  background-clip: padding-box !important;
+}
+
+.square-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #60a5fa !important; /* Blue 400 */
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.6) !important;
+}

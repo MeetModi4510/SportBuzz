@@ -101,7 +101,7 @@ export const TrendingPlayers = ({
       </div>
 
       {/* Players Grid */}
-      <div className="flex overflow-x-auto gap-4 pb-6 pt-2 snap-x snap-mandatory hide-scrollbar">
+      <div className="flex overflow-x-auto gap-4 pb-6 pt-2 snap-x snap-mandatory premium-scrollbar">
         {combined.map((item, index) => {
           const isCricketApi = 'faceImageId' in item;
           const isFootballApi = 'playerId' in item && 'teamName' in item;

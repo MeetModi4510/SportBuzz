@@ -25,6 +25,17 @@ export default function SeriesMatches({ season }: { season: string }) {
                 leagues.push(m);
             }
         });
+        const getStageWeight = (stage: string) => {
+            stage = stage.toLowerCase();
+            if (stage === 'final' || stage.includes('final')) return 1;
+            if (stage.includes('qualifier 2')) return 2;
+            if (stage.includes('eliminator')) return 3;
+            if (stage.includes('qualifier 1')) return 4;
+            if (stage.includes('semi')) return 5;
+            return 99;
+        };
+
+        knockouts.sort((a, b) => getStageWeight(a.stage || '') - getStageWeight(b.stage || ''));
         
         return { leagueMatches: leagues, knockoutMatches: knockouts };
     }, [matches]);

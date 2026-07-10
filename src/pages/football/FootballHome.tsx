@@ -48,14 +48,19 @@ export default function FootballHome() {
     } else if (transferFilter !== "all") {
       result = result.filter(t => {
         const feeText = typeof t.fee === 'string' ? t.fee : t.fee?.feeText;
-        const typeText = typeof t.transferType === 'string' ? t.transferType : t.transferType?.localizationKey;
+        const typeText = typeof t.transferType === 'string' ? t.transferType : (t.transferType?.text || t.transferType?.localizationKey);
+        
+        const safeFeeText = feeText?.toLowerCase() || "";
+        const safeTypeText = typeText?.toLowerCase() || "";
 
         if (transferFilter === "loans") return t.onLoan;
-        if (transferFilter === "free_transfers") return feeText?.toLowerCase() === "free transfer";
+        if (transferFilter === "free_transfers") return safeFeeText === "free transfer";
         if (transferFilter === "free_agents") return t.fromClubId === 2 || t.toClubId === 2 || t.fromClub.toLowerCase().includes('free agent') || t.toClub.toLowerCase().includes('free agent') || t.fromClub.toLowerCase().includes('without') || t.toClub.toLowerCase().includes('without') || t.fromClub.toLowerCase().includes('retired') || t.toClub.toLowerCase().includes('retired');
-        if (transferFilter === "contracts") return typeText === "contract";
-        if (transferFilter === "contract_extensions") return t.contractExtension;
-        if (transferFilter === "transfers") return !t.onLoan && feeText?.toLowerCase() !== "free transfer" && !t.contractExtension && typeText !== "contract";
+        
+        if (transferFilter === "contracts") return safeTypeText.includes("contract") && !safeTypeText.includes("extension") && safeFeeText === "";
+        if (transferFilter === "contract_extensions") return t.contractExtension || safeTypeText.includes("extension");
+        
+        if (transferFilter === "transfers") return !t.onLoan && safeFeeText !== "free transfer" && !t.contractExtension;
         return true;
       });
     }
@@ -236,7 +241,7 @@ export default function FootballHome() {
                 <p className="text-muted-foreground font-medium text-sm">No transfers match your current filters.</p>
               </div>
             ) : (
-              <div className={isCustomTransferView ? "flex overflow-x-auto gap-6 pb-6 pt-4 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0" : "relative overflow-hidden w-full group py-4 -mx-4 px-4 md:mx-0 md:px-0"}>
+              <div className={isCustomTransferView ? "flex overflow-x-auto gap-6 pb-6 pt-4 snap-x snap-mandatory square-scrollbar -mx-4 px-4 md:mx-0 md:px-0" : "relative overflow-hidden w-full group py-4 -mx-4 px-4 md:mx-0 md:px-0"}>
                 <div
                   className={isCustomTransferView ? "flex gap-6" : "flex w-max gap-6 animate-marquee hover:[animation-play-state:paused]"}
                   style={!isCustomTransferView ? { animationDuration: `${Math.max(60, processedTransfers.length * 5)}s` } : undefined}

@@ -117,10 +117,10 @@ export const cricketApi = {
 
     // LOCAL IPL DATA ENDPOINTS
     getLocalIplSeasons: () => api.get('cricket/local/ipl-seasons'),
-    getLocalIplMatches: (season: string) => api.get(`cricket/local/ipl-matches/${season}`),
-    getLocalIplStandings: (season: string) => api.get(`cricket/local/ipl-standings/${season}`),
-    getLocalIplSquads: (season: string) => api.get(`cricket/local/ipl-squads/${season}`),
-    getLocalIplStats: (season: string) => api.get(`cricket/local/ipl-stats/${season}`),
+    getLocalIplMatches: (season: string) => api.get(`cricket/local/ipl-matches/${encodeURIComponent(season)}`),
+    getLocalIplStandings: (season: string) => api.get(`cricket/local/ipl-standings/${encodeURIComponent(season)}`),
+    getLocalIplSquads: (season: string) => api.get(`cricket/local/ipl-squads/${encodeURIComponent(season)}`),
+    getLocalIplStats: (season: string) => api.get(`cricket/local/ipl-stats/${encodeURIComponent(season)}`),
     getLocalIplAllTimeStats: (teamId: string) => api.get(`cricket/team-all-time/${teamId}`),
     getFeaturedMatches: async () => {
         try {

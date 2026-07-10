@@ -122,8 +122,14 @@ export const TeamLogo = ({ logo, name, shortName, size = "md", className, season
         'rajasthan royals': '/flags/ipl_2026/rr.png',
         'rr': '/flags/ipl_2026/rr.png',
         'sunrisers hyderabad': '/flags/ipl_2026/srh.png',
-        'deccan chargers': '/flags/ipl_2026/srh.png',
         'srh': '/flags/ipl_2026/srh.png',
+        'deccan chargers': '/flags/ipl_2026/dec.png',
+        'dec': '/flags/ipl_2026/dec.png',
+        'kochi tuskers kerala': '/flags/ipl_2026/ktk.png',
+        'ktk': '/flags/ipl_2026/ktk.png',
+        'pune warriors india': '/flags/ipl_2026/pwi.png',
+        'pune warriors': '/flags/ipl_2026/pwi.png',
+        'pwi': '/flags/ipl_2026/pwi.png',
         
         ...mplFlags
     };

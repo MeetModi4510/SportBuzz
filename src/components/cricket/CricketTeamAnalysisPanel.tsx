@@ -753,7 +753,7 @@ export function CricketTeamAnalysisPanel() {
                                 <span className="text-xs font-semibold bg-white/8 px-3 py-1 rounded-md text-slate-400">All Time</span>
                             </div>
                             
-                            <div className="flex-1 flex gap-12 overflow-x-auto hide-scrollbar pb-8 pt-4 px-4 items-end snap-x snap-mandatory">
+                            <div className="flex-1 flex gap-12 overflow-x-auto square-scrollbar pb-8 pt-4 px-4 items-end snap-x snap-mandatory">
                                 {(analyticsData.players?.topRunScorers || []).map((p: any, i: number) => (
                                     <div key={i} className="flex flex-col items-center group shrink-0 w-[160px] snap-center">
                                         <div className="relative mb-6 w-full max-w-[130px] aspect-square">
@@ -796,7 +796,7 @@ export function CricketTeamAnalysisPanel() {
                                 <span className="text-xs font-semibold bg-white/8 px-3 py-1 rounded-md text-slate-400">All Time</span>
                             </div>
                             
-                            <div className="flex-1 flex gap-12 overflow-x-auto hide-scrollbar pb-8 pt-4 px-4 items-end snap-x snap-mandatory">
+                            <div className="flex-1 flex gap-12 overflow-x-auto square-scrollbar pb-8 pt-4 px-4 items-end snap-x snap-mandatory">
                                 {(analyticsData.players?.topWicketTakers || []).map((p: any, i: number) => (
                                     <div key={i} className="flex flex-col items-center group shrink-0 w-[160px] snap-center">
                                         <div className="relative mb-6 w-full max-w-[130px] aspect-square">
