@@ -42,7 +42,7 @@ export default function LiveFootballMatch() {
     const receivedSocketUpdate = useRef(false);
     const lastUpdateTimestamp = useRef<Date>(new Date());
     const [displayTime, setDisplayTime] = useState("00:00");
-    const { lineupData, loading: lineupLoading } = useFotmobLineups(id);
+    const { lineupData, loading: lineupLoading } = useFotmobLineups(match?.homeTeam?.name, match?.awayTeam?.name);
 
     const summarizePlayerEvents = (playerName: string, events: any[], teamGoalsConceded: number = 0) => {
         const playerEvents = {
@@ -1108,22 +1108,22 @@ export default function LiveFootballMatch() {
                                         <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
                                         <p className="text-sm font-medium tracking-widest uppercase">Loading Lineups...</p>
                                     </div>
-                                ) : lineupData ? (
+                                ) : (lineupData || match?.lineups?.home?.startingXI?.length > 0 || match?.homeTeam?.players?.length > 0) ? (
                                     <FootballPitchLineup 
                                         homeTeam={{
-                                            name: match?.homeTeam?.name || lineupData.homeTeam?.name || 'Home Team',
+                                            name: match?.homeTeam?.name || lineupData?.homeTeam?.name || 'Home Team',
                                             logo: match?.homeTeam?.logo,
                                             primaryColor: match?.homeTeam?.primaryColor || '#2563eb',
-                                            coach: lineupData.homeTeam?.coach ? { name: lineupData.homeTeam.coach.name } : undefined
+                                            coach: lineupData?.homeTeam?.coach ? { name: lineupData.homeTeam.coach.name } : undefined
                                         }}
                                         awayTeam={{
-                                            name: match?.awayTeam?.name || lineupData.awayTeam?.name || 'Away Team',
+                                            name: match?.awayTeam?.name || lineupData?.awayTeam?.name || 'Away Team',
                                             logo: match?.awayTeam?.logo,
                                             primaryColor: match?.awayTeam?.primaryColor || '#ea580c',
-                                            coach: lineupData.awayTeam?.coach ? { name: lineupData.awayTeam.coach.name } : undefined
+                                            coach: lineupData?.awayTeam?.coach ? { name: lineupData.awayTeam.coach.name } : undefined
                                         }}
                                         homePlayers={[
-                                            ...(lineupData.homeTeam?.starters?.map((p: any) => ({
+                                            ...(lineupData?.homeTeam?.starters?.map((p: any) => ({
                                                 id: p.id.toString(),
                                                 name: p.name.first ? `${p.name.first} ${p.name.last}` : p.name,
                                                 role: p.positionStringShort || 'Midfielder',
@@ -1132,8 +1132,24 @@ export default function LiveFootballMatch() {
                                                 isCaptain: p.isCaptain || false,
                                                 rating: p.rating?.num || p.performance?.rating || undefined,
                                                 events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.away || 0)
+                                            })) || match?.lineups?.home?.startingXI?.map((p: any, i: number) => ({
+                                                id: `home-starter-${i}`,
+                                                name: typeof p === 'string' ? p : (p.name || p.player || 'Player'),
+                                                role: 'Midfielder',
+                                                number: i + 1,
+                                                isSubstitute: false,
+                                                isCaptain: false,
+                                                events: summarizePlayerEvents(typeof p === 'string' ? p : (p.name || p.player), match?.events || [], match?.score?.away || 0)
+                                            })) || match?.homeTeam?.players?.slice(0, 11).map((p: any, i: number) => ({
+                                                id: p._id || p.name,
+                                                name: p.name,
+                                                role: p.role || 'Midfielder',
+                                                number: p.number || i + 1,
+                                                isSubstitute: false,
+                                                isCaptain: p.isCaptain || false,
+                                                events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.away || 0)
                                             })) || []),
-                                            ...(lineupData.homeTeam?.subs?.map((p: any) => ({
+                                            ...(lineupData?.homeTeam?.subs?.map((p: any) => ({
                                                 id: p.id.toString(),
                                                 name: p.name.first ? `${p.name.first} ${p.name.last}` : p.name,
                                                 role: p.positionStringShort || 'Midfielder',
@@ -1141,11 +1157,27 @@ export default function LiveFootballMatch() {
                                                 isSubstitute: true,
                                                 isCaptain: p.isCaptain || false,
                                                 rating: p.rating?.num || p.performance?.rating || undefined,
+                                                events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.away || 0)
+                                            })) || match?.lineups?.home?.substitutes?.map((p: any, i: number) => ({
+                                                id: `home-sub-${i}`,
+                                                name: typeof p === 'string' ? p : (p.name || p.player || 'Player'),
+                                                role: 'Midfielder',
+                                                number: i + 12,
+                                                isSubstitute: true,
+                                                isCaptain: false,
+                                                events: summarizePlayerEvents(typeof p === 'string' ? p : (p.name || p.player), match?.events || [], match?.score?.away || 0)
+                                            })) || match?.homeTeam?.players?.slice(11).map((p: any, i: number) => ({
+                                                id: p._id || p.name,
+                                                name: p.name,
+                                                role: p.role || 'Midfielder',
+                                                number: p.number || i + 12,
+                                                isSubstitute: true,
+                                                isCaptain: p.isCaptain || false,
                                                 events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.away || 0)
                                             })) || [])
                                         ]}
                                         awayPlayers={[
-                                            ...(lineupData.awayTeam?.starters?.map((p: any) => ({
+                                            ...(lineupData?.awayTeam?.starters?.map((p: any) => ({
                                                 id: p.id.toString(),
                                                 name: p.name.first ? `${p.name.first} ${p.name.last}` : p.name,
                                                 role: p.positionStringShort || 'Midfielder',
@@ -1154,8 +1186,24 @@ export default function LiveFootballMatch() {
                                                 isCaptain: p.isCaptain || false,
                                                 rating: p.rating?.num || p.performance?.rating || undefined,
                                                 events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.home || 0)
+                                            })) || match?.lineups?.away?.startingXI?.map((p: any, i: number) => ({
+                                                id: `away-starter-${i}`,
+                                                name: typeof p === 'string' ? p : (p.name || p.player || 'Player'),
+                                                role: 'Midfielder',
+                                                number: i + 1,
+                                                isSubstitute: false,
+                                                isCaptain: false,
+                                                events: summarizePlayerEvents(typeof p === 'string' ? p : (p.name || p.player), match?.events || [], match?.score?.home || 0)
+                                            })) || match?.awayTeam?.players?.slice(0, 11).map((p: any, i: number) => ({
+                                                id: p._id || p.name,
+                                                name: p.name,
+                                                role: p.role || 'Midfielder',
+                                                number: p.number || i + 1,
+                                                isSubstitute: false,
+                                                isCaptain: p.isCaptain || false,
+                                                events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.home || 0)
                                             })) || []),
-                                            ...(lineupData.awayTeam?.subs?.map((p: any) => ({
+                                            ...(lineupData?.awayTeam?.subs?.map((p: any) => ({
                                                 id: p.id.toString(),
                                                 name: p.name.first ? `${p.name.first} ${p.name.last}` : p.name,
                                                 role: p.positionStringShort || 'Midfielder',
@@ -1164,10 +1212,26 @@ export default function LiveFootballMatch() {
                                                 isCaptain: p.isCaptain || false,
                                                 rating: p.rating?.num || p.performance?.rating || undefined,
                                                 events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.home || 0)
+                                            })) || match?.lineups?.away?.substitutes?.map((p: any, i: number) => ({
+                                                id: `away-sub-${i}`,
+                                                name: typeof p === 'string' ? p : (p.name || p.player || 'Player'),
+                                                role: 'Midfielder',
+                                                number: i + 12,
+                                                isSubstitute: true,
+                                                isCaptain: false,
+                                                events: summarizePlayerEvents(typeof p === 'string' ? p : (p.name || p.player), match?.events || [], match?.score?.home || 0)
+                                            })) || match?.awayTeam?.players?.slice(11).map((p: any, i: number) => ({
+                                                id: p._id || p.name,
+                                                name: p.name,
+                                                role: p.role || 'Midfielder',
+                                                number: p.number || i + 12,
+                                                isSubstitute: true,
+                                                isCaptain: p.isCaptain || false,
+                                                events: summarizePlayerEvents(p.name, match?.events || [], match?.score?.home || 0)
                                             })) || [])
                                         ]}
-                                        homeFormation={lineupData.homeTeam?.formation || match?.lineups?.home?.formation || '4-4-2'}
-                                        awayFormation={lineupData.awayTeam?.formation || match?.lineups?.away?.formation || '4-4-2'}
+                                        homeFormation={lineupData?.homeTeam?.formation || match?.lineups?.home?.formation || '4-4-2'}
+                                        awayFormation={lineupData?.awayTeam?.formation || match?.lineups?.away?.formation || '4-4-2'}
                                         currentMinute={match?.timer?.currentMinute || 90}
                                     />
                                 ) : (

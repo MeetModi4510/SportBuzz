@@ -146,18 +146,32 @@ export default function FootballTournamentDetails() {
             fetchNews();
 
             const socket = getSocket();
-            socket.on('football_update', (updatedMatch) => {
+            
+            const handleUpdate = (updatedMatch: any) => {
                 if (updatedMatch.tournamentId === id) {
+                    setMatches(prev => prev.map(m => m._id === updatedMatch._id ? updatedMatch : m));
+                    // We still fetch details occasionally to ensure stats and other data are perfectly in sync
+                    // but we don't await it so UI updates instantly
                     fetchDetails();
-                    fetchNews();
                 }
-            });
+            };
+
+            socket.on('football_update', handleUpdate);
 
             return () => {
-                socket.off('football_update');
+                socket.off('football_update', handleUpdate);
             };
         }
     }, [id]);
+
+    useEffect(() => {
+        const socket = getSocket();
+        if (socket.connected && matches.length > 0) {
+            matches.forEach(match => {
+                socket.emit("join_football_match", match._id);
+            });
+        }
+    }, [matches.map(m => m._id).join(',')]);
 
     const handleAddExistingTeam = async () => {
         if (!selectedExistingTeam) return;
