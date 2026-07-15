@@ -10,6 +10,7 @@ import PointsTable from '../models/PointsTable.js';
 import Notification from '../models/Notification.js';
 import User from '../models/User.js';
 import Team from '../models/Team.js';
+import Favorite from '../models/Favorite.js';
 import { emitScoreUpdate, getIO } from '../config/socket.js';
 import { computeCricketLiveDetails } from '../utils/cricketLiveDetails.js';
 
@@ -41,6 +42,49 @@ async function triggerFollowerNotifications(match, { title, message, type }) {
         await Promise.all(notificationPromises);
     } catch (err) {
         console.error('[NOTIFICATION] broadcast error:', err);
+    }
+}
+
+// Helper to broadcast notifications to users who favorited playing teams
+async function triggerTeamFavoriteNotifications(match, teamA, teamB) {
+    try {
+        const teamIds = [match.homeTeam?.toString(), match.awayTeam?.toString()].filter(Boolean);
+        if (teamIds.length === 0) return;
+
+        const favorites = await Favorite.find({ type: 'team', itemId: { $in: teamIds } });
+        
+        const userFavMap = new Map();
+        for (const fav of favorites) {
+            const userId = fav.userId.toString();
+            if (!userFavMap.has(userId)) {
+                userFavMap.set(userId, fav);
+            }
+        }
+
+        const notificationPromises = Array.from(userFavMap.values()).map(async (fav) => {
+            const favTeamName = fav.itemId === match.homeTeam?.toString() ? teamA?.name : teamB?.name;
+            const oppTeamName = fav.itemId === match.homeTeam?.toString() ? teamB?.name : teamA?.name;
+            
+            const notification = await Notification.create({
+                userId: fav.userId,
+                title: 'Your favorite team is Live! 🔴',
+                message: `${favTeamName || fav.name || 'Your team'} is now playing against ${oppTeamName || 'their opponent'}.`,
+                type: 'match_live',
+                relatedId: match._id
+            });
+            
+            if (notification) {
+                try {
+                    const io = getIO();
+                    io.to(fav.userId.toString()).emit('new_notification', notification);
+                } catch (err) {
+                    console.error('[SOCKET] Error emitting notification:', err);
+                }
+            }
+        });
+        await Promise.all(notificationPromises);
+    } catch (err) {
+        console.error('[NOTIFICATION] team favorite broadcast error:', err);
     }
 }
 
@@ -192,6 +236,8 @@ export const updateMatch = asyncHandler(async (req, res) => {
                     message: `The match between ${teamA?.name || 'Team A'} and ${teamB?.name || 'Team B'} is now live in ${tournamentDoc?.name || 'Tournament'}`,
                     type: 'match_live'
                 });
+
+                await triggerTeamFavoriteNotifications(updatedMatch, teamA, teamB);
             } catch (err) {
                 console.error('Live notification error:', err);
             }

@@ -2430,11 +2430,6 @@ const MatchDetails = () => {
                   <div className="flex items-center gap-3">
                     <MessageSquare className="w-4 h-4 text-primary" />
                     <h3 className="font-semibold text-foreground tracking-tight">Commentary</h3>
-                    {isCricketMatch && (
-                      <span className="text-[10px] font-bold text-primary/70 uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-full">
-                        Cricbuzz
-                      </span>
-                    )}
                   </div>
                   {(isLive || cbFullCommentaryField.loading) && (
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
