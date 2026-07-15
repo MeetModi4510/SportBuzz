@@ -21,6 +21,13 @@ const footballTournamentSchema = new mongoose.Schema({
         draw: { type: Number, default: 1 },
         loss: { type: Number, default: 0 }
     },
+    matchConfig: {
+        playersPerTeam: { type: Number, default: 11 },
+        duration: { type: Number, default: 90 },
+        halfDuration: { type: Number, default: 45 },
+        maxSubstitutions: { type: Number, default: 5 }, // 999 for rolling subs
+        yellowCardBanThreshold: { type: Number, default: 2 } // number of accumulated YCs for a ban
+    },
     startDate: {
         type: Date,
         required: true

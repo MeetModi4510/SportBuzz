@@ -519,7 +519,10 @@ function PlayerNode({
     const stats = derivePlayerPerformance(player, currentMinute);
     const [imgError, setImgError] = useState(false);
     const hasImage = player.image && !imgError;
-    const displayName = player.name.split(' ').pop() || player.name;
+    const nameParts = player.name.trim().split(' ');
+    const displayName = nameParts.length >= 2
+        ? `${nameParts[0][0].toUpperCase()}. ${nameParts.slice(1).join(' ')}`
+        : player.name;
 
     const isRedCarded = (player.events?.redCards || 0) > 0;
     const isSubbedIn = player.events?.substitution?.inMinute !== undefined;
@@ -563,7 +566,7 @@ function PlayerNode({
                 )}
                 
                 {/* Status Badges */}
-                <div className="absolute -top-2 -right-2 flex flex-col gap-1 z-10 pointer-events-none">
+                <div className="absolute -top-2 -left-2 flex flex-col gap-1 z-10 pointer-events-none">
                     {/* Goals - Overlapping soccer balls */}
                     {(player.events?.goals || 0) > 0 && (
                         <div className="relative w-4 h-4">

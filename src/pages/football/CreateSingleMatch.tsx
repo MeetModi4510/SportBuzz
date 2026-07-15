@@ -71,16 +71,20 @@ export default function CreateSingleMatch() {
             // 1. Create Team A
             const resA = await footballApi.createTeam({
                 name: teamAName,
-                players: teamAPlayers.map(name => ({ name })), // Backend expects array of object or string? Wait, createTeam takes players: [{...}] or strings?
-                // The current createTeam expects: name, logo, acronym, players, substitutes.
-                // Looking at createTeam controller earlier: name, logo, acronym, players (could be array of objects or strings, depends on model. Actually, the frontend just passes an array. In most cases string works or {name} works). Let's just send string array, or map to { name } if needed. Let's send strings, we can fix it if it fails.
+                players: teamAPlayers.map((name, index) => ({ 
+                    name, 
+                    role: index === 0 ? 'Goalkeeper' : 'Midfielder' 
+                })),
             });
             const teamAId = resA.data._id;
 
             // 2. Create Team B
             const resB = await footballApi.createTeam({
                 name: teamBName,
-                players: teamBPlayers.map(name => ({ name })), 
+                players: teamBPlayers.map((name, index) => ({ 
+                    name, 
+                    role: index === 0 ? 'Goalkeeper' : 'Midfielder' 
+                })),
             });
             const teamBId = resB.data._id;
 
@@ -92,6 +96,7 @@ export default function CreateSingleMatch() {
                 matchDate: new Date(),
                 venue: venue || 'Local Pitch',
                 matchConfig: {
+                    playersPerTeam: playersNeeded,
                     duration: Number(duration),
                     halfDuration: Number(halfDuration),
                     maxSubstitutions: unlimitedSubs ? 999 : Number(maxSubstitutions),

@@ -114,7 +114,7 @@ export default function FootballScoringPanel() {
     const [showInjuryPrompt, setShowInjuryPrompt] = useState(false);
     const [injuryMatchMinute, setInjuryMatchMinute] = useState(0); 
     const [tempInjuryTime, setTempInjuryTime] = useState(0);
-    const [lastPromptedHalf, setLastPromptedHalf] = useState(0); 
+    const lastPromptedHalfRef = useRef(0);
 
     // Lineup Selection State
     const [homeXI, setHomeXI] = useState<string[]>([]);
@@ -125,17 +125,20 @@ export default function FootballScoringPanel() {
     const [awayFormation, setAwayFormation] = useState<string>('4-4-2');
     const [isFinalizingLineups, setIsFinalizingLineups] = useState(false);
 
+    const halfDur = match?.tournamentId?.matchConfig?.halfDuration || match?.matchConfig?.halfDuration || 45;
+    const fullDur = match?.tournamentId?.matchConfig?.duration || match?.matchConfig?.duration || 90;
+
     const formatTime = (totalSeconds: number, currentHalf: number = 1) => {
         const totalMins = Math.floor(totalSeconds / 60);
         const secs = totalSeconds % 60;
 
-        if (currentHalf === 1 && totalMins >= 45) {
-            const extra = totalMins - 45;
-            return `45:${secs < 10 ? '0' : ''}${secs} +${extra}`;
+        if (currentHalf === 1 && totalMins >= halfDur) {
+            const extra = totalMins - halfDur;
+            return `${halfDur}:${secs < 10 ? '0' : ''}${secs} +${extra}`;
         }
-        if (currentHalf === 2 && totalMins >= 90) {
-            const extra = totalMins - 90;
-            return `90:${secs < 10 ? '0' : ''}${secs} +${extra}`;
+        if (currentHalf === 2 && totalMins >= fullDur) {
+            const extra = totalMins - fullDur;
+            return `${fullDur}:${secs < 10 ? '0' : ''}${secs} +${extra}`;
         }
 
         return `${totalMins < 10 ? '0' : ''}${totalMins}:${secs < 10 ? '0' : ''}${secs}`;
@@ -214,6 +217,8 @@ export default function FootballScoringPanel() {
     }, [id]);
 
     useEffect(() => {
+        if (timerInterval.current) clearInterval(timerInterval.current);
+
         if (match?.timer?.isRunning) {
             // Safety: If somehow the status is HalfTime or FullTime but isRunning is true, stop it
             if (match.timer.halfStatus === 'HalfTime' || match.timer.halfStatus === 'FullTime') {
@@ -231,19 +236,21 @@ export default function FootballScoringPanel() {
                 setSecondsElapsed(totalSecs);
                 setDisplayTime(formatTime(totalSecs, match.timer.half));
 
-                // Injury Time Prompt Logic
-                if (match.timer.half === 1 && currentMin === 43 && !showInjuryPrompt && match.timer.injuryTime === 0 && lastPromptedHalf !== 1) {
-                    setInjuryMatchMinute(43);
+                // Injury Time Prompt - trigger 2 mins before half end
+                const injuryPromptMin1 = halfDur - 2;
+                const injuryPromptMin2 = fullDur - 2;
+                if (match.timer.half === 1 && currentMin === injuryPromptMin1 && !showInjuryPrompt && match.timer.injuryTime === 0 && lastPromptedHalfRef.current !== 1) {
+                    setInjuryMatchMinute(injuryPromptMin1);
                     setShowInjuryPrompt(true);
-                    setLastPromptedHalf(1);
-                } else if (match.timer.half === 2 && currentMin === 88 && !showInjuryPrompt && match.timer.injuryTime === 0 && lastPromptedHalf !== 2) {
-                    setInjuryMatchMinute(88);
+                    lastPromptedHalfRef.current = 1;
+                } else if (match.timer.half === 2 && currentMin === injuryPromptMin2 && !showInjuryPrompt && match.timer.injuryTime === 0 && lastPromptedHalfRef.current !== 2) {
+                    setInjuryMatchMinute(injuryPromptMin2);
                     setShowInjuryPrompt(true);
-                    setLastPromptedHalf(2);
+                    lastPromptedHalfRef.current = 2;
                 }
 
                 // Auto-Stop / Transition Logic
-                const limit = match.timer.half === 1 ? 45 : 90;
+                const limit = match.timer.half === 1 ? halfDur : fullDur;
                 const isEndTime = currentMin >= limit + (match.timer.injuryTime || 0);
 
                 if (isEndTime && !isUpdatingTimer.current) {
@@ -261,9 +268,11 @@ export default function FootballScoringPanel() {
                     }
                 }
             }, 1000); 
-        } else {
-            if (timerInterval.current) clearInterval(timerInterval.current);
         }
+
+        return () => {
+            if (timerInterval.current) clearInterval(timerInterval.current);
+        };
     }, [match?.timer?.isRunning, match?.timer?.startTime, match?.timer?.currentMinute, match?.timer?.half, match?.timer?.injuryTime, match?.timer?.halfStatus, showInjuryPrompt]);
 
     const handleTimerControl = async (isRunning: boolean, minuteOverride?: number, statusOverride?: string, silent: boolean = false) => {
@@ -292,18 +301,30 @@ export default function FootballScoringPanel() {
         }
     };
 
-    const handleSetInjuryTime = async () => {
+    useEffect(() => {
+        let timeout: any;
+        if (showInjuryPrompt) {
+            timeout = setTimeout(() => {
+                setTempInjuryTime(0);
+                handleSetInjuryTime(0);
+            }, 15000);
+        }
+        return () => clearTimeout(timeout);
+    }, [showInjuryPrompt]);
+
+    const handleSetInjuryTime = async (timeOverride?: number) => {
+        const timeToSet = timeOverride !== undefined ? timeOverride : tempInjuryTime;
         try {
-            const res: any = await footballApi.updateTimer(id!, { injuryTime: tempInjuryTime });
+            const res: any = await footballApi.updateTimer(id!, { injuryTime: timeToSet });
             if (res.success) {
-                toast.success(`Stoppage Time set to ${tempInjuryTime} mins`);
+                toast.success(`Stoppage Time set to ${timeToSet} mins`);
                 setMatch(res.data);
                 setShowInjuryPrompt(false);
 
                 // If already past the limit, immediately offer to end half or auto-end
                 const totalSecs = (res.data.timer.currentMinute * 60);
                 const limit = res.data.timer.half === 1 ? 45 : 90;
-                const isEndTime = Math.floor(totalSecs / 60) >= limit + tempInjuryTime;
+                const isEndTime = Math.floor(totalSecs / 60) >= limit + timeToSet;
                 
                 if (isEndTime && res.data.timer.isRunning) {
                     if (res.data.timer.half === 1) {
@@ -322,7 +343,7 @@ export default function FootballScoringPanel() {
         try {
             const res: any = await footballApi.updateTimer(id!, { 
                 half: 2, 
-                currentMinute: 45, 
+                currentMinute: halfDur, 
                 halfStatus: 'SecondHalf', 
                 isRunning: true,
                 injuryTime: 0 // Reset for 2nd half
@@ -512,9 +533,36 @@ export default function FootballScoringPanel() {
         }
     };
 
+    const requiredPlayers = match?.tournamentId?.matchConfig?.playersPerTeam || match?.matchConfig?.playersPerTeam || 11;
+
+    const getFormationsForPlayers = (players: number) => {
+        switch (players) {
+            case 5: return ['2-1-1', '1-2-1', '2-2', '1-3', '3-1'];
+            case 6: return ['2-2-1', '2-1-2', '3-1-1', '1-3-1', '2-3'];
+            case 7: return ['2-3-1', '3-2-1', '2-2-2', '3-1-2', '1-4-1'];
+            case 8: return ['3-3-1', '2-4-1', '3-2-2', '2-3-2'];
+            case 9: return ['3-4-1', '4-3-1', '3-3-2', '2-4-2'];
+            case 10: return ['4-4-1', '4-3-2', '3-4-2', '3-5-1'];
+            case 11: 
+            default: return ['4-4-2', '4-3-3', '4-2-3-1', '3-5-2', '5-3-2', '3-4-3', '4-5-1', '4-1-2-1-2'];
+        }
+    };
+    
+    const availableFormations = getFormationsForPlayers(requiredPlayers);
+
+    useEffect(() => {
+        if (!availableFormations.includes(homeFormation)) {
+            setHomeFormation(availableFormations[0]);
+        }
+        if (!availableFormations.includes(awayFormation)) {
+            setAwayFormation(availableFormations[0]);
+        }
+    }, [requiredPlayers]); // only trigger on requiredPlayers change to avoid infinite loop / constant re-renders
+
+
     const handleSaveLineups = async () => {
-        if (homeXI.length !== 11 || awayXI.length !== 11) {
-            toast.error("Each team must have exactly 11 players in the Starting XI");
+        if (homeXI.length !== requiredPlayers || awayXI.length !== requiredPlayers) {
+            toast.error(`Each team must have exactly ${requiredPlayers} players in the Starting XI`);
             return;
         }
 
@@ -548,8 +596,8 @@ export default function FootballScoringPanel() {
                 if (homeXI.includes(playerName)) {
                     setHomeXI(homeXI.filter(p => p !== playerName));
                 } else {
-                    if (homeXI.length >= 11) {
-                        toast.warning("Home Starting XI is full (11 players)");
+                    if (homeXI.length >= requiredPlayers) {
+                        toast.warning(`Home Starting XI is full (${requiredPlayers} players)`);
                         return;
                     }
                     setHomeXI([...homeXI, playerName]);
@@ -568,8 +616,8 @@ export default function FootballScoringPanel() {
                 if (awayXI.includes(playerName)) {
                     setAwayXI(awayXI.filter(p => p !== playerName));
                 } else {
-                    if (awayXI.length >= 11) {
-                        toast.warning("Away Starting XI is full (11 players)");
+                    if (awayXI.length >= requiredPlayers) {
+                        toast.warning(`Away Starting XI is full (${requiredPlayers} players)`);
                         return;
                     }
                     setAwayXI([...awayXI, playerName]);
@@ -601,7 +649,7 @@ export default function FootballScoringPanel() {
                             <div>
                                 <h3 className="text-2xl font-black italic uppercase text-blue-500">{match?.homeTeam?.name || 'Home Team'}</h3>
                                 <div className="flex flex-wrap gap-2 mt-2">
-                                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Starting XI: {homeXI.length}/11</p>
+                                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Starting XI: {homeXI.length}/{match?.tournamentId?.matchConfig?.playersPerTeam || match?.matchConfig?.playersPerTeam || 11}</p>
                                     <div className="w-1 h-1 rounded-full bg-slate-700 mt-1.5" />
                                     <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Subs: {homeSubs.length}</p>
                                 </div>
@@ -613,7 +661,7 @@ export default function FootballScoringPanel() {
                                     onChange={(e) => setHomeFormation(e.target.value)}
                                     className="bg-slate-950/50 border border-white/5 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-blue-500/50 transition-colors"
                                 >
-                                    {['4-4-2', '4-3-3', '4-2-3-1', '3-5-2', '5-3-2', '3-4-3', '4-5-1', '4-1-2-1-2'].map(f => (
+                                    {availableFormations.map(f => (
                                         <option key={f} value={f}>{f}</option>
                                     ))}
                                 </select>
@@ -671,7 +719,7 @@ export default function FootballScoringPanel() {
                             <div>
                                 <h3 className="text-2xl font-black italic uppercase text-orange-500">{match?.awayTeam?.name || 'Away Team'}</h3>
                                 <div className="flex flex-wrap gap-2 mt-2">
-                                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Starting XI: {awayXI.length}/11</p>
+                                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Starting XI: {awayXI.length}/{match?.tournamentId?.matchConfig?.playersPerTeam || match?.matchConfig?.playersPerTeam || 11}</p>
                                     <div className="w-1 h-1 rounded-full bg-slate-700 mt-1.5" />
                                     <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Subs: {awaySubs.length}</p>
                                 </div>
@@ -683,7 +731,7 @@ export default function FootballScoringPanel() {
                                     onChange={(e) => setAwayFormation(e.target.value)}
                                     className="bg-slate-950/50 border border-white/5 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-orange-500/50 transition-colors"
                                 >
-                                    {['4-4-2', '4-3-3', '4-2-3-1', '3-5-2', '5-3-2', '3-4-3', '4-5-1', '4-1-2-1-2'].map(f => (
+                                    {availableFormations.map(f => (
                                         <option key={f} value={f}>{f}</option>
                                     ))}
                                 </select>
@@ -741,7 +789,7 @@ export default function FootballScoringPanel() {
                         size="lg"
                         className="h-20 px-20 bg-green-600 hover:bg-green-500 rounded-[2rem] font-black italic uppercase tracking-tighter text-2xl shadow-2xl shadow-green-500/20"
                         onClick={handleSaveLineups}
-                        disabled={isFinalizingLineups || homeXI.length !== 11 || awayXI.length !== 11}
+                        disabled={isFinalizingLineups || homeXI.length !== requiredPlayers || awayXI.length !== requiredPlayers}
                     >
                         {isFinalizingLineups ? <Loader2 className="animate-spin mr-3" /> : <Play className="mr-3 fill-current" />}
                         Finalize & Kick Off
@@ -826,7 +874,7 @@ export default function FootballScoringPanel() {
             <div className="max-w-6xl mx-auto px-4 py-12">
                 {match.tournamentId && (
                     <Link 
-                        to={`/football/tournament/${match.tournamentId}`}
+                        to={`/football/tournament/${match.tournamentId?._id || match.tournamentId}`}
                         className="inline-flex items-center gap-2 mb-8 px-6 py-2 bg-slate-900/50 border border-white/5 rounded-2xl hover:bg-slate-800 transition-colors group"
                     >
                         <ArrowLeft size={16} className="text-slate-400 group-hover:text-white transition-colors" />
@@ -838,88 +886,83 @@ export default function FootballScoringPanel() {
                 ) : (
                     <>
                         {/* Header / Scoreboard */}
-                <div className="relative mb-12 overflow-hidden rounded-[3rem] bg-slate-900/40 border border-white/5 backdrop-blur-3xl p-12">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-orange-600 to-red-600" />
-                    
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-12 relative z-10">
+                <div className="relative mb-8 rounded-[2rem] bg-slate-950/60 border border-white/5 backdrop-blur-xl p-8 lg:p-12 shadow-2xl">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-10 relative z-10">
                         {/* Home Team */}
-                        <div className="flex flex-col items-center">
-                            <div className="w-24 h-24 sm:w-32 sm:h-32 mb-6 rounded-[2rem] bg-slate-900 border border-slate-800 flex items-center justify-center overflow-hidden shadow-2xl relative group transition-transform hover:scale-105">
+                        <div className="flex flex-col items-center flex-1">
+                            <div className="w-20 h-20 sm:w-28 sm:h-28 mb-4 rounded-full bg-slate-900 border-2 border-slate-800 flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(37,99,235,0.15)] relative group transition-transform hover:scale-105">
                                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                {match.homeTeam?.logo ? <img src={match.homeTeam.logo} alt={match.homeTeam.name} /> : <Users size={40} className="text-slate-700" />}
+                                {match.homeTeam?.logo ? <img src={match.homeTeam.logo} alt={match.homeTeam.name} className="w-full h-full object-cover" /> : <Users size={32} className="text-slate-700" />}
                             </div>
-                            <h2 className="text-xl sm:text-2xl font-black italic uppercase tracking-tighter text-white group-hover:text-blue-500 transition-colors">{match.homeTeam?.name || 'Home Team'}</h2>
+                            <h2 className="text-lg sm:text-xl font-bold tracking-wide text-white group-hover:text-blue-400 transition-colors text-center">{match.homeTeam?.name || 'Home Team'}</h2>
                             
                             {/* Scorers List */}
-                            <div className="mt-4 flex flex-col items-center gap-1">
+                            <div className="mt-3 flex flex-col items-center gap-1">
                                 {match.events?.filter((e: any) => e.type === 'Goal' && String(e.team) === String(match.homeTeam?._id)).map((e: any, i: number) => (
-                                    <span key={i} className="text-[10px] font-black uppercase text-slate-500 tracking-widest italic">
-                                        {e.player} {e.minute}' {e.goalType === 'Penalty' && <span className="text-blue-500">(P)</span>}
+                                    <span key={i} className="text-xs font-medium text-slate-400 tracking-wide">
+                                        {e.player} {e.assister && <span className="text-slate-500 text-[10px]">({e.assister})</span>} <span className="text-slate-500">{e.minute}'</span> {e.goalType === 'Penalty' && <span className="text-blue-400/80">(P)</span>}
                                     </span>
                                 ))}
                             </div>
                         </div>
 
                         {/* Mid Section: Score & Timer */}
-                        <div className="flex flex-col items-center gap-6">
-                            <div className="flex items-center gap-8 translate-y-2">
-                                <span className="text-8xl font-black italic tracking-tighter text-white tabular-nums drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">{match.score?.home ?? 0}</span>
-                                <div className="w-1.5 h-1.5 rounded-full bg-slate-700" />
-                                <span className="text-8xl font-black italic tracking-tighter text-white tabular-nums drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">{match.score?.away ?? 0}</span>
+                        <div className="flex flex-col items-center flex-shrink-0 px-4">
+                            <div className="flex items-center gap-6">
+                                <span className="text-6xl sm:text-7xl font-bold tracking-tight text-white tabular-nums">{match.score?.home ?? 0}</span>
+                                <div className="w-2 h-2 rounded-full bg-slate-700" />
+                                <span className="text-6xl sm:text-7xl font-bold tracking-tight text-white tabular-nums">{match.score?.away ?? 0}</span>
                             </div>
                             
-                            <div className="flex flex-col items-center">
-                                <div className="px-8 py-3 bg-white/5 rounded-2xl border border-white/10 flex flex-col items-center gap-1 min-w-[180px]">
-                                    <div className="flex items-center gap-3">
-                                        <Timer className={match.timer?.isRunning ? "text-green-500 animate-pulse" : "text-slate-500"} size={20} />
-                                        <span className="text-3xl font-black italic tabular-nums tracking-tighter">
-                                            {displayTime}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">
-                                            {match.timer?.halfStatus === 'FirstHalf' ? '1st Half' : 
-                                             match.timer?.halfStatus === 'HalfTime' ? 'Half Time' :
-                                             match.timer?.halfStatus === 'SecondHalf' ? '2nd Half' : 'Full Time'}
-                                        </span>
-                                        {(match.timer?.injuryTime || 0) > 0 && (
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-orange-500">
-                                                +{match.timer.injuryTime}' ET
-                                            </span>
-                                        )}
-                                    </div>
+                            <div className="flex flex-col items-center mt-6">
+                                <div className="px-6 py-2 bg-slate-900/50 rounded-full border border-white/5 flex items-center gap-3">
+                                    <Timer className={match.timer?.isRunning ? "text-emerald-400 animate-pulse" : "text-slate-500"} size={16} />
+                                    <span className="text-2xl font-semibold tabular-nums tracking-wide text-white">
+                                        {displayTime}
+                                    </span>
                                 </div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mt-2">Live Match Engine</p>
+                                <div className="flex items-center gap-2 mt-3">
+                                    <span className="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
+                                        {match.timer?.halfStatus === 'FirstHalf' ? '1st Half' : 
+                                         match.timer?.halfStatus === 'HalfTime' ? 'Half Time' :
+                                         match.timer?.halfStatus === 'SecondHalf' ? '2nd Half' : 'Full Time'}
+                                    </span>
+                                    {(match.timer?.injuryTime || 0) > 0 && (
+                                        <span className="text-xs font-bold uppercase tracking-[0.15em] text-orange-400">
+                                            +{match.timer.injuryTime}' ET
+                                        </span>
+                                    )}
+                                </div>
 
                                 {/* Win Probability Index */}
-                                <div className="mt-8 w-64 space-y-3">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-[9px] font-black uppercase text-blue-500 italic">H {match.performance?.winProbability?.home || 45}%</span>
-                                        <span className="text-[9px] font-black uppercase text-slate-500 italic">D {match.performance?.winProbability?.draw || 25}%</span>
-                                        <span className="text-[9px] font-black uppercase text-orange-500 italic">A {match.performance?.winProbability?.away || 30}%</span>
+                                <div className="mt-8 w-56 space-y-2 opacity-80 hover:opacity-100 transition-opacity">
+                                    <div className="flex justify-between items-center px-1">
+                                        <span className="text-[10px] font-bold text-blue-400">H {match.performance?.winProbability?.home || 45}%</span>
+                                        <span className="text-[10px] font-medium text-slate-500">D {match.performance?.winProbability?.draw || 25}%</span>
+                                        <span className="text-[10px] font-bold text-orange-400">A {match.performance?.winProbability?.away || 30}%</span>
                                     </div>
-                                    <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden flex border border-white/5 p-0.5">
-                                        <div className="h-full bg-blue-600 rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(37,99,235,0.3)]" style={{ width: `${match.performance?.winProbability?.home || 45}%` }} />
-                                        <div className="h-full bg-slate-700 mx-0.5 rounded-full transition-all duration-1000" style={{ width: `${match.performance?.winProbability?.draw || 25}%` }} />
-                                        <div className="h-full bg-orange-600 rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(234,88,12,0.3)]" style={{ width: `${match.performance?.winProbability?.away || 30}%` }} />
+                                    <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden flex">
+                                        <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${match.performance?.winProbability?.home || 45}%` }} />
+                                        <div className="h-full bg-slate-700 transition-all duration-1000" style={{ width: `${match.performance?.winProbability?.draw || 25}%` }} />
+                                        <div className="h-full bg-orange-500 transition-all duration-1000" style={{ width: `${match.performance?.winProbability?.away || 30}%` }} />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Away Team */}
-                        <div className="flex flex-col items-center">
-                            <div className="w-24 h-24 sm:w-32 sm:h-32 mb-6 rounded-[2rem] bg-slate-900 border border-slate-800 flex items-center justify-center overflow-hidden shadow-2xl relative group transition-transform hover:scale-105">
+                        <div className="flex flex-col items-center flex-1">
+                            <div className="w-20 h-20 sm:w-28 sm:h-28 mb-4 rounded-full bg-slate-900 border-2 border-slate-800 flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(234,88,12,0.15)] relative group transition-transform hover:scale-105">
                                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                {match.awayTeam?.logo ? <img src={match.awayTeam.logo} alt={match.awayTeam.name} /> : <Users size={40} className="text-slate-700" />}
+                                {match.awayTeam?.logo ? <img src={match.awayTeam.logo} alt={match.awayTeam.name} className="w-full h-full object-cover" /> : <Users size={32} className="text-slate-700" />}
                             </div>
-                            <h2 className="text-xl sm:text-2xl font-black italic uppercase tracking-tighter text-white group-hover:text-orange-500 transition-colors">{match.awayTeam?.name || 'Away Team'}</h2>
+                            <h2 className="text-lg sm:text-xl font-bold tracking-wide text-white group-hover:text-orange-400 transition-colors text-center">{match.awayTeam?.name || 'Away Team'}</h2>
                             
                             {/* Scorers List */}
-                            <div className="mt-4 flex flex-col items-center gap-1">
+                            <div className="mt-3 flex flex-col items-center gap-1">
                                 {match.events?.filter((e: any) => e.type === 'Goal' && String(e.team) === String(match.awayTeam?._id)).map((e: any, i: number) => (
-                                    <span key={i} className="text-[10px] font-black uppercase text-slate-500 tracking-widest italic">
-                                        {e.player} {e.minute}' {e.goalType === 'Penalty' && <span className="text-orange-500">(P)</span>}
+                                    <span key={i} className="text-xs font-medium text-slate-400 tracking-wide">
+                                        {e.player} {e.assister && <span className="text-slate-500 text-[10px]">({e.assister})</span>} <span className="text-slate-500">{e.minute}'</span> {e.goalType === 'Penalty' && <span className="text-orange-400/80">(P)</span>}
                                     </span>
                                 ))}
                             </div>
@@ -929,21 +972,21 @@ export default function FootballScoringPanel() {
 
                 {/* Tabs Navigation */}
                 <Tabs defaultValue="live" className="space-y-8">
-                    <TabsList className="bg-slate-900/60 border border-white/5 p-1 rounded-2xl h-14 w-full justify-start gap-2">
-                        <TabsTrigger value="live" className="rounded-xl px-8 data-[state=active]:bg-blue-600 font-black italic uppercase tracking-tight gap-2">
-                            <Zap size={16} /> Live
+                    <TabsList className="bg-slate-950/50 border border-white/5 p-1.5 rounded-2xl h-14 w-full justify-start gap-2 shadow-inner">
+                        <TabsTrigger value="live" className="rounded-xl px-6 data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400 data-[state=active]:shadow-sm font-medium transition-all gap-2">
+                            <Zap size={16} className="text-blue-400" /> Live
                         </TabsTrigger>
-                        <TabsTrigger value="overview" className="rounded-xl px-8 data-[state=active]:bg-slate-800 font-black italic uppercase tracking-tight gap-2">
+                        <TabsTrigger value="overview" className="rounded-xl px-6 data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400 data-[state=active]:shadow-sm font-medium transition-all gap-2">
                             <LayoutDashboard size={16} /> Overview
                         </TabsTrigger>
-                        <TabsTrigger value="lineups" className="rounded-xl px-8 data-[state=active]:bg-slate-800 font-black italic uppercase tracking-tight gap-2">
+                        <TabsTrigger value="lineups" className="rounded-xl px-6 data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400 data-[state=active]:shadow-sm font-medium transition-all gap-2">
                             <Users size={16} /> Lineups
                         </TabsTrigger>
-                        <TabsTrigger value="stats" className="rounded-xl px-8 data-[state=active]:bg-slate-800 font-black italic uppercase tracking-tight gap-2">
+                        <TabsTrigger value="stats" className="rounded-xl px-6 data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400 data-[state=active]:shadow-sm font-medium transition-all gap-2">
                             <BarChart3 size={16} /> Stats
                         </TabsTrigger>
-                        <TabsTrigger value="performance" className="rounded-xl px-8 data-[state=active]:bg-purple-600 font-black italic uppercase tracking-tight gap-2">
-                            <TrendingUp size={16} /> Performance Lab
+                        <TabsTrigger value="performance" className="rounded-xl px-6 data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400 data-[state=active]:shadow-sm font-medium transition-all gap-2">
+                            <TrendingUp size={16} className="text-purple-400" /> Performance Lab
                         </TabsTrigger>
                     </TabsList>
 
@@ -952,14 +995,17 @@ export default function FootballScoringPanel() {
                         <div className="lg:col-span-2 space-y-8">
                             <div className="grid grid-cols-2 gap-6">
                                 {/* Home Actions */}
-                                <Card className="bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-8">
-                                    <CardHeader className="px-0 pt-0 mb-6">
-                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Home Actions</h3>
+                                <Card className="bg-slate-900/20 border-white/5 rounded-3xl p-6 shadow-lg backdrop-blur-sm">
+                                    <CardHeader className="px-0 pt-0 mb-5">
+                                        <h3 className="text-sm font-semibold text-slate-400 flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-blue-500" />
+                                            Home Actions
+                                        </h3>
                                     </CardHeader>
                                     <div className="grid gap-3">
                                         <Button 
                                             onClick={() => openEventDialog('Goal', match.homeTeam)}
-                                            className="h-16 bg-blue-600 hover:bg-blue-500 rounded-2xl font-black italic uppercase tracking-tight"
+                                            className="h-14 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white border border-blue-500/20 rounded-2xl font-semibold transition-all"
                                         >
                                             <Circle className="mr-2 fill-current" size={18} /> Record Goal
                                         </Button>
@@ -967,14 +1013,14 @@ export default function FootballScoringPanel() {
                                             <Button 
                                                 onClick={() => openEventDialog('YellowCard', match.homeTeam)}
                                                 variant="outline"
-                                                className="h-14 border-slate-800 bg-slate-950 text-yellow-500 hover:bg-yellow-500 hover:text-black rounded-2xl font-black"
+                                                className="h-12 border-white/10 bg-slate-950/50 text-yellow-500 hover:bg-yellow-500 hover:text-black hover:border-yellow-500 rounded-2xl font-medium transition-all"
                                             >
                                                 <Flag size={16} className="mr-2" /> Yellow
                                             </Button>
                                             <Button 
                                                 onClick={() => openEventDialog('RedCard', match.homeTeam)}
                                                 variant="outline"
-                                                className="h-14 border-slate-800 bg-slate-950 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl font-black"
+                                                className="h-12 border-white/10 bg-slate-950/50 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 rounded-2xl font-medium transition-all"
                                             >
                                                 <ShieldAlert size={16} className="mr-2" /> Red Card
                                             </Button>
@@ -982,53 +1028,54 @@ export default function FootballScoringPanel() {
                                         <Button 
                                             onClick={() => openEventDialog('Save', match.homeTeam)}
                                             variant="outline"
-                                            className="h-14 mt-3 border-slate-800 bg-slate-950 text-blue-400 hover:bg-blue-600 hover:text-white rounded-2xl font-black w-full"
+                                            className="h-12 border-white/10 bg-slate-950/50 text-blue-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 rounded-2xl font-medium transition-all w-full"
                                         >
                                             <Shield size={16} className="mr-2" /> Record Save
                                         </Button>
 
                                         {/* Advanced Home Actions */}
-                                        <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-white/5">
-                                            <Button onClick={() => openEventDialog('ShotOnTarget', match.homeTeam)} variant="ghost" className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-blue-500/10 hover:text-blue-400">
-                                                <Target size={14} /> SOT
+                                        <div className="grid grid-cols-3 gap-2 mt-2 pt-4 border-t border-white/5">
+                                            <Button onClick={() => openEventDialog('ShotOnTarget', match.homeTeam)} variant="ghost" className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-blue-500/10 hover:text-blue-400 rounded-xl">
+                                                <Target size={16} /> SOT
                                             </Button>
-                                            <Button onClick={() => openEventDialog('ShotOffTarget', match.homeTeam)} variant="ghost" className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-slate-800">
-                                                <Circle size={14} /> Shot
+                                            <Button onClick={() => openEventDialog('ShotOffTarget', match.homeTeam)} variant="ghost" className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-white/10 rounded-xl">
+                                                <Circle size={16} /> Shot
                                             </Button>
-                                            <Button onClick={() => openEventDialog('Corner', match.homeTeam)} variant="ghost" className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-slate-800">
-                                                <Flag size={14} /> Corner
+                                            <Button onClick={() => openEventDialog('Corner', match.homeTeam)} variant="ghost" className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-white/10 rounded-xl">
+                                                <Flag size={16} /> Corner
                                             </Button>
-                                            <Button onClick={() => openEventDialog('Foul', match.homeTeam)} variant="ghost" className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-red-500/10 hover:text-red-400">
-                                                <AlertCircle size={14} /> Foul
+                                            <Button onClick={() => openEventDialog('Foul', match.homeTeam)} variant="ghost" className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-red-500/10 hover:text-red-400 rounded-xl">
+                                                <AlertCircle size={16} /> Foul
                                             </Button>
-                                            <Button onClick={() => openEventDialog('Offside', match.homeTeam)} variant="ghost" className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-slate-800">
-                                                <Flag size={14} className="rotate-45" /> Offside
+                                            <Button onClick={() => openEventDialog('Offside', match.homeTeam)} variant="ghost" className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-white/10 rounded-xl">
+                                                <Flag size={16} className="rotate-45" /> Offside
                                             </Button>
                                             <Button 
                                                 onClick={() => openEventDialog('Substitution', match.homeTeam)} 
                                                 variant="ghost" 
                                                 disabled={match.lineups?.home?.substitutionCount >= 5}
-                                                className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-purple-500/10 hover:text-purple-400 disabled:opacity-20"
+                                                className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-purple-500/10 hover:text-purple-400 disabled:opacity-30 rounded-xl relative"
                                             >
-                                                <ArrowRightLeft size={14} /> 
-                                                <span className="flex flex-col">
-                                                    <span>Sub</span>
-                                                    {match.lineups?.home?.substitutionCount > 0 && <span className="text-[7px] text-purple-600">{match.lineups.home.substitutionCount}/5</span>}
-                                                </span>
+                                                <ArrowRightLeft size={16} /> 
+                                                <span>Sub</span>
+                                                {match.lineups?.home?.substitutionCount > 0 && <span className="absolute top-1 right-1 text-[9px] text-purple-400 bg-purple-500/20 px-1 rounded">{match.lineups.home.substitutionCount}/5</span>}
                                             </Button>
                                         </div>
                                     </div>
                                 </Card>
 
                                 {/* Away Actions */}
-                                <Card className="bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-8">
-                                    <CardHeader className="px-0 pt-0 mb-6">
-                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Away Actions</h3>
+                                <Card className="bg-slate-900/20 border-white/5 rounded-3xl p-6 shadow-lg backdrop-blur-sm">
+                                    <CardHeader className="px-0 pt-0 mb-5">
+                                        <h3 className="text-sm font-semibold text-slate-400 flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-orange-500" />
+                                            Away Actions
+                                        </h3>
                                     </CardHeader>
                                     <div className="grid gap-3">
                                         <Button 
                                             onClick={() => openEventDialog('Goal', match.awayTeam)}
-                                            className="h-16 bg-orange-600 hover:bg-orange-500 rounded-2xl font-black italic uppercase tracking-tight"
+                                            className="h-14 bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-white border border-orange-500/20 rounded-2xl font-semibold transition-all"
                                         >
                                             <Circle className="mr-2 fill-current" size={18} /> Record Goal
                                         </Button>
@@ -1036,14 +1083,14 @@ export default function FootballScoringPanel() {
                                             <Button 
                                                 onClick={() => openEventDialog('YellowCard', match.awayTeam)}
                                                 variant="outline"
-                                                className="h-14 border-slate-800 bg-slate-950 text-yellow-500 hover:bg-yellow-500 hover:text-black rounded-2xl font-black"
+                                                className="h-12 border-white/10 bg-slate-950/50 text-yellow-500 hover:bg-yellow-500 hover:text-black hover:border-yellow-500 rounded-2xl font-medium transition-all"
                                             >
                                                 <Flag size={16} className="mr-2" /> Yellow
                                             </Button>
                                             <Button 
                                                 onClick={() => openEventDialog('RedCard', match.awayTeam)}
                                                 variant="outline"
-                                                className="h-14 border-slate-800 bg-slate-950 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl font-black"
+                                                className="h-12 border-white/10 bg-slate-950/50 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 rounded-2xl font-medium transition-all"
                                             >
                                                 <ShieldAlert size={16} className="mr-2" /> Red Card
                                             </Button>
@@ -1051,39 +1098,37 @@ export default function FootballScoringPanel() {
                                         <Button 
                                             onClick={() => openEventDialog('Save', match.awayTeam)}
                                             variant="outline"
-                                            className="h-14 mt-3 border-slate-800 bg-slate-950 text-blue-400 hover:bg-blue-600 hover:text-white rounded-2xl font-black w-full"
+                                            className="h-12 border-white/10 bg-slate-950/50 text-blue-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 rounded-2xl font-medium transition-all w-full"
                                         >
                                             <Shield size={16} className="mr-2" /> Record Save
                                         </Button>
 
                                         {/* Advanced Away Actions */}
-                                        <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-white/5">
-                                            <Button onClick={() => openEventDialog('ShotOnTarget', match.awayTeam)} variant="ghost" className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-blue-500/10 hover:text-blue-400">
-                                                <Target size={14} /> SOT
+                                        <div className="grid grid-cols-3 gap-2 mt-2 pt-4 border-t border-white/5">
+                                            <Button onClick={() => openEventDialog('ShotOnTarget', match.awayTeam)} variant="ghost" className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-orange-500/10 hover:text-orange-400 rounded-xl">
+                                                <Target size={16} /> SOT
                                             </Button>
-                                            <Button onClick={() => openEventDialog('ShotOffTarget', match.awayTeam)} variant="ghost" className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-slate-800">
-                                                <Circle size={14} /> Shot
+                                            <Button onClick={() => openEventDialog('ShotOffTarget', match.awayTeam)} variant="ghost" className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-white/10 rounded-xl">
+                                                <Circle size={16} /> Shot
                                             </Button>
-                                            <Button onClick={() => openEventDialog('Corner', match.awayTeam)} variant="ghost" className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-slate-800">
-                                                <Flag size={14} /> Corner
+                                            <Button onClick={() => openEventDialog('Corner', match.awayTeam)} variant="ghost" className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-white/10 rounded-xl">
+                                                <Flag size={16} /> Corner
                                             </Button>
-                                            <Button onClick={() => openEventDialog('Foul', match.awayTeam)} variant="ghost" className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-red-500/10 hover:text-red-400">
-                                                <AlertCircle size={14} /> Foul
+                                            <Button onClick={() => openEventDialog('Foul', match.awayTeam)} variant="ghost" className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-red-500/10 hover:text-red-400 rounded-xl">
+                                                <AlertCircle size={16} /> Foul
                                             </Button>
-                                            <Button onClick={() => openEventDialog('Offside', match.awayTeam)} variant="ghost" className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-slate-800">
-                                                <Flag size={14} className="rotate-45" /> Offside
+                                            <Button onClick={() => openEventDialog('Offside', match.awayTeam)} variant="ghost" className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-white/10 rounded-xl">
+                                                <Flag size={16} className="rotate-45" /> Offside
                                             </Button>
                                             <Button 
                                                 onClick={() => openEventDialog('Substitution', match.awayTeam)} 
                                                 variant="ghost" 
                                                 disabled={match.lineups?.away?.substitutionCount >= 5}
-                                                className="h-12 flex-col gap-1 text-[10px] font-black uppercase tracking-tighter hover:bg-purple-500/10 hover:text-purple-400 disabled:opacity-20"
+                                                className="h-14 flex-col gap-1.5 text-xs font-medium text-slate-400 hover:bg-purple-500/10 hover:text-purple-400 disabled:opacity-30 rounded-xl relative"
                                             >
-                                                <ArrowRightLeft size={14} /> 
-                                                <span className="flex flex-col">
-                                                    <span>Sub</span>
-                                                    {match.lineups?.away?.substitutionCount > 0 && <span className="text-[7px] text-purple-600">{match.lineups.away.substitutionCount}/5</span>}
-                                                </span>
+                                                <ArrowRightLeft size={16} /> 
+                                                <span>Sub</span>
+                                                {match.lineups?.away?.substitutionCount > 0 && <span className="absolute top-1 right-1 text-[9px] text-purple-400 bg-purple-500/20 px-1 rounded">{match.lineups.away.substitutionCount}/5</span>}
                                             </Button>
                                         </div>
                                     </div>
@@ -1091,10 +1136,10 @@ export default function FootballScoringPanel() {
                             </div>
 
                             {/* Timeline / Events */}
-                            <Card className="bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-8 min-h-[400px]">
-                                <CardHeader className="px-0 pt-0 mb-6 flex flex-row items-center justify-between">
-                                    <h3 className="text-xl font-black uppercase tracking-tight italic">Match Timeline</h3>
-                                    <History size={20} className="text-slate-500" />
+                            <Card className="bg-slate-900/20 border-white/5 rounded-3xl p-6 shadow-lg backdrop-blur-sm min-h-[400px]">
+                                <CardHeader className="px-0 pt-0 mb-5 flex flex-row items-center justify-between">
+                                    <h3 className="text-lg font-semibold tracking-wide flex items-center gap-2 text-white">Match Timeline</h3>
+                                    <History size={20} className="text-slate-400" />
                                 </CardHeader>
                                 <div className="space-y-4">
                                     {match.events?.length === 0 && (
@@ -1115,8 +1160,8 @@ export default function FootballScoringPanel() {
                                                 {event.type === 'Save' && <Shield size={14} />}
                                             </div>
                                             <div className="flex-1">
-                                                <p className="text-sm font-bold uppercase tracking-tight text-white">
-                                                    {event.type} {event.goalType === 'Penalty' && <span className="text-red-500 text-[10px] ml-2">(PEN)</span>}
+                                                <p className="text-sm font-semibold tracking-wide text-white">
+                                                    {event.type} {event.goalType === 'Penalty' && <span className="text-red-400 text-[10px] ml-2">(PEN)</span>}
                                                 </p>
                                                 <p className={`text-[10px] uppercase font-black ${event.isInjured ? 'text-red-400' : 'text-slate-500'}`}>
                                                     {event.player} {event.assister && <span className="text-blue-400 normal-case font-medium ml-1">Assist: {event.assister}</span>}
@@ -1131,14 +1176,14 @@ export default function FootballScoringPanel() {
 
                         {/* Sidebar Controls */}
                         <div className="space-y-6">
-                            <Card className="bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-8">
-                                <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Match Controls</h3>
+                            <Card className="bg-slate-900/20 border-white/5 rounded-3xl p-6 shadow-lg backdrop-blur-sm">
+                                <h3 className="text-sm font-semibold text-slate-400 mb-5">Match Controls</h3>
                                 <div className="grid gap-4">
                                     {match.timer.halfStatus === 'HalfTime' ? (
                                         <Button 
                                             onClick={handleStartSecondHalf}
                                             size="lg"
-                                            className="h-16 rounded-2xl font-black uppercase italic tracking-widest bg-blue-600 hover:bg-blue-500 text-white animate-pulse"
+                                            className="h-14 rounded-2xl font-semibold tracking-wide bg-blue-500 hover:bg-blue-400 text-white animate-pulse transition-all shadow-[0_0_20px_rgba(59,130,246,0.3)]"
                                         >
                                             <Play className="mr-2" size={20} /> Start 2nd Half
                                         </Button>
@@ -1147,7 +1192,7 @@ export default function FootballScoringPanel() {
                                             onClick={() => handleTimerControl(!match.timer.isRunning)}
                                             size="lg"
                                             disabled={match.timer.halfStatus === 'FullTime'}
-                                            className={`h-16 rounded-2xl font-black uppercase italic tracking-widest ${match.timer.isRunning ? 'bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20' : 'bg-green-600 hover:bg-green-500 text-white'}`}
+                                            className={`h-14 rounded-2xl font-semibold tracking-wide transition-all ${match.timer.isRunning ? 'bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/20' : 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.3)]'}`}
                                         >
                                             {match.timer.isRunning ? <Pause className="mr-2" size={20} /> : <Play className="mr-2" size={20} />}
                                             {match.timer.isRunning ? 'Pause Engine' : 'Resume Engine'}
@@ -1157,9 +1202,9 @@ export default function FootballScoringPanel() {
                                     <Button 
                                         onClick={handleFinalize}
                                         variant="outline"
-                                        className="h-14 border-slate-800 bg-slate-950 text-white hover:bg-slate-800 rounded-2xl font-black uppercase italic tracking-widest"
+                                        className="h-12 border-white/10 bg-slate-950/50 text-slate-300 hover:bg-white/5 rounded-2xl font-semibold tracking-wide transition-all"
                                     >
-                                        <CheckCircle2 size={20} className="mr-2 text-green-500" /> End Match
+                                        <CheckCircle2 size={18} className="mr-2 text-green-500" /> End Match
                                     </Button>
 
                                     {/* Manual End Half Button */}
@@ -1174,22 +1219,22 @@ export default function FootballScoringPanel() {
                                                 }
                                             }}
                                             variant="secondary"
-                                            className="h-14 bg-orange-600/10 hover:bg-orange-600/20 text-orange-500 border border-orange-500/20 rounded-2xl font-black uppercase italic tracking-widest"
+                                            className="h-12 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 rounded-2xl font-medium transition-all"
                                         >
-                                            <Clock size={20} className="mr-2" /> 
+                                            <Clock size={18} className="mr-2" /> 
                                             End {match.timer.half === 1 ? '1st' : '2nd'} Half
                                         </Button>
                                     )}
                                 </div>
                             </Card>
 
-                            <Card className="bg-slate-900/40 border-slate-800 rounded-[2.5rem] p-8 overflow-hidden relative">
-                                <div className="absolute -right-4 -bottom-4 opacity-5">
-                                    <ShieldAlert size={120} />
+                            <Card className="bg-slate-900/20 border-white/5 rounded-3xl p-6 overflow-hidden relative shadow-lg backdrop-blur-sm">
+                                <div className="absolute -right-4 -bottom-4 opacity-[0.03]">
+                                    <ShieldAlert size={100} />
                                 </div>
-                                <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Live Insights</h3>
-                                <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl">
-                                    <p className="text-blue-400 text-xs font-bold italic uppercase tracking-tight">
+                                <h3 className="text-sm font-semibold text-slate-400 mb-4">Live Insights</h3>
+                                <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl shadow-inner">
+                                    <p className="text-blue-400 text-sm font-medium leading-relaxed">
                                         {match.score.home > match.score.away 
                                             ? `${match.homeTeam.name} is dominating possession and scoreline.`
                                             : match.score.away > match.score.home

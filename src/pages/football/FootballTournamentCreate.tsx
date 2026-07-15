@@ -21,7 +21,12 @@ export default function FootballTournamentCreate() {
         endDate: "",
         winPoints: "3",
         drawPoints: "1",
-        lossPoints: "0"
+        lossPoints: "0",
+        playersPerTeam: "11",
+        matchDuration: "90",
+        halfDuration: "45",
+        maxSubstitutions: "5",
+        yellowCardBan: "2"
     });
 
     const [teams, setTeams] = useState<any[]>([]);
@@ -50,6 +55,13 @@ export default function FootballTournamentCreate() {
                     win: Number(formData.winPoints),
                     draw: Number(formData.drawPoints),
                     loss: Number(formData.lossPoints)
+                },
+                matchConfig: {
+                    playersPerTeam: Number(formData.playersPerTeam),
+                    duration: Number(formData.matchDuration),
+                    halfDuration: Number(formData.halfDuration),
+                    maxSubstitutions: Number(formData.maxSubstitutions),
+                    yellowCardBanThreshold: Number(formData.yellowCardBan)
                 }
             });
 
@@ -176,6 +188,64 @@ export default function FootballTournamentCreate() {
                                             value={formData.lossPoints}
                                             onChange={(e) => setFormData({...formData, lossPoints: e.target.value})}
                                             className="bg-slate-950 border-slate-800 h-14 rounded-2xl px-6 text-center"
+                                        />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        
+                        <Card className="bg-slate-900/40 border-slate-800 rounded-[2rem] p-8 backdrop-blur-xl md:col-span-2">
+                            <CardHeader className="px-0 pt-0">
+                                <CardTitle className="text-xl font-black italic uppercase tracking-tight">Match Rules</CardTitle>
+                                <CardDescription className="text-slate-500">Global rules applied to all matches in this tournament</CardDescription>
+                            </CardHeader>
+                            <CardContent className="px-0">
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-500 ml-1">Format (v)</Label>
+                                        <Input 
+                                            type="number"
+                                            value={formData.playersPerTeam}
+                                            onChange={(e) => setFormData({...formData, playersPerTeam: e.target.value})}
+                                            className="bg-slate-950 border-slate-800 h-14 rounded-2xl px-6 text-center"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-500 ml-1">Match (Mins)</Label>
+                                        <Input 
+                                            type="number"
+                                            value={formData.matchDuration}
+                                            onChange={(e) => setFormData({...formData, matchDuration: e.target.value})}
+                                            className="bg-slate-950 border-slate-800 h-14 rounded-2xl px-6 text-center"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-500 ml-1">Half (Mins)</Label>
+                                        <Input 
+                                            type="number"
+                                            value={formData.halfDuration}
+                                            onChange={(e) => setFormData({...formData, halfDuration: e.target.value})}
+                                            className="bg-slate-950 border-slate-800 h-14 rounded-2xl px-6 text-center"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-500 ml-1">Max Subs</Label>
+                                        <Input 
+                                            type="number"
+                                            value={formData.maxSubstitutions}
+                                            onChange={(e) => setFormData({...formData, maxSubstitutions: e.target.value})}
+                                            className="bg-slate-950 border-slate-800 h-14 rounded-2xl px-6 text-center"
+                                            placeholder="999 for rolling"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-500 ml-1">YC Ban</Label>
+                                        <Input 
+                                            type="number"
+                                            value={formData.yellowCardBan}
+                                            onChange={(e) => setFormData({...formData, yellowCardBan: e.target.value})}
+                                            className="bg-slate-950 border-slate-800 h-14 rounded-2xl px-6 text-center"
+                                            placeholder="Cards to ban"
                                         />
                                     </div>
                                 </div>

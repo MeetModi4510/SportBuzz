@@ -10,6 +10,7 @@ const footballMatchSchema = new mongoose.Schema({
         ref: 'User'
     },
     matchConfig: {
+        playersPerTeam: { type: Number, default: 11 },
         duration: { type: Number, default: 90 },
         halfDuration: { type: Number, default: 45 },
         maxSubstitutions: { type: Number, default: 5 }, // 999 for rolling subs

@@ -206,65 +206,64 @@ export default function LiveFootballMatch() {
                 )}
 
                 {/* Cinema Scoreboard */}
-                <div className="relative mb-12 rounded-[4rem] overflow-hidden bg-gradient-to-b from-slate-900/80 to-slate-950/90 border border-white/5 shadow-2xl backdrop-blur-3xl p-16">
-                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
-                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600" />
+                <div className="relative mb-12 rounded-[2.5rem] overflow-hidden bg-slate-950/60 border border-white/5 shadow-lg backdrop-blur-3xl p-12">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500 opacity-80" />
                     
                     <div className="flex flex-col md:flex-row items-center justify-between gap-16 relative z-10">
                         {/* Home */}
-                        <div className="flex flex-col items-center gap-6 flex-1 group">
-                            <div className="w-40 h-40 rounded-[2.5rem] bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden shadow-[0_0_50px_rgba(59,130,246,0.15)] group-hover:scale-105 transition-transform duration-700">
-                                {match.homeTeam.logo ? <img src={match.homeTeam.logo} /> : <Users size={60} className="text-slate-800" />}
+                        <div className="flex flex-col items-center gap-5 flex-1 group">
+                            <div className="w-32 h-32 rounded-3xl bg-slate-900/50 border border-white/5 flex items-center justify-center overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-500">
+                                {match.homeTeam.logo ? <img src={match.homeTeam.logo} /> : <Users size={48} className="text-slate-600" />}
                             </div>
-                            <h2 className="text-4xl font-black italic uppercase tracking-tighter text-center leading-none">{match.homeTeam.name}</h2>
+                            <h2 className="text-3xl font-bold tracking-tight text-white/95 text-center leading-none">{match.homeTeam.name}</h2>
                             <div className="mt-2 flex flex-col items-center gap-1">
                                 {match.events?.filter((e: any) => e.type === 'Goal' && String(e.team?._id || e.team) === String(match.homeTeam._id)).map((e: any, i: number) => (
-                                    <span key={i} className="text-[10px] font-black uppercase text-slate-500 tracking-widest italic animate-in fade-in slide-in-from-top-2 duration-500">
-                                        {e.player} {formatEventMinute(e.minute, e.half)} {e.goalType === 'Penalty' && <span className="text-blue-500">(P)</span>}
+                                    <span key={i} className="text-[11px] font-medium text-slate-400 tracking-wider animate-in fade-in slide-in-from-top-2 duration-500">
+                                        {e.player} {e.assister && <span className="text-slate-500 text-[10px]">({e.assister})</span>} {formatEventMinute(e.minute, e.half)} {e.goalType === 'Penalty' && <span className="text-blue-400">(P)</span>}
                                     </span>
                                 ))}
                             </div>
                         </div>
 
                         {/* Mid Section */}
-                        <div className="flex flex-col items-center gap-8">
-                             <div className="px-6 py-2 rounded-full border border-blue-500/20 bg-blue-500/5 text-blue-400 text-[10px] font-black uppercase tracking-[0.4em]">Live Transmission</div>
+                        <div className="flex flex-col items-center gap-6">
+                             <div className="px-4 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-semibold uppercase tracking-widest mb-2">Live Transmission</div>
                              
-                             <div className="flex items-center gap-12">
-                                <span className="text-9xl font-black italic tracking-tighter text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">{match.score?.home ?? 0}</span>
+                             <div className="flex items-center gap-8">
+                                <span className="text-7xl font-bold tracking-tight text-white">{match.score?.home ?? 0}</span>
                                 <div className="flex flex-col items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-slate-700" />
-                                    <div className="w-2 h-2 rounded-full bg-slate-700" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-600" />
                                 </div>
-                                <span className="text-9xl font-black italic tracking-tighter text-white drop-shadow-[0_0_30_rgba(255,255,255,0.2)]">{match.score?.away ?? 0}</span>
+                                <span className="text-7xl font-bold tracking-tight text-white">{match.score?.away ?? 0}</span>
                              </div>
 
-                             <div className="flex flex-col items-center">
-                                <div className="flex items-center gap-3 text-4xl font-black italic tabular-nums tracking-tighter">
-                                    <Timer className={match.timer?.isRunning ? "text-green-500 animate-pulse" : "text-slate-600"} size={28} />
+                             <div className="flex flex-col items-center mt-2">
+                                <div className="flex items-center gap-3 text-3xl font-semibold tabular-nums tracking-tight text-white/90">
+                                    <Timer className={match.timer?.isRunning ? "text-green-500 animate-pulse" : "text-slate-500"} size={24} />
                                     <span>{displayTime}</span>
                                 </div>
                                 <div className="flex items-center gap-3 mt-2">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500">
+                                    <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">
                                         {match.timer?.halfStatus === 'FirstHalf' ? '1st Half' : 
                                          match.timer?.halfStatus === 'HalfTime' ? 'Half Time' :
                                          match.timer?.halfStatus === 'SecondHalf' ? '2nd Half' : 'Full Time'}
                                     </span>
-                                    {match.timer?.injuryTime > 0 && <span className="text-orange-500 font-black italic text-[10px] tracking-widest">+{match.timer.injuryTime}' ET</span>}
+                                    {match.timer?.injuryTime > 0 && <span className="text-orange-400 font-medium text-xs tracking-wider">+{match.timer.injuryTime}' ET</span>}
                                 </div>
                              </div>
                         </div>
 
                         {/* Away */}
-                        <div className="flex flex-col items-center gap-6 flex-1 group">
-                             <div className="w-40 h-40 rounded-[2.5rem] bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden shadow-[0_0_50px_rgba(249,115,22,0.15)] group-hover:scale-105 transition-transform duration-700">
-                                {match.awayTeam.logo ? <img src={match.awayTeam.logo} /> : <Users size={60} className="text-slate-800" />}
+                        <div className="flex flex-col items-center gap-5 flex-1 group">
+                             <div className="w-32 h-32 rounded-3xl bg-slate-900/50 border border-white/5 flex items-center justify-center overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-500">
+                                {match.awayTeam.logo ? <img src={match.awayTeam.logo} /> : <Users size={48} className="text-slate-600" />}
                              </div>
-                             <h2 className="text-4xl font-black italic uppercase tracking-tighter text-center leading-none">{match.awayTeam.name}</h2>
+                             <h2 className="text-3xl font-bold tracking-tight text-white/95 text-center leading-none">{match.awayTeam.name}</h2>
                              <div className="mt-2 flex flex-col items-center gap-1">
                                 {match.events?.filter((e: any) => e.type === 'Goal' && String(e.team?._id || e.team) === String(match.awayTeam._id)).map((e: any, i: number) => (
-                                    <span key={i} className="text-[10px] font-black uppercase text-slate-500 tracking-widest italic animate-in fade-in slide-in-from-top-2 duration-500">
-                                        {e.player} {formatEventMinute(e.minute, e.half)} {e.goalType === 'Penalty' && <span className="text-orange-500">(P)</span>}
+                                    <span key={i} className="text-[11px] font-medium text-slate-400 tracking-wider animate-in fade-in slide-in-from-top-2 duration-500">
+                                        {e.player} {e.assister && <span className="text-slate-500 text-[10px]">({e.assister})</span>} {formatEventMinute(e.minute, e.half)} {e.goalType === 'Penalty' && <span className="text-orange-400">(P)</span>}
                                     </span>
                                 ))}
                             </div>
@@ -273,20 +272,20 @@ export default function LiveFootballMatch() {
                 </div>
 
                 <Tabs defaultValue="live" className="space-y-12">
-                    <TabsList className="bg-slate-900/40 border border-white/5 p-1 h-14 rounded-2xl backdrop-blur-xl">
-                        <TabsTrigger value="overview" className="rounded-xl px-8 h-full font-black italic uppercase tracking-widest text-[10px] data-[state=active]:bg-slate-800 data-[state=active]:text-white transition-all gap-2">
+                    <TabsList className="bg-slate-950/50 border border-white/5 p-1.5 rounded-2xl h-14 w-full md:w-auto justify-start gap-2 shadow-inner overflow-x-auto no-scrollbar">
+                        <TabsTrigger value="overview" className="rounded-xl px-6 h-full font-medium text-xs data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400 data-[state=active]:shadow-sm transition-all gap-2">
                             <LayoutDashboard size={14} /> Overview
                         </TabsTrigger>
-                        <TabsTrigger value="live" className="rounded-xl px-8 h-full font-black italic uppercase tracking-widest text-[10px] data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all gap-2">
-                            <Zap size={14} /> Live Narrative
+                        <TabsTrigger value="live" className="rounded-xl px-6 h-full font-medium text-xs data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400 data-[state=active]:shadow-sm transition-all gap-2">
+                            <Zap size={14} className="text-blue-400" /> Live Narrative
                         </TabsTrigger>
-                        <TabsTrigger value="stats" className="rounded-xl px-8 h-full font-black italic uppercase tracking-widest text-[10px] data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all gap-2">
+                        <TabsTrigger value="stats" className="rounded-xl px-6 h-full font-medium text-xs data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400 data-[state=active]:shadow-sm transition-all gap-2">
                             <BarChart3 size={14} /> Data Stream
                         </TabsTrigger>
-                        <TabsTrigger value="lab" className="rounded-xl px-8 h-full font-black italic uppercase tracking-widest text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white transition-all gap-2">
-                            <Activity size={14} /> Performance Lab
+                        <TabsTrigger value="lab" className="rounded-xl px-6 h-full font-medium text-xs data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400 data-[state=active]:shadow-sm transition-all gap-2">
+                            <Activity size={14} className="text-purple-400" /> Performance Lab
                         </TabsTrigger>
-                        <TabsTrigger value="lineups" className="rounded-xl px-8 h-full font-black italic uppercase tracking-widest text-[10px] data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all gap-2">
+                        <TabsTrigger value="lineups" className="rounded-xl px-6 h-full font-medium text-xs data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400 data-[state=active]:shadow-sm transition-all gap-2">
                             <Users size={14} /> Tactical Lineups
                         </TabsTrigger>
                     </TabsList>
@@ -522,123 +521,91 @@ export default function LiveFootballMatch() {
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="live" className="space-y-12">
-                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                            <div className="lg:col-span-2 space-y-8">
-                                <div className="flex items-center gap-4 px-4">
-                                    <History className="text-blue-500" size={24} />
-                                    <h3 className="text-2xl font-black italic uppercase tracking-tight">Match Narrative</h3>
+                    <TabsContent value="live" className="space-y-8">
+                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="flex items-center justify-between px-2">
+                                    <h3 className="text-xl font-bold tracking-tight text-white/95 flex items-center gap-2">
+                                        <History className="text-blue-500" size={20} /> Match Narrative
+                                    </h3>
                                 </div>
                                 <div className="grid gap-4">
-                                    {match.events?.length === 0 && <p className="p-20 text-center text-slate-700 italic border-2 border-dashed border-white/5 rounded-[3rem] uppercase font-black text-xs tracking-widest">Awaiting breakthrough on the field...</p>}
+                                    {match.events?.length === 0 && <p className="py-12 text-center text-slate-500 font-medium text-sm">No events recorded yet.</p>}
                                     {match.events?.slice().reverse().map((event: any, i: number) => {
                                         const isHome = String(event.team?._id || event.team) === String(match.homeTeam._id);
-                                        const accentColor = isHome ? 'bg-blue-600' : 'bg-orange-600';
+                                        const accentColor = isHome ? 'bg-blue-500' : 'bg-orange-500';
                                         
                                         const formatEventType = (type: string) => {
                                             const formatted = type.replace(/([A-Z])/g, ' $1').trim();
                                             return formatted;
                                         };
 
-                                        const getEventGlow = (type: string) => {
-                                            switch(type) {
-                                                case 'Goal': return 'after:bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.1)_0%,transparent_70%)]';
-                                                case 'RedCard': return 'after:bg-[radial-gradient(circle_at_center,rgba(239,68,68,0.1)_0%,transparent_70%)]';
-                                                case 'YellowCard': return 'after:bg-[radial-gradient(circle_at_center,rgba(234,179,8,0.05)_0%,transparent_70%)]';
-                                                default: return isHome ? 'after:bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.05)_0%,transparent_70%)]' : 'after:bg-[radial-gradient(circle_at_center,rgba(234,88,12,0.05)_0%,transparent_70%)]';
-                                            }
-                                        };
-
                                         return (
-                                            <Card key={event._id || i} className={`relative bg-slate-950/40 border-white/5 rounded-2xl p-5 hover:bg-slate-900/60 transition-all duration-500 group overflow-hidden ${getEventGlow(event.type)} after:absolute after:inset-0 after:pointer-events-none after:opacity-50`}>
+                                            <Card key={event._id || i} className="relative bg-slate-950/40 border-white/5 rounded-2xl p-4 hover:bg-slate-900/60 transition-colors group overflow-hidden">
                                                 {/* Team Accent Bar */}
-                                                <div className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor} opacity-40 group-hover:opacity-100 transition-opacity duration-500`} />
+                                                <div className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor} opacity-50`} />
                                                 
-                                                <div className="flex items-center gap-6 relative z-10 group-hover:translate-x-0.5 transition-transform duration-500">
+                                                <div className="flex items-start gap-4 relative z-10 pl-2">
                                                     
                                                     {/* Compact Time Tag */}
-                                                    <div className="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-slate-950/90 border border-white/5 shadow-inner-dark backdrop-blur-md shrink-0">
-                                                        <span className="text-2xl font-black italic tracking-tighter text-white tabular-nums leading-none">
-                                                            {event.minute}
-                                                        </span>
-                                                        <span className="text-[7px] font-black text-slate-600 uppercase tracking-widest mt-1">
-                                                            {event.half === 1 ? '1st' : '2nd'}
+                                                    <div className="flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-slate-900/50 border border-white/5 shrink-0">
+                                                        <span className="text-lg font-bold text-white tabular-nums leading-none">
+                                                            {event.minute}'
                                                         </span>
                                                     </div>
 
                                                     {/* Sleek Icon Box */}
-                                                    <div className={`w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 relative group-hover:scale-105 transition-all duration-500 ${isHome ? 'text-blue-500' : 'text-orange-500'}`}>
-                                                        {event.type === 'Goal' && <Trophy size={20} className="animate-bounce" />}
-                                                        {event.type === 'Save' && <Shield size={20} />}
-                                                        {event.type === 'YellowCard' && <Square className="fill-yellow-500 text-yellow-500" size={20} />}
-                                                        {event.type === 'RedCard' && <Square className="fill-red-500 text-red-500" size={20} />}
-                                                        {event.type === 'Substitution' && <ArrowRightLeft size={20} className="text-purple-500" />}
-                                                        {event.type === 'ShotOnTarget' && <Activity size={20} />}
-                                                        {event.type === 'ShotOffTarget' && <Activity className="rotate-45" size={20} />}
-                                                        {event.type === 'Offside' && <Flag size={20} />}
-                                                        {event.type === 'Foul' && <AlertCircle size={20} />}
-                                                        {event.type === 'Corner' && <Flag size={20} />}
-                                                        
-                                                        {/* Icon Glow */}
-                                                        <div className={`absolute inset-0 rounded-xl blur-lg opacity-10 group-hover:opacity-20 transition-all duration-500 ${accentColor}`} />
+                                                    <div className={`w-10 h-10 mt-1 rounded-full bg-slate-900/50 border border-white/5 flex items-center justify-center shrink-0 ${isHome ? 'text-blue-400' : 'text-orange-400'}`}>
+                                                        {event.type === 'Goal' && <Trophy size={16} className="text-green-400" />}
+                                                        {event.type === 'Save' && <Shield size={16} />}
+                                                        {event.type === 'YellowCard' && <Square className="fill-yellow-500 text-yellow-500" size={16} />}
+                                                        {event.type === 'RedCard' && <Square className="fill-red-500 text-red-500" size={16} />}
+                                                        {event.type === 'Substitution' && <ArrowRightLeft size={16} className="text-purple-400" />}
+                                                        {event.type === 'ShotOnTarget' && <Activity size={16} />}
+                                                        {event.type === 'ShotOffTarget' && <Activity className="rotate-45" size={16} />}
+                                                        {event.type === 'Offside' && <Flag size={16} />}
+                                                        {event.type === 'Foul' && <AlertCircle size={16} />}
+                                                        {event.type === 'Corner' && <Flag size={16} />}
                                                     </div>
 
                                                     {/* Streamlined Details */}
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-3 flex-wrap">
-                                                            <h4 className="text-lg font-black italic uppercase tracking-tight text-white truncate">{event.player}</h4>
+                                                    <div className="flex-1 min-w-0 pt-0.5">
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <h4 className="text-base font-semibold text-white/95 truncate">{event.player}</h4>
                                                             <div className="flex items-center gap-2">
-                                                                <span className={`text-[10px] font-black italic uppercase tracking-widest ${event.type === 'Goal' ? 'text-green-500' : event.type === 'Substitution' ? 'text-purple-500' : 'text-slate-500'}`}>
+                                                                <span className={`text-[10px] font-semibold uppercase tracking-wider ${event.type === 'Goal' ? 'text-green-400' : event.type === 'Substitution' ? 'text-purple-400' : 'text-slate-400'}`}>
                                                                     {formatEventType(event.type)}
                                                                 </span>
-                                                                {event.goalType === 'Penalty' && <span className="text-[8px] font-black text-red-500 uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">Penalty</span>}
+                                                                {event.goalType === 'Penalty' && <span className="text-[10px] font-semibold text-blue-400 uppercase tracking-wider">(Penalty)</span>}
                                                             </div>
                                                         </div>
                                                         
                                                         {event.type === 'Substitution' && (
-                                                            <div className="mt-1 flex items-center gap-4">
-                                                                <div className="flex items-center gap-1.5 overflow-hidden">
-                                                                    <ArrowUpRight size={10} className="text-green-500 shrink-0" />
-                                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest truncate max-w-[120px]">
-                                                                        IN: <span className="text-white italic">{event.player}</span>
-                                                                    </span>
+                                                            <div className="mt-1.5 flex items-center gap-4">
+                                                                <div className="flex items-center gap-1.5 text-sm">
+                                                                    <ArrowUpRight size={14} className="text-green-500 shrink-0" />
+                                                                    <span className="text-white font-medium truncate">{event.player}</span>
                                                                 </div>
-                                                                <div className="w-px h-3 bg-white/5" />
-                                                                <div className="flex items-center gap-1.5 overflow-hidden">
-                                                                    <ArrowDownLeft size={10} className="text-red-500 shrink-0" />
-                                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest truncate max-w-[120px]">
-                                                                        OUT: <span className="text-slate-500 italic">{event.playerOut}</span>
-                                                                    </span>
+                                                                <div className="flex items-center gap-1.5 text-sm">
+                                                                    <ArrowDownLeft size={14} className="text-red-500 shrink-0" />
+                                                                    <span className="text-slate-400 font-medium truncate">{event.playerOut}</span>
                                                                 </div>
                                                             </div>
                                                         )}
 
                                                         {event.assister && (
-                                                            <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-0.5">
-                                                                Assist: <span className="text-slate-400 italic lowercase font-medium">{event.assister}</span>
+                                                            <p className="text-xs font-medium text-slate-400 mt-1">
+                                                                Assist: <span className="text-slate-300">{event.assister}</span>
                                                             </p>
                                                         )}
 
                                                         {event.commentary && (
-                                                            <div className="mt-3 p-3 bg-white/[0.02] rounded-xl border border-white/5 backdrop-blur-sm relative overflow-hidden group/commentary max-w-2xl">
-                                                                <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-600/20" />
-                                                                <p className="text-[10px] font-medium text-slate-400 italic leading-snug">
+                                                            <div className="mt-2.5">
+                                                                <p className="text-sm text-slate-400 leading-relaxed">
                                                                     "{event.commentary}"
                                                                 </p>
                                                             </div>
                                                         )}
-                                                    </div>
-
-                                                    {/* Discreet Official Marker */}
-                                                    <div className="hidden sm:flex flex-col items-end gap-1.5 shrink-0 opacity-20 group-hover:opacity-60 transition-opacity">
-                                                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
-                                                            <div className="w-1 h-1 rounded-full bg-blue-500 animate-pulse" />
-                                                            <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 font-mono">LIVE</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/5 border border-green-500/10 text-green-500/80">
-                                                            <CheckCircle2 size={10} />
-                                                            <span className="text-[8px] font-black uppercase tracking-widest">OFFICIAL</span>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </Card>
@@ -647,37 +614,37 @@ export default function LiveFootballMatch() {
                                 </div>
                             </div>
 
-                            <div className="space-y-8">
-                                <Card className="bg-slate-900/40 border-slate-800 rounded-[3rem] p-10 overflow-hidden relative group">
-                                    <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/5 blur-[80px] rounded-full -mr-20 -mt-20 group-hover:bg-blue-600/10 transition-colors" />
-                                    <h3 className="text-xs font-black uppercase tracking-[0.4em] text-slate-500 mb-10 flex items-center gap-3">
-                                        <Activity size={16} className="animate-pulse" /> Live Pulse Index
-                                    </h3>
+                            <div className="space-y-6">
+                                <Card className="bg-slate-950/30 border border-white/5 rounded-2xl p-6">
+                                    <div className="flex items-center gap-2 mb-8">
+                                        <Activity size={18} className="text-blue-500" />
+                                        <h3 className="text-sm font-semibold tracking-wide text-white/95">Live Pulse Index</h3>
+                                    </div>
                                     
-                                    <div className="space-y-10">
-                                        <div className="space-y-4">
-                                            <div className="flex justify-between items-end">
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Win Probability</span>
-                                                <div className="flex gap-4">
-                                                    <span className="text-xs font-black text-blue-500 italic">H {match.performance?.winProbability?.home || 45}%</span>
-                                                    <span className="text-xs font-black text-orange-500 italic">A {match.performance?.winProbability?.away || 30}%</span>
+                                    <div className="space-y-8">
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="font-medium text-slate-400 uppercase tracking-wider">Win Probability</span>
+                                                <div className="flex gap-3">
+                                                    <span className="font-semibold text-blue-400">H {match.performance?.winProbability?.home || 45}%</span>
+                                                    <span className="font-semibold text-orange-400">A {match.performance?.winProbability?.away || 30}%</span>
                                                 </div>
                                             </div>
-                                            <div className="h-3 bg-slate-950 rounded-full overflow-hidden flex border border-white/5">
-                                                <div className="h-full bg-blue-600 transition-all duration-1000 shadow-[0_0_20px_rgba(37,99,235,0.4)]" style={{ width: `${match.performance?.winProbability?.home || 45}%` }} />
-                                                <div className="h-full bg-slate-800 transition-all duration-1000" style={{ width: `${match.performance?.winProbability?.draw || 25}%` }} />
-                                                <div className="h-full bg-orange-600 transition-all duration-1000 shadow-[0_0_20px_rgba(234,88,12,0.4)]" style={{ width: `${match.performance?.winProbability?.away || 30}%` }} />
+                                            <div className="h-1.5 bg-slate-900 rounded-full overflow-hidden flex border border-white/5">
+                                                <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${match.performance?.winProbability?.home || 45}%` }} />
+                                                <div className="h-full bg-slate-700 transition-all duration-1000" style={{ width: `${match.performance?.winProbability?.draw || 25}%` }} />
+                                                <div className="h-full bg-orange-500 transition-all duration-1000" style={{ width: `${match.performance?.winProbability?.away || 30}%` }} />
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-6">
-                                             <div className="bg-slate-950/50 p-6 rounded-[2.5rem] border border-white/5 hover:border-blue-500/20 transition-colors">
-                                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-2">Pressure Index</p>
-                                                <p className="text-4xl font-black italic tracking-tighter text-blue-500">{match.performance?.pressureIndex || '5.0'}</p>
+                                        <div className="grid grid-cols-2 gap-4">
+                                             <div className="bg-slate-900/40 p-4 rounded-xl border border-white/5">
+                                                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Pressure Index</p>
+                                                <p className="text-2xl font-bold tabular-nums text-white">{match.performance?.pressureIndex || '5.0'}</p>
                                              </div>
-                                             <div className="bg-slate-950/50 p-6 rounded-[2.5rem] border border-white/5 hover:border-orange-500/20 transition-colors">
-                                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-2">Recent Events</p>
-                                                <p className="text-4xl font-black italic tracking-tighter text-orange-500">{match.events?.filter((e: any) => e.minute > (match.timer?.currentMinute || 0) - 10).length || 0}</p>
+                                             <div className="bg-slate-900/40 p-4 rounded-xl border border-white/5">
+                                                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Recent Events</p>
+                                                <p className="text-2xl font-bold tabular-nums text-white">{match.events?.filter((e: any) => e.minute > (match.timer?.currentMinute || 0) - 10).length || 0}</p>
                                              </div>
                                         </div>
                                     </div>

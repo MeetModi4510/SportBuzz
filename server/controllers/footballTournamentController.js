@@ -9,7 +9,7 @@ import User from '../models/User.js';
 // @route   POST /api/football/tournaments
 // @access  Private
 export const createTournament = asyncHandler(async (req, res) => {
-    const { name, format, teams, pointsRule, startDate, endDate } = req.body;
+    const { name, format, teams, pointsRule, matchConfig, startDate, endDate } = req.body;
 
     try {
         const tournament = await FootballTournament.create({
@@ -17,6 +17,7 @@ export const createTournament = asyncHandler(async (req, res) => {
             format,
             teams, // IDs of FootballTeam
             pointsRule,
+            matchConfig,
             startDate,
             endDate,
             createdBy: req.user._id
@@ -330,9 +331,21 @@ export const getTeamById = asyncHandler(async (req, res) => {
             if (event.team?.toString() === req.params.id || (typeof event.team === 'object' && event.team?._id?.toString() === req.params.id)) {
                 const playerName = event.player;
                 if (!playerStats[playerName]) {
-                    playerStats[playerName] = { goals: 0, yellowCards: 0, redCards: 0 };
+                    playerStats[playerName] = { goals: 0, assists: 0, yellowCards: 0, redCards: 0 };
                 }
-                if (event.type === 'Goal') playerStats[playerName].goals++;
+                
+                if (event.type === 'Goal') {
+                    playerStats[playerName].goals++;
+                    
+                    if (event.assister) {
+                        const assisterName = event.assister;
+                        if (!playerStats[assisterName]) {
+                            playerStats[assisterName] = { goals: 0, assists: 0, yellowCards: 0, redCards: 0 };
+                        }
+                        playerStats[assisterName].assists++;
+                    }
+                }
+                
                 if (event.type === 'YellowCard') playerStats[playerName].yellowCards++;
                 if (event.type === 'RedCard') playerStats[playerName].redCards++;
             }
@@ -460,8 +473,11 @@ export const getTournamentStats = asyncHandler(async (req, res) => {
     const statsResult = {
         topScorers: statsList.filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals).slice(0, 5),
         topAssisters: statsList.filter(p => p.assists > 0).sort((a, b) => b.assists - a.assists).slice(0, 5),
+        topContributors: statsList.filter(p => (p.goals + p.assists) > 0).sort((a, b) => (b.goals + b.assists) - (a.goals + a.assists)).slice(0, 5),
+        topKeepers: statsList.filter(p => p.saves > 0).sort((a, b) => b.saves - a.saves).slice(0, 5),
         mostCards: statsList.filter(p => (p.yellowCards + p.redCards) > 0).sort((a, b) => (b.yellowCards + b.redCards) - (a.yellowCards + a.redCards)).slice(0, 5),
-        topKeepers: statsList.filter(p => p.saves > 0).sort((a, b) => b.saves - a.saves).slice(0, 5)
+        mostYellows: statsList.filter(p => p.yellowCards > 0).sort((a, b) => b.yellowCards - a.yellowCards).slice(0, 5),
+        mostReds: statsList.filter(p => p.redCards > 0).sort((a, b) => b.redCards - a.redCards).slice(0, 5)
     };
 
     res.json({ 
