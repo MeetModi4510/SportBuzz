@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Trophy, Calendar, Users, Plus, ArrowRight, Loader2, Search, Trophy as TrophyIcon, Bell, BellOff, Trash2 } from "lucide-react";
+import { Trophy, Calendar, Users, Plus, ArrowRight, Loader2, Search, Trophy as TrophyIcon, Bell, BellOff, Trash2, Lock } from "lucide-react";
 import { footballApi } from "@/services/api";
 import { useTournamentFollow } from "@/hooks/useTournamentFollow";
 import { toast } from "sonner";
@@ -14,7 +14,13 @@ export const FootballTournamentManager = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const { toggle: toggleFollow, isFollowed } = useTournamentFollow();
-
+    
+    // Private tournament logic
+    const [passcodePromptTournament, setPasscodePromptTournament] = useState<any>(null);
+    const [passcodeAttempt, setPasscodeAttempt] = useState("");
+    const [passcodeError, setPasscodeError] = useState("");
+    const [isVerifying, setIsVerifying] = useState(false);
+    
     const getCurrentUserId = () => {
         try {
             const userStr = localStorage.getItem("user");
@@ -27,20 +33,110 @@ export const FootballTournamentManager = () => {
     };
     const currentUserId = getCurrentUserId();
 
+    // Get granted tournaments from localStorage
+    const getGrantedTournaments = () => {
+        try {
+            return JSON.parse(localStorage.getItem('footballGrantedTournamentIds') || '[]');
+        } catch {
+            return [];
+        }
+    };
+
+    const addGrantedTournament = (id: string) => {
+        const granted = getGrantedTournaments();
+        if (!granted.includes(id)) {
+            granted.push(id);
+            localStorage.setItem('footballGrantedTournamentIds', JSON.stringify(granted));
+        }
+    };
+
     useEffect(() => {
-        fetchTournaments();
+        fetchTournamentsWithLocation();
     }, []);
 
-    const fetchTournaments = async () => {
+    const fetchTournamentsWithLocation = () => {
         setIsLoading(true);
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    fetchTournaments(position.coords.latitude, position.coords.longitude);
+                },
+                (error) => {
+                    console.warn("Geolocation denied or error, fetching default discovery:", error);
+                    fetchTournaments();
+                },
+                { timeout: 10000, maximumAge: 60000 }
+            );
+        } else {
+            fetchTournaments();
+        }
+    };
+
+    const fetchTournaments = async (lat?: number, lng?: number) => {
         try {
-            const res: any = await footballApi.getTournaments();
+            const params: any = {};
+            if (lat && lng) {
+                params.lat = lat;
+                params.lng = lng;
+            }
+            if (searchQuery) {
+                params.search = searchQuery;
+            }
+            // Always pass userId so the backend returns the creator's own private tournaments
+            if (currentUserId) {
+                params.userId = currentUserId;
+            }
+            const res: any = await footballApi.getTournaments(params);
             setTournaments(res.data || []);
         } catch (err) {
             console.error("Failed to fetch football tournaments:", err);
             toast.error("Failed to load tournaments");
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    // Refetch when search query changes (debounced)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchTournamentsWithLocation();
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const handleTournamentClick = (tournament: any) => {
+        const granted = getGrantedTournaments();
+        // If public, or user created it, or user already granted access
+        if (tournament.visibility !== 'Private' || 
+            (currentUserId && tournament.createdBy === currentUserId) ||
+            granted.includes(tournament._id)) {
+            navigate(`/football/tournament/${tournament._id}`);
+        } else {
+            setPasscodePromptTournament(tournament);
+            setPasscodeAttempt("");
+            setPasscodeError("");
+        }
+    };
+
+    const handleVerifyPasscode = async () => {
+        if (!passcodeAttempt) {
+            setPasscodeError("Passcode is required");
+            return;
+        }
+        setIsVerifying(true);
+        setPasscodeError("");
+        try {
+            const res: any = await footballApi.verifyPasscode(passcodePromptTournament._id, passcodeAttempt);
+            if (res.success) {
+                addGrantedTournament(passcodePromptTournament._id);
+                toast.success("Access granted!");
+                navigate(`/football/tournament/${passcodePromptTournament._id}`);
+                setPasscodePromptTournament(null);
+            }
+        } catch (err: any) {
+            setPasscodeError(err.response?.data?.message || "Invalid passcode");
+        } finally {
+            setIsVerifying(false);
         }
     };
 
@@ -74,7 +170,7 @@ export const FootballTournamentManager = () => {
             {list.map((tournament) => (
                 <div key={tournament._id} className="snap-start shrink-0 w-[300px] md:w-[360px]">
                     <Card 
-                        onClick={() => navigate(`/football/tournament/${tournament._id}`)}
+                        onClick={() => handleTournamentClick(tournament)}
                         className="bg-secondary/30 backdrop-blur-md border-border/50 rounded-3xl overflow-hidden hover:bg-secondary/50 hover:border-border transition-all duration-300 cursor-pointer group h-full flex flex-col shadow-sm hover:shadow-md"
                     >
                         <CardContent className="p-0 flex-1 flex flex-col">
@@ -83,11 +179,12 @@ export const FootballTournamentManager = () => {
                                     <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20 text-primary transition-colors group-hover:bg-primary/20">
                                         <Trophy size={20} className="text-primary" />
                                     </div>
-                                    <div className={`px-3 py-1.5 rounded-full border text-[11px] font-bold tracking-wide ${
+                                    <div className={`px-3 py-1.5 rounded-full border text-[11px] font-bold tracking-wide flex items-center gap-1 ${
                                         tournament.status === 'Live' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
                                         tournament.status === 'Upcoming' ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' :
-                                        'bg-muted border-border text-muted-foreground'
+                                        'bg-zinc-500/10 border-zinc-500/20 text-zinc-500'
                                     }`}>
+                                        {tournament.visibility === 'Private' && <Lock size={10} />}
                                         {tournament.status}
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -248,6 +345,53 @@ export const FootballTournamentManager = () => {
                     </div>
                 </Tabs>
             </div>
+
+            {passcodePromptTournament && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
+                    <div className="bg-card w-full max-w-md rounded-3xl border border-border/50 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="p-6">
+                            <h3 className="text-xl font-bold mb-2">Private Tournament</h3>
+                            <p className="text-sm text-muted-foreground mb-6">
+                                "{passcodePromptTournament.name}" is a private tournament. Please enter the passcode to access it.
+                            </p>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <input
+                                        type="password"
+                                        placeholder="Enter Passcode"
+                                        value={passcodeAttempt}
+                                        onChange={(e) => setPasscodeAttempt(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleVerifyPasscode()}
+                                        className="w-full bg-secondary/50 border border-border rounded-xl h-12 px-4 focus:ring-2 ring-primary/20 focus:border-primary outline-none transition-all"
+                                        autoFocus
+                                    />
+                                    {passcodeError && (
+                                        <p className="text-red-500 text-sm mt-2">{passcodeError}</p>
+                                    )}
+                                </div>
+                                
+                                <div className="flex gap-3 pt-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setPasscodePromptTournament(null)}
+                                        className="flex-1 rounded-xl"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        onClick={handleVerifyPasscode}
+                                        disabled={!passcodeAttempt || isVerifying}
+                                        className="flex-1 rounded-xl"
+                                    >
+                                        {isVerifying ? <Loader2 className="animate-spin" size={18} /> : "Verify & Enter"}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

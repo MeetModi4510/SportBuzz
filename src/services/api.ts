@@ -209,8 +209,9 @@ export const cricketApi = {
 export const footballApi = {
     // Tournaments
     createTournament: (data: any) => api.post('football/tournaments', data),
-    getTournaments: () => api.get('football/tournaments'),
+    getTournaments: (params?: any) => api.get('football/tournaments', { params }),
     getTournamentById: (id: string) => api.get(`football/tournaments/${id}`),
+    verifyPasscode: (id: string, passcode: string) => api.post(`football/tournaments/${id}/verify-passcode`, { passcode }),
     createTeam: (data: any) => api.post('football/teams', data),
     getTeams: () => api.get('football/teams'),
     addTeamToTournament: (id: string, teamId: string) => api.post(`football/tournaments/${id}/teams`, { teamId }),

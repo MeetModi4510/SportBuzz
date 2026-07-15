@@ -25,7 +25,8 @@ import {
     getTournamentStats,
     followTournament,
     unfollowTournament,
-    getTournamentNews
+    getTournamentNews,
+    verifyPasscode
 } from '../controllers/footballTournamentController.js';
 import { 
     getMatchById,
@@ -830,6 +831,7 @@ router.get('/tournaments/:id/stats', getTournamentStats);
 router.post('/tournaments/:id/follow', protect, followTournament);
 router.post('/tournaments/:id/unfollow', protect, unfollowTournament);
 router.get('/tournaments/:id/news', getTournamentNews);
+router.post('/tournaments/:id/verify-passcode', verifyPasscode);
 
 // Team Routes
 router.get('/teams', getTeams);

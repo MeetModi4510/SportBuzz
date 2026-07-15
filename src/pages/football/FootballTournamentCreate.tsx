@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trophy, Calendar, Users, ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
+import { Trophy, Calendar, Users, ArrowLeft, Loader2, Plus, Trash2, Globe, Lock, MapPin } from "lucide-react";
 import { footballApi } from "@/services/api";
 import { toast } from "sonner";
 
@@ -26,7 +26,11 @@ export default function FootballTournamentCreate() {
         matchDuration: "90",
         halfDuration: "45",
         maxSubstitutions: "5",
-        yellowCardBan: "2"
+        yellowCardBan: "2",
+        visibility: "Public",
+        passcode: "",
+        locationName: "",
+        locationCoordinates: null as any
     });
 
     const [teams, setTeams] = useState<any[]>([]);
@@ -45,6 +49,22 @@ export default function FootballTournamentCreate() {
 
         setLoading(true);
         try {
+            // Get location if provided but no coordinates
+            let finalCoords = formData.locationCoordinates;
+            if (formData.locationName && !finalCoords && "geolocation" in navigator) {
+                try {
+                    const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+                    });
+                    finalCoords = {
+                        type: "Point",
+                        coordinates: [position.coords.longitude, position.coords.latitude]
+                    };
+                } catch (err) {
+                    console.warn("Could not get exact coordinates for tournament location");
+                }
+            }
+
             // 1. Create teams first if any are new
             // For now, assume we are creating a tournament with existing or manually added team names
             // In a real app, we'd have a team selection or creation flow.
@@ -62,7 +82,11 @@ export default function FootballTournamentCreate() {
                     halfDuration: Number(formData.halfDuration),
                     maxSubstitutions: Number(formData.maxSubstitutions),
                     yellowCardBanThreshold: Number(formData.yellowCardBan)
-                }
+                },
+                visibility: formData.visibility,
+                passcode: formData.visibility === 'Private' ? formData.passcode : undefined,
+                locationName: formData.locationName,
+                locationCoordinates: finalCoords
             });
 
             if (res.success) {
@@ -140,6 +164,79 @@ export default function FootballTournamentCreate() {
                         </Card>
 
                         <Card className="bg-slate-900/40 border-slate-800 rounded-[2rem] p-8 backdrop-blur-xl">
+                            <CardHeader className="px-0 pt-0">
+                                <CardTitle className="text-xl font-black italic uppercase tracking-tight">Visibility & Location</CardTitle>
+                                <CardDescription className="text-slate-500">Tournament access and discovery</CardDescription>
+                            </CardHeader>
+                            <CardContent className="px-0 space-y-6">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-500 ml-1">Visibility</Label>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div 
+                                            onClick={() => setFormData({...formData, visibility: 'Public'})}
+                                            className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                                                formData.visibility === 'Public' 
+                                                ? 'bg-blue-500/10 border-blue-500 text-blue-400' 
+                                                : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                                            }`}
+                                        >
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Globe size={18} />
+                                                <span className="font-bold">Public</span>
+                                            </div>
+                                            <p className="text-xs opacity-70">Anyone can find and view</p>
+                                        </div>
+                                        <div 
+                                            onClick={() => setFormData({...formData, visibility: 'Private'})}
+                                            className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                                                formData.visibility === 'Private' 
+                                                ? 'bg-red-500/10 border-red-500 text-red-400' 
+                                                : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                                            }`}
+                                        >
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Lock size={18} />
+                                                <span className="font-bold">Private</span>
+                                            </div>
+                                            <p className="text-xs opacity-70">Requires passcode to view</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {formData.visibility === 'Private' && (
+                                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-500 ml-1 flex items-center gap-2">
+                                            <Lock size={12} /> Passcode (Required)
+                                        </Label>
+                                        <Input 
+                                            type="text"
+                                            value={formData.passcode}
+                                            onChange={(e) => setFormData({...formData, passcode: e.target.value})}
+                                            placeholder="Enter secret passcode"
+                                            className="bg-slate-950 border-slate-800 h-14 rounded-2xl px-6 focus:ring-2 ring-red-500/20"
+                                        />
+                                    </div>
+                                )}
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-500 ml-1 flex items-center gap-2">
+                                        <MapPin size={12} /> Location (For discovery)
+                                    </Label>
+                                    <Input 
+                                        type="text"
+                                        value={formData.locationName}
+                                        onChange={(e) => setFormData({...formData, locationName: e.target.value})}
+                                        placeholder="City or Area name"
+                                        className="bg-slate-950 border-slate-800 h-14 rounded-2xl px-6 focus:ring-2 ring-blue-500/20"
+                                    />
+                                    <p className="text-[10px] text-slate-500 ml-1 mt-2">
+                                        If provided, your current GPS location will be attached so nearby users can discover this tournament automatically.
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="bg-slate-900/40 border-slate-800 rounded-[2rem] p-8 backdrop-blur-xl md:col-span-2">
                             <CardHeader className="px-0 pt-0">
                                 <CardTitle className="text-xl font-black italic uppercase tracking-tight">Format & Rules</CardTitle>
                                 <CardDescription className="text-slate-500">How the competition works</CardDescription>

@@ -197,7 +197,7 @@ export default function LiveFootballMatch() {
             <div className="max-w-7xl mx-auto px-4 py-12">
                 {match.tournamentId && (
                     <Link 
-                        to={`/football/tournament/${match.tournamentId}`}
+                        to={`/football/tournament/${match.tournamentId._id || match.tournamentId}`}
                         className="inline-flex items-center gap-2 mb-8 px-6 py-2 bg-slate-900/50 border border-white/5 rounded-2xl hover:bg-slate-800 transition-colors group"
                     >
                         <ArrowLeft size={16} className="text-slate-400 group-hover:text-white transition-colors" />

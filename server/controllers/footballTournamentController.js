@@ -9,7 +9,7 @@ import User from '../models/User.js';
 // @route   POST /api/football/tournaments
 // @access  Private
 export const createTournament = asyncHandler(async (req, res) => {
-    const { name, format, teams, pointsRule, matchConfig, startDate, endDate } = req.body;
+    const { name, format, teams, pointsRule, matchConfig, startDate, endDate, visibility, passcode, locationName, locationCoordinates } = req.body;
 
     try {
         const tournament = await FootballTournament.create({
@@ -20,6 +20,10 @@ export const createTournament = asyncHandler(async (req, res) => {
             matchConfig,
             startDate,
             endDate,
+            visibility: visibility || 'Public',
+            passcode: passcode || undefined,
+            locationName: locationName || undefined,
+            locationCoordinates: locationCoordinates || { type: 'Point', coordinates: [0, 0] },
             createdBy: req.user._id
         });
 
@@ -72,15 +76,93 @@ export const syncTournamentStatus = async (tournamentOrId) => {
 // @route   GET /api/football/tournaments
 // @access  Public
 export const getTournaments = asyncHandler(async (req, res) => {
-    const tournaments = await FootballTournament.find({}).populate('teams');
-    
-    // Sync statuses before returning
-    const syncedTournaments = await Promise.all(
-        tournaments.map(t => syncTournamentStatus(t))
+    const { search, userId, lat, lng } = req.query;
+    let filter = {};
+    let geoSort = false;
+
+    if (search) {
+        // Search view: find any tournament by name (Public or Private), global
+        filter.name = { $regex: search, $options: 'i' };
+
+        const tournaments = await FootballTournament.find(filter)
+            .select('-passcode')
+            .populate('teams')
+            .sort({ createdAt: -1 });
+
+        const synced = await Promise.all(tournaments.map(t => syncTournamentStatus(t)));
+        return res.json({ success: true, count: synced.length, data: synced });
+    }
+
+    if (userId) {
+        // Logged-in user view: show all public tournaments + their own private ones
+        const publicFilter = { visibility: { $ne: 'Private' } };
+        const privateFilter = { createdBy: userId, visibility: 'Private' };
+
+        let [publicTournaments, privateTournaments] = await Promise.all([
+            buildLocationQuery(FootballTournament.find(publicFilter).select('-passcode').populate('teams'), lat, lng),
+            FootballTournament.find(privateFilter).select('+passcode').populate('teams').sort({ createdAt: -1 })
+        ]);
+
+        // Merge: private ones first so creator always sees their own
+        const publicIds = new Set(publicTournaments.map(t => t._id.toString()));
+        const combined = [
+            ...privateTournaments,
+            ...publicTournaments.filter(t => !privateTournaments.some(p => p._id.toString() === t._id.toString()))
+        ];
+
+        const synced = await Promise.all(combined.map(t => syncTournamentStatus(t)));
+        return res.json({ success: true, count: synced.length, data: synced });
+    }
+
+    // Pure public discover: only Public tournaments
+    filter.visibility = { $ne: 'Private' };
+    const tournaments = await buildLocationQuery(
+        FootballTournament.find(filter).select('-passcode').populate('teams'),
+        lat,
+        lng
     );
-    
-    res.json({ success: true, data: syncedTournaments });
+
+    const synced = await Promise.all(tournaments.map(t => syncTournamentStatus(t)));
+    res.json({ success: true, count: synced.length, data: synced });
 });
+
+// Helper: apply location filter or default sort
+const buildLocationQuery = async (baseQuery, lat, lng) => {
+    if (lat && lng) {
+        const userLat = parseFloat(lat);
+        const userLng = parseFloat(lng);
+
+        // Two queries: nearby tournaments + ones with no location set
+        const [nearbyTournaments, noLocationTournaments] = await Promise.all([
+            FootballTournament.find({
+                ...baseQuery.getFilter(),
+                locationCoordinates: {
+                    $near: {
+                        $geometry: { type: 'Point', coordinates: [userLng, userLat] },
+                        $maxDistance: 30000
+                    }
+                }
+            }).select('-passcode').populate('teams'),
+            FootballTournament.find({
+                ...baseQuery.getFilter(),
+                $or: [
+                    { locationCoordinates: { $exists: false } },
+                    { locationName: { $exists: false } },
+                    { locationName: '' }
+                ]
+            }).select('-passcode').populate('teams').sort({ createdAt: -1 })
+        ]);
+
+        // Deduplicate and merge: nearby first, then no-location ones
+        const nearbyIds = new Set(nearbyTournaments.map(t => t._id.toString()));
+        return [
+            ...nearbyTournaments,
+            ...noLocationTournaments.filter(t => !nearbyIds.has(t._id.toString()))
+        ];
+    }
+    return baseQuery.sort({ createdAt: -1 });
+};
+
 
 // @desc    Get tournament by ID (with Table)
 // @route   GET /api/football/tournaments/:id
@@ -497,4 +579,28 @@ export const getTournamentNews = asyncHandler(async (req, res) => {
         .limit(20);
     
     res.json({ success: true, data: news });
+});
+
+// @desc    Verify passcode for a private tournament
+// @route   POST /api/football/tournaments/:id/verify-passcode
+// @access  Public
+export const verifyPasscode = asyncHandler(async (req, res) => {
+    const { passcode } = req.body;
+    const tournament = await FootballTournament.findById(req.params.id).select('+passcode');
+
+    if (!tournament) {
+        res.status(404);
+        throw new Error('Tournament not found');
+    }
+
+    if (tournament.visibility !== 'Private') {
+        // Not a private tournament, just grant access
+        return res.json({ success: true, message: 'Access granted' });
+    }
+
+    if (!tournament.passcode || tournament.passcode === passcode) {
+        return res.json({ success: true, message: 'Passcode correct. Access granted.' });
+    }
+
+    res.status(401).json({ success: false, message: 'Incorrect passcode. Please try again.' });
 });

@@ -6,6 +6,29 @@ const footballTournamentSchema = new mongoose.Schema({
         required: [true, 'Tournament name is required'],
         trim: true
     },
+    visibility: {
+        type: String,
+        enum: ['Public', 'Private'],
+        default: 'Public'
+    },
+    passcode: {
+        type: String
+    },
+    locationName: {
+        type: String,
+        trim: true
+    },
+    locationCoordinates: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            default: [0, 0]
+        }
+    },
     format: {
         type: String,
         enum: ['League', 'Knockout', 'Group+Knockout'],
@@ -63,6 +86,8 @@ const footballTournamentSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+footballTournamentSchema.index({ locationCoordinates: '2dsphere' });
 
 const FootballTournament = mongoose.model('FootballTournament', footballTournamentSchema);
 
