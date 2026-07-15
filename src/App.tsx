@@ -46,6 +46,7 @@ import FootballHome from "./pages/football/FootballHome";
 import MatchCenter from "./pages/football/MatchCenter";
 import PlayerProfile from "./pages/football/PlayerProfile";
 import FootballLeagueOverview from "./pages/football/FootballLeagueOverview";
+import CreateSingleMatch from './pages/football/CreateSingleMatch';
 import CricketHome from "./pages/cricket/CricketHome";
 import CricketSeriesOverview from "./pages/cricket/CricketSeriesOverview";
 import NotFound from "./pages/NotFound";
@@ -238,6 +239,7 @@ const App = () => {
               <Route path="/football" element={<ProtectedRoute><FootballHome /></ProtectedRoute>} />
               <Route path="/football/match/:id" element={<ProtectedRoute><MatchCenter /></ProtectedRoute>} />
               <Route path="/football/player/:id" element={<ProtectedRoute><PlayerProfile /></ProtectedRoute>} />
+              <Route path="/football/match/create" element={<ProtectedRoute><CreateSingleMatch /></ProtectedRoute>} />
               <Route path="/football/tournament/create" element={<ProtectedRoute><FootballTournamentCreate /></ProtectedRoute>} />
               <Route path="/football/tournament/:id" element={<ProtectedRoute><FootballTournamentDetails /></ProtectedRoute>} />
               <Route path="/football/score/football/:id" element={<ProtectedRoute><FootballScoringPanel /></ProtectedRoute>} />

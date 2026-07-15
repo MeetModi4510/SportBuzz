@@ -5,6 +5,16 @@ const footballMatchSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'FootballTournament'
     },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    matchConfig: {
+        duration: { type: Number, default: 90 },
+        halfDuration: { type: Number, default: 45 },
+        maxSubstitutions: { type: Number, default: 5 }, // 999 for rolling subs
+        allowPenalties: { type: Boolean, default: false }
+    },
     homeTeam: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'FootballTeam',

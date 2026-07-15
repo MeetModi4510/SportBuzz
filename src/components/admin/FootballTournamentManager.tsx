@@ -70,151 +70,184 @@ export const FootballTournamentManager = () => {
     const recent = filteredTournaments.filter(t => t.status === 'Completed');
 
     const TournamentList = ({ list }: { list: any[] }) => (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        <div className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 mt-2">
             {list.map((tournament) => (
-                <Card 
-                    key={tournament._id}
-                    onClick={() => navigate(`/football/tournament/${tournament._id}`)}
-                    className="bg-slate-900/40 border-slate-800 rounded-[2rem] overflow-hidden hover:border-blue-500/30 transition-all cursor-pointer group"
-                >
-                    <CardContent className="p-0">
-                        <div className="p-6 space-y-4">
-                            <div className="flex justify-between items-start">
-                                <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20 text-blue-400">
-                                    <Trophy size={20} />
+                <div key={tournament._id} className="snap-start shrink-0 w-[300px] md:w-[360px]">
+                    <Card 
+                        onClick={() => navigate(`/football/tournament/${tournament._id}`)}
+                        className="bg-secondary/30 backdrop-blur-md border-border/50 rounded-3xl overflow-hidden hover:bg-secondary/50 hover:border-border transition-all duration-300 cursor-pointer group h-full flex flex-col shadow-sm hover:shadow-md"
+                    >
+                        <CardContent className="p-0 flex-1 flex flex-col">
+                            <div className="p-6 space-y-5 flex-1">
+                                <div className="flex justify-between items-start">
+                                    <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20 text-primary transition-colors group-hover:bg-primary/20">
+                                        <Trophy size={20} className="text-primary" />
+                                    </div>
+                                    <div className={`px-3 py-1.5 rounded-full border text-[11px] font-bold tracking-wide ${
+                                        tournament.status === 'Live' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                                        tournament.status === 'Upcoming' ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' :
+                                        'bg-muted border-border text-muted-foreground'
+                                    }`}>
+                                        {tournament.status}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={(e) => handleToggleFollow(e, tournament._id)}
+                                            className={`p-2 rounded-xl transition-all ${isFollowed(tournament._id)
+                                                ? 'text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20'
+                                                : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                                                }`}
+                                            title={isFollowed(tournament._id) ? "Unfollow tournament" : "Follow tournament"}
+                                        >
+                                            {isFollowed(tournament._id) ? <BellOff size={16} /> : <Bell size={16} />}
+                                        </button>
+                                        {(() => {
+                                            const ownerId = typeof tournament.createdBy === 'object' ? tournament.createdBy?._id : tournament.createdBy;
+                                            const user = JSON.parse(localStorage.getItem("user") || "{}");
+                                            const isOwner = (ownerId && currentUserId && ownerId.toString() === currentUserId.toString()) || 
+                                                           user.role?.toLowerCase() === 'admin' || 
+                                                           user.email?.toLowerCase() === 'admin@sportbuzz.com';
+                                            
+                                            return isOwner && (
+                                                <button
+                                                    onClick={(e) => handleDeleteTournament(e, tournament._id, tournament.name)}
+                                                    className="p-2 rounded-xl text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
+                                                    title="Delete tournament"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            );
+                                        })()}
+                                    </div>
                                 </div>
-                                <div className={`px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${
-                                    tournament.status === 'Live' ? 'bg-green-500/10 border-green-500/20 text-green-400' :
-                                    tournament.status === 'Upcoming' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
-                                    'bg-slate-500/10 border-slate-500/20 text-slate-400'
-                                }`}>
-                                    {tournament.status}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={(e) => handleToggleFollow(e, tournament._id)}
-                                        className={`p-1.5 rounded-lg transition-all ${isFollowed(tournament._id)
-                                            ? 'text-yellow-400 bg-yellow-500/10 hover:bg-yellow-500/20'
-                                            : 'text-slate-500 hover:text-yellow-400 hover:bg-yellow-500/10'
-                                            }`}
-                                        title={isFollowed(tournament._id) ? "Unfollow tournament" : "Follow tournament"}
-                                    >
-                                        {isFollowed(tournament._id) ? <BellOff size={14} /> : <Bell size={14} />}
-                                    </button>
-                                    {(() => {
-                                        const ownerId = typeof tournament.createdBy === 'object' ? tournament.createdBy?._id : tournament.createdBy;
-                                        const user = JSON.parse(localStorage.getItem("user") || "{}");
-                                        const isOwner = (ownerId && currentUserId && ownerId.toString() === currentUserId.toString()) || 
-                                                       user.role?.toLowerCase() === 'admin' || 
-                                                       user.email?.toLowerCase() === 'admin@sportbuzz.com';
-                                        
-                                        return isOwner && (
-                                            <button
-                                                onClick={(e) => handleDeleteTournament(e, tournament._id, tournament.name)}
-                                                className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
-                                                title="Delete tournament"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
-                                        );
-                                    })()}
+                                
+                                <div>
+                                    <h3 className="text-xl font-bold tracking-tight group-hover:text-primary transition-colors line-clamp-1">
+                                        {tournament.name}
+                                    </h3>
+                                    <div className="flex items-center gap-5 mt-3 text-muted-foreground">
+                                        <div className="flex items-center gap-1.5 text-xs font-semibold">
+                                            <Users size={14} className="opacity-70" /> 
+                                            <span>{tournament.teams?.length || 0} Teams</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-xs font-semibold">
+                                            <Calendar size={14} className="opacity-70" /> 
+                                            <span>{new Date(tournament.startDate).getFullYear()}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div>
-                                <h3 className="text-xl font-black italic uppercase tracking-tight group-hover:text-blue-400 transition-colors line-clamp-1">
-                                    {tournament.name}
-                                </h3>
-                                <div className="flex items-center gap-4 mt-2 text-slate-500">
-                                    <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
-                                        <Users size={12} /> {tournament.teams?.length || 0} Teams
-                                    </div>
-                                    <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
-                                        <Calendar size={12} /> {new Date(tournament.startDate).getFullYear()}
-                                    </div>
-                                </div>
+                            <div className="px-6 py-4 bg-muted/30 border-t border-border/50 flex justify-between items-center group-hover:bg-muted/50 transition-colors mt-auto">
+                                <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase group-hover:text-foreground transition-colors">
+                                    {tournament.format}
+                                </span>
+                                <ArrowRight size={18} className="text-muted-foreground group-hover:text-primary transition-all group-hover:translate-x-1" />
                             </div>
-                        </div>
-                        
-                        <div className="px-6 py-4 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center group-hover:bg-blue-500/5 transition-colors">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 group-hover:text-blue-500/60 transition-colors">
-                                {tournament.format}
-                            </span>
-                            <ArrowRight size={16} className="text-slate-700 group-hover:text-blue-500 transition-all group-hover:translate-x-1" />
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                </div>
             ))}
             {list.length === 0 && (
-                <div className="col-span-full py-20 text-center bg-slate-900/20 border border-white/5 rounded-[3rem]">
-                    <TrophyIcon size={48} className="mx-auto text-slate-800 mb-4 opacity-20" />
-                    <p className="text-slate-500 font-black uppercase tracking-[0.2em] text-xs">No tournaments found</p>
+                <div className="w-full py-24 text-center bg-secondary/20 border border-border/50 rounded-3xl flex flex-col items-center justify-center">
+                    <div className="p-4 bg-secondary rounded-full mb-4">
+                        <TrophyIcon size={32} className="text-muted-foreground/50" />
+                    </div>
+                    <p className="text-muted-foreground font-medium text-sm">No tournaments found in this category.</p>
                 </div>
             )}
         </div>
     );
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto pb-12">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h2 className="text-3xl font-black italic uppercase tracking-tighter flex items-center gap-3">
-                        Football Tournaments
-                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                    </h2>
-                    <p className="text-slate-500 font-medium text-sm mt-1">Manage your leagues and knockout competitions</p>
+                    <div className="flex items-center gap-3">
+                        <div className="relative flex items-center justify-center w-8 h-8 rounded-xl bg-primary/10 text-primary border border-primary/20">
+                            <Trophy size={18} />
+                        </div>
+                        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+                            Tournaments
+                        </h2>
+                    </div>
+                    <p className="text-muted-foreground font-medium text-sm mt-2 ml-11">Manage your leagues and knockout competitions</p>
                 </div>
                 
-                <Button 
-                    onClick={() => navigate("/football/tournament/create")}
-                    className="bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase italic tracking-tight px-8 h-12 shadow-lg shadow-blue-500/20"
-                >
-                    <Plus size={18} className="mr-2" /> New Tournament
-                </Button>
+                <div className="flex gap-3">
+                    <Button 
+                        onClick={() => navigate("/football/match/create")}
+                        variant="secondary"
+                        className="rounded-full font-semibold px-6 h-12 shadow-sm transition-all hover:shadow-md border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary"
+                    >
+                        <Plus size={18} className="mr-2" /> New Match
+                    </Button>
+                    <Button 
+                        onClick={() => navigate("/football/tournament/create")}
+                        className="rounded-full font-semibold px-6 h-12 shadow-sm transition-all hover:shadow-md"
+                    >
+                        <Plus size={18} className="mr-2" /> New Tournament
+                    </Button>
+                </div>
             </div>
 
             <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                 <input 
                     type="text"
                     placeholder="Search tournaments..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl h-14 pl-12 pr-6 focus:ring-2 ring-blue-500/20 outline-none transition-all placeholder:text-slate-600 font-medium"
+                    className="w-full bg-secondary/40 backdrop-blur-sm border border-border rounded-full h-14 pl-14 pr-6 focus:ring-2 ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-muted-foreground/70 font-medium shadow-sm"
                 />
             </div>
 
-            <Tabs defaultValue="ongoing" className="w-full">
-                <TabsList className="bg-slate-900/60 backdrop-blur-xl border border-white/5 p-1 h-14 rounded-2xl">
-                    <TabsTrigger value="ongoing" className="rounded-xl px-8 h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white font-bold uppercase tracking-widest text-[10px] transition-all">
-                        Ongoing ({ongoing.length})
-                    </TabsTrigger>
-                    <TabsTrigger value="upcoming" className="rounded-xl px-8 h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white font-bold uppercase tracking-widest text-[10px] transition-all">
-                        Upcoming ({upcoming.length})
-                    </TabsTrigger>
-                    <TabsTrigger value="recent" className="rounded-xl px-8 h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white font-bold uppercase tracking-widest text-[10px] transition-all">
-                        Recent ({recent.length})
-                    </TabsTrigger>
-                </TabsList>
-
-                {isLoading ? (
-                    <div className="py-20 flex justify-center">
-                        <Loader2 className="animate-spin text-blue-500" size={48} />
+            <div className="space-y-4">
+                <Tabs defaultValue="ongoing" className="w-full">
+                    <div className="flex p-1.5 bg-secondary/60 backdrop-blur-xl rounded-full border border-border/50 overflow-x-auto max-w-max hide-scrollbar shadow-inner">
+                        <TabsList className="bg-transparent border-0 p-0 h-auto">
+                            <TabsTrigger 
+                                value="ongoing" 
+                                className="shrink-0 px-6 py-2 rounded-full text-xs font-bold tracking-wide transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm text-muted-foreground hover:text-foreground"
+                            >
+                                Ongoing ({ongoing.length})
+                            </TabsTrigger>
+                            <TabsTrigger 
+                                value="upcoming" 
+                                className="shrink-0 px-6 py-2 rounded-full text-xs font-bold tracking-wide transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm text-muted-foreground hover:text-foreground"
+                            >
+                                Upcoming ({upcoming.length})
+                            </TabsTrigger>
+                            <TabsTrigger 
+                                value="recent" 
+                                className="shrink-0 px-6 py-2 rounded-full text-xs font-bold tracking-wide transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm text-muted-foreground hover:text-foreground"
+                            >
+                                Recent ({recent.length})
+                            </TabsTrigger>
+                        </TabsList>
                     </div>
-                ) : (
-                    <>
-                        <TabsContent value="ongoing">
-                            <TournamentList list={ongoing} />
-                        </TabsContent>
-                        <TabsContent value="upcoming">
-                            <TournamentList list={upcoming} />
-                        </TabsContent>
-                        <TabsContent value="recent">
-                            <TournamentList list={recent} />
-                        </TabsContent>
-                    </>
-                )}
-            </Tabs>
+
+                    <div className="mt-6">
+                        {isLoading ? (
+                            <div className="py-24 flex justify-center items-center">
+                                <Loader2 className="animate-spin text-primary" size={32} />
+                            </div>
+                        ) : (
+                            <>
+                                <TabsContent value="ongoing" className="mt-0 outline-none">
+                                    <TournamentList list={ongoing} />
+                                </TabsContent>
+                                <TabsContent value="upcoming" className="mt-0 outline-none">
+                                    <TournamentList list={upcoming} />
+                                </TabsContent>
+                                <TabsContent value="recent" className="mt-0 outline-none">
+                                    <TournamentList list={recent} />
+                                </TabsContent>
+                            </>
+                        )}
+                    </div>
+                </Tabs>
+            </div>
         </div>
     );
 };

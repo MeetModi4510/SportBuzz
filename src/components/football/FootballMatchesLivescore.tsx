@@ -323,7 +323,7 @@ export const FootballMatchesLivescore = ({ variant = 'dashboard' }: FootballMatc
                 <h3 className="text-sm font-semibold tracking-wider uppercase text-muted-foreground">{section.title}</h3>
                 <span className="text-xs text-muted-foreground/50 font-medium">({section.matches.length})</span>
               </div>
-              <div className="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+              <div className="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0">
                 {section.matches.map(match => (
                   <div key={match.id} className="snap-start shrink-0 w-[300px] md:w-[350px]">
                     <LivescoreMatchCard 
