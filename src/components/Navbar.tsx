@@ -213,7 +213,7 @@ export const Navbar = () => {
     
     <header className={cn(
       "fixed top-0 left-0 right-0 z-[100] w-full transition-all duration-300",
-      "bg-background/90 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-b border-border/50 md:border-none",
+      "bg-background border-b border-border md:border-none",
       "md:px-4 md:pt-4"
     )}>
       <div className="w-full md:container md:mx-auto md:max-w-7xl">
@@ -486,7 +486,7 @@ export const Navbar = () => {
 
     {/* Mobile Bottom Navigation */}
     <div 
-      className="md:hidden bg-background/95 backdrop-blur-xl border-t border-border shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
+      className="md:hidden bg-background border-t border-border"
       style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 99999, transform: 'translateZ(0)' }}
     >
       <div className="flex items-center justify-around p-2 px-4">
