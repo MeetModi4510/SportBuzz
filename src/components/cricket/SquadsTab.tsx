@@ -111,9 +111,9 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
                         <div 
                             key={`${p.id}-${i}`} 
                             onClick={() => handlePlayerClick(p)}
-                            className="flex items-center gap-4 p-4 bg-card/40 hover:bg-card hover:shadow-md cursor-pointer transition-all duration-200 border border-border/40 hover:border-primary/30 rounded-2xl h-[112px]"
+                            className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 p-2 sm:p-4 bg-card/40 hover:bg-card hover:shadow-md cursor-pointer transition-all duration-200 border border-border/40 hover:border-primary/30 rounded-xl sm:rounded-2xl h-auto min-h-[100px] sm:h-[112px] text-center sm:text-left"
                         >
-                            <div className="w-14 h-14 rounded-full overflow-hidden bg-secondary/50 flex-shrink-0 border-2 border-border/50 relative">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-secondary/50 flex-shrink-0 border border-border/50 sm:border-2 relative">
                                 {imageId ? (
                                     <img 
                                         src={`https://static.cricbuzz.com/a/img/v1/152x152/i1/c${imageId}/player.jpg`} 
@@ -125,15 +125,15 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
                                     <CricketPlayerImage playerId={p.id?.toString()} playerName={formatPlayerName(p.name)} className="w-full h-full object-cover" />
                                 )}
                             </div>
-                            <div className="min-w-0 flex-1">
-                                <div className="flex flex-wrap items-center gap-1.5">
-                                    <h4 className="font-bold text-sm text-foreground break-words line-clamp-2">{formatPlayerName(p.name)}</h4>
-                                    {!isSupportStaff && p.captain && <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary/20 text-primary whitespace-nowrap">C</span>}
-                                    {!isSupportStaff && p.keeper && <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-500 whitespace-nowrap">WK</span>}
+                            <div className="min-w-0 flex-1 flex flex-col items-center sm:items-start w-full">
+                                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1 sm:gap-1.5 w-full">
+                                    <h4 className="font-bold text-[11px] sm:text-sm text-foreground break-words line-clamp-2 leading-tight">{formatPlayerName(p.name)}</h4>
+                                    {!isSupportStaff && p.captain && <span className="px-1 sm:px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-bold bg-primary/20 text-primary whitespace-nowrap">C</span>}
+                                    {!isSupportStaff && p.keeper && <span className="px-1 sm:px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-bold bg-blue-500/20 text-blue-500 whitespace-nowrap">WK</span>}
                                 </div>
-                                <p className="text-xs font-medium text-muted-foreground mt-0.5 break-words line-clamp-2">{p.role || (isSupportStaff ? 'Staff' : 'Player')}</p>
+                                <p className="text-[9px] sm:text-xs font-medium text-muted-foreground mt-0.5 break-words line-clamp-1">{p.role || (isSupportStaff ? 'Staff' : 'Player')}</p>
                                 {(p.battingStyle || p.bowlingStyle) && (
-                                    <div className="flex flex-col gap-0.5 mt-1.5 text-[10px] text-muted-foreground/80">
+                                    <div className="flex flex-col gap-0.5 mt-1 sm:mt-1.5 text-[8px] sm:text-[10px] text-muted-foreground/80 w-full">
                                         {p.battingStyle && !p.battingStyle.includes('$undefined') && <span className="break-words line-clamp-1">{p.battingStyle}</span>}
                                         {p.bowlingStyle && !p.bowlingStyle.includes('$undefined') && <span className="break-words line-clamp-1">{p.bowlingStyle}</span>}
                                     </div>
@@ -151,9 +151,9 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
         const { name: tName, imageId: tImageId } = getTeamInfo(team);
         
         return (
-            <div className="flex items-center gap-4 border-b border-border/40 pb-4">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 border-b border-border/40 pb-4 text-center sm:text-left">
                 {tImageId && (
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary p-1 shrink-0">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-secondary p-1 shrink-0">
                         <img 
                             src={`/api/cricket/scraped/team-logo/${tImageId}`} 
                             alt={tName} 
@@ -162,42 +162,26 @@ export const SquadsTab: React.FC<SquadsTabProps> = ({ squadsData, loading, error
                         />
                     </div>
                 )}
-                <h2 className="text-xl font-black uppercase tracking-wider">{tName}</h2>
+                <h2 className="text-sm sm:text-xl font-black uppercase tracking-wider line-clamp-1">{tName}</h2>
             </div>
         );
     };
 
     return (
         <div className="animate-fade-in">
-            {/* Desktop Unified Layout */}
-            <div className="hidden lg:grid grid-cols-2 gap-x-12 bg-muted/5 rounded-3xl p-8 border border-border/20">
-                <div className="col-span-1">{renderTeamHeader(team1)}</div>
-                <div className="col-span-1">{renderTeamHeader(team2)}</div>
+            {/* Unified Side-by-Side Layout for ALL screens */}
+            <div className="grid grid-cols-2 gap-x-2 sm:gap-x-4 md:gap-x-12 bg-muted/5 rounded-2xl md:rounded-3xl p-2 sm:p-4 md:p-8 border border-border/20">
+                <div className="col-span-1 min-w-0">{renderTeamHeader(team1)}</div>
+                <div className="col-span-1 min-w-0">{renderTeamHeader(team2)}</div>
 
-                <div className="col-span-1">{renderPlayerGroup('Playing XI', team1?.['playing XI'], false, team1)}</div>
-                <div className="col-span-1">{renderPlayerGroup('Playing XI', team2?.['playing XI'], false, team2)}</div>
+                <div className="col-span-1 min-w-0">{renderPlayerGroup('Playing XI', team1?.['playing XI'], false, team1)}</div>
+                <div className="col-span-1 min-w-0">{renderPlayerGroup('Playing XI', team2?.['playing XI'], false, team2)}</div>
 
-                <div className="col-span-1">{renderPlayerGroup('Bench', team1?.bench, false, team1)}</div>
-                <div className="col-span-1">{renderPlayerGroup('Bench', team2?.bench, false, team2)}</div>
+                <div className="col-span-1 min-w-0">{renderPlayerGroup('Bench', team1?.bench, false, team1)}</div>
+                <div className="col-span-1 min-w-0">{renderPlayerGroup('Bench', team2?.bench, false, team2)}</div>
 
-                <div className="col-span-1">{renderPlayerGroup('Support Staff', team1?.['support staff'], true, team1)}</div>
-                <div className="col-span-1">{renderPlayerGroup('Support Staff', team2?.['support staff'], true, team2)}</div>
-            </div>
-
-            {/* Mobile Split Layout */}
-            <div className="grid grid-cols-1 gap-8 lg:hidden">
-                <div className="bg-muted/5 rounded-3xl p-6 border border-border/20">
-                    {renderTeamHeader(team1)}
-                    {renderPlayerGroup('Playing XI', team1?.['playing XI'], false, team1)}
-                    {renderPlayerGroup('Bench', team1?.bench, false, team1)}
-                    {renderPlayerGroup('Support Staff', team1?.['support staff'], true, team1)}
-                </div>
-                <div className="bg-muted/5 rounded-3xl p-6 border border-border/20">
-                    {renderTeamHeader(team2)}
-                    {renderPlayerGroup('Playing XI', team2?.['playing XI'], false, team2)}
-                    {renderPlayerGroup('Bench', team2?.bench, false, team2)}
-                    {renderPlayerGroup('Support Staff', team2?.['support staff'], true, team2)}
-                </div>
+                <div className="col-span-1 min-w-0">{renderPlayerGroup('Support Staff', team1?.['support staff'], true, team1)}</div>
+                <div className="col-span-1 min-w-0">{renderPlayerGroup('Support Staff', team2?.['support staff'], true, team2)}</div>
             </div>
 
             <PlayerProfilePanel 
