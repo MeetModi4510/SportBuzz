@@ -215,14 +215,14 @@ const Index = () => {
       <div className="min-h-screen">
         <Navbar />
 
-        <main className="container mx-auto px-4 py-6 space-y-8">
+        <main className="container mx-auto px-4 py-4 md:py-6 space-y-6 md:space-y-8 pb-24 md:pb-8">
           {/* Hero Section */}
-          <section className="text-center py-8 space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold font-display">
+          <section className="text-center py-4 md:py-8 space-y-2 md:space-y-4">
+            <h1 className="text-3xl md:text-5xl font-bold font-display">
               <span className="gradient-text">Live Sports</span>
               <span className="text-foreground"> at Your Fingertips</span>
             </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className="hidden md:block text-muted-foreground text-lg max-w-2xl mx-auto">
               Real-time scores, deep analytics, and performance insights across Cricket, Football, Basketball, and Tennis.
             </p>
             {/* Live match badge hidden per user request */}

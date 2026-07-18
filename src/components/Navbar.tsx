@@ -20,8 +20,9 @@ import {
   Shield,
   Settings,
   Clock,
+  Moon,
   Sun,
-  Moon
+  AlignLeft
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -206,15 +207,26 @@ export const Navbar = () => {
   const showDropdown = searchOpen && searchQuery.trim().length > 0;
 
   return (
-    <header className="sticky top-4 z-50 w-full px-4 transition-all duration-300">
-      <div className="container mx-auto max-w-7xl">
-        <div className="flex h-16 items-center justify-between px-6 bg-background/70 backdrop-blur-xl border border-border/50 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
+    <>
+    {/* Spacer to prevent content from hiding under fixed top navbar */}
+    <div className="h-14 md:h-20 w-full shrink-0" />
+    
+    <header className={cn(
+      "fixed top-0 left-0 right-0 z-[100] w-full transition-all duration-300",
+      "bg-background/90 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-b border-border/50 md:border-none",
+      "md:px-4 md:pt-4"
+    )}>
+      <div className="w-full md:container md:mx-auto md:max-w-7xl">
+        <div className={cn(
+          "flex h-14 md:h-16 items-center justify-between px-4 md:px-6",
+          "md:bg-background/80 md:backdrop-blur-xl md:border md:border-border/50 md:rounded-full md:shadow-sm"
+        )}>
           {/* Drawer & Logo */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 md:gap-4">
             <Sheet>
               <SheetTrigger asChild>
-                <button className="p-2 -ml-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors" aria-label="Open Sidebar">
-                  <Menu size={24} />
+                <button className="p-2 -ml-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors" aria-label="Open Sidebar">
+                  <AlignLeft size={22} strokeWidth={2} />
                 </button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-72 border-r border-border/50 bg-card/95 backdrop-blur-md">
@@ -223,11 +235,11 @@ export const Navbar = () => {
             </Sheet>
 
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="relative">
-                <Zap className="h-8 w-8 text-primary transition-transform group-hover:scale-110" fill="currentColor" />
+              <div className="relative flex items-center justify-center">
+                <Zap className="h-7 w-7 md:h-8 md:w-8 text-primary transition-transform group-hover:scale-110" fill="currentColor" />
                 <div className="absolute inset-0 bg-primary/30 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <span className="text-xl font-bold gradient-text font-display">SportsBuzz</span>
+              <span className="text-xl md:text-xl font-bold gradient-text font-display tracking-tight">SportsBuzz</span>
             </Link>
           </div>
 
@@ -259,10 +271,10 @@ export const Navbar = () => {
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              className="hidden md:flex p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
               aria-label="Toggle theme"
             >
               {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
@@ -271,7 +283,7 @@ export const Navbar = () => {
             <button
               onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setSearchQuery(""); }}
               className={cn(
-                "p-2 rounded-lg transition-colors",
+                "hidden md:flex p-2 rounded-lg transition-colors",
                 searchOpen ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               )}
             >
@@ -325,12 +337,7 @@ export const Navbar = () => {
               </div>
             )}
 
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            {/* Mobile menu trigger removed from top bar, moved to bottom nav */}
           </div>
         </div>
 
@@ -431,16 +438,13 @@ export const Navbar = () => {
           </div>
         )}
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu Dropdown (Triggered by Bottom Nav) */}
         {mobileMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-border animate-slide-up">
-            <div className="flex flex-col gap-2">
-              <NavItem to="/" icon={<Home size={18} />} label="Dashboard" isActive={location.pathname === "/"} />
-              <NavItem to="/performance-lab" icon={<BarChart3 size={18} />} label="Performance Lab" isActive={location.pathname === "/performance-lab"} />
-              <NavItem to="/create" icon={<PlusCircle size={18} />} label="Create" isActive={location.pathname === "/create"} />
-              <div className="flex items-center gap-2 pt-4 border-t border-border mt-2">
+          <nav className="md:hidden py-4 border-t border-border animate-slide-up bg-background/95 backdrop-blur-xl absolute left-0 right-0 shadow-xl z-40">
+            <div className="flex flex-col gap-2 px-4">
+              <div className="flex items-center gap-2 pt-2">
                 {sports.map((sport) => (
-                  <Link key={sport} to={['cricket', 'football'].includes(sport) ? `/${sport}` : `/?sport=${sport}`} className="flex-1 flex items-center justify-center p-3 rounded-lg bg-secondary">
+                  <Link onClick={() => setMobileMenuOpen(false)} key={sport} to={['cricket', 'football'].includes(sport) ? `/${sport}` : `/?sport=${sport}`} className="flex-1 flex items-center justify-center p-3 rounded-lg bg-secondary">
                     <SportIcon sport={sport} size={24} />
                   </Link>
                 ))}
@@ -448,21 +452,21 @@ export const Navbar = () => {
               {user ? (
                 <div className="flex flex-col gap-2 pt-4 border-t border-border mt-2">
                   {((user as any).role === 'admin' || (user as any).role === 'scorer') && (
-                    <Link to="/admin" className="flex items-center gap-2 px-3 py-2 rounded-lg text-blue-400 font-bold hover:bg-blue-500/10 transition-colors">
+                    <Link onClick={() => setMobileMenuOpen(false)} to="/admin" className="flex items-center gap-2 px-3 py-2 rounded-lg text-blue-400 font-bold hover:bg-blue-500/10 transition-colors">
                       <Shield size={18} /><span>Admin Dashboard</span>
                     </Link>
                   )}
-                  <Link to="/profile" className="flex items-center gap-2 px-3 py-2 rounded-lg text-blue-400 hover:bg-blue-500/10 transition-colors"><User size={18} /><span>My Profile</span></Link>
-                  <Link to="/favorites" className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"><Heart size={18} /><span>Favorites</span></Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} to="/profile" className="flex items-center gap-2 px-3 py-2 rounded-lg text-blue-400 hover:bg-blue-500/10 transition-colors"><User size={18} /><span>My Profile</span></Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} to="/favorites" className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"><Heart size={18} /><span>Favorites</span></Link>
                   <button onClick={handleLogout} className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors mt-2"><LogOut size={18} /><span>Logout</span></button>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2 pt-4 border-t border-border mt-2">
-                  <Link to="/login" className="px-3 py-2 rounded-lg text-center bg-secondary text-foreground hover:bg-secondary/80 transition-colors text-sm font-medium">Login</Link>
-                  <Link to="/signup" className="px-3 py-2 rounded-lg text-center bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium">Sign Up</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} to="/login" className="px-3 py-2 rounded-lg text-center bg-secondary text-foreground hover:bg-secondary/80 transition-colors text-sm font-medium">Login</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} to="/signup" className="px-3 py-2 rounded-lg text-center bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium">Sign Up</Link>
                 </div>
               )}
-              <div className="pt-4 border-t border-border mt-2 flex justify-center">
+              <div className="pt-4 border-t border-border mt-2 flex justify-center pb-2">
                 <button
                   onClick={toggleTheme}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors w-full justify-center"
@@ -479,5 +483,35 @@ export const Navbar = () => {
         )}
       </div>
     </header>
+
+    {/* Mobile Bottom Navigation */}
+    <div 
+      className="md:hidden bg-background/95 backdrop-blur-xl border-t border-border shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
+      style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 99999, transform: 'translateZ(0)' }}
+    >
+      <div className="flex items-center justify-around p-2 px-4">
+        <Link to="/" onClick={() => setMobileMenuOpen(false)} className={cn("flex flex-col items-center gap-1 p-2 rounded-lg transition-colors", location.pathname === "/" ? "text-primary" : "text-muted-foreground")}>
+          <Home size={22} strokeWidth={location.pathname === "/" ? 2.5 : 2} />
+          <span className="text-[10px] font-medium">Home</span>
+        </Link>
+        <Link to="/performance-lab" onClick={() => setMobileMenuOpen(false)} className={cn("flex flex-col items-center gap-1 p-2 rounded-lg transition-colors", location.pathname === "/performance-lab" ? "text-primary" : "text-muted-foreground")}>
+          <BarChart3 size={22} strokeWidth={location.pathname === "/performance-lab" ? 2.5 : 2} />
+          <span className="text-[10px] font-medium">Lab</span>
+        </Link>
+        <button onClick={() => { setSearchOpen(!searchOpen); setMobileMenuOpen(false); }} className={cn("flex flex-col items-center gap-1 p-2 rounded-lg transition-colors", searchOpen ? "text-primary" : "text-muted-foreground")}>
+          <Search size={22} strokeWidth={searchOpen ? 2.5 : 2} />
+          <span className="text-[10px] font-medium">Search</span>
+        </button>
+        <button onClick={() => { setMobileMenuOpen(!mobileMenuOpen); setSearchOpen(false); }} className={cn("flex flex-col items-center gap-1 p-2 rounded-lg transition-colors", mobileMenuOpen ? "text-primary" : "text-muted-foreground")}>
+          {user && user.photoUrl ? (
+             <img src={user.photoUrl.startsWith('http') || user.photoUrl.startsWith('data:') ? user.photoUrl : `http://localhost:5001/${user.photoUrl}`} alt="Menu" className="w-6 h-6 rounded-full object-cover border-2 border-transparent focus:border-primary" />
+          ) : (
+             <User size={22} strokeWidth={mobileMenuOpen ? 2.5 : 2} />
+          )}
+          <span className="text-[10px] font-medium">Menu</span>
+        </button>
+      </div>
+    </div>
+    </>
   );
 };
