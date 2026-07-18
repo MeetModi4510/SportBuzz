@@ -12,11 +12,6 @@
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
-    },
-    {
-      "src": "/world-cup-trophy-real.png",
-      "sizes": "512x512",
-      "type": "image/png"
     }
   ]
 }
