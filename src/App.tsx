@@ -4,8 +4,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { SplashScreen } from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import MatchDetails from "./pages/MatchDetails";
 import PerformanceLab from "./pages/PerformanceLab";
@@ -69,6 +71,8 @@ const initializeTheme = () => {
 initializeTheme();
 
 const App = () => {
+  const [showSplash, setShowSplash] = useState(true);
+
   useEffect(() => {
     initializeTheme();
   }, []);
@@ -79,6 +83,11 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          
+          <AnimatePresence>
+            {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+          </AnimatePresence>
+
           <BrowserRouter>
             <Routes>
               {/* Public Routes */}
