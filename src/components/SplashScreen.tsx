@@ -3,10 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
   useEffect(() => {
-    // Ensure the splash screen stays on for 2.5 seconds before hiding
+    // Ensure the splash screen stays on for 3.8 seconds before hiding
     const timer = setTimeout(() => {
       onComplete();
-    }, 2500);
+    }, 3800);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
@@ -21,7 +21,7 @@ export const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
         <motion.div
           initial={{ scale: 0, rotate: -45 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ duration: 0.8, type: "spring", bounce: 0.5 }}
+          transition={{ duration: 1.2, type: "spring", bounce: 0.4 }}
           className="z-20 relative flex items-center justify-center"
         >
           {/* Custom Bolt SVG matching the user's screenshot */}
@@ -48,7 +48,7 @@ export const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
         <motion.div
           initial={{ width: 0, opacity: 0, marginLeft: 0 }}
           animate={{ width: "auto", opacity: 1, marginLeft: "12px" }}
-          transition={{ delay: 0.8, duration: 0.7, type: "spring", bounce: 0.1 }}
+          transition={{ delay: 1.2, duration: 1.0, type: "spring", bounce: 0.1 }}
           className="overflow-hidden whitespace-nowrap z-10 flex items-center py-2"
         >
           <span className="text-4xl md:text-5xl font-black font-display tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 pb-1">
