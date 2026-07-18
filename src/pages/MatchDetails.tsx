@@ -844,24 +844,24 @@ const MatchDetails = () => {
                  const showTestScore = isTestMatch;
 
                  return (
-                   <div className="flex flex-col md:grid md:grid-cols-[1fr_auto_1fr] items-center px-6 md:px-8 lg:px-16 py-10 md:py-14 gap-8 md:gap-6 lg:gap-8 relative w-full">
+                   <div className="grid grid-cols-2 md:grid-cols-[1fr_auto_1fr] items-center px-4 md:px-8 lg:px-16 py-8 md:py-14 gap-y-8 md:gap-6 lg:gap-8 relative w-full">
                        
                        {/* Home Team (Left Side) */}
-                       <div className="flex justify-center md:justify-end z-10 w-full min-w-0">
-                           <div className="flex items-center gap-4 md:gap-5 lg:gap-6 min-w-0">
-                               <div className="text-right min-w-0">
-                                   <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground tracking-tight break-words">{team1Name}</h2>
-                                   <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team1ShortName}</p>
+                       <div className="col-span-1 flex justify-center md:justify-end z-10 w-full min-w-0">
+                           <div className="flex flex-col-reverse md:flex-row items-center gap-3 md:gap-5 lg:gap-6 min-w-0">
+                               <div className="text-center md:text-right min-w-0">
+                                   <h2 className="text-lg md:text-2xl lg:text-3xl font-bold text-foreground tracking-tight break-words leading-tight">{team1Name}</h2>
+                                   <p className="text-[10px] md:text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team1ShortName}</p>
                                </div>
-                               <TeamLogo logo={team1Logo} name={team1Name} size="lg" className="w-16 h-12 md:w-20 md:h-14 lg:w-24 lg:h-16 object-contain shrink-0 drop-shadow-md" />
+                               <TeamLogo logo={team1Logo} name={team1Name} size="lg" className="w-14 h-14 md:w-20 md:h-14 lg:w-24 lg:h-16 object-contain shrink-0 drop-shadow-md" />
                                
                                {/* Score next to Home Team if only Home is batting */}
                                {!showTestScore && showHome && !showDualScore && (
-                                   <div className="ml-2 pl-4 md:ml-4 md:pl-4 lg:ml-6 lg:pl-6 border-l-2 border-primary/20 relative flex items-center md:w-[130px] lg:w-[150px] shrink-0">
-                                       <span className="text-5xl md:text-5xl lg:text-6xl font-black tracking-tighter text-foreground leading-none">{home.runs}</span>
+                                   <div className="mt-2 md:mt-0 md:ml-2 md:pl-4 lg:ml-6 lg:pl-6 border-t border-border/50 pt-3 md:pt-0 md:border-t-0 md:border-l-2 md:border-primary/20 relative flex flex-col md:items-center md:w-[130px] lg:w-[150px] shrink-0">
+                                       <span className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-foreground leading-none text-center md:text-left w-full">{home.runs}</span>
                                        {home.overs && (
-                                           <div className="absolute top-[105%] left-4 md:left-4 lg:left-6 whitespace-nowrap">
-                                               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md">
+                                           <div className="md:absolute top-[105%] md:left-4 lg:left-6 whitespace-nowrap mt-2 md:mt-0 text-center md:text-left w-full">
+                                               <span className="text-[9px] md:text-[10px] text-muted-foreground font-bold uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md inline-block">
                                                    {home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS
                                                </span>
                                            </div>
@@ -877,7 +877,7 @@ const MatchDetails = () => {
                        </div>
 
                        {/* Center Area (Test matches, Dual Scores, VS, or empty spacer) */}
-                       <div className="flex flex-col items-center justify-center shrink-0 z-10 md:min-w-[40px] my-4 md:my-0">
+                       <div className="col-span-2 md:col-span-1 order-3 md:order-none flex flex-col items-center justify-center shrink-0 z-10 md:min-w-[40px] my-2 md:my-0">
                          {showTestScore && match.scoreBreakdown ? (
                             <div className="flex flex-col items-center gap-3">
                               <div className="flex items-center gap-6">
@@ -935,15 +935,15 @@ const MatchDetails = () => {
                               })()}
                             </div>
                          ) : showDualScore ? (
-                            <div className="flex items-center gap-6 md:gap-10">
+                            <div className="flex items-center gap-4 md:gap-10">
                               <div className="flex flex-col items-center">
-                                <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{home.runs}</span>
-                                {home.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2.5 uppercase tracking-widest bg-secondary/40 px-3 py-1 rounded-md">{home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                                <span className="text-4xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{home.runs}</span>
+                                {home.overs && <span className="text-[9px] md:text-[10px] text-muted-foreground font-bold mt-2 md:mt-2.5 uppercase tracking-widest bg-secondary/40 px-2 md:px-3 py-1 rounded-md">{home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
                               </div>
-                              <span className="text-border text-4xl font-light mb-4">-</span>
+                              <span className="text-border text-3xl md:text-4xl font-light mb-4 md:mb-6">-</span>
                               <div className="flex flex-col items-center">
-                                <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{away.runs}</span>
-                                {away.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2.5 uppercase tracking-widest bg-secondary/40 px-3 py-1 rounded-md">{away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                                <span className="text-4xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{away.runs}</span>
+                                {away.overs && <span className="text-[9px] md:text-[10px] text-muted-foreground font-bold mt-2 md:mt-2.5 uppercase tracking-widest bg-secondary/40 px-2 md:px-3 py-1 rounded-md">{away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
                               </div>
                             </div>
                          ) : (!showHome && !showAway && !showTestScore) ? (
@@ -954,8 +954,8 @@ const MatchDetails = () => {
                        </div>
 
                        {/* Away Team (Right Side) */}
-                       <div className="flex justify-center md:justify-start z-10 w-full min-w-0">
-                           <div className="flex items-center gap-4 md:gap-5 lg:gap-6 min-w-0">
+                       <div className="col-span-1 flex justify-center md:justify-start z-10 w-full min-w-0">
+                           <div className="flex flex-col md:flex-row items-center gap-3 md:gap-5 lg:gap-6 min-w-0">
                                
                                {/* Invisible placeholder when Home is batting to keep Flags equidistant */}
                                {!showTestScore && showHome && !showAway && !showDualScore && (
@@ -964,11 +964,11 @@ const MatchDetails = () => {
 
                                {/* Score next to Away Team if only Away is batting */}
                                {!showTestScore && showAway && !showDualScore && (
-                                   <div className="mr-2 pr-4 md:mr-4 md:pr-4 lg:mr-6 lg:pr-6 border-r-2 border-primary/20 relative flex items-center justify-end md:w-[130px] lg:w-[150px] shrink-0">
-                                       <span className="text-5xl md:text-5xl lg:text-6xl font-black tracking-tighter text-foreground leading-none">{away.runs}</span>
+                                   <div className="mb-2 md:mb-0 md:mr-2 md:pr-4 lg:mr-6 lg:pr-6 border-b border-border/50 pb-3 md:pb-0 md:border-b-0 md:border-r-2 md:border-primary/20 relative flex flex-col md:items-center justify-center md:justify-end md:w-[130px] lg:w-[150px] shrink-0">
+                                       <span className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-foreground leading-none text-center md:text-right w-full">{away.runs}</span>
                                        {away.overs && (
-                                           <div className="absolute top-[105%] right-4 md:right-4 lg:right-6 whitespace-nowrap">
-                                               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md">
+                                           <div className="md:absolute top-[105%] md:right-4 lg:right-6 whitespace-nowrap mt-2 md:mt-0 text-center md:text-right w-full">
+                                               <span className="text-[9px] md:text-[10px] text-muted-foreground font-bold uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md inline-block">
                                                    {away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS
                                                </span>
                                            </div>
@@ -976,10 +976,10 @@ const MatchDetails = () => {
                                    </div>
                                )}
                                
-                               <TeamLogo logo={team2Logo} name={team2Name} size="lg" className="w-16 h-12 md:w-20 md:h-14 lg:w-24 lg:h-16 object-contain shrink-0 drop-shadow-md" />
-                               <div className="text-left min-w-0">
-                                   <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground tracking-tight break-words">{team2Name}</h2>
-                                   <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team2ShortName}</p>
+                               <TeamLogo logo={team2Logo} name={team2Name} size="lg" className="w-14 h-14 md:w-20 md:h-14 lg:w-24 lg:h-16 object-contain shrink-0 drop-shadow-md" />
+                               <div className="text-center md:text-left min-w-0">
+                                   <h2 className="text-lg md:text-2xl lg:text-3xl font-bold text-foreground tracking-tight break-words leading-tight">{team2Name}</h2>
+                                   <p className="text-[10px] md:text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.25em] mt-1">{team2ShortName}</p>
                                </div>
                            </div>
                        </div>

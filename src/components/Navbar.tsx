@@ -498,10 +498,10 @@ export const Navbar = () => {
           <BarChart3 size={22} strokeWidth={location.pathname === "/performance-lab" ? 2.5 : 2} />
           <span className="text-[10px] font-medium">Lab</span>
         </Link>
-        <button onClick={() => { setSearchOpen(!searchOpen); setMobileMenuOpen(false); }} className={cn("flex flex-col items-center gap-1 p-2 rounded-lg transition-colors", searchOpen ? "text-primary" : "text-muted-foreground")}>
-          <Search size={22} strokeWidth={searchOpen ? 2.5 : 2} />
-          <span className="text-[10px] font-medium">Search</span>
-        </button>
+        <Link to="/create" onClick={() => setMobileMenuOpen(false)} className={cn("flex flex-col items-center gap-1 p-2 rounded-lg transition-colors", location.pathname === "/create" ? "text-primary" : "text-muted-foreground")}>
+          <PlusCircle size={22} strokeWidth={location.pathname === "/create" ? 2.5 : 2} />
+          <span className="text-[10px] font-medium">Create</span>
+        </Link>
         <button onClick={() => { setMobileMenuOpen(!mobileMenuOpen); setSearchOpen(false); }} className={cn("flex flex-col items-center gap-1 p-2 rounded-lg transition-colors", mobileMenuOpen ? "text-primary" : "text-muted-foreground")}>
           {user && user.photoUrl ? (
              <img src={user.photoUrl.startsWith('http') || user.photoUrl.startsWith('data:') ? user.photoUrl : `http://localhost:5001/${user.photoUrl}`} alt="Menu" className="w-6 h-6 rounded-full object-cover border-2 border-transparent focus:border-primary" />
