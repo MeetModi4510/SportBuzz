@@ -12,33 +12,33 @@ export const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
 
   return (
     <motion.div 
-      className="fixed inset-0 z-[999999] bg-background flex items-center justify-center overflow-hidden"
-      exit={{ opacity: 0, scale: 1.1 }}
+      className="fixed inset-0 z-[999999] bg-[#0a0a0c] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#1a2332] via-[#0a0a0c] to-[#0a0a0c] flex items-center justify-center overflow-hidden"
+      exit={{ opacity: 0, scale: 1.05 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
     >
       <div className="relative flex items-center justify-center w-full h-full">
         {/* Animated Wrapper that shifts left to keep things centered as text appears */}
         <motion.div
           initial={{ x: 0 }}
-          animate={{ x: -90 }}
-          transition={{ delay: 1.2, duration: 1.0, type: "spring", bounce: 0.1 }}
+          animate={{ x: -110 }}
+          transition={{ delay: 1.0, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="relative flex items-center z-20"
         >
           {/* Logo */}
           <motion.div
-            initial={{ scale: 0, rotate: -45 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 1.2, type: "spring", bounce: 0.4 }}
-            className="relative z-20 bg-background flex items-center justify-center rounded-full p-2"
+            initial={{ scale: 0.4, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
+            className="relative z-20 flex items-center justify-center rounded-full"
           >
             {/* Custom Bolt SVG matching the user's screenshot */}
             <svg
-              width="80"
-              height="80"
+              width="84"
+              height="84"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="text-primary drop-shadow-[0_0_15px_rgba(0,229,153,0.4)]"
+              className="text-[#00E599]"
             >
               <path
                 d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
@@ -53,12 +53,12 @@ export const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
 
           {/* Text sliding out from behind the logo */}
           <motion.div
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 10, opacity: 1 }}
-            transition={{ delay: 1.2, duration: 1.0, type: "spring", bounce: 0.1 }}
-            className="absolute left-[85%] z-10 whitespace-nowrap"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 1.0, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute left-full ml-5 z-10 whitespace-nowrap"
           >
-            <span className="text-4xl md:text-5xl font-black font-display tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500">
+            <span className="text-[44px] md:text-[52px] font-black font-display tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-[#00E599] to-[#3b82f6]">
               SPORTSBUZZ
             </span>
           </motion.div>
