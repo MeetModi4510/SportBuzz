@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.sportsbuzz_m.twa",
+        "sha256_cert_fingerprints": ["05:9A:EF:11:3D:E0:22:FD:BF:F6:6F:0B:BA:EA:FB:42:F0:B8:0F:DD:1F:2E:31:C6:A2:F8:3B:72:3A:48:79:B4"]
+      }
+    }]
