@@ -1,0 +1,22 @@
+{
+  "name": "SportsBuzz",
+  "short_name": "SportsBuzz",
+  "description": "Live Sports Scores & Stats",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/world-cup-trophy-real.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
