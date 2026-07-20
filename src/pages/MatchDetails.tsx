@@ -193,7 +193,7 @@ const MatchDetails = () => {
 
   const { lineupData: fotmobLineups } = useFotmobLineups(undefined, undefined, !isCricketMatch);
 
-  // ΓöÇΓöÇ Cricket Hooks ΓöÇΓöÇ
+  // -- Cricket Hooks --
   const {
     data: cricketDataMatch,
     loading: cricketDataLoading
@@ -204,7 +204,7 @@ const MatchDetails = () => {
     isLoading: legacyLoading
   } = useCricketMatchDetails(isCricketMatch ? id?.replace("cricket-", "") : undefined);
 
-  // ΓöÇΓöÇ Football Hook ΓöÇΓöÇ
+  // -- Football Hook --
   // Football matches now route to /football/match/:id.
   const footballMatchData = undefined;
   const footballLoading = false;
@@ -249,7 +249,7 @@ const MatchDetails = () => {
     }
   }, [cleanMatchId, isCricketMatch, queryClient]);
 
-  // ΓöÇΓöÇ Helper to calculate balls bowled from overs string (e.g. "11.4" -> 70) ΓöÇΓöÇ
+  // -- Helper to calculate balls bowled from overs string (e.g. "11.4" -> 70) --
   const parseBalls = useCallback((overStr: string | number | undefined): number => {
     if (!overStr) return 0;
     const str = String(overStr);
@@ -326,7 +326,7 @@ const MatchDetails = () => {
     const t2 = (match?.awayTeam?.shortName || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     const mType = (match?.matchType || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     if (!t1 || !t2) return cricbuzzSlug;
-    // Return minimal slug ΓÇö server will auto-resolve
+    // Return minimal slug – server will auto-resolve
     return `${t1}-vs-${t2}${mType ? `-${mType}` : ''}`.replace(/[^a-z0-9-]/g, '');
   })();
 
@@ -371,7 +371,7 @@ const MatchDetails = () => {
     commentarySyncTrigger
   );
 
-  // ΓöÇΓöÇ Full Commentary from Cricbuzz HTML page scraper ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // -- Full Commentary from Cricbuzz HTML page scraper -----------------------
   const cbFullCommentaryField = useMatchFieldData(
     isCricketMatch ? cleanMatchId : undefined,
     'cbFullCommentary',
@@ -380,7 +380,7 @@ const MatchDetails = () => {
     commentarySyncTrigger
   );
 
-  // ΓöÇΓöÇ Compute Balls for Scorecard and Commentary ΓöÇΓöÇ
+  // -- Compute Balls for Scorecard and Commentary --
   let scorecardBalls = 0;
   if (cbScorecardField.data?.innings?.length > 0) {
     const latestInn = cbScorecardField.data.innings[cbScorecardField.data.innings.length - 1];
@@ -405,15 +405,15 @@ const MatchDetails = () => {
     } else if (Array.isArray(rawComm?.commentary)) {
       const first = rawComm.commentary[0];
       if (Array.isArray(first?.commentaryList)) {
-        // Shape 2 ΓÇö nested
+        // Shape 2 – nested
         commEntries = first.commentaryList;
       } else {
-        // Shape 1 ΓÇö flat (actual scraper output)
+        // Shape 1 – flat (actual scraper output)
         commEntries = rawComm.commentary;
       }
     }
 
-    // Find the entry with the highest overNum ΓÇö that is the latest ball
+    // Find the entry with the highest overNum – that is the latest ball
     let maxOverBalls = 0;
     for (const c of commEntries) {
       if (c.overNum !== undefined && c.overNum !== null) {
@@ -425,7 +425,7 @@ const MatchDetails = () => {
     commentaryBalls = maxOverBalls;
   }
 
-  // ΓöÇΓöÇ Global Mismatch Detector ΓöÇΓöÇ
+  // -- Global Mismatch Detector --
   // A mismatch exists whenever ANY two of the three live sources disagree.
   // This is tab-independent: even if the user is on Commentary and it is ahead
   // of the header, we must detect it and force the header to catch up.
@@ -463,7 +463,7 @@ const MatchDetails = () => {
     // When a new ball is bowled, this number increases ΓåÆ new event ΓåÆ reset retries.
     const sig = `${Math.max(summaryBalls, scorecardBalls, commentaryBalls)}`;
     if (sig !== lastMismatchSig.current) {
-      // Genuinely new event ΓÇö reset retry counter
+      // Genuinely new event – reset retry counter
       globalRetries.current = 0;
       lastMismatchSig.current = sig;
     }
@@ -565,7 +565,7 @@ const MatchDetails = () => {
   const dynamicTimeStr = match?.displayTime && (match?.sport === 'cricket' || match?.sport === 'football')
     ? match.displayTime
     : (dynamicStartTimeMs && !isNaN(new Date(dynamicStartTimeMs).getTime())
-      ? format(new Date(dynamicStartTimeMs), "MMM d, yyyy ΓÇó h:mm a")
+      ? format(new Date(dynamicStartTimeMs), "MMM d, yyyy • h:mm a")
       : "Time TBA");
 
   if (dynamicMatchInfo?.matchFormat?.toUpperCase() === 'TEST') {
@@ -582,7 +582,7 @@ const MatchDetails = () => {
   const dynamicTeam1 = dynamicMatchInfo?.team1;
   const dynamicTeam2 = dynamicMatchInfo?.team2;
 
-  // ΓöÇΓöÇ Cache lookup: read listing data already stored by the dashboard ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // -- Cache lookup: read listing data already stored by the dashboard -------------
   // The summary endpoint has no imageId on team objects and its team1/team2 order
   // may differ from the listing.  The listing cache is authoritative for completed
   // matches: same source the dashboard card used, guaranteed correct home/away order.
@@ -621,9 +621,9 @@ const MatchDetails = () => {
 
   const cachedIsCompleted = cachedListingMatch?.status === 'completed';
 
-  // ΓöÇΓöÇ Team names & logos ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // -- Team names & logos --------------------------------------------------------
   // For completed matches: use listing cache as ground truth (correct order + imageId).
-  // For live/upcoming:     use cbSummary / match as before ΓÇö never touches this branch.
+  // For live/upcoming:     use cbSummary / match as before – never touches this branch.
   const team1Name = cachedIsCompleted
     ? (cachedListingMatch?.homeTeam?.name || dynamicTeam1?.teamName || match?.homeTeam?.name || 'Team 1')
     : (dynamicTeam1?.teamName || match?.homeTeam?.name || 'Team 1');
@@ -650,9 +650,9 @@ const MatchDetails = () => {
     ? (cachedListingMatch?.awayTeam?.logo || match?.awayTeam?.logo || '')
     : ((dynamicTeam2?.imageId ? `/api/cricket/scraped/team-logo/${dynamicTeam2.imageId}` : '') || match?.awayTeam?.logo || '');
 
-  // ΓöÇΓöÇ Scores ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // -- Scores --------------------------------------------------------------------
   // For completed matches: seed immediately from the cached listing (same as dashboard).
-  // Then, if cbSummary arrives, override using batTeamName matching ΓÇö NOT array index ΓÇö
+  // Then, if cbSummary arrives, override using batTeamName matching – NOT array index –
   // because innings[0] is the team that batted first, which may be team1 OR team2.
   let dynamicHomeScoreStr: string | undefined =
     cachedIsCompleted && cachedListingMatch?.homeScore ? String(cachedListingMatch.homeScore) : undefined;
@@ -664,7 +664,7 @@ const MatchDetails = () => {
     if (ms) {
       if (Array.isArray(ms)) {
         if (isCompleted) {
-          // ΓöÇΓöÇ Completed match: assign by team name matching, not by array index ΓöÇΓöÇ
+          // -- Completed match: assign by team name matching, not by array index --
           // innings[i].batTeamName tells us WHICH team batted in that innings.
           // team1Name/team2Name are already correctly set.
           const scoreForTeam = (teamName: string): string | undefined => {
@@ -848,7 +848,7 @@ const MatchDetails = () => {
     }
   }
 
-  // ΓöÇΓöÇ Completed-Match Last-Resort Fallback ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // -- Completed-Match Last-Resort Fallback --------------------------------------
   // Only runs for completed matches so live/upcoming logic is never affected.
   // Extracts from cbSummary.matchScore (object shape with team1Score/team2Score)
   // when inningsScoreList was absent from the summary response.
@@ -981,15 +981,15 @@ const MatchDetails = () => {
               {/* 2. Main Score Area */}
               {(() => {
                 const parseScore = (raw: string | undefined) => {
-                  if (!raw) return { runs: "ΓÇö", overs: "" };
+                  if (!raw) return { runs: "–", overs: "" };
                   const m = raw.match(/^([\d\/]+(?:\s*\(d\))?)\s*\((.+?)\)\s*$/);
                   if (m) return { runs: m[1].trim(), overs: m[2].trim() };
                   return { runs: raw, overs: "" };
                 };
                 const home = parseScore(dynamicHomeScoreStr);
                 const away = parseScore(dynamicAwayScoreStr);
-                const showAway = away.runs !== "ΓÇö" && away.runs !== "";
-                const showHome = home.runs !== "ΓÇö" && home.runs !== "";
+                const showAway = away.runs !== "–" && away.runs !== "";
+                const showHome = home.runs !== "–" && home.runs !== "";
                 const showDualScore = showHome && showAway;
                 const showTestScore = isTestMatch;
 
@@ -1031,15 +1031,15 @@ const MatchDetails = () => {
                       {showTestScore && match.scoreBreakdown ? (
                         <div className="flex flex-col items-center gap-3">
                           <div className="flex items-center gap-6">
-                            <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">{match.scoreBreakdown.home.inn1 || "ΓÇö"}</span>
+                            <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">{match.scoreBreakdown.home.inn1 || "–"}</span>
                             <span className="text-border text-2xl font-light">-</span>
-                            <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">{match.scoreBreakdown.away.inn1 || "ΓÇö"}</span>
+                            <span className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">{match.scoreBreakdown.away.inn1 || "–"}</span>
                           </div>
                           {(match.scoreBreakdown.home.inn2 || match.scoreBreakdown.away.inn2) && (
                             <div className="flex items-center gap-4 text-muted-foreground">
-                              <span className="text-xl md:text-2xl font-bold">{match.scoreBreakdown.home.inn2 || "ΓÇö"}</span>
+                              <span className="text-xl md:text-2xl font-bold">{match.scoreBreakdown.home.inn2 || "–"}</span>
                               <span className="text-border text-lg">-</span>
-                              <span className="text-xl md:text-2xl font-bold">{match.scoreBreakdown.away.inn2 || "ΓÇö"}</span>
+                              <span className="text-xl md:text-2xl font-bold">{match.scoreBreakdown.away.inn2 || "–"}</span>
                             </div>
                           )}
                         </div>
@@ -1064,7 +1064,7 @@ const MatchDetails = () => {
                                         <span className={cn("font-black tracking-tighter transition-all", isHomeLatest ? "text-4xl md:text-5xl text-foreground" : "text-2xl md:text-3xl text-muted-foreground")}>{hInn.score}</span>
                                         {hInn.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversText(hInn.overs).replace(/ov/i, '').trim()} OVERS</span>}
                                       </>
-                                    ) : <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">ΓÇö</span>}
+                                    ) : <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">–</span>}
                                   </div>
                                   <div className="flex items-center justify-center">
                                     <div className="px-2.5 py-1 bg-muted/40 border border-border/40 rounded-full text-[9px] font-black text-muted-foreground uppercase tracking-[0.25em] shadow-sm">
@@ -1077,7 +1077,7 @@ const MatchDetails = () => {
                                         <span className={cn("font-black tracking-tighter transition-all", isAwayLatest ? "text-4xl md:text-5xl text-foreground" : "text-2xl md:text-3xl text-muted-foreground")}>{aInn.score}</span>
                                         {aInn.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversText(aInn.overs).replace(/ov/i, '').trim()} OVERS</span>}
                                       </>
-                                    ) : <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">ΓÇö</span>}
+                                    ) : <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">–</span>}
                                   </div>
                                 </div>
                               );
@@ -1097,7 +1097,7 @@ const MatchDetails = () => {
                           </div>
                         </div>
                       ) : (!showHome && !showAway && !showTestScore) ? (
-                        <span className="text-4xl text-muted-foreground/30 font-light">ΓÇö</span>
+                        <span className="text-4xl text-muted-foreground/30 font-light">–</span>
                       ) : (showHome || showAway) && !showDualScore ? null : (
                         <span className="text-2xl font-bold text-muted-foreground/30 tracking-widest">VS</span>
                       )}
@@ -1590,10 +1590,10 @@ const MatchDetails = () => {
                                   <div className="mb-8">
                                     {(() => {
                                       const matchTitleStr = cbInfo.extraInfo.Match || (match as any).name || "";
-                                      const titleParts = matchTitleStr.split(/(?:,|ΓÇó)/).map((p: string) => p.trim()).filter(Boolean);
+                                      const titleParts = matchTitleStr.split(/(?:,|•)/).map((p: string) => p.trim()).filter(Boolean);
                                       if (titleParts.length > 1) {
                                         const mainTitle = titleParts[0];
-                                        const subTitles = titleParts.slice(1).join(" ΓÇó ");
+                                        const subTitles = titleParts.slice(1).join(" • ");
                                         return (
                                           <h2 className="flex flex-col gap-1.5 sm:gap-2">
                                             <span className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] font-black text-foreground uppercase tracking-tighter leading-none bg-gradient-to-br from-foreground to-foreground/80 bg-clip-text text-transparent pb-1">
@@ -1662,7 +1662,7 @@ const MatchDetails = () => {
                                   {([cbInfo.extraInfo.TV ? `TV: ${cbInfo.extraInfo.TV}` : null, cbInfo.extraInfo.Streaming ? `Stream: ${cbInfo.extraInfo.Streaming}` : null].filter(Boolean).length > 0) && (
                                     <div className="pt-4 border-t border-border/50">
                                       <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Broadcast</span>
-                                      <span className="text-[11px] font-bold text-foreground leading-snug block opacity-80">{[cbInfo.extraInfo.TV ? `TV: ${cbInfo.extraInfo.TV}` : null, cbInfo.extraInfo.Streaming ? `Stream: ${cbInfo.extraInfo.Streaming}` : null].filter(Boolean).join(' ΓÇó ')}</span>
+                                      <span className="text-[11px] font-bold text-foreground leading-snug block opacity-80">{[cbInfo.extraInfo.TV ? `TV: ${cbInfo.extraInfo.TV}` : null, cbInfo.extraInfo.Streaming ? `Stream: ${cbInfo.extraInfo.Streaming}` : null].filter(Boolean).join(' • ')}</span>
                                     </div>
                                   )}
                                 </div>
@@ -1729,7 +1729,7 @@ const MatchDetails = () => {
               {isCricketMatch ? (
                 <SquadsTab squadsData={squads} loading={squadsLoading} error={squadsError} />
               ) : (match.sport === 'football' ? (
-                /* ΓöÇΓöÇ Football Lineups ΓöÇΓöÇ */
+                /* -- Football Lineups -- */
                 <div className="bg-card border border-border rounded-[2.5rem] p-4 md:p-8 overflow-hidden relative">
                   <FootballPitchLineup
                     homeTeam={{
@@ -1851,7 +1851,7 @@ const MatchDetails = () => {
                   </div>
                 </div>
               ) : (cbSquadsField.data?.teams?.length || match?.homeTeam?.players?.length || match?.awayTeam?.players?.length) ? (
-                /* ΓöÇΓöÇ Cricket Head-to-Head Lineups ΓöÇΓöÇ */
+                /* -- Cricket Head-to-Head Lineups -- */
                 (() => {
                   const apiTeams = cbSquadsField.data?.teams || [];
                   const teams: any[] = [];
@@ -1989,14 +1989,14 @@ const MatchDetails = () => {
                   );
                 })()
               ) : (
-                /* ΓöÇΓöÇ Fallback to existing SquadsList ΓöÇΓöÇ */
+                /* -- Fallback to existing SquadsList -- */
                 <SquadsList match={match} matchData={rawApiData} isLoading={matchInfoField.loading} />
               ))}
             </TabsContent>
 
             <TabsContent value="scoreboard" className="animate-fade-in">
               {match?.sport === 'football' ? (
-                /* ΓöÇΓöÇ Football Match Stats ΓöÇΓöÇ */
+                /* -- Football Match Stats -- */
                 <div className="space-y-6">
                   {(() => {
                     const homeTeamName = match?.homeTeam?.shortName || 'Home';
@@ -2089,7 +2089,7 @@ const MatchDetails = () => {
                   })()}
                 </div>
               ) : match?.sport === 'tennis' ? (
-                /* ΓöÇΓöÇ Tennis Match Stats ΓöÇΓöÇ */
+                /* -- Tennis Match Stats -- */
                 <div className="space-y-6">
                   {(() => {
                     const homeTeamName = match?.homeTeam?.shortName || match?.homeTeam?.name || 'P1';
@@ -2186,21 +2186,21 @@ const MatchDetails = () => {
                   })()}
                 </div>
               ) : (
-                /* ΓöÇΓöÇ Cricket / Other Sports Scoreboard ΓöÇΓöÇ */
+                /* -- Cricket / Other Sports Scoreboard -- */
                 <div className="bg-card border border-border rounded-xl p-6 space-y-6">
                   <h3 className="font-semibold text-foreground">Scoreboard</h3>
 
                   {isUpcoming ? (
                     <div className="text-center py-12 text-muted-foreground">
                       <ListOrdered className="mx-auto h-12 w-12 mb-3 opacity-10" />
-                      <p>Match not started yet ΓÇö scoreboard will be available once play begins.</p>
+                      <p>Match not started yet – scoreboard will be available once play begins.</p>
                     </div>
                   ) : (cbScorecardField.loading) ? (
                     <div className="flex justify-center p-8">
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
                   ) : cbScorecardField.data?.innings && cbScorecardField.data.innings.length > 0 ? (
-                    /* ΓöÇΓöÇ Cricbuzz Detailed Scorecard ΓöÇΓöÇ */
+                    /* -- Cricbuzz Detailed Scorecard -- */
                     <div className="space-y-8">
                       {cbScorecardField.data.status && (
                         <div className="flex items-center gap-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
@@ -2255,14 +2255,14 @@ const MatchDetails = () => {
                               </div>
                             </div>
 
-                            {/* Card-Based Batting Scorecard ΓÇö all 11 players shown together */}
+                            {/* Card-Based Batting Scorecard – all 11 players shown together */}
                             <div className="pt-2 pb-8">
                               <h5 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 font-bold mb-4 px-1">Batting</h5>
                               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                                 {(() => {
                                   // Build complete 11-player list:
                                   // 1. Batsmen who have batted (from inn.batsmen)
-                                  // 2. Players yet to bat (from inn.yetToBat ΓÇö now objects with faceImageId)
+                                  // 2. Players yet to bat (from inn.yetToBat – now objects with faceImageId)
                                   const battedList = (inn.batsmen || []).map((b: any) => ({
                                     ...b,
                                     _status: 'batted' as const,
@@ -2533,7 +2533,7 @@ const MatchDetails = () => {
                       })()}
                     </div>
                   ) : rawApiData?.score && Array.isArray(rawApiData.score) && rawApiData.score.length > 0 ? (
-                    /* ΓöÇΓöÇ CricketData.org Summary Fallback ΓöÇΓöÇ */
+                    /* -- CricketData.org Summary Fallback -- */
                     <div className="space-y-6">
                       <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg text-sm flex items-center gap-2">
                         <Info size={16} className="text-amber-500" />
@@ -2597,11 +2597,11 @@ const MatchDetails = () => {
 
                 <div className="p-6 space-y-4">
                   {match?.sport === 'football' ? (
-                    /* ΓöÇΓöÇ Football events ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
+                    /* -- Football events ------------------------------------ */
                     isUpcoming ? (
                       <div className="text-center py-12 text-muted-foreground">
                         <MessageSquare className="mx-auto h-12 w-12 mb-3 opacity-10" />
-                        <p>Match not started yet ΓÇö commentary will be available once play begins.</p>
+                        <p>Match not started yet – commentary will be available once play begins.</p>
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -2652,7 +2652,7 @@ const MatchDetails = () => {
                       </div>
                     )
                   ) : cbFullCommentaryField.loading ? (
-                    /* ΓöÇΓöÇ Loading state ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
+                    /* -- Loading state --------------------------------------- */
                     <div className="space-y-3">
                       {[...Array(6)].map((_, i) => (
                         <div key={i} className="flex gap-4 animate-pulse">
@@ -2666,7 +2666,7 @@ const MatchDetails = () => {
                       ))}
                     </div>
                   ) : cbFullCommentaryField.data?.commentary && cbFullCommentaryField.data.commentary.length > 0 ? (
-                    /* ΓöÇΓöÇ Full Cricbuzz Commentary ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
+                    /* -- Full Cricbuzz Commentary ---------------------------- */
                     (() => {
                       const items: any[] = cbFullCommentaryField.data.commentary;
                       // Group by innings
@@ -2931,10 +2931,10 @@ const MatchDetails = () => {
                       );
                     })()
                   ) : cbCommentaryField.data?.commentary && cbCommentaryField.data.commentary.length > 0 ? (
-                    /* ΓöÇΓöÇ Cricbuzz Highlight Commentary Fallback ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
+                    /* -- Cricbuzz Highlight Commentary Fallback --------------- */
                     <div className="space-y-3">
                       {cbCommentaryField.data.commentary.map((item: any, idx: number) => {
-                        const icon = item.eventType === 'WICKET' ? 'Γÿ¥∩╕Å' : item.eventType === 'SIX' ? '6∩╕ÅΓâú' : item.eventType === 'FOUR' ? '4∩╕ÅΓâú' : 'ΓÇó';
+                        const icon = item.eventType === 'WICKET' ? 'Γÿ¥∩╕Å' : item.eventType === 'SIX' ? '6∩╕ÅΓâú' : item.eventType === 'FOUR' ? '4∩╕ÅΓâú' : '•';
                         return (
                           <div key={idx} className="relative pl-8 pb-2 last:pb-0 border-l border-border/60 last:border-l-0">
                             <div className={cn("absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full", item.eventType === 'WICKET' ? "bg-red-500" : item.eventType === 'SIX' ? "bg-yellow-400" : item.eventType === 'FOUR' ? "bg-blue-400" : "bg-primary/60")} />
@@ -2948,7 +2948,7 @@ const MatchDetails = () => {
                       })}
                     </div>
                   ) : commentaryField.data?.bpiList && commentaryField.data.bpiList.length > 0 ? (
-                    /* ΓöÇΓöÇ CricketData.org bpiList Fallback ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
+                    /* -- CricketData.org bpiList Fallback ------------------- */
                     <div className="space-y-6">
                       {(() => {
                         const grouped = commentaryField.data.bpiList.reduce((acc: any, item: string) => {
@@ -2979,14 +2979,14 @@ const MatchDetails = () => {
                       })()}
                     </div>
                   ) : cbFullCommentaryField.error ? (
-                    /* ΓöÇΓöÇ Error state ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
+                    /* -- Error state ------------------------------------------ */
                     <div className="text-center py-12 text-muted-foreground">
                       <AlertTriangle className="mx-auto h-12 w-12 mb-3 opacity-30" />
                       <p className="font-medium">Commentary temporarily unavailable</p>
                       <p className="text-xs mt-1 opacity-60">Data will refresh shortly</p>
                     </div>
                   ) : (
-                    /* ΓöÇΓöÇ Empty / upcoming ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
+                    /* -- Empty / upcoming ------------------------------------- */
                     <div className="text-center py-12 text-muted-foreground">
                       <MessageSquare className="mx-auto h-12 w-12 mb-3 opacity-10" />
                       <p>No commentary available for this match.</p>

@@ -199,15 +199,15 @@ export const cricketApi = {
         }
     },
 
-    /** Only live ΓÇö called on initial load. Cached 1 minute on server. */
+    /** Only live – called on initial load. Cached 1 minute on server. */
     getLiveCricketFeatured: (): Promise<{ test: Match[], odi: Match[], t20: Match[] }> =>
         cricketApi._fetchFeaturedSlice('cricket/scraped/matches/live'),
 
-    /** Only upcoming ΓÇö called lazily when user clicks "Upcoming". Cached 30 min. */
+    /** Only upcoming – called lazily when user clicks "Upcoming". Cached 30 min. */
     getUpcomingCricketFeatured: (): Promise<{ test: Match[], odi: Match[], t20: Match[] }> =>
         cricketApi._fetchFeaturedSlice('cricket/scraped/matches/upcoming'),
 
-    /** Only recent/completed ΓÇö called lazily when user clicks "Completed". Cached 30 min. */
+    /** Only recent/completed – called lazily when user clicks "Completed". Cached 30 min. */
     getRecentCricketFeatured: (): Promise<{ test: Match[], odi: Match[], t20: Match[] }> =>
         cricketApi._fetchFeaturedSlice('cricket/scraped/matches/recent'),
 };
