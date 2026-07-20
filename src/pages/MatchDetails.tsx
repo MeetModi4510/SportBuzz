@@ -708,9 +708,12 @@ const MatchDetails = () => {
     reconciledStatusText = cbFullCommentaryField.data.matchHeader.status;
   }
 
-  let reconciledInningsScores = match?.inningsScores ? [...match.inningsScores] : [];
+  let reconciledInningsScores = cachedIsCompleted && cachedListingMatch?.inningsScores?.length
+    ? [...cachedListingMatch.inningsScores]
+    : (match?.inningsScores ? [...match.inningsScores] : []);
 
-  if (isTestMatch && cbSummary) {
+  // For live/upcoming Test matches, fallback to manually parsing cbSummary if match.inningsScores is insufficient
+  if (isTestMatch && cbSummary && !cachedIsCompleted) {
     const summaryInnings: any[] = [];
     const ms = cbSummary.matchScore || cbSummary.inningsScoreList || cbSummary.miniscore?.matchScoreDetails?.inningsScoreList;
 
