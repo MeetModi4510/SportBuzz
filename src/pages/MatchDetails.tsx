@@ -1,10 +1,10 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { LiveBadge } from "@/components/LiveBadge";
 import { SportIcon, getSportGradient } from "@/components/SportIcon";
 import { TeamLogo } from "@/components/TeamLogo";
 import { matches, players } from "@/data/mockData";
-import { useCricketMatchDetails, useCricketMatchSquads, useCricbuzzSummary, useCricbuzzInfo } from "@/hooks/useCricketMatches";
+import { useCricketMatchDetails, useCricketMatchSquads, useCricbuzzSummary, useCricbuzzInfo, useAllCricketMatches } from "@/hooks/useCricketMatches";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCricketDataMatch, useCricbuzzSquads } from "@/hooks/useCricketDataMatch";
 import { useMatchFieldData } from "@/hooks/useMatchFieldData";
@@ -586,8 +586,25 @@ const MatchDetails = () => {
   // The summary endpoint has no imageId on team objects and its team1/team2 order
   // may differ from the listing.  The listing cache is authoritative for completed
   // matches: same source the dashboard card used, guaranteed correct home/away order.
+  const location = useLocation();
+  const { data: allMatches } = useAllCricketMatches();
+  
   const cachedListingMatch = (() => {
     if (!cleanMatchId) return null;
+
+    // 1. Check router state (fastest, from dashboard click)
+    const stateMatch = location.state?.match;
+    if (stateMatch && String(stateMatch.id) === String(cleanMatchId)) {
+      return stateMatch;
+    }
+
+    // 2. Check allMatches which actively fetches if cache is empty (handles hard reload)
+    if (Array.isArray(allMatches)) {
+      const found = allMatches.find((m: any) => String(m.id) === String(cleanMatchId));
+      if (found) return found;
+    }
+
+    // 3. Fallback to manual query client check
     for (const key of [
       ['cricket', 'matches', 'live'],
       ['cricket', 'matches', 'recent'],
@@ -595,7 +612,7 @@ const MatchDetails = () => {
     ]) {
       const list = queryClient.getQueryData<any[]>(key);
       if (Array.isArray(list)) {
-        const found = list.find((m: any) => String(m.id) === cleanMatchId);
+        const found = list.find((m: any) => String(m.id) === String(cleanMatchId));
         if (found) return found;
       }
     }
