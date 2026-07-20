@@ -133,16 +133,23 @@ const GlobalNews = () => {
                 )} />
 
                 {/* Image Header */}
-                {(news.sport === 'football' && (news as any).imageUrl) || (news.sport === 'cricket' && (news as CricketNewsItem).imageId) ? (
-                  <div className="w-full h-40 overflow-hidden shrink-0 border-b border-border/10 relative">
+                <div className="w-full h-40 overflow-hidden shrink-0 border-b border-border/10 relative bg-secondary/30 flex items-center justify-center">
+                  {(news.sport === 'football' && (news as any).imageUrl) || (news.sport === 'cricket' && (news as CricketNewsItem).imageId) ? (
                     <img 
                       src={news.sport === 'football' ? (news as any).imageUrl : getCricketImageUrl((news as CricketNewsItem).imageId)!} 
                       alt="" 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
-                  </div>
-                ) : null}
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-full opacity-40">
+                      <SportIcon sport={news.sport as Sport} size={48} />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+                </div>
 
                 <div className="relative z-10 flex flex-col h-full gap-3 p-5 pointer-events-none flex-grow">
                   <div className="flex items-center justify-between mb-2">

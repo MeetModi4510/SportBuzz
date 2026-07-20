@@ -226,8 +226,8 @@ export const CricketNewsSection = () => {
               className="group flex flex-col justify-between p-5 rounded-3xl border border-border/40 bg-card/40 cursor-pointer hover:border-white/20 hover:bg-secondary/20 transition-all duration-300"
             >
               <div className="space-y-4">
-                {article.imageId && (
-                  <div className="w-full h-36 rounded-xl overflow-hidden bg-secondary/30 relative border border-border/30 mb-2">
+                <div className="w-full h-36 rounded-xl overflow-hidden bg-secondary/30 relative border border-border/30 mb-2 flex items-center justify-center">
+                  {article.imageId ? (
                     <img 
                       src={getImageUrl(article.imageId)!} 
                       alt={article.headline}
@@ -236,8 +236,13 @@ export const CricketNewsSection = () => {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
-                  </div>
-                )}
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-full opacity-40">
+                      <SportIcon sport="cricket" size={40} />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent pointer-events-none" />
+                </div>
                 <div className="flex items-center justify-between">
 
                   <div className="flex items-center gap-1 text-[11px] text-muted-foreground font-medium whitespace-nowrap">
