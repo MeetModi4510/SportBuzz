@@ -51,8 +51,24 @@ export function mapApiMatchToModel(apiMatch: any): Match {
             primaryColor: '#6366f1',
             players: apiMatch.awayTeam?.players
         },
-        homeScore: apiMatch.score?.team1?.runs !== undefined ? `${apiMatch.score.team1.runs}/${apiMatch.score.team1.wickets || 0}` : '',
-        awayScore: apiMatch.score?.team2?.runs !== undefined ? `${apiMatch.score.team2.runs}/${apiMatch.score.team2.wickets || 0}` : '',
+        // The listing API returns score as an array [{inning, r, w, o}] per innings.
+        // Fall back to legacy {team1, team2} object shape if array is not present.
+        homeScore: (() => {
+            const scoreArr = Array.isArray(apiMatch.score) ? apiMatch.score : null;
+            if (scoreArr && scoreArr.length > 0) {
+                const s = scoreArr[0];
+                return s.r !== undefined ? `${s.r}/${s.w || 0}${s.o !== undefined ? ` (${s.o} ov)` : ''}` : '';
+            }
+            return apiMatch.score?.team1?.runs !== undefined ? `${apiMatch.score.team1.runs}/${apiMatch.score.team1.wickets || 0}` : '';
+        })(),
+        awayScore: (() => {
+            const scoreArr = Array.isArray(apiMatch.score) ? apiMatch.score : null;
+            if (scoreArr && scoreArr.length > 1) {
+                const s = scoreArr[1];
+                return s.r !== undefined ? `${s.r}/${s.w || 0}${s.o !== undefined ? ` (${s.o} ov)` : ''}` : '';
+            }
+            return apiMatch.score?.team2?.runs !== undefined ? `${apiMatch.score.team2.runs}/${apiMatch.score.team2.wickets || 0}` : '';
+        })(),
         status: getStatus(apiMatch.status || apiMatch.state),
         venue: {
             id: 'v1',
@@ -170,7 +186,7 @@ export function useCricbuzzSummary(matchId: string | undefined) {
         queryFn: async () => {
             if (!matchId) return null;
             const res = await cricketApi.getCricbuzzSummary(matchId);
-            return res.data || res;
+            return res.data?.data || res.data || res;
         },
         enabled: !!matchId,
         refetchInterval: 60000, // 1 minute auto-refresh
@@ -184,9 +200,24 @@ export function useCricbuzzInfo(matchId: string | undefined, isSummaryLoaded: bo
         queryFn: async () => {
             if (!matchId) return null;
             const res = await cricketApi.getCricbuzzInfo(matchId);
-            return res.data || res;
+            return res.data?.data || res.data || res;
         },
         enabled: !!matchId && isSummaryLoaded,
         staleTime: 3600000, // 1 hour cache
     });
 }
+
+export function useMatchOversGraph(matchId: string | undefined) {
+    return useQuery({
+        queryKey: ['cricket', 'oversGraph', matchId],
+        queryFn: async () => {
+            if (!matchId) return null;
+            const res = await cricketApi.getOversGraph(matchId);
+            return res.data?.data || res.data || res;
+        },
+        enabled: !!matchId,
+        refetchInterval: 300000, // 5 minutes cache match backend scraper
+        staleTime: 300000,
+    });
+}
+

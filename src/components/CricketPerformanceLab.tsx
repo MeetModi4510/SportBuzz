@@ -11,6 +11,7 @@ import {
 import type { Match } from "@/data/types";
 import { useMatchFieldData } from "@/hooks/useMatchFieldData";
 import { WinProbabilityGraph } from "./cricket/graphs/WinProbabilityGraph";
+import { OversGraph } from "./cricket/graphs/OversGraph";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const COLORS = {
@@ -185,6 +186,10 @@ export default function CricketPerformanceLab({
     const { 
         data: winProbData, 
     } = useMatchFieldData(match.id, 'cbWinProbability', true, undefined, undefined);
+
+    const { 
+        data: oversGraphData, 
+    } = useMatchFieldData(match.id, 'cbOversGraph', true, undefined, undefined);
 
     // ── Derived data ──────────────────────────────────────────────────────────
     const currentInnings = innings[selectedInnings] || innings[0];
@@ -771,6 +776,17 @@ export default function CricketPerformanceLab({
                     subtitle="Live match win probability predictions"
                 >
                     <WinProbabilityGraph data={winProbData} />
+                </AnalyticsSection>
+            )}
+
+            {/* --- Overs Graph --- */}
+            {oversGraphData?.available && oversGraphData.data && oversGraphData.data.length > 0 && (
+                <AnalyticsSection
+                    icon={<BarChart3 size={18} className="text-purple-500" />}
+                    title="Overs Graph"
+                    subtitle="Runs scored over by over"
+                >
+                    <OversGraph data={oversGraphData} />
                 </AnalyticsSection>
             )}
 

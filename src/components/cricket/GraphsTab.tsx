@@ -8,9 +8,11 @@ interface GraphsTabProps {
     inningsList?: { id: number; name: string }[];
     syncTrigger?: number;
     isLive?: boolean;
+    isActive?: boolean;
+    onBallsCalculated?: (balls: number) => void;
 }
 
-export const GraphsTab: React.FC<GraphsTabProps> = ({ matchId, inningsList = [], syncTrigger, isLive }) => {
+export const GraphsTab: React.FC<GraphsTabProps> = ({ matchId, inningsList = [], syncTrigger, isLive, isActive = true, onBallsCalculated }) => {
     const defaultInnings = inningsList.length > 0 ? (isLive ? inningsList[inningsList.length - 1].id : inningsList[0].id) : 1;
     const [activeInnings, setActiveInnings] = useState<number>(defaultInnings);
 
@@ -25,7 +27,26 @@ export const GraphsTab: React.FC<GraphsTabProps> = ({ matchId, inningsList = [],
         data: ballMapData, 
         loading: loadingBallMap, 
         error: ballMapError 
-    } = useMatchFieldData(matchId, 'cbBallMap', true, String(activeInnings), syncTrigger);
+    } = useMatchFieldData(matchId, 'cbBallMap', isActive, String(activeInnings), syncTrigger);
+
+    useEffect(() => {
+        if (!onBallsCalculated) return;
+        const ballsArray = ballMapData?.data?.balls || ballMapData?.balls;
+        if (!ballsArray || ballsArray.length === 0) {
+            onBallsCalculated(0);
+            return;
+        }
+
+        let maxOverBalls = 0;
+        ballsArray.forEach((b: any) => {
+            if (b.overNum !== undefined && b.overNum !== null) {
+                const entryBalls = (parseInt(String(b.overNum)) * 6) + (parseInt(String(b.ballNbr ?? 0)) || 0);
+                if (entryBalls > maxOverBalls) maxOverBalls = entryBalls;
+            }
+        });
+
+        onBallsCalculated(maxOverBalls);
+    }, [ballMapData, onBallsCalculated]);
 
     const renderBallMap = () => {
         const ballsArray = ballMapData?.data?.balls || ballMapData?.balls;
@@ -80,7 +101,7 @@ export const GraphsTab: React.FC<GraphsTabProps> = ({ matchId, inningsList = [],
                             >
                                 {/* Over Header */}
                                 <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                                    <span className="text-sm font-black tracking-widest text-muted-foreground/80 uppercase">Over {over}</span>
+                                    <span className="text-sm font-black tracking-widest text-muted-foreground/80 uppercase">Over {over + 1}</span>
                                     <span className="text-xs font-bold text-foreground bg-foreground/10 px-2.5 py-1 rounded-md">{overRuns > 0 ? `${overRuns} Runs` : 'Maiden'}</span>
                                 </div>
                                 

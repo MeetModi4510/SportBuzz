@@ -39,12 +39,26 @@ export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean
             if (raw && (raw.matchInfo || raw.matchId)) {
                 // Map scraped summary to our Match model
                 const info = raw.matchInfo || {};
-                const score = raw.matchScore || {};
+                const score = raw.matchScore || raw.inningsScoreList || raw.miniscore?.matchScoreDetails?.inningsScoreList || {};
 
                 // Build innings scores from matchScore
                 const inningsScores: any[] = [];
-                const t1Score = score.team1Score?.inngs1;
-                const t2Score = score.team2Score?.inngs1;
+                let t1Score: any;
+                let t2Score: any;
+
+                if (Array.isArray(score)) {
+                    // It's an array of innings objects
+                    // We assign the first element to t1Score and the second to t2Score
+                    // They have format { batTeamName, score, wickets, overs }
+                    const inn1 = score[0];
+                    const inn2 = score[1];
+                    if (inn1) t1Score = { runs: inn1.score, wickets: inn1.wickets, overs: inn1.overs };
+                    if (inn2) t2Score = { runs: inn2.score, wickets: inn2.wickets, overs: inn2.overs };
+                } else {
+                    t1Score = score.team1Score?.inngs1;
+                    t2Score = score.team2Score?.inngs1;
+                }
+
                 if (t1Score) inningsScores.push({ team: 'home', score: `${t1Score.runs}/${t1Score.wickets}`, overs: t1Score.overs });
                 if (t2Score) inningsScores.push({ team: 'away', score: `${t2Score.runs}/${t2Score.wickets}`, overs: t2Score.overs });
 

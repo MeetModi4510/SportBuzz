@@ -1282,10 +1282,12 @@ export async function fetchMatchSquadsScraped(matchId) {
     return result;
 }
 
-export async function fetchBallMap(matchId, inningsId) {
+export async function fetchBallMap(matchId, inningsId, force = false) {
     const cacheKey = `ballmap_${matchId}_${inningsId}`;
-    const cached = liveCache.get(cacheKey);
-    if (cached) return cached;
+    if (!force) {
+        const cached = liveCache.get(cacheKey);
+        if (cached) return cached;
+    }
 
     try {
         const url = `https://www.cricbuzz.com/api/mcenter/balls-map/${matchId}/${inningsId}`;

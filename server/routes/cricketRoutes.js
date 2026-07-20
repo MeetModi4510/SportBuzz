@@ -6,7 +6,7 @@ import { cricketService } from '../services/cricketApiService.js';
 import { cricbuzzService } from '../services/cricbuzzService.js';
 import { scrapeScorecard } from '../services/cricbuzzScorecardScraper.js';
 import { scrapeFullCommentary } from '../services/cricbuzzScraperService.js';
-import { getWinProbabilityGraph } from '../services/cricbuzzWinProbabilityScraper.js';
+import { getWinProbabilityGraph, getOversGraph } from '../services/cricbuzzWinProbabilityScraper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -105,7 +105,8 @@ router.get('/scraped/match/:id/squads', async (req, res) => {
 });
 
 router.get('/scraped/match/:id/graphs/ballmap/:inningsId', async (req, res) => {
-    const data = await fetchBallMap(req.params.id, req.params.inningsId);
+    const force = req.query.force === '1' || req.query.force === 'true';
+    const data = await fetchBallMap(req.params.id, req.params.inningsId, force);
     if (!data) return res.status(404).json({ status: 'error', message: 'Ball map not found' });
     res.json({ status: 'success', data });
 });
@@ -126,6 +127,19 @@ router.get('/scraped/match/:id/graphs/win-probability', async (req, res) => {
     } catch (err) {
         console.error('Error fetching win probability graph:', err);
         res.status(500).json({ status: 'error', message: 'Failed to fetch win probability graph' });
+    }
+});
+
+router.get('/scraped/match/:id/graphs/overs-graph', async (req, res) => {
+    try {
+        const data = await getOversGraph(req.params.id);
+        if (!data || !data.available) {
+            return res.status(404).json({ status: 'error', message: 'Overs graph not found or not available', data: null });
+        }
+        res.json({ status: 'success', data });
+    } catch (err) {
+        console.error('Error fetching overs graph:', err);
+        res.status(500).json({ status: 'error', message: 'Failed to fetch overs graph' });
     }
 });
 
