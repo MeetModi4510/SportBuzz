@@ -1,4 +1,4 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 import { Match } from '@/data/types';
 import { mapApiMatchToModel } from './cricketMapper';
 
@@ -34,9 +34,31 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
+// Helper to recursively clean mojibake characters from API responses
+const cleanMojibake = (obj: any): any => {
+    if (typeof obj === 'string') {
+        // ΓÇö -> — (em dash), ΓÇó -> • (bullet), rçö -> — (in case it actually is that)
+        return obj.replace(/ΓÇö/g, '—').replace(/ΓÇó/g, '•').replace(/rçö/g, '—');
+    }
+    if (Array.isArray(obj)) {
+        return obj.map(cleanMojibake);
+    }
+    if (obj !== null && typeof obj === 'object') {
+        const cleaned: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+            cleaned[key] = cleanMojibake(value);
+        }
+        return cleaned;
+    }
+    return obj;
+};
+
 // Response interceptor for error handling
 api.interceptors.response.use(
-    (response) => response.data,
+    (response) => {
+        response.data = cleanMojibake(response.data);
+        return response.data;
+    },
     (error) => {
         if (error.response?.status === 401) {
             console.error("API 401 Error on:", error.config?.url);
