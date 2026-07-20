@@ -478,12 +478,7 @@ export function CricketTrendingPlayers({ className }: { className?: string }) {
         </div>
       )}
 
-      {/* Last updated */}
-      {!loading && trending?.lastUpdatedOn && !trending.error && (
-        <p className="text-[10px] text-muted-foreground/60 text-center">
-          Last updated on {formatLastUpdated(trending.lastUpdatedOn)}
-        </p>
-      )}
+
 
       {/* Player Profile Modal */}
       {selectedPlayer && (
