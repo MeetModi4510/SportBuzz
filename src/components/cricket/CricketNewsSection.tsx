@@ -226,6 +226,18 @@ export const CricketNewsSection = () => {
               className="group flex flex-col justify-between p-5 rounded-3xl border border-border/40 bg-card/40 cursor-pointer hover:border-white/20 hover:bg-secondary/20 transition-all duration-300"
             >
               <div className="space-y-4">
+                {article.imageId && (
+                  <div className="w-full h-36 rounded-xl overflow-hidden bg-secondary/30 relative border border-border/30 mb-2">
+                    <img 
+                      src={getImageUrl(article.imageId)!} 
+                      alt={article.headline}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
 
                   <div className="flex items-center gap-1 text-[11px] text-muted-foreground font-medium whitespace-nowrap">
