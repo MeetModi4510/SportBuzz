@@ -32,14 +32,21 @@ import { Loader2 } from "lucide-react";
 const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const initialSport = (searchParams.get("sport") as Sport | null) || "all";
   const [activeSport, setActiveSport] = useState<Sport | "all">(initialSport);
   const [activeStatus, setActiveStatus] = useState<MatchStatus | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCategory, setSearchCategory] = useState<"all" | "team" | "venue" | "type">("all");
-  const [cricketTab, setCricketTab] = useState<'live' | 'upcoming' | 'recent'>('live');
+  
+  const cricketTab = (searchParams.get('tab') as 'live' | 'upcoming' | 'recent') || 'live';
+  const setCricketTab = (tab: 'live' | 'upcoming' | 'recent') => {
+    setSearchParams(prev => {
+      prev.set('tab', tab);
+      return prev;
+    }, { replace: true });
+  };
 
   // ─── Cricket: lazy-load by filter ───────────────────────────────────────────
   // Live: always on (initial load). Upcoming/Recent: load when cricket is in scope AND tab is active.

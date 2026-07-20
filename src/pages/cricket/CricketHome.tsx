@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Navbar } from "../../components/Navbar";
 import { MatchSection } from "../../components/MatchSection";
@@ -12,7 +12,15 @@ import { Match } from "../../data/types";
 
 export default function CricketHome() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'live' | 'upcoming' | 'recent'>('live');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = (searchParams.get('tab') as 'live' | 'upcoming' | 'recent') || 'live';
+  
+  const setActiveTab = (tab: 'live' | 'upcoming' | 'recent') => {
+    setSearchParams(prev => {
+      prev.set('tab', tab);
+      return prev;
+    }, { replace: true });
+  };
   const { data: liveData, isLoading: liveLoading } = useFeaturedLiveCricketMatches();
   const { data: upcomingData, isLoading: upcomingLoading } = useFeaturedUpcomingCricketMatches(activeTab === 'upcoming');
   const { data: recentData, isLoading: recentLoading } = useFeaturedRecentCricketMatches(activeTab === 'recent');
