@@ -35,11 +35,12 @@ export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean
             const response = await fetch(`${BACKEND}/cricket/scraped/match/${matchId}/summary`);
             const json = await response.json();
             const raw = json?.data;
+            const matchDetails = raw?.matchScoreDetails || raw;
 
-            if (raw && (raw.matchInfo || raw.matchId)) {
+            if (matchDetails && (matchDetails.matchInfo || matchDetails.matchId)) {
                 // Map scraped summary to our Match model
-                const info = raw.matchInfo || {};
-                const score = raw.matchScore || raw.inningsScoreList || raw.miniscore?.matchScoreDetails?.inningsScoreList || {};
+                const info = matchDetails.matchInfo || {};
+                const score = matchDetails.matchScore || matchDetails.inningsScoreList || raw?.miniscore?.matchScoreDetails?.inningsScoreList || {};
 
                 // Build innings scores from matchScore
                 const inningsScores: any[] = [];
@@ -67,27 +68,27 @@ export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean
                 const away = info.team2 || {};
 
                 const matchData: any = {
-                    id: String(raw.matchId || matchId),
+                    id: String(matchDetails.matchId || matchId),
                     sport: 'cricket',
                     matchType: info.matchFormat || info.matchType || 'T20',
-                    seriesName: info.series?.name || raw.seriesName || '',
+                    seriesName: info.series?.name || matchDetails.seriesName || '',
                     status: (() => {
-                        const st = (info.state || raw.state || '').toLowerCase();
+                        const st = (info.state || matchDetails.state || '').toLowerCase();
                         if (st === 'complete' || st === 'completed' || st === 'result' || st === 'abandoned' || st === 'cancelled') return 'completed';
                         if (st === 'preview' || st === 'upcoming' || st === '') return 'upcoming';
                         // Stumps, Lunch, Tea, Innings Break, Rain, In Progress, Live, etc.
                         return 'live';
                     })(),
-                    summaryText: info.status || raw.status || '',
+                    summaryText: info.status || matchDetails.status || '',
                     startTime: info.matchStartTimestamp ? new Date(parseInt(info.matchStartTimestamp)) : new Date(),
                     homeTeam: {
-                        name: home.name || raw.team1 || 'TBA',
-                        shortName: home.shortName || raw.team1 || '',
+                        name: home.name || matchDetails.team1 || 'TBA',
+                        shortName: home.shortName || matchDetails.team1 || '',
                         logo: home.imageId ? `/api/cricket/scraped/team-logo/${home.imageId}` : '',
                     },
                     awayTeam: {
-                        name: away.name || raw.team2 || 'TBA',
-                        shortName: away.shortName || raw.team2 || '',
+                        name: away.name || matchDetails.team2 || 'TBA',
+                        shortName: away.shortName || matchDetails.team2 || '',
                         logo: away.imageId ? `/api/cricket/scraped/team-logo/${away.imageId}` : '',
                     },
                     venue: info.venue ? `${info.venue.name || ''}, ${info.venue.city || ''}`.trim().replace(/^,|,$/g, '') : '',
