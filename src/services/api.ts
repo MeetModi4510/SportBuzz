@@ -37,8 +37,11 @@ api.interceptors.request.use(
 // Helper to recursively clean mojibake characters from API responses
 const cleanMojibake = (obj: any): any => {
     if (typeof obj === 'string') {
-        // ΓÇö -> — (em dash), ΓÇó -> • (bullet), rçö -> — (in case it actually is that)
-        return obj.replace(/ΓÇö/g, '—').replace(/ΓÇó/g, '•').replace(/rçö/g, '—');
+        // Use unicode escapes to avoid file encoding corruption
+        return obj.replace(/\u0393\u00C7\u00F6/g, '\u2014')
+                  .replace(/\u0393\u00C7\u00F3/g, '\u2022')
+                  .replace(/r\u00E7\u00F6/g, '\u2014')
+                  .replace(/rco3/g, '\u2014');
     }
     if (Array.isArray(obj)) {
         return obj.map(cleanMojibake);
