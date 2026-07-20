@@ -428,8 +428,8 @@ export async function scrapeScorecard(matchId, slug = null, force = false) {
     // 60s for live (frontend bypasses this via force on its 60s cycle), 600s for completed
     const isLive = /live|stumps|day \d|innings break/i.test(matchStatus);
     const liveTtl = 60; // 60s cache time
-    scorecardCache.set(cacheKey, result, isLive ? liveTtl : 600);
-    console.log(`[ScorecardScraper] Parsed ${innings.length} innings for match ${matchId} (TTL: ${isLive ? liveTtl : 600}s, force=${force})`);
+    scorecardCache.set(cacheKey, result, isLive ? liveTtl : 3600);
+    console.log(`[ScorecardScraper] Parsed ${innings.length} innings for match ${matchId} (TTL: ${isLive ? liveTtl : 3600}s, force=${force})`);
 
     return result;
 }

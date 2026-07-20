@@ -119,7 +119,7 @@ export function useMatchFieldData(
 
         // When bypassCache=true (timer-triggered refresh), pass force=true to also
         // bypass the backend NodeCache — otherwise we'd get the same old data back
-        const force = bypassCache;
+        const force = bypassCache && !disableAutoRefresh;
 
         try {
             let result: any = null;
@@ -203,10 +203,11 @@ export function useMatchFieldData(
         if (syncTrigger !== undefined && prevSyncRef.current !== syncTrigger) {
             prevSyncRef.current = syncTrigger;
             if (enabled) {
-                fetchData(true);
+                // Only bypass cache (force network/scrape) if the match is NOT completed
+                fetchData(!disableAutoRefresh);
             }
         }
-    }, [syncTrigger, enabled, fetchData]);
+    }, [syncTrigger, enabled, fetchData, disableAutoRefresh]);
 
     // ── Reset on matchId change ───────────────────────────────────────────────
     useEffect(() => {
