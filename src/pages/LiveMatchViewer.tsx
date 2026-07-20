@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import MatchPerformanceLab from "@/components/MatchPerformanceLab";
-import GraphsTab from "@/components/GraphsTab";
+import GraphsTab from "@/components/cricket/GraphsTab";
 import { cleanMojibake } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
