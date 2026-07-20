@@ -2483,37 +2483,50 @@ const MatchDetails = () => {
                             <div className="pt-8 pb-4">
                               <h5 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 font-bold mb-4 px-1">Bowling</h5>
                               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-                                {inn.bowlers?.map((b: any, bIdx: number) => (
-                                  <div key={bIdx}
-                                    onClick={() => {
-                                      setSelectedPlayerId(b.cricbuzzPlayerId?.toString() || '0');
-                                      setSelectedPlayerName(formatPlayerName(b.name));
-                                    }}
-                                    className={cn(
-                                      "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group cursor-pointer",
-                                      parseInt(b.wickets) >= 3 ? "border-primary/40 shadow-[0_4px_20px_rgba(var(--primary),0.1)]" : "border-border/40 shadow-sm"
-                                    )}>
-                                    {/* Subtle background glow for high wicket takers */}
-                                    {parseInt(b.wickets) >= 3 && <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 blur-2xl rounded-full"></div>}
+                                {inn.bowlers?.map((b: any, bIdx: number) => {
+                                  const isLiveInning = isLive && displayIndex === inningsList.length - 1;
+                                  const isBowling = isLiveInning && (
+                                    (b.cricbuzzPlayerId && cbSummary?.miniscore?.bowlerStriker?.id === b.cricbuzzPlayerId) ||
+                                    (b.cricbuzzPlayerId && cbSummary?.miniscore?.bowlerNonStriker?.id === b.cricbuzzPlayerId) ||
+                                    (cbSummary?.miniscore?.bowlerStriker?.name && formatPlayerName(cbSummary.miniscore.bowlerStriker.name) === formatPlayerName(b.name)) ||
+                                    (cbSummary?.miniscore?.bowlerNonStriker?.name && formatPlayerName(cbSummary.miniscore.bowlerNonStriker.name) === formatPlayerName(b.name))
+                                  );
 
-                                    {/* Player photo + name + wickets row */}
-                                    <div className="flex items-start gap-3 relative z-10">
-                                      <CricketPlayerImage
-                                        playerId={getPlayerImageId(b.name)}
-                                        playerName={formatPlayerName(b.name)}
-                                        size={40}
-                                        className="shrink-0 mt-0.5"
-                                      />
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between items-start gap-1">
-                                          <div className="flex flex-col min-w-0">
-                                            <h4 className="font-bold text-sm leading-tight break-words text-foreground/90">{formatPlayerName(b.name)}</h4>
-                                            {b.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold mt-1.5 inline-block w-max">C</span>}
-                                          </div>
-                                          <div className="flex flex-col items-end leading-none shrink-0">
-                                            <span className={cn("text-3xl font-black tracking-tighter", parseInt(b.wickets) > 0 ? "text-primary" : "text-muted-foreground/50")}>{b.wickets}</span>
-                                            <span className="text-[8px] text-muted-foreground/60 uppercase tracking-widest mt-1 font-bold">Wickets</span>
-                                          </div>
+                                  return (
+                                    <div key={bIdx}
+                                      onClick={() => {
+                                        setSelectedPlayerId(b.cricbuzzPlayerId?.toString() || '0');
+                                        setSelectedPlayerName(formatPlayerName(b.name));
+                                      }}
+                                      className={cn(
+                                        "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group cursor-pointer",
+                                        isBowling ? "border-red-500/40 shadow-[0_4px_20px_rgba(239,68,68,0.1)]" : parseInt(b.wickets) >= 3 ? "border-primary/40 shadow-[0_4px_20px_rgba(var(--primary),0.1)]" : "border-border/40 shadow-sm"
+                                      )}>
+                                      {/* Subtle background glow for high wicket takers or active bowler */}
+                                      {isBowling && <div className="absolute -top-10 -right-10 w-24 h-24 bg-red-500/20 blur-2xl rounded-full pointer-events-none"></div>}
+                                      {!isBowling && parseInt(b.wickets) >= 3 && <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 blur-2xl rounded-full pointer-events-none"></div>}
+
+                                      {/* Player photo + name + wickets row */}
+                                      <div className="flex items-start gap-3 relative z-10">
+                                        <CricketPlayerImage
+                                          playerId={getPlayerImageId(b.name)}
+                                          playerName={formatPlayerName(b.name)}
+                                          size={40}
+                                          className="shrink-0 mt-0.5"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex justify-between items-start gap-1">
+                                            <div className="flex flex-col min-w-0">
+                                              <h4 className={cn("font-bold text-sm leading-tight break-words", isBowling ? "text-foreground" : "text-foreground/90")}>{formatPlayerName(b.name)}</h4>
+                                              <div className="flex items-center gap-1.5 mt-1.5">
+                                                {isBowling && <span className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse" title="Bowling"></span>}
+                                                {b.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold inline-block w-max">C</span>}
+                                              </div>
+                                            </div>
+                                            <div className="flex flex-col items-end leading-none shrink-0">
+                                              <span className={cn("text-3xl font-black tracking-tighter", parseInt(b.wickets) > 0 ? "text-primary" : "text-muted-foreground/50")}>{b.wickets}</span>
+                                              <span className="text-[8px] text-muted-foreground/60 uppercase tracking-widest mt-1 font-bold">Wickets</span>
+                                            </div>
                                         </div>
                                       </div>
                                     </div>
@@ -2525,7 +2538,7 @@ const MatchDetails = () => {
                                       <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">Econ</span><span className="font-mono text-xs font-bold text-foreground/90">{b.economy}</span></div>
                                     </div>
                                   </div>
-                                ))}
+                                )})}
                               </div>
                             </div>
                           </div>
