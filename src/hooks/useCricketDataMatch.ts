@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Match } from '@/data/types';
+import { cleanMojibake } from '@/lib/utils';
 
 
 export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean) => {
@@ -33,7 +34,8 @@ export const useCricketDataMatch = (matchId: string | undefined, isOpen: boolean
                 if (!BACKEND) BACKEND = (import.meta.env.PROD ? '' : '') + '/api';
             }
             const response = await fetch(`${BACKEND}/cricket/scraped/match/${matchId}/summary`);
-            const json = await response.json();
+            const rawJson = await response.json();
+            const json = cleanMojibake(rawJson);
             const raw = json?.data;
             const matchDetails = raw?.matchScoreDetails || raw;
 
@@ -139,7 +141,8 @@ export const useCricbuzzSquads = (matchId: string | number | undefined, enabled:
             }
             const res = await fetch(`${BACKEND}/cricket/scraped/match/${matchId}/squads`);
             if (!res.ok) throw new Error('Network response was not ok');
-            const json = await res.json();
+            const rawJson = await res.json();
+            const json = cleanMojibake(rawJson);
             if (json.status === 'success' && json.data?.success) {
                 return json.data.data;
             }

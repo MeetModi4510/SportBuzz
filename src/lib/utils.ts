@@ -5,6 +5,26 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
+export const cleanMojibake = (obj: any): any => {
+    if (typeof obj === 'string') {
+        return obj.replace(/\u0393\u00C7\u00F6/g, '\u2014')
+                  .replace(/\u0393\u00C7\u00F3/g, '\u2022')
+                  .replace(/r\u00E7\u00F6/g, '\u2014')
+                  .replace(/rco3/g, '\u2014');
+    }
+    if (Array.isArray(obj)) {
+        return obj.map(cleanMojibake);
+    }
+    if (obj !== null && typeof obj === 'object') {
+        const cleaned: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+            cleaned[key] = cleanMojibake(value);
+        }
+        return cleaned;
+    }
+    return obj;
+};
+
 export function getTeamAcronym(name: string): string {
     if (!name) return "";
     

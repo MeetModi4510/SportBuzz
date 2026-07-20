@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import MatchPerformanceLab from "@/components/MatchPerformanceLab";
+import GraphsTab from "@/components/GraphsTab";
+import { cleanMojibake } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     Zap, Trophy, Calendar, MapPin, ChevronLeft, Wifi, WifiOff,
@@ -167,7 +171,8 @@ const LiveMatchViewer = () => {
         const fetchCbPlayerIds = async () => {
             try {
                 const res = await fetch(`${API_BASE}/api/cricket/cb/scorecard/${cbId}`);
-                const json = await res.json();
+                const rawJson = await res.json();
+                const json = cleanMojibake(rawJson);
                 const innings = json?.data?.innings || [];
                 const idMap: Record<string, string> = {};
                 innings.forEach((inn: any) => {

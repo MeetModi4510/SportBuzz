@@ -34,27 +34,7 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Helper to recursively clean mojibake characters from API responses
-const cleanMojibake = (obj: any): any => {
-    if (typeof obj === 'string') {
-        // Use unicode escapes to avoid file encoding corruption
-        return obj.replace(/\u0393\u00C7\u00F6/g, '\u2014')
-                  .replace(/\u0393\u00C7\u00F3/g, '\u2022')
-                  .replace(/r\u00E7\u00F6/g, '\u2014')
-                  .replace(/rco3/g, '\u2014');
-    }
-    if (Array.isArray(obj)) {
-        return obj.map(cleanMojibake);
-    }
-    if (obj !== null && typeof obj === 'object') {
-        const cleaned: any = {};
-        for (const [key, value] of Object.entries(obj)) {
-            cleaned[key] = cleanMojibake(value);
-        }
-        return cleaned;
-    }
-    return obj;
-};
+import { cleanMojibake } from '@/lib/utils';
 
 // Response interceptor for error handling
 api.interceptors.response.use(
