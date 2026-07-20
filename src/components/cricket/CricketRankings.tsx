@@ -441,17 +441,7 @@ export const CricketRankings = () => {
         )}
       </div>
 
-      {/* Last updated footer */}
-      {!loading && lastUpdatedOn && (
-        <p className="text-[10px] text-muted-foreground/60 text-center pt-1 border-t border-border/20">
-          Last updated on {formatLastUpdated(lastUpdatedOn)}
-        </p>
-      )}
-      {!loading && !lastUpdatedOn && (isTeams ? !!teamRankings : !!playerRankings) && !hasError && (
-        <p className="text-[10px] text-muted-foreground/60 text-center pt-1 border-t border-border/20">
-          Source: Cricbuzz / ICC · Refreshes every Wednesday at 6 PM
-        </p>
-      )}
+
     </div>
   );
 };
