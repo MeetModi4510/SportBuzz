@@ -461,7 +461,7 @@ const MatchDetails = () => {
 
     // Build a signature: the MAX ball count across all sources.
     // When a new ball is bowled, this number increases ΓåÆ new event ΓåÆ reset retries.
-    const sig = `${Math.max(summaryBalls, scorecardBalls, commentaryBalls)}`;
+    const sig = `${Math.max(summaryBalls, scorecardBalls, commentaryBalls, oversBalls)}`;
     if (sig !== lastMismatchSig.current) {
       // Genuinely new event – reset retry counter
       globalRetries.current = 0;
@@ -500,6 +500,9 @@ const MatchDetails = () => {
           setScorecardSyncTrigger(Date.now());
         } else if (activeTab === 'commentary') {
           setCommentarySyncTrigger(Date.now());
+        } else if (activeTab === 'graphs') {
+          // Graphs tab: refresh scorecard (for innings list) — ball map has its own sync via summaryUpdatedAt
+          setScorecardSyncTrigger(Date.now());
         } else {
           // On Summary/Squads tabs, refresh scorecard (header reads from it for Test innings)
           setScorecardSyncTrigger(Date.now());
@@ -1727,7 +1730,23 @@ const MatchDetails = () => {
 
             <TabsContent value="squads" className="space-y-6 animate-fade-in">
               {isCricketMatch ? (
-                <SquadsTab squadsData={squads} loading={squadsLoading} error={squadsError} />
+                (() => {
+                  const hasPlayers = (squads?.team1?.['playing XI']?.length || 0) > 0 || 
+                                     (squads?.team1?.bench?.length || 0) > 0 || 
+                                     (squads?.team2?.['playing XI']?.length || 0) > 0 || 
+                                     (squads?.team2?.bench?.length || 0) > 0;
+                                     
+                  if (isUpcoming && !hasPlayers && !squadsLoading) {
+                    return (
+                      <div className="text-center py-16 text-muted-foreground bg-card border border-border rounded-xl">
+                        <Users className="mx-auto h-12 w-12 mb-4 opacity-20" />
+                        <h3 className="text-lg font-semibold text-foreground/80 mb-2">Squads not announced yet</h3>
+                        <p className="text-sm opacity-80">Playing XI and squads will be updated closer to the match start time.</p>
+                      </div>
+                    );
+                  }
+                  return <SquadsTab squadsData={squads} loading={squadsLoading} error={squadsError} />;
+                })()
               ) : (match.sport === 'football' ? (
                 /* -- Football Lineups -- */
                 <div className="bg-card border border-border rounded-[2.5rem] p-4 md:p-8 overflow-hidden relative">
@@ -2306,11 +2325,11 @@ const MatchDetails = () => {
                                           isYetToBat
                                             ? "border-border/20 opacity-60"
                                             : isActiveAtCrease
-                                              ? "border-primary/40 shadow-[0_4px_20px_rgba(var(--primary),0.1)]"
+                                              ? "border-green-500/40 shadow-[0_4px_20px_rgba(34,197,94,0.1)]"
                                               : "border-border/40 shadow-sm"
                                         )}>
                                         {/* Subtle background glow for batsmen at crease */}
-                                        {isActiveAtCrease && <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 blur-2xl rounded-full pointer-events-none"></div>}
+                                        {isActiveAtCrease && <div className="absolute -top-10 -right-10 w-24 h-24 bg-green-500/20 blur-2xl rounded-full pointer-events-none"></div>}
 
                                         <div className="flex items-start gap-3 relative z-10">
                                           <CricketPlayerImage
@@ -2487,9 +2506,7 @@ const MatchDetails = () => {
                                   const isLiveInning = isLive && displayIndex === inningsList.length - 1;
                                   const isBowling = isLiveInning && (
                                     (b.cricbuzzPlayerId && cbSummary?.miniscore?.bowlerStriker?.id === b.cricbuzzPlayerId) ||
-                                    (b.cricbuzzPlayerId && cbSummary?.miniscore?.bowlerNonStriker?.id === b.cricbuzzPlayerId) ||
-                                    (cbSummary?.miniscore?.bowlerStriker?.name && formatPlayerName(cbSummary.miniscore.bowlerStriker.name) === formatPlayerName(b.name)) ||
-                                    (cbSummary?.miniscore?.bowlerNonStriker?.name && formatPlayerName(cbSummary.miniscore.bowlerNonStriker.name) === formatPlayerName(b.name))
+                                    (cbSummary?.miniscore?.bowlerStriker?.name && formatPlayerName(cbSummary.miniscore.bowlerStriker.name) === formatPlayerName(b.name))
                                   );
 
                                   return (
@@ -2500,10 +2517,10 @@ const MatchDetails = () => {
                                       }}
                                       className={cn(
                                         "bg-card/50 backdrop-blur-sm border rounded-2xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group cursor-pointer",
-                                        isBowling ? "border-red-500/40 shadow-[0_4px_20px_rgba(239,68,68,0.1)]" : parseInt(b.wickets) >= 3 ? "border-primary/40 shadow-[0_4px_20px_rgba(var(--primary),0.1)]" : "border-border/40 shadow-sm"
+                                        isBowling ? "border-green-500/40 shadow-[0_4px_20px_rgba(34,197,94,0.1)]" : parseInt(b.wickets) >= 3 ? "border-primary/40 shadow-[0_4px_20px_rgba(var(--primary),0.1)]" : "border-border/40 shadow-sm"
                                       )}>
                                       {/* Subtle background glow for high wicket takers or active bowler */}
-                                      {isBowling && <div className="absolute -top-10 -right-10 w-24 h-24 bg-red-500/20 blur-2xl rounded-full pointer-events-none"></div>}
+                                      {isBowling && <div className="absolute -top-10 -right-10 w-24 h-24 bg-green-500/20 blur-2xl rounded-full pointer-events-none"></div>}
                                       {!isBowling && parseInt(b.wickets) >= 3 && <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 blur-2xl rounded-full pointer-events-none"></div>}
 
                                       {/* Player photo + name + wickets row */}
@@ -2519,7 +2536,7 @@ const MatchDetails = () => {
                                             <div className="flex flex-col min-w-0">
                                               <h4 className={cn("font-bold text-sm leading-tight break-words", isBowling ? "text-foreground" : "text-foreground/90")}>{formatPlayerName(b.name)}</h4>
                                               <div className="flex items-center gap-1.5 mt-1.5">
-                                                {isBowling && <span className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse" title="Bowling"></span>}
+                                                {isBowling && <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" title="Bowling"></span>}
                                                 {b.isCaptain && <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold inline-block w-max">C</span>}
                                               </div>
                                             </div>
@@ -2664,6 +2681,13 @@ const MatchDetails = () => {
                         })()}
                       </div>
                     )
+                  ) : isUpcoming ? (
+                    /* -- Upcoming state --------------------------------------- */
+                    <div className="text-center py-16 text-muted-foreground bg-card border border-border rounded-xl">
+                      <MessageSquare className="mx-auto h-12 w-12 mb-4 opacity-20" />
+                      <h3 className="text-lg font-semibold text-foreground/80 mb-2">Match not started yet</h3>
+                      <p className="text-sm opacity-80">Commentary will be available once play begins.</p>
+                    </div>
                   ) : cbFullCommentaryField.loading ? (
                     /* -- Loading state --------------------------------------- */
                     <div className="space-y-3">
@@ -3000,10 +3024,16 @@ const MatchDetails = () => {
                     </div>
                   ) : (
                     /* -- Empty / upcoming ------------------------------------- */
-                    <div className="text-center py-12 text-muted-foreground">
-                      <MessageSquare className="mx-auto h-12 w-12 mb-3 opacity-10" />
-                      <p>No commentary available for this match.</p>
-                      {isUpcoming && <p className="text-xs mt-2 opacity-60">Commentary will appear once the match begins.</p>}
+                    <div className="text-center py-16 text-muted-foreground bg-card border border-border rounded-xl">
+                      <MessageSquare className="mx-auto h-12 w-12 mb-4 opacity-20" />
+                      {isUpcoming ? (
+                        <>
+                          <h3 className="text-lg font-semibold text-foreground/80 mb-2">Match not started yet</h3>
+                          <p className="text-sm opacity-80">Commentary will be available once play begins.</p>
+                        </>
+                      ) : (
+                        <p>No commentary available for this match.</p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -3013,8 +3043,15 @@ const MatchDetails = () => {
 
             {match?.sport === 'cricket' && !isIPL && (
               <TabsContent value="graphs" className="animate-fade-in">
-                <Suspense fallback={<div className="p-12 flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
-                  <GraphsTab
+                {isUpcoming ? (
+                  <div className="text-center py-16 text-muted-foreground bg-card border border-border rounded-xl">
+                    <Activity className="mx-auto h-12 w-12 mb-4 opacity-20" />
+                    <h3 className="text-lg font-semibold text-foreground/80 mb-2">Match not started yet</h3>
+                    <p className="text-sm opacity-80">Over by over map will be available once play begins.</p>
+                  </div>
+                ) : (
+                  <Suspense fallback={<div className="p-12 flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+                    <GraphsTab
                     matchId={id || ""}
                     inningsList={cbScorecardField.data?.innings?.map((inn: any) => {
                       const rawName = inn.teamName || inn.inningsName || `Innings ${inn.inningsNumber || inn.inningsId}`;
@@ -3031,12 +3068,13 @@ const MatchDetails = () => {
                         name: formattedName
                       };
                     }) || [{ id: 1, name: 'Innings 1' }, { id: 2, name: 'Innings 2' }]}
-                    syncTrigger={scorecardSyncTrigger}
+                    syncTrigger={summaryUpdatedAt}
                     isLive={match?.status === 'live'}
                     isActive={activeTab === 'graphs'}
                     onBallsCalculated={setOversBalls}
                   />
                 </Suspense>
+                )}
               </TabsContent>
             )}
 
