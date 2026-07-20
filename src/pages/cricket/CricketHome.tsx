@@ -51,7 +51,8 @@ export default function CricketHome() {
   }, [liveData, upcomingData, recentData]);
 
   const handleMatchClick = (matchId: string) => {
-    navigate(`/match/${matchId}`, { state: { from: 'cricket-hub', section: 'matches' } });
+    const match = currentMatches.find(m => m.id === matchId);
+    navigate(`/match/${matchId}`, { state: { from: 'cricket-hub', section: 'matches', match } });
   };
 
   return (

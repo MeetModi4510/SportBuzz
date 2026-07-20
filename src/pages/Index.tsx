@@ -146,7 +146,7 @@ const Index = () => {
     if (match?.sport === 'football') {
       navigate(`/football/match/${matchId}`);
     } else {
-      navigate(`/match/${matchId}`, { state: { from: 'dashboard', section: 'matches' } });
+      navigate(`/match/${matchId}`, { state: { from: 'dashboard', section: 'matches', match } });
     }
   };
 

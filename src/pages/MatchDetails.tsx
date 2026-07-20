@@ -723,7 +723,7 @@ const MatchDetails = () => {
 
   // Scorecard reconciliation: if Scoreboard tab has fresher data (higher run count OR higher ball count),
   // update the header score so both always match. Cricket scores only go up.
-  if (cbScorecardField.data?.innings?.length > 0) {
+  if (!isCompleted && cbScorecardField.data?.innings?.length > 0) {
     const latestInn = cbScorecardField.data.innings[cbScorecardField.data.innings.length - 1];
     const sd = latestInn?.scoreDetails || latestInn;
     const scRuns = latestInn?.score ?? sd?.runs ?? sd?.teamScore;
