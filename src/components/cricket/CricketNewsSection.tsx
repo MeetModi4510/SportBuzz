@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronRight, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { ChevronRight, Clock, Loader2, AlertCircle, Newspaper } from 'lucide-react';
 import { useCricketNews, useCricketNewsDetail, type CricketNewsItem } from '@/hooks/useCricketNews';
 import { SportIcon } from '@/components/SportIcon';
 import { cn } from '@/lib/utils';
@@ -50,8 +50,8 @@ export const CricketNewsSection = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-primary/10 text-primary rounded-xl">
-              <SportIcon sport="cricket" size={20} />
+            <div className="p-2.5 bg-orange-500/10 text-orange-500 rounded-xl">
+              <Newspaper size={20} />
             </div>
             <div>
               <h2 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">Top Stories</h2>
@@ -212,8 +212,8 @@ export const CricketNewsSection = () => {
         <DialogDescription className="sr-only">View all the latest cricket news and updates.</DialogDescription>
         <DialogHeader className="mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 text-primary rounded-lg">
-              <SportIcon sport="cricket" size={24} />
+            <div className="p-2.5 bg-orange-500/10 text-orange-500 rounded-xl">
+              <Newspaper size={24} />
             </div>
             <DialogTitle className="text-2xl md:text-3xl font-bold tracking-tight">All Cricket News</DialogTitle>
           </div>

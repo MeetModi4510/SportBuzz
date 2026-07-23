@@ -536,6 +536,18 @@ const MatchDetails = () => {
   ].filter(Boolean).join(" ").toLowerCase();
 
   const isIPL = allMatchText.includes('ipl') || allMatchText.includes('indian premier league');
+  const isTheHundred = allMatchText.includes('the hundred');
+
+  const formatOversForHundred = (oversStr: string | undefined | null) => {
+    if (!oversStr) return "";
+    let cleanStr = String(oversStr).replace(/[\(\)]/g, '').replace(/ov/i, '').trim();
+    if (isTheHundred) {
+      const oversNum = parseFloat(cleanStr);
+      if (isNaN(oversNum)) return `${cleanStr} BALLS`;
+      return `${oversNum} BALLS`;
+    }
+    return `${cleanStr} OVERS`;
+  };
 
   const dynamicVenueStr = dynamicMatchInfo?.venueInfo?.ground
     ? `${dynamicMatchInfo.venueInfo.ground}${dynamicMatchInfo.venueInfo.city ? `, ${dynamicMatchInfo.venueInfo.city}` : ''}`
@@ -973,7 +985,16 @@ const MatchDetails = () => {
                       UPCOMING
                     </span>
                   )}
-                  <span className="text-xs font-semibold text-foreground uppercase tracking-widest">{safeStr(match.tournament?.name || match.matchType, 'Cricket')}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-foreground uppercase tracking-widest">
+                      {isTheHundred ? "The Hundred" : safeStr(match.tournament?.name || match.matchType, 'Cricket')}
+                    </span>
+                    {isTheHundred && (
+                      <span className="bg-[#39FF14] text-black px-2 py-0.5 rounded shadow-[0_0_8px_rgba(57,255,20,0.5)] text-[10px] font-black tracking-tight shrink-0">
+                        100
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center gap-5 text-xs text-muted-foreground font-medium">
                   <span className="flex items-center gap-1.5"><MapPin size={14} className="text-muted-foreground/60" /> {safeStr(dynamicVenueStr, "Unknown Venue")}</span>
@@ -1015,7 +1036,7 @@ const MatchDetails = () => {
                             {home.overs && (
                               <div className="absolute top-[105%] left-4 md:left-4 lg:left-6 whitespace-nowrap">
                                 <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md">
-                                  {home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS
+                                  {formatOversForHundred(home.overs)}
                                 </span>
                               </div>
                             )}
@@ -1065,7 +1086,7 @@ const MatchDetails = () => {
                                     {hInn ? (
                                       <>
                                         <span className={cn("font-black tracking-tighter transition-all", isHomeLatest ? "text-4xl md:text-5xl text-foreground" : "text-2xl md:text-3xl text-muted-foreground")}>{hInn.score}</span>
-                                        {hInn.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversText(hInn.overs).replace(/ov/i, '').trim()} OVERS</span>}
+                                        {hInn.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversForHundred(formatOversText(hInn.overs))}</span>}
                                       </>
                                     ) : <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">–</span>}
                                   </div>
@@ -1078,7 +1099,7 @@ const MatchDetails = () => {
                                     {aInn ? (
                                       <>
                                         <span className={cn("font-black tracking-tighter transition-all", isAwayLatest ? "text-4xl md:text-5xl text-foreground" : "text-2xl md:text-3xl text-muted-foreground")}>{aInn.score}</span>
-                                        {aInn.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversText(aInn.overs).replace(/ov/i, '').trim()} OVERS</span>}
+                                        {aInn.overs && <span className="text-[10px] text-muted-foreground mt-1.5 font-bold bg-secondary/40 px-2 py-0.5 rounded uppercase tracking-widest">{formatOversForHundred(formatOversText(aInn.overs))}</span>}
                                       </>
                                     ) : <span className="text-2xl md:text-3xl text-muted-foreground/30 font-black tracking-tighter">–</span>}
                                   </div>
@@ -1091,12 +1112,12 @@ const MatchDetails = () => {
                         <div className="flex items-center gap-6 md:gap-10">
                           <div className="flex flex-col items-center">
                             <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{home.runs}</span>
-                            {home.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2.5 uppercase tracking-widest bg-secondary/40 px-3 py-1 rounded-md">{home.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                            {home.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2.5 uppercase tracking-widest bg-secondary/40 px-3 py-1 rounded-md">{formatOversForHundred(home.overs)}</span>}
                           </div>
                           <span className="text-border text-4xl font-light mb-4">-</span>
                           <div className="flex flex-col items-center">
                             <span className="text-5xl md:text-6xl font-black tracking-tighter text-foreground leading-none">{away.runs}</span>
-                            {away.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2.5 uppercase tracking-widest bg-secondary/40 px-3 py-1 rounded-md">{away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS</span>}
+                            {away.overs && <span className="text-[10px] text-muted-foreground font-bold mt-2.5 uppercase tracking-widest bg-secondary/40 px-3 py-1 rounded-md">{formatOversForHundred(away.overs)}</span>}
                           </div>
                         </div>
                       ) : (!showHome && !showAway && !showTestScore) ? (
@@ -1122,7 +1143,7 @@ const MatchDetails = () => {
                             {away.overs && (
                               <div className="absolute top-[105%] right-4 md:right-4 lg:right-6 whitespace-nowrap">
                                 <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest bg-secondary/40 px-2.5 py-0.5 rounded-md">
-                                  {away.overs.replace(/[\(\)]/g, '').replace(/ov/i, '').trim()} OVERS
+                                  {formatOversForHundred(away.overs)}
                                 </span>
                               </div>
                             )}
@@ -2269,7 +2290,7 @@ const MatchDetails = () => {
                               <div className="flex flex-col sm:items-end">
                                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Score</span>
                                 <span className="text-2xl sm:text-3xl font-mono font-black text-primary leading-none">
-                                  {inn.score}/{inn.wickets} <span className="text-sm text-muted-foreground font-medium ml-1">({formatOversText(inn.overs)})</span>
+                                  {inn.score}/{inn.wickets} <span className="text-sm text-muted-foreground font-medium ml-1">({formatOversForHundred(formatOversText(inn.overs))})</span>
                                 </span>
                               </div>
                             </div>
@@ -2462,9 +2483,10 @@ const MatchDetails = () => {
 
                             {/* Fall of Wickets Grid */}
                             {inn.fallOfWickets && inn.fallOfWickets.length > 0 && (
-                              <div className="bg-secondary/5 border border-border/10 rounded-xl p-4 flex flex-col md:flex-row gap-3 md:gap-4 md:items-center relative">
-                                <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70 font-bold bg-background/50 px-2 py-1 rounded shrink-0 w-max">Fall of Wickets</span>
-                                <div className="flex flex-wrap items-center gap-2">
+                              <div className="bg-gradient-to-br from-secondary/10 via-background to-secondary/5 border border-border/10 rounded-2xl p-5 flex flex-col md:flex-row gap-4 md:items-start relative overflow-hidden shadow-inner">
+                                <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-secondary/5 to-transparent pointer-events-none"></div>
+                                <span className="text-[10px] uppercase tracking-[0.25em] text-primary/80 font-black bg-primary/5 px-2.5 py-1.5 rounded shrink-0 w-max border border-primary/10 shadow-sm relative z-10">Fall of Wickets</span>
+                                <div className="flex flex-wrap items-center gap-y-3 gap-x-1.5 relative z-10">
                                   {inn.fallOfWickets.map((f: any, fIdx: number) => {
                                     let score, wicketNum, batsmanName, overNumber;
 
@@ -2487,10 +2509,18 @@ const MatchDetails = () => {
                                     }
 
                                     return (
-                                      <div key={fIdx} className="flex items-center shrink-0 bg-background/30 px-2.5 py-1 rounded-full border border-border/10 hover:bg-secondary/20 transition-colors">
-                                        <span className="text-[11px] font-black tracking-widest text-foreground mr-1.5">{score}/{wicketNum}</span>
-                                        <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">{batsmanName}</span>
-                                        {overNumber && <span className="text-[9px] uppercase font-semibold text-muted-foreground/60 ml-1.5 bg-foreground/5 px-1.5 py-0.5 rounded">{overNumber.replace('ov', 'ovs')}</span>}
+                                      <div key={fIdx} className="flex items-center gap-2.5 px-1 py-1 pr-3 rounded-full bg-secondary/10 hover:bg-secondary/20 transition-colors border border-border/10 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
+                                        <div className="px-3 py-1 rounded-full bg-background/80 text-foreground flex items-center justify-center font-black text-[12px] tracking-tight border border-border/10 shadow-sm">
+                                          {score}<span className="text-muted-foreground/50 font-normal mx-0.5">/</span><span className="text-red-500">{wicketNum}</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                          <span className="text-[10px] text-muted-foreground font-bold whitespace-nowrap uppercase tracking-widest">{batsmanName}</span>
+                                        </div>
+                                        {overNumber && (
+                                          <div className="text-[9px] font-mono font-semibold text-muted-foreground/60 pl-2 border-l border-border/10 uppercase tracking-wider">
+                                            {isTheHundred ? formatOversForHundred(overNumber) : overNumber.replace('ov', 'OVS')}
+                                          </div>
+                                        )}
                                       </div>
                                     );
                                   })}
@@ -2549,7 +2579,7 @@ const MatchDetails = () => {
                                     </div>
 
                                     <div className="grid grid-cols-4 gap-1 text-center border-t border-border/20 pt-3 mt-4 relative z-10">
-                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">Overs</span><span className="font-mono text-xs font-bold text-foreground/90">{b.overs}</span></div>
+                                      <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">{isTheHundred ? 'Balls' : 'Overs'}</span><span className="font-mono text-xs font-bold text-foreground/90">{isTheHundred ? formatOversForHundred(b.overs).split(' ')[0] : b.overs}</span></div>
                                       <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">Runs</span><span className="font-mono text-xs font-bold text-foreground/90">{b.runs}</span></div>
                                       <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">Mdns</span><span className="font-mono text-xs font-medium text-muted-foreground">{b.maidens}</span></div>
                                       <div className="flex flex-col"><span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-0.5">Econ</span><span className="font-mono text-xs font-bold text-foreground/90">{b.economy}</span></div>

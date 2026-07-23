@@ -90,6 +90,22 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
   const themeBorder = getSportBorderColor(match.sport) || "border-border/60";
   const isFinalMatch = match.matchType?.toLowerCase().includes('final');
 
+  const allMatchText = [match?.tournament?.name, (match as any)?.name, (match as any)?.seriesName, match?.matchType].filter(Boolean).join(" ").toLowerCase();
+  const isTheHundred = allMatchText.includes('the hundred');
+
+  const formatOversForHundred = (oversStr: string | number) => {
+    const oversNum = parseFloat(oversStr.toString());
+    if (isNaN(oversNum)) return oversStr.toString();
+    return `${oversNum}`;
+  };
+
+  const processScore = (scoreStr: string) => {
+    if (!scoreStr || !isTheHundred) return scoreStr;
+    return scoreStr.replace(/\(([\d.]+)\s*ov(?:ers?)?\)/i, (match, overs) => {
+      return `(${formatOversForHundred(overs)} BALLS)`;
+    });
+  };
+
   return (
     <div
       onClick={() => onClick?.(match)}
@@ -104,9 +120,12 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
     >
       {/* Header */}
       <div className={cn("flex items-center justify-between pb-3 border-b", themeBorder)}>
-        <span className="text-[11px] text-muted-foreground tracking-widest font-semibold uppercase truncate mr-2" title={match.seriesName || match.matchType}>
-          {showSeriesName && match.seriesName ? match.seriesName : match.matchType}
-        </span>
+        <div className="flex items-center gap-2 overflow-hidden">
+          <span className="text-[11px] text-muted-foreground tracking-widest font-semibold uppercase truncate" title={match.seriesName || match.matchType}>
+            {isTheHundred ? "The Hundred" : (showSeriesName && match.seriesName ? match.seriesName : match.matchType)}
+          </span>
+          {isTheHundred && <span className="bg-[#39FF14] text-black px-2 py-0.5 rounded shadow-[0_0_8px_rgba(57,255,20,0.5)] text-[10px] font-black tracking-tight shrink-0">100</span>}
+        </div>
         <div className="flex items-center gap-2">
            {isLive && <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />}
            <span className={cn("text-[11px] uppercase tracking-widest", getStatusColor())}>
@@ -132,14 +151,14 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
                       </span>
                       {inn.overs && (
                         <span className="text-xs text-muted-foreground font-medium">
-                          ({formatOversText(inn.overs)})
+                          ({isTheHundred ? formatOversForHundred(inn.overs) + ' BALLS' : formatOversText(inn.overs)})
                         </span>
                       )}
                     </div>
                  ))
              ) : (
                  <span className="font-bold text-[15px] tracking-tight text-foreground">
-                   {formatScoreString(match.homeScore) || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
+                   {processScore(formatScoreString(match.homeScore) || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0')))}
                  </span>
              )}
           </div>
@@ -160,14 +179,14 @@ export const MatchCard = ({ match: initialMatch, onClick, className, showSeriesN
                       </span>
                       {inn.overs && (
                         <span className="text-xs text-muted-foreground font-medium">
-                          ({formatOversText(inn.overs)})
+                          ({isTheHundred ? formatOversForHundred(inn.overs) + ' BALLS' : formatOversText(inn.overs)})
                         </span>
                       )}
                     </div>
                  ))
              ) : (
                  <span className="font-bold text-[15px] tracking-tight text-foreground">
-                   {formatScoreString(match.awayScore) || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0'))}
+                   {processScore(formatScoreString(match.awayScore) || (isUpcoming ? '-' : (scoresUnavailable ? '-' : '0/0')))}
                  </span>
              )}
           </div>

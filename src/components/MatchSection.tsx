@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Match, Sport } from "@/data/types";
 import { MatchCard } from "./MatchCard";
 import { SportIcon } from "./SportIcon";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight, Loader2, Calendar } from "lucide-react";
 
 interface MatchSectionProps {
   title: string;
@@ -134,7 +134,7 @@ export const MatchSection = ({
         {/* Section Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <SportIcon sport={sport} size={24} />
+            <Calendar className={cn("w-6 h-6", `text-${sport}`)} />
             <div className="flex items-baseline gap-3">
               <h2 className="text-2xl font-bold font-display text-foreground">{title}</h2>
               <span className="text-xs font-semibold text-muted-foreground/80 tracking-widest uppercase">
@@ -179,7 +179,7 @@ export const MatchSection = ({
       {/* Section Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <SportIcon sport={sport} size={24} />
+          <Calendar className={cn("w-6 h-6", `text-${sport}`)} />
           <h2 className="text-2xl font-bold font-display text-foreground">{title}</h2>
           <span className="text-sm text-muted-foreground">
             ({matches.length} {matches.length === 1 ? "match" : "matches"})

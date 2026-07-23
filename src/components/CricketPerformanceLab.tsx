@@ -168,6 +168,15 @@ export default function CricketPerformanceLab({
 
     const [selectedInnings, setSelectedInnings] = useState(0);
 
+    const allMatchText = [match?.tournament?.name, (match as any)?.name, (match as any)?.seriesName, match?.matchType].filter(Boolean).join(" ").toLowerCase();
+    const isTheHundred = allMatchText.includes('the hundred');
+
+    const formatOversForHundred = (oversStr: string | number) => {
+        const oversNum = parseFloat(oversStr.toString());
+        if (isNaN(oversNum)) return oversStr.toString();
+        return `${oversNum}`;
+    };
+
     // ── Auto-select latest innings if live ────────────────────────────────────
     const innings = scorecardData?.innings || [];
     useEffect(() => {
@@ -810,8 +819,9 @@ export default function CricketPerformanceLab({
                                 type="number" 
                                 domain={[0, 'dataMax']} 
                                 dataKey="over" 
+                                tickFormatter={(tick) => isTheHundred ? formatOversForHundred(tick) : tick}
                                 tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
-                                label={{ value: "Overs", position: "insideBottomRight", offset: -5, fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
+                                label={{ value: isTheHundred ? "Balls" : "Overs", position: "insideBottomRight", offset: -5, fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
                             />
                             <YAxis 
                                 tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
@@ -820,13 +830,13 @@ export default function CricketPerformanceLab({
                             <Tooltip
                                 contentStyle={TOOLTIP_STYLE}
                                 formatter={(value: number, name: string) => [`${value} runs`, "Score"]}
-                                labelFormatter={(label) => `Over ${label}`}
+                                labelFormatter={(label) => isTheHundred ? `Ball ${formatOversForHundred(label)}` : `Over ${label}`}
                                 content={({ active, payload }) => {
                                     if (!active || !payload?.length) return null;
                                     const item = payload[0]?.payload;
                                     return (
                                         <div className="bg-card border border-border rounded-lg p-2 text-xs shadow-lg">
-                                            <p className="font-medium">Over {item.over}</p>
+                                            <p className="font-medium">{isTheHundred ? 'Ball' : 'Over'} {isTheHundred ? formatOversForHundred(item.over) : item.over}</p>
                                             <p className="text-primary font-bold">{item.runs} runs</p>
                                             {item.wicket && <p className="text-red-400">🏏 {item.wicket} out</p>}
                                         </div>

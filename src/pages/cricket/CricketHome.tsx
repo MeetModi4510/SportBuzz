@@ -8,6 +8,7 @@ import { CricketRankings } from "../../components/cricket/CricketRankings";
 import { CricketTrendingPlayers } from "../../components/cricket/CricketTrendingPlayers";
 import { useFeaturedLiveCricketMatches, useFeaturedUpcomingCricketMatches, useFeaturedRecentCricketMatches } from "../../hooks/useFeaturedMatches";
 import { Loader2 } from "lucide-react";
+import { SportIcon } from "../../components/SportIcon";
 import { Match } from "../../data/types";
 
 export default function CricketHome() {
@@ -69,7 +70,7 @@ export default function CricketHome() {
           {/* Header & Controls */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-border/40 pb-4">
             <h1 className="text-3xl font-bold font-display tracking-tight text-foreground flex items-center gap-3">
-              <span className="text-2xl">🏏</span> Cricket Center
+              <SportIcon sport="cricket" size={32} className="inline-block" /> Cricket Center
             </h1>
           </div>
 

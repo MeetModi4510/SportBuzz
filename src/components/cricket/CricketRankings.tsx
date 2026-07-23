@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Trophy, Loader2, RefreshCw, AlertCircle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Medal, Trophy, Loader2, RefreshCw, AlertCircle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { TeamLogo } from '@/components/TeamLogo';
 import { useTeamRankings, type RankingFormat } from '@/hooks/useTeamRankings';
 import { usePlayerRankings, type PlayerRankingCategory } from '@/hooks/usePlayerRankings';
@@ -188,8 +188,8 @@ export const CricketRankings = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-primary/10 text-primary rounded-xl">
-            <Trophy size={18} />
+          <div className="p-2.5 bg-yellow-500/10 text-yellow-500 rounded-xl">
+            <Medal size={18} />
           </div>
           <div>
             <h2 className="text-lg font-bold tracking-tight text-foreground">ICC Rankings</h2>
