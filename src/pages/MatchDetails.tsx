@@ -2774,7 +2774,8 @@ const MatchDetails = () => {
                   ) : (htComm && htComm.length > 0) || (cbFullCommentaryField.data?.commentary && cbFullCommentaryField.data.commentary.length > 0) ? (
                     /* -- Full Cricbuzz Commentary ---------------------------- */
                     (() => {
-                      const items: any[] = (htComm && htComm.length > 0) ? htComm : cbFullCommentaryField.data.commentary;
+                      const isHtData = (htComm && htComm.length > 0);
+                      const items: any[] = isHtData ? htComm : cbFullCommentaryField.data.commentary;
                       // Group by innings
                       const byInnings: Record<number, any[]> = {};
                       items.forEach(item => {
@@ -2835,7 +2836,7 @@ const MatchDetails = () => {
                       return (
                         <div className="space-y-8 mt-2">
                           {/* Innings Filter Buttons */}
-                          {displayInnIds.length > 1 && (
+                          {(isHtData ? displayInnIds.length > 0 : displayInnIds.length > 1) && (
                             <div className="flex flex-wrap items-center gap-2 mb-2 pb-4 border-b border-border/40">
                               {displayInnIds.map(innId => {
                                 const innName = inningsNames[innId];
@@ -2897,11 +2898,13 @@ const MatchDetails = () => {
                                             const computedItems = [...overItems].reverse().map(item => ({ ...item }));
                                             let legalCount = 0;
                                             computedItems.forEach(item => {
-                                              const evt = item.event || 'NONE';
-                                              const isIllegal = evt === 'WIDE' || evt === 'NOBALL' || 
-                                                (item.commText && (/(?:wide|no ball)/i.test(item.commText)));
-                                              item._displayBall = Math.min(legalCount + 1, 6);
-                                              if (!isIllegal && evt !== 'OVER_BREAK') legalCount++;
+                                              if (isHtData) {
+                                                const evt = item.event || 'NONE';
+                                                const isIllegal = evt === 'WIDE' || evt === 'NOBALL' || 
+                                                  (item.commText && (/(?:wide|no ball)/i.test(item.commText)));
+                                                item._displayBall = Math.min(legalCount + 1, 6);
+                                                if (!isIllegal && evt !== 'OVER_BREAK') legalCount++;
+                                              }
                                             });
                                             return computedItems.reverse().map((item: any, idx: number) => {
                                             const evt = item.event || 'NONE';
@@ -2973,7 +2976,7 @@ const MatchDetails = () => {
                                                     <span className="text-[10px] font-bold font-mono text-muted-foreground/60 leading-none mt-1 group-hover:text-foreground/80 transition-colors">
                                                       {(() => {
                                                         const bInOver = item._displayBall || item.ballInOver || (item.ballNbr > 15 ? (item.ballNbr % 6 === 0 ? 6 : item.ballNbr % 6) : item.ballNbr);
-                                                        return `${ov}.${bInOver}`;
+                                                        return bInOver === 6 ? `${ov + 1}.0` : `${ov}.${bInOver}`;
                                                       })()}
                                                     </span>
                                                   )}
