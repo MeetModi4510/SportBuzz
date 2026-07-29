@@ -670,6 +670,48 @@ const MatchDetails = () => {
   const [isLoadingHtComm, setIsLoadingHtComm] = useState(false);
   const [hasAttemptedHtFetch, setHasAttemptedHtFetch] = useState(false);
 
+  useEffect(() => {
+    if (!cleanMatchId) return;
+    const fetchState = localStorage.getItem(`ht_comm_state_${cleanMatchId}`);
+    
+    if (fetchState === 'failed') {
+      setHasAttemptedHtFetch(true);
+      setHtComm([]);
+      return;
+    }
+    
+    if (fetchState === 'success') {
+      const cachedStr = localStorage.getItem(`ht_comm_data_${cleanMatchId}`);
+      if (cachedStr) {
+        try {
+          const cachedObj = JSON.parse(cachedStr);
+          const now = new Date().getTime();
+          // 3 hours TTL
+          if (now - cachedObj.timestamp < 10800000 && Array.isArray(cachedObj.data)) {
+            setHtComm(cachedObj.data);
+            setHasAttemptedHtFetch(true);
+            return; 
+          }
+        } catch (e) {
+          console.error('Failed to parse ht_comm_data cache', e);
+        }
+      }
+      
+      if (team1Name && team2Name) {
+        fetchHtData(true, team1Name, team2Name, (match as any)?.matchType || '', (match as any)?.matchStartDate || '');
+      }
+    }
+  }, [cleanMatchId, team1Name, team2Name]);
+
+  // Refetch HT data on background sync if it is active
+  useEffect(() => {
+    if (commentarySyncTrigger && hasAttemptedHtFetch && htComm.length > 0) {
+      if (team1Name && team2Name) {
+        fetchHtData(true, team1Name, team2Name, (match as any)?.matchType || '', (match as any)?.matchStartDate || '');
+      }
+    }
+  }, [commentarySyncTrigger]);
+
   const fetchHtData = async (
     isHtMode = false,
     team1 = "",
@@ -690,10 +732,16 @@ const MatchDetails = () => {
       const response = await fetch(`/api/cricket/full-commentary?${qs}`);
       if (response.ok) {
         const data = await response.json();
-        if (data.status === 'success' && data.data?.commentaryList) {
+        if (data.status === 'success' && data.data?.commentaryList && data.data.commentaryList.length > 0) {
            setHtComm(data.data.commentaryList);
+           localStorage.setItem(`ht_comm_state_${cleanMatchId}`, 'success');
+           localStorage.setItem(`ht_comm_data_${cleanMatchId}`, JSON.stringify({
+             timestamp: new Date().getTime(),
+             data: data.data.commentaryList
+           }));
         } else {
            setHtComm([]);
+           localStorage.setItem(`ht_comm_state_${cleanMatchId}`, 'failed');
         }
       }
     } catch (e) {
@@ -2774,8 +2822,35 @@ const MatchDetails = () => {
                   ) : (htComm && htComm.length > 0) || (cbFullCommentaryField.data?.commentary && cbFullCommentaryField.data.commentary.length > 0) ? (
                     /* -- Full Cricbuzz Commentary ---------------------------- */
                     (() => {
+                      const cbItems = cbFullCommentaryField.data?.commentary || [];
+                      let items: any[] = [...cbItems];
+                      
                       const isHtData = (htComm && htComm.length > 0);
-                      const items: any[] = isHtData ? htComm : cbFullCommentaryField.data.commentary;
+                      if (isHtData) {
+                        // Find the oldest ball Cricbuzz has for each innings
+                        const minCbByInnings: Record<number, number> = {};
+                        cbItems.forEach((c: any) => {
+                           const inn = c.inningsId;
+                           const val = (c.overNum || 0) * 100 + (c.ballNbr || 0);
+                           if (minCbByInnings[inn] === undefined || val < minCbByInnings[inn]) {
+                               minCbByInnings[inn] = val;
+                           }
+                        });
+                        
+                        // Only append HT items that are strictly OLDER than the oldest Cricbuzz item
+                        const uniqueHtItems = htComm
+                          .filter((h: any) => {
+                             const inn = h.inningsId;
+                             if (minCbByInnings[inn] === undefined) return true; // CB has no data for this innings
+                             
+                             const val = (h.overNum || 0) * 100 + (h.ballNbr || 0);
+                             return val < minCbByInnings[inn];
+                          })
+                          .map((h: any) => ({ ...h, _isHt: true }));
+                          
+                        items = [...cbItems, ...uniqueHtItems];
+                      }
+                      
                       // Group by innings
                       const byInnings: Record<number, any[]> = {};
                       items.forEach(item => {
@@ -2895,10 +2970,14 @@ const MatchDetails = () => {
                                         {/* Commentary items wrapped in a single premium card */}
                                         <div className="bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden flex flex-col">
                                           {(() => {
-                                            const computedItems = [...overItems].reverse().map(item => ({ ...item }));
+                                            const sortedOverItems = [...overItems].sort((a, b) => {
+                                                // Handle absolute ball numbers vs over ball numbers gracefully if mixed, though they should be consistent within an over.
+                                                return (b.ballInOver || b.ballNbr || 0) - (a.ballInOver || a.ballNbr || 0);
+                                            });
+                                            const computedItems = [...sortedOverItems].reverse().map(item => ({ ...item }));
                                             let legalCount = 0;
                                             computedItems.forEach(item => {
-                                              if (isHtData) {
+                                              if (item._isHt) {
                                                 const evt = item.event || 'NONE';
                                                 const isIllegal = evt === 'WIDE' || evt === 'NOBALL' || 
                                                   (item.commText && (/(?:wide|no ball)/i.test(item.commText)));

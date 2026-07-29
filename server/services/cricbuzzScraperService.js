@@ -1021,9 +1021,51 @@ export async function scrapeFullCommentary(matchId, slug, force = false) {
         const cheerio = await import('cheerio');
         const $ = cheerio.load(html);
         
+        // ── Extract the active inningsId FIRST from the RSC payload ─────────
+        // Cricbuzz's DOM-scraped balls don't carry inningsId, so we must read
+        // it from the background data (commentaryPageData.miniscore.inningsId).
+        let activeInningsId = null;
+        try {
+            const cpMarker = 'commentaryPageData';
+            const cpIdx = html.indexOf(cpMarker);
+            if (cpIdx !== -1) {
+                const scriptStart = html.lastIndexOf('self.__next_f.push', cpIdx);
+                const scriptClose = html.indexOf('</script>', scriptStart);
+                const rawScript = html.substring(scriptStart, scriptClose === -1 ? Math.min(scriptStart + 80000, html.length) : scriptClose);
+                const payloadMatch = rawScript.match(/self\.__next_f\.push\(\[1,"([\s\S]+?)"\]\)/);
+                if (payloadMatch) {
+                    let unescaped;
+                    try {
+                        unescaped = JSON.parse('"' + payloadMatch[1] + '"');
+                    } catch (_) {
+                        unescaped = payloadMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+                    }
+                    const objMarker = '"commentaryPageData":{';
+                    const objMarkerIdx = unescaped.indexOf(objMarker);
+                    if (objMarkerIdx !== -1) {
+                        const objStart = objMarkerIdx + objMarker.length - 1; // include the '{'
+                        let braces = 0;
+                        let objEnd = objStart;
+                        for (let i = objStart; i < unescaped.length; i++) {
+                            if (unescaped[i] === '{') braces++;
+                            else if (unescaped[i] === '}') braces--;
+                            if (braces === 0 && i > objStart) { objEnd = i + 1; break; }
+                        }
+                        const pageData = JSON.parse(unescaped.substring(objStart, objEnd));
+                        if (pageData?.miniscore?.inningsId) {
+                            activeInningsId = parseInt(pageData.miniscore.inningsId);
+                            console.log(`[Commentary Scraper] Detected active inningsId: ${activeInningsId}`);
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('[Commentary Scraper] Could not extract activeInningsId:', e.message);
+        }
+
         const commentaryList = [];
 
-        // Parse DOM for ball-by-ball
+        // Parse DOM for ball-by-ball — tag each item with the detected inningsId
         $('div.font-bold').each((i, el) => {
             const text = $(el).text().trim();
             // Match over and ball (e.g., "76.6")
@@ -1046,7 +1088,9 @@ export async function scrapeFullCommentary(matchId, slug, force = false) {
                     overNum: parseInt(overNum),
                     ballNbr: parseInt(ballNbr),
                     event: isWicket ? 'WICKET' : isSix ? 'SIX' : isFour ? 'FOUR' : 'NONE',
-                    timestamp: Date.now() - (i * 1000) // fake timestamps to preserve order
+                    timestamp: Date.now() - (i * 1000), // fake timestamps to preserve order
+                    // Tag with detected inningsId so deduplication works correctly
+                    inningsId: activeInningsId || undefined
                 });
             }
         });
@@ -1147,8 +1191,17 @@ export async function scrapeFullCommentary(matchId, slug, force = false) {
         // Combine ball-by-ball with preview items
         const combinedList = [...commentaryList, ...formattedPreview].filter(c => c.commText && c.commText.length > 2);
         
-        // Ensure every item has an inningsId, defaulting to 1 (or 0 if API starts at 0, MatchDetails expects it for grouping)
-        const defaultInningsId = mpObj.commentary?.[0]?.inningsId || 1;
+        // Ensure every item has an inningsId:
+        // - DOM-scraped items already have it set from activeInningsId above
+        // - Preview items (matchPreviewFullComm) carry it from the API
+        // - Fallback: use mpObj.commentary array or activeInningsId
+        let defaultInningsId = activeInningsId;
+        if (!defaultInningsId) {
+            defaultInningsId = 1;
+            if (mpObj.commentary && mpObj.commentary.length > 0) {
+                defaultInningsId = mpObj.commentary[mpObj.commentary.length - 1].inningsId || 1;
+            }
+        }
         const finalList = combinedList.map(item => ({
             ...item,
             inningsId: item.inningsId !== undefined ? item.inningsId : defaultInningsId
