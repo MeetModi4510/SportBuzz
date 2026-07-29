@@ -81,9 +81,43 @@ async function findHTMatchId(teamA, teamB, matchDate, matchFormat) {
                 if (!hasT1 || !hasT2) return;
 
                 let score = 10;
-                if (year && hrefSlug.includes(year)) score += 40;
-                if (monthStr && hrefSlug.includes(monthStr)) score += 20;
-                if (day && hrefSlug.includes(day)) score += 10;
+                if (year && hrefSlug.includes(year)) score += 30;
+                
+                // HT slugs encode the match date as MMDDYYYY right before the 6-digit match ID.
+                // e.g. slug suffix: 'npne07292026270956' → month=07, day=29, year=2026
+                // Extract this and compare precisely with the target date.
+                const slugDateMatch = hrefSlug.match(/(\d{2})(\d{2})(\d{4})(\d{6})$/);
+                if (slugDateMatch) {
+                    const slugMonth = parseInt(slugDateMatch[1]);  // 07
+                    const slugDay   = parseInt(slugDateMatch[2]);  // 29
+                    const slugYear  = parseInt(slugDateMatch[3]);  // 2026
+                    const targetMonth = monthStr ? (MONTH_NAMES.indexOf(monthStr) + 1) : null;
+                    const targetDay   = day ? parseInt(day) : null;
+                    const targetYear  = year ? parseInt(year) : null;
+                    
+                    let dateScore = 0;
+                    if (targetYear  && slugYear  === targetYear)  dateScore += 30;
+                    if (targetMonth && slugMonth === targetMonth) dateScore += 20;
+                    if (targetDay   && slugDay   === targetDay) {
+                        dateScore += 60;  // decisive: correct day → correct match
+                    } else if (targetDay) {
+                        dateScore -= 40;  // heavy penalty: wrong day = definitely wrong match
+                    }
+                    score += dateScore;
+                    console.log(`   Slug date: ${slugDay}/${slugMonth}/${slugYear}, target: ${targetDay}/${targetMonth && targetMonth}/${targetYear}, dateScore: ${dateScore}`);
+                } else {
+                    // Fallback text-based scoring for slugs without the MMDDYYYY pattern
+                    if (monthStr && hrefSlug.includes(monthStr)) score += 20;
+                    if (day) {
+                        const dayPatterns = [`-${day}-`, `${day}${monthStr}`, `${monthStr}${day}`];
+                        if (dayPatterns.some(p => hrefSlug.includes(p))) {
+                            score += 60;
+                        } else {
+                            score -= 20;
+                        }
+                    }
+                }
+                
                 if (cleanFormat && hrefSlug.includes(cleanFormat)) score += 15;
 
                 allCandidates.push({ href, score, id });

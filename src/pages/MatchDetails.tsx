@@ -675,9 +675,20 @@ const MatchDetails = () => {
     const fetchState = localStorage.getItem(`ht_comm_state_${cleanMatchId}`);
     
     if (fetchState === 'failed') {
-      setHasAttemptedHtFetch(true);
-      setHtComm([]);
-      return;
+      // Check if failed state is older than 30 minutes — if so, allow retry
+      const failedAtStr = localStorage.getItem(`ht_comm_failed_at_${cleanMatchId}`);
+      const failedAt = failedAtStr ? parseInt(failedAtStr) : 0;
+      const thirtyMins = 30 * 60 * 1000;
+      if (Date.now() - failedAt < thirtyMins) {
+        // Still within 30 min grace period — show "not available" without retrying
+        setHasAttemptedHtFetch(true);
+        setHtComm([]);
+        return;
+      } else {
+        // Expired failed cache — clear it and allow user to retry
+        localStorage.removeItem(`ht_comm_state_${cleanMatchId}`);
+        localStorage.removeItem(`ht_comm_failed_at_${cleanMatchId}`);
+      }
     }
     
     if (fetchState === 'success') {
@@ -698,7 +709,7 @@ const MatchDetails = () => {
       }
       
       if (team1Name && team2Name) {
-        fetchHtData(true, team1Name, team2Name, (match as any)?.matchType || '', (match as any)?.matchStartDate || '');
+        fetchHtData(true, team1Name, team2Name, (match as any)?.matchType || '', dynamicStartTimeMs ? String(dynamicStartTimeMs) : '');
       }
     }
   }, [cleanMatchId, team1Name, team2Name]);
@@ -707,7 +718,7 @@ const MatchDetails = () => {
   useEffect(() => {
     if (commentarySyncTrigger && hasAttemptedHtFetch && htComm.length > 0) {
       if (team1Name && team2Name) {
-        fetchHtData(true, team1Name, team2Name, (match as any)?.matchType || '', (match as any)?.matchStartDate || '');
+        fetchHtData(true, team1Name, team2Name, (match as any)?.matchType || '', dynamicStartTimeMs ? String(dynamicStartTimeMs) : '');
       }
     }
   }, [commentarySyncTrigger]);
@@ -742,6 +753,7 @@ const MatchDetails = () => {
         } else {
            setHtComm([]);
            localStorage.setItem(`ht_comm_state_${cleanMatchId}`, 'failed');
+           localStorage.setItem(`ht_comm_failed_at_${cleanMatchId}`, String(Date.now()));
         }
       }
     } catch (e) {
@@ -3236,10 +3248,21 @@ const MatchDetails = () => {
                           <MessageSquare className="w-6 h-6 opacity-40 mb-1" />
                           <p className="text-sm font-medium">Historical commentary is not available for this match.</p>
                           <p className="text-xs opacity-70">We couldn't find a complete ball-by-ball record in our archives.</p>
+                          <button
+                            onClick={() => {
+                              localStorage.removeItem(`ht_comm_state_${cleanMatchId}`);
+                              localStorage.removeItem(`ht_comm_failed_at_${cleanMatchId}`);
+                              setHasAttemptedHtFetch(false);
+                              setHtComm([]);
+                            }}
+                            className="mt-1 text-xs text-primary/70 hover:text-primary underline underline-offset-2 transition-colors"
+                          >
+                            Try again
+                          </button>
                         </div>
                       ) : (
                         <button 
-                          onClick={() => fetchHtData(true, team1Name || '', team2Name || '', (match as any)?.matchType || '', (match as any)?.matchStartDate || '')}
+                          onClick={() => fetchHtData(true, team1Name || '', team2Name || '', (match as any)?.matchType || '', dynamicStartTimeMs ? String(dynamicStartTimeMs) : '')}
                           disabled={isLoadingHtComm}
                           className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full font-bold shadow-md transition-all flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0"
                         >
