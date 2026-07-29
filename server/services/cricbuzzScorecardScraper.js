@@ -302,9 +302,10 @@ export async function scrapeScorecard(matchId, slug = null, force = false) {
         const scoreText = headerText.find('.font-bold').last().text().trim();
         const overs = headerText.find('span:not(.font-bold)').text().trim().replace(/[()]/g, '').trim();
 
-        const scoreMatch = scoreText.match(/^(\d+)-(\d+)$/);
+        // scoreText could be "291-7", "424-9 d", or "411"
+        const scoreMatch = scoreText.replace(/[^\d-]/g, '').match(/^(\d+)(?:-(\d+))?$/);
         const runs = scoreMatch ? parseInt(scoreMatch[1]) : 0;
-        const wickets = scoreMatch ? parseInt(scoreMatch[2]) : 0;
+        const wickets = scoreMatch ? (scoreMatch[2] ? parseInt(scoreMatch[2]) : 10) : 0;
 
         // Find the corresponding scorecard content div
         const scorecardDiv = $(`#scard-team-${teamId}-innings-${inningsNum}`);

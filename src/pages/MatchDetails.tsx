@@ -665,6 +665,45 @@ const MatchDetails = () => {
     ? (cachedListingMatch?.awayTeam?.logo || match?.awayTeam?.logo || '')
     : ((dynamicTeam2?.imageId ? `/api/cricket/scraped/team-logo/${dynamicTeam2.imageId}` : '') || match?.awayTeam?.logo || '');
 
+  // ─── HT Background Sync ──────────────────────────────────────────
+  const [htComm, setHtComm] = useState<any[]>([]);
+  const [isLoadingHtComm, setIsLoadingHtComm] = useState(false);
+  const [hasAttemptedHtFetch, setHasAttemptedHtFetch] = useState(false);
+
+  const fetchHtData = async (
+    isHtMode = false,
+    team1 = "",
+    team2 = "",
+    matchType = "",
+    matchStartDate = ""
+  ) => {
+    if (!cleanMatchId || !team1 || !team2) return;
+    setIsLoadingHtComm(true);
+    try {
+      const qs = new URLSearchParams({
+        teamA: team1,
+        teamB: team2,
+        format: matchType || '',
+        date: matchStartDate || ''
+      }).toString();
+      
+      const response = await fetch(`/api/cricket/full-commentary?${qs}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status === 'success' && data.data?.commentaryList) {
+           setHtComm(data.data.commentaryList);
+        } else {
+           setHtComm([]);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoadingHtComm(false);
+      setHasAttemptedHtFetch(true);
+    }
+  };
+
   // -- Scores --------------------------------------------------------------------
   // For completed matches: seed immediately from the cached listing (same as dashboard).
   // Then, if cbSummary arrives, override using batTeamName matching – NOT array index –
@@ -2732,10 +2771,10 @@ const MatchDetails = () => {
                         </div>
                       ))}
                     </div>
-                  ) : cbFullCommentaryField.data?.commentary && cbFullCommentaryField.data.commentary.length > 0 ? (
+                  ) : (htComm && htComm.length > 0) || (cbFullCommentaryField.data?.commentary && cbFullCommentaryField.data.commentary.length > 0) ? (
                     /* -- Full Cricbuzz Commentary ---------------------------- */
                     (() => {
-                      const items: any[] = cbFullCommentaryField.data.commentary;
+                      const items: any[] = (htComm && htComm.length > 0) ? htComm : cbFullCommentaryField.data.commentary;
                       // Group by innings
                       const byInnings: Record<number, any[]> = {};
                       items.forEach(item => {
@@ -2745,33 +2784,68 @@ const MatchDetails = () => {
 
                       const displayInnIds = Object.keys(byInnings).map(Number).sort((a, b) => b - a);
 
+                      // Generate ordinal names for each innings based on team occurrence
+                      const teamInningsCount: Record<string, number> = {};
+                      const inningsNames: Record<number, string> = {};
+                      const ascendingInnIds = [...displayInnIds].reverse();
+
+                      ascendingInnIds.forEach((innId, index) => {
+                        let batTeamName = byInnings[innId][0]?.batTeamName;
+
+                        // 1. Fallback to Scorecard Data
+                        if (!batTeamName && cbScorecardField.data?.innings) {
+                           const scInn = cbScorecardField.data.innings.find((i: any) => String(i.inningsId) === String(innId) || String(i.inningsNumber) === String(innId));
+                           if (scInn && scInn.teamName) {
+                             batTeamName = scInn.teamName;
+                           } else if (cbScorecardField.data.innings[index]?.teamName) {
+                             batTeamName = cbScorecardField.data.innings[index].teamName;
+                           }
+                        }
+
+                        // 2. Fallback to Summary Data
+                        if (!batTeamName && cbSummary) {
+                            const ms = cbSummary.matchScore || cbSummary.inningsScoreList || cbSummary.miniscore?.matchScoreDetails?.inningsScoreList;
+                            if (ms && Array.isArray(ms) && ms.length > 0) {
+                               const summaryInn = ms.find((i: any) => String(i.inningsId) === String(innId));
+                               if (summaryInn) {
+                                 batTeamName = summaryInn.batTeamName || summaryInn.batTeamShortName || summaryInn.teamName;
+                               }
+                               if (!batTeamName && ms[index]) {
+                                 batTeamName = ms[index].batTeamName || ms[index].batTeamShortName || ms[index].teamName;
+                               }
+                            }
+                        }
+
+                        // 3. Last Resort Fallback (assume team1 batted first, then alternate)
+                        if (!batTeamName) {
+                             batTeamName = (innId % 2 !== 0) ? (team1Name || 'Team 1') : (team2Name || 'Team 2');
+                        }
+
+                        if (batTeamName) {
+                          teamInningsCount[batTeamName] = (teamInningsCount[batTeamName] || 0) + 1;
+                          const ordinal = teamInningsCount[batTeamName] === 1 ? '1st' : teamInningsCount[batTeamName] === 2 ? '2nd' : teamInningsCount[batTeamName] === 3 ? '3rd' : `${teamInningsCount[batTeamName]}th`;
+                          inningsNames[innId] = `${batTeamName} ${ordinal} Innings`;
+                        } else {
+                          inningsNames[innId] = `Innings ${innId}`;
+                        }
+                      });
+
+                      const activeId = activeCommentaryInningsId === 'all' ? displayInnIds[0] : activeCommentaryInningsId;
+
                       return (
                         <div className="space-y-8 mt-2">
                           {/* Innings Filter Buttons */}
                           {displayInnIds.length > 1 && (
                             <div className="flex flex-wrap items-center gap-2 mb-2 pb-4 border-b border-border/40">
-                              <button
-                                onClick={() => setActiveCommentaryInningsId('all')}
-                                className={cn(
-                                  "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-sm border",
-                                  activeCommentaryInningsId === 'all'
-                                    ? "bg-primary text-primary-foreground border-primary"
-                                    : "bg-background text-muted-foreground border-border/50 hover:bg-secondary hover:border-border"
-                                )}
-                              >
-                                All Innings
-                              </button>
                               {displayInnIds.map(innId => {
-                                const innName = byInnings[innId][0]?.batTeamName
-                                  ? `${byInnings[innId][0].batTeamName} Innings`
-                                  : `Innings ${innId}`;
+                                const innName = inningsNames[innId];
                                 return (
                                   <button
                                     key={innId}
                                     onClick={() => setActiveCommentaryInningsId(innId)}
                                     className={cn(
                                       "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-sm border",
-                                      activeCommentaryInningsId === innId
+                                      activeId === innId
                                         ? "bg-primary text-primary-foreground border-primary"
                                         : "bg-background text-muted-foreground border-border/50 hover:bg-secondary hover:border-border"
                                     )}
@@ -2784,7 +2858,7 @@ const MatchDetails = () => {
                           )}
 
                           {displayInnIds
-                            .filter(innId => activeCommentaryInningsId === 'all' || activeCommentaryInningsId === innId)
+                            .filter(innId => activeId === innId)
                             .map((innId) => {
                               const innItems = byInnings[innId]; // Do not reverse: keep latest first for over grouping
                               // Group by over
@@ -2795,17 +2869,11 @@ const MatchDetails = () => {
                                 byOver[ov].push(item);
                               });
                               const overKeys = Object.keys(byOver).map(Number).sort((a, b) => b - a);
-                              const innName = innItems[0]?.batTeamName ? `${innItems[0].batTeamName} Innings` : `Innings ${innId}`;
+                              const innName = inningsNames[innId];
 
                               return (
                                 <div key={innId} className="space-y-5">
-                                  {/* Innings Header */}
-                                  <div className="sticky top-0 z-10 bg-card border-b border-border/50 py-3 mb-4 backdrop-blur-md bg-opacity-90">
-                                    <h4 className="font-bold text-foreground tracking-tight px-1 flex items-center gap-2">
-                                      <div className="w-1.5 h-4 bg-primary rounded-full"></div>
-                                      {innName}
-                                    </h4>
-                                  </div>
+                                {/* Innings Header Removed as per user request */}
 
                                   {overKeys.map((ov) => {
                                     const overItems = byOver[ov];
@@ -2825,7 +2893,17 @@ const MatchDetails = () => {
 
                                         {/* Commentary items wrapped in a single premium card */}
                                         <div className="bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden flex flex-col">
-                                          {overItems.map((item: any, idx: number) => {
+                                          {(() => {
+                                            const computedItems = [...overItems].reverse().map(item => ({ ...item }));
+                                            let legalCount = 0;
+                                            computedItems.forEach(item => {
+                                              const evt = item.event || 'NONE';
+                                              const isIllegal = evt === 'WIDE' || evt === 'NOBALL' || 
+                                                (item.commText && (/(?:wide|no ball)/i.test(item.commText)));
+                                              item._displayBall = Math.min(legalCount + 1, 6);
+                                              if (!isIllegal && evt !== 'OVER_BREAK') legalCount++;
+                                            });
+                                            return computedItems.reverse().map((item: any, idx: number) => {
                                             const evt = item.event || 'NONE';
                                             const isWicket = evt === 'WICKET' || (item.commText && (/(?:,\s*out\s+.*?(?:caught|bowled|lbw|stumped|run out|hit wicket))/i.test(item.commText) || /\bWICKET\b/.test(item.commText)));
                                             const isSix = evt === 'SIX' || (item.commText && /(?:,\s*SIX\b)/.test(item.commText));
@@ -2852,13 +2930,13 @@ const MatchDetails = () => {
                                                     isOverComplete ? 'bg-emerald-500/5 dark:bg-emerald-500/10' :
                                                       'bg-transparent hover:bg-muted/30';
 
-                                            const eventIcon = isWicket ? 'Γÿ¥∩╕Å' :
-                                              isMilestone ? '≡ƒîƒ' :
-                                                isSix ? '6∩╕ÅΓâú' :
-                                                  isFour ? '4∩╕ÅΓâú' :
-                                                    isNoBall ? '≡ƒÜ½' :
-                                                      isWide ? 'Γåö∩╕Å' :
-                                                        isOverComplete ? '≡ƒöä' : '';
+                                            const eventIcon = isWicket ? 'W' :
+                                              isMilestone ? '★' :
+                                                isSix ? '6' :
+                                                  isFour ? '4' :
+                                                    isNoBall ? 'NB' :
+                                                      isWide ? 'WD' :
+                                                        isOverComplete ? 'O' : '';
 
                                             let milestoneLabel = 'MILESTONE';
                                             if (isMilestone && item.commText) {
@@ -2894,8 +2972,8 @@ const MatchDetails = () => {
                                                   {!isSpecialOver && item.ballNbr > 0 && (
                                                     <span className="text-[10px] font-bold font-mono text-muted-foreground/60 leading-none mt-1 group-hover:text-foreground/80 transition-colors">
                                                       {(() => {
-                                                        const bInOver = item.ballInOver || (item.ballNbr % 6 === 0 ? 6 : item.ballNbr % 6);
-                                                        return bInOver === 6 ? `${ov + 1}.0` : `${ov}.${bInOver}`;
+                                                        const bInOver = item._displayBall || item.ballInOver || (item.ballNbr > 15 ? (item.ballNbr % 6 === 0 ? 6 : item.ballNbr % 6) : item.ballNbr);
+                                                        return `${ov}.${bInOver}`;
                                                       })()}
                                                     </span>
                                                   )}
@@ -2979,13 +3057,14 @@ const MatchDetails = () => {
                                                 {isWicket && (
                                                   <div className="shrink-0 self-center hidden sm:block">
                                                     <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-500/10 border border-red-500/30 group-hover:bg-red-500/20 transition-all duration-300">
-                                                      <span className="text-lg opacity-80">≡ƒÅÅ</span>
+                                                      <span className="text-lg opacity-80 font-bold text-red-500">W</span>
                                                     </div>
                                                   </div>
                                                 )}
                                               </div>
                                             );
-                                          })}
+                                          });
+                                        })()}
                                         </div>
                                       </div>
                                     );
@@ -3001,7 +3080,7 @@ const MatchDetails = () => {
                     /* -- Cricbuzz Highlight Commentary Fallback --------------- */
                     <div className="space-y-3">
                       {cbCommentaryField.data.commentary.map((item: any, idx: number) => {
-                        const icon = item.eventType === 'WICKET' ? 'Γÿ¥∩╕Å' : item.eventType === 'SIX' ? '6∩╕ÅΓâú' : item.eventType === 'FOUR' ? '4∩╕ÅΓâú' : '•';
+                        const icon = item.eventType === 'WICKET' ? 'W' : item.eventType === 'SIX' ? '6' : item.eventType === 'FOUR' ? '4' : '•';
                         return (
                           <div key={idx} className="relative pl-8 pb-2 last:pb-0 border-l border-border/60 last:border-l-0">
                             <div className={cn("absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full", item.eventType === 'WICKET' ? "bg-red-500" : item.eventType === 'SIX' ? "bg-yellow-400" : item.eventType === 'FOUR' ? "bg-blue-400" : "bg-primary/60")} />
@@ -3063,6 +3142,28 @@ const MatchDetails = () => {
                         </>
                       ) : (
                         <p>No commentary available for this match.</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Load Historical Commentary Button */}
+                  {(!htComm || htComm.length === 0) && (
+                    <div className="mt-8 flex flex-col items-center border-t border-border/40 pt-6">
+                      {hasAttemptedHtFetch ? (
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground bg-secondary/20 px-6 py-4 rounded-xl border border-border/30">
+                          <MessageSquare className="w-6 h-6 opacity-40 mb-1" />
+                          <p className="text-sm font-medium">Historical commentary is not available for this match.</p>
+                          <p className="text-xs opacity-70">We couldn't find a complete ball-by-ball record in our archives.</p>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => fetchHtData(true, team1Name || '', team2Name || '', (match as any)?.matchType || '', (match as any)?.matchStartDate || '')}
+                          disabled={isLoadingHtComm}
+                          className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full font-bold shadow-md transition-all flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0"
+                        >
+                          {isLoadingHtComm ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
+                          {isLoadingHtComm ? 'Searching Archives...' : 'Load Full Historical Commentary'}
+                        </button>
                       )}
                     </div>
                   )}

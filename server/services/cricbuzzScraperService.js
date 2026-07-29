@@ -1013,10 +1013,11 @@ export async function scrapeFullCommentary(matchId, slug, force = false) {
                 'Accept-Language': 'en-US,en;q=0.9',
                 'Referer': 'https://www.cricbuzz.com/'
             },
+            responseType: 'arraybuffer',
             timeout: 15000
         });
 
-        const html = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
+        const html = new TextDecoder('utf-8').decode(res.data);
         const cheerio = await import('cheerio');
         const $ = cheerio.load(html);
         

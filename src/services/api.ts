@@ -97,11 +97,14 @@ export const cricketApi = {
         const qs = params.toString();
         return api.get(`cricket/scraped/match/${matchId}/scorecard${qs ? `?${qs}` : ''}`);
     },
-    getCricbuzzSquads: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/squads`),
-    getCricbuzzCommentary: (matchId: string, force?: boolean) =>
-        api.get(`cricket/scraped/match/${matchId}/commentary${force ? '?force=1' : ''}`),
-    getCricbuzzSummary: (matchId: string, force?: boolean) =>
-        api.get(`cricket/scraped/match/${matchId}/summary${force ? '?force=1' : ''}`),
+    getCricbuzzSquads: (matchId: string) =>
+        api.get(`cricket/scraped/match/${matchId}/squads`),
+    getCricbuzzCommentary: (matchId: string, force?: boolean, slug?: string) =>
+        api.get(`cricket/scraped/match/${matchId}/commentary?${force ? 'force=1&' : ''}${slug ? `slug=${slug}` : ''}`),
+    getCricbuzzSummary: (matchId: string, force?: boolean, slug?: string) =>
+        api.get(`cricket/scraped/match/${matchId}/summary?${force ? 'force=1&' : ''}${slug ? `slug=${slug}` : ''}`),
+    getCricbuzzOvers: (matchId: string, force?: boolean, slug?: string) =>
+        api.get(`cricket/scraped/match/${matchId}/overs?${force ? 'force=1&' : ''}${slug ? `slug=${slug}` : ''}`),
     getCricbuzzInfo: (matchId: string) => api.get(`cricket/scraped/match/${matchId}/info`),
     getPlayerProfile: (playerId: string) => api.get(`cricket/players/${playerId}`),
     getBallMap: (matchId: string, inningsId: string, force?: boolean) => api.get(`cricket/scraped/match/${matchId}/graphs/ballmap/${inningsId}${force ? '?force=1' : ''}`),

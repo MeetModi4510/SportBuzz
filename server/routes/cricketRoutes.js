@@ -7,6 +7,7 @@ import { cricbuzzService } from '../services/cricbuzzService.js';
 import { scrapeScorecard } from '../services/cricbuzzScorecardScraper.js';
 import { scrapeFullCommentary } from '../services/cricbuzzScraperService.js';
 import { getWinProbabilityGraph, getOversGraph } from '../services/cricbuzzWinProbabilityScraper.js';
+import { getFullCommentaryFromHT } from '../services/htCommentaryService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -196,7 +197,8 @@ router.get('/scraped/match/:id/:endpointType', async (req, res) => {
     }
 
     const force = req.query.force === '1' || req.query.force === 'true';
-    const data = await fetchMatchDetailScraped(id, endpointType, force);
+    const slug = req.query.slug || 'match';
+    const data = await fetchMatchDetailScraped(id, endpointType, force, slug);
     res.json({ status: 'success', data });
 });
 // =============================
@@ -431,6 +433,31 @@ router.get('/cb/full-commentary/:matchId', async (req, res) => {
         res.json({ status: 'success', data });
     } catch (error) {
         console.error('[full-commentary route] Error:', error.message);
+        res.status(500).json({ status: 'error', data: null, error: error.message });
+    }
+});
+
+// â”€â”€ Hindustan Times Full Commentary Fallback (Just-In-Time)
+// GET /api/cricket/full-commentary?teamA=India&teamB=Sri+Lanka
+router.get('/full-commentary', async (req, res) => {
+    try {
+        const { teamA, teamB, date, format } = req.query;
+        if (!teamA || !teamB) {
+            return res.status(400).json({ status: 'error', message: 'teamA and teamB query params required' });
+        }
+        
+        const data = await getFullCommentaryFromHT(teamA, teamB, date, format);
+        if (!data) {
+            return res.status(404).json({ status: 'error', message: 'Full historical commentary unavailable for this match.' });
+        }
+        
+        // Wrap in standard Cricbuzz-like structure for frontend parser compatibility
+        res.json({
+            status: 'success',
+            data: { commentaryList: data }
+        });
+    } catch (error) {
+        console.error('[ht-full-commentary route] Error:', error.message);
         res.status(500).json({ status: 'error', data: null, error: error.message });
     }
 });

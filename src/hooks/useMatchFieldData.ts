@@ -131,7 +131,7 @@ export function useMatchFieldData(
                 const response = await cricketApi.getMatchInfo(cleanId);
                 result = response?.data || response;
             } else if (field === 'commentary') {
-                const response = await cricketApi.getCricbuzzCommentary(cleanId, force);
+                const response = await cricketApi.getCricbuzzCommentary(cleanId, force, slug);
                 result = response?.data || null;
             } else if (field === 'cbScorecard') {
                 const response = await cricketApi.getCricbuzzScorecard(cleanId, slug, force);
@@ -140,7 +140,7 @@ export function useMatchFieldData(
                 const response = await cricketApi.getCricbuzzSquads(cleanId);
                 result = response?.data || null;
             } else if (field === 'cbCommentary') {
-                const response = await cricketApi.getCricbuzzCommentary(cleanId, force);
+                const response = await cricketApi.getCricbuzzCommentary(cleanId, force, slug);
                 result = response?.data || null;
             } else if (field === 'cbFullCommentary') {
                 const response = await cricketApi.getCricbuzzFullCommentary(cleanId, slug, force);

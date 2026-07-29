@@ -1,0 +1,3052 @@
+{
+  "Innings": [
+    {
+      "Number": "First",
+      "Battingteam": "1163",
+      "Bowlingteam": "1165",
+      "Total": "411",
+      "Wickets": "10",
+      "Overs": "105.2",
+      "Total_Balls_Bowled": "632",
+      "AllotedBalls": "540",
+      "Runrate": "3.90",
+      "Runsperball": "0.65",
+      "Byes": "9",
+      "Legbyes": "10",
+      "Wides": "3",
+      "Noballs": "5",
+      "Penalty": "0",
+      "AllottedOvers": "90",
+      "Batsmen": [
+        {
+          "Batsman": "136728",
+          "Runs": "0",
+          "Balls": "3",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "3",
+          "Strikerate": "0",
+          "Dismissal": "bowled",
+          "Howout": "b Sethmika Seneviratne",
+          "Howout_short": "b S Seneviratne",
+          "Bowler": "136042",
+          "Fielder": "",
+          "RunScoredInLastBalls": {},
+          "Number": 1,
+          "DismissalType": "bowled",
+          "DismissalId": "b"
+        },
+        {
+          "Batsman": "139569",
+          "Runs": "0",
+          "Balls": "18",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "18",
+          "Strikerate": "0",
+          "Dismissal": "caught",
+          "Howout": "c Aveesha Samash b Gimhan Mendis",
+          "Howout_short": "c A Samash b G Mendis",
+          "Bowler": "139938",
+          "Fielder": "140310",
+          "RunScoredInLastBalls": {
+            "10": "0"
+          },
+          "Number": 2,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "139572",
+          "Runs": "111",
+          "Balls": "193",
+          "Fours": "12",
+          "Sixes": "2",
+          "Dots": "133",
+          "Strikerate": "57.51",
+          "Dismissal": "run out",
+          "Howout": "run out (Dulnith Sigera)",
+          "Howout_short": "run out (D Sigera)",
+          "Bowler": "129215",
+          "Fielder": "129215",
+          "Fielder1": "129215",
+          "RunScoredInLastBalls": {
+            "10": "5",
+            "20": "12",
+            "30": "21"
+          },
+          "Number": 3,
+          "DismissalType": "run out",
+          "DismissalId": "ro"
+        },
+        {
+          "Batsman": "139570",
+          "Runs": "78",
+          "Balls": "89",
+          "Fours": "11",
+          "Sixes": "2",
+          "Dots": "56",
+          "Strikerate": "87.64",
+          "Dismissal": "caught",
+          "Howout": "c Senuja Wekunagoda b Gimhan Mendis",
+          "Howout_short": "c S Wekunagoda b G Mendis",
+          "Bowler": "139938",
+          "Fielder": "132504",
+          "RunScoredInLastBalls": {
+            "10": "5",
+            "20": "6",
+            "30": "16"
+          },
+          "Number": 4,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "139581",
+          "Runs": "150",
+          "Balls": "244",
+          "Fours": "20",
+          "Sixes": "1",
+          "Dots": "169",
+          "Strikerate": "61.47",
+          "Dismissal": "caught",
+          "Howout": "c Vigneshwaran Akash b Gimhan Mendis",
+          "Howout_short": "c V Akash b G Mendis",
+          "Bowler": "139938",
+          "Fielder": "132153",
+          "RunScoredInLastBalls": {
+            "10": "12",
+            "20": "20",
+            "30": "27"
+          },
+          "Number": 5,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "139582",
+          "Runs": "10",
+          "Balls": "27",
+          "Fours": "2",
+          "Sixes": "0",
+          "Dots": "23",
+          "Strikerate": "37.03",
+          "Dismissal": "caught",
+          "Howout": "c Jason Fernando b Sethmika Seneviratne",
+          "Howout_short": "c J Fernando b S Seneviratne",
+          "Bowler": "136042",
+          "Fielder": "134868",
+          "RunScoredInLastBalls": {
+            "10": "5",
+            "20": "10"
+          },
+          "Number": 6,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "139578",
+          "Runs": "6",
+          "Balls": "17",
+          "Fours": "1",
+          "Sixes": "0",
+          "Dots": "15",
+          "Strikerate": "35.29",
+          "Dismissal": "bowled",
+          "Howout": "b Dulnith Sigera",
+          "Howout_short": "b D Sigera",
+          "Bowler": "129215",
+          "Fielder": "",
+          "RunScoredInLastBalls": {
+            "10": "2"
+          },
+          "Number": 7,
+          "DismissalType": "bowled",
+          "DismissalId": "b"
+        },
+        {
+          "Batsman": "129956",
+          "Runs": "4",
+          "Balls": "8",
+          "Fours": "1",
+          "Sixes": "0",
+          "Dots": "7",
+          "Strikerate": "50",
+          "Dismissal": "bowled",
+          "Howout": "b Dulnith Sigera",
+          "Howout_short": "b D Sigera",
+          "Bowler": "129215",
+          "Fielder": "",
+          "RunScoredInLastBalls": {},
+          "Number": 8,
+          "DismissalType": "bowled",
+          "DismissalId": "b"
+        },
+        {
+          "Batsman": "139584",
+          "Runs": "25",
+          "Balls": "33",
+          "Fours": "2",
+          "Sixes": "0",
+          "Dots": "21",
+          "Strikerate": "75.75",
+          "Dismissal": "lbw",
+          "Howout": "lbw b Vigneshwaran Akash",
+          "Howout_short": "lbw b V Akash",
+          "Bowler": "132153",
+          "Fielder": "",
+          "RunScoredInLastBalls": {
+            "10": "5",
+            "20": "15",
+            "30": "22"
+          },
+          "Number": 9,
+          "DismissalType": "lbw",
+          "DismissalId": "lbw"
+        },
+        {
+          "Batsman": "139575",
+          "Runs": "0",
+          "Balls": "4",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "4",
+          "Strikerate": "0",
+          "Dismissal": "lbw",
+          "Howout": "lbw b Vigneshwaran Akash",
+          "Howout_short": "lbw b V Akash",
+          "Bowler": "132153",
+          "Fielder": "",
+          "RunScoredInLastBalls": {},
+          "Number": 10,
+          "DismissalType": "lbw",
+          "DismissalId": "lbw"
+        },
+        {
+          "Batsman": "128866",
+          "Runs": "0",
+          "Balls": "1",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "1",
+          "Strikerate": "0",
+          "Dismissal": "not out",
+          "Howout": "not out",
+          "Howout_short": "not out",
+          "Bowler": "",
+          "Fielder": "",
+          "RunScoredInLastBalls": {},
+          "Number": 11,
+          "DismissalType": "not out",
+          "DismissalId": "no"
+        }
+      ],
+      "Partnership_Current": {
+        "Runs": "0",
+        "Balls": "3",
+        "ExtraRuns": "0",
+        "Batsmen": [
+          {
+            "Batsman": "128866",
+            "Runs": "0",
+            "Balls": "1"
+          },
+          {
+            "Batsman": "139575",
+            "Runs": "0",
+            "Balls": "2"
+          }
+        ],
+        "ForWicket": 10
+      },
+      "Bowlers": [
+        {
+          "Bowler": "136042",
+          "Overs": "25",
+          "Balls_Bowled": "150",
+          "Maidens": "6",
+          "Runs": "90",
+          "Wickets": "2",
+          "Fours": "14",
+          "Sixes": "1",
+          "Economyrate": "3.60",
+          "Runsperball": "0.60",
+          "Noballs": "0",
+          "Wides": "1",
+          "Dots": "111",
+          "RungivenInLastBalls": {
+            "10": "12",
+            "20": "21",
+            "30": "25"
+          },
+          "Number": 1,
+          "Hattrick_Count": 0
+        },
+        {
+          "Bowler": "139938",
+          "Overs": "25",
+          "Balls_Bowled": "150",
+          "Maidens": "7",
+          "Runs": "102",
+          "Wickets": "3",
+          "Fours": "16",
+          "Sixes": "0",
+          "Economyrate": "4.08",
+          "Runsperball": "0.68",
+          "Noballs": "4",
+          "Wides": "0",
+          "Dots": "107",
+          "RungivenInLastBalls": {
+            "10": "14",
+            "20": "19",
+            "30": "27"
+          },
+          "Number": 2,
+          "Hattrick_Count": 0
+        },
+        {
+          "Bowler": "129215",
+          "Overs": "20",
+          "Balls_Bowled": "120",
+          "Maidens": "1",
+          "Runs": "76",
+          "Wickets": "2",
+          "Fours": "7",
+          "Sixes": "1",
+          "Economyrate": "3.80",
+          "Runsperball": "0.63",
+          "Noballs": "0",
+          "Wides": "2",
+          "Dots": "82",
+          "RungivenInLastBalls": {
+            "10": "7",
+            "20": "15",
+            "30": "16"
+          },
+          "Number": 3,
+          "Hattrick_Count": 0
+        },
+        {
+          "Bowler": "129226",
+          "Overs": "3",
+          "Balls_Bowled": "18",
+          "Maidens": "0",
+          "Runs": "21",
+          "Wickets": "0",
+          "Fours": "2",
+          "Sixes": "2",
+          "Economyrate": "7.00",
+          "Runsperball": "1.16",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "13",
+          "RungivenInLastBalls": {
+            "10": "15"
+          },
+          "Number": 4,
+          "Hattrick_Count": 0
+        },
+        {
+          "Bowler": "129219",
+          "Overs": "14",
+          "Balls_Bowled": "84",
+          "Maidens": "1",
+          "Runs": "53",
+          "Wickets": "0",
+          "Fours": "5",
+          "Sixes": "0",
+          "Economyrate": "3.78",
+          "Runsperball": "0.63",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "51",
+          "RungivenInLastBalls": {
+            "10": "5",
+            "20": "16",
+            "30": "17"
+          },
+          "Number": 5,
+          "Hattrick_Count": 0
+        },
+        {
+          "Bowler": "132153",
+          "Overs": "18.2",
+          "Balls_Bowled": "110",
+          "Maidens": "2",
+          "Runs": "50",
+          "Wickets": "2",
+          "Fours": "5",
+          "Sixes": "1",
+          "Economyrate": "2.72",
+          "Runsperball": "0.45",
+          "Noballs": "1",
+          "Wides": "0",
+          "Dots": "82",
+          "RungivenInLastBalls": {
+            "10": "1",
+            "20": "4",
+            "30": "12"
+          },
+          "Number": 6,
+          "Hattrick_Count": 0
+        }
+      ],
+      "FallofWickets": [
+        {
+          "Batsman": "136728",
+          "Score": "0",
+          "Overs": "0.3",
+          "Wicket_No": 1,
+          "Review_status_id": 0,
+          "Ball_number": "3"
+        },
+        {
+          "Batsman": "139569",
+          "Score": "0",
+          "Overs": "6",
+          "Wicket_No": 2,
+          "Review_status_id": 0,
+          "Ball_number": "36"
+        },
+        {
+          "Batsman": "139570",
+          "Score": "122",
+          "Overs": "30",
+          "Wicket_No": 3,
+          "Review_status_id": 0,
+          "Ball_number": "180"
+        },
+        {
+          "Batsman": "139572",
+          "Score": "277",
+          "Overs": "71.4",
+          "Wicket_No": 4,
+          "Review_status_id": 0,
+          "Ball_number": "430"
+        },
+        {
+          "Batsman": "139582",
+          "Score": "326",
+          "Overs": "84.5",
+          "Wicket_No": 5,
+          "Review_status_id": 0,
+          "Ball_number": "509"
+        },
+        {
+          "Batsman": "139578",
+          "Score": "351",
+          "Overs": "91.2",
+          "Wicket_No": 6,
+          "Review_status_id": 0,
+          "Ball_number": "548"
+        },
+        {
+          "Batsman": "129956",
+          "Score": "355",
+          "Overs": "93.4",
+          "Wicket_No": 7,
+          "Review_status_id": 0,
+          "Ball_number": "562"
+        },
+        {
+          "Batsman": "139584",
+          "Score": "403",
+          "Overs": "103.4",
+          "Wicket_No": 8,
+          "Review_status_id": 0,
+          "Ball_number": "622"
+        },
+        {
+          "Batsman": "139581",
+          "Score": "411",
+          "Overs": "104.5",
+          "Wicket_No": 9,
+          "Review_status_id": 0,
+          "Ball_number": "629"
+        },
+        {
+          "Batsman": "139575",
+          "Score": "411",
+          "Overs": "105.2",
+          "Wicket_No": 10,
+          "Review_status_id": 0,
+          "Ball_number": "632"
+        }
+      ],
+      "Partnerships": [
+        {
+          "Runs": "0",
+          "Balls": "3",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "139569",
+              "Runs": "0",
+              "Balls": "0"
+            },
+            {
+              "Batsman": "136728",
+              "Runs": "0",
+              "Balls": "3"
+            }
+          ],
+          "ForWicket": 1
+        },
+        {
+          "Runs": "0",
+          "Balls": "33",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "139569",
+              "Runs": "0",
+              "Balls": "18"
+            },
+            {
+              "Batsman": "139572",
+              "Runs": "0",
+              "Balls": "15"
+            }
+          ],
+          "ForWicket": 2
+        },
+        {
+          "Runs": "122",
+          "Balls": "146",
+          "ExtraRuns": "9",
+          "Batsmen": [
+            {
+              "Batsman": "139570",
+              "Runs": "78",
+              "Balls": "89"
+            },
+            {
+              "Batsman": "139572",
+              "Runs": "35",
+              "Balls": "57"
+            }
+          ],
+          "ForWicket": 3
+        },
+        {
+          "Runs": "155",
+          "Balls": "253",
+          "ExtraRuns": "8",
+          "Batsmen": [
+            {
+              "Batsman": "139581",
+              "Runs": "71",
+              "Balls": "132"
+            },
+            {
+              "Batsman": "139572",
+              "Runs": "76",
+              "Balls": "121"
+            }
+          ],
+          "ForWicket": 4
+        },
+        {
+          "Runs": "49",
+          "Balls": "79",
+          "ExtraRuns": "2",
+          "Batsmen": [
+            {
+              "Batsman": "139581",
+              "Runs": "37",
+              "Balls": "52"
+            },
+            {
+              "Batsman": "139582",
+              "Runs": "10",
+              "Balls": "27"
+            }
+          ],
+          "ForWicket": 5
+        },
+        {
+          "Runs": "25",
+          "Balls": "39",
+          "ExtraRuns": "5",
+          "Batsmen": [
+            {
+              "Batsman": "139581",
+              "Runs": "14",
+              "Balls": "22"
+            },
+            {
+              "Batsman": "139578",
+              "Runs": "6",
+              "Balls": "17"
+            }
+          ],
+          "ForWicket": 6
+        },
+        {
+          "Runs": "4",
+          "Balls": "14",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "139581",
+              "Runs": "0",
+              "Balls": "6"
+            },
+            {
+              "Batsman": "129956",
+              "Runs": "4",
+              "Balls": "8"
+            }
+          ],
+          "ForWicket": 7
+        },
+        {
+          "Runs": "48",
+          "Balls": "60",
+          "ExtraRuns": "3",
+          "Batsmen": [
+            {
+              "Batsman": "139581",
+              "Runs": "20",
+              "Balls": "27"
+            },
+            {
+              "Batsman": "139584",
+              "Runs": "25",
+              "Balls": "33"
+            }
+          ],
+          "ForWicket": 8
+        },
+        {
+          "Runs": "8",
+          "Balls": "7",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "139581",
+              "Runs": "8",
+              "Balls": "5"
+            },
+            {
+              "Batsman": "139575",
+              "Runs": "0",
+              "Balls": "2"
+            }
+          ],
+          "ForWicket": 9
+        },
+        {
+          "Runs": "0",
+          "Balls": "3",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "128866",
+              "Runs": "0",
+              "Balls": "1"
+            },
+            {
+              "Batsman": "139575",
+              "Runs": "0",
+              "Balls": "2"
+            }
+          ],
+          "ForWicket": 10
+        }
+      ],
+      "LastOvers": {
+        "5": {
+          "Score": "17",
+          "Wicket": "3",
+          "Runrate": "3.92"
+        },
+        "10": {
+          "Score": "48",
+          "Wicket": "3",
+          "Runrate": "5.14"
+        }
+      },
+      "StatusId": 4,
+      "StartTimeStamp": "2026-07-20T10:59:26.000+0:00",
+      "OverNo": "106",
+      "BallNo": "2",
+      "Best_Performers": {
+        "Batsmen": [
+          {
+            "Player_Id": "139581",
+            "Player_Name": "Manal Chauhan",
+            "Team_Id": "1163",
+            "Team_Name": "India Under-19",
+            "Runs": "150",
+            "Balls": "244",
+            "Fours": "20",
+            "Sixes": "1",
+            "Strikerate": "61.47"
+          },
+          {
+            "Player_Id": "139572",
+            "Player_Name": "Kushagra Ojha",
+            "Team_Id": "1163",
+            "Team_Name": "India Under-19",
+            "Runs": "111",
+            "Balls": "193",
+            "Fours": "12",
+            "Sixes": "2",
+            "Strikerate": "57.51"
+          }
+        ],
+        "Bowlers": [
+          {
+            "Player_Id": "139938",
+            "Player_Name": "Gimhan Mendis",
+            "Team_Id": "1165",
+            "Team_Name": "Sri Lanka Under-19",
+            "Wickets": "3",
+            "Balls_Bowled": "150",
+            "Economyrate": "4.08",
+            "Overs": "25",
+            "Runs": "102",
+            "Fours": "16",
+            "Sixes": "0"
+          },
+          {
+            "Player_Id": "132153",
+            "Player_Name": "Vigneshwaran Akash",
+            "Team_Id": "1165",
+            "Team_Name": "Sri Lanka Under-19",
+            "Wickets": "2",
+            "Balls_Bowled": "110",
+            "Economyrate": "2.72",
+            "Overs": "18.2",
+            "Runs": "50",
+            "Fours": "5",
+            "Sixes": "1"
+          }
+        ]
+      }
+    },
+    {
+      "Number": "Second",
+      "Battingteam": "1165",
+      "Bowlingteam": "1163",
+      "Total": "122",
+      "Wickets": "8",
+      "Overs": "40.0",
+      "Total_Balls_Bowled": "240",
+      "AllotedBalls": "540",
+      "Runrate": "3.05",
+      "Runsperball": "0.50",
+      "Byes": "4",
+      "Legbyes": "0",
+      "Wides": "2",
+      "Noballs": "3",
+      "Penalty": "0",
+      "AllottedOvers": "90",
+      "Batsmen": [
+        {
+          "Batsman": "132148",
+          "Runs": "24",
+          "Balls": "29",
+          "Fours": "5",
+          "Sixes": "0",
+          "Dots": "20",
+          "Strikerate": "82.75",
+          "Dismissal": "caught",
+          "Howout": "c Manal Chauhan b Kavya Patel",
+          "Howout_short": "c M Chauhan b K Patel",
+          "Bowler": "139578",
+          "Fielder": "139581",
+          "RunScoredInLastBalls": {
+            "10": "4",
+            "20": "11"
+          },
+          "Number": 1,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "140310",
+          "Runs": "9",
+          "Balls": "15",
+          "Fours": "2",
+          "Sixes": "0",
+          "Dots": "12",
+          "Strikerate": "60",
+          "Dismissal": "caught",
+          "Howout": "c Aryan Sakpal b Pranav Raghavendra",
+          "Howout_short": "c A Sakpal b P Raghavendra",
+          "Bowler": "128866",
+          "Fielder": "139582",
+          "RunScoredInLastBalls": {
+            "10": "9"
+          },
+          "Number": 2,
+          "DismissalType": "caught wicket keeper",
+          "DismissalId": "cwk"
+        },
+        {
+          "Batsman": "132504",
+          "Runs": "5",
+          "Balls": "10",
+          "Fours": "1",
+          "Sixes": "0",
+          "Dots": "8",
+          "Strikerate": "50",
+          "Dismissal": "caught",
+          "Howout": "c Lakshya Raichandani b Chigurupati Venkata",
+          "Howout_short": "c L Raichandani b C Venkata",
+          "Bowler": "139584",
+          "Fielder": "136728",
+          "RunScoredInLastBalls": {
+            "10": "5"
+          },
+          "Number": 3,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "124869",
+          "Runs": "8",
+          "Balls": "43",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "35",
+          "Strikerate": "18.60",
+          "Dismissal": "caught",
+          "Howout": "c Pranav Raghavendra b Jeganathan Hemchudeshan",
+          "Howout_short": "c P Raghavendra b J Hemchudeshan",
+          "Bowler": "129956",
+          "Fielder": "128866",
+          "RunScoredInLastBalls": {
+            "10": "1",
+            "20": "2",
+            "30": "4"
+          },
+          "Number": 4,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "129219",
+          "Runs": "7",
+          "Balls": "35",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "30",
+          "Strikerate": "20",
+          "Dismissal": "caught",
+          "Howout": "c sub Manav Krishna b Pranav Raghavendra",
+          "Howout_short": "c sub M Krishna b P Raghavendra",
+          "Bowler": "128866",
+          "Fielder": "131211",
+          "RunScoredInLastBalls": {
+            "10": "2",
+            "20": "3",
+            "30": "5"
+          },
+          "Number": 5,
+          "Caughtby": "131211",
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "129226",
+          "Runs": "21",
+          "Balls": "35",
+          "Fours": "3",
+          "Sixes": "0",
+          "Dots": "26",
+          "Strikerate": "60",
+          "Dismissal": "bowled",
+          "Howout": "b Chigurupati Venkata",
+          "Howout_short": "b C Venkata",
+          "Bowler": "139584",
+          "Fielder": "",
+          "RunScoredInLastBalls": {
+            "10": "4",
+            "20": "12",
+            "30": "21"
+          },
+          "Number": 6,
+          "DismissalType": "bowled",
+          "DismissalId": "b"
+        },
+        {
+          "Batsman": "129215",
+          "Runs": "31",
+          "Balls": "37",
+          "Fours": "5",
+          "Sixes": "0",
+          "Dots": "22",
+          "Strikerate": "83.78",
+          "Dismissal": "bowled",
+          "Howout": "b Rohit Yadav",
+          "Howout_short": "b R Yadav",
+          "Bowler": "139575",
+          "Fielder": "",
+          "RunScoredInLastBalls": {
+            "10": "8",
+            "20": "18",
+            "30": "25"
+          },
+          "Number": 7,
+          "DismissalType": "bowled",
+          "DismissalId": "b"
+        },
+        {
+          "Batsman": "134868",
+          "Runs": "0",
+          "Balls": "13",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "13",
+          "Strikerate": "0",
+          "Dismissal": "bowled",
+          "Howout": "b Rohit Yadav",
+          "Howout_short": "b R Yadav",
+          "Bowler": "139575",
+          "Fielder": "",
+          "RunScoredInLastBalls": {
+            "10": "0"
+          },
+          "Number": 8,
+          "DismissalType": "bowled",
+          "DismissalId": "b"
+        },
+        {
+          "Batsman": "136042",
+          "Runs": "4",
+          "Balls": "15",
+          "Fours": "1",
+          "Sixes": "0",
+          "Dots": "14",
+          "Strikerate": "26.66",
+          "Dismissal": "",
+          "Howout": "Batting",
+          "Howout_short": "Batting",
+          "Bowler": "",
+          "Fielder": "",
+          "Isbatting": true,
+          "Isonstrike": true,
+          "RunScoredInLastBalls": {
+            "10": "4"
+          },
+          "Number": 9,
+          "DismissalType": "",
+          "DismissalId": ""
+        },
+        {
+          "Batsman": "139938",
+          "Runs": "4",
+          "Balls": "11",
+          "Fours": "1",
+          "Sixes": "0",
+          "Dots": "10",
+          "Strikerate": "36.36",
+          "Dismissal": "",
+          "Howout": "Batting",
+          "Howout_short": "Batting",
+          "Bowler": "",
+          "Fielder": "",
+          "Isbatting": true,
+          "RunScoredInLastBalls": {
+            "10": "4"
+          },
+          "Number": 10,
+          "DismissalType": "",
+          "DismissalId": ""
+        },
+        {
+          "Batsman": "132153",
+          "Runs": "",
+          "Balls": "",
+          "Fours": "",
+          "Sixes": "",
+          "Dots": "",
+          "Strikerate": "",
+          "Dismissal": "",
+          "Howout": "",
+          "Howout_short": "",
+          "Bowler": "",
+          "Fielder": "",
+          "Number": 11,
+          "DismissalType": "",
+          "DismissalId": ""
+        }
+      ],
+      "Partnership_Current": {
+        "Runs": "8",
+        "Balls": "17",
+        "ExtraRuns": "0",
+        "IsCurrent": "true",
+        "Batsmen": [
+          {
+            "Batsman": "139938",
+            "Runs": "4",
+            "Balls": "11"
+          },
+          {
+            "Batsman": "136042",
+            "Runs": "4",
+            "Balls": "6",
+            "IsStriker": true
+          }
+        ],
+        "ForWicket": 9,
+        "Runrate": "2.82",
+        "Runsperball": "0.47"
+      },
+      "Bowlers": [
+        {
+          "Bowler": "128866",
+          "Overs": "10",
+          "Balls_Bowled": "60",
+          "Maidens": "2",
+          "Runs": "28",
+          "Wickets": "2",
+          "Fours": "5",
+          "Sixes": "0",
+          "Economyrate": "2.80",
+          "Runsperball": "0.46",
+          "Noballs": "0",
+          "Wides": "1",
+          "Dots": "48",
+          "RungivenInLastBalls": {
+            "10": "5",
+            "20": "5",
+            "30": "7"
+          },
+          "Number": 1,
+          "Hattrick_Count": 0
+        },
+        {
+          "Bowler": "139578",
+          "Overs": "10",
+          "Balls_Bowled": "60",
+          "Maidens": "1",
+          "Runs": "34",
+          "Wickets": "1",
+          "Fours": "5",
+          "Sixes": "0",
+          "Economyrate": "3.40",
+          "Runsperball": "0.56",
+          "Noballs": "3",
+          "Wides": "1",
+          "Dots": "46",
+          "RungivenInLastBalls": {
+            "10": "6",
+            "20": "9",
+            "30": "12"
+          },
+          "Number": 2,
+          "Hattrick_Count": 0
+        },
+        {
+          "Bowler": "139584",
+          "Overs": "9",
+          "Balls_Bowled": "54",
+          "Maidens": "3",
+          "Runs": "23",
+          "Wickets": "2",
+          "Fours": "3",
+          "Sixes": "0",
+          "Economyrate": "2.55",
+          "Runsperball": "0.42",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "43",
+          "RungivenInLastBalls": {
+            "10": "5",
+            "20": "8",
+            "30": "17"
+          },
+          "Number": 3,
+          "Hattrick_Count": 0
+        },
+        {
+          "Bowler": "129956",
+          "Overs": "8",
+          "Balls_Bowled": "48",
+          "Maidens": "0",
+          "Runs": "29",
+          "Wickets": "1",
+          "Fours": "4",
+          "Sixes": "0",
+          "Economyrate": "3.62",
+          "Runsperball": "0.60",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "33",
+          "Isbowlingtandem": true,
+          "RungivenInLastBalls": {
+            "10": "4",
+            "20": "10",
+            "30": "17"
+          },
+          "Number": 4,
+          "Hattrick_Count": 0
+        },
+        {
+          "Bowler": "139575",
+          "Overs": "3",
+          "Balls_Bowled": "18",
+          "Maidens": "2",
+          "Runs": "4",
+          "Wickets": "2",
+          "Fours": "1",
+          "Sixes": "0",
+          "Economyrate": "1.33",
+          "Runsperball": "0.22",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "17",
+          "Isbowlingtandem": true,
+          "Isbowlingnow": true,
+          "ThisOver": [
+            {
+              "T": "",
+              "B": "0"
+            },
+            {
+              "T": "",
+              "B": "0"
+            },
+            {
+              "T": "",
+              "B": "0"
+            },
+            {
+              "T": "",
+              "B": "4"
+            },
+            {
+              "T": "",
+              "B": "0"
+            },
+            {
+              "T": "",
+              "B": "0"
+            }
+          ],
+          "RungivenInLastBalls": {
+            "10": "4"
+          },
+          "Number": 5,
+          "Hattrick_Count": 0
+        }
+      ],
+      "FallofWickets": [
+        {
+          "Batsman": "140310",
+          "Score": "35",
+          "Overs": "6.2",
+          "Wicket_No": 1,
+          "Review_status_id": 0,
+          "Ball_number": "38"
+        },
+        {
+          "Batsman": "132148",
+          "Score": "40",
+          "Overs": "7.5",
+          "Wicket_No": 2,
+          "Review_status_id": 0,
+          "Ball_number": "47"
+        },
+        {
+          "Batsman": "132504",
+          "Score": "44",
+          "Overs": "10.4",
+          "Wicket_No": 3,
+          "Review_status_id": 0,
+          "Ball_number": "64"
+        },
+        {
+          "Batsman": "129219",
+          "Score": "61",
+          "Overs": "19.4",
+          "Wicket_No": 4,
+          "Review_status_id": 0,
+          "Ball_number": "118"
+        },
+        {
+          "Batsman": "124869",
+          "Score": "79",
+          "Overs": "25",
+          "Wicket_No": 5,
+          "Review_status_id": 0,
+          "Ball_number": "150"
+        },
+        {
+          "Batsman": "129226",
+          "Score": "91",
+          "Overs": "29.4",
+          "Wicket_No": 6,
+          "Review_status_id": 0,
+          "Ball_number": "178"
+        },
+        {
+          "Batsman": "134868",
+          "Score": "113",
+          "Overs": "35.1",
+          "Wicket_No": 7,
+          "Review_status_id": 0,
+          "Ball_number": "211"
+        },
+        {
+          "Batsman": "129215",
+          "Score": "114",
+          "Overs": "37.1",
+          "Wicket_No": 8,
+          "Review_status_id": 0,
+          "Ball_number": "223"
+        }
+      ],
+      "Partnerships": [
+        {
+          "Runs": "35",
+          "Balls": "39",
+          "ExtraRuns": "2",
+          "Batsmen": [
+            {
+              "Batsman": "132148",
+              "Runs": "24",
+              "Balls": "24"
+            },
+            {
+              "Batsman": "140310",
+              "Runs": "9",
+              "Balls": "15"
+            }
+          ],
+          "ForWicket": 1
+        },
+        {
+          "Runs": "5",
+          "Balls": "9",
+          "ExtraRuns": "1",
+          "Batsmen": [
+            {
+              "Batsman": "132148",
+              "Runs": "0",
+              "Balls": "5"
+            },
+            {
+              "Batsman": "132504",
+              "Runs": "4",
+              "Balls": "4"
+            }
+          ],
+          "ForWicket": 2
+        },
+        {
+          "Runs": "4",
+          "Balls": "17",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "124869",
+              "Runs": "3",
+              "Balls": "11"
+            },
+            {
+              "Batsman": "132504",
+              "Runs": "1",
+              "Balls": "6"
+            }
+          ],
+          "ForWicket": 3
+        },
+        {
+          "Runs": "17",
+          "Balls": "56",
+          "ExtraRuns": "6",
+          "Batsmen": [
+            {
+              "Batsman": "124869",
+              "Runs": "4",
+              "Balls": "21"
+            },
+            {
+              "Batsman": "129219",
+              "Runs": "7",
+              "Balls": "35"
+            }
+          ],
+          "ForWicket": 4
+        },
+        {
+          "Runs": "18",
+          "Balls": "32",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "124869",
+              "Runs": "1",
+              "Balls": "11"
+            },
+            {
+              "Batsman": "129226",
+              "Runs": "17",
+              "Balls": "21"
+            }
+          ],
+          "ForWicket": 5
+        },
+        {
+          "Runs": "12",
+          "Balls": "28",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "129215",
+              "Runs": "8",
+              "Balls": "14"
+            },
+            {
+              "Batsman": "129226",
+              "Runs": "4",
+              "Balls": "14"
+            }
+          ],
+          "ForWicket": 6
+        },
+        {
+          "Runs": "22",
+          "Balls": "33",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "129215",
+              "Runs": "22",
+              "Balls": "20"
+            },
+            {
+              "Batsman": "134868",
+              "Runs": "0",
+              "Balls": "13"
+            }
+          ],
+          "ForWicket": 7
+        },
+        {
+          "Runs": "1",
+          "Balls": "12",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "129215",
+              "Runs": "1",
+              "Balls": "3"
+            },
+            {
+              "Batsman": "136042",
+              "Runs": "0",
+              "Balls": "9"
+            }
+          ],
+          "ForWicket": 8
+        },
+        {
+          "Runs": "8",
+          "Balls": "17",
+          "ExtraRuns": "0",
+          "IsCurrent": "true",
+          "Batsmen": [
+            {
+              "Batsman": "139938",
+              "Runs": "4",
+              "Balls": "11"
+            },
+            {
+              "Batsman": "136042",
+              "Runs": "4",
+              "Balls": "6",
+              "IsStriker": true
+            }
+          ],
+          "ForWicket": 9,
+          "Runrate": "2.82",
+          "Runsperball": "0.47"
+        }
+      ],
+      "LastOvers": {
+        "5": {
+          "Score": "9",
+          "Wicket": "2",
+          "Runrate": "1.80"
+        },
+        "10": {
+          "Score": "31",
+          "Wicket": "2",
+          "Runrate": "3.10"
+        }
+      },
+      "StartTimeStamp": "2026-07-21T14:42:09.000+0:00",
+      "OverNo": "40",
+      "BallNo": "6",
+      "Best_Performers": {
+        "Batsmen": [],
+        "Bowlers": []
+      }
+    }
+  ],
+  "Matchequation": {
+    "Team1_id": 1165,
+    "Team1_name": "Sri Lanka Under-19",
+    "Runs": 289,
+    "Wickets": 2,
+    "Raw_eq_type": 1,
+    "Equation": "Sri Lanka Under-19 trail by 289 runs with 2 wickets remaining",
+    "Eq_type": "trail_by"
+  },
+  "language": "eng",
+  "Timestamp": "07/21/2026T21:21:28.351+05:30",
+  "Matchdetail": {
+    "Team_Home": "1165",
+    "Team_Away": "1163",
+    "Match": {
+      "Livecoverage": "no",
+      "Id": "271827",
+      "Code": "sluinu07202026271827",
+      "League": "youth_international",
+      "League_Id": "9",
+      "Number": "2nd Youth Test",
+      "Type": "Youth Test",
+      "Date": "7/20/2026",
+      "Time": "10:00",
+      "Revised_time_utc": "",
+      "Offset": "+05:30",
+      "Group": "",
+      "Coverage_level_id": "5",
+      "Coverage_level": "Delayed Scorecard and Ball-by-Ball (by 15 minutes)",
+      "Match_ordinal": "2",
+      "Daynight": "no",
+      "Comp_type_id": "21",
+      "End_date": "7/23/2026",
+      "End_time": "17:00",
+      "Upcoming": false,
+      "Live": true,
+      "Recent": false,
+      "StartDate": "7/20/2026T04:30+00:00",
+      "is_provisional_date": false,
+      "is_provisional_time": false,
+      "match_in_progress": true,
+      "is_rescheduled": false,
+      "first_ball_bowled": true
+    },
+    "Series": {
+      "Id": "15655",
+      "Name": "India Under-19 in Sri Lanka, 2 Youth Test Series, 2026",
+      "Series_short_display_name": "IND-U19 in SL, 2 Youth Tests, 2026",
+      "Series_start_date": "7/13/2026",
+      "Series_end_date": "7/23/2026",
+      "Series_end_date_ist": "7/23/2026",
+      "Series_end_date_gmt": "7/23/2026",
+      "Series_start_date_ist": "7/13/2026",
+      "Series_start_date_gmt": "7/13/2026",
+      "Series_type": "Series",
+      "Status": "2 Test series level 0-0",
+      "Tour": "12608",
+      "Tour_Name": "India Under-19 tour of Sri Lanka, 2026",
+      "Has_standings": "false",
+      "Is_series_lastmatch": true,
+      "Calendar_file_name": "calendar_new_youth_international",
+      "Streaming_platform": [],
+      "Broadcasting_platform": [],
+      "is_provisional_date": false,
+      "Series_match_count": 2,
+      "Series_completed": false
+    },
+    "Venue": {
+      "Id": "131",
+      "Name": "R.Premadasa Stadium, Colombo",
+      "Country": "Sri Lanka",
+      "City": "Colombo",
+      "Latitude": "6.939788",
+      "Longitude": "79.872066",
+      "Venue_Weather": {
+        "Weather_Id": "16",
+        "Weather": "Clouds",
+        "Description": "overcast clouds",
+        "Humidity": "85%",
+        "Temperature": "27.83C",
+        "Visibility": "10000 meter",
+        "Wind_Speed": "2.74 meter/sec",
+        "Rain": ""
+      },
+      "Pitch_Detail": {
+        "Pitch_Suited_For_Id": "1",
+        "Pitch_Suited_For": "Batting friendly",
+        "Pitch_Surface_Id": "2",
+        "Pitch_Surface": "Damp"
+      },
+      "Neutralvenue": "false"
+    },
+    "Officials": {
+      "Umpires": "Deepal Gunawardene (SL), Sanjeewa Fernando (SL) and No TV Umpire",
+      "Referee": "Ravi Punchihewa (SL)",
+      "Referee_Id": "63408",
+      "Umpire1_Name": "Deepal Gunawardene (SL)",
+      "Umpire2_Name": "Sanjeewa Fernando (SL)",
+      "Umpire3_Name": "No TV Umpire",
+      "Umpire1_Id": "32601",
+      "Umpire2_Id": "63794",
+      "Umpire3_Id": "0"
+    },
+    "Weather": "Overcast",
+    "Tosswonby": "1165",
+    "Toss_elected_to": "field",
+    "Status": "Stumps",
+    "Status_Id": "120",
+    "Match_display_status": "Stumps",
+    "Day": "2",
+    "Overs_Remaining": "0.0",
+    "Session": "3",
+    "Equation": "Sri Lanka Under-19 trail by 289 runs",
+    "Lineup_status": 2
+  },
+  "SerialNumber": 1460,
+  "Nuggets": [],
+  "Teams": {
+    "1163": {
+      "Name_Full": "India Under-19",
+      "Name_Short": "IND-U19",
+      "Players": {
+        "128866": {
+          "Position": "10",
+          "Name_Full": "Pranav Raghavendra",
+          "Name_Short": "P Raghavendra",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "2",
+            "Strikerate": "33.33",
+            "Runs": "2"
+          },
+          "Bowling": {
+            "Style": "RM",
+            "Average": "29.50",
+            "Economyrate": "3.30",
+            "Wickets": "4"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 4,
+          "nationality": "India",
+          "prev_match_played": true
+        },
+        "129956": {
+          "Position": "8",
+          "Name_Full": "Jeganathan Hemchudeshan",
+          "Name_Short": "J Hemchudeshan",
+          "Skill": "3",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "2",
+            "Strikerate": "44.44",
+            "Runs": "4"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "48.25",
+            "Economyrate": "4.68",
+            "Wickets": "4"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 4,
+          "nationality": "India",
+          "prev_match_played": true
+        },
+        "136728": {
+          "Position": "2",
+          "Name_Full": "Lakshya Raichandani",
+          "Name_Short": "L Raichandani",
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "103.50",
+            "Strikerate": "63.30",
+            "Runs": "207"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 4,
+          "nationality": "India",
+          "prev_match_played": true
+        },
+        "139569": {
+          "Position": "3",
+          "Name_Full": "Sagar Virk",
+          "Name_Short": "S Virk",
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "67",
+            "Strikerate": "40.60",
+            "Runs": "134"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "0",
+            "Economyrate": "2.50",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 4,
+          "nationality": "India",
+          "prev_match_played": true
+        },
+        "139570": {
+          "Position": "1",
+          "Name_Full": "Yashbardhan Chauhan",
+          "Name_Short": "Y Chauhan",
+          "Iscaptain": true,
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "42",
+            "Strikerate": "75",
+            "Runs": "84"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "18.20",
+            "Economyrate": "5.05",
+            "Wickets": "5"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 4,
+          "nationality": "India",
+          "prev_match_played": true
+        },
+        "139572": {
+          "Position": "4",
+          "Name_Full": "Kushagra Ojha",
+          "Name_Short": "K Ojha",
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "67.50",
+            "Strikerate": "57.93",
+            "Runs": "135"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 4,
+          "nationality": "India",
+          "prev_match_played": true
+        },
+        "139575": {
+          "Position": "11",
+          "Name_Full": "Rohit Yadav",
+          "Name_Short": "R Yadav",
+          "Skill": "3",
+          "Skill_Name": "All-Rounder",
+          "Role": "All-Rounder",
+          "Confirm_XI": true,
+          "Matches": "1",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "0",
+            "Strikerate": "0",
+            "Runs": "0"
+          },
+          "Bowling": {
+            "Style": "LBG",
+            "Average": "2",
+            "Economyrate": "1.33",
+            "Wickets": "2"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 4,
+          "nationality": "India",
+          "prev_match_played": false
+        },
+        "139578": {
+          "Position": "9",
+          "Name_Full": "Kavya Patel",
+          "Name_Short": "K Patel",
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "7",
+            "Strikerate": "35.89",
+            "Runs": "14"
+          },
+          "Bowling": {
+            "Style": "RM",
+            "Average": "35.33",
+            "Economyrate": "3.78",
+            "Wickets": "3"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 4,
+          "nationality": "India",
+          "prev_match_played": true
+        },
+        "139581": {
+          "Position": "6",
+          "Name_Full": "Manal Chauhan",
+          "Name_Short": "M Chauhan",
+          "Skill": "3",
+          "Skill_Name": "All-Rounder",
+          "Role": "All-Rounder",
+          "Confirm_XI": true,
+          "Matches": "1",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "150",
+            "Strikerate": "61.47",
+            "Runs": "150"
+          },
+          "Bowling": {
+            "Style": "SLO",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 4,
+          "nationality": "India",
+          "prev_match_played": false
+        },
+        "139582": {
+          "Position": "5",
+          "Name_Full": "Aryan Sakpal",
+          "Name_Short": "A Sakpal",
+          "Iskeeper": true,
+          "Skill": "4",
+          "Skill_Name": "Wicket Keeper",
+          "Role": "Wicket Keeper",
+          "Confirm_XI": true,
+          "Matches": "1",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "10",
+            "Strikerate": "37.03",
+            "Runs": "10"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 4,
+          "nationality": "India",
+          "prev_match_played": false
+        },
+        "139584": {
+          "Position": "7",
+          "Name_Full": "Chigurupati Venkata",
+          "Name_Short": "C Venkata",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "1",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "25",
+            "Strikerate": "75.75",
+            "Runs": "25"
+          },
+          "Bowling": {
+            "Style": "",
+            "Average": "11.50",
+            "Economyrate": "2.55",
+            "Wickets": "2"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 4,
+          "nationality": "India",
+          "prev_match_played": false
+        }
+      }
+    },
+    "1165": {
+      "Name_Full": "Sri Lanka Under-19",
+      "Name_Short": "SL-U19",
+      "Players": {
+        "124869": {
+          "Position": "4",
+          "Name_Full": "Vimath Dinsara",
+          "Name_Short": "V Dinsara",
+          "Iscaptain": true,
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "21.33",
+            "Strikerate": "39.50",
+            "Runs": "64"
+          },
+          "Bowling": {
+            "Style": "LB",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 8,
+          "nationality": "Sri Lanka",
+          "prev_match_played": true
+        },
+        "129215": {
+          "Position": "6",
+          "Name_Full": "Dulnith Sigera",
+          "Name_Short": "D Sigera",
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "34.33",
+            "Strikerate": "88.03",
+            "Runs": "103"
+          },
+          "Bowling": {
+            "Style": "RM",
+            "Average": "46",
+            "Economyrate": "3.20",
+            "Wickets": "3"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 8,
+          "nationality": "Sri Lanka",
+          "prev_match_played": true
+        },
+        "129219": {
+          "Position": "10",
+          "Name_Full": "Kavija Gamage",
+          "Name_Short": "K Gamage",
+          "Skill": "3",
+          "Skill_Name": "All-Rounder",
+          "Role": "All-Rounder",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "35.66",
+            "Strikerate": "48.19",
+            "Runs": "107"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "85",
+            "Economyrate": "3.79",
+            "Wickets": "2"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 8,
+          "nationality": "Sri Lanka",
+          "prev_match_played": true
+        },
+        "129226": {
+          "Position": "11",
+          "Name_Full": "Viran Chamuditha",
+          "Name_Short": "V Chamuditha",
+          "Skill": "3",
+          "Skill_Name": "All-Rounder",
+          "Role": "All-Rounder",
+          "Confirm_XI": true,
+          "Matches": "1",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "21",
+            "Strikerate": "60",
+            "Runs": "21"
+          },
+          "Bowling": {
+            "Style": "SLO",
+            "Average": "0",
+            "Economyrate": "7",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 8,
+          "nationality": "Sri Lanka",
+          "prev_match_played": false
+        },
+        "132148": {
+          "Position": "1",
+          "Name_Full": "Dimantha Mahavithana",
+          "Name_Short": "D Mahavithana",
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "8.66",
+            "Strikerate": "63.41",
+            "Runs": "26"
+          },
+          "Bowling": {
+            "Style": "RMF",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 8,
+          "nationality": "Sri Lanka",
+          "prev_match_played": true
+        },
+        "132153": {
+          "Position": "9",
+          "Name_Full": "Vigneshwaran Akash",
+          "Name_Short": "V Akash",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "1",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "0",
+            "Strikerate": "0",
+            "Runs": "0"
+          },
+          "Bowling": {
+            "Style": "LBG",
+            "Average": "25",
+            "Economyrate": "2.72",
+            "Wickets": "2"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 8,
+          "nationality": "Sri Lanka",
+          "prev_match_played": false
+        },
+        "132504": {
+          "Position": "3",
+          "Name_Full": "Senuja Wekunagoda",
+          "Name_Short": "S Wekunagoda",
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "121",
+            "Strikerate": "83.73",
+            "Runs": "242"
+          },
+          "Bowling": {
+            "Style": "",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 8,
+          "nationality": "Sri Lanka",
+          "prev_match_played": true
+        },
+        "134868": {
+          "Position": "5",
+          "Name_Full": "Jason Fernando",
+          "Name_Short": "J Fernando",
+          "Iskeeper": true,
+          "Skill": "4",
+          "Skill_Name": "Wicket Keeper",
+          "Role": "Wicket Keeper",
+          "Confirm_XI": true,
+          "Matches": "2",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "4.33",
+            "Strikerate": "30.23",
+            "Runs": "13"
+          },
+          "Bowling": {
+            "Style": "",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 8,
+          "nationality": "Sri Lanka",
+          "prev_match_played": true
+        },
+        "136042": {
+          "Position": "7",
+          "Name_Full": "Sethmika Seneviratne",
+          "Name_Short": "S Seneviratne",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "1",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "0",
+            "Strikerate": "26.66",
+            "Runs": "4"
+          },
+          "Bowling": {
+            "Style": "RM",
+            "Average": "45",
+            "Economyrate": "3.60",
+            "Wickets": "2"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 8,
+          "nationality": "Sri Lanka",
+          "prev_match_played": false
+        },
+        "139938": {
+          "Position": "8",
+          "Name_Full": "Gimhan Mendis",
+          "Name_Short": "G Mendis",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "1",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "0",
+            "Strikerate": "36.36",
+            "Runs": "4"
+          },
+          "Bowling": {
+            "Style": "LM",
+            "Average": "34",
+            "Economyrate": "4.08",
+            "Wickets": "3"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 8,
+          "nationality": "Sri Lanka",
+          "prev_match_played": false
+        },
+        "140310": {
+          "Position": "2",
+          "Name_Full": "Aveesha Samash",
+          "Name_Short": "A Samash",
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "1",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "9",
+            "Strikerate": "60",
+            "Runs": "9"
+          },
+          "Bowling": {
+            "Style": "",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 8,
+          "nationality": "Sri Lanka",
+          "prev_match_played": false
+        }
+      }
+    }
+  },
+  "createdTime": "2026-07-20T11:00:18+5:30",
+  "lastUpdatedTime": "2026-07-21T15:51:34+5:30",
+  "Notes": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": [],
+    "5": []
+  },
+  "matchId": "271827",
+  "commentary": [
+    {
+      "Ball": "6",
+      "commentaryTimestamp": 1784657054000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Commentary": "No run.",
+      "Over_No": "40",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Bowler_Conceded_Runs": "0",
+      "OID": 20245,
+      "This_Over": "0,0,0,4,0,0,",
+      "UID": 20245,
+      "Score": "122/8",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "3",
+        "Maidens": "2",
+        "Runs": "4",
+        "Wickets": "2"
+      },
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "245",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\",\"\",\"\",\"\",\"\",\"\"",
+      "Non_Striker": "136042",
+      "Timestamp": "2026-07-21T18:04:14+05:30",
+      "Runs": "0",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.6",
+      "Default_Commentary": "39.6: Rohit Yadav to Gimhan Mendis, No run.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "End_Over": true,
+      "Bowler": "139575",
+      "Ball_Number": "240",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "4",
+        "Balls": "11",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "type_id": 0,
+      "Batsman_Runs": "0",
+      "Batsman_Style": "L",
+      "Created_Timestamp": "2026-07-21T18:04:14+05:30",
+      "Summary": {
+        "Score": "122/8",
+        "Over": "40",
+        "Runs": "4",
+        "Wickets": "0",
+        "Batsmen": [
+          {
+            "Batsman": "139938",
+            "Isonstrike": true,
+            "Runs": "4",
+            "Balls": "11",
+            "Fours": "1",
+            "Sixes": "0"
+          },
+          {
+            "Batsman": "136042",
+            "Runs": "4",
+            "Balls": "15",
+            "Fours": "1",
+            "Sixes": "0"
+          }
+        ],
+        "Bowlers": [
+          {
+            "Bowler": "139575",
+            "Overs": "3",
+            "Maidens": "2",
+            "Runs": "4",
+            "Wickets": "2",
+            "Ball_bowled": "18",
+            "Dot_balls": "17"
+          }
+        ],
+        "Balls": "240",
+        "Current_runrate": "3.05"
+      },
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Session": "3"
+    },
+    {
+      "Ball": "6",
+      "commentaryTimestamp": 1784657054000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Commentary": "No run.",
+      "Over_No": "40",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Bowler_Conceded_Runs": "0",
+      "OID": 20245,
+      "This_Over": "0,0,0,4,0,0,",
+      "UID": 20245,
+      "Score": "122/8",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "3",
+        "Maidens": "2",
+        "Runs": "4",
+        "Wickets": "2"
+      },
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "245",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\",\"\",\"\",\"\",\"\",\"\"",
+      "Non_Striker": "136042",
+      "Timestamp": "2026-07-21T18:04:14+05:30",
+      "Runs": "0",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.6",
+      "Default_Commentary": "39.6: Rohit Yadav to Gimhan Mendis, No run.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "End_Over": true,
+      "Bowler": "139575",
+      "Ball_Number": "240",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "4",
+        "Balls": "11",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "type_id": 0,
+      "Batsman_Runs": "0",
+      "Batsman_Style": "L",
+      "Created_Timestamp": "2026-07-21T18:04:14+05:30",
+      "Summary": {
+        "Score": "122/8",
+        "Over": "40",
+        "Runs": "4",
+        "Wickets": "0",
+        "Batsmen": [
+          {
+            "Batsman": "139938",
+            "Isonstrike": true,
+            "Runs": "4",
+            "Balls": "11",
+            "Fours": "1",
+            "Sixes": "0"
+          },
+          {
+            "Batsman": "136042",
+            "Runs": "4",
+            "Balls": "15",
+            "Fours": "1",
+            "Sixes": "0"
+          }
+        ],
+        "Bowlers": [
+          {
+            "Bowler": "139575",
+            "Overs": "3",
+            "Maidens": "2",
+            "Runs": "4",
+            "Wickets": "2",
+            "Ball_bowled": "18",
+            "Dot_balls": "17"
+          }
+        ],
+        "Balls": "240",
+        "Current_runrate": "3.05"
+      },
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Session": "3"
+    },
+    {
+      "Ball": "5",
+      "Non_Striker": "136042",
+      "commentaryTimestamp": 1784657053000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Timestamp": "2026-07-21T18:04:13+05:30",
+      "Runs": "0",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.5",
+      "Default_Commentary": "39.5: Rohit Yadav to Gimhan Mendis, No run.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "Bowler": "139575",
+      "Ball_Number": "239",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "4",
+        "Balls": "10",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Commentary": "No run.",
+      "Over_No": "40",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "type_id": 0,
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Batsman_Runs": "0",
+      "Bowler_Conceded_Runs": "0",
+      "OID": 20244,
+      "This_Over": "0,0,0,4,0,",
+      "UID": 20244,
+      "Score": "122/8",
+      "Batsman_Style": "L",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "2.5",
+        "Maidens": "2",
+        "Runs": "4",
+        "Wickets": "2"
+      },
+      "Created_Timestamp": "2026-07-21T18:04:12+05:30",
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "244",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\",\"\",\"\",\"\",\"\"",
+      "Session": "3"
+    },
+    {
+      "Ball": "5",
+      "Non_Striker": "136042",
+      "commentaryTimestamp": 1784657053000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Timestamp": "2026-07-21T18:04:13+05:30",
+      "Runs": "0",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.5",
+      "Default_Commentary": "39.5: Rohit Yadav to Gimhan Mendis, No run.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "Bowler": "139575",
+      "Ball_Number": "239",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "4",
+        "Balls": "10",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Commentary": "No run.",
+      "Over_No": "40",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "type_id": 0,
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Batsman_Runs": "0",
+      "Bowler_Conceded_Runs": "0",
+      "OID": 20244,
+      "This_Over": "0,0,0,4,0,",
+      "UID": 20244,
+      "Score": "122/8",
+      "Batsman_Style": "L",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "2.5",
+        "Maidens": "2",
+        "Runs": "4",
+        "Wickets": "2"
+      },
+      "Created_Timestamp": "2026-07-21T18:04:12+05:30",
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "244",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\",\"\",\"\",\"\",\"\"",
+      "Session": "3"
+    },
+    {
+      "Ball": "4",
+      "Non_Striker": "136042",
+      "commentaryTimestamp": 1784657051000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Timestamp": "2026-07-21T18:04:11+05:30",
+      "Runs": "4",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.4",
+      "Default_Commentary": "39.4: Rohit Yadav to Gimhan Mendis, Four.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "Bowler": "139575",
+      "Ball_Number": "238",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "4",
+        "Balls": "9",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Commentary": "Four.",
+      "Over_No": "40",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "type_id": 0,
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Batsman_Runs": "4",
+      "Bowler_Conceded_Runs": "4",
+      "OID": 20243,
+      "Isboundary": true,
+      "This_Over": "0,0,0,4,",
+      "UID": 20243,
+      "Score": "122/8",
+      "Batsman_Style": "L",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "2.4",
+        "Maidens": "2",
+        "Runs": "4",
+        "Wickets": "2"
+      },
+      "Created_Timestamp": "2026-07-21T18:04:11+05:30",
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "243",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\",\"\",\"\",\"\"",
+      "Session": "3"
+    },
+    {
+      "Ball": "4",
+      "Non_Striker": "136042",
+      "commentaryTimestamp": 1784657051000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Timestamp": "2026-07-21T18:04:11+05:30",
+      "Runs": "4",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.4",
+      "Default_Commentary": "39.4: Rohit Yadav to Gimhan Mendis, Four.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "Bowler": "139575",
+      "Ball_Number": "238",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "4",
+        "Balls": "9",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Commentary": "Four.",
+      "Over_No": "40",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "type_id": 0,
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Batsman_Runs": "4",
+      "Bowler_Conceded_Runs": "4",
+      "OID": 20243,
+      "Isboundary": true,
+      "This_Over": "0,0,0,4,",
+      "UID": 20243,
+      "Score": "122/8",
+      "Batsman_Style": "L",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "2.4",
+        "Maidens": "2",
+        "Runs": "4",
+        "Wickets": "2"
+      },
+      "Created_Timestamp": "2026-07-21T18:04:11+05:30",
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "243",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\",\"\",\"\",\"\"",
+      "Session": "3"
+    },
+    {
+      "Ball": "3",
+      "Non_Striker": "136042",
+      "commentaryTimestamp": 1784657049000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Timestamp": "2026-07-21T18:04:09+05:30",
+      "Runs": "0",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.3",
+      "Default_Commentary": "39.3: Rohit Yadav to Gimhan Mendis, No run.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "Bowler": "139575",
+      "Ball_Number": "237",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "0",
+        "Balls": "8",
+        "Fours": "0",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Commentary": "No run.",
+      "Over_No": "40",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "type_id": 0,
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Batsman_Runs": "0",
+      "Bowler_Conceded_Runs": "0",
+      "OID": 20242,
+      "This_Over": "0,0,0,",
+      "UID": 20242,
+      "Score": "118/8",
+      "Batsman_Style": "L",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "2.3",
+        "Maidens": "2",
+        "Runs": "0",
+        "Wickets": "2"
+      },
+      "Created_Timestamp": "2026-07-21T18:04:09+05:30",
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "242",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\",\"\",\"\"",
+      "Session": "3"
+    },
+    {
+      "Ball": "3",
+      "Non_Striker": "136042",
+      "commentaryTimestamp": 1784657049000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Timestamp": "2026-07-21T18:04:09+05:30",
+      "Runs": "0",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.3",
+      "Default_Commentary": "39.3: Rohit Yadav to Gimhan Mendis, No run.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "Bowler": "139575",
+      "Ball_Number": "237",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "0",
+        "Balls": "8",
+        "Fours": "0",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Commentary": "No run.",
+      "Over_No": "40",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "type_id": 0,
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Batsman_Runs": "0",
+      "Bowler_Conceded_Runs": "0",
+      "OID": 20242,
+      "This_Over": "0,0,0,",
+      "UID": 20242,
+      "Score": "118/8",
+      "Batsman_Style": "L",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "2.3",
+        "Maidens": "2",
+        "Runs": "0",
+        "Wickets": "2"
+      },
+      "Created_Timestamp": "2026-07-21T18:04:09+05:30",
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "242",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\",\"\",\"\"",
+      "Session": "3"
+    },
+    {
+      "Ball": "2",
+      "Non_Striker": "136042",
+      "commentaryTimestamp": 1784657047000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Timestamp": "2026-07-21T18:04:07+05:30",
+      "Runs": "0",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.2",
+      "Default_Commentary": "39.2: Rohit Yadav to Gimhan Mendis, No run.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "Bowler": "139575",
+      "Ball_Number": "236",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "0",
+        "Balls": "7",
+        "Fours": "0",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Commentary": "No run.",
+      "Over_No": "40",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "type_id": 0,
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Batsman_Runs": "0",
+      "Bowler_Conceded_Runs": "0",
+      "OID": 20241,
+      "This_Over": "0,0,",
+      "UID": 20241,
+      "Score": "118/8",
+      "Batsman_Style": "L",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "2.2",
+        "Maidens": "2",
+        "Runs": "0",
+        "Wickets": "2"
+      },
+      "Created_Timestamp": "2026-07-21T18:04:07+05:30",
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "241",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\",\"\"",
+      "Session": "3"
+    },
+    {
+      "Ball": "2",
+      "Non_Striker": "136042",
+      "commentaryTimestamp": 1784657047000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Timestamp": "2026-07-21T18:04:07+05:30",
+      "Runs": "0",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.2",
+      "Default_Commentary": "39.2: Rohit Yadav to Gimhan Mendis, No run.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "Bowler": "139575",
+      "Ball_Number": "236",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "0",
+        "Balls": "7",
+        "Fours": "0",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Commentary": "No run.",
+      "Over_No": "40",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "type_id": 0,
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Batsman_Runs": "0",
+      "Bowler_Conceded_Runs": "0",
+      "OID": 20241,
+      "This_Over": "0,0,",
+      "UID": 20241,
+      "Score": "118/8",
+      "Batsman_Style": "L",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "2.2",
+        "Maidens": "2",
+        "Runs": "0",
+        "Wickets": "2"
+      },
+      "Created_Timestamp": "2026-07-21T18:04:07+05:30",
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "241",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\",\"\"",
+      "Session": "3"
+    },
+    {
+      "Ball": "1",
+      "Non_Striker": "136042",
+      "commentaryTimestamp": 1784657045000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Timestamp": "2026-07-21T18:04:05+05:30",
+      "Runs": "0",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.1",
+      "Default_Commentary": "39.1: Rohit Yadav to Gimhan Mendis, No run.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "Bowler": "139575",
+      "Ball_Number": "235",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "0",
+        "Balls": "6",
+        "Fours": "0",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Commentary": "No run.",
+      "Over_No": "40",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "type_id": 0,
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Batsman_Runs": "0",
+      "Bowler_Conceded_Runs": "0",
+      "OID": 20240,
+      "This_Over": "0,",
+      "UID": 20240,
+      "Score": "118/8",
+      "Batsman_Style": "L",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "2.1",
+        "Maidens": "2",
+        "Runs": "0",
+        "Wickets": "2"
+      },
+      "Created_Timestamp": "2026-07-21T18:04:05+05:30",
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "240",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\"",
+      "Session": "3"
+    },
+    {
+      "Ball": "1",
+      "Non_Striker": "136042",
+      "commentaryTimestamp": 1784657045000,
+      "Batsman": "139938",
+      "Shot_type_id": "",
+      "language": "eng",
+      "Timestamp": "2026-07-21T18:04:05+05:30",
+      "Runs": "0",
+      "Batsman_Short_Name": "G Mendis",
+      "Over": "39.1",
+      "Default_Commentary": "39.1: Rohit Yadav to Gimhan Mendis, No run.",
+      "Ball_Speed": "",
+      "Ball_Line_Length": "",
+      "Bowler": "139575",
+      "Ball_Number": "235",
+      "Batsman_Details": {
+        "Batsman": "139938",
+        "Runs": "0",
+        "Balls": "6",
+        "Fours": "0",
+        "Sixes": "0"
+      },
+      "Isball": true,
+      "Shot_type": "",
+      "matchId": "271827",
+      "Commentary": "No run.",
+      "Over_No": "40",
+      "Edited_Commentary": 0,
+      "Bowler_Name": "Rohit Yadav",
+      "Bowler_Short_Name": "R Yadav",
+      "Batsman_Name": "Gimhan Mendis",
+      "Milestone": [],
+      "type_id": 0,
+      "Non_Striker_Name": "Sethmika Seneviratne",
+      "Batsman_Runs": "0",
+      "Bowler_Conceded_Runs": "0",
+      "OID": 20240,
+      "This_Over": "0,",
+      "UID": 20240,
+      "Score": "118/8",
+      "Batsman_Style": "L",
+      "Bowler_Details": {
+        "Bowler": "139575",
+        "Overs": "2.1",
+        "Maidens": "2",
+        "Runs": "0",
+        "Wickets": "2"
+      },
+      "Created_Timestamp": "2026-07-21T18:04:05+05:30",
+      "inning": "2",
+      "_id": {
+        "timestamp": 1784637258,
+        "date": "2026-07-21T12:34:18.000+00:00"
+      },
+      "Id": "240",
+      "Non_Striker_Short_Name": "S Seneviratne",
+      "ZAD": "",
+      "Non_Striker_Details": {
+        "Batsman": "136042",
+        "Runs": "4",
+        "Balls": "15",
+        "Fours": "1",
+        "Sixes": "0"
+      },
+      "Day": "2",
+      "Detail": "",
+      "Ball_Speed_This_Over": "\"\"",
+      "Session": "3"
+    }
+  ],
+  "timestamp": "2026-07-21T21:21:34"
+}

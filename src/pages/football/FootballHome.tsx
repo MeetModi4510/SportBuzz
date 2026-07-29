@@ -300,8 +300,8 @@ export default function FootballHome() {
             ) : !trendingPlayersData?.data || trendingPlayersData.data.length === 0 ? (
               <div className="py-20 text-center flex flex-col items-center justify-center bg-foreground/5 rounded-2xl border border-border">
                 <TrendingUp size={32} className="mx-auto text-muted-foreground/20 mb-3" />
-                <p className="text-muted-foreground font-medium text-sm">Trending players will appear once the API key is configured.</p>
-                <p className="text-muted-foreground/40 text-xs mt-1">Set ALLSPORTS_API_FOOTBALL_TRENDING_PLAYERS in server/.env</p>
+                <p className="text-muted-foreground font-medium text-sm">No trending players at the moment.</p>
+                <p className="text-muted-foreground/40 text-xs mt-1">Check back later for updates</p>
               </div>
             ) : (
               <div className="flex overflow-x-auto gap-5 pb-6 pt-2 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
